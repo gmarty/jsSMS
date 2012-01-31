@@ -55,16 +55,16 @@
                 <arg line="--externs ${closure-compiler.dir}/contrib/externs/jquery-1.7.js" />
                 <arg line="--externs source/build/externs/fullscreen.js" />
                 <arg line="--externs source/build/externs/jquery.ajaxsettings.js" />
-                <arg line="--define='DEBUG=true'" />
+                <arg line="--define 'DEBUG=true'" />
                 <arg line="--debug true" />
                 <arg line="--formatting pretty_print" />
             </extraflags>
         </closure-compile>
-        <replace file="${build.dir}/jssms.adv.js" token="JSCompiler_alias_NULL" value="null" />
-        <replace file="${build.dir}/jssms.adv.js" token="JSCompiler_alias_TRUE" value="true" />
-        <replace file="${build.dir}/jssms.adv.js" token="JSCompiler_alias_FALSE" value="false" />
+        <replace file="${build.dir}/jssms.adv.js" token="$null$$" value="null" />
+        <replace file="${build.dir}/jssms.adv.js" token="$true$$" value="true" />
+        <replace file="${build.dir}/jssms.adv.js" token="$false$$" value="false" />
         <replace file="${build.dir}/jssms.adv.js" token="void 0" value="undefined" />
-        <replace file="${build.dir}/jssms.adv.js" token="var true = !0, null = null, false = !1;" value="" />
+        <replace file="${build.dir}/jssms.adv.js" token="var true = true, null = null, false = false;" value="" />
         <exec executable="fixjsstyle">
           <arg line="--strict" />
           <arg line="${build.dir}/jssms.adv.js" />
