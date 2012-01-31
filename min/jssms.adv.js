@@ -128,6 +128,9 @@ $JSSMS$$.prototype = {$isRunning$: $false$$, $cyclesPerLine$: 0, $no_of_scanline
   return'' !== this.$romData$ && '' !== this.$romFileName$ ? this.$readRomDirectly$(this.$romData$, this.$romFileName$) : $false$$;
 }};
 function $JSSMS$Utils$copyArray$$($src$$2$$) {
+  if (undefined === $src$$2$$) {
+    return [];
+  }
   for (var $i$$3$$ = $src$$2$$.length, $dest$$1$$ = Array($i$$3$$); $i$$3$$--;) {
     'undefined' != typeof $src$$2$$[$i$$3$$] && ($dest$$1$$[$i$$3$$] = $src$$2$$[$i$$3$$]);
   }
@@ -1789,7 +1792,8 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   this.$f$ = $carry$$1$$ | this.$SZP_TABLE$[$value$$52$$];
   return $value$$52$$;
 }, $rl$: function $$JSSMS$Z80$$$$$rl$$($value$$53$$) {
-  var $carry$$2$$ = ($value$$53$$ & 128) >> 7, $value$$53$$ = ($value$$53$$ << 1 | this.$f$ & 1) & 255;
+  var $carry$$2$$ = ($value$$53$$ & 128) >> 7;
+  $value$$53$$ = ($value$$53$$ << 1 | this.$f$ & 1) & 255;
   this.$f$ = $carry$$2$$ | this.$SZP_TABLE$[$value$$53$$];
   return $value$$53$$;
 }, $rr$: function $$JSSMS$Z80$$$$$rr$$($value$$54$$) {
@@ -1797,7 +1801,8 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   this.$f$ = $carry$$3$$ | this.$SZP_TABLE$[$value$$54$$];
   return $value$$54$$;
 }, $sla$: function $$JSSMS$Z80$$$$$sla$$($value$$55$$) {
-  var $carry$$4$$ = ($value$$55$$ & 128) >> 7, $value$$55$$ = $value$$55$$ << 1 & 255;
+  var $carry$$4$$ = ($value$$55$$ & 128) >> 7;
+  $value$$55$$ = $value$$55$$ << 1 & 255;
   this.$f$ = $carry$$4$$ | this.$SZP_TABLE$[$value$$55$$];
   return $value$$55$$;
 }, $sll$: function $$JSSMS$Z80$$$$$sll$$($value$$56$$) {
@@ -1809,7 +1814,8 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   this.$f$ = $carry$$6$$ | this.$SZP_TABLE$[$value$$57$$];
   return $value$$57$$;
 }, $srl$: function $$JSSMS$Z80$$$$$srl$$($value$$58$$) {
-  var $carry$$7$$ = $value$$58$$ & 1, $value$$58$$ = $value$$58$$ >> 1 & 255;
+  var $carry$$7$$ = $value$$58$$ & 1;
+  $value$$58$$ = $value$$58$$ >> 1 & 255;
   this.$f$ = $carry$$7$$ | this.$SZP_TABLE$[$value$$58$$];
   return $value$$58$$;
 }, $bit$: function $$JSSMS$Z80$$$$$bit$$($mask$$5$$) {
@@ -2411,7 +2417,8 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
       this.$pc$--;
   }
 }, $doIndexCB$: function $$JSSMS$Z80$$$$$doIndexCB$$($index$$52_location$$24$$) {
-  var $index$$52_location$$24$$ = $index$$52_location$$24$$ + this.$d_$() & 65535, $opcode$$6$$ = this.$readMem$(++this.$pc$);
+  $index$$52_location$$24$$ = $index$$52_location$$24$$ + this.$d_$() & 65535;
+  var $opcode$$6$$ = this.$readMem$(++this.$pc$);
   this.$tstates$ -= $OP_INDEX_CB_STATES$$[$opcode$$6$$];
   switch ($opcode$$6$$) {
     case 6:
@@ -2685,7 +2692,8 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
       this.$pc$ += 3;
       break;
     case 103:
-      var $a_copy_location$$25_opcode$$7_temp$$4$$ = this.$getHL$(), $hlmem$$ = this.$readMem$($a_copy_location$$25_opcode$$7_temp$$4$$);
+      $a_copy_location$$25_opcode$$7_temp$$4$$ = this.$getHL$();
+      var $hlmem$$ = this.$readMem$($a_copy_location$$25_opcode$$7_temp$$4$$);
       this.$writeMem$($a_copy_location$$25_opcode$$7_temp$$4$$, $hlmem$$ >> 4 | (this.$a$ & 15) << 4);
       this.$a$ = this.$a$ & 240 | $hlmem$$ & 15;
       this.$f$ = this.$f$ & 1 | this.$SZP_TABLE$[this.$a$];
@@ -2922,7 +2930,8 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   this.$f$ = this.$SZHVC_ADD_TABLE$[this.$a$ << 8 | $temp$$5_value$$60$$];
   this.$a$ = $temp$$5_value$$60$$;
 }, $adc_a$: function $$JSSMS$Z80$$$$$adc_a$$($temp$$6_value$$61$$) {
-  var $carry$$9$$ = this.$f$ & 1, $temp$$6_value$$61$$ = this.$a$ + $temp$$6_value$$61$$ + $carry$$9$$ & 255;
+  var $carry$$9$$ = this.$f$ & 1;
+  $temp$$6_value$$61$$ = this.$a$ + $temp$$6_value$$61$$ + $carry$$9$$ & 255;
   this.$f$ = this.$SZHVC_ADD_TABLE$[$carry$$9$$ << 16 | this.$a$ << 8 | $temp$$6_value$$61$$];
   this.$a$ = $temp$$6_value$$61$$;
 }, $sub_a$: function $$JSSMS$Z80$$$$$sub_a$$($temp$$7_value$$62$$) {
@@ -3525,7 +3534,8 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
   }
   8 <= $sprites$$[0] && (this.status |= 64);
 }, $drawBGColour$: function $$JSSMS$Vdp$$$$$drawBGColour$$($lineno$$5_row_precal$$1$$) {
-  var $colour$$3$$ = this.$CRAM$[16 + (this.$vdpreg$[7] & 15)], $lineno$$5_row_precal$$1$$ = $lineno$$5_row_precal$$1$$ << 8, $i$$15$$;
+  $lineno$$5_row_precal$$1$$ = $lineno$$5_row_precal$$1$$ << 8;
+  var $colour$$3$$ = this.$CRAM$[16 + (this.$vdpreg$[7] & 15)], $i$$15$$;
   for ($i$$15$$ = 0; 256 > $i$$15$$; $i$$15$$++) {
     this.display[$lineno$$5_row_precal$$1$$++] = $colour$$3$$;
   }
@@ -3609,7 +3619,8 @@ function $JSSMS$DummyUI$$($sms$$4$$) {
 'undefined' !== typeof $ && ($.fn.$JSSMSUI$ = function $$$fn$$JSSMSUI$$($roms$$) {
   function $UI$$($root_sms$$5$$) {
     this.$main$ = $root_sms$$5$$;
-    var $self$$2$$ = this, $root_sms$$5$$ = $('<div></div>'), $romContainer$$ = $('<div class="roms"></div>'), $controls$$ = $('<div class="controls"></div>'), $fullscreenSupport$$ = $JSSMS$Utils$getPrefix$$(['fullscreenEnabled', 'mozFullScreenEnabled', 'webkitCancelFullScreen']);
+    $root_sms$$5$$ = $('<div></div>');
+    var $self$$2$$ = this, $romContainer$$ = $('<div class="roms"></div>'), $controls$$ = $('<div class="controls"></div>'), $fullscreenSupport$$ = $JSSMS$Utils$getPrefix$$(['fullscreenEnabled', 'mozFullScreenEnabled', 'webkitCancelFullScreen']);
     this.$hiddenPrefix$ = $JSSMS$Utils$getPrefix$$(['hidden', 'mozHidden', 'webkitHidden', 'msHidden']);
     this.screen = $('<canvas width=256 height=192 class="screen"></canvas>');
     this.$canvasContext$ = this.screen[0].getContext('2d');
@@ -3754,5 +3765,4 @@ $JSSMS$Ports$$.prototype = {reset: function $$JSSMS$Ports$$$$reset$() {
 }};
 window.JSSMS = $JSSMS$$;
 jQuery.fn.JSSMSUI = jQuery.fn.$JSSMSUI$;
-var $console$$;
-
+var $console$$ = console;
