@@ -42,7 +42,6 @@
                 <arg line="--js source/build/exports.js" />
                 <arg line="--externs ${closure-compiler.dir}/contrib/externs/jquery-1.7.js" />
                 <arg line="--externs source/build/externs/fullscreen.js" />
-                <arg line="--externs source/build/externs/jquery.ajaxsettings.js" />
                 <arg line="--define 'DEBUG=false'" />
                 <arg line="--debug false" />
             </extraflags>
@@ -55,7 +54,6 @@
                 <arg line="--js source/build/exports.js" />
                 <arg line="--externs ${closure-compiler.dir}/contrib/externs/jquery-1.7.js" />
                 <arg line="--externs source/build/externs/fullscreen.js" />
-                <arg line="--externs source/build/externs/jquery.ajaxsettings.js" />
                 <arg line="--define 'DEBUG=true'" />
                 <arg line="--debug true" />
                 <arg line="--formatting pretty_print" />
@@ -78,7 +76,6 @@
                 <arg line="--js source/build/exports.js" />
                 <arg line="--externs ${closure-compiler.dir}/contrib/externs/jquery-1.7.js" />
                 <arg line="--externs source/build/externs/fullscreen.js" />
-                <arg line="--externs source/build/externs/jquery.ajaxsettings.js" />
                 <arg line="--debug true" />
                 <arg line="--formatting pretty_print" />
             </extraflags>
