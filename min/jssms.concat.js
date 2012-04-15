@@ -219,6 +219,9 @@ JSSMS.Utils = {rndInt: function(range) {
     dest[destPos + i] = src[srcPos + i];
   }
 }, copyArray: function(src) {
+  if (src === undefined) {
+    return [];
+  }
   var i = src.length, dest = new Array(i);
   while (i--) {
     if (typeof src[i] != 'undefined') {

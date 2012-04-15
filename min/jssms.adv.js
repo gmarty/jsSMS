@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-'use strict';var $true$$ = !0, $null$$ = null, $false$$ = !1;
+'use strict';var $JSCompiler_alias_TRUE$$ = !0, $JSCompiler_alias_NULL$$ = null, $JSCompiler_alias_FALSE$$ = !1;
 function $JSCompiler_emptyFn$$() {
   return function() {
   }
@@ -36,7 +36,7 @@ function $JSCompiler_emptyFn$$() {
   this.$cpu$ = new $JSSMS$Z80$$(this);
   this.$ui$.updateStatus('Ready to load a ROM.');
 }
-$JSSMS$$.prototype = {$isRunning$: $false$$, $cyclesPerLine$: 0, $no_of_scanlines$: 0, $frameSkip$: 0, $fps$: 0, $frameskip_counter$: 0, $pause_button$: $false$$, $is_sms$: $true$$, $is_gg$: $false$$, $soundEnabled$: $false$$, $fpsFrameCount$: 0, $z80TimeCounter$: 0, $drawTimeCounter$: 0, $frameCount$: 0, $romData$: '', $romFileName$: '', reset: function $$JSSMS$$$$reset$() {
+$JSSMS$$.prototype = {$isRunning$: $JSCompiler_alias_FALSE$$, $cyclesPerLine$: 0, $no_of_scanlines$: 0, $frameSkip$: 0, $fps$: 0, $frameskip_counter$: 0, $pause_button$: $JSCompiler_alias_FALSE$$, $is_sms$: $JSCompiler_alias_TRUE$$, $is_gg$: $JSCompiler_alias_FALSE$$, $soundEnabled$: $JSCompiler_alias_FALSE$$, $fpsFrameCount$: 0, $z80TimeCounter$: 0, $drawTimeCounter$: 0, $frameCount$: 0, $romData$: '', $romFileName$: '', reset: function $$JSSMS$$$$reset$() {
   this.$setVideoTiming$(this.$vdp$.$videoMode$);
   this.$frameCount$ = 0;
   this.$frameskip_counter$ = this.$frameSkip$;
@@ -45,10 +45,10 @@ $JSSMS$$.prototype = {$isRunning$: $false$$, $cyclesPerLine$: 0, $no_of_scanline
   this.$vdp$.reset();
   this.ports.reset();
   this.$cpu$.reset();
-  this.$cpu$.$resetMemory$($null$$);
+  this.$cpu$.$resetMemory$($JSCompiler_alias_NULL$$);
 }, start: function $$JSSMS$$$$start$() {
   var $self$$1$$ = this;
-  this.$isRunning$ || (this.$isRunning$ = $true$$);
+  this.$isRunning$ || (this.$isRunning$ = $JSCompiler_alias_TRUE$$);
   this.$frameInterval$ = setInterval(function() {
     $self$$1$$.frame();
   }, 17);
@@ -60,7 +60,7 @@ $JSSMS$$.prototype = {$isRunning$: $false$$, $cyclesPerLine$: 0, $no_of_scanline
 }, stop: function $$JSSMS$$$$stop$() {
   clearInterval(this.$frameInterval$);
   clearInterval(this.$fpsInterval$);
-  this.$isRunning$ = $false$$;
+  this.$isRunning$ = $JSCompiler_alias_FALSE$$;
 }, frame: function $$JSSMS$$$$frame$() {
   this.$emulateNextFrame$() && this.$doRepaint$();
   this.$fpsFrameCount$++;
@@ -70,23 +70,23 @@ $JSSMS$$.prototype = {$isRunning$: $false$$, $cyclesPerLine$: 0, $no_of_scanline
     $startTime$$1$$ = +new Date, 193 == $lineno$$ ? (this.$cpu$.$run$(this.$cyclesPerLine$, 8), this.$vdp$.$setVBlankFlag$(), this.$cpu$.$run$(0, 0)) : this.$cpu$.$run$(this.$cyclesPerLine$, 0), this.$z80TimeCounter$ += +new Date - $startTime$$1$$, this.$vdp$.$line$ = $lineno$$, 0 == this.$frameskip_counter$ && 192 > $lineno$$ && ($startTime$$1$$ = +new Date, this.$vdp$.$drawLine$($lineno$$), this.$drawTimeCounter$ += +new Date - $startTime$$1$$), this.$vdp$.$interrupts$($lineno$$);
   }
   60 == ++this.$frameCount$ && (this.$frameCount$ = this.$drawTimeCounter$ = this.$z80TimeCounter$ = 0);
-  this.$pause_button$ && (this.$cpu$.$nmi$(), this.$pause_button$ = $false$$);
-  return 0 == this.$frameskip_counter$-- ? (this.$frameskip_counter$ = this.$frameSkip$, $true$$) : $false$$;
+  this.$pause_button$ && (this.$cpu$.$nmi$(), this.$pause_button$ = $JSCompiler_alias_FALSE$$);
+  return 0 == this.$frameskip_counter$-- ? (this.$frameskip_counter$ = this.$frameSkip$, $JSCompiler_alias_TRUE$$) : $JSCompiler_alias_FALSE$$;
 }, $setSMS$: function $$JSSMS$$$$$setSMS$$() {
-  this.$is_sms$ = $true$$;
-  this.$is_gg$ = $false$$;
+  this.$is_sms$ = $JSCompiler_alias_TRUE$$;
+  this.$is_gg$ = $JSCompiler_alias_FALSE$$;
   this.$vdp$.$h_start$ = 0;
   this.$vdp$.$h_end$ = 32;
 }, $setGG$: function $$JSSMS$$$$$setGG$$() {
-  this.$is_gg$ = $true$$;
-  this.$is_sms$ = $false$$;
+  this.$is_gg$ = $JSCompiler_alias_TRUE$$;
+  this.$is_sms$ = $JSCompiler_alias_FALSE$$;
   this.$vdp$.$h_start$ = 5;
   this.$vdp$.$h_end$ = 27;
-}, $setVideoTiming$: function $$JSSMS$$$$$setVideoTiming$$($mode$$7$$) {
+}, $setVideoTiming$: function $$JSSMS$$$$$setVideoTiming$$($mode$$8$$) {
   var $clockSpeedHz$$ = 0;
-  0 == $mode$$7$$ || this.$is_gg$ ? (this.$fps$ = 60, this.$no_of_scanlines$ = 262, $clockSpeedHz$$ = 3579545) : 1 == $mode$$7$$ && (this.$fps$ = 50, this.$no_of_scanlines$ = 313, $clockSpeedHz$$ = 3546893);
+  0 == $mode$$8$$ || this.$is_gg$ ? (this.$fps$ = 60, this.$no_of_scanlines$ = 262, $clockSpeedHz$$ = 3579545) : 1 == $mode$$8$$ && (this.$fps$ = 50, this.$no_of_scanlines$ = 313, $clockSpeedHz$$ = 3546893);
   this.$cyclesPerLine$ = Math.round($clockSpeedHz$$ / this.$fps$ / this.$no_of_scanlines$ + 1);
-  this.$vdp$.$videoMode$ = $mode$$7$$;
+  this.$vdp$.$videoMode$ = $mode$$8$$;
 }, $doRepaint$: function $$JSSMS$$$$$doRepaint$$() {
   this.$ui$.$writeFrame$(this.$vdp$.display, []);
 }, $printFps$: function $$JSSMS$$$$$printFps$$() {
@@ -96,36 +96,36 @@ $JSSMS$$.prototype = {$isRunning$: $false$$, $cyclesPerLine$: 0, $no_of_scanline
   this.$fpsFrameCount$ = 0;
   this.$lastFpsTime$ = $now$$;
 }, $resetFps$: function $$JSSMS$$$$$resetFps$$() {
-  this.$lastFpsTime$ = $null$$;
+  this.$lastFpsTime$ = $JSCompiler_alias_NULL$$;
   this.$fpsFrameCount$ = 0;
-}, $readRomDirectly$: function $$JSSMS$$$$$readRomDirectly$$($data$$28$$, $fileName$$) {
-  var $mode$$8_pages$$;
-  $mode$$8_pages$$ = '.gg' === $fileName$$.substr(-3).toLowerCase() ? 2 : 1;
-  var $size$$9$$ = $data$$28$$.length;
-  1 == $mode$$8_pages$$ ? this.$setSMS$() : 2 == $mode$$8_pages$$ && this.$setGG$();
+}, $readRomDirectly$: function $$JSSMS$$$$$readRomDirectly$$($data$$30$$, $fileName$$) {
+  var $mode$$9_pages$$;
+  $mode$$9_pages$$ = '.gg' === $fileName$$.substr(-3).toLowerCase() ? 2 : 1;
+  var $size$$9$$ = $data$$30$$.length;
+  1 == $mode$$9_pages$$ ? this.$setSMS$() : 2 == $mode$$9_pages$$ && this.$setGG$();
   if (1024 >= $size$$9$$) {
-    return $false$$;
+    return $JSCompiler_alias_FALSE$$;
   }
-  $mode$$8_pages$$ = this.$loadROM$($data$$28$$, $size$$9$$);
-  if ($mode$$8_pages$$ == $null$$) {
-    return $false$$;
+  $mode$$9_pages$$ = this.$loadROM$($data$$30$$, $size$$9$$);
+  if ($mode$$9_pages$$ == $JSCompiler_alias_NULL$$) {
+    return $JSCompiler_alias_FALSE$$;
   }
-  this.$cpu$.$resetMemory$($mode$$8_pages$$);
-  this.$romData$ = $data$$28$$;
+  this.$cpu$.$resetMemory$($mode$$9_pages$$);
+  this.$romData$ = $data$$30$$;
   this.$romFileName$ = $fileName$$;
-  return $true$$;
-}, $loadROM$: function $$JSSMS$$$$$loadROM$$($data$$29$$, $size$$10$$) {
-  0 != $size$$10$$ % 1024 && ($data$$29$$ = $data$$29$$.substr(512), $size$$10$$ -= 512);
+  return $JSCompiler_alias_TRUE$$;
+}, $loadROM$: function $$JSSMS$$$$$loadROM$$($data$$31$$, $size$$10$$) {
+  0 != $size$$10$$ % 1024 && ($data$$31$$ = $data$$31$$.substr(512), $size$$10$$ -= 512);
   var $i$$1$$, $j$$, $number_of_pages$$ = Math.round($size$$10$$ / 1024), $pages$$1$$ = Array($number_of_pages$$);
   for ($i$$1$$ = 0; $i$$1$$ < $number_of_pages$$; $i$$1$$++) {
     $pages$$1$$[$i$$1$$] = Array(1024);
     for ($j$$ = 0; 1024 > $j$$; $j$$++) {
-      $pages$$1$$[$i$$1$$][$j$$] = $data$$29$$.charCodeAt(1024 * $i$$1$$ + $j$$) & 255;
+      $pages$$1$$[$i$$1$$][$j$$] = $data$$31$$.charCodeAt(1024 * $i$$1$$ + $j$$) & 255;
     }
   }
   return $pages$$1$$;
 }, $reloadRom$: function $$JSSMS$$$$$reloadRom$$() {
-  return'' !== this.$romData$ && '' !== this.$romFileName$ ? this.$readRomDirectly$(this.$romData$, this.$romFileName$) : $false$$;
+  return'' !== this.$romData$ && '' !== this.$romFileName$ ? this.$readRomDirectly$(this.$romData$, this.$romFileName$) : $JSCompiler_alias_FALSE$$;
 }};
 function $JSSMS$Utils$copyArray$$($src$$2$$) {
   if (undefined === $src$$2$$) {
@@ -137,9 +137,9 @@ function $JSSMS$Utils$copyArray$$($src$$2$$) {
   return $dest$$1$$;
 }
 function $JSSMS$Utils$getPrefix$$($arr$$16$$) {
-  var $prefix$$2$$ = $false$$;
+  var $prefix$$2$$ = $JSCompiler_alias_FALSE$$;
   $arr$$16$$.some(function($prop$$4$$) {
-    return $prop$$4$$ in document ? ($prefix$$2$$ = $prop$$4$$, $true$$) : $false$$;
+    return $prop$$4$$ in document ? ($prefix$$2$$ = $prop$$4$$, $JSCompiler_alias_TRUE$$) : $JSCompiler_alias_FALSE$$;
   });
   return $prefix$$2$$;
 }
@@ -156,11 +156,11 @@ function $JSSMS$Z80$$($sms$$) {
   this.$main$ = $sms$$;
   this.port = $sms$$.ports;
   this.$im$ = this.$sp$ = this.$pc$ = 0;
-  this.$interruptLine$ = this.$EI_inst$ = this.$halt$ = this.$iff2$ = this.$iff1$ = $false$$;
+  this.$interruptLine$ = this.$EI_inst$ = this.$halt$ = this.$iff2$ = this.$iff1$ = $JSCompiler_alias_FALSE$$;
   this.$tstates$ = this.$f2$ = this.$f$ = this.$i$ = this.$iyH$ = this.$iyL$ = this.$ixH$ = this.$ixL$ = this.$l2$ = this.$h2$ = this.$l$ = this.$h$ = this.$e2$ = this.$d2$ = this.$e$ = this.$d$ = this.$c2$ = this.$b2$ = this.$c$ = this.$b$ = this.$a2$ = this.$a$ = this.$interruptVector$ = 0;
   this.$rom$ = [];
   this.$ram$ = Array(8);
-  this.$sram$ = $null$$;
+  this.$sram$ = $JSCompiler_alias_NULL$$;
   this.$frameReg$ = Array(4);
   this.$number_of_pages$ = 0;
   this.$memWriteMap$ = Array(65);
@@ -181,14 +181,14 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   this.$pc$ = this.$f2$ = this.$f$ = this.$i$ = this.$iyL$ = this.$iyH$ = this.$ixL$ = this.$ixH$ = this.$h$ = this.$l$ = this.$h2$ = this.$l2$ = this.$d$ = this.$e$ = this.$d2$ = this.$e2$ = this.$b$ = this.$c$ = this.$b2$ = this.$c2$ = this.$a$ = this.$a2$ = 0;
   this.$sp$ = 57328;
   this.$im$ = this.$tstates$ = 0;
-  this.$EI_inst$ = this.$iff2$ = this.$iff1$ = $false$$;
+  this.$EI_inst$ = this.$iff2$ = this.$iff1$ = $JSCompiler_alias_FALSE$$;
   this.$interruptVector$ = 0;
-  this.$halt$ = $false$$;
+  this.$halt$ = $JSCompiler_alias_FALSE$$;
 }, $run$: function $$JSSMS$Z80$$$$$run$$($cycles$$, $cyclesTo$$) {
   for (this.$tstates$ += $cycles$$; this.$tstates$ > $cyclesTo$$;) {
     this.$interruptLine$ && this.$interrupt$();
     var $location$$21_opcode$$2_temp$$ = this.$readMem$(this.$pc$++);
-    this.$EI_inst$ = $false$$;
+    this.$EI_inst$ = $JSCompiler_alias_FALSE$$;
     this.$tstates$ -= $OP_STATES$$[$location$$21_opcode$$2_temp$$];
     switch ($location$$21_opcode$$2_temp$$) {
       case 1:
@@ -540,7 +540,7 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
         this.$writeMem$(this.$getHL$(), this.$l$);
         break;
       case 118:
-        this.$halt$ = $true$$;
+        this.$halt$ = $JSCompiler_alias_TRUE$$;
         this.$pc$--;
         break;
       case 119:
@@ -937,8 +937,8 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
         this.$jp$(0 == (this.$f$ & 128));
         break;
       case 243:
-        this.$iff1$ = this.$iff2$ = $false$$;
-        this.$EI_inst$ = $true$$;
+        this.$iff1$ = this.$iff2$ = $JSCompiler_alias_FALSE$$;
+        this.$EI_inst$ = $JSCompiler_alias_TRUE$$;
         break;
       case 244:
         this.call(0 == (this.$f$ & 128));
@@ -963,7 +963,7 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
         this.$jp$(0 != (this.$f$ & 128));
         break;
       case 251:
-        this.$iff1$ = this.$iff2$ = this.$EI_inst$ = $true$$;
+        this.$iff1$ = this.$iff2$ = this.$EI_inst$ = $JSCompiler_alias_TRUE$$;
         break;
       case 252:
         this.call(0 != (this.$f$ & 128));
@@ -980,13 +980,13 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   }
 }, $nmi$: function $$JSSMS$Z80$$$$$nmi$$() {
   this.$iff2$ = this.$iff1$;
-  this.$iff1$ = $false$$;
-  this.$halt$ && (this.$pc$++, this.$halt$ = $false$$);
+  this.$iff1$ = $JSCompiler_alias_FALSE$$;
+  this.$halt$ && (this.$pc$++, this.$halt$ = $JSCompiler_alias_FALSE$$);
   this.push(this.$pc$);
   this.$pc$ = 102;
   this.$tstates$ -= 11;
 }, $interrupt$: function $$JSSMS$Z80$$$$$interrupt$$() {
-  this.$iff1$ && !this.$EI_inst$ && (this.$halt$ && (this.$pc$++, this.$halt$ = $false$$), this.$interruptLine$ = this.$iff1$ = this.$iff2$ = $false$$, this.push(this.$pc$), 0 == this.$im$ ? (this.$pc$ = 0 == this.$interruptVector$ || 255 == this.$interruptVector$ ? 56 : this.$interruptVector$, this.$tstates$ -= 13) : 1 == this.$im$ ? (this.$pc$ = 56, this.$tstates$ -= 13) : (this.$pc$ = this.$readMemWord$((this.$i$ << 8) + this.$interruptVector$), this.$tstates$ -=
+  this.$iff1$ && !this.$EI_inst$ && ((this.$halt$ && (this.$pc$++, this.$halt$ = $JSCompiler_alias_FALSE$$), this.$interruptLine$ = this.$iff1$ = this.$iff2$ = $JSCompiler_alias_FALSE$$, this.push(this.$pc$), 0 == this.$im$) ? (this.$pc$ = 0 == this.$interruptVector$ || 255 == this.$interruptVector$ ? 56 : this.$interruptVector$, this.$tstates$ -= 13) : 1 == this.$im$ ? (this.$pc$ = 56, this.$tstates$ -= 13) : (this.$pc$ = this.$readMemWord$((this.$i$ << 8) + this.$interruptVector$), this.$tstates$ -=
       19));
 }, $jp$: function $$JSSMS$Z80$$$$$jp$$($condition$$1$$) {
   this.$pc$ = $condition$$1$$ ? this.$readMemWord$(this.$pc$) : this.$pc$ + 2;
@@ -996,8 +996,8 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   $condition$$3$$ ? (this.push(this.$pc$ + 2), this.$pc$ = this.$readMemWord$(this.$pc$), this.$tstates$ -= 7) : this.$pc$ += 2;
 }, $ret$: function $$JSSMS$Z80$$$$$ret$$($condition$$4$$) {
   $condition$$4$$ && (this.$pc$ = this.$readMemWord$(this.$sp$), this.$sp$ += 2, this.$tstates$ -= 6);
-}, push: function $$JSSMS$Z80$$$$push$($value$$50$$, $l$$) {
-  'undefined' === typeof $l$$ ? (this.$writeMem$(--this.$sp$, $value$$50$$ >> 8), this.$writeMem$(--this.$sp$, $value$$50$$ & 255)) : (this.$writeMem$(--this.$sp$, $value$$50$$), this.$writeMem$(--this.$sp$, $l$$));
+}, push: function $$JSSMS$Z80$$$$push$($value$$48$$, $l$$) {
+  'undefined' === typeof $l$$ ? (this.$writeMem$(--this.$sp$, $value$$48$$ >> 8), this.$writeMem$(--this.$sp$, $value$$48$$ & 255)) : (this.$writeMem$(--this.$sp$, $value$$48$$), this.$writeMem$(--this.$sp$, $l$$));
 }, $incMem$: function $$JSSMS$Z80$$$$$incMem$$($offset$$14$$) {
   this.$writeMem$($offset$$14$$, this.$inc8$(this.$readMem$($offset$$14$$)));
 }, $decMem$: function $$JSSMS$Z80$$$$$decMem$$($offset$$15$$) {
@@ -1781,43 +1781,40 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
       this.$a$ |= 128;
       break;
     default:
-      $console$$.log('Unimplemented CB Opcode: ' + $opcode$$3$$.toString(16));
+      console.log('Unimplemented CB Opcode: ' + $opcode$$3$$.toString(16));
   }
-}, $rlc$: function $$JSSMS$Z80$$$$$rlc$$($value$$51$$) {
-  var $carry$$ = ($value$$51$$ & 128) >> 7, $value$$51$$ = ($value$$51$$ << 1 | $value$$51$$ >> 7) & 255;
-  this.$f$ = $carry$$ | this.$SZP_TABLE$[$value$$51$$];
+}, $rlc$: function $$JSSMS$Z80$$$$$rlc$$($value$$49$$) {
+  var $carry$$ = ($value$$49$$ & 128) >> 7, $value$$49$$ = ($value$$49$$ << 1 | $value$$49$$ >> 7) & 255;
+  this.$f$ = $carry$$ | this.$SZP_TABLE$[$value$$49$$];
+  return $value$$49$$;
+}, $rrc$: function $$JSSMS$Z80$$$$$rrc$$($value$$50$$) {
+  var $carry$$1$$ = $value$$50$$ & 1, $value$$50$$ = ($value$$50$$ >> 1 | $value$$50$$ << 7) & 255;
+  this.$f$ = $carry$$1$$ | this.$SZP_TABLE$[$value$$50$$];
+  return $value$$50$$;
+}, $rl$: function $$JSSMS$Z80$$$$$rl$$($value$$51$$) {
+  var $carry$$2$$ = ($value$$51$$ & 128) >> 7, $value$$51$$ = ($value$$51$$ << 1 | this.$f$ & 1) & 255;
+  this.$f$ = $carry$$2$$ | this.$SZP_TABLE$[$value$$51$$];
   return $value$$51$$;
-}, $rrc$: function $$JSSMS$Z80$$$$$rrc$$($value$$52$$) {
-  var $carry$$1$$ = $value$$52$$ & 1, $value$$52$$ = ($value$$52$$ >> 1 | $value$$52$$ << 7) & 255;
-  this.$f$ = $carry$$1$$ | this.$SZP_TABLE$[$value$$52$$];
+}, $rr$: function $$JSSMS$Z80$$$$$rr$$($value$$52$$) {
+  var $carry$$3$$ = $value$$52$$ & 1, $value$$52$$ = ($value$$52$$ >> 1 | this.$f$ << 7) & 255;
+  this.$f$ = $carry$$3$$ | this.$SZP_TABLE$[$value$$52$$];
   return $value$$52$$;
-}, $rl$: function $$JSSMS$Z80$$$$$rl$$($value$$53$$) {
-  var $carry$$2$$ = ($value$$53$$ & 128) >> 7;
-  $value$$53$$ = ($value$$53$$ << 1 | this.$f$ & 1) & 255;
-  this.$f$ = $carry$$2$$ | this.$SZP_TABLE$[$value$$53$$];
+}, $sla$: function $$JSSMS$Z80$$$$$sla$$($value$$53$$) {
+  var $carry$$4$$ = ($value$$53$$ & 128) >> 7, $value$$53$$ = $value$$53$$ << 1 & 255;
+  this.$f$ = $carry$$4$$ | this.$SZP_TABLE$[$value$$53$$];
   return $value$$53$$;
-}, $rr$: function $$JSSMS$Z80$$$$$rr$$($value$$54$$) {
-  var $carry$$3$$ = $value$$54$$ & 1, $value$$54$$ = ($value$$54$$ >> 1 | this.$f$ << 7) & 255;
-  this.$f$ = $carry$$3$$ | this.$SZP_TABLE$[$value$$54$$];
+}, $sll$: function $$JSSMS$Z80$$$$$sll$$($value$$54$$) {
+  var $carry$$5$$ = ($value$$54$$ & 128) >> 7, $value$$54$$ = ($value$$54$$ << 1 | 1) & 255;
+  this.$f$ = $carry$$5$$ | this.$SZP_TABLE$[$value$$54$$];
   return $value$$54$$;
-}, $sla$: function $$JSSMS$Z80$$$$$sla$$($value$$55$$) {
-  var $carry$$4$$ = ($value$$55$$ & 128) >> 7;
-  $value$$55$$ = $value$$55$$ << 1 & 255;
-  this.$f$ = $carry$$4$$ | this.$SZP_TABLE$[$value$$55$$];
+}, $sra$: function $$JSSMS$Z80$$$$$sra$$($value$$55$$) {
+  var $carry$$6$$ = $value$$55$$ & 1, $value$$55$$ = $value$$55$$ >> 1 | $value$$55$$ & 128;
+  this.$f$ = $carry$$6$$ | this.$SZP_TABLE$[$value$$55$$];
   return $value$$55$$;
-}, $sll$: function $$JSSMS$Z80$$$$$sll$$($value$$56$$) {
-  var $carry$$5$$ = ($value$$56$$ & 128) >> 7, $value$$56$$ = ($value$$56$$ << 1 | 1) & 255;
-  this.$f$ = $carry$$5$$ | this.$SZP_TABLE$[$value$$56$$];
+}, $srl$: function $$JSSMS$Z80$$$$$srl$$($value$$56$$) {
+  var $carry$$7$$ = $value$$56$$ & 1, $value$$56$$ = $value$$56$$ >> 1 & 255;
+  this.$f$ = $carry$$7$$ | this.$SZP_TABLE$[$value$$56$$];
   return $value$$56$$;
-}, $sra$: function $$JSSMS$Z80$$$$$sra$$($value$$57$$) {
-  var $carry$$6$$ = $value$$57$$ & 1, $value$$57$$ = $value$$57$$ >> 1 | $value$$57$$ & 128;
-  this.$f$ = $carry$$6$$ | this.$SZP_TABLE$[$value$$57$$];
-  return $value$$57$$;
-}, $srl$: function $$JSSMS$Z80$$$$$srl$$($value$$58$$) {
-  var $carry$$7$$ = $value$$58$$ & 1;
-  $value$$58$$ = $value$$58$$ >> 1 & 255;
-  this.$f$ = $carry$$7$$ | this.$SZP_TABLE$[$value$$58$$];
-  return $value$$58$$;
 }, $bit$: function $$JSSMS$Z80$$$$$bit$$($mask$$5$$) {
   this.$f$ = this.$f$ & 1 | this.$SZ_BIT_TABLE$[$mask$$5$$];
 }, $doIndexOpIX$: function $$JSSMS$Z80$$$$$doIndexOpIX$$($location$$22_opcode$$4_temp$$2$$) {
@@ -2416,109 +2413,108 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
     default:
       this.$pc$--;
   }
-}, $doIndexCB$: function $$JSSMS$Z80$$$$$doIndexCB$$($index$$52_location$$24$$) {
-  $index$$52_location$$24$$ = $index$$52_location$$24$$ + this.$d_$() & 65535;
-  var $opcode$$6$$ = this.$readMem$(++this.$pc$);
+}, $doIndexCB$: function $$JSSMS$Z80$$$$$doIndexCB$$($index$$44_location$$24$$) {
+  var $index$$44_location$$24$$ = $index$$44_location$$24$$ + this.$d_$() & 65535, $opcode$$6$$ = this.$readMem$(++this.$pc$);
   this.$tstates$ -= $OP_INDEX_CB_STATES$$[$opcode$$6$$];
   switch ($opcode$$6$$) {
     case 6:
-      this.$writeMem$($index$$52_location$$24$$, this.$rlc$(this.$readMem$($index$$52_location$$24$$)));
+      this.$writeMem$($index$$44_location$$24$$, this.$rlc$(this.$readMem$($index$$44_location$$24$$)));
       break;
     case 14:
-      this.$writeMem$($index$$52_location$$24$$, this.$rrc$(this.$readMem$($index$$52_location$$24$$)));
+      this.$writeMem$($index$$44_location$$24$$, this.$rrc$(this.$readMem$($index$$44_location$$24$$)));
       break;
     case 22:
-      this.$writeMem$($index$$52_location$$24$$, this.$rl$(this.$readMem$($index$$52_location$$24$$)));
+      this.$writeMem$($index$$44_location$$24$$, this.$rl$(this.$readMem$($index$$44_location$$24$$)));
       break;
     case 30:
-      this.$writeMem$($index$$52_location$$24$$, this.$rr$(this.$readMem$($index$$52_location$$24$$)));
+      this.$writeMem$($index$$44_location$$24$$, this.$rr$(this.$readMem$($index$$44_location$$24$$)));
       break;
     case 38:
-      this.$writeMem$($index$$52_location$$24$$, this.$sla$(this.$readMem$($index$$52_location$$24$$)));
+      this.$writeMem$($index$$44_location$$24$$, this.$sla$(this.$readMem$($index$$44_location$$24$$)));
       break;
     case 46:
-      this.$writeMem$($index$$52_location$$24$$, this.$sra$(this.$readMem$($index$$52_location$$24$$)));
+      this.$writeMem$($index$$44_location$$24$$, this.$sra$(this.$readMem$($index$$44_location$$24$$)));
       break;
     case 54:
-      this.$writeMem$($index$$52_location$$24$$, this.$sll$(this.$readMem$($index$$52_location$$24$$)));
+      this.$writeMem$($index$$44_location$$24$$, this.$sll$(this.$readMem$($index$$44_location$$24$$)));
       break;
     case 62:
-      this.$writeMem$($index$$52_location$$24$$, this.$srl$(this.$readMem$($index$$52_location$$24$$)));
+      this.$writeMem$($index$$44_location$$24$$, this.$srl$(this.$readMem$($index$$44_location$$24$$)));
       break;
     case 70:
-      this.$bit$(this.$readMem$($index$$52_location$$24$$) & 1);
+      this.$bit$(this.$readMem$($index$$44_location$$24$$) & 1);
       break;
     case 78:
-      this.$bit$(this.$readMem$($index$$52_location$$24$$) & 2);
+      this.$bit$(this.$readMem$($index$$44_location$$24$$) & 2);
       break;
     case 86:
-      this.$bit$(this.$readMem$($index$$52_location$$24$$) & 4);
+      this.$bit$(this.$readMem$($index$$44_location$$24$$) & 4);
       break;
     case 94:
-      this.$bit$(this.$readMem$($index$$52_location$$24$$) & 8);
+      this.$bit$(this.$readMem$($index$$44_location$$24$$) & 8);
       break;
     case 102:
-      this.$bit$(this.$readMem$($index$$52_location$$24$$) & 16);
+      this.$bit$(this.$readMem$($index$$44_location$$24$$) & 16);
       break;
     case 110:
-      this.$bit$(this.$readMem$($index$$52_location$$24$$) & 32);
+      this.$bit$(this.$readMem$($index$$44_location$$24$$) & 32);
       break;
     case 118:
-      this.$bit$(this.$readMem$($index$$52_location$$24$$) & 64);
+      this.$bit$(this.$readMem$($index$$44_location$$24$$) & 64);
       break;
     case 126:
-      this.$bit$(this.$readMem$($index$$52_location$$24$$) & 128);
+      this.$bit$(this.$readMem$($index$$44_location$$24$$) & 128);
       break;
     case 134:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) & -2);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) & -2);
       break;
     case 142:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) & -3);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) & -3);
       break;
     case 150:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) & -5);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) & -5);
       break;
     case 158:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) & -9);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) & -9);
       break;
     case 166:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) & -17);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) & -17);
       break;
     case 174:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) & -33);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) & -33);
       break;
     case 182:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) & -65);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) & -65);
       break;
     case 190:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) & -129);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) & -129);
       break;
     case 198:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) | 1);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) | 1);
       break;
     case 206:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) | 2);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) | 2);
       break;
     case 214:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) | 4);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) | 4);
       break;
     case 222:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) | 8);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) | 8);
       break;
     case 230:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) | 16);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) | 16);
       break;
     case 238:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) | 32);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) | 32);
       break;
     case 246:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) | 64);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) | 64);
       break;
     case 254:
-      this.$writeMem$($index$$52_location$$24$$, this.$readMem$($index$$52_location$$24$$) | 128);
+      this.$writeMem$($index$$44_location$$24$$, this.$readMem$($index$$44_location$$24$$) | 128);
       break;
     default:
-      $console$$.log('Unimplemented DDCB or FDCB Opcode: ' + ($opcode$$6$$ & 255).toString(16));
+      console.log('Unimplemented DDCB or FDCB Opcode: ' + ($opcode$$6$$ & 255).toString(16));
   }
   this.$pc$++;
 }, $doED$: function $$JSSMS$Z80$$$$$doED$$($a_copy_location$$25_opcode$$7_temp$$4$$) {
@@ -2692,8 +2688,7 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
       this.$pc$ += 3;
       break;
     case 103:
-      $a_copy_location$$25_opcode$$7_temp$$4$$ = this.$getHL$();
-      var $hlmem$$ = this.$readMem$($a_copy_location$$25_opcode$$7_temp$$4$$);
+      var $a_copy_location$$25_opcode$$7_temp$$4$$ = this.$getHL$(), $hlmem$$ = this.$readMem$($a_copy_location$$25_opcode$$7_temp$$4$$);
       this.$writeMem$($a_copy_location$$25_opcode$$7_temp$$4$$, $hlmem$$ >> 4 | (this.$a$ & 15) << 4);
       this.$a$ = this.$a$ & 240 | $hlmem$$ & 15;
       this.$f$ = this.$f$ & 1 | this.$SZP_TABLE$[this.$a$];
@@ -2896,7 +2891,7 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
       this.$f$ = 0 != ($a_copy_location$$25_opcode$$7_temp$$4$$ & 128) ? this.$f$ | 2 : this.$f$ & -3;
       break;
     default:
-      $console$$.log('Unimplemented ED Opcode: ' + $a_copy_location$$25_opcode$$7_temp$$4$$.toString(16)), this.$pc$++;
+      console.log('Unimplemented ED Opcode: ' + $a_copy_location$$25_opcode$$7_temp$$4$$.toString(16)), this.$pc$++;
   }
 }, $generateDAATable$: function $$JSSMS$Z80$$$$$generateDAATable$$() {
   this.$DAA_TABLE$ = Array(2048);
@@ -2910,40 +2905,39 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
     }
   }
   this.$a$ = this.$f$ = 0;
-}, $getDAAResult$: function $$JSSMS$Z80$$$$$getDAAResult$$($value$$59$$, $flags$$3$$) {
-  this.$a$ = $value$$59$$;
-  this.$f$ = $flags$$3$$;
-  var $a_copy$$1$$ = this.$a$, $correction$$ = 0, $carry$$8$$ = $flags$$3$$ & 1, $carry_copy$$ = $carry$$8$$;
-  if (0 != ($flags$$3$$ & 16) || 9 < ($a_copy$$1$$ & 15)) {
+}, $getDAAResult$: function $$JSSMS$Z80$$$$$getDAAResult$$($value$$57$$, $flags$$2$$) {
+  this.$a$ = $value$$57$$;
+  this.$f$ = $flags$$2$$;
+  var $a_copy$$1$$ = this.$a$, $correction$$ = 0, $carry$$8$$ = $flags$$2$$ & 1, $carry_copy$$ = $carry$$8$$;
+  if (0 != ($flags$$2$$ & 16) || 9 < ($a_copy$$1$$ & 15)) {
     $correction$$ |= 6;
   }
   if (1 == $carry$$8$$ || 159 < $a_copy$$1$$ || 143 < $a_copy$$1$$ && 9 < ($a_copy$$1$$ & 15)) {
     $correction$$ |= 96, $carry_copy$$ = 1;
   }
   153 < $a_copy$$1$$ && ($carry_copy$$ = 1);
-  0 != ($flags$$3$$ & 2) ? this.$sub_a$($correction$$) : this.$add_a$($correction$$);
-  $flags$$3$$ = this.$f$ & 254 | $carry_copy$$;
-  $flags$$3$$ = this.$getParity$(this.$a$) ? $flags$$3$$ & 251 | 4 : $flags$$3$$ & 251;
-  return this.$a$ | $flags$$3$$ << 8;
-}, $add_a$: function $$JSSMS$Z80$$$$$add_a$$($temp$$5_value$$60$$) {
-  $temp$$5_value$$60$$ = this.$a$ + $temp$$5_value$$60$$ & 255;
-  this.$f$ = this.$SZHVC_ADD_TABLE$[this.$a$ << 8 | $temp$$5_value$$60$$];
-  this.$a$ = $temp$$5_value$$60$$;
-}, $adc_a$: function $$JSSMS$Z80$$$$$adc_a$$($temp$$6_value$$61$$) {
-  var $carry$$9$$ = this.$f$ & 1;
-  $temp$$6_value$$61$$ = this.$a$ + $temp$$6_value$$61$$ + $carry$$9$$ & 255;
-  this.$f$ = this.$SZHVC_ADD_TABLE$[$carry$$9$$ << 16 | this.$a$ << 8 | $temp$$6_value$$61$$];
-  this.$a$ = $temp$$6_value$$61$$;
-}, $sub_a$: function $$JSSMS$Z80$$$$$sub_a$$($temp$$7_value$$62$$) {
-  $temp$$7_value$$62$$ = this.$a$ - $temp$$7_value$$62$$ & 255;
-  this.$f$ = this.$SZHVC_SUB_TABLE$[this.$a$ << 8 | $temp$$7_value$$62$$];
-  this.$a$ = $temp$$7_value$$62$$;
-}, $sbc_a$: function $$JSSMS$Z80$$$$$sbc_a$$($temp$$8_value$$63$$) {
-  var $carry$$10$$ = this.$f$ & 1, $temp$$8_value$$63$$ = this.$a$ - $temp$$8_value$$63$$ - $carry$$10$$ & 255;
-  this.$f$ = this.$SZHVC_SUB_TABLE$[$carry$$10$$ << 16 | this.$a$ << 8 | $temp$$8_value$$63$$];
-  this.$a$ = $temp$$8_value$$63$$;
-}, $cp_a$: function $$JSSMS$Z80$$$$$cp_a$$($value$$64$$) {
-  this.$f$ = this.$SZHVC_SUB_TABLE$[this.$a$ << 8 | this.$a$ - $value$$64$$ & 255];
+  0 != ($flags$$2$$ & 2) ? this.$sub_a$($correction$$) : this.$add_a$($correction$$);
+  $flags$$2$$ = this.$f$ & 254 | $carry_copy$$;
+  $flags$$2$$ = this.$getParity$(this.$a$) ? $flags$$2$$ & 251 | 4 : $flags$$2$$ & 251;
+  return this.$a$ | $flags$$2$$ << 8;
+}, $add_a$: function $$JSSMS$Z80$$$$$add_a$$($temp$$5_value$$58$$) {
+  $temp$$5_value$$58$$ = this.$a$ + $temp$$5_value$$58$$ & 255;
+  this.$f$ = this.$SZHVC_ADD_TABLE$[this.$a$ << 8 | $temp$$5_value$$58$$];
+  this.$a$ = $temp$$5_value$$58$$;
+}, $adc_a$: function $$JSSMS$Z80$$$$$adc_a$$($temp$$6_value$$59$$) {
+  var $carry$$9$$ = this.$f$ & 1, $temp$$6_value$$59$$ = this.$a$ + $temp$$6_value$$59$$ + $carry$$9$$ & 255;
+  this.$f$ = this.$SZHVC_ADD_TABLE$[$carry$$9$$ << 16 | this.$a$ << 8 | $temp$$6_value$$59$$];
+  this.$a$ = $temp$$6_value$$59$$;
+}, $sub_a$: function $$JSSMS$Z80$$$$$sub_a$$($temp$$7_value$$60$$) {
+  $temp$$7_value$$60$$ = this.$a$ - $temp$$7_value$$60$$ & 255;
+  this.$f$ = this.$SZHVC_SUB_TABLE$[this.$a$ << 8 | $temp$$7_value$$60$$];
+  this.$a$ = $temp$$7_value$$60$$;
+}, $sbc_a$: function $$JSSMS$Z80$$$$$sbc_a$$($temp$$8_value$$61$$) {
+  var $carry$$10$$ = this.$f$ & 1, $temp$$8_value$$61$$ = this.$a$ - $temp$$8_value$$61$$ - $carry$$10$$ & 255;
+  this.$f$ = this.$SZHVC_SUB_TABLE$[$carry$$10$$ << 16 | this.$a$ << 8 | $temp$$8_value$$61$$];
+  this.$a$ = $temp$$8_value$$61$$;
+}, $cp_a$: function $$JSSMS$Z80$$$$$cp_a$$($value$$62$$) {
+  this.$f$ = this.$SZHVC_SUB_TABLE$[this.$a$ << 8 | this.$a$ - $value$$62$$ & 255];
 }, $cpl_a$: function $$JSSMS$Z80$$$$$cpl_a$$() {
   this.$a$ ^= 255;
   this.$f$ |= 18;
@@ -2973,21 +2967,21 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   return this.$ixH$ << 8 | this.$ixL$;
 }, $getIY$: function $$JSSMS$Z80$$$$$getIY$$() {
   return this.$iyH$ << 8 | this.$iyL$;
-}, $setBC$: function $$JSSMS$Z80$$$$$setBC$$($value$$65$$) {
-  this.$b$ = $value$$65$$ >> 8;
-  this.$c$ = $value$$65$$ & 255;
-}, $setDE$: function $$JSSMS$Z80$$$$$setDE$$($value$$66$$) {
-  this.$d$ = $value$$66$$ >> 8;
-  this.$e$ = $value$$66$$ & 255;
-}, $setHL$: function $$JSSMS$Z80$$$$$setHL$$($value$$67$$) {
-  this.$h$ = $value$$67$$ >> 8;
-  this.$l$ = $value$$67$$ & 255;
-}, $setIX$: function $$JSSMS$Z80$$$$$setIX$$($value$$68$$) {
-  this.$ixH$ = $value$$68$$ >> 8;
-  this.$ixL$ = $value$$68$$ & 255;
-}, $setIY$: function $$JSSMS$Z80$$$$$setIY$$($value$$69$$) {
-  this.$iyH$ = $value$$69$$ >> 8;
-  this.$iyL$ = $value$$69$$ & 255;
+}, $setBC$: function $$JSSMS$Z80$$$$$setBC$$($value$$63$$) {
+  this.$b$ = $value$$63$$ >> 8;
+  this.$c$ = $value$$63$$ & 255;
+}, $setDE$: function $$JSSMS$Z80$$$$$setDE$$($value$$64$$) {
+  this.$d$ = $value$$64$$ >> 8;
+  this.$e$ = $value$$64$$ & 255;
+}, $setHL$: function $$JSSMS$Z80$$$$$setHL$$($value$$65$$) {
+  this.$h$ = $value$$65$$ >> 8;
+  this.$l$ = $value$$65$$ & 255;
+}, $setIX$: function $$JSSMS$Z80$$$$$setIX$$($value$$66$$) {
+  this.$ixH$ = $value$$66$$ >> 8;
+  this.$ixL$ = $value$$66$$ & 255;
+}, $setIY$: function $$JSSMS$Z80$$$$$setIY$$($value$$67$$) {
+  this.$iyH$ = $value$$67$$ >> 8;
+  this.$iyL$ = $value$$67$$ & 255;
 }, $incBC$: function $$JSSMS$Z80$$$$$incBC$$() {
   this.$c$ = this.$c$ + 1 & 255;
   0 == this.$c$ && (this.$b$ = this.$b$ + 1 & 255);
@@ -3018,14 +3012,14 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
 }, $decIY$: function $$JSSMS$Z80$$$$$decIY$$() {
   this.$iyL$ = this.$iyL$ - 1 & 255;
   255 == this.$iyL$ && (this.$iyH$ = this.$iyH$ - 1 & 255);
-}, $inc8$: function $$JSSMS$Z80$$$$$inc8$$($value$$70$$) {
-  $value$$70$$ = $value$$70$$ + 1 & 255;
-  this.$f$ = this.$f$ & 1 | this.$SZHV_INC_TABLE$[$value$$70$$];
-  return $value$$70$$;
-}, $dec8$: function $$JSSMS$Z80$$$$$dec8$$($value$$71$$) {
-  $value$$71$$ = $value$$71$$ - 1 & 255;
-  this.$f$ = this.$f$ & 1 | this.$SZHV_DEC_TABLE$[$value$$71$$];
-  return $value$$71$$;
+}, $inc8$: function $$JSSMS$Z80$$$$$inc8$$($value$$68$$) {
+  $value$$68$$ = $value$$68$$ + 1 & 255;
+  this.$f$ = this.$f$ & 1 | this.$SZHV_INC_TABLE$[$value$$68$$];
+  return $value$$68$$;
+}, $dec8$: function $$JSSMS$Z80$$$$$dec8$$($value$$69$$) {
+  $value$$69$$ = $value$$69$$ - 1 & 255;
+  this.$f$ = this.$f$ & 1 | this.$SZHV_DEC_TABLE$[$value$$69$$];
+  return $value$$69$$;
 }, $exAF$: function $$JSSMS$Z80$$$$$exAF$$() {
   var $temp$$9$$ = this.$a$;
   this.$a$ = this.$a2$;
@@ -3054,18 +3048,18 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   $temp$$12$$ = this.$l$;
   this.$l$ = this.$l2$;
   this.$l2$ = $temp$$12$$;
-}, $add16$: function $$JSSMS$Z80$$$$$add16$$($reg$$, $value$$72$$) {
-  var $result$$ = $reg$$ + $value$$72$$;
-  this.$f$ = this.$f$ & 196 | ($reg$$ ^ $result$$ ^ $value$$72$$) >> 8 & 16 | $result$$ >> 16 & 1;
+}, $add16$: function $$JSSMS$Z80$$$$$add16$$($reg$$, $value$$70$$) {
+  var $result$$ = $reg$$ + $value$$70$$;
+  this.$f$ = this.$f$ & 196 | ($reg$$ ^ $result$$ ^ $value$$70$$) >> 8 & 16 | $result$$ >> 16 & 1;
   return $result$$ & 65535;
-}, $adc16$: function $$JSSMS$Z80$$$$$adc16$$($value$$73$$) {
-  var $hl$$ = this.$h$ << 8 | this.$l$, $result$$1$$ = $hl$$ + $value$$73$$ + (this.$f$ & 1);
-  this.$f$ = ($hl$$ ^ $result$$1$$ ^ $value$$73$$) >> 8 & 16 | $result$$1$$ >> 16 & 1 | $result$$1$$ >> 8 & 128 | (0 != ($result$$1$$ & 65535) ? 0 : 64) | (($value$$73$$ ^ $hl$$ ^ 32768) & ($value$$73$$ ^ $result$$1$$) & 32768) >> 13;
+}, $adc16$: function $$JSSMS$Z80$$$$$adc16$$($value$$71$$) {
+  var $hl$$ = this.$h$ << 8 | this.$l$, $result$$1$$ = $hl$$ + $value$$71$$ + (this.$f$ & 1);
+  this.$f$ = ($hl$$ ^ $result$$1$$ ^ $value$$71$$) >> 8 & 16 | $result$$1$$ >> 16 & 1 | $result$$1$$ >> 8 & 128 | (0 != ($result$$1$$ & 65535) ? 0 : 64) | (($value$$71$$ ^ $hl$$ ^ 32768) & ($value$$71$$ ^ $result$$1$$) & 32768) >> 13;
   this.$h$ = $result$$1$$ >> 8 & 255;
   this.$l$ = $result$$1$$ & 255;
-}, $sbc16$: function $$JSSMS$Z80$$$$$sbc16$$($value$$74$$) {
-  var $hl$$1$$ = this.$h$ << 8 | this.$l$, $result$$2$$ = $hl$$1$$ - $value$$74$$ - (this.$f$ & 1);
-  this.$f$ = ($hl$$1$$ ^ $result$$2$$ ^ $value$$74$$) >> 8 & 16 | 2 | $result$$2$$ >> 16 & 1 | $result$$2$$ >> 8 & 128 | (0 != ($result$$2$$ & 65535) ? 0 : 64) | (($value$$74$$ ^ $hl$$1$$) & ($hl$$1$$ ^ $result$$2$$) & 32768) >> 13;
+}, $sbc16$: function $$JSSMS$Z80$$$$$sbc16$$($value$$72$$) {
+  var $hl$$1$$ = this.$h$ << 8 | this.$l$, $result$$2$$ = $hl$$1$$ - $value$$72$$ - (this.$f$ & 1);
+  this.$f$ = ($hl$$1$$ ^ $result$$2$$ ^ $value$$72$$) >> 8 & 16 | 2 | $result$$2$$ >> 16 & 1 | $result$$2$$ >> 8 & 128 | (0 != ($result$$2$$ & 65535) ? 0 : 64) | (($value$$72$$ ^ $hl$$1$$) & ($hl$$1$$ ^ $result$$2$$) & 32768) >> 13;
   this.$h$ = $result$$2$$ >> 8 & 255;
   this.$l$ = $result$$2$$ & 255;
 }, $generateFlagTables$: function $$JSSMS$Z80$$$$$generateFlagTables$$() {
@@ -3125,9 +3119,9 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
       $psbc_yf$$++;
     }
   }
-}, $getParity$: function $$JSSMS$Z80$$$$$getParity$$($value$$75$$) {
-  for (var $parity$$ = $true$$, $j$$1$$ = 0; 8 > $j$$1$$; $j$$1$$++) {
-    0 != ($value$$75$$ & 1 << $j$$1$$) && ($parity$$ = !$parity$$);
+}, $getParity$: function $$JSSMS$Z80$$$$$getParity$$($value$$73$$) {
+  for (var $parity$$ = $JSCompiler_alias_TRUE$$, $j$$1$$ = 0; 8 > $j$$1$$; $j$$1$$++) {
+    0 != ($value$$73$$ & 1 << $j$$1$$) && ($parity$$ = !$parity$$);
   }
   return $parity$$;
 }, $getDummyWrite$: function $$JSSMS$Z80$$$$$getDummyWrite$$() {
@@ -3139,17 +3133,17 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   for ($i$$6$$ = 0; 8 > $i$$6$$; $i$$6$$++) {
     this.$ram$[$i$$6$$] = Array(1024);
   }
-  this.$sram$ == $null$$ && (this.$sram$ = Array(32));
+  this.$sram$ == $JSCompiler_alias_NULL$$ && (this.$sram$ = Array(32));
   this.$memReadMap$[64] = this.$getDummyWrite$();
   this.$memWriteMap$[64] = this.$getDummyWrite$();
   this.$number_of_pages$ = 2;
 }, $resetMemory$: function $$JSSMS$Z80$$$$$resetMemory$$($p$$) {
-  $p$$ != $null$$ && (this.$rom$ = $p$$);
+  $p$$ != $JSCompiler_alias_NULL$$ && (this.$rom$ = $p$$);
   this.$frameReg$[0] = 0;
   this.$frameReg$[1] = 0;
   this.$frameReg$[2] = 1;
   this.$frameReg$[3] = 0;
-  this.$rom$ != $null$$ ? (this.$number_of_pages$ = this.$rom$.length / 16, this.$setDefaultMemoryMapping$()) : this.$number_of_pages$ = 0;
+  this.$rom$ != $JSCompiler_alias_NULL$$ ? (this.$number_of_pages$ = this.$rom$.length / 16, this.$setDefaultMemoryMapping$()) : this.$number_of_pages$ = 0;
 }, $setDefaultMemoryMapping$: function $$JSSMS$Z80$$$$$setDefaultMemoryMapping$$() {
   for (var $i$$7$$ = 0; 48 > $i$$7$$; $i$$7$$++) {
     this.$memReadMap$[$i$$7$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$i$$7$$ & 31]), this.$memWriteMap$[$i$$7$$] = this.$getDummyWrite$();
@@ -3157,16 +3151,16 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   for ($i$$7$$ = 48; 64 > $i$$7$$; $i$$7$$++) {
     this.$memReadMap$[$i$$7$$] = this.$ram$[$i$$7$$ & 7], this.$memWriteMap$[$i$$7$$] = this.$ram$[$i$$7$$ & 7];
   }
-}, $writeMem$: function $$JSSMS$Z80$$$$$writeMem$$($address$$, $value$$76$$) {
+}, $writeMem$: function $$JSSMS$Z80$$$$$writeMem$$($address$$, $value$$74$$) {
   if ($address$$ >> 10 >= this.$memWriteMap$.length || !this.$memWriteMap$[$address$$ >> 10] || ($address$$ & 1023) >= this.$memWriteMap$[$address$$ >> 10].length) {
-    $console$$.log($address$$, $address$$ >> 10, $address$$ & 1023);
+    console.log($address$$, $address$$ >> 10, $address$$ & 1023);
     debugger;
   }
-  this.$memWriteMap$[$address$$ >> 10][$address$$ & 1023] = $value$$76$$;
-  65532 <= $address$$ && this.page($address$$ & 3, $value$$76$$);
+  this.$memWriteMap$[$address$$ >> 10][$address$$ & 1023] = $value$$74$$;
+  65532 <= $address$$ && this.page($address$$ & 3, $value$$74$$);
 }, $readMem$: function $$JSSMS$Z80$$$$$readMem$$($address$$1$$) {
   if ($address$$1$$ >> 10 >= this.$memReadMap$.length || !this.$memReadMap$[$address$$1$$ >> 10] || ($address$$1$$ & 1023) >= this.$memReadMap$[$address$$1$$ >> 10].length) {
-    $console$$.log($address$$1$$, $address$$1$$ >> 10, $address$$1$$ & 1023);
+    console.log($address$$1$$, $address$$1$$ >> 10, $address$$1$$ & 1023);
     debugger;
   }
   return this.$memReadMap$[$address$$1$$ >> 10][$address$$1$$ & 1023] & 255;
@@ -3174,12 +3168,12 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   return this.$memReadMap$[this.$pc$ >> 10][this.$pc$ & 1023];
 }, $readMemWord$: function $$JSSMS$Z80$$$$$readMemWord$$($address$$2$$) {
   return this.$memReadMap$[$address$$2$$ >> 10][$address$$2$$ & 1023] & 255 | (this.$memReadMap$[++$address$$2$$ >> 10][$address$$2$$ & 1023] & 255) << 8;
-}, page: function $$JSSMS$Z80$$$$page$($address$$3$$, $value$$77$$) {
-  this.$frameReg$[$address$$3$$] = $value$$77$$;
+}, page: function $$JSSMS$Z80$$$$page$($address$$3$$, $value$$75$$) {
+  this.$frameReg$[$address$$3$$] = $value$$75$$;
   switch ($address$$3$$) {
     case 0:
-      if (0 != ($value$$77$$ & 8)) {
-        for (var $offset$$16_p$$1$$ = ($value$$77$$ & 4) << 2, $i$$8$$ = 32; 48 > $i$$8$$; $i$$8$$++) {
+      if (0 != ($value$$75$$ & 8)) {
+        for (var $offset$$16_p$$1$$ = ($value$$75$$ & 4) << 2, $i$$8$$ = 32; 48 > $i$$8$$; $i$$8$$++) {
           this.$memReadMap$[$i$$8$$] = $JSSMS$Utils$copyArray$$(this.$sram$[$offset$$16_p$$1$$]), this.$memWriteMap$[$i$$8$$] = $JSSMS$Utils$copyArray$$(this.$sram$[$offset$$16_p$$1$$]), $offset$$16_p$$1$$++;
         }
       }else {
@@ -3190,20 +3184,20 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
       }
       break;
     case 1:
-      $offset$$16_p$$1$$ = ($value$$77$$ % this.$number_of_pages$ << 4) + 1;
+      $offset$$16_p$$1$$ = ($value$$75$$ % this.$number_of_pages$ << 4) + 1;
       for ($i$$8$$ = 1; 16 > $i$$8$$; $i$$8$$++) {
         this.$memReadMap$[$i$$8$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++]);
       }
       break;
     case 2:
-      $offset$$16_p$$1$$ = $value$$77$$ % this.$number_of_pages$ << 4;
+      $offset$$16_p$$1$$ = $value$$75$$ % this.$number_of_pages$ << 4;
       for ($i$$8$$ = 16; 32 > $i$$8$$; $i$$8$$++) {
         this.$memReadMap$[$i$$8$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++]);
       }
       break;
     case 3:
       if (0 == (this.$frameReg$[0] & 8)) {
-        $offset$$16_p$$1$$ = $value$$77$$ % this.$number_of_pages$ << 4;
+        $offset$$16_p$$1$$ = $value$$75$$ % this.$number_of_pages$ << 4;
         for ($i$$8$$ = 32; 48 > $i$$8$$; $i$$8$$++) {
           this.$memReadMap$[$i$$8$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++]);
         }
@@ -3216,7 +3210,7 @@ function $JSSMS$Keyboard$$($sms$$1$$) {
 }
 $JSSMS$Keyboard$$.prototype = {reset: function $$JSSMS$Keyboard$$$$reset$() {
   this.$ggstart$ = this.$controller2$ = this.$controller1$ = 255;
-  this.$pause_button$ = $false$$;
+  this.$pause_button$ = $JSCompiler_alias_FALSE$$;
 }, keydown: function $$JSSMS$Keyboard$$$$keydown$($evt$$14$$) {
   switch ($evt$$14$$.keyCode) {
     case 38:
@@ -3238,7 +3232,7 @@ $JSSMS$Keyboard$$.prototype = {reset: function $$JSSMS$Keyboard$$$$reset$() {
       this.$controller1$ &= -33;
       break;
     case 13:
-      this.$main$.$is_sms$ ? this.$main$.$pause_button$ = $true$$ : this.$ggstart$ &= -129;
+      this.$main$.$is_sms$ ? this.$main$.$pause_button$ = $JSCompiler_alias_TRUE$$ : this.$ggstart$ &= -129;
       break;
     case 104:
       this.$controller2$ &= -2;
@@ -3328,7 +3322,7 @@ function $JSSMS$Vdp$$($i$$10_sms$$3$$) {
   }
   this.$vdpreg$ = Array(16);
   this.status = 0;
-  this.$firstByte$ = $false$$;
+  this.$firstByte$ = $JSCompiler_alias_FALSE$$;
   this.$counter$ = this.$line$ = this.$readBuffer$ = this.$operation$ = this.location = this.$commandByte$ = 0;
   this.$bgPriority$ = Array(256);
   this.$spriteCol$ = Array(256);
@@ -3338,7 +3332,7 @@ function $JSSMS$Vdp$$($i$$10_sms$$3$$) {
   this.$GG_JAVA1$ = [];
   this.$GG_JAVA2$ = [];
   this.$sat$ = this.$h_end$ = this.$h_start$ = 0;
-  this.$isSatDirty$ = $false$$;
+  this.$isSatDirty$ = $JSCompiler_alias_FALSE$$;
   this.$lineSprites$ = Array(192);
   for ($i$$10_sms$$3$$ = 0; 192 > $i$$10_sms$$3$$; $i$$10_sms$$3$$++) {
     this.$lineSprites$[$i$$10_sms$$3$$] = Array(25);
@@ -3351,15 +3345,15 @@ function $JSSMS$Vdp$$($i$$10_sms$$3$$) {
 $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
   var $i$$11$$;
   this.$generateConvertedPals$();
-  this.$firstByte$ = $true$$;
+  this.$firstByte$ = $JSCompiler_alias_TRUE$$;
   for ($i$$11$$ = this.$operation$ = this.status = this.$counter$ = this.location = 0; 16 > $i$$11$$; $i$$11$$++) {
     this.$vdpreg$[$i$$11$$] = 0;
   }
   this.$vdpreg$[2] = 14;
   this.$vdpreg$[5] = 126;
   this.$vScrollLatch$ = 0;
-  this.$main$.$cpu$.$interruptLine$ = $false$$;
-  this.$isSatDirty$ = $true$$;
+  this.$main$.$cpu$.$interruptLine$ = $JSCompiler_alias_FALSE$$;
+  this.$isSatDirty$ = $JSCompiler_alias_TRUE$$;
   this.$minDirty$ = 512;
   this.$maxDirty$ = -1;
   for ($i$$11$$ = 0; 16384 > $i$$11$$; $i$$11$$++) {
@@ -3373,10 +3367,10 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
   this.$minDirty$ = 0;
   this.$maxDirty$ = 511;
   for (var $i$$12$$ = 0, $l$$1$$ = this.$isTileDirty$.length; $i$$12$$ < $l$$1$$; $i$$12$$++) {
-    this.$isTileDirty$[$i$$12$$] = $true$$;
+    this.$isTileDirty$[$i$$12$$] = $JSCompiler_alias_TRUE$$;
   }
   this.$sat$ = (this.$vdpreg$[5] & -130) << 7;
-  this.$isSatDirty$ = $true$$;
+  this.$isSatDirty$ = $JSCompiler_alias_TRUE$$;
 }, $getVCount$: function $$JSSMS$Vdp$$$$$getVCount$$() {
   if (0 == this.$videoMode$) {
     if (218 < this.$line$) {
@@ -3389,27 +3383,27 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
   }
   return this.$line$;
 }, $controlRead$: function $$JSSMS$Vdp$$$$$controlRead$$() {
-  this.$firstByte$ = $true$$;
+  this.$firstByte$ = $JSCompiler_alias_TRUE$$;
   var $statuscopy$$ = this.status;
   this.status = 0;
-  this.$main$.$cpu$.$interruptLine$ = $false$$;
+  this.$main$.$cpu$.$interruptLine$ = $JSCompiler_alias_FALSE$$;
   return $statuscopy$$;
-}, $controlWrite$: function $$JSSMS$Vdp$$$$$controlWrite$$($reg$$1_value$$79$$) {
+}, $controlWrite$: function $$JSSMS$Vdp$$$$$controlWrite$$($reg$$1_value$$77$$) {
   if (this.$firstByte$) {
-    this.$firstByte$ = $false$$, this.$commandByte$ = $reg$$1_value$$79$$, this.location = this.location & 16128 | $reg$$1_value$$79$$;
+    this.$firstByte$ = $JSCompiler_alias_FALSE$$, this.$commandByte$ = $reg$$1_value$$77$$, this.location = this.location & 16128 | $reg$$1_value$$77$$;
   }else {
-    if (this.$firstByte$ = $true$$, this.$operation$ = $reg$$1_value$$79$$ >> 6 & 3, this.location = this.$commandByte$ | $reg$$1_value$$79$$ << 8, 0 == this.$operation$) {
+    if (this.$firstByte$ = $JSCompiler_alias_TRUE$$, this.$operation$ = $reg$$1_value$$77$$ >> 6 & 3, this.location = this.$commandByte$ | $reg$$1_value$$77$$ << 8, 0 == this.$operation$) {
       this.$readBuffer$ = this.$VRAM$[this.location++ & 16383] & 255;
     }else {
       if (2 == this.$operation$) {
-        $reg$$1_value$$79$$ &= 15;
-        switch ($reg$$1_value$$79$$) {
+        $reg$$1_value$$77$$ &= 15;
+        switch ($reg$$1_value$$77$$) {
           case 0:
             0 != (this.status & 4) && (this.$main$.$cpu$.$interruptLine$ = 0 != (this.$commandByte$ & 16));
             break;
           case 1:
-            0 != (this.status & 128) && 0 != (this.$commandByte$ & 32) && (this.$main$.$cpu$.$interruptLine$ = $true$$);
-            (this.$commandByte$ & 3) != (this.$vdpreg$[$reg$$1_value$$79$$] & 3) && (this.$isSatDirty$ = $true$$);
+            0 != (this.status & 128) && 0 != (this.$commandByte$ & 32) && (this.$main$.$cpu$.$interruptLine$ = $JSCompiler_alias_TRUE$$);
+            (this.$commandByte$ & 3) != (this.$vdpreg$[$reg$$1_value$$77$$] & 3) && (this.$isSatDirty$ = $JSCompiler_alias_TRUE$$);
             break;
           case 2:
             this.$bgt$ = (this.$commandByte$ & 14) << 10;
@@ -3417,19 +3411,19 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
           case 5:
             var $old$$ = this.$sat$;
             this.$sat$ = (this.$commandByte$ & -130) << 7;
-            $old$$ != this.$sat$ && (this.$isSatDirty$ = $true$$, $console$$.log('New address written to SAT: ' + $old$$ + ' -> ' + this.$sat$));
+            $old$$ != this.$sat$ && (this.$isSatDirty$ = $JSCompiler_alias_TRUE$$, console.log('New address written to SAT: ' + $old$$ + ' -> ' + this.$sat$));
         }
-        this.$vdpreg$[$reg$$1_value$$79$$] = this.$commandByte$;
+        this.$vdpreg$[$reg$$1_value$$77$$] = this.$commandByte$;
       }
     }
   }
 }, $dataRead$: function $$JSSMS$Vdp$$$$$dataRead$$() {
-  this.$firstByte$ = $true$$;
-  var $value$$80$$ = this.$readBuffer$;
+  this.$firstByte$ = $JSCompiler_alias_TRUE$$;
+  var $value$$78$$ = this.$readBuffer$;
   this.$readBuffer$ = this.$VRAM$[this.location++ & 16383] & 255;
-  return $value$$80$$;
-}, $dataWrite$: function $$JSSMS$Vdp$$$$$dataWrite$$($value$$81$$) {
-  this.$firstByte$ = $true$$;
+  return $value$$78$$;
+}, $dataWrite$: function $$JSSMS$Vdp$$$$$dataWrite$$($value$$79$$) {
+  this.$firstByte$ = $JSCompiler_alias_TRUE$$;
   switch (this.$operation$) {
     case 0:
 ;
@@ -3437,36 +3431,43 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
 ;
     case 2:
       var $address$$4$$ = this.location & 16383;
-      if ($value$$81$$ != (this.$VRAM$[$address$$4$$] & 255)) {
+      if ($value$$79$$ != (this.$VRAM$[$address$$4$$] & 255)) {
         if ($address$$4$$ >= this.$sat$ && $address$$4$$ < this.$sat$ + 64) {
-          this.$isSatDirty$ = $true$$;
+          this.$isSatDirty$ = $JSCompiler_alias_TRUE$$;
         }else {
           if ($address$$4$$ >= this.$sat$ + 128 && $address$$4$$ < this.$sat$ + 256) {
-            this.$isSatDirty$ = $true$$;
+            this.$isSatDirty$ = $JSCompiler_alias_TRUE$$;
           }else {
             var $tileIndex$$ = $address$$4$$ >> 5;
-            this.$isTileDirty$[$tileIndex$$] = $true$$;
+            this.$isTileDirty$[$tileIndex$$] = $JSCompiler_alias_TRUE$$;
             $tileIndex$$ < this.$minDirty$ && (this.$minDirty$ = $tileIndex$$);
             $tileIndex$$ > this.$maxDirty$ && (this.$maxDirty$ = $tileIndex$$);
           }
         }
-        this.$VRAM$[$address$$4$$] = $value$$81$$;
+        this.$VRAM$[$address$$4$$] = $value$$79$$;
       }
       break;
     case 3:
-      this.$main$.$is_sms$ ? this.$CRAM$[this.location & 31] = this.$main_JAVA$[$value$$81$$ & 63] : this.$main$.$is_gg$ && (this.$CRAM$[(this.location & 63) >> 1] = 0 == (this.location & 1) ? this.$GG_JAVA1$[$value$$81$$] : this.$CRAM$[(this.location & 63) >> 1] | this.$GG_JAVA2$[$value$$81$$ & 15]);
+      this.$main$.$is_sms$ ? this.$CRAM$[this.location & 31] = this.$main_JAVA$[$value$$79$$ & 63] : this.$main$.$is_gg$ && (this.$CRAM$[(this.location & 63) >> 1] = 0 == (this.location & 1) ? this.$GG_JAVA1$[$value$$79$$] : this.$CRAM$[(this.location & 63) >> 1] | this.$GG_JAVA2$[$value$$79$$ & 15]);
   }
-  this.$readBuffer$ = $value$$81$$;
+  this.$readBuffer$ = $value$$79$$;
   this.location++;
 }, $interrupts$: function $$JSSMS$Vdp$$$$$interrupts$$($lineno$$1$$) {
-  192 >= $lineno$$1$$ ? (0 == this.$counter$ ? (this.$counter$ = this.$vdpreg$[10], this.status |= 4) : this.$counter$--, 0 != (this.status & 4) && 0 != (this.$vdpreg$[0] & 16) && (this.$main$.$cpu$.$interruptLine$ = $true$$)) : (this.$counter$ = this.$vdpreg$[10], 0 != (this.status & 128) && 0 != (this.$vdpreg$[1] & 32) && 224 > $lineno$$1$$ && (this.$main$.$cpu$.$interruptLine$ = $true$$), $lineno$$1$$ == this.$main$.$no_of_scanlines$ - 1 && (this.$vScrollLatch$ =
-      this.$vdpreg$[9]));
+  if (192 >= $lineno$$1$$) {
+    if (0 == this.$counter$ ? (this.$counter$ = this.$vdpreg$[10], this.status |= 4) : this.$counter$--, 0 != (this.status & 4) && 0 != (this.$vdpreg$[0] & 16)) {
+      this.$main$.$cpu$.$interruptLine$ = $JSCompiler_alias_TRUE$$;
+    }
+  }else {
+    if (this.$counter$ = this.$vdpreg$[10], 0 != (this.status & 128) && (0 != (this.$vdpreg$[1] & 32) && 224 > $lineno$$1$$) && (this.$main$.$cpu$.$interruptLine$ = $JSCompiler_alias_TRUE$$), $lineno$$1$$ == this.$main$.$no_of_scanlines$ - 1) {
+      this.$vScrollLatch$ = this.$vdpreg$[9];
+    }
+  }
 }, $setVBlankFlag$: function $$JSSMS$Vdp$$$$$setVBlankFlag$$() {
   this.status |= 128;
 }, $drawLine$: function $$JSSMS$Vdp$$$$$drawLine$$($lineno$$2_location$$26$$) {
   if (!this.$main$.$is_gg$ || !(24 > $lineno$$2_location$$26$$ || 168 <= $lineno$$2_location$$26$$)) {
     for (var $colour_i$$13$$ = this.$spriteCol$.length; 0 != $colour_i$$13$$--;) {
-      this.$spriteCol$[$colour_i$$13$$] = $false$$;
+      this.$spriteCol$[$colour_i$$13$$] = $JSCompiler_alias_FALSE$$;
     }
     if (0 != (this.$vdpreg$[1] & 64)) {
       if (-1 != this.$maxDirty$ && this.$decodeTiles$(), this.$drawBg$($lineno$$2_location$$26$$), this.$isSatDirty$ && this.$decodeSat$(), 0 != this.$lineSprites$[$lineno$$2_location$$26$$][0] && this.$drawSprite$($lineno$$2_location$$26$$), this.$main$.$is_sms$ && 0 != (this.$vdpreg$[0] & 32)) {
@@ -3514,28 +3515,28 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
   }
 }, $drawSprite$: function $$JSSMS$Vdp$$$$$drawSprite$$($lineno$$4$$) {
   for (var $sprites$$ = this.$lineSprites$[$lineno$$4$$], $count$$6_i$$14$$ = Math.min(8, $sprites$$[0]), $zoomed$$ = this.$vdpreg$[1] & 1, $row_precal$$ = $lineno$$4$$ << 8, $off$$ = 3 * $count$$6_i$$14$$; 0 != $count$$6_i$$14$$--;) {
-    var $n$$2_tile$$1$$ = $sprites$$[$off$$--] | (this.$vdpreg$[6] & 4) << 6, $pix_y$$32$$ = $sprites$$[$off$$--], $x$$48$$ = $sprites$$[$off$$--] - (this.$vdpreg$[0] & 8), $offset$$17_tileRow$$ = $lineno$$4$$ - $pix_y$$32$$ >> $zoomed$$;
+    var $n$$2_tile$$1$$ = $sprites$$[$off$$--] | (this.$vdpreg$[6] & 4) << 6, $pix_y$$35$$ = $sprites$$[$off$$--], $x$$52$$ = $sprites$$[$off$$--] - (this.$vdpreg$[0] & 8), $offset$$17_tileRow$$ = $lineno$$4$$ - $pix_y$$35$$ >> $zoomed$$;
     0 != (this.$vdpreg$[1] & 2) && ($n$$2_tile$$1$$ &= -2);
     $n$$2_tile$$1$$ = this.$tiles$[$n$$2_tile$$1$$ + (($offset$$17_tileRow$$ & 8) >> 3)];
-    $pix_y$$32$$ = 0;
-    0 > $x$$48$$ && ($pix_y$$32$$ = -$x$$48$$, $x$$48$$ = 0);
-    $offset$$17_tileRow$$ = $pix_y$$32$$ + (($offset$$17_tileRow$$ & 7) << 3);
+    $pix_y$$35$$ = 0;
+    0 > $x$$52$$ && ($pix_y$$35$$ = -$x$$52$$, $x$$52$$ = 0);
+    $offset$$17_tileRow$$ = $pix_y$$35$$ + (($offset$$17_tileRow$$ & 7) << 3);
     if (0 == $zoomed$$) {
-      for (; 8 > $pix_y$$32$$ && 256 > $x$$48$$; $pix_y$$32$$++, $x$$48$$++) {
+      for (; 8 > $pix_y$$35$$ && 256 > $x$$52$$; $pix_y$$35$$++, $x$$52$$++) {
         var $colour$$2$$ = $n$$2_tile$$1$$[$offset$$17_tileRow$$++];
-        0 != $colour$$2$$ && !this.$bgPriority$[$x$$48$$] && (this.display[$x$$48$$ + $row_precal$$] = this.$CRAM$[$colour$$2$$ + 16], this.$spriteCol$[$x$$48$$] ? this.status |= 32 : this.$spriteCol$[$x$$48$$] = $true$$);
+        0 != $colour$$2$$ && !this.$bgPriority$[$x$$52$$] && (this.display[$x$$52$$ + $row_precal$$] = this.$CRAM$[$colour$$2$$ + 16], this.$spriteCol$[$x$$52$$] ? this.status |= 32 : this.$spriteCol$[$x$$52$$] = $JSCompiler_alias_TRUE$$);
       }
     }else {
-      for (; 8 > $pix_y$$32$$ && 256 > $x$$48$$; $pix_y$$32$$++, $x$$48$$ += 2) {
-        $colour$$2$$ = $n$$2_tile$$1$$[$offset$$17_tileRow$$++], 0 != $colour$$2$$ && !this.$bgPriority$[$x$$48$$] && (this.display[$x$$48$$ + $row_precal$$] = this.$CRAM$[$colour$$2$$ + 16], this.$spriteCol$[$x$$48$$] ? this.status |= 32 : this.$spriteCol$[$x$$48$$] = $true$$), 0 != $colour$$2$$ && !this.$bgPriority$[$x$$48$$ + 1] && (this.display[$x$$48$$ + $row_precal$$ + 1] = this.$CRAM$[$colour$$2$$ + 16], this.$spriteCol$[$x$$48$$ + 1] ? this.status |= 32 : this.$spriteCol$[$x$$48$$ +
-            1] = $true$$);
+      for (; 8 > $pix_y$$35$$ && 256 > $x$$52$$; $pix_y$$35$$++, $x$$52$$ += 2) {
+        if ($colour$$2$$ = $n$$2_tile$$1$$[$offset$$17_tileRow$$++], 0 != $colour$$2$$ && !this.$bgPriority$[$x$$52$$] && (this.display[$x$$52$$ + $row_precal$$] = this.$CRAM$[$colour$$2$$ + 16], this.$spriteCol$[$x$$52$$] ? this.status |= 32 : this.$spriteCol$[$x$$52$$] = $JSCompiler_alias_TRUE$$), 0 != $colour$$2$$ && !this.$bgPriority$[$x$$52$$ + 1]) {
+          this.display[$x$$52$$ + $row_precal$$ + 1] = this.$CRAM$[$colour$$2$$ + 16], this.$spriteCol$[$x$$52$$ + 1] ? this.status |= 32 : this.$spriteCol$[$x$$52$$ + 1] = $JSCompiler_alias_TRUE$$;
+        }
       }
     }
   }
   8 <= $sprites$$[0] && (this.status |= 64);
 }, $drawBGColour$: function $$JSSMS$Vdp$$$$$drawBGColour$$($lineno$$5_row_precal$$1$$) {
-  $lineno$$5_row_precal$$1$$ = $lineno$$5_row_precal$$1$$ << 8;
-  var $colour$$3$$ = this.$CRAM$[16 + (this.$vdpreg$[7] & 15)], $i$$15$$;
+  var $colour$$3$$ = this.$CRAM$[16 + (this.$vdpreg$[7] & 15)], $lineno$$5_row_precal$$1$$ = $lineno$$5_row_precal$$1$$ << 8, $i$$15$$;
   for ($i$$15$$ = 0; 256 > $i$$15$$; $i$$15$$++) {
     this.display[$lineno$$5_row_precal$$1$$++] = $colour$$3$$;
   }
@@ -3563,12 +3564,12 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
     this.$tiles$[$i$$17$$] = Array(64);
   }
 }, $decodeTiles$: function $$JSSMS$Vdp$$$$$decodeTiles$$() {
-  $console$$.log('[' + this.$line$ + '] min dirty:' + this.$minDirty$ + ' max: ' + this.$maxDirty$);
+  console.log('[' + this.$line$ + '] min dirty:' + this.$minDirty$ + ' max: ' + this.$maxDirty$);
   for (var $i$$18$$ = this.$minDirty$; $i$$18$$ <= this.$maxDirty$; $i$$18$$++) {
     if (this.$isTileDirty$[$i$$18$$]) {
-      this.$isTileDirty$[$i$$18$$] = $false$$;
-      $console$$.log('tile ' + $i$$18$$ + ' is dirty');
-      for (var $tile$$2$$ = this.$tiles$[$i$$18$$], $pixel_index$$ = 0, $address$$5$$ = $i$$18$$ << 5, $y$$33$$ = 0; 8 > $y$$33$$; $y$$33$$++) {
+      this.$isTileDirty$[$i$$18$$] = $JSCompiler_alias_FALSE$$;
+      console.log('tile ' + $i$$18$$ + ' is dirty');
+      for (var $tile$$2$$ = this.$tiles$[$i$$18$$], $pixel_index$$ = 0, $address$$5$$ = $i$$18$$ << 5, $y$$36$$ = 0; 8 > $y$$36$$; $y$$36$$++) {
         for (var $address0$$ = this.$VRAM$[$address$$5$$++], $address1$$ = this.$VRAM$[$address$$5$$++], $address2$$ = this.$VRAM$[$address$$5$$++], $address3$$ = this.$VRAM$[$address$$5$$++], $bit$$ = 128; 0 != $bit$$; $bit$$ >>= 1) {
           var $colour$$4$$ = 0;
           0 != ($address0$$ & $bit$$) && ($colour$$4$$ |= 1);
@@ -3583,26 +3584,26 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
   this.$minDirty$ = 512;
   this.$maxDirty$ = -1;
 }, $decodeSat$: function $$JSSMS$Vdp$$$$$decodeSat$$() {
-  this.$isSatDirty$ = $false$$;
-  for (var $height$$9_i$$19$$ = 0; $height$$9_i$$19$$ < this.$lineSprites$.length; $height$$9_i$$19$$++) {
-    this.$lineSprites$[$height$$9_i$$19$$][0] = 0;
+  this.$isSatDirty$ = $JSCompiler_alias_FALSE$$;
+  for (var $height$$11_i$$19$$ = 0; $height$$11_i$$19$$ < this.$lineSprites$.length; $height$$11_i$$19$$++) {
+    this.$lineSprites$[$height$$11_i$$19$$][0] = 0;
   }
-  $height$$9_i$$19$$ = 0 == (this.$vdpreg$[1] & 2) ? 8 : 16;
-  1 == (this.$vdpreg$[1] & 1) && ($height$$9_i$$19$$ <<= 1);
+  $height$$11_i$$19$$ = 0 == (this.$vdpreg$[1] & 2) ? 8 : 16;
+  1 == (this.$vdpreg$[1] & 1) && ($height$$11_i$$19$$ <<= 1);
   for (var $spriteno$$ = 0; 64 > $spriteno$$; $spriteno$$++) {
-    var $y$$34$$ = this.$VRAM$[this.$sat$ + $spriteno$$] & 255;
-    if (208 == $y$$34$$) {
+    var $y$$37$$ = this.$VRAM$[this.$sat$ + $spriteno$$] & 255;
+    if (208 == $y$$37$$) {
       break;
     }
-    $y$$34$$++;
-    240 < $y$$34$$ && ($y$$34$$ -= 256);
+    $y$$37$$++;
+    240 < $y$$37$$ && ($y$$37$$ -= 256);
     for (var $lineno$$6$$ = 0; 192 > $lineno$$6$$; $lineno$$6$$++) {
-      if ($lineno$$6$$ >= $y$$34$$ && $lineno$$6$$ - $y$$34$$ < $height$$9_i$$19$$) {
+      if ($lineno$$6$$ >= $y$$37$$ && $lineno$$6$$ - $y$$37$$ < $height$$11_i$$19$$) {
         var $sprites$$1$$ = this.$lineSprites$[$lineno$$6$$];
         if (8 > $sprites$$1$$[0]) {
           var $off$$1$$ = 3 * $sprites$$1$$[0] + 1, $address$$6$$ = this.$sat$ + ($spriteno$$ << 1) + 128;
           $sprites$$1$$[$off$$1$$++] = this.$VRAM$[$address$$6$$++] & 255;
-          $sprites$$1$$[$off$$1$$++] = $y$$34$$;
+          $sprites$$1$$[$off$$1$$++] = $y$$37$$;
           $sprites$$1$$[$off$$1$$++] = this.$VRAM$[$address$$6$$] & 255;
           $sprites$$1$$[0]++;
         }
@@ -3619,8 +3620,7 @@ function $JSSMS$DummyUI$$($sms$$4$$) {
 'undefined' !== typeof $ && ($.fn.$JSSMSUI$ = function $$$fn$$JSSMSUI$$($roms$$) {
   function $UI$$($root_sms$$5$$) {
     this.$main$ = $root_sms$$5$$;
-    $root_sms$$5$$ = $('<div></div>');
-    var $self$$2$$ = this, $romContainer$$ = $('<div class="roms"></div>'), $controls$$ = $('<div class="controls"></div>'), $fullscreenSupport$$ = $JSSMS$Utils$getPrefix$$(['fullscreenEnabled', 'mozFullScreenEnabled', 'webkitCancelFullScreen']);
+    var $self$$2$$ = this, $root_sms$$5$$ = $('<div></div>'), $romContainer$$ = $('<div class="roms"></div>'), $controls$$ = $('<div class="controls"></div>'), $fullscreenSupport$$ = $JSSMS$Utils$getPrefix$$(['fullscreenEnabled', 'mozFullScreenEnabled', 'webkitCancelFullScreen']);
     this.$hiddenPrefix$ = $JSSMS$Utils$getPrefix$$(['hidden', 'mozHidden', 'webkitHidden', 'msHidden']);
     this.screen = $('<canvas width=256 height=192 class="screen"></canvas>');
     this.$canvasContext$ = this.screen[0].getContext('2d');
@@ -3634,7 +3634,7 @@ function $JSSMS$DummyUI$$($sms$$4$$) {
       $self$$2$$.$main$.$isRunning$ ? ($self$$2$$.$main$.stop(), $self$$2$$.updateStatus('Paused'), $self$$2$$.$buttons$.start.attr('value', 'Start')) : ($self$$2$$.$main$.start(), $self$$2$$.$buttons$.start.attr('value', 'Stop'));
     }), this.$buttons$.$restart$.click(function() {
       $self$$2$$.$main$.$reloadRom$() ? ($self$$2$$.$main$.reset(), $self$$2$$.$main$.$vdp$.$forceFullRedraw$(), $self$$2$$.$main$.start()) : $(this).attr('disabled', 'disabled');
-    }), this.$buttons$.$sound$.click($JSCompiler_emptyFn$$()), this.$zoomed$ = $false$$, this.$buttons$.zoom.click(function() {
+    }), this.$buttons$.$sound$.click($JSCompiler_emptyFn$$()), this.$zoomed$ = $JSCompiler_alias_FALSE$$, this.$buttons$.zoom.click(function() {
       $self$$2$$.$zoomed$ ? ($self$$2$$.screen.animate({width: '256px', height: '192px'}, function() {
         $(this).removeAttr('style');
       }), $self$$2$$.$buttons$.zoom.attr('value', 'Zoom in')) : ($self$$2$$.screen.animate({width: '512px', height: '384px'}), $self$$2$$.$buttons$.zoom.attr('value', 'Zoom out'));
@@ -3686,11 +3686,11 @@ function $JSSMS$DummyUI$$($sms$$4$$) {
     this.$main$.$soundEnabled$ ? this.$buttons$.$sound$.attr('value', 'Disable sound') : this.$buttons$.$sound$.attr('value', 'Enable sound');
   }, updateStatus: function $$UI$$$$updateStatus$($s$$3$$) {
     this.log.text($s$$3$$);
-  }, $writeFrame$: function $$UI$$$$$writeFrame$$($buffer$$11$$) {
+  }, $writeFrame$: function $$UI$$$$$writeFrame$$($buffer$$8$$) {
     if (!this.$hiddenPrefix$ || !document[this.$hiddenPrefix$]) {
       var $imageData$$ = this.$canvasImageData$.data, $pixel$$, $i$$23$$, $j$$2$$;
       for ($i$$23$$ = 0; 49152 >= $i$$23$$; $i$$23$$++) {
-        $pixel$$ = $buffer$$11$$[$i$$23$$], $j$$2$$ = 4 * $i$$23$$, $imageData$$[$j$$2$$] = $pixel$$ & 255, $imageData$$[$j$$2$$ + 1] = $pixel$$ >> 8 & 255, $imageData$$[$j$$2$$ + 2] = $pixel$$ >> 16 & 255;
+        $pixel$$ = $buffer$$8$$[$i$$23$$], $j$$2$$ = 4 * $i$$23$$, $imageData$$[$j$$2$$] = $pixel$$ & 255, $imageData$$[$j$$2$$ + 1] = $pixel$$ >> 8 & 255, $imageData$$[$j$$2$$ + 2] = $pixel$$ >> 16 & 255;
       }
       this.$canvasContext$.putImageData(this.$canvasImageData$, 0, 0);
     }
@@ -3708,24 +3708,24 @@ function $JSSMS$Ports$$($sms$$6$$) {
 }
 $JSSMS$Ports$$.prototype = {reset: function $$JSSMS$Ports$$$$reset$() {
   this.$ioPorts$ = Array(2);
-}, $out$: function $$JSSMS$Ports$$$$$out$$($port$$, $value$$82$$) {
+}, $out$: function $$JSSMS$Ports$$$$$out$$($port$$, $value$$80$$) {
   if (!(this.$main$.$is_gg$ && 7 > $port$$)) {
     switch ($port$$ & 193) {
       case 1:
-        this.$ioPorts$[0] = ($value$$82$$ & 32) << 1;
-        this.$ioPorts$[1] = $value$$82$$ & 128;
+        this.$ioPorts$[0] = ($value$$80$$ & 32) << 1;
+        this.$ioPorts$[1] = $value$$80$$ & 128;
         0 == this.$europe$ && (this.$ioPorts$[0] = ~this.$ioPorts$[0], this.$ioPorts$[1] = ~this.$ioPorts$[1]);
         break;
       case 128:
-        this.$vdp$.$dataWrite$($value$$82$$);
+        this.$vdp$.$dataWrite$($value$$80$$);
         break;
       case 129:
-        this.$vdp$.$controlWrite$($value$$82$$);
+        this.$vdp$.$controlWrite$($value$$80$$);
         break;
       case 64:
 ;
       case 65:
-        this.$main$.$soundEnabled$ && this.$psg$.write($value$$82$$);
+        this.$main$.$soundEnabled$ && this.$psg$.write($value$$80$$);
     }
   }
 }, $in_$: function $$JSSMS$Ports$$$$$in_$$($port$$1$$) {
@@ -3765,4 +3765,4 @@ $JSSMS$Ports$$.prototype = {reset: function $$JSSMS$Ports$$$$reset$() {
 }};
 window.JSSMS = $JSSMS$$;
 jQuery.fn.JSSMSUI = jQuery.fn.$JSSMSUI$;
-var $console$$ = console;
+

@@ -22,11 +22,12 @@
                 <arg line="--js source/vdp.js" />
                 <arg line="--js source/ui.js" />
                 <arg line="--js source/ports.js" />
+                <arg line="--externs ${closure-compiler.dir}/contrib/externs/webkit_console.js" />
                 <arg line="--js_output_file @{outputfile}" />
-                <arg line="--compilation_level=@{compilationlevel}" />
+                <arg line="--compilation_level @{compilationlevel}" />
                 <arg line="--summary_detail_level @{summarydetaillevel}" />
                 <arg line="--warning_level @{warninglevel}" />
-                <arg line="--language_in=ECMASCRIPT5_STRICT" />
+                <arg line="--language_in ECMASCRIPT5_STRICT" />
                 <extraflags />
             </java>
         </sequential>
@@ -42,7 +43,7 @@
                 <arg line="--externs ${closure-compiler.dir}/contrib/externs/jquery-1.7.js" />
                 <arg line="--externs source/build/externs/fullscreen.js" />
                 <arg line="--externs source/build/externs/jquery.ajaxsettings.js" />
-                <arg line="--define='DEBUG=false'" />
+                <arg line="--define 'DEBUG=false'" />
                 <arg line="--debug false" />
             </extraflags>
         </closure-compile>
