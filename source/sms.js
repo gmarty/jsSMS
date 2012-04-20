@@ -56,7 +56,8 @@ var CLOCK_PAL = 3546893;
  */
 function JSSMS(opts) {
   this.opts = {
-    'ui': JSSMS.DummyUI
+    'ui': JSSMS.DummyUI,
+    'swfPath': 'lib/'
   };
   if (typeof opts != 'undefined') {
     var key;
@@ -153,7 +154,35 @@ JSSMS.prototype = {
    * Sound enabled.
    * @type {boolean}
    */
-  soundEnabled: false,
+  soundEnabled: true,
+
+
+  /**
+   * Audio buffer.
+   * Should be a Float32Array.
+   * @type {Array.<number>}
+   */
+  audioBuffer: [],
+
+
+  /**
+   * Offset into audio buffer.
+   * @type {number}
+   */
+  audioBufferOffset: 0,
+
+
+  /**
+   * Number of samples to generate per frame.
+   * @type {number}
+   */
+  samplesPerFrame: 0,
+
+
+  /** How many samples to generate per line.
+   * @type {Array.<number>}
+   */
+  samplesPerLine: [],
 
 
   // Emulation Related
@@ -331,8 +360,8 @@ JSSMS.prototype = {
       if (Setup.DEBUG_TIMING) this.z80TimeCounter += +new Date() - startTime;
 
       // PSG
-      //if (this.soundEnabled)
-      //this.updateSound(lineno);
+      if (this.soundEnabled)
+        this.updateSound(lineno);
 
       // VDP
       this.vdp.line = lineno;
@@ -348,8 +377,8 @@ JSSMS.prototype = {
       this.vdp.interrupts(lineno);
     }
 
-    //if (this.soundEnabled)
-    //audioOutput(audioBuffer);
+    if (this.soundEnabled)
+      this.audioOutput(this.audioBuffer);
 
     // Reset framecount once we've drawn 60 frames per second
     if (Setup.DEBUG_TIMING && ++this.frameCount == 60) {
@@ -413,7 +442,8 @@ JSSMS.prototype = {
    * http://www.smspower.org/dev/docs/wiki/Systems/MasterSystem
    */
   setVideoTiming: function(mode) {
-    var clockSpeedHz = 0;
+    var clockSpeedHz = 0,
+        i, v;
 
     // Game Gear should only work in NTSC
     if (mode == NTSC || this.is_gg) {
@@ -431,29 +461,38 @@ JSSMS.prototype = {
     this.vdp.videoMode = mode;
 
     // Setup appropriate sound buffer
-    /*if (SUPPORTS_SOUND) {
-      psg.init(clockSpeedHz, SAMPLE_RATE);
+    if (this.soundEnabled) {
+      this.psg.init(clockSpeedHz, SAMPLE_RATE);
 
-      samplesPerFrame = SAMPLE_RATE / fps;
+      this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps);
 
-      if (audioBuffer == null || audioBuffer.length != samplesPerFrame)
-        audioBuffer = new byte[samplesPerFrame];
+      if (this.audioBuffer.length == 0 || this.audioBuffer.length != this.samplesPerFrame)
+        this.audioBuffer = new Array(this.samplesPerFrame);
 
-      if (samplesPerLine == null || samplesPerLine.length != no_of_scanlines) {
-        samplesPerLine = new int[no_of_scanlines];
+      if (this.samplesPerLine.length == 0 || this.samplesPerLine.length != this.no_of_scanlines) {
+        this.samplesPerLine = new Array(this.no_of_scanlines);
 
-        int fractional = 0;
+        var fractional = 0;
 
         // Calculate number of sound samples to generate per scanline
-        for (var i = 0; i < no_of_scanlines; i++) {
-          var v = ((samplesPerFrame << 16) / no_of_scanlines) + fractional;
+        for (i = 0; i < this.no_of_scanlines; i++) {
+          v = ((this.samplesPerFrame << 16) / this.no_of_scanlines) + fractional;
           fractional = v - ((v >> 16) << 16);
-          samplesPerLine[i] = v >> 16;
+          this.samplesPerLine[i] = v >> 16;
         }
       }
-    }*/
+    }
 
     //setFrameSkip(frameSkip);
+  },
+
+
+  // Sound Output
+  /**
+   * @param {Array.<number>} buffer
+   */
+  audioOutput: function(buffer) {
+    this.ui.writeAudio(buffer);
   },
 
 
@@ -483,6 +522,19 @@ JSSMS.prototype = {
   resetFps: function() {
     this.lastFpsTime = null;
     this.fpsFrameCount = 0;
+  },
+
+
+  /**
+   * @param {number} line
+   */
+  updateSound: function(line) {
+    if (line == 0)
+      this.audioBufferOffset = 0;
+
+    var samplesToGenerate = this.samplesPerLine[line];
+    this.audioBuffer = this.psg.update(this.audioBuffer, this.audioBufferOffset, samplesToGenerate);
+    this.audioBufferOffset += samplesToGenerate;
   },
 
 

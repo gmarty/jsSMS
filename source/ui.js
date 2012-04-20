@@ -294,6 +294,13 @@ if (typeof $ !== 'undefined') {
 
 
       /**
+       * @param {Array.<number>} buffer
+       */
+      writeAudio: function(buffer) {
+      },
+
+
+      /**
        * Update the canvas screen. ATM, prevBuffer is not used. See JSNES for
        * an implementation of differential update.
        *

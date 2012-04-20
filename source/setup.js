@@ -34,6 +34,14 @@ var DEBUG = true;
 var ACCURATE = true;
 
 
+// Sound Output
+/**
+ * Sample Rate
+ * @const
+ */
+var SAMPLE_RATE = 44100; //8000
+
+
 /**
  * @const
  */
