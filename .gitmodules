@@ -1,0 +1,3 @@
+[submodule "lib/XAudioJS"]
+	path = lib/XAudioJS
+	url = git@github.com:gmarty/XAudioJS.git
