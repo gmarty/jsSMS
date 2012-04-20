@@ -184,6 +184,9 @@ if (typeof $ !== 'undefined') {
             self.main.keyboard.keyup(evt);
             //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
           });
+
+      // Sound
+      self.sound = new XAudioServer(1, SAMPLE_RATE, 0, 8192 * 100, null, 1);
     };
 
     UI.prototype = {
@@ -297,6 +300,7 @@ if (typeof $ !== 'undefined') {
        * @param {Array.<number>} buffer
        */
       writeAudio: function(buffer) {
+        return this.sound.writeAudioNoCallback(buffer);
       },
 
 

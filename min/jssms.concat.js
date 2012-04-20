@@ -18,13 +18,14 @@
 */
 'use strict';var DEBUG = true;
 var ACCURATE = true;
+var SAMPLE_RATE = 44100;
 var Setup = {DEBUG_TIMING: DEBUG, REFRESH_EMULATION: false, ACCURATE_INTERRUPT_EMULATION: ACCURATE, LIGHTGUN: false, VDP_SPRITE_COLLISIONS: ACCURATE, PAGE_SIZE: 1024};
 var frameTime = 17;
 var fpsInterval = 500;
 var CLOCK_NTSC = 3579545;
 var CLOCK_PAL = 3546893;
 function JSSMS(opts) {
-  this.opts = {'ui': JSSMS.DummyUI};
+  this.opts = {'ui': JSSMS.DummyUI, 'swfPath': 'lib/'};
   if (typeof opts != 'undefined') {
     var key;
     for (key in this.opts) {
@@ -41,7 +42,7 @@ function JSSMS(opts) {
   this.cpu = new JSSMS.Z80(this);
   this.ui.updateStatus('Ready to load a ROM.');
 }
-JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frameSkip: 0, throttle: true, fps: 0, frameskip_counter: 0, pause_button: false, is_sms: true, is_gg: false, soundEnabled: false, emuWidth: 0, emuHeight: 0, fpsFrameCount: 0, z80Time: 0, drawTime: 0, z80TimeCounter: 0, drawTimeCounter: 0, frameCount: 0, romData: '', romFileName: '', reset: function() {
+JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frameSkip: 0, throttle: true, fps: 0, frameskip_counter: 0, pause_button: false, is_sms: true, is_gg: false, soundEnabled: true, audioBuffer: [], audioBufferOffset: 0, samplesPerFrame: 0, samplesPerLine: [], emuWidth: 0, emuHeight: 0, fpsFrameCount: 0, z80Time: 0, drawTime: 0, z80TimeCounter: 0, drawTimeCounter: 0, frameCount: 0, romData: '', romFileName: '', reset: function() {
   this.setVideoTiming(this.vdp.videoMode);
   this.frameCount = 0;
   this.frameskip_counter = this.frameSkip;
@@ -97,6 +98,9 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
     if (Setup.DEBUG_TIMING) {
       this.z80TimeCounter += +new Date - startTime;
     }
+    if (this.soundEnabled) {
+      this.updateSound(lineno);
+    }
     this.vdp.line = lineno;
     if (this.frameskip_counter == 0 && lineno < 192) {
       if (Setup.DEBUG_TIMING) {
@@ -108,6 +112,9 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
       }
     }
     this.vdp.interrupts(lineno);
+  }
+  if (this.soundEnabled) {
+    this.audioOutput(this.audioBuffer);
   }
   if (Setup.DEBUG_TIMING && ++this.frameCount == 60) {
     this.z80Time = this.z80TimeCounter;
@@ -140,7 +147,7 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
   this.emuWidth = GG_WIDTH;
   this.emuHeight = GG_HEIGHT;
 }, setVideoTiming: function(mode) {
-  var clockSpeedHz = 0;
+  var clockSpeedHz = 0, i, v;
   if (mode == NTSC || this.is_gg) {
     this.fps = 60;
     this.no_of_scanlines = SMS_Y_PIXELS_NTSC;
@@ -154,6 +161,24 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
   }
   this.cyclesPerLine = Math.round(clockSpeedHz / this.fps / this.no_of_scanlines + 1);
   this.vdp.videoMode = mode;
+  if (this.soundEnabled) {
+    this.psg.init(clockSpeedHz, SAMPLE_RATE);
+    this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps);
+    if (this.audioBuffer.length == 0 || this.audioBuffer.length != this.samplesPerFrame) {
+      this.audioBuffer = new Array(this.samplesPerFrame);
+    }
+    if (this.samplesPerLine.length == 0 || this.samplesPerLine.length != this.no_of_scanlines) {
+      this.samplesPerLine = new Array(this.no_of_scanlines);
+      var fractional = 0;
+      for (i = 0; i < this.no_of_scanlines; i++) {
+        v = (this.samplesPerFrame << 16) / this.no_of_scanlines + fractional;
+        fractional = v - (v >> 16 << 16);
+        this.samplesPerLine[i] = v >> 16;
+      }
+    }
+  }
+}, audioOutput: function(buffer) {
+  this.ui.writeAudio(buffer);
 }, doRepaint: function() {
   this.ui.writeFrame(this.vdp.display, []);
 }, printFps: function() {
@@ -167,6 +192,13 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
 }, resetFps: function() {
   this.lastFpsTime = null;
   this.fpsFrameCount = 0;
+}, updateSound: function(line) {
+  if (line == 0) {
+    this.audioBufferOffset = 0;
+  }
+  var samplesToGenerate = this.samplesPerLine[line];
+  this.audioBuffer = this.psg.update(this.audioBuffer, this.audioBufferOffset, samplesToGenerate);
+  this.audioBufferOffset += samplesToGenerate;
 }, readRomDirectly: function(data, fileName) {
   var pages;
   var mode = fileName.substr(-3).toLowerCase() === '.gg' ? 2 : 1;
@@ -3960,10 +3992,130 @@ JSSMS.Keyboard.prototype = {reset: function() {
   }
   evt.preventDefault();
 }};
+var SCALE = 8;
+var NO_ANTIALIAS = Number.MIN_VALUE;
+var SHIFT_RESET = 32768;
+var FEEDBACK_PATTERN = 9;
+var PSG_VOLUME = [25, 20, 16, 13, 10, 8, 6, 5, 4, 3, 3, 2, 2, 1, 1, 0];
 JSSMS.SN76489 = function(sms) {
   this.main = sms;
+  this.clock = 0;
+  this.clockFrac = 0;
+  this.reg = new Array(8);
+  this.regLatch = 0;
+  this.freqCounter = new Array(4);
+  this.freqPolarity = new Array(4);
+  this.freqPos = new Array(3);
+  this.noiseFreq = 16;
+  this.noiseShiftReg = SHIFT_RESET;
+  this.outputChannel = new Array(4);
 };
-JSSMS.SN76489.prototype = {write: function(value) {
+JSSMS.SN76489.prototype = {init: function(clockSpeed, sampleRate) {
+  this.clock = (clockSpeed << SCALE) / 16 / sampleRate;
+  this.clockFrac = 0;
+  this.regLatch = 0;
+  this.noiseFreq = 16;
+  this.noiseShiftReg = SHIFT_RESET;
+  for (var i = 0; i < 4; i++) {
+    this.reg[i << 1] = 1;
+    this.reg[(i << 1) + 1] = 15;
+    this.freqCounter[i] = 0;
+    this.freqPolarity[i] = 1;
+    if (i != 3) {
+      this.freqPos[i] = NO_ANTIALIAS;
+    }
+  }
+}, write: function(value) {
+  if ((value & 128) != 0) {
+    this.regLatch = value >> 4 & 7;
+    this.reg[this.regLatch] = this.reg[this.regLatch] & 1008 | value & 15;
+  }else {
+    if (this.regLatch == 0 || this.regLatch == 2 || this.regLatch == 4) {
+      this.reg[this.regLatch] = this.reg[this.regLatch] & 15 | (value & 63) << 4;
+    }else {
+      this.reg[this.regLatch] = value & 15;
+    }
+  }
+  switch (this.regLatch) {
+    case 0:
+;
+    case 2:
+;
+    case 4:
+      if (this.reg[this.regLatch] == 0) {
+        this.reg[this.regLatch] = 1;
+      }
+      break;
+    case 6:
+      this.noiseFreq = 16 << (this.reg[6] & 3);
+      this.noiseShiftReg = SHIFT_RESET;
+      break;
+  }
+}, update: function(buffer, offset, samplesToGenerate) {
+  var sample, i;
+  for (sample = 0; sample < samplesToGenerate; sample++) {
+    for (i = 0; i < 3; i++) {
+      if (this.freqPos[i] != NO_ANTIALIAS) {
+        this.outputChannel[i] = PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPos[i] >> SCALE;
+      }else {
+        this.outputChannel[i] = PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPolarity[i];
+      }
+    }
+    this.outputChannel[3] = PSG_VOLUME[this.reg[7]] * (this.noiseShiftReg & 1) << 1;
+    var output = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
+    if (output > 127) {
+      output = 127;
+    }else {
+      if (output < -128) {
+        output = -128;
+      }
+    }
+    buffer[offset + sample] = output;
+    this.clockFrac += this.clock;
+    var clockCycles = this.clockFrac >> SCALE;
+    var clockCyclesScaled = clockCycles << SCALE;
+    this.clockFrac -= clockCyclesScaled;
+    this.freqCounter[0] -= clockCycles;
+    this.freqCounter[1] -= clockCycles;
+    this.freqCounter[2] -= clockCycles;
+    if (this.noiseFreq == 128) {
+      this.freqCounter[3] = this.freqCounter[2];
+    }else {
+      this.freqCounter[3] -= clockCycles;
+    }
+    for (i = 0; i < 3; i++) {
+      var counter = this.freqCounter[i];
+      if (counter <= 0) {
+        var tone = this.reg[i << 1];
+        if (tone > 6) {
+          this.freqPos[i] = (clockCyclesScaled - this.clockFrac + (2 << SCALE) * counter << SCALE) * this.freqPolarity[i] / (clockCyclesScaled + this.clockFrac);
+          this.freqPolarity[i] = -this.freqPolarity[i];
+        }else {
+          this.freqPolarity[i] = 1;
+          this.freqPos[i] = NO_ANTIALIAS;
+        }
+        this.freqCounter[i] += tone * (clockCycles / tone + 1);
+      }else {
+        this.freqPos[i] = NO_ANTIALIAS;
+      }
+    }
+    if (this.freqCounter[3] <= 0) {
+      this.freqPolarity[3] = -this.freqPolarity[3];
+      if (this.noiseFreq != 128) {
+        this.freqCounter[3] += this.noiseFreq * (clockCycles / this.noiseFreq + 1);
+      }
+      if (this.freqPolarity[3] == 1) {
+        var feedback;
+        if ((this.reg[6] & 4) != 0) {
+          feedback = (this.noiseShiftReg & FEEDBACK_PATTERN) != 0 && (this.noiseShiftReg & FEEDBACK_PATTERN ^ FEEDBACK_PATTERN) != 0 ? 1 : 0;
+        }else {
+          feedback = this.noiseShiftReg & 1;
+        }
+        this.noiseShiftReg = this.noiseShiftReg >> 1 | feedback << 15;
+      }
+    }
+  }
+  return buffer;
 }};
 var NTSC = 0;
 var PAL = 1;
@@ -4576,6 +4728,7 @@ if (typeof $ !== 'undefined') {
       }).bind('keyup', function(evt) {
         self.main.keyboard.keyup(evt);
       });
+      self.sound = new XAudioServer(1, SAMPLE_RATE, 0, 8192 * 100, null, 1);
     };
     UI.prototype = {reset: function() {
       this.screen[0].width = SMS_WIDTH;
@@ -4627,6 +4780,8 @@ if (typeof $ !== 'undefined') {
       }
     }, updateStatus: function(s) {
       this.log.text(s);
+    }, writeAudio: function(buffer) {
+      return this.sound.writeAudioNoCallback(buffer);
     }, writeFrame: function(buffer, prevBuffer) {
       if (this.hiddenPrefix && document[this.hiddenPrefix]) {
         return;
@@ -4784,4 +4939,1126 @@ JSSMS.Ports.prototype = {reset: function() {
 }, isDomestic: function() {
   return this.europe != 0;
 }};
+var swfobject = function() {
+  var UNDEF = 'undefined', OBJECT = 'object', SHOCKWAVE_FLASH = 'Shockwave Flash', SHOCKWAVE_FLASH_AX = 'ShockwaveFlash.ShockwaveFlash', FLASH_MIME_TYPE = 'application/x-shockwave-flash', EXPRESS_INSTALL_ID = 'SWFObjectExprInst', ON_READY_STATE_CHANGE = 'onreadystatechange', win = window, doc = document, nav = navigator, plugin = false, domLoadFnArr = [main], regObjArr = [], objIdArr = [], listenersArr = [], storedAltContent, storedAltContentId, storedCallbackFn, storedCallbackObj, isDomLoaded =
+      false, isExpressInstallActive = false, dynamicStylesheet, dynamicStylesheetMedia, autoHideShow = true, ua = function() {
+    var w3cdom = typeof doc.getElementById != UNDEF && typeof doc.getElementsByTagName != UNDEF && typeof doc.createElement != UNDEF, u = nav.userAgent.toLowerCase(), p = nav.platform.toLowerCase(), windows = p ? /win/.test(p) : /win/.test(u), mac = p ? /mac/.test(p) : /mac/.test(u), webkit = /webkit/.test(u) ? parseFloat(u.replace(/^.*webkit\/(\d+(\.\d+)?).*$/, '$1')) : false, ie = !+'\v1', playerVersion = [0, 0, 0], d = null;
+    if (typeof nav.plugins != UNDEF && typeof nav.plugins[SHOCKWAVE_FLASH] == OBJECT) {
+      d = nav.plugins[SHOCKWAVE_FLASH].description;
+      if (d && !(typeof nav.mimeTypes != UNDEF && nav.mimeTypes[FLASH_MIME_TYPE] && !nav.mimeTypes[FLASH_MIME_TYPE].enabledPlugin)) {
+        plugin = true;
+        ie = false;
+        d = d.replace(/^.*\s+(\S+\s+\S+$)/, '$1');
+        playerVersion[0] = parseInt(d.replace(/^(.*)\..*$/, '$1'), 10);
+        playerVersion[1] = parseInt(d.replace(/^.*\.(.*)\s.*$/, '$1'), 10);
+        playerVersion[2] = /[a-zA-Z]/.test(d) ? parseInt(d.replace(/^.*[a-zA-Z]+(.*)$/, '$1'), 10) : 0;
+      }
+    }else {
+      if (typeof win.ActiveXObject != UNDEF) {
+        try {
+          var a = new ActiveXObject(SHOCKWAVE_FLASH_AX);
+          if (a) {
+            d = a.GetVariable('$version');
+            if (d) {
+              ie = true;
+              d = d.split(' ')[1].split(',');
+              playerVersion = [parseInt(d[0], 10), parseInt(d[1], 10), parseInt(d[2], 10)];
+            }
+          }
+        }catch (e) {
+        }
+      }
+    }
+    return{w3: w3cdom, pv: playerVersion, wk: webkit, ie: ie, win: windows, mac: mac};
+  }(), onDomLoad = function() {
+    if (!ua.w3) {
+      return;
+    }
+    if (typeof doc.readyState != UNDEF && doc.readyState == 'complete' || typeof doc.readyState == UNDEF && (doc.getElementsByTagName('body')[0] || doc.body)) {
+      callDomLoadFunctions();
+    }
+    if (!isDomLoaded) {
+      if (typeof doc.addEventListener != UNDEF) {
+        doc.addEventListener('DOMContentLoaded', callDomLoadFunctions, false);
+      }
+      if (ua.ie && ua.win) {
+        doc.attachEvent(ON_READY_STATE_CHANGE, function() {
+          if (doc.readyState == 'complete') {
+            doc.detachEvent(ON_READY_STATE_CHANGE, arguments.callee);
+            callDomLoadFunctions();
+          }
+        });
+        if (win == top) {
+          (function() {
+            if (isDomLoaded) {
+              return;
+            }
+            try {
+              doc.documentElement.doScroll('left');
+            }catch (e) {
+              setTimeout(arguments.callee, 0);
+              return;
+            }
+            callDomLoadFunctions();
+          })();
+        }
+      }
+      if (ua.wk) {
+        (function() {
+          if (isDomLoaded) {
+            return;
+          }
+          if (!/loaded|complete/.test(doc.readyState)) {
+            setTimeout(arguments.callee, 0);
+            return;
+          }
+          callDomLoadFunctions();
+        })();
+      }
+      addLoadEvent(callDomLoadFunctions);
+    }
+  }();
+  function callDomLoadFunctions() {
+    if (isDomLoaded) {
+      return;
+    }
+    try {
+      var t = doc.getElementsByTagName('body')[0].appendChild(createElement('span'));
+      t.parentNode.removeChild(t);
+    }catch (e) {
+      return;
+    }
+    isDomLoaded = true;
+    var dl = domLoadFnArr.length;
+    for (var i = 0; i < dl; i++) {
+      domLoadFnArr[i]();
+    }
+  }
+  function addDomLoadEvent(fn) {
+    if (isDomLoaded) {
+      fn();
+    }else {
+      domLoadFnArr[domLoadFnArr.length] = fn;
+    }
+  }
+  function addLoadEvent(fn) {
+    if (typeof win.addEventListener != UNDEF) {
+      win.addEventListener('load', fn, false);
+    }else {
+      if (typeof doc.addEventListener != UNDEF) {
+        doc.addEventListener('load', fn, false);
+      }else {
+        if (typeof win.attachEvent != UNDEF) {
+          addListener(win, 'onload', fn);
+        }else {
+          if (typeof win.onload == 'function') {
+            var fnOld = win.onload;
+            win.onload = function() {
+              fnOld();
+              fn();
+            }
+          }else {
+            win.onload = fn;
+          }
+        }
+      }
+    }
+  }
+  function main() {
+    if (plugin) {
+      testPlayerVersion();
+    }else {
+      matchVersions();
+    }
+  }
+  function testPlayerVersion() {
+    var b = doc.getElementsByTagName('body')[0];
+    var o = createElement(OBJECT);
+    o.setAttribute('type', FLASH_MIME_TYPE);
+    var t = b.appendChild(o);
+    if (t) {
+      var counter = 0;
+      (function() {
+        if (typeof t.GetVariable != UNDEF) {
+          var d = t.GetVariable('$version');
+          if (d) {
+            d = d.split(' ')[1].split(',');
+            ua.pv = [parseInt(d[0], 10), parseInt(d[1], 10), parseInt(d[2], 10)];
+          }
+        }else {
+          if (counter < 10) {
+            counter++;
+            setTimeout(arguments.callee, 10);
+            return;
+          }
+        }
+        b.removeChild(o);
+        t = null;
+        matchVersions();
+      })();
+    }else {
+      matchVersions();
+    }
+  }
+  function matchVersions() {
+    var rl = regObjArr.length;
+    if (rl > 0) {
+      for (var i = 0; i < rl; i++) {
+        var id = regObjArr[i].id;
+        var cb = regObjArr[i].callbackFn;
+        var cbObj = {success: false, id: id};
+        if (ua.pv[0] > 0) {
+          var obj = getElementById(id);
+          if (obj) {
+            if (hasPlayerVersion(regObjArr[i].swfVersion) && !(ua.wk && ua.wk < 312)) {
+              setVisibility(id, true);
+              if (cb) {
+                cbObj.success = true;
+                cbObj.ref = getObjectById(id);
+                cb(cbObj);
+              }
+            }else {
+              if (regObjArr[i].expressInstall && canExpressInstall()) {
+                var att = {};
+                att.data = regObjArr[i].expressInstall;
+                att.width = obj.getAttribute('width') || '0';
+                att.height = obj.getAttribute('height') || '0';
+                if (obj.getAttribute('class')) {
+                  att.styleclass = obj.getAttribute('class');
+                }
+                if (obj.getAttribute('align')) {
+                  att.align = obj.getAttribute('align');
+                }
+                var par = {};
+                var p = obj.getElementsByTagName('param');
+                var pl = p.length;
+                for (var j = 0; j < pl; j++) {
+                  if (p[j].getAttribute('name').toLowerCase() != 'movie') {
+                    par[p[j].getAttribute('name')] = p[j].getAttribute('value');
+                  }
+                }
+                showExpressInstall(att, par, id, cb);
+              }else {
+                displayAltContent(obj);
+                if (cb) {
+                  cb(cbObj);
+                }
+              }
+            }
+          }
+        }else {
+          setVisibility(id, true);
+          if (cb) {
+            var o = getObjectById(id);
+            if (o && typeof o.SetVariable != UNDEF) {
+              cbObj.success = true;
+              cbObj.ref = o;
+            }
+            cb(cbObj);
+          }
+        }
+      }
+    }
+  }
+  function getObjectById(objectIdStr) {
+    var r = null;
+    var o = getElementById(objectIdStr);
+    if (o && o.nodeName == 'OBJECT') {
+      if (typeof o.SetVariable != UNDEF) {
+        r = o;
+      }else {
+        var n = o.getElementsByTagName(OBJECT)[0];
+        if (n) {
+          r = n;
+        }
+      }
+    }
+    return r;
+  }
+  function canExpressInstall() {
+    return!isExpressInstallActive && hasPlayerVersion('6.0.65') && (ua.win || ua.mac) && !(ua.wk && ua.wk < 312);
+  }
+  function showExpressInstall(att, par, replaceElemIdStr, callbackFn) {
+    isExpressInstallActive = true;
+    storedCallbackFn = callbackFn || null;
+    storedCallbackObj = {success: false, id: replaceElemIdStr};
+    var obj = getElementById(replaceElemIdStr);
+    if (obj) {
+      if (obj.nodeName == 'OBJECT') {
+        storedAltContent = abstractAltContent(obj);
+        storedAltContentId = null;
+      }else {
+        storedAltContent = obj;
+        storedAltContentId = replaceElemIdStr;
+      }
+      att.id = EXPRESS_INSTALL_ID;
+      if (typeof att.width == UNDEF || !/%$/.test(att.width) && parseInt(att.width, 10) < 310) {
+        att.width = '310';
+      }
+      if (typeof att.height == UNDEF || !/%$/.test(att.height) && parseInt(att.height, 10) < 137) {
+        att.height = '137';
+      }
+      doc.title = doc.title.slice(0, 47) + ' - Flash Player Installation';
+      var pt = ua.ie && ua.win ? 'ActiveX' : 'PlugIn', fv = 'MMredirectURL=' + win.location.toString().replace(/&/g, '%26') + '&MMplayerType=' + pt + '&MMdoctitle=' + doc.title;
+      if (typeof par.flashvars != UNDEF) {
+        par.flashvars += '&' + fv;
+      }else {
+        par.flashvars = fv;
+      }
+      if (ua.ie && ua.win && obj.readyState != 4) {
+        var newObj = createElement('div');
+        replaceElemIdStr += 'SWFObjectNew';
+        newObj.setAttribute('id', replaceElemIdStr);
+        obj.parentNode.insertBefore(newObj, obj);
+        obj.style.display = 'none';
+        (function() {
+          if (obj.readyState == 4) {
+            obj.parentNode.removeChild(obj);
+          }else {
+            setTimeout(arguments.callee, 10);
+          }
+        })();
+      }
+      createSWF(att, par, replaceElemIdStr);
+    }
+  }
+  function displayAltContent(obj) {
+    if (ua.ie && ua.win && obj.readyState != 4) {
+      var el = createElement('div');
+      obj.parentNode.insertBefore(el, obj);
+      el.parentNode.replaceChild(abstractAltContent(obj), el);
+      obj.style.display = 'none';
+      (function() {
+        if (obj.readyState == 4) {
+          obj.parentNode.removeChild(obj);
+        }else {
+          setTimeout(arguments.callee, 10);
+        }
+      })();
+    }else {
+      obj.parentNode.replaceChild(abstractAltContent(obj), obj);
+    }
+  }
+  function abstractAltContent(obj) {
+    var ac = createElement('div');
+    if (ua.win && ua.ie) {
+      ac.innerHTML = obj.innerHTML;
+    }else {
+      var nestedObj = obj.getElementsByTagName(OBJECT)[0];
+      if (nestedObj) {
+        var c = nestedObj.childNodes;
+        if (c) {
+          var cl = c.length;
+          for (var i = 0; i < cl; i++) {
+            if (!(c[i].nodeType == 1 && c[i].nodeName == 'PARAM') && !(c[i].nodeType == 8)) {
+              ac.appendChild(c[i].cloneNode(true));
+            }
+          }
+        }
+      }
+    }
+    return ac;
+  }
+  function createSWF(attObj, parObj, id) {
+    var r, el = getElementById(id);
+    if (ua.wk && ua.wk < 312) {
+      return r;
+    }
+    if (el) {
+      if (typeof attObj.id == UNDEF) {
+        attObj.id = id;
+      }
+      if (ua.ie && ua.win) {
+        var att = '';
+        for (var i in attObj) {
+          if (attObj[i] != Object.prototype[i]) {
+            if (i.toLowerCase() == 'data') {
+              parObj.movie = attObj[i];
+            }else {
+              if (i.toLowerCase() == 'styleclass') {
+                att += ' class="' + attObj[i] + '"';
+              }else {
+                if (i.toLowerCase() != 'classid') {
+                  att += ' ' + i + '="' + attObj[i] + '"';
+                }
+              }
+            }
+          }
+        }
+        var par = '';
+        for (var j in parObj) {
+          if (parObj[j] != Object.prototype[j]) {
+            par += '<param name="' + j + '" value="' + parObj[j] + '" />';
+          }
+        }
+        el.outerHTML = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"' + att + '>' + par + '</object>';
+        objIdArr[objIdArr.length] = attObj.id;
+        r = getElementById(attObj.id);
+      }else {
+        var o = createElement(OBJECT);
+        o.setAttribute('type', FLASH_MIME_TYPE);
+        for (var m in attObj) {
+          if (attObj[m] != Object.prototype[m]) {
+            if (m.toLowerCase() == 'styleclass') {
+              o.setAttribute('class', attObj[m]);
+            }else {
+              if (m.toLowerCase() != 'classid') {
+                o.setAttribute(m, attObj[m]);
+              }
+            }
+          }
+        }
+        for (var n in parObj) {
+          if (parObj[n] != Object.prototype[n] && n.toLowerCase() != 'movie') {
+            createObjParam(o, n, parObj[n]);
+          }
+        }
+        el.parentNode.replaceChild(o, el);
+        r = o;
+      }
+    }
+    return r;
+  }
+  function createObjParam(el, pName, pValue) {
+    var p = createElement('param');
+    p.setAttribute('name', pName);
+    p.setAttribute('value', pValue);
+    el.appendChild(p);
+  }
+  function removeSWF(id) {
+    var obj = getElementById(id);
+    if (obj && obj.nodeName == 'OBJECT') {
+      if (ua.ie && ua.win) {
+        obj.style.display = 'none';
+        (function() {
+          if (obj.readyState == 4) {
+            removeObjectInIE(id);
+          }else {
+            setTimeout(arguments.callee, 10);
+          }
+        })();
+      }else {
+        obj.parentNode.removeChild(obj);
+      }
+    }
+  }
+  function removeObjectInIE(id) {
+    var obj = getElementById(id);
+    if (obj) {
+      for (var i in obj) {
+        if (typeof obj[i] == 'function') {
+          obj[i] = null;
+        }
+      }
+      obj.parentNode.removeChild(obj);
+    }
+  }
+  function getElementById(id) {
+    var el = null;
+    try {
+      el = doc.getElementById(id);
+    }catch (e) {
+    }
+    return el;
+  }
+  function createElement(el) {
+    return doc.createElement(el);
+  }
+  function addListener(target, eventType, fn) {
+    target.attachEvent(eventType, fn);
+    listenersArr[listenersArr.length] = [target, eventType, fn];
+  }
+  function hasPlayerVersion(rv) {
+    var pv = ua.pv, v = rv.split('.');
+    v[0] = parseInt(v[0], 10);
+    v[1] = parseInt(v[1], 10) || 0;
+    v[2] = parseInt(v[2], 10) || 0;
+    return pv[0] > v[0] || pv[0] == v[0] && pv[1] > v[1] || pv[0] == v[0] && pv[1] == v[1] && pv[2] >= v[2] ? true : false;
+  }
+  function createCSS(sel, decl, media, newStyle) {
+    if (ua.ie && ua.mac) {
+      return;
+    }
+    var h = doc.getElementsByTagName('head')[0];
+    if (!h) {
+      return;
+    }
+    var m = media && typeof media == 'string' ? media : 'screen';
+    if (newStyle) {
+      dynamicStylesheet = null;
+      dynamicStylesheetMedia = null;
+    }
+    if (!dynamicStylesheet || dynamicStylesheetMedia != m) {
+      var s = createElement('style');
+      s.setAttribute('type', 'text/css');
+      s.setAttribute('media', m);
+      dynamicStylesheet = h.appendChild(s);
+      if (ua.ie && ua.win && typeof doc.styleSheets != UNDEF && doc.styleSheets.length > 0) {
+        dynamicStylesheet = doc.styleSheets[doc.styleSheets.length - 1];
+      }
+      dynamicStylesheetMedia = m;
+    }
+    if (ua.ie && ua.win) {
+      if (dynamicStylesheet && typeof dynamicStylesheet.addRule == OBJECT) {
+        dynamicStylesheet.addRule(sel, decl);
+      }
+    }else {
+      if (dynamicStylesheet && typeof doc.createTextNode != UNDEF) {
+        dynamicStylesheet.appendChild(doc.createTextNode(sel + ' {' + decl + '}'));
+      }
+    }
+  }
+  function setVisibility(id, isVisible) {
+    if (!autoHideShow) {
+      return;
+    }
+    var v = isVisible ? 'visible' : 'hidden';
+    if (isDomLoaded && getElementById(id)) {
+      getElementById(id).style.visibility = v;
+    }else {
+      createCSS('#' + id, 'visibility:' + v);
+    }
+  }
+  function urlEncodeIfNecessary(s) {
+    var regex = /[\\\"<>\.;]/;
+    var hasBadChars = regex.exec(s) != null;
+    return hasBadChars && typeof encodeURIComponent != UNDEF ? encodeURIComponent(s) : s;
+  }
+  var cleanup = function() {
+    if (ua.ie && ua.win) {
+      window.attachEvent('onunload', function() {
+        var ll = listenersArr.length;
+        for (var i = 0; i < ll; i++) {
+          listenersArr[i][0].detachEvent(listenersArr[i][1], listenersArr[i][2]);
+        }
+        var il = objIdArr.length;
+        for (var j = 0; j < il; j++) {
+          removeSWF(objIdArr[j]);
+        }
+        for (var k in ua) {
+          ua[k] = null;
+        }
+        ua = null;
+        for (var l in swfobject) {
+          swfobject[l] = null;
+        }
+        swfobject = null;
+      });
+    }
+  }();
+  return{registerObject: function(objectIdStr, swfVersionStr, xiSwfUrlStr, callbackFn) {
+    if (ua.w3 && objectIdStr && swfVersionStr) {
+      var regObj = {};
+      regObj.id = objectIdStr;
+      regObj.swfVersion = swfVersionStr;
+      regObj.expressInstall = xiSwfUrlStr;
+      regObj.callbackFn = callbackFn;
+      regObjArr[regObjArr.length] = regObj;
+      setVisibility(objectIdStr, false);
+    }else {
+      if (callbackFn) {
+        callbackFn({success: false, id: objectIdStr});
+      }
+    }
+  }, getObjectById: function(objectIdStr) {
+    if (ua.w3) {
+      return getObjectById(objectIdStr);
+    }
+  }, embedSWF: function(swfUrlStr, replaceElemIdStr, widthStr, heightStr, swfVersionStr, xiSwfUrlStr, flashvarsObj, parObj, attObj, callbackFn) {
+    var callbackObj = {success: false, id: replaceElemIdStr};
+    if (ua.w3 && !(ua.wk && ua.wk < 312) && swfUrlStr && replaceElemIdStr && widthStr && heightStr && swfVersionStr) {
+      setVisibility(replaceElemIdStr, false);
+      addDomLoadEvent(function() {
+        widthStr += '';
+        heightStr += '';
+        var att = {};
+        if (attObj && typeof attObj === OBJECT) {
+          for (var i in attObj) {
+            att[i] = attObj[i];
+          }
+        }
+        att.data = swfUrlStr;
+        att.width = widthStr;
+        att.height = heightStr;
+        var par = {};
+        if (parObj && typeof parObj === OBJECT) {
+          for (var j in parObj) {
+            par[j] = parObj[j];
+          }
+        }
+        if (flashvarsObj && typeof flashvarsObj === OBJECT) {
+          for (var k in flashvarsObj) {
+            if (typeof par.flashvars != UNDEF) {
+              par.flashvars += '&' + k + '=' + flashvarsObj[k];
+            }else {
+              par.flashvars = k + '=' + flashvarsObj[k];
+            }
+          }
+        }
+        if (hasPlayerVersion(swfVersionStr)) {
+          var obj = createSWF(att, par, replaceElemIdStr);
+          if (att.id == replaceElemIdStr) {
+            setVisibility(replaceElemIdStr, true);
+          }
+          callbackObj.success = true;
+          callbackObj.ref = obj;
+        }else {
+          if (xiSwfUrlStr && canExpressInstall()) {
+            att.data = xiSwfUrlStr;
+            showExpressInstall(att, par, replaceElemIdStr, callbackFn);
+            return;
+          }else {
+            setVisibility(replaceElemIdStr, true);
+          }
+        }
+        if (callbackFn) {
+          callbackFn(callbackObj);
+        }
+      });
+    }else {
+      if (callbackFn) {
+        callbackFn(callbackObj);
+      }
+    }
+  }, switchOffAutoHideShow: function() {
+    autoHideShow = false;
+  }, ua: ua, getFlashPlayerVersion: function() {
+    return{major: ua.pv[0], minor: ua.pv[1], release: ua.pv[2]};
+  }, hasFlashPlayerVersion: hasPlayerVersion, createSWF: function(attObj, parObj, replaceElemIdStr) {
+    if (ua.w3) {
+      return createSWF(attObj, parObj, replaceElemIdStr);
+    }else {
+      return undefined;
+    }
+  }, showExpressInstall: function(att, par, replaceElemIdStr, callbackFn) {
+    if (ua.w3 && canExpressInstall()) {
+      showExpressInstall(att, par, replaceElemIdStr, callbackFn);
+    }
+  }, removeSWF: function(objElemIdStr) {
+    if (ua.w3) {
+      removeSWF(objElemIdStr);
+    }
+  }, createCSS: function(selStr, declStr, mediaStr, newStyleBoolean) {
+    if (ua.w3) {
+      createCSS(selStr, declStr, mediaStr, newStyleBoolean);
+    }
+  }, addDomLoadEvent: addDomLoadEvent, addLoadEvent: addLoadEvent, getQueryParamValue: function(param) {
+    var q = doc.location.search || doc.location.hash;
+    if (q) {
+      if (/\?/.test(q)) {
+        q = q.split('?')[1];
+      }
+      if (param == null) {
+        return urlEncodeIfNecessary(q);
+      }
+      var pairs = q.split('&');
+      for (var i = 0; i < pairs.length; i++) {
+        if (pairs[i].substring(0, pairs[i].indexOf('=')) == param) {
+          return urlEncodeIfNecessary(pairs[i].substring(pairs[i].indexOf('=') + 1));
+        }
+      }
+    }
+    return'';
+  }, expressInstallCallback: function() {
+    if (isExpressInstallActive) {
+      var obj = getElementById(EXPRESS_INSTALL_ID);
+      if (obj && storedAltContent) {
+        obj.parentNode.replaceChild(storedAltContent, obj);
+        if (storedAltContentId) {
+          setVisibility(storedAltContentId, true);
+          if (ua.ie && ua.win) {
+            storedAltContent.style.display = 'block';
+          }
+        }
+        if (storedCallbackFn) {
+          storedCallbackFn(storedCallbackObj);
+        }
+      }
+      isExpressInstallActive = false;
+    }
+  }};
+}();
+function Resampler(fromSampleRate, toSampleRate, channels, outputBufferSize, noReturn) {
+  this.fromSampleRate = fromSampleRate;
+  this.toSampleRate = toSampleRate;
+  this.channels = channels | 0;
+  this.outputBufferSize = outputBufferSize;
+  this.noReturn = !!noReturn;
+  this.initialize();
+}
+Resampler.prototype.initialize = function() {
+  if (this.fromSampleRate > 0 && this.toSampleRate > 0 && this.channels > 0) {
+    if (this.fromSampleRate == this.toSampleRate) {
+      this.resampler = this.bypassResampler;
+      this.ratioWeight = 1;
+    }else {
+      this.compileInterpolationFunction();
+      this.resampler = this.interpolate;
+      this.ratioWeight = this.fromSampleRate / this.toSampleRate;
+      this.tailExists = false;
+      this.lastWeight = 0;
+      this.initializeBuffers();
+    }
+  }else {
+    throw new Error('Invalid settings specified for the resampler.');
+  }
+};
+Resampler.prototype.compileInterpolationFunction = function() {
+  var toCompile = 'var bufferLength = Math.min(buffer.length, this.outputBufferSize);  if ((bufferLength % ' + this.channels + ') == 0) {    if (bufferLength > 0) {      var ratioWeight = this.ratioWeight;      var weight = 0;';
+  for (var channel = 0; channel < this.channels; ++channel) {
+    toCompile += 'var output' + channel + ' = 0;';
+  }
+  toCompile += 'var actualPosition = 0;      var amountToNext = 0;      var alreadyProcessedTail = !this.tailExists;      this.tailExists = false;      var outputBuffer = this.outputBuffer;      var outputOffset = 0;      var currentPosition = 0;      do {        if (alreadyProcessedTail) {          weight = ratioWeight;';
+  for (channel = 0; channel < this.channels; ++channel) {
+    toCompile += 'output' + channel + ' = 0;';
+  }
+  toCompile += '}        else {          weight = this.lastWeight;';
+  for (channel = 0; channel < this.channels; ++channel) {
+    toCompile += 'output' + channel + ' = this.lastOutput[' + channel + '];';
+  }
+  toCompile += 'alreadyProcessedTail = true;        }        while (weight > 0 && actualPosition < bufferLength) {          amountToNext = 1 + actualPosition - currentPosition;          if (weight >= amountToNext) {';
+  for (channel = 0; channel < this.channels; ++channel) {
+    toCompile += 'output' + channel + ' += buffer[actualPosition++] * amountToNext;';
+  }
+  toCompile += 'currentPosition = actualPosition;            weight -= amountToNext;          }          else {';
+  for (channel = 0; channel < this.channels; ++channel) {
+    toCompile += 'output' + channel + ' += buffer[actualPosition' + (channel > 0 ? ' + ' + channel : '') + '] * weight;';
+  }
+  toCompile += 'currentPosition += weight;            weight = 0;            break;          }        }        if (weight == 0) {';
+  for (channel = 0; channel < this.channels; ++channel) {
+    toCompile += 'outputBuffer[outputOffset++] = output' + channel + ' / ratioWeight;';
+  }
+  toCompile += '}        else {          this.lastWeight = weight;';
+  for (channel = 0; channel < this.channels; ++channel) {
+    toCompile += 'this.lastOutput[' + channel + '] = output' + channel + ';';
+  }
+  toCompile += 'this.tailExists = true;          break;        }      } while (actualPosition < bufferLength);      return this.bufferSlice(outputOffset);    }    else {      return (this.noReturn) ? 0 : [];    }  }  else {    throw(new Error("Buffer was of incorrect sample length."));  }';
+  this.interpolate = Function('buffer', toCompile);
+};
+Resampler.prototype.bypassResampler = function(buffer) {
+  if (this.noReturn) {
+    this.outputBuffer = buffer;
+    return buffer.length;
+  }else {
+    return buffer;
+  }
+};
+Resampler.prototype.bufferSlice = function(sliceAmount) {
+  if (this.noReturn) {
+    return sliceAmount;
+  }else {
+    try {
+      return this.outputBuffer.subarray(0, sliceAmount);
+    }catch (error1) {
+      try {
+        this.outputBuffer.length = sliceAmount;
+        return this.outputBuffer;
+      }catch (error2) {
+        return this.outputBuffer.slice(0, sliceAmount);
+      }
+    }
+  }
+};
+Resampler.prototype.initializeBuffers = function(generateTailCache) {
+  this.outputBuffer = getFloat32(this.outputBufferSize);
+  this.lastOutput = getFloat32(this.channels);
+};
+function XAudioServer(channels, sampleRate, minBufferSize, maxBufferSize, underRunCallback, volume) {
+  this.audioChannels = channels == 2 ? 2 : 1;
+  webAudioMono = this.audioChannels == 1;
+  XAudioJSSampleRate = sampleRate > 0 && sampleRate <= 16777215 ? sampleRate : 44100;
+  webAudioMinBufferSize = minBufferSize >= samplesPerCallback << 1 && minBufferSize < maxBufferSize ? minBufferSize & (webAudioMono ? 4294967295 : 4294967294) : samplesPerCallback << 1;
+  webAudioMaxBufferSize = Math.floor(maxBufferSize) > webAudioMinBufferSize + this.audioChannels ? maxBufferSize & (webAudioMono ? 4294967295 : 4294967294) : minBufferSize << 1;
+  this.underRunCallback = typeof underRunCallback == 'function' ? underRunCallback : function() {
+  };
+  XAudioJSVolume = volume >= 0 && volume <= 1 ? volume : 1;
+  this.audioType = -1;
+  this.mozAudioTail = [];
+  this.audioHandleMoz = null;
+  this.audioHandleFlash = null;
+  this.flashInitialized = false;
+  this.mozAudioFound = false;
+  this.initializeAudio();
+}
+XAudioServer.prototype.MOZWriteAudio = function(buffer) {
+  this.MOZWriteAudioNoCallback(buffer);
+  this.MOZExecuteCallback();
+};
+XAudioServer.prototype.MOZWriteAudioNoCallback = function(buffer) {
+  this.writeMozAudio(buffer);
+};
+XAudioServer.prototype.callbackBasedWriteAudio = function(buffer) {
+  this.callbackBasedWriteAudioNoCallback(buffer);
+  this.callbackBasedExecuteCallback();
+};
+XAudioServer.prototype.callbackBasedWriteAudioNoCallback = function(buffer) {
+  var length = buffer.length;
+  for (var bufferCounter = 0; bufferCounter < length && audioBufferSize < webAudioMaxBufferSize;) {
+    audioContextSampleBuffer[audioBufferSize++] = buffer[bufferCounter++];
+  }
+};
+XAudioServer.prototype.writeAudio = function(buffer) {
+  if (this.audioType == 0) {
+    this.MOZWriteAudio(buffer);
+  }else {
+    if (this.audioType == 1) {
+      this.callbackBasedWriteAudio(buffer);
+    }else {
+      if (this.audioType == 2) {
+        if (this.checkFlashInit() || launchedContext) {
+          this.callbackBasedWriteAudio(buffer);
+        }else {
+          if (this.mozAudioFound) {
+            this.MOZWriteAudio(buffer);
+          }
+        }
+      }
+    }
+  }
+};
+XAudioServer.prototype.writeAudioNoCallback = function(buffer) {
+  if (this.audioType == 0) {
+    this.MOZWriteAudioNoCallback(buffer);
+  }else {
+    if (this.audioType == 1) {
+      this.callbackBasedWriteAudioNoCallback(buffer);
+    }else {
+      if (this.audioType == 2) {
+        if (this.checkFlashInit() || launchedContext) {
+          this.callbackBasedWriteAudioNoCallback(buffer);
+        }else {
+          if (this.mozAudioFound) {
+            this.MOZWriteAudioNoCallback(buffer);
+          }
+        }
+      }
+    }
+  }
+};
+XAudioServer.prototype.remainingBuffer = function() {
+  if (this.audioType == 0) {
+    return this.samplesAlreadyWritten - this.audioHandleMoz.mozCurrentSampleOffset();
+  }else {
+    if (this.audioType == 1) {
+      return (resampledSamplesLeft() * resampleControl.ratioWeight >> this.audioChannels - 1 << this.audioChannels - 1) + audioBufferSize;
+    }else {
+      if (this.audioType == 2) {
+        if (this.checkFlashInit() || launchedContext) {
+          return (resampledSamplesLeft() * resampleControl.ratioWeight >> this.audioChannels - 1 << this.audioChannels - 1) + audioBufferSize;
+        }else {
+          if (this.mozAudioFound) {
+            return this.samplesAlreadyWritten - this.audioHandleMoz.mozCurrentSampleOffset();
+          }
+        }
+      }
+    }
+  }
+  return 0;
+};
+XAudioServer.prototype.MOZExecuteCallback = function() {
+  var samplesRequested = webAudioMinBufferSize - this.remainingBuffer();
+  if (samplesRequested > 0) {
+    this.writeMozAudio(this.underRunCallback(samplesRequested));
+  }
+};
+XAudioServer.prototype.callbackBasedExecuteCallback = function() {
+  var samplesRequested = webAudioMinBufferSize - this.remainingBuffer();
+  if (samplesRequested > 0) {
+    this.callbackBasedWriteAudioNoCallback(this.underRunCallback(samplesRequested));
+  }
+};
+XAudioServer.prototype.executeCallback = function() {
+  if (this.audioType == 0) {
+    this.MOZExecuteCallback();
+  }else {
+    if (this.audioType == 1) {
+      this.callbackBasedExecuteCallback();
+    }else {
+      if (this.audioType == 2) {
+        if (this.checkFlashInit() || launchedContext) {
+          this.callbackBasedExecuteCallback();
+        }else {
+          if (this.mozAudioFound) {
+            this.MOZExecuteCallback();
+          }
+        }
+      }
+    }
+  }
+};
+XAudioServer.prototype.initializeAudio = function() {
+  try {
+    this.preInitializeMozAudio();
+    if (navigator.platform == 'Linux i686') {
+      throw new Error('');
+    }
+    this.initializeMozAudio();
+  }catch (error1) {
+    try {
+      this.initializeWebAudio();
+    }catch (error2) {
+      try {
+        this.initializeFlashAudio();
+      }catch (error3) {
+        throw new Error('Browser does not support real time audio output.');
+      }
+    }
+  }
+};
+XAudioServer.prototype.preInitializeMozAudio = function() {
+  this.audioHandleMoz = new Audio;
+  this.audioHandleMoz.mozSetup(this.audioChannels, XAudioJSSampleRate);
+  this.samplesAlreadyWritten = 0;
+  var emptySampleFrame = this.audioChannels == 2 ? getFloat32(2) : getFloat32(1);
+  var prebufferAmount = 0;
+  if (navigator.platform != 'MacIntel' && navigator.platform != 'MacPPC') {
+    while (this.audioHandleMoz.mozCurrentSampleOffset() == 0) {
+      prebufferAmount += this.audioHandleMoz.mozWriteAudio(emptySampleFrame);
+    }
+    var samplesToDoubleBuffer = prebufferAmount / this.audioChannels;
+    for (var index = 0; index < samplesToDoubleBuffer; index++) {
+      this.samplesAlreadyWritten += this.audioHandleMoz.mozWriteAudio(emptySampleFrame);
+    }
+  }
+  this.samplesAlreadyWritten += prebufferAmount;
+  webAudioMinBufferSize += this.samplesAlreadyWritten;
+  this.mozAudioFound = true;
+};
+XAudioServer.prototype.initializeMozAudio = function() {
+  this.writeMozAudio(getFloat32(webAudioMinBufferSize));
+  this.audioType = 0;
+};
+XAudioServer.prototype.initializeWebAudio = function() {
+  if (launchedContext) {
+    resetCallbackAPIAudioBuffer(webAudioActualSampleRate, samplesPerCallback);
+    this.audioType = 1;
+  }else {
+    throw new Error('');
+  }
+};
+XAudioServer.prototype.initializeFlashAudio = function() {
+  var existingFlashload = document.getElementById('XAudioJS');
+  if (existingFlashload == null) {
+    var thisObj = this;
+    var mainContainerNode = document.createElement('div');
+    mainContainerNode.setAttribute('style', 'position: fixed; bottom: 0px; right: 0px; margin: 0px; padding: 0px; border: none; width: 8px; height: 8px; overflow: hidden; z-index: -1000; ');
+    var containerNode = document.createElement('div');
+    containerNode.setAttribute('style', 'position: static; border: none; width: 0px; height: 0px; visibility: hidden; margin: 8px; padding: 0px;');
+    containerNode.setAttribute('id', 'XAudioJS');
+    mainContainerNode.appendChild(containerNode);
+    document.getElementsByTagName('body')[0].appendChild(mainContainerNode);
+    swfobject.embedSWF('XAudioJS.swf', 'XAudioJS', '8', '8', '9.0.0', '', {}, {'allowscriptaccess': 'always'}, {'style': 'position: static; visibility: hidden; margin: 8px; padding: 0px; border: none'}, function(event) {
+      if (event.success) {
+        thisObj.audioHandleFlash = event.ref;
+      }else {
+        thisObj.audioType = 1;
+      }
+    });
+  }else {
+    this.audioHandleFlash = existingFlashload;
+  }
+  this.audioType = 2;
+};
+XAudioServer.prototype.changeVolume = function(newVolume) {
+  if (newVolume >= 0 && newVolume <= 1) {
+    XAudioJSVolume = newVolume;
+    if (this.checkFlashInit()) {
+      this.audioHandleFlash.changeVolume(XAudioJSVolume);
+    }
+    if (this.mozAudioFound) {
+      this.audioHandleMoz.volume = XAudioJSVolume;
+    }
+  }
+};
+XAudioServer.prototype.writeMozAudio = function(buffer) {
+  var length = this.mozAudioTail.length;
+  if (length > 0) {
+    var samplesAccepted = this.audioHandleMoz.mozWriteAudio(this.mozAudioTail);
+    this.samplesAlreadyWritten += samplesAccepted;
+    this.mozAudioTail.splice(0, samplesAccepted);
+  }
+  length = Math.min(buffer.length, webAudioMaxBufferSize - this.samplesAlreadyWritten + this.audioHandleMoz.mozCurrentSampleOffset());
+  var samplesAccepted = this.audioHandleMoz.mozWriteAudio(buffer);
+  this.samplesAlreadyWritten += samplesAccepted;
+  for (var index = 0; length > samplesAccepted; --length) {
+    this.mozAudioTail.push(buffer[index++]);
+  }
+};
+XAudioServer.prototype.checkFlashInit = function() {
+  if (!this.flashInitialized && this.audioHandleFlash && this.audioHandleFlash.initialize) {
+    this.flashInitialized = true;
+    this.audioHandleFlash.initialize(this.audioChannels, XAudioJSVolume);
+    resetCallbackAPIAudioBuffer(44100, samplesPerCallback);
+  }
+  return this.flashInitialized;
+};
+function getFloat32(size) {
+  try {
+    return new Float32Array(size);
+  }catch (error) {
+    return new Array(size);
+  }
+}
+function getFloat32Flat(size) {
+  try {
+    var newBuffer = new Float32Array(size);
+  }catch (error) {
+    var newBuffer = new Array(size);
+    var audioSampleIndice = 0;
+    do {
+      newBuffer[audioSampleIndice] = 0;
+    }while (++audioSampleIndice < size);
+  }
+  return newBuffer;
+}
+var samplesPerCallback = 2048;
+var outputConvert = null;
+function audioOutputFlashEvent() {
+  resampleRefill();
+  return outputConvert();
+}
+function generateFlashStereoString() {
+  var copyBinaryStringLeft = '';
+  var copyBinaryStringRight = '';
+  for (var index = 0; index < samplesPerCallback && resampleBufferStart != resampleBufferEnd; ++index) {
+    copyBinaryStringLeft += String.fromCharCode((Math.min(Math.max(resampled[resampleBufferStart++] + 1, 0), 2) * 16383 | 0) + 12288);
+    copyBinaryStringRight += String.fromCharCode((Math.min(Math.max(resampled[resampleBufferStart++] + 1, 0), 2) * 16383 | 0) + 12288);
+    if (resampleBufferStart == resampleBufferSize) {
+      resampleBufferStart = 0;
+    }
+  }
+  return copyBinaryStringLeft + copyBinaryStringRight;
+}
+function generateFlashMonoString() {
+  var copyBinaryString = '';
+  for (var index = 0; index < samplesPerCallback && resampleBufferStart != resampleBufferEnd; ++index) {
+    copyBinaryString += String.fromCharCode((Math.min(Math.max(resampled[resampleBufferStart++] + 1, 0), 2) * 16383 | 0) + 12288);
+    if (resampleBufferStart == resampleBufferSize) {
+      resampleBufferStart = 0;
+    }
+  }
+  return copyBinaryString;
+}
+var audioContextHandle = null;
+var audioNode = null;
+var audioSource = null;
+var launchedContext = false;
+var audioContextSampleBuffer = [];
+var resampled = [];
+var webAudioMinBufferSize = 15E3;
+var webAudioMaxBufferSize = 25E3;
+var webAudioActualSampleRate = 44100;
+var XAudioJSSampleRate = 0;
+var webAudioMono = false;
+var XAudioJSVolume = 1;
+var resampleControl = null;
+var audioBufferSize = 0;
+var resampleBufferStart = 0;
+var resampleBufferEnd = 0;
+var resampleBufferSize = 2;
+function audioOutputEvent(event) {
+  var index = 0;
+  var buffer1 = event.outputBuffer.getChannelData(0);
+  var buffer2 = event.outputBuffer.getChannelData(1);
+  resampleRefill();
+  if (!webAudioMono) {
+    while (index < samplesPerCallback && resampleBufferStart != resampleBufferEnd) {
+      buffer1[index] = resampled[resampleBufferStart++] * XAudioJSVolume;
+      buffer2[index++] = resampled[resampleBufferStart++] * XAudioJSVolume;
+      if (resampleBufferStart == resampleBufferSize) {
+        resampleBufferStart = 0;
+      }
+    }
+  }else {
+    while (index < samplesPerCallback && resampleBufferStart != resampleBufferEnd) {
+      buffer2[index] = buffer1[index] = resampled[resampleBufferStart++] * XAudioJSVolume;
+      ++index;
+      if (resampleBufferStart == resampleBufferSize) {
+        resampleBufferStart = 0;
+      }
+    }
+  }
+  while (index < samplesPerCallback) {
+    buffer2[index] = buffer1[index] = 0;
+    ++index;
+  }
+}
+function resampleRefill() {
+  if (audioBufferSize > 0) {
+    var resampleLength = resampleControl.resampler(getBufferSamples());
+    var resampledResult = resampleControl.outputBuffer;
+    for (var index2 = 0; index2 < resampleLength; ++index2) {
+      resampled[resampleBufferEnd++] = resampledResult[index2];
+      if (resampleBufferEnd == resampleBufferSize) {
+        resampleBufferEnd = 0;
+      }
+      if (resampleBufferStart == resampleBufferEnd) {
+        ++resampleBufferStart;
+        if (resampleBufferStart == resampleBufferSize) {
+          resampleBufferStart = 0;
+        }
+      }
+    }
+    audioBufferSize = 0;
+  }
+}
+function resampledSamplesLeft() {
+  return (resampleBufferStart <= resampleBufferEnd ? 0 : resampleBufferSize) + resampleBufferEnd - resampleBufferStart;
+}
+function getBufferSamples() {
+  try {
+    return audioContextSampleBuffer.subarray(0, audioBufferSize);
+  }catch (error1) {
+    try {
+      audioContextSampleBuffer.length = audioBufferSize;
+      return audioContextSampleBuffer;
+    }catch (error2) {
+      return audioContextSampleBuffer.slice(0, audioBufferSize);
+    }
+  }
+}
+function resetCallbackAPIAudioBuffer(APISampleRate, bufferAlloc) {
+  audioContextSampleBuffer = getFloat32(webAudioMaxBufferSize);
+  audioBufferSize = webAudioMaxBufferSize;
+  resampleBufferStart = 0;
+  resampleBufferEnd = 0;
+  resampleBufferSize = Math.max(webAudioMaxBufferSize * Math.ceil(XAudioJSSampleRate / APISampleRate), samplesPerCallback) << 1;
+  if (webAudioMono) {
+    resampled = getFloat32Flat(resampleBufferSize);
+    resampleControl = new Resampler(XAudioJSSampleRate, APISampleRate, 1, resampleBufferSize, true);
+    outputConvert = generateFlashMonoString;
+  }else {
+    resampleBufferSize <<= 1;
+    resampled = getFloat32Flat(resampleBufferSize);
+    resampleControl = new Resampler(XAudioJSSampleRate, APISampleRate, 2, resampleBufferSize, true);
+    outputConvert = generateFlashStereoString;
+  }
+}
+(function() {
+  if (!launchedContext) {
+    try {
+      audioContextHandle = new webkitAudioContext;
+    }catch (error1) {
+      try {
+        audioContextHandle = new AudioContext;
+      }catch (error2) {
+        return;
+      }
+    }
+    try {
+      audioSource = audioContextHandle.createBufferSource();
+      audioSource.loop = false;
+      XAudioJSSampleRate = webAudioActualSampleRate = audioContextHandle.sampleRate;
+      audioSource.buffer = audioContextHandle.createBuffer(1, 1, webAudioActualSampleRate);
+      audioNode = audioContextHandle.createJavaScriptNode(samplesPerCallback, 1, 2);
+      audioNode.onaudioprocess = audioOutputEvent;
+      audioSource.connect(audioNode);
+      audioNode.connect(audioContextHandle.destination);
+      audioSource.noteOn(0);
+    }catch (error) {
+      return;
+    }
+    launchedContext = true;
+  }
+})();
 

@@ -22,7 +22,7 @@ function $JSCompiler_emptyFn$$() {
   }
 }
 ;function $JSSMS$$($opts$$) {
-  this.$opts$ = {ui: $JSSMS$DummyUI$$};
+  this.$opts$ = {ui: $JSSMS$DummyUI$$, swfPath: 'lib/'};
   if ('undefined' != typeof $opts$$) {
     for (var $key$$15$$ in this.$opts$) {
       'undefined' != typeof $opts$$[$key$$15$$] && (this.$opts$[$key$$15$$] = $opts$$[$key$$15$$]);
@@ -36,7 +36,7 @@ function $JSCompiler_emptyFn$$() {
   this.$cpu$ = new $JSSMS$Z80$$(this);
   this.$ui$.updateStatus('Ready to load a ROM.');
 }
-$JSSMS$$.prototype = {$isRunning$: $JSCompiler_alias_FALSE$$, $cyclesPerLine$: 0, $no_of_scanlines$: 0, $frameSkip$: 0, $fps$: 0, $frameskip_counter$: 0, $pause_button$: $JSCompiler_alias_FALSE$$, $is_sms$: $JSCompiler_alias_TRUE$$, $is_gg$: $JSCompiler_alias_FALSE$$, $soundEnabled$: $JSCompiler_alias_FALSE$$, $fpsFrameCount$: 0, $z80TimeCounter$: 0, $drawTimeCounter$: 0, $frameCount$: 0, $romData$: '', $romFileName$: '', reset: function $$JSSMS$$$$reset$() {
+$JSSMS$$.prototype = {$isRunning$: $JSCompiler_alias_FALSE$$, $cyclesPerLine$: 0, $no_of_scanlines$: 0, $frameSkip$: 0, $fps$: 0, $frameskip_counter$: 0, $pause_button$: $JSCompiler_alias_FALSE$$, $is_sms$: $JSCompiler_alias_TRUE$$, $is_gg$: $JSCompiler_alias_FALSE$$, $soundEnabled$: $JSCompiler_alias_TRUE$$, $audioBuffer$: [], $audioBufferOffset$: 0, $samplesPerFrame$: 0, $samplesPerLine$: [], $fpsFrameCount$: 0, $z80TimeCounter$: 0, $drawTimeCounter$: 0, $frameCount$: 0, $romData$: '', $romFileName$: '', reset: function $$JSSMS$$$$reset$() {
   this.$setVideoTiming$(this.$vdp$.$videoMode$);
   this.$frameCount$ = 0;
   this.$frameskip_counter$ = this.$frameSkip$;
@@ -65,10 +65,12 @@ $JSSMS$$.prototype = {$isRunning$: $JSCompiler_alias_FALSE$$, $cyclesPerLine$: 0
   this.$emulateNextFrame$() && this.$doRepaint$();
   this.$fpsFrameCount$++;
 }, $emulateNextFrame$: function $$JSSMS$$$$$emulateNextFrame$$() {
-  var $startTime$$1$$, $lineno$$;
+  var $startTime$$2$$, $lineno$$;
   for ($lineno$$ = 0; $lineno$$ < this.$no_of_scanlines$; $lineno$$++) {
-    $startTime$$1$$ = +new Date, 193 == $lineno$$ ? (this.$cpu$.$run$(this.$cyclesPerLine$, 8), this.$vdp$.$setVBlankFlag$(), this.$cpu$.$run$(0, 0)) : this.$cpu$.$run$(this.$cyclesPerLine$, 0), this.$z80TimeCounter$ += +new Date - $startTime$$1$$, this.$vdp$.$line$ = $lineno$$, 0 == this.$frameskip_counter$ && 192 > $lineno$$ && ($startTime$$1$$ = +new Date, this.$vdp$.$drawLine$($lineno$$), this.$drawTimeCounter$ += +new Date - $startTime$$1$$), this.$vdp$.$interrupts$($lineno$$);
+    $startTime$$2$$ = +new Date, 193 == $lineno$$ ? (this.$cpu$.$run$(this.$cyclesPerLine$, 8), this.$vdp$.$setVBlankFlag$(), this.$cpu$.$run$(0, 0)) : this.$cpu$.$run$(this.$cyclesPerLine$, 0), this.$z80TimeCounter$ += +new Date - $startTime$$2$$, this.$soundEnabled$ && this.$updateSound$($lineno$$), this.$vdp$.$line$ = $lineno$$, 0 == this.$frameskip_counter$ && 192 > $lineno$$ && ($startTime$$2$$ = +new Date, this.$vdp$.$drawLine$($lineno$$), this.$drawTimeCounter$ += +new Date - $startTime$$2$$),
+    this.$vdp$.$interrupts$($lineno$$);
   }
+  this.$soundEnabled$ && this.$audioOutput$(this.$audioBuffer$);
   60 == ++this.$frameCount$ && (this.$frameCount$ = this.$drawTimeCounter$ = this.$z80TimeCounter$ = 0);
   this.$pause_button$ && (this.$cpu$.$nmi$(), this.$pause_button$ = $JSCompiler_alias_FALSE$$);
   return 0 == this.$frameskip_counter$-- ? (this.$frameskip_counter$ = this.$frameSkip$, $JSCompiler_alias_TRUE$$) : $JSCompiler_alias_FALSE$$;
@@ -82,11 +84,26 @@ $JSSMS$$.prototype = {$isRunning$: $JSCompiler_alias_FALSE$$, $cyclesPerLine$: 0
   this.$is_sms$ = $JSCompiler_alias_FALSE$$;
   this.$vdp$.$h_start$ = 5;
   this.$vdp$.$h_end$ = 27;
-}, $setVideoTiming$: function $$JSSMS$$$$$setVideoTiming$$($mode$$8$$) {
-  var $clockSpeedHz$$ = 0;
-  0 == $mode$$8$$ || this.$is_gg$ ? (this.$fps$ = 60, this.$no_of_scanlines$ = 262, $clockSpeedHz$$ = 3579545) : 1 == $mode$$8$$ && (this.$fps$ = 50, this.$no_of_scanlines$ = 313, $clockSpeedHz$$ = 3546893);
-  this.$cyclesPerLine$ = Math.round($clockSpeedHz$$ / this.$fps$ / this.$no_of_scanlines$ + 1);
-  this.$vdp$.$videoMode$ = $mode$$8$$;
+}, $setVideoTiming$: function $$JSSMS$$$$$setVideoTiming$$($i$$1_mode$$8$$) {
+  var $clockSpeedHz_v$$ = 0;
+  0 == $i$$1_mode$$8$$ || this.$is_gg$ ? (this.$fps$ = 60, this.$no_of_scanlines$ = 262, $clockSpeedHz_v$$ = 3579545) : 1 == $i$$1_mode$$8$$ && (this.$fps$ = 50, this.$no_of_scanlines$ = 313, $clockSpeedHz_v$$ = 3546893);
+  this.$cyclesPerLine$ = Math.round($clockSpeedHz_v$$ / this.$fps$ / this.$no_of_scanlines$ + 1);
+  this.$vdp$.$videoMode$ = $i$$1_mode$$8$$;
+  if (this.$soundEnabled$) {
+    this.$psg$.$init$($clockSpeedHz_v$$, 44100);
+    this.$samplesPerFrame$ = Math.round(44100 / this.$fps$);
+    if (0 == this.$audioBuffer$.length || this.$audioBuffer$.length != this.$samplesPerFrame$) {
+      this.$audioBuffer$ = Array(this.$samplesPerFrame$);
+    }
+    if (0 == this.$samplesPerLine$.length || this.$samplesPerLine$.length != this.$no_of_scanlines$) {
+      this.$samplesPerLine$ = Array(this.$no_of_scanlines$);
+      for (var $fractional$$ = 0, $i$$1_mode$$8$$ = 0; $i$$1_mode$$8$$ < this.$no_of_scanlines$; $i$$1_mode$$8$$++) {
+        $clockSpeedHz_v$$ = (this.$samplesPerFrame$ << 16) / this.$no_of_scanlines$ + $fractional$$, $fractional$$ = $clockSpeedHz_v$$ - ($clockSpeedHz_v$$ >> 16 << 16), this.$samplesPerLine$[$i$$1_mode$$8$$] = $clockSpeedHz_v$$ >> 16;
+      }
+    }
+  }
+}, $audioOutput$: function $$JSSMS$$$$$audioOutput$$($buffer$$9$$) {
+  this.$ui$.$writeAudio$($buffer$$9$$);
 }, $doRepaint$: function $$JSSMS$$$$$doRepaint$$() {
   this.$ui$.$writeFrame$(this.$vdp$.display, []);
 }, $printFps$: function $$JSSMS$$$$$printFps$$() {
@@ -98,6 +115,11 @@ $JSSMS$$.prototype = {$isRunning$: $JSCompiler_alias_FALSE$$, $cyclesPerLine$: 0
 }, $resetFps$: function $$JSSMS$$$$$resetFps$$() {
   this.$lastFpsTime$ = $JSCompiler_alias_NULL$$;
   this.$fpsFrameCount$ = 0;
+}, $updateSound$: function $$JSSMS$$$$$updateSound$$($line_samplesToGenerate$$) {
+  0 == $line_samplesToGenerate$$ && (this.$audioBufferOffset$ = 0);
+  $line_samplesToGenerate$$ = this.$samplesPerLine$[$line_samplesToGenerate$$];
+  this.$audioBuffer$ = this.$psg$.update(this.$audioBuffer$, this.$audioBufferOffset$, $line_samplesToGenerate$$);
+  this.$audioBufferOffset$ += $line_samplesToGenerate$$;
 }, $readRomDirectly$: function $$JSSMS$$$$$readRomDirectly$$($data$$30$$, $fileName$$) {
   var $mode$$9_pages$$;
   $mode$$9_pages$$ = '.gg' === $fileName$$.substr(-3).toLowerCase() ? 2 : 1;
@@ -116,23 +138,23 @@ $JSSMS$$.prototype = {$isRunning$: $JSCompiler_alias_FALSE$$, $cyclesPerLine$: 0
   return $JSCompiler_alias_TRUE$$;
 }, $loadROM$: function $$JSSMS$$$$$loadROM$$($data$$31$$, $size$$10$$) {
   0 != $size$$10$$ % 1024 && ($data$$31$$ = $data$$31$$.substr(512), $size$$10$$ -= 512);
-  var $i$$1$$, $j$$, $number_of_pages$$ = Math.round($size$$10$$ / 1024), $pages$$1$$ = Array($number_of_pages$$);
-  for ($i$$1$$ = 0; $i$$1$$ < $number_of_pages$$; $i$$1$$++) {
-    $pages$$1$$[$i$$1$$] = Array(1024);
+  var $i$$2$$, $j$$, $number_of_pages$$ = Math.round($size$$10$$ / 1024), $pages$$1$$ = Array($number_of_pages$$);
+  for ($i$$2$$ = 0; $i$$2$$ < $number_of_pages$$; $i$$2$$++) {
+    $pages$$1$$[$i$$2$$] = Array(1024);
     for ($j$$ = 0; 1024 > $j$$; $j$$++) {
-      $pages$$1$$[$i$$1$$][$j$$] = $data$$31$$.charCodeAt(1024 * $i$$1$$ + $j$$) & 255;
+      $pages$$1$$[$i$$2$$][$j$$] = $data$$31$$.charCodeAt(1024 * $i$$2$$ + $j$$) & 255;
     }
   }
   return $pages$$1$$;
 }, $reloadRom$: function $$JSSMS$$$$$reloadRom$$() {
   return'' !== this.$romData$ && '' !== this.$romFileName$ ? this.$readRomDirectly$(this.$romData$, this.$romFileName$) : $JSCompiler_alias_FALSE$$;
 }};
-function $JSSMS$Utils$copyArray$$($src$$2$$) {
-  if (undefined === $src$$2$$) {
+function $JSSMS$Utils$copyArray$$($src$$3$$) {
+  if (undefined === $src$$3$$) {
     return [];
   }
-  for (var $i$$3$$ = $src$$2$$.length, $dest$$1$$ = Array($i$$3$$); $i$$3$$--;) {
-    'undefined' != typeof $src$$2$$[$i$$3$$] && ($dest$$1$$[$i$$3$$] = $src$$2$$[$i$$3$$]);
+  for (var $i$$4$$ = $src$$3$$.length, $dest$$1$$ = Array($i$$4$$); $i$$4$$--;) {
+    'undefined' != typeof $src$$3$$[$i$$4$$] && ($dest$$1$$[$i$$4$$] = $src$$3$$[$i$$4$$]);
   }
   return $dest$$1$$;
 }
@@ -996,8 +1018,8 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   $condition$$3$$ ? (this.push(this.$pc$ + 2), this.$pc$ = this.$readMemWord$(this.$pc$), this.$tstates$ -= 7) : this.$pc$ += 2;
 }, $ret$: function $$JSSMS$Z80$$$$$ret$$($condition$$4$$) {
   $condition$$4$$ && (this.$pc$ = this.$readMemWord$(this.$sp$), this.$sp$ += 2, this.$tstates$ -= 6);
-}, push: function $$JSSMS$Z80$$$$push$($value$$48$$, $l$$) {
-  'undefined' === typeof $l$$ ? (this.$writeMem$(--this.$sp$, $value$$48$$ >> 8), this.$writeMem$(--this.$sp$, $value$$48$$ & 255)) : (this.$writeMem$(--this.$sp$, $value$$48$$), this.$writeMem$(--this.$sp$, $l$$));
+}, push: function $$JSSMS$Z80$$$$push$($value$$51$$, $l$$) {
+  'undefined' === typeof $l$$ ? (this.$writeMem$(--this.$sp$, $value$$51$$ >> 8), this.$writeMem$(--this.$sp$, $value$$51$$ & 255)) : (this.$writeMem$(--this.$sp$, $value$$51$$), this.$writeMem$(--this.$sp$, $l$$));
 }, $incMem$: function $$JSSMS$Z80$$$$$incMem$$($offset$$14$$) {
   this.$writeMem$($offset$$14$$, this.$inc8$(this.$readMem$($offset$$14$$)));
 }, $decMem$: function $$JSSMS$Z80$$$$$decMem$$($offset$$15$$) {
@@ -1783,38 +1805,38 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
     default:
       console.log('Unimplemented CB Opcode: ' + $opcode$$3$$.toString(16));
   }
-}, $rlc$: function $$JSSMS$Z80$$$$$rlc$$($value$$49$$) {
-  var $carry$$ = ($value$$49$$ & 128) >> 7, $value$$49$$ = ($value$$49$$ << 1 | $value$$49$$ >> 7) & 255;
-  this.$f$ = $carry$$ | this.$SZP_TABLE$[$value$$49$$];
-  return $value$$49$$;
-}, $rrc$: function $$JSSMS$Z80$$$$$rrc$$($value$$50$$) {
-  var $carry$$1$$ = $value$$50$$ & 1, $value$$50$$ = ($value$$50$$ >> 1 | $value$$50$$ << 7) & 255;
-  this.$f$ = $carry$$1$$ | this.$SZP_TABLE$[$value$$50$$];
-  return $value$$50$$;
-}, $rl$: function $$JSSMS$Z80$$$$$rl$$($value$$51$$) {
-  var $carry$$2$$ = ($value$$51$$ & 128) >> 7, $value$$51$$ = ($value$$51$$ << 1 | this.$f$ & 1) & 255;
-  this.$f$ = $carry$$2$$ | this.$SZP_TABLE$[$value$$51$$];
-  return $value$$51$$;
-}, $rr$: function $$JSSMS$Z80$$$$$rr$$($value$$52$$) {
-  var $carry$$3$$ = $value$$52$$ & 1, $value$$52$$ = ($value$$52$$ >> 1 | this.$f$ << 7) & 255;
-  this.$f$ = $carry$$3$$ | this.$SZP_TABLE$[$value$$52$$];
+}, $rlc$: function $$JSSMS$Z80$$$$$rlc$$($value$$52$$) {
+  var $carry$$ = ($value$$52$$ & 128) >> 7, $value$$52$$ = ($value$$52$$ << 1 | $value$$52$$ >> 7) & 255;
+  this.$f$ = $carry$$ | this.$SZP_TABLE$[$value$$52$$];
   return $value$$52$$;
-}, $sla$: function $$JSSMS$Z80$$$$$sla$$($value$$53$$) {
-  var $carry$$4$$ = ($value$$53$$ & 128) >> 7, $value$$53$$ = $value$$53$$ << 1 & 255;
-  this.$f$ = $carry$$4$$ | this.$SZP_TABLE$[$value$$53$$];
+}, $rrc$: function $$JSSMS$Z80$$$$$rrc$$($value$$53$$) {
+  var $carry$$1$$ = $value$$53$$ & 1, $value$$53$$ = ($value$$53$$ >> 1 | $value$$53$$ << 7) & 255;
+  this.$f$ = $carry$$1$$ | this.$SZP_TABLE$[$value$$53$$];
   return $value$$53$$;
-}, $sll$: function $$JSSMS$Z80$$$$$sll$$($value$$54$$) {
-  var $carry$$5$$ = ($value$$54$$ & 128) >> 7, $value$$54$$ = ($value$$54$$ << 1 | 1) & 255;
-  this.$f$ = $carry$$5$$ | this.$SZP_TABLE$[$value$$54$$];
+}, $rl$: function $$JSSMS$Z80$$$$$rl$$($value$$54$$) {
+  var $carry$$2$$ = ($value$$54$$ & 128) >> 7, $value$$54$$ = ($value$$54$$ << 1 | this.$f$ & 1) & 255;
+  this.$f$ = $carry$$2$$ | this.$SZP_TABLE$[$value$$54$$];
   return $value$$54$$;
-}, $sra$: function $$JSSMS$Z80$$$$$sra$$($value$$55$$) {
-  var $carry$$6$$ = $value$$55$$ & 1, $value$$55$$ = $value$$55$$ >> 1 | $value$$55$$ & 128;
-  this.$f$ = $carry$$6$$ | this.$SZP_TABLE$[$value$$55$$];
+}, $rr$: function $$JSSMS$Z80$$$$$rr$$($value$$55$$) {
+  var $carry$$3$$ = $value$$55$$ & 1, $value$$55$$ = ($value$$55$$ >> 1 | this.$f$ << 7) & 255;
+  this.$f$ = $carry$$3$$ | this.$SZP_TABLE$[$value$$55$$];
   return $value$$55$$;
-}, $srl$: function $$JSSMS$Z80$$$$$srl$$($value$$56$$) {
-  var $carry$$7$$ = $value$$56$$ & 1, $value$$56$$ = $value$$56$$ >> 1 & 255;
-  this.$f$ = $carry$$7$$ | this.$SZP_TABLE$[$value$$56$$];
+}, $sla$: function $$JSSMS$Z80$$$$$sla$$($value$$56$$) {
+  var $carry$$4$$ = ($value$$56$$ & 128) >> 7, $value$$56$$ = $value$$56$$ << 1 & 255;
+  this.$f$ = $carry$$4$$ | this.$SZP_TABLE$[$value$$56$$];
   return $value$$56$$;
+}, $sll$: function $$JSSMS$Z80$$$$$sll$$($value$$57$$) {
+  var $carry$$5$$ = ($value$$57$$ & 128) >> 7, $value$$57$$ = ($value$$57$$ << 1 | 1) & 255;
+  this.$f$ = $carry$$5$$ | this.$SZP_TABLE$[$value$$57$$];
+  return $value$$57$$;
+}, $sra$: function $$JSSMS$Z80$$$$$sra$$($value$$58$$) {
+  var $carry$$6$$ = $value$$58$$ & 1, $value$$58$$ = $value$$58$$ >> 1 | $value$$58$$ & 128;
+  this.$f$ = $carry$$6$$ | this.$SZP_TABLE$[$value$$58$$];
+  return $value$$58$$;
+}, $srl$: function $$JSSMS$Z80$$$$$srl$$($value$$59$$) {
+  var $carry$$7$$ = $value$$59$$ & 1, $value$$59$$ = $value$$59$$ >> 1 & 255;
+  this.$f$ = $carry$$7$$ | this.$SZP_TABLE$[$value$$59$$];
+  return $value$$59$$;
 }, $bit$: function $$JSSMS$Z80$$$$$bit$$($mask$$5$$) {
   this.$f$ = this.$f$ & 1 | this.$SZ_BIT_TABLE$[$mask$$5$$];
 }, $doIndexOpIX$: function $$JSSMS$Z80$$$$$doIndexOpIX$$($location$$22_opcode$$4_temp$$2$$) {
@@ -2895,18 +2917,18 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   }
 }, $generateDAATable$: function $$JSSMS$Z80$$$$$generateDAATable$$() {
   this.$DAA_TABLE$ = Array(2048);
-  for (var $i$$4$$ = 256; 0 != $i$$4$$--;) {
+  for (var $i$$5$$ = 256; 0 != $i$$5$$--;) {
     for (var $c$$ = 0; 1 >= $c$$; $c$$++) {
       for (var $h$$4$$ = 0; 1 >= $h$$4$$; $h$$4$$++) {
         for (var $n$$1$$ = 0; 1 >= $n$$1$$; $n$$1$$++) {
-          this.$DAA_TABLE$[$c$$ << 8 | $n$$1$$ << 9 | $h$$4$$ << 10 | $i$$4$$] = this.$getDAAResult$($i$$4$$, $c$$ | $n$$1$$ << 1 | $h$$4$$ << 4);
+          this.$DAA_TABLE$[$c$$ << 8 | $n$$1$$ << 9 | $h$$4$$ << 10 | $i$$5$$] = this.$getDAAResult$($i$$5$$, $c$$ | $n$$1$$ << 1 | $h$$4$$ << 4);
         }
       }
     }
   }
   this.$a$ = this.$f$ = 0;
-}, $getDAAResult$: function $$JSSMS$Z80$$$$$getDAAResult$$($value$$57$$, $flags$$2$$) {
-  this.$a$ = $value$$57$$;
+}, $getDAAResult$: function $$JSSMS$Z80$$$$$getDAAResult$$($value$$60$$, $flags$$2$$) {
+  this.$a$ = $value$$60$$;
   this.$f$ = $flags$$2$$;
   var $a_copy$$1$$ = this.$a$, $correction$$ = 0, $carry$$8$$ = $flags$$2$$ & 1, $carry_copy$$ = $carry$$8$$;
   if (0 != ($flags$$2$$ & 16) || 9 < ($a_copy$$1$$ & 15)) {
@@ -2920,24 +2942,24 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   $flags$$2$$ = this.$f$ & 254 | $carry_copy$$;
   $flags$$2$$ = this.$getParity$(this.$a$) ? $flags$$2$$ & 251 | 4 : $flags$$2$$ & 251;
   return this.$a$ | $flags$$2$$ << 8;
-}, $add_a$: function $$JSSMS$Z80$$$$$add_a$$($temp$$5_value$$58$$) {
-  $temp$$5_value$$58$$ = this.$a$ + $temp$$5_value$$58$$ & 255;
-  this.$f$ = this.$SZHVC_ADD_TABLE$[this.$a$ << 8 | $temp$$5_value$$58$$];
-  this.$a$ = $temp$$5_value$$58$$;
-}, $adc_a$: function $$JSSMS$Z80$$$$$adc_a$$($temp$$6_value$$59$$) {
-  var $carry$$9$$ = this.$f$ & 1, $temp$$6_value$$59$$ = this.$a$ + $temp$$6_value$$59$$ + $carry$$9$$ & 255;
-  this.$f$ = this.$SZHVC_ADD_TABLE$[$carry$$9$$ << 16 | this.$a$ << 8 | $temp$$6_value$$59$$];
-  this.$a$ = $temp$$6_value$$59$$;
-}, $sub_a$: function $$JSSMS$Z80$$$$$sub_a$$($temp$$7_value$$60$$) {
-  $temp$$7_value$$60$$ = this.$a$ - $temp$$7_value$$60$$ & 255;
-  this.$f$ = this.$SZHVC_SUB_TABLE$[this.$a$ << 8 | $temp$$7_value$$60$$];
-  this.$a$ = $temp$$7_value$$60$$;
-}, $sbc_a$: function $$JSSMS$Z80$$$$$sbc_a$$($temp$$8_value$$61$$) {
-  var $carry$$10$$ = this.$f$ & 1, $temp$$8_value$$61$$ = this.$a$ - $temp$$8_value$$61$$ - $carry$$10$$ & 255;
-  this.$f$ = this.$SZHVC_SUB_TABLE$[$carry$$10$$ << 16 | this.$a$ << 8 | $temp$$8_value$$61$$];
-  this.$a$ = $temp$$8_value$$61$$;
-}, $cp_a$: function $$JSSMS$Z80$$$$$cp_a$$($value$$62$$) {
-  this.$f$ = this.$SZHVC_SUB_TABLE$[this.$a$ << 8 | this.$a$ - $value$$62$$ & 255];
+}, $add_a$: function $$JSSMS$Z80$$$$$add_a$$($temp$$5_value$$61$$) {
+  $temp$$5_value$$61$$ = this.$a$ + $temp$$5_value$$61$$ & 255;
+  this.$f$ = this.$SZHVC_ADD_TABLE$[this.$a$ << 8 | $temp$$5_value$$61$$];
+  this.$a$ = $temp$$5_value$$61$$;
+}, $adc_a$: function $$JSSMS$Z80$$$$$adc_a$$($temp$$6_value$$62$$) {
+  var $carry$$9$$ = this.$f$ & 1, $temp$$6_value$$62$$ = this.$a$ + $temp$$6_value$$62$$ + $carry$$9$$ & 255;
+  this.$f$ = this.$SZHVC_ADD_TABLE$[$carry$$9$$ << 16 | this.$a$ << 8 | $temp$$6_value$$62$$];
+  this.$a$ = $temp$$6_value$$62$$;
+}, $sub_a$: function $$JSSMS$Z80$$$$$sub_a$$($temp$$7_value$$63$$) {
+  $temp$$7_value$$63$$ = this.$a$ - $temp$$7_value$$63$$ & 255;
+  this.$f$ = this.$SZHVC_SUB_TABLE$[this.$a$ << 8 | $temp$$7_value$$63$$];
+  this.$a$ = $temp$$7_value$$63$$;
+}, $sbc_a$: function $$JSSMS$Z80$$$$$sbc_a$$($temp$$8_value$$64$$) {
+  var $carry$$10$$ = this.$f$ & 1, $temp$$8_value$$64$$ = this.$a$ - $temp$$8_value$$64$$ - $carry$$10$$ & 255;
+  this.$f$ = this.$SZHVC_SUB_TABLE$[$carry$$10$$ << 16 | this.$a$ << 8 | $temp$$8_value$$64$$];
+  this.$a$ = $temp$$8_value$$64$$;
+}, $cp_a$: function $$JSSMS$Z80$$$$$cp_a$$($value$$65$$) {
+  this.$f$ = this.$SZHVC_SUB_TABLE$[this.$a$ << 8 | this.$a$ - $value$$65$$ & 255];
 }, $cpl_a$: function $$JSSMS$Z80$$$$$cpl_a$$() {
   this.$a$ ^= 255;
   this.$f$ |= 18;
@@ -2967,21 +2989,21 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   return this.$ixH$ << 8 | this.$ixL$;
 }, $getIY$: function $$JSSMS$Z80$$$$$getIY$$() {
   return this.$iyH$ << 8 | this.$iyL$;
-}, $setBC$: function $$JSSMS$Z80$$$$$setBC$$($value$$63$$) {
-  this.$b$ = $value$$63$$ >> 8;
-  this.$c$ = $value$$63$$ & 255;
-}, $setDE$: function $$JSSMS$Z80$$$$$setDE$$($value$$64$$) {
-  this.$d$ = $value$$64$$ >> 8;
-  this.$e$ = $value$$64$$ & 255;
-}, $setHL$: function $$JSSMS$Z80$$$$$setHL$$($value$$65$$) {
-  this.$h$ = $value$$65$$ >> 8;
-  this.$l$ = $value$$65$$ & 255;
-}, $setIX$: function $$JSSMS$Z80$$$$$setIX$$($value$$66$$) {
-  this.$ixH$ = $value$$66$$ >> 8;
-  this.$ixL$ = $value$$66$$ & 255;
-}, $setIY$: function $$JSSMS$Z80$$$$$setIY$$($value$$67$$) {
-  this.$iyH$ = $value$$67$$ >> 8;
-  this.$iyL$ = $value$$67$$ & 255;
+}, $setBC$: function $$JSSMS$Z80$$$$$setBC$$($value$$66$$) {
+  this.$b$ = $value$$66$$ >> 8;
+  this.$c$ = $value$$66$$ & 255;
+}, $setDE$: function $$JSSMS$Z80$$$$$setDE$$($value$$67$$) {
+  this.$d$ = $value$$67$$ >> 8;
+  this.$e$ = $value$$67$$ & 255;
+}, $setHL$: function $$JSSMS$Z80$$$$$setHL$$($value$$68$$) {
+  this.$h$ = $value$$68$$ >> 8;
+  this.$l$ = $value$$68$$ & 255;
+}, $setIX$: function $$JSSMS$Z80$$$$$setIX$$($value$$69$$) {
+  this.$ixH$ = $value$$69$$ >> 8;
+  this.$ixL$ = $value$$69$$ & 255;
+}, $setIY$: function $$JSSMS$Z80$$$$$setIY$$($value$$70$$) {
+  this.$iyH$ = $value$$70$$ >> 8;
+  this.$iyL$ = $value$$70$$ & 255;
 }, $incBC$: function $$JSSMS$Z80$$$$$incBC$$() {
   this.$c$ = this.$c$ + 1 & 255;
   0 == this.$c$ && (this.$b$ = this.$b$ + 1 & 255);
@@ -3012,14 +3034,14 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
 }, $decIY$: function $$JSSMS$Z80$$$$$decIY$$() {
   this.$iyL$ = this.$iyL$ - 1 & 255;
   255 == this.$iyL$ && (this.$iyH$ = this.$iyH$ - 1 & 255);
-}, $inc8$: function $$JSSMS$Z80$$$$$inc8$$($value$$68$$) {
-  $value$$68$$ = $value$$68$$ + 1 & 255;
-  this.$f$ = this.$f$ & 1 | this.$SZHV_INC_TABLE$[$value$$68$$];
-  return $value$$68$$;
-}, $dec8$: function $$JSSMS$Z80$$$$$dec8$$($value$$69$$) {
-  $value$$69$$ = $value$$69$$ - 1 & 255;
-  this.$f$ = this.$f$ & 1 | this.$SZHV_DEC_TABLE$[$value$$69$$];
-  return $value$$69$$;
+}, $inc8$: function $$JSSMS$Z80$$$$$inc8$$($value$$71$$) {
+  $value$$71$$ = $value$$71$$ + 1 & 255;
+  this.$f$ = this.$f$ & 1 | this.$SZHV_INC_TABLE$[$value$$71$$];
+  return $value$$71$$;
+}, $dec8$: function $$JSSMS$Z80$$$$$dec8$$($value$$72$$) {
+  $value$$72$$ = $value$$72$$ - 1 & 255;
+  this.$f$ = this.$f$ & 1 | this.$SZHV_DEC_TABLE$[$value$$72$$];
+  return $value$$72$$;
 }, $exAF$: function $$JSSMS$Z80$$$$$exAF$$() {
   var $temp$$9$$ = this.$a$;
   this.$a$ = this.$a2$;
@@ -3048,18 +3070,18 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   $temp$$12$$ = this.$l$;
   this.$l$ = this.$l2$;
   this.$l2$ = $temp$$12$$;
-}, $add16$: function $$JSSMS$Z80$$$$$add16$$($reg$$, $value$$70$$) {
-  var $result$$ = $reg$$ + $value$$70$$;
-  this.$f$ = this.$f$ & 196 | ($reg$$ ^ $result$$ ^ $value$$70$$) >> 8 & 16 | $result$$ >> 16 & 1;
+}, $add16$: function $$JSSMS$Z80$$$$$add16$$($reg$$, $value$$73$$) {
+  var $result$$ = $reg$$ + $value$$73$$;
+  this.$f$ = this.$f$ & 196 | ($reg$$ ^ $result$$ ^ $value$$73$$) >> 8 & 16 | $result$$ >> 16 & 1;
   return $result$$ & 65535;
-}, $adc16$: function $$JSSMS$Z80$$$$$adc16$$($value$$71$$) {
-  var $hl$$ = this.$h$ << 8 | this.$l$, $result$$1$$ = $hl$$ + $value$$71$$ + (this.$f$ & 1);
-  this.$f$ = ($hl$$ ^ $result$$1$$ ^ $value$$71$$) >> 8 & 16 | $result$$1$$ >> 16 & 1 | $result$$1$$ >> 8 & 128 | (0 != ($result$$1$$ & 65535) ? 0 : 64) | (($value$$71$$ ^ $hl$$ ^ 32768) & ($value$$71$$ ^ $result$$1$$) & 32768) >> 13;
+}, $adc16$: function $$JSSMS$Z80$$$$$adc16$$($value$$74$$) {
+  var $hl$$ = this.$h$ << 8 | this.$l$, $result$$1$$ = $hl$$ + $value$$74$$ + (this.$f$ & 1);
+  this.$f$ = ($hl$$ ^ $result$$1$$ ^ $value$$74$$) >> 8 & 16 | $result$$1$$ >> 16 & 1 | $result$$1$$ >> 8 & 128 | (0 != ($result$$1$$ & 65535) ? 0 : 64) | (($value$$74$$ ^ $hl$$ ^ 32768) & ($value$$74$$ ^ $result$$1$$) & 32768) >> 13;
   this.$h$ = $result$$1$$ >> 8 & 255;
   this.$l$ = $result$$1$$ & 255;
-}, $sbc16$: function $$JSSMS$Z80$$$$$sbc16$$($value$$72$$) {
-  var $hl$$1$$ = this.$h$ << 8 | this.$l$, $result$$2$$ = $hl$$1$$ - $value$$72$$ - (this.$f$ & 1);
-  this.$f$ = ($hl$$1$$ ^ $result$$2$$ ^ $value$$72$$) >> 8 & 16 | 2 | $result$$2$$ >> 16 & 1 | $result$$2$$ >> 8 & 128 | (0 != ($result$$2$$ & 65535) ? 0 : 64) | (($value$$72$$ ^ $hl$$1$$) & ($hl$$1$$ ^ $result$$2$$) & 32768) >> 13;
+}, $sbc16$: function $$JSSMS$Z80$$$$$sbc16$$($value$$75$$) {
+  var $hl$$1$$ = this.$h$ << 8 | this.$l$, $result$$2$$ = $hl$$1$$ - $value$$75$$ - (this.$f$ & 1);
+  this.$f$ = ($hl$$1$$ ^ $result$$2$$ ^ $value$$75$$) >> 8 & 16 | 2 | $result$$2$$ >> 16 & 1 | $result$$2$$ >> 8 & 128 | (0 != ($result$$2$$ & 65535) ? 0 : 64) | (($value$$75$$ ^ $hl$$1$$) & ($hl$$1$$ ^ $result$$2$$) & 32768) >> 13;
   this.$h$ = $result$$2$$ >> 8 & 255;
   this.$l$ = $result$$2$$ & 255;
 }, $generateFlagTables$: function $$JSSMS$Z80$$$$$generateFlagTables$$() {
@@ -3068,34 +3090,34 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   this.$SZHV_INC_TABLE$ = Array(256);
   this.$SZHV_DEC_TABLE$ = Array(256);
   this.$SZ_BIT_TABLE$ = Array(256);
-  for (var $i$$5_padd$$ = 0; 256 > $i$$5_padd$$; $i$$5_padd$$++) {
-    var $padc_sf$$ = 0 != ($i$$5_padd$$ & 128) ? 128 : 0, $psub_zf$$ = 0 == $i$$5_padd$$ ? 64 : 0, $psbc_yf$$ = $i$$5_padd$$ & 32, $oldval_xf$$ = $i$$5_padd$$ & 8, $newval_pf$$ = this.$getParity$($i$$5_padd$$) ? 4 : 0;
-    this.$SZ_TABLE$[$i$$5_padd$$] = $padc_sf$$ | $psub_zf$$ | $psbc_yf$$ | $oldval_xf$$;
-    this.$SZP_TABLE$[$i$$5_padd$$] = $padc_sf$$ | $psub_zf$$ | $psbc_yf$$ | $oldval_xf$$ | $newval_pf$$;
-    this.$SZHV_INC_TABLE$[$i$$5_padd$$] = $padc_sf$$ | $psub_zf$$ | $psbc_yf$$ | $oldval_xf$$;
-    this.$SZHV_INC_TABLE$[$i$$5_padd$$] |= 128 == $i$$5_padd$$ ? 4 : 0;
-    this.$SZHV_INC_TABLE$[$i$$5_padd$$] |= 0 == ($i$$5_padd$$ & 15) ? 16 : 0;
-    this.$SZHV_DEC_TABLE$[$i$$5_padd$$] = $padc_sf$$ | $psub_zf$$ | $psbc_yf$$ | $oldval_xf$$ | 2;
-    this.$SZHV_DEC_TABLE$[$i$$5_padd$$] |= 127 == $i$$5_padd$$ ? 4 : 0;
-    this.$SZHV_DEC_TABLE$[$i$$5_padd$$] |= 15 == ($i$$5_padd$$ & 15) ? 16 : 0;
-    this.$SZ_BIT_TABLE$[$i$$5_padd$$] = 0 != $i$$5_padd$$ ? $i$$5_padd$$ & 128 : 68;
-    this.$SZ_BIT_TABLE$[$i$$5_padd$$] |= $psbc_yf$$ | $oldval_xf$$ | 16;
+  for (var $i$$6_padd$$ = 0; 256 > $i$$6_padd$$; $i$$6_padd$$++) {
+    var $padc_sf$$ = 0 != ($i$$6_padd$$ & 128) ? 128 : 0, $psub_zf$$ = 0 == $i$$6_padd$$ ? 64 : 0, $psbc_yf$$ = $i$$6_padd$$ & 32, $oldval_xf$$ = $i$$6_padd$$ & 8, $newval_pf$$ = this.$getParity$($i$$6_padd$$) ? 4 : 0;
+    this.$SZ_TABLE$[$i$$6_padd$$] = $padc_sf$$ | $psub_zf$$ | $psbc_yf$$ | $oldval_xf$$;
+    this.$SZP_TABLE$[$i$$6_padd$$] = $padc_sf$$ | $psub_zf$$ | $psbc_yf$$ | $oldval_xf$$ | $newval_pf$$;
+    this.$SZHV_INC_TABLE$[$i$$6_padd$$] = $padc_sf$$ | $psub_zf$$ | $psbc_yf$$ | $oldval_xf$$;
+    this.$SZHV_INC_TABLE$[$i$$6_padd$$] |= 128 == $i$$6_padd$$ ? 4 : 0;
+    this.$SZHV_INC_TABLE$[$i$$6_padd$$] |= 0 == ($i$$6_padd$$ & 15) ? 16 : 0;
+    this.$SZHV_DEC_TABLE$[$i$$6_padd$$] = $padc_sf$$ | $psub_zf$$ | $psbc_yf$$ | $oldval_xf$$ | 2;
+    this.$SZHV_DEC_TABLE$[$i$$6_padd$$] |= 127 == $i$$6_padd$$ ? 4 : 0;
+    this.$SZHV_DEC_TABLE$[$i$$6_padd$$] |= 15 == ($i$$6_padd$$ & 15) ? 16 : 0;
+    this.$SZ_BIT_TABLE$[$i$$6_padd$$] = 0 != $i$$6_padd$$ ? $i$$6_padd$$ & 128 : 68;
+    this.$SZ_BIT_TABLE$[$i$$6_padd$$] |= $psbc_yf$$ | $oldval_xf$$ | 16;
   }
   this.$SZHVC_ADD_TABLE$ = Array(131072);
   this.$SZHVC_SUB_TABLE$ = Array(131072);
-  $i$$5_padd$$ = 0;
+  $i$$6_padd$$ = 0;
   $padc_sf$$ = 65536;
   $psub_zf$$ = 0;
   $psbc_yf$$ = 65536;
   for ($oldval_xf$$ = 0; 256 > $oldval_xf$$; $oldval_xf$$++) {
     for ($newval_pf$$ = 0; 256 > $newval_pf$$; $newval_pf$$++) {
       var $val$$ = $newval_pf$$ - $oldval_xf$$;
-      this.$SZHVC_ADD_TABLE$[$i$$5_padd$$] = 0 != $newval_pf$$ ? 0 != ($newval_pf$$ & 128) ? 128 : 0 : 64;
-      this.$SZHVC_ADD_TABLE$[$i$$5_padd$$] |= $newval_pf$$ & 40;
-      ($newval_pf$$ & 15) < ($oldval_xf$$ & 15) && (this.$SZHVC_ADD_TABLE$[$i$$5_padd$$] |= 16);
-      $newval_pf$$ < $oldval_xf$$ && (this.$SZHVC_ADD_TABLE$[$i$$5_padd$$] |= 1);
-      0 != (($val$$ ^ $oldval_xf$$ ^ 128) & ($val$$ ^ $newval_pf$$) & 128) && (this.$SZHVC_ADD_TABLE$[$i$$5_padd$$] |= 4);
-      $i$$5_padd$$++;
+      this.$SZHVC_ADD_TABLE$[$i$$6_padd$$] = 0 != $newval_pf$$ ? 0 != ($newval_pf$$ & 128) ? 128 : 0 : 64;
+      this.$SZHVC_ADD_TABLE$[$i$$6_padd$$] |= $newval_pf$$ & 40;
+      ($newval_pf$$ & 15) < ($oldval_xf$$ & 15) && (this.$SZHVC_ADD_TABLE$[$i$$6_padd$$] |= 16);
+      $newval_pf$$ < $oldval_xf$$ && (this.$SZHVC_ADD_TABLE$[$i$$6_padd$$] |= 1);
+      0 != (($val$$ ^ $oldval_xf$$ ^ 128) & ($val$$ ^ $newval_pf$$) & 128) && (this.$SZHVC_ADD_TABLE$[$i$$6_padd$$] |= 4);
+      $i$$6_padd$$++;
       $val$$ = $newval_pf$$ - $oldval_xf$$ - 1;
       this.$SZHVC_ADD_TABLE$[$padc_sf$$] = 0 != $newval_pf$$ ? 0 != ($newval_pf$$ & 128) ? 128 : 0 : 64;
       this.$SZHVC_ADD_TABLE$[$padc_sf$$] |= $newval_pf$$ & 40;
@@ -3119,19 +3141,19 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
       $psbc_yf$$++;
     }
   }
-}, $getParity$: function $$JSSMS$Z80$$$$$getParity$$($value$$73$$) {
+}, $getParity$: function $$JSSMS$Z80$$$$$getParity$$($value$$76$$) {
   for (var $parity$$ = $JSCompiler_alias_TRUE$$, $j$$1$$ = 0; 8 > $j$$1$$; $j$$1$$++) {
-    0 != ($value$$73$$ & 1 << $j$$1$$) && ($parity$$ = !$parity$$);
+    0 != ($value$$76$$ & 1 << $j$$1$$) && ($parity$$ = !$parity$$);
   }
   return $parity$$;
 }, $getDummyWrite$: function $$JSSMS$Z80$$$$$getDummyWrite$$() {
   return Array(1024);
 }, $generateMemory$: function $$JSSMS$Z80$$$$$generateMemory$$() {
-  for (var $i$$6$$ = 0; 65 > $i$$6$$; $i$$6$$++) {
-    this.$memReadMap$[$i$$6$$] = Array(1024), this.$memWriteMap$[$i$$6$$] = Array(1024);
+  for (var $i$$7$$ = 0; 65 > $i$$7$$; $i$$7$$++) {
+    this.$memReadMap$[$i$$7$$] = Array(1024), this.$memWriteMap$[$i$$7$$] = Array(1024);
   }
-  for ($i$$6$$ = 0; 8 > $i$$6$$; $i$$6$$++) {
-    this.$ram$[$i$$6$$] = Array(1024);
+  for ($i$$7$$ = 0; 8 > $i$$7$$; $i$$7$$++) {
+    this.$ram$[$i$$7$$] = Array(1024);
   }
   this.$sram$ == $JSCompiler_alias_NULL$$ && (this.$sram$ = Array(32));
   this.$memReadMap$[64] = this.$getDummyWrite$();
@@ -3145,19 +3167,19 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   this.$frameReg$[3] = 0;
   this.$rom$ != $JSCompiler_alias_NULL$$ ? (this.$number_of_pages$ = this.$rom$.length / 16, this.$setDefaultMemoryMapping$()) : this.$number_of_pages$ = 0;
 }, $setDefaultMemoryMapping$: function $$JSSMS$Z80$$$$$setDefaultMemoryMapping$$() {
-  for (var $i$$7$$ = 0; 48 > $i$$7$$; $i$$7$$++) {
-    this.$memReadMap$[$i$$7$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$i$$7$$ & 31]), this.$memWriteMap$[$i$$7$$] = this.$getDummyWrite$();
+  for (var $i$$8$$ = 0; 48 > $i$$8$$; $i$$8$$++) {
+    this.$memReadMap$[$i$$8$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$i$$8$$ & 31]), this.$memWriteMap$[$i$$8$$] = this.$getDummyWrite$();
   }
-  for ($i$$7$$ = 48; 64 > $i$$7$$; $i$$7$$++) {
-    this.$memReadMap$[$i$$7$$] = this.$ram$[$i$$7$$ & 7], this.$memWriteMap$[$i$$7$$] = this.$ram$[$i$$7$$ & 7];
+  for ($i$$8$$ = 48; 64 > $i$$8$$; $i$$8$$++) {
+    this.$memReadMap$[$i$$8$$] = this.$ram$[$i$$8$$ & 7], this.$memWriteMap$[$i$$8$$] = this.$ram$[$i$$8$$ & 7];
   }
-}, $writeMem$: function $$JSSMS$Z80$$$$$writeMem$$($address$$, $value$$74$$) {
+}, $writeMem$: function $$JSSMS$Z80$$$$$writeMem$$($address$$, $value$$77$$) {
   if ($address$$ >> 10 >= this.$memWriteMap$.length || !this.$memWriteMap$[$address$$ >> 10] || ($address$$ & 1023) >= this.$memWriteMap$[$address$$ >> 10].length) {
     console.log($address$$, $address$$ >> 10, $address$$ & 1023);
     debugger;
   }
-  this.$memWriteMap$[$address$$ >> 10][$address$$ & 1023] = $value$$74$$;
-  65532 <= $address$$ && this.page($address$$ & 3, $value$$74$$);
+  this.$memWriteMap$[$address$$ >> 10][$address$$ & 1023] = $value$$77$$;
+  65532 <= $address$$ && this.page($address$$ & 3, $value$$77$$);
 }, $readMem$: function $$JSSMS$Z80$$$$$readMem$$($address$$1$$) {
   if ($address$$1$$ >> 10 >= this.$memReadMap$.length || !this.$memReadMap$[$address$$1$$ >> 10] || ($address$$1$$ & 1023) >= this.$memReadMap$[$address$$1$$ >> 10].length) {
     console.log($address$$1$$, $address$$1$$ >> 10, $address$$1$$ & 1023);
@@ -3168,38 +3190,38 @@ $JSSMS$Z80$$.prototype = {reset: function $$JSSMS$Z80$$$$reset$() {
   return this.$memReadMap$[this.$pc$ >> 10][this.$pc$ & 1023];
 }, $readMemWord$: function $$JSSMS$Z80$$$$$readMemWord$$($address$$2$$) {
   return this.$memReadMap$[$address$$2$$ >> 10][$address$$2$$ & 1023] & 255 | (this.$memReadMap$[++$address$$2$$ >> 10][$address$$2$$ & 1023] & 255) << 8;
-}, page: function $$JSSMS$Z80$$$$page$($address$$3$$, $value$$75$$) {
-  this.$frameReg$[$address$$3$$] = $value$$75$$;
+}, page: function $$JSSMS$Z80$$$$page$($address$$3$$, $value$$78$$) {
+  this.$frameReg$[$address$$3$$] = $value$$78$$;
   switch ($address$$3$$) {
     case 0:
-      if (0 != ($value$$75$$ & 8)) {
-        for (var $offset$$16_p$$1$$ = ($value$$75$$ & 4) << 2, $i$$8$$ = 32; 48 > $i$$8$$; $i$$8$$++) {
-          this.$memReadMap$[$i$$8$$] = $JSSMS$Utils$copyArray$$(this.$sram$[$offset$$16_p$$1$$]), this.$memWriteMap$[$i$$8$$] = $JSSMS$Utils$copyArray$$(this.$sram$[$offset$$16_p$$1$$]), $offset$$16_p$$1$$++;
+      if (0 != ($value$$78$$ & 8)) {
+        for (var $offset$$16_p$$1$$ = ($value$$78$$ & 4) << 2, $i$$9$$ = 32; 48 > $i$$9$$; $i$$9$$++) {
+          this.$memReadMap$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$sram$[$offset$$16_p$$1$$]), this.$memWriteMap$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$sram$[$offset$$16_p$$1$$]), $offset$$16_p$$1$$++;
         }
       }else {
         $offset$$16_p$$1$$ = this.$frameReg$[3] % this.$number_of_pages$ << 4;
-        for ($i$$8$$ = 32; 48 > $i$$8$$; $i$$8$$++) {
-          this.$memReadMap$[$i$$8$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++]), this.$memWriteMap$[$i$$8$$] = this.$getDummyWrite$();
+        for ($i$$9$$ = 32; 48 > $i$$9$$; $i$$9$$++) {
+          this.$memReadMap$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++]), this.$memWriteMap$[$i$$9$$] = this.$getDummyWrite$();
         }
       }
       break;
     case 1:
-      $offset$$16_p$$1$$ = ($value$$75$$ % this.$number_of_pages$ << 4) + 1;
-      for ($i$$8$$ = 1; 16 > $i$$8$$; $i$$8$$++) {
-        this.$memReadMap$[$i$$8$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++]);
+      $offset$$16_p$$1$$ = ($value$$78$$ % this.$number_of_pages$ << 4) + 1;
+      for ($i$$9$$ = 1; 16 > $i$$9$$; $i$$9$$++) {
+        this.$memReadMap$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++]);
       }
       break;
     case 2:
-      $offset$$16_p$$1$$ = $value$$75$$ % this.$number_of_pages$ << 4;
-      for ($i$$8$$ = 16; 32 > $i$$8$$; $i$$8$$++) {
-        this.$memReadMap$[$i$$8$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++]);
+      $offset$$16_p$$1$$ = $value$$78$$ % this.$number_of_pages$ << 4;
+      for ($i$$9$$ = 16; 32 > $i$$9$$; $i$$9$$++) {
+        this.$memReadMap$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++]);
       }
       break;
     case 3:
       if (0 == (this.$frameReg$[0] & 8)) {
-        $offset$$16_p$$1$$ = $value$$75$$ % this.$number_of_pages$ << 4;
-        for ($i$$8$$ = 32; 48 > $i$$8$$; $i$$8$$++) {
-          this.$memReadMap$[$i$$8$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++]);
+        $offset$$16_p$$1$$ = $value$$78$$ % this.$number_of_pages$ << 4;
+        for ($i$$9$$ = 32; 48 > $i$$9$$; $i$$9$$++) {
+          this.$memReadMap$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++]);
         }
       }
   }
@@ -3308,17 +3330,78 @@ $JSSMS$Keyboard$$.prototype = {reset: function $$JSSMS$Keyboard$$$$reset$() {
   }
   $evt$$15$$.preventDefault();
 }};
+var $NO_ANTIALIAS$$ = Number.MIN_VALUE, $PSG_VOLUME$$ = [25, 20, 16, 13, 10, 8, 6, 5, 4, 3, 3, 2, 2, 1, 1, 0];
 function $JSSMS$SN76489$$($sms$$2$$) {
   this.$main$ = $sms$$2$$;
+  this.$clockFrac$ = this.$clock$ = 0;
+  this.$reg$ = Array(8);
+  this.$regLatch$ = 0;
+  this.$freqCounter$ = Array(4);
+  this.$freqPolarity$ = Array(4);
+  this.$freqPos$ = Array(3);
+  this.$noiseFreq$ = 16;
+  this.$noiseShiftReg$ = 32768;
+  this.$outputChannel$ = Array(4);
 }
-$JSSMS$SN76489$$.prototype = {write: $JSCompiler_emptyFn$$()};
-function $JSSMS$Vdp$$($i$$10_sms$$3$$) {
-  this.$main$ = $i$$10_sms$$3$$;
+$JSSMS$SN76489$$.prototype = {$init$: function $$JSSMS$SN76489$$$$$init$$($clockSpeed$$, $sampleRate$$1$$) {
+  this.$clock$ = ($clockSpeed$$ << 8) / 16 / $sampleRate$$1$$;
+  this.$regLatch$ = this.$clockFrac$ = 0;
+  this.$noiseFreq$ = 16;
+  this.$noiseShiftReg$ = 32768;
+  for (var $i$$11$$ = 0; 4 > $i$$11$$; $i$$11$$++) {
+    this.$reg$[$i$$11$$ << 1] = 1, this.$reg$[($i$$11$$ << 1) + 1] = 15, this.$freqCounter$[$i$$11$$] = 0, this.$freqPolarity$[$i$$11$$] = 1, 3 != $i$$11$$ && (this.$freqPos$[$i$$11$$] = $NO_ANTIALIAS$$);
+  }
+}, write: function $$JSSMS$SN76489$$$$write$($value$$79$$) {
+  0 != ($value$$79$$ & 128) ? (this.$regLatch$ = $value$$79$$ >> 4 & 7, this.$reg$[this.$regLatch$] = this.$reg$[this.$regLatch$] & 1008 | $value$$79$$ & 15) : this.$reg$[this.$regLatch$] = 0 == this.$regLatch$ || 2 == this.$regLatch$ || 4 == this.$regLatch$ ? this.$reg$[this.$regLatch$] & 15 | ($value$$79$$ & 63) << 4 : $value$$79$$ & 15;
+  switch (this.$regLatch$) {
+    case 0:
+;
+    case 2:
+;
+    case 4:
+      0 == this.$reg$[this.$regLatch$] && (this.$reg$[this.$regLatch$] = 1);
+      break;
+    case 6:
+      this.$noiseFreq$ = 16 << (this.$reg$[6] & 3), this.$noiseShiftReg$ = 32768;
+  }
+}, update: function $$JSSMS$SN76489$$$$update$($buffer$$10$$, $offset$$17$$, $samplesToGenerate$$1$$) {
+  var $sample$$, $i$$12_output$$2$$;
+  for ($sample$$ = 0; $sample$$ < $samplesToGenerate$$1$$; $sample$$++) {
+    for ($i$$12_output$$2$$ = 0; 3 > $i$$12_output$$2$$; $i$$12_output$$2$$++) {
+      this.$outputChannel$[$i$$12_output$$2$$] = this.$freqPos$[$i$$12_output$$2$$] != $NO_ANTIALIAS$$ ? $PSG_VOLUME$$[this.$reg$[($i$$12_output$$2$$ << 1) + 1]] * this.$freqPos$[$i$$12_output$$2$$] >> 8 : $PSG_VOLUME$$[this.$reg$[($i$$12_output$$2$$ << 1) + 1]] * this.$freqPolarity$[$i$$12_output$$2$$];
+    }
+    this.$outputChannel$[3] = $PSG_VOLUME$$[this.$reg$[7]] * (this.$noiseShiftReg$ & 1) << 1;
+    $i$$12_output$$2$$ = this.$outputChannel$[0] + this.$outputChannel$[1] + this.$outputChannel$[2] + this.$outputChannel$[3];
+    127 < $i$$12_output$$2$$ ? $i$$12_output$$2$$ = 127 : -128 > $i$$12_output$$2$$ && ($i$$12_output$$2$$ = -128);
+    $buffer$$10$$[$offset$$17$$ + $sample$$] = $i$$12_output$$2$$;
+    this.$clockFrac$ += this.$clock$;
+    var $clockCycles$$ = this.$clockFrac$ >> 8, $clockCyclesScaled$$ = $clockCycles$$ << 8;
+    this.$clockFrac$ -= $clockCyclesScaled$$;
+    this.$freqCounter$[0] -= $clockCycles$$;
+    this.$freqCounter$[1] -= $clockCycles$$;
+    this.$freqCounter$[2] -= $clockCycles$$;
+    this.$freqCounter$[3] = 128 == this.$noiseFreq$ ? this.$freqCounter$[2] : this.$freqCounter$[3] - $clockCycles$$;
+    for ($i$$12_output$$2$$ = 0; 3 > $i$$12_output$$2$$; $i$$12_output$$2$$++) {
+      var $counter$$ = this.$freqCounter$[$i$$12_output$$2$$];
+      if (0 >= $counter$$) {
+        var $tone$$ = this.$reg$[$i$$12_output$$2$$ << 1];
+        6 < $tone$$ ? (this.$freqPos$[$i$$12_output$$2$$] = ($clockCyclesScaled$$ - this.$clockFrac$ + 512 * $counter$$ << 8) * this.$freqPolarity$[$i$$12_output$$2$$] / ($clockCyclesScaled$$ + this.$clockFrac$), this.$freqPolarity$[$i$$12_output$$2$$] = -this.$freqPolarity$[$i$$12_output$$2$$]) : (this.$freqPolarity$[$i$$12_output$$2$$] = 1, this.$freqPos$[$i$$12_output$$2$$] = $NO_ANTIALIAS$$);
+        this.$freqCounter$[$i$$12_output$$2$$] += $tone$$ * ($clockCycles$$ / $tone$$ + 1);
+      }else {
+        this.$freqPos$[$i$$12_output$$2$$] = $NO_ANTIALIAS$$;
+      }
+    }
+    0 >= this.$freqCounter$[3] && (this.$freqPolarity$[3] = -this.$freqPolarity$[3], 128 != this.$noiseFreq$ && (this.$freqCounter$[3] += this.$noiseFreq$ * ($clockCycles$$ / this.$noiseFreq$ + 1)), 1 == this.$freqPolarity$[3] && (this.$noiseShiftReg$ = this.$noiseShiftReg$ >> 1 | (0 != (this.$reg$[6] & 4) ? 0 != (this.$noiseShiftReg$ & 9) && 0 != (this.$noiseShiftReg$ & 9 ^ 9) ? 1 : 0 : this.$noiseShiftReg$ & 1) << 15));
+  }
+  return $buffer$$10$$;
+}};
+function $JSSMS$Vdp$$($i$$13_sms$$3$$) {
+  this.$main$ = $i$$13_sms$$3$$;
   this.$videoMode$ = 0;
   this.$VRAM$ = Array(16384);
   this.$CRAM$ = Array(32);
-  for ($i$$10_sms$$3$$ = 0; 32 > $i$$10_sms$$3$$; $i$$10_sms$$3$$++) {
-    this.$CRAM$[$i$$10_sms$$3$$] = 0;
+  for ($i$$13_sms$$3$$ = 0; 32 > $i$$13_sms$$3$$; $i$$13_sms$$3$$++) {
+    this.$CRAM$[$i$$13_sms$$3$$] = 0;
   }
   this.$vdpreg$ = Array(16);
   this.status = 0;
@@ -3334,8 +3417,8 @@ function $JSSMS$Vdp$$($i$$10_sms$$3$$) {
   this.$sat$ = this.$h_end$ = this.$h_start$ = 0;
   this.$isSatDirty$ = $JSCompiler_alias_FALSE$$;
   this.$lineSprites$ = Array(192);
-  for ($i$$10_sms$$3$$ = 0; 192 > $i$$10_sms$$3$$; $i$$10_sms$$3$$++) {
-    this.$lineSprites$[$i$$10_sms$$3$$] = Array(25);
+  for ($i$$13_sms$$3$$ = 0; 192 > $i$$13_sms$$3$$; $i$$13_sms$$3$$++) {
+    this.$lineSprites$[$i$$13_sms$$3$$] = Array(25);
   }
   this.$tiles$ = Array(512);
   this.$isTileDirty$ = Array(512);
@@ -3343,11 +3426,11 @@ function $JSSMS$Vdp$$($i$$10_sms$$3$$) {
   this.$createCachedImages$();
 }
 $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
-  var $i$$11$$;
+  var $i$$14$$;
   this.$generateConvertedPals$();
   this.$firstByte$ = $JSCompiler_alias_TRUE$$;
-  for ($i$$11$$ = this.$operation$ = this.status = this.$counter$ = this.location = 0; 16 > $i$$11$$; $i$$11$$++) {
-    this.$vdpreg$[$i$$11$$] = 0;
+  for ($i$$14$$ = this.$operation$ = this.status = this.$counter$ = this.location = 0; 16 > $i$$14$$; $i$$14$$++) {
+    this.$vdpreg$[$i$$14$$] = 0;
   }
   this.$vdpreg$[2] = 14;
   this.$vdpreg$[5] = 126;
@@ -3356,18 +3439,18 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
   this.$isSatDirty$ = $JSCompiler_alias_TRUE$$;
   this.$minDirty$ = 512;
   this.$maxDirty$ = -1;
-  for ($i$$11$$ = 0; 16384 > $i$$11$$; $i$$11$$++) {
-    this.$VRAM$[$i$$11$$] = 0;
+  for ($i$$14$$ = 0; 16384 > $i$$14$$; $i$$14$$++) {
+    this.$VRAM$[$i$$14$$] = 0;
   }
-  for ($i$$11$$ = 0; 49152 > $i$$11$$; $i$$11$$++) {
-    this.display[$i$$11$$] = 0;
+  for ($i$$14$$ = 0; 49152 > $i$$14$$; $i$$14$$++) {
+    this.display[$i$$14$$] = 0;
   }
 }, $forceFullRedraw$: function $$JSSMS$Vdp$$$$$forceFullRedraw$$() {
   this.$bgt$ = (this.$vdpreg$[2] & 14) << 10;
   this.$minDirty$ = 0;
   this.$maxDirty$ = 511;
-  for (var $i$$12$$ = 0, $l$$1$$ = this.$isTileDirty$.length; $i$$12$$ < $l$$1$$; $i$$12$$++) {
-    this.$isTileDirty$[$i$$12$$] = $JSCompiler_alias_TRUE$$;
+  for (var $i$$15$$ = 0, $l$$1$$ = this.$isTileDirty$.length; $i$$15$$ < $l$$1$$; $i$$15$$++) {
+    this.$isTileDirty$[$i$$15$$] = $JSCompiler_alias_TRUE$$;
   }
   this.$sat$ = (this.$vdpreg$[5] & -130) << 7;
   this.$isSatDirty$ = $JSCompiler_alias_TRUE$$;
@@ -3388,22 +3471,22 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
   this.status = 0;
   this.$main$.$cpu$.$interruptLine$ = $JSCompiler_alias_FALSE$$;
   return $statuscopy$$;
-}, $controlWrite$: function $$JSSMS$Vdp$$$$$controlWrite$$($reg$$1_value$$77$$) {
+}, $controlWrite$: function $$JSSMS$Vdp$$$$$controlWrite$$($reg$$1_value$$80$$) {
   if (this.$firstByte$) {
-    this.$firstByte$ = $JSCompiler_alias_FALSE$$, this.$commandByte$ = $reg$$1_value$$77$$, this.location = this.location & 16128 | $reg$$1_value$$77$$;
+    this.$firstByte$ = $JSCompiler_alias_FALSE$$, this.$commandByte$ = $reg$$1_value$$80$$, this.location = this.location & 16128 | $reg$$1_value$$80$$;
   }else {
-    if (this.$firstByte$ = $JSCompiler_alias_TRUE$$, this.$operation$ = $reg$$1_value$$77$$ >> 6 & 3, this.location = this.$commandByte$ | $reg$$1_value$$77$$ << 8, 0 == this.$operation$) {
+    if (this.$firstByte$ = $JSCompiler_alias_TRUE$$, this.$operation$ = $reg$$1_value$$80$$ >> 6 & 3, this.location = this.$commandByte$ | $reg$$1_value$$80$$ << 8, 0 == this.$operation$) {
       this.$readBuffer$ = this.$VRAM$[this.location++ & 16383] & 255;
     }else {
       if (2 == this.$operation$) {
-        $reg$$1_value$$77$$ &= 15;
-        switch ($reg$$1_value$$77$$) {
+        $reg$$1_value$$80$$ &= 15;
+        switch ($reg$$1_value$$80$$) {
           case 0:
             0 != (this.status & 4) && (this.$main$.$cpu$.$interruptLine$ = 0 != (this.$commandByte$ & 16));
             break;
           case 1:
             0 != (this.status & 128) && 0 != (this.$commandByte$ & 32) && (this.$main$.$cpu$.$interruptLine$ = $JSCompiler_alias_TRUE$$);
-            (this.$commandByte$ & 3) != (this.$vdpreg$[$reg$$1_value$$77$$] & 3) && (this.$isSatDirty$ = $JSCompiler_alias_TRUE$$);
+            (this.$commandByte$ & 3) != (this.$vdpreg$[$reg$$1_value$$80$$] & 3) && (this.$isSatDirty$ = $JSCompiler_alias_TRUE$$);
             break;
           case 2:
             this.$bgt$ = (this.$commandByte$ & 14) << 10;
@@ -3413,16 +3496,16 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
             this.$sat$ = (this.$commandByte$ & -130) << 7;
             $old$$ != this.$sat$ && (this.$isSatDirty$ = $JSCompiler_alias_TRUE$$, console.log('New address written to SAT: ' + $old$$ + ' -> ' + this.$sat$));
         }
-        this.$vdpreg$[$reg$$1_value$$77$$] = this.$commandByte$;
+        this.$vdpreg$[$reg$$1_value$$80$$] = this.$commandByte$;
       }
     }
   }
 }, $dataRead$: function $$JSSMS$Vdp$$$$$dataRead$$() {
   this.$firstByte$ = $JSCompiler_alias_TRUE$$;
-  var $value$$78$$ = this.$readBuffer$;
+  var $value$$81$$ = this.$readBuffer$;
   this.$readBuffer$ = this.$VRAM$[this.location++ & 16383] & 255;
-  return $value$$78$$;
-}, $dataWrite$: function $$JSSMS$Vdp$$$$$dataWrite$$($value$$79$$) {
+  return $value$$81$$;
+}, $dataWrite$: function $$JSSMS$Vdp$$$$$dataWrite$$($value$$82$$) {
   this.$firstByte$ = $JSCompiler_alias_TRUE$$;
   switch (this.$operation$) {
     case 0:
@@ -3431,7 +3514,7 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
 ;
     case 2:
       var $address$$4$$ = this.location & 16383;
-      if ($value$$79$$ != (this.$VRAM$[$address$$4$$] & 255)) {
+      if ($value$$82$$ != (this.$VRAM$[$address$$4$$] & 255)) {
         if ($address$$4$$ >= this.$sat$ && $address$$4$$ < this.$sat$ + 64) {
           this.$isSatDirty$ = $JSCompiler_alias_TRUE$$;
         }else {
@@ -3444,13 +3527,13 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
             $tileIndex$$ > this.$maxDirty$ && (this.$maxDirty$ = $tileIndex$$);
           }
         }
-        this.$VRAM$[$address$$4$$] = $value$$79$$;
+        this.$VRAM$[$address$$4$$] = $value$$82$$;
       }
       break;
     case 3:
-      this.$main$.$is_sms$ ? this.$CRAM$[this.location & 31] = this.$main_JAVA$[$value$$79$$ & 63] : this.$main$.$is_gg$ && (this.$CRAM$[(this.location & 63) >> 1] = 0 == (this.location & 1) ? this.$GG_JAVA1$[$value$$79$$] : this.$CRAM$[(this.location & 63) >> 1] | this.$GG_JAVA2$[$value$$79$$ & 15]);
+      this.$main$.$is_sms$ ? this.$CRAM$[this.location & 31] = this.$main_JAVA$[$value$$82$$ & 63] : this.$main$.$is_gg$ && (this.$CRAM$[(this.location & 63) >> 1] = 0 == (this.location & 1) ? this.$GG_JAVA1$[$value$$82$$] : this.$CRAM$[(this.location & 63) >> 1] | this.$GG_JAVA2$[$value$$82$$ & 15]);
   }
-  this.$readBuffer$ = $value$$79$$;
+  this.$readBuffer$ = $value$$82$$;
   this.location++;
 }, $interrupts$: function $$JSSMS$Vdp$$$$$interrupts$$($lineno$$1$$) {
   if (192 >= $lineno$$1$$) {
@@ -3466,12 +3549,12 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
   this.status |= 128;
 }, $drawLine$: function $$JSSMS$Vdp$$$$$drawLine$$($lineno$$2_location$$26$$) {
   if (!this.$main$.$is_gg$ || !(24 > $lineno$$2_location$$26$$ || 168 <= $lineno$$2_location$$26$$)) {
-    for (var $colour_i$$13$$ = this.$spriteCol$.length; 0 != $colour_i$$13$$--;) {
-      this.$spriteCol$[$colour_i$$13$$] = $JSCompiler_alias_FALSE$$;
+    for (var $colour_i$$16$$ = this.$spriteCol$.length; 0 != $colour_i$$16$$--;) {
+      this.$spriteCol$[$colour_i$$16$$] = $JSCompiler_alias_FALSE$$;
     }
     if (0 != (this.$vdpreg$[1] & 64)) {
       if (-1 != this.$maxDirty$ && this.$decodeTiles$(), this.$drawBg$($lineno$$2_location$$26$$), this.$isSatDirty$ && this.$decodeSat$(), 0 != this.$lineSprites$[$lineno$$2_location$$26$$][0] && this.$drawSprite$($lineno$$2_location$$26$$), this.$main$.$is_sms$ && 0 != (this.$vdpreg$[0] & 32)) {
-        $colour_i$$13$$ = this.$CRAM$[16 + (this.$vdpreg$[7] & 15)];
+        $colour_i$$16$$ = this.$CRAM$[16 + (this.$vdpreg$[7] & 15)];
         $lineno$$2_location$$26$$ <<= 8;
         if (32 < 16 + (this.$vdpreg$[7] & 15)) {
           debugger;
@@ -3479,14 +3562,14 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
         if (49152 < $lineno$$2_location$$26$$) {
           debugger;
         }
-        this.display[$lineno$$2_location$$26$$++] = $colour_i$$13$$;
-        this.display[$lineno$$2_location$$26$$++] = $colour_i$$13$$;
-        this.display[$lineno$$2_location$$26$$++] = $colour_i$$13$$;
-        this.display[$lineno$$2_location$$26$$++] = $colour_i$$13$$;
-        this.display[$lineno$$2_location$$26$$++] = $colour_i$$13$$;
-        this.display[$lineno$$2_location$$26$$++] = $colour_i$$13$$;
-        this.display[$lineno$$2_location$$26$$++] = $colour_i$$13$$;
-        this.display[$lineno$$2_location$$26$$] = $colour_i$$13$$;
+        this.display[$lineno$$2_location$$26$$++] = $colour_i$$16$$;
+        this.display[$lineno$$2_location$$26$$++] = $colour_i$$16$$;
+        this.display[$lineno$$2_location$$26$$++] = $colour_i$$16$$;
+        this.display[$lineno$$2_location$$26$$++] = $colour_i$$16$$;
+        this.display[$lineno$$2_location$$26$$++] = $colour_i$$16$$;
+        this.display[$lineno$$2_location$$26$$++] = $colour_i$$16$$;
+        this.display[$lineno$$2_location$$26$$++] = $colour_i$$16$$;
+        this.display[$lineno$$2_location$$26$$] = $colour_i$$16$$;
       }
     }else {
       this.$drawBGColour$($lineno$$2_location$$26$$);
@@ -3514,62 +3597,62 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
     0 != $lock$$ && 23 == $tx$$ && ($tile_row$$ = $lineno$$3$$ >> 3, $tile_y_vscroll$$ = ($lineno$$3$$ & 7) << 3);
   }
 }, $drawSprite$: function $$JSSMS$Vdp$$$$$drawSprite$$($lineno$$4$$) {
-  for (var $sprites$$ = this.$lineSprites$[$lineno$$4$$], $count$$6_i$$14$$ = Math.min(8, $sprites$$[0]), $zoomed$$ = this.$vdpreg$[1] & 1, $row_precal$$ = $lineno$$4$$ << 8, $off$$ = 3 * $count$$6_i$$14$$; 0 != $count$$6_i$$14$$--;) {
-    var $n$$2_tile$$1$$ = $sprites$$[$off$$--] | (this.$vdpreg$[6] & 4) << 6, $pix_y$$35$$ = $sprites$$[$off$$--], $x$$52$$ = $sprites$$[$off$$--] - (this.$vdpreg$[0] & 8), $offset$$17_tileRow$$ = $lineno$$4$$ - $pix_y$$35$$ >> $zoomed$$;
+  for (var $sprites$$ = this.$lineSprites$[$lineno$$4$$], $count$$6_i$$17$$ = Math.min(8, $sprites$$[0]), $zoomed$$ = this.$vdpreg$[1] & 1, $row_precal$$ = $lineno$$4$$ << 8, $off$$ = 3 * $count$$6_i$$17$$; 0 != $count$$6_i$$17$$--;) {
+    var $n$$2_tile$$1$$ = $sprites$$[$off$$--] | (this.$vdpreg$[6] & 4) << 6, $pix_y$$41$$ = $sprites$$[$off$$--], $x$$58$$ = $sprites$$[$off$$--] - (this.$vdpreg$[0] & 8), $offset$$18_tileRow$$ = $lineno$$4$$ - $pix_y$$41$$ >> $zoomed$$;
     0 != (this.$vdpreg$[1] & 2) && ($n$$2_tile$$1$$ &= -2);
-    $n$$2_tile$$1$$ = this.$tiles$[$n$$2_tile$$1$$ + (($offset$$17_tileRow$$ & 8) >> 3)];
-    $pix_y$$35$$ = 0;
-    0 > $x$$52$$ && ($pix_y$$35$$ = -$x$$52$$, $x$$52$$ = 0);
-    $offset$$17_tileRow$$ = $pix_y$$35$$ + (($offset$$17_tileRow$$ & 7) << 3);
+    $n$$2_tile$$1$$ = this.$tiles$[$n$$2_tile$$1$$ + (($offset$$18_tileRow$$ & 8) >> 3)];
+    $pix_y$$41$$ = 0;
+    0 > $x$$58$$ && ($pix_y$$41$$ = -$x$$58$$, $x$$58$$ = 0);
+    $offset$$18_tileRow$$ = $pix_y$$41$$ + (($offset$$18_tileRow$$ & 7) << 3);
     if (0 == $zoomed$$) {
-      for (; 8 > $pix_y$$35$$ && 256 > $x$$52$$; $pix_y$$35$$++, $x$$52$$++) {
-        var $colour$$2$$ = $n$$2_tile$$1$$[$offset$$17_tileRow$$++];
-        0 != $colour$$2$$ && !this.$bgPriority$[$x$$52$$] && (this.display[$x$$52$$ + $row_precal$$] = this.$CRAM$[$colour$$2$$ + 16], this.$spriteCol$[$x$$52$$] ? this.status |= 32 : this.$spriteCol$[$x$$52$$] = $JSCompiler_alias_TRUE$$);
+      for (; 8 > $pix_y$$41$$ && 256 > $x$$58$$; $pix_y$$41$$++, $x$$58$$++) {
+        var $colour$$2$$ = $n$$2_tile$$1$$[$offset$$18_tileRow$$++];
+        0 != $colour$$2$$ && !this.$bgPriority$[$x$$58$$] && (this.display[$x$$58$$ + $row_precal$$] = this.$CRAM$[$colour$$2$$ + 16], this.$spriteCol$[$x$$58$$] ? this.status |= 32 : this.$spriteCol$[$x$$58$$] = $JSCompiler_alias_TRUE$$);
       }
     }else {
-      for (; 8 > $pix_y$$35$$ && 256 > $x$$52$$; $pix_y$$35$$++, $x$$52$$ += 2) {
-        if ($colour$$2$$ = $n$$2_tile$$1$$[$offset$$17_tileRow$$++], 0 != $colour$$2$$ && !this.$bgPriority$[$x$$52$$] && (this.display[$x$$52$$ + $row_precal$$] = this.$CRAM$[$colour$$2$$ + 16], this.$spriteCol$[$x$$52$$] ? this.status |= 32 : this.$spriteCol$[$x$$52$$] = $JSCompiler_alias_TRUE$$), 0 != $colour$$2$$ && !this.$bgPriority$[$x$$52$$ + 1]) {
-          this.display[$x$$52$$ + $row_precal$$ + 1] = this.$CRAM$[$colour$$2$$ + 16], this.$spriteCol$[$x$$52$$ + 1] ? this.status |= 32 : this.$spriteCol$[$x$$52$$ + 1] = $JSCompiler_alias_TRUE$$;
+      for (; 8 > $pix_y$$41$$ && 256 > $x$$58$$; $pix_y$$41$$++, $x$$58$$ += 2) {
+        if ($colour$$2$$ = $n$$2_tile$$1$$[$offset$$18_tileRow$$++], 0 != $colour$$2$$ && !this.$bgPriority$[$x$$58$$] && (this.display[$x$$58$$ + $row_precal$$] = this.$CRAM$[$colour$$2$$ + 16], this.$spriteCol$[$x$$58$$] ? this.status |= 32 : this.$spriteCol$[$x$$58$$] = $JSCompiler_alias_TRUE$$), 0 != $colour$$2$$ && !this.$bgPriority$[$x$$58$$ + 1]) {
+          this.display[$x$$58$$ + $row_precal$$ + 1] = this.$CRAM$[$colour$$2$$ + 16], this.$spriteCol$[$x$$58$$ + 1] ? this.status |= 32 : this.$spriteCol$[$x$$58$$ + 1] = $JSCompiler_alias_TRUE$$;
         }
       }
     }
   }
   8 <= $sprites$$[0] && (this.status |= 64);
 }, $drawBGColour$: function $$JSSMS$Vdp$$$$$drawBGColour$$($lineno$$5_row_precal$$1$$) {
-  var $colour$$3$$ = this.$CRAM$[16 + (this.$vdpreg$[7] & 15)], $lineno$$5_row_precal$$1$$ = $lineno$$5_row_precal$$1$$ << 8, $i$$15$$;
-  for ($i$$15$$ = 0; 256 > $i$$15$$; $i$$15$$++) {
+  var $colour$$3$$ = this.$CRAM$[16 + (this.$vdpreg$[7] & 15)], $lineno$$5_row_precal$$1$$ = $lineno$$5_row_precal$$1$$ << 8, $i$$18$$;
+  for ($i$$18$$ = 0; 256 > $i$$18$$; $i$$18$$++) {
     this.display[$lineno$$5_row_precal$$1$$++] = $colour$$3$$;
   }
 }, $generateConvertedPals$: function $$JSSMS$Vdp$$$$$generateConvertedPals$$() {
-  var $i$$16$$, $r$$, $g$$, $b$$;
+  var $i$$19$$, $r$$, $g$$, $b$$1$$;
   if (this.$main$.$is_sms$ && !this.$main_JAVA$.length) {
     this.$main_JAVA$ = Array(64);
-    for ($i$$16$$ = 0; 64 > $i$$16$$; $i$$16$$++) {
-      $r$$ = $i$$16$$ & 3, $g$$ = $i$$16$$ >> 2 & 3, $b$$ = $i$$16$$ >> 4 & 3, this.$main_JAVA$[$i$$16$$] = 85 * $r$$ | 85 * $g$$ << 8 | 85 * $b$$ << 16;
+    for ($i$$19$$ = 0; 64 > $i$$19$$; $i$$19$$++) {
+      $r$$ = $i$$19$$ & 3, $g$$ = $i$$19$$ >> 2 & 3, $b$$1$$ = $i$$19$$ >> 4 & 3, this.$main_JAVA$[$i$$19$$] = 85 * $r$$ | 85 * $g$$ << 8 | 85 * $b$$1$$ << 16;
     }
   }else {
     if (this.$main$.$is_gg$ && !this.$GG_JAVA1$.length) {
       this.$GG_JAVA1$ = Array(256);
       this.$GG_JAVA2$ = Array(16);
-      for ($i$$16$$ = 0; 256 > $i$$16$$; $i$$16$$++) {
-        $g$$ = $i$$16$$ & 15, $b$$ = $i$$16$$ >> 4 & 15, this.$GG_JAVA1$[$i$$16$$] = $b$$ << 12 | $b$$ << 8 | $g$$ << 4 | $g$$;
+      for ($i$$19$$ = 0; 256 > $i$$19$$; $i$$19$$++) {
+        $g$$ = $i$$19$$ & 15, $b$$1$$ = $i$$19$$ >> 4 & 15, this.$GG_JAVA1$[$i$$19$$] = $b$$1$$ << 12 | $b$$1$$ << 8 | $g$$ << 4 | $g$$;
       }
-      for ($i$$16$$ = 0; 16 > $i$$16$$; $i$$16$$++) {
-        this.$GG_JAVA2$[$i$$16$$] = $i$$16$$ << 20;
+      for ($i$$19$$ = 0; 16 > $i$$19$$; $i$$19$$++) {
+        this.$GG_JAVA2$[$i$$19$$] = $i$$19$$ << 20;
       }
     }
   }
 }, $createCachedImages$: function $$JSSMS$Vdp$$$$$createCachedImages$$() {
-  for (var $i$$17$$ = 0; 512 > $i$$17$$; $i$$17$$++) {
-    this.$tiles$[$i$$17$$] = Array(64);
+  for (var $i$$20$$ = 0; 512 > $i$$20$$; $i$$20$$++) {
+    this.$tiles$[$i$$20$$] = Array(64);
   }
 }, $decodeTiles$: function $$JSSMS$Vdp$$$$$decodeTiles$$() {
   console.log('[' + this.$line$ + '] min dirty:' + this.$minDirty$ + ' max: ' + this.$maxDirty$);
-  for (var $i$$18$$ = this.$minDirty$; $i$$18$$ <= this.$maxDirty$; $i$$18$$++) {
-    if (this.$isTileDirty$[$i$$18$$]) {
-      this.$isTileDirty$[$i$$18$$] = $JSCompiler_alias_FALSE$$;
-      console.log('tile ' + $i$$18$$ + ' is dirty');
-      for (var $tile$$2$$ = this.$tiles$[$i$$18$$], $pixel_index$$ = 0, $address$$5$$ = $i$$18$$ << 5, $y$$36$$ = 0; 8 > $y$$36$$; $y$$36$$++) {
+  for (var $i$$21$$ = this.$minDirty$; $i$$21$$ <= this.$maxDirty$; $i$$21$$++) {
+    if (this.$isTileDirty$[$i$$21$$]) {
+      this.$isTileDirty$[$i$$21$$] = $JSCompiler_alias_FALSE$$;
+      console.log('tile ' + $i$$21$$ + ' is dirty');
+      for (var $tile$$2$$ = this.$tiles$[$i$$21$$], $pixel_index$$ = 0, $address$$5$$ = $i$$21$$ << 5, $y$$42$$ = 0; 8 > $y$$42$$; $y$$42$$++) {
         for (var $address0$$ = this.$VRAM$[$address$$5$$++], $address1$$ = this.$VRAM$[$address$$5$$++], $address2$$ = this.$VRAM$[$address$$5$$++], $address3$$ = this.$VRAM$[$address$$5$$++], $bit$$ = 128; 0 != $bit$$; $bit$$ >>= 1) {
           var $colour$$4$$ = 0;
           0 != ($address0$$ & $bit$$) && ($colour$$4$$ |= 1);
@@ -3585,25 +3668,25 @@ $JSSMS$Vdp$$.prototype = {reset: function $$JSSMS$Vdp$$$$reset$() {
   this.$maxDirty$ = -1;
 }, $decodeSat$: function $$JSSMS$Vdp$$$$$decodeSat$$() {
   this.$isSatDirty$ = $JSCompiler_alias_FALSE$$;
-  for (var $height$$11_i$$19$$ = 0; $height$$11_i$$19$$ < this.$lineSprites$.length; $height$$11_i$$19$$++) {
-    this.$lineSprites$[$height$$11_i$$19$$][0] = 0;
+  for (var $height$$11_i$$22$$ = 0; $height$$11_i$$22$$ < this.$lineSprites$.length; $height$$11_i$$22$$++) {
+    this.$lineSprites$[$height$$11_i$$22$$][0] = 0;
   }
-  $height$$11_i$$19$$ = 0 == (this.$vdpreg$[1] & 2) ? 8 : 16;
-  1 == (this.$vdpreg$[1] & 1) && ($height$$11_i$$19$$ <<= 1);
+  $height$$11_i$$22$$ = 0 == (this.$vdpreg$[1] & 2) ? 8 : 16;
+  1 == (this.$vdpreg$[1] & 1) && ($height$$11_i$$22$$ <<= 1);
   for (var $spriteno$$ = 0; 64 > $spriteno$$; $spriteno$$++) {
-    var $y$$37$$ = this.$VRAM$[this.$sat$ + $spriteno$$] & 255;
-    if (208 == $y$$37$$) {
+    var $y$$43$$ = this.$VRAM$[this.$sat$ + $spriteno$$] & 255;
+    if (208 == $y$$43$$) {
       break;
     }
-    $y$$37$$++;
-    240 < $y$$37$$ && ($y$$37$$ -= 256);
+    $y$$43$$++;
+    240 < $y$$43$$ && ($y$$43$$ -= 256);
     for (var $lineno$$6$$ = 0; 192 > $lineno$$6$$; $lineno$$6$$++) {
-      if ($lineno$$6$$ >= $y$$37$$ && $lineno$$6$$ - $y$$37$$ < $height$$11_i$$19$$) {
+      if ($lineno$$6$$ >= $y$$43$$ && $lineno$$6$$ - $y$$43$$ < $height$$11_i$$22$$) {
         var $sprites$$1$$ = this.$lineSprites$[$lineno$$6$$];
         if (8 > $sprites$$1$$[0]) {
           var $off$$1$$ = 3 * $sprites$$1$$[0] + 1, $address$$6$$ = this.$sat$ + ($spriteno$$ << 1) + 128;
           $sprites$$1$$[$off$$1$$++] = this.$VRAM$[$address$$6$$++] & 255;
-          $sprites$$1$$[$off$$1$$++] = $y$$37$$;
+          $sprites$$1$$[$off$$1$$++] = $y$$43$$;
           $sprites$$1$$[$off$$1$$++] = this.$VRAM$[$address$$6$$] & 255;
           $sprites$$1$$[0]++;
         }
@@ -3615,6 +3698,7 @@ function $JSSMS$DummyUI$$($sms$$4$$) {
   this.$main$ = $sms$$4$$;
   this.enable = $JSCompiler_emptyFn$$();
   this.updateStatus = $JSCompiler_emptyFn$$();
+  this.$writeAudio$ = $JSCompiler_emptyFn$$();
   this.$writeFrame$ = $JSCompiler_emptyFn$$();
 }
 'undefined' !== typeof $ && ($.fn.$JSSMSUI$ = function $$$fn$$JSSMSUI$$($roms$$) {
@@ -3643,7 +3727,7 @@ function $JSSMS$DummyUI$$($sms$$4$$) {
       $self$$2$$.$main$.$keyboard$.keydown($evt$$16$$);
     }).bind('keyup', function($evt$$17$$) {
       $self$$2$$.$main$.$keyboard$.keyup($evt$$17$$);
-    })) : $($parent$$2$$).html('<div class="alert-message error"><p><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</p></div>');
+    }), $self$$2$$.$sound$ = new $XAudioServer$$(1, 44100, 0, 819200, $JSCompiler_alias_NULL$$, 1)) : $($parent$$2$$).html('<div class="alert-message error"><p><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</p></div>');
   }
   var $parent$$2$$ = this;
   $UI$$.prototype = {reset: function $$UI$$$$reset$() {
@@ -3653,16 +3737,16 @@ function $JSSMS$DummyUI$$($sms$$4$$) {
   }, $resetCanvas$: function $$UI$$$$$resetCanvas$$() {
     this.$canvasContext$.fillStyle = 'black';
     this.$canvasContext$.fillRect(0, 0, 256, 192);
-    for (var $i$$20$$ = 3; $i$$20$$ <= this.$canvasImageData$.data.length - 3; $i$$20$$ += 4) {
-      this.$canvasImageData$.data[$i$$20$$] = 255;
+    for (var $i$$23$$ = 3; $i$$23$$ <= this.$canvasImageData$.data.length - 3; $i$$23$$ += 4) {
+      this.$canvasImageData$.data[$i$$23$$] = 255;
     }
   }, $setRoms$: function $$UI$$$$$setRoms$$($roms$$1$$) {
     this.$romSelect$.children().remove();
     $('<option>Select a ROM...</option>').appendTo(this.$romSelect$);
     for (var $groupName$$ in $roms$$1$$) {
       if ($roms$$1$$.hasOwnProperty($groupName$$)) {
-        for (var $optgroup$$ = $('<optgroup></optgroup>').attr('label', $groupName$$), $i$$21$$ = 0; $i$$21$$ < $roms$$1$$[$groupName$$].length; $i$$21$$++) {
-          $('<option>' + $roms$$1$$[$groupName$$][$i$$21$$][0] + '</option>').attr('value', $roms$$1$$[$groupName$$][$i$$21$$][1]).appendTo($optgroup$$);
+        for (var $optgroup$$ = $('<optgroup></optgroup>').attr('label', $groupName$$), $i$$24$$ = 0; $i$$24$$ < $roms$$1$$[$groupName$$].length; $i$$24$$++) {
+          $('<option>' + $roms$$1$$[$groupName$$][$i$$24$$][0] + '</option>').attr('value', $roms$$1$$[$groupName$$][$i$$24$$][1]).appendTo($optgroup$$);
         }
         this.$romSelect$.append($optgroup$$);
       }
@@ -3686,11 +3770,15 @@ function $JSSMS$DummyUI$$($sms$$4$$) {
     this.$main$.$soundEnabled$ ? this.$buttons$.$sound$.attr('value', 'Disable sound') : this.$buttons$.$sound$.attr('value', 'Enable sound');
   }, updateStatus: function $$UI$$$$updateStatus$($s$$3$$) {
     this.log.text($s$$3$$);
-  }, $writeFrame$: function $$UI$$$$$writeFrame$$($buffer$$8$$) {
+  }, $writeAudio$: function $$UI$$$$$writeAudio$$($buffer$$11$$) {
+    var $JSCompiler_StaticMethods_writeAudioNoCallback$self$$inline_16$$ = this.$sound$;
+    0 == $JSCompiler_StaticMethods_writeAudioNoCallback$self$$inline_16$$.$audioType$ ? $JSCompiler_StaticMethods_writeMozAudio$$($JSCompiler_StaticMethods_writeAudioNoCallback$self$$inline_16$$, $buffer$$11$$) : 1 == $JSCompiler_StaticMethods_writeAudioNoCallback$self$$inline_16$$.$audioType$ ? $JSCompiler_StaticMethods_callbackBasedWriteAudioNoCallback$$($buffer$$11$$) : 2 == $JSCompiler_StaticMethods_writeAudioNoCallback$self$$inline_16$$.$audioType$ && ($JSCompiler_StaticMethods_checkFlashInit$$($JSCompiler_StaticMethods_writeAudioNoCallback$self$$inline_16$$) ||
+        $launchedContext$$ ? $JSCompiler_StaticMethods_callbackBasedWriteAudioNoCallback$$($buffer$$11$$) : $JSCompiler_StaticMethods_writeAudioNoCallback$self$$inline_16$$.$mozAudioFound$ && $JSCompiler_StaticMethods_writeMozAudio$$($JSCompiler_StaticMethods_writeAudioNoCallback$self$$inline_16$$, $buffer$$11$$))
+  }, $writeFrame$: function $$UI$$$$$writeFrame$$($buffer$$12$$) {
     if (!this.$hiddenPrefix$ || !document[this.$hiddenPrefix$]) {
-      var $imageData$$ = this.$canvasImageData$.data, $pixel$$, $i$$23$$, $j$$2$$;
-      for ($i$$23$$ = 0; 49152 >= $i$$23$$; $i$$23$$++) {
-        $pixel$$ = $buffer$$8$$[$i$$23$$], $j$$2$$ = 4 * $i$$23$$, $imageData$$[$j$$2$$] = $pixel$$ & 255, $imageData$$[$j$$2$$ + 1] = $pixel$$ >> 8 & 255, $imageData$$[$j$$2$$ + 2] = $pixel$$ >> 16 & 255;
+      var $imageData$$ = this.$canvasImageData$.data, $pixel$$, $i$$26$$, $j$$2$$;
+      for ($i$$26$$ = 0; 49152 >= $i$$26$$; $i$$26$$++) {
+        $pixel$$ = $buffer$$12$$[$i$$26$$], $j$$2$$ = 4 * $i$$26$$, $imageData$$[$j$$2$$] = $pixel$$ & 255, $imageData$$[$j$$2$$ + 1] = $pixel$$ >> 8 & 255, $imageData$$[$j$$2$$ + 2] = $pixel$$ >> 16 & 255;
       }
       this.$canvasContext$.putImageData(this.$canvasImageData$, 0, 0);
     }
@@ -3708,24 +3796,24 @@ function $JSSMS$Ports$$($sms$$6$$) {
 }
 $JSSMS$Ports$$.prototype = {reset: function $$JSSMS$Ports$$$$reset$() {
   this.$ioPorts$ = Array(2);
-}, $out$: function $$JSSMS$Ports$$$$$out$$($port$$, $value$$80$$) {
+}, $out$: function $$JSSMS$Ports$$$$$out$$($port$$, $value$$83$$) {
   if (!(this.$main$.$is_gg$ && 7 > $port$$)) {
     switch ($port$$ & 193) {
       case 1:
-        this.$ioPorts$[0] = ($value$$80$$ & 32) << 1;
-        this.$ioPorts$[1] = $value$$80$$ & 128;
+        this.$ioPorts$[0] = ($value$$83$$ & 32) << 1;
+        this.$ioPorts$[1] = $value$$83$$ & 128;
         0 == this.$europe$ && (this.$ioPorts$[0] = ~this.$ioPorts$[0], this.$ioPorts$[1] = ~this.$ioPorts$[1]);
         break;
       case 128:
-        this.$vdp$.$dataWrite$($value$$80$$);
+        this.$vdp$.$dataWrite$($value$$83$$);
         break;
       case 129:
-        this.$vdp$.$controlWrite$($value$$80$$);
+        this.$vdp$.$controlWrite$($value$$83$$);
         break;
       case 64:
 ;
       case 65:
-        this.$main$.$soundEnabled$ && this.$psg$.write($value$$80$$);
+        this.$main$.$soundEnabled$ && this.$psg$.write($value$$83$$);
     }
   }
 }, $in_$: function $$JSSMS$Ports$$$$$in_$$($port$$1$$) {
@@ -3763,6 +3851,664 @@ $JSSMS$Ports$$.prototype = {reset: function $$JSSMS$Ports$$$$reset$() {
   }
   return 255;
 }};
+var $swfobject$$ = function() {
+  function $callDomLoadFunctions$$() {
+    if (!$isDomLoaded$$) {
+      try {
+        var $dl_t$$ = $doc$$.getElementsByTagName('body')[0].appendChild($doc$$.createElement('span'));
+        $dl_t$$.parentNode.removeChild($dl_t$$);
+      }catch ($e$$8$$) {
+        return;
+      }
+      $isDomLoaded$$ = $JSCompiler_alias_TRUE$$;
+      for (var $dl_t$$ = $domLoadFnArr$$.length, $i$$27$$ = 0; $i$$27$$ < $dl_t$$; $i$$27$$++) {
+        $domLoadFnArr$$[$i$$27$$]();
+      }
+    }
+  }
+  function $addDomLoadEvent$$($fn$$) {
+    $isDomLoaded$$ ? $fn$$() : $domLoadFnArr$$[$domLoadFnArr$$.length] = $fn$$;
+  }
+  function $addLoadEvent$$($fn$$1$$) {
+    if (typeof $win$$.addEventListener != $UNDEF$$) {
+      $win$$.addEventListener('load', $fn$$1$$, $JSCompiler_alias_FALSE$$);
+    }else {
+      if (typeof $doc$$.addEventListener != $UNDEF$$) {
+        $doc$$.addEventListener('load', $fn$$1$$, $JSCompiler_alias_FALSE$$);
+      }else {
+        if (typeof $win$$.attachEvent != $UNDEF$$) {
+          $addListener$$($win$$, $fn$$1$$);
+        }else {
+          if ('function' == typeof $win$$.onload) {
+            var $fnOld$$ = $win$$.onload;
+            $win$$.onload = function $$win$$$onload$() {
+              $fnOld$$();
+              $fn$$1$$();
+            }
+          }else {
+            $win$$.onload = $fn$$1$$;
+          }
+        }
+      }
+    }
+  }
+  function $testPlayerVersion$$() {
+    var $b$$2$$ = $doc$$.getElementsByTagName('body')[0], $o$$ = $doc$$.createElement($OBJECT$$);
+    $o$$.setAttribute('type', $FLASH_MIME_TYPE$$);
+    var $t$$1$$ = $b$$2$$.appendChild($o$$);
+    if ($t$$1$$) {
+      var $counter$$1$$ = 0;
+      (function() {
+        if (typeof $t$$1$$.GetVariable != $UNDEF$$) {
+          var $d$$1$$ = $t$$1$$.GetVariable('$version');
+          $d$$1$$ && ($d$$1$$ = $d$$1$$.split(' ')[1].split(','), $ua$$.$pv$ = [parseInt($d$$1$$[0], 10), parseInt($d$$1$$[1], 10), parseInt($d$$1$$[2], 10)]);
+        }else {
+          if (10 > $counter$$1$$) {
+            $counter$$1$$++;
+            setTimeout(arguments.callee, 10);
+            return;
+          }
+        }
+        $b$$2$$.removeChild($o$$);
+        $t$$1$$ = $JSCompiler_alias_NULL$$;
+        $matchVersions$$();
+      })();
+    }else {
+      $matchVersions$$();
+    }
+  }
+  function $matchVersions$$() {
+    var $rl$$ = $regObjArr$$.length;
+    if (0 < $rl$$) {
+      for (var $i$$28$$ = 0; $i$$28$$ < $rl$$; $i$$28$$++) {
+        var $id$$1_o$$1$$ = $regObjArr$$[$i$$28$$].id, $cb$$ = $regObjArr$$[$i$$28$$].$callbackFn$, $att_cbObj$$ = {success: $JSCompiler_alias_FALSE$$, id: $id$$1_o$$1$$};
+        if (0 < $ua$$.$pv$[0]) {
+          var $obj$$32_p$$2$$ = $getElementById$$($id$$1_o$$1$$);
+          if ($obj$$32_p$$2$$) {
+            if ($hasPlayerVersion$$($regObjArr$$[$i$$28$$].$swfVersion$) && !($ua$$.$wk$ && 312 > $ua$$.$wk$)) {
+              $setVisibility$$($id$$1_o$$1$$, $JSCompiler_alias_TRUE$$), $cb$$ && ($att_cbObj$$.success = $JSCompiler_alias_TRUE$$, $att_cbObj$$.$ref$ = $getObjectById$$($id$$1_o$$1$$), $cb$$($att_cbObj$$));
+            }else {
+              if ($regObjArr$$[$i$$28$$].$expressInstall$ && $canExpressInstall$$()) {
+                $att_cbObj$$ = {};
+                $att_cbObj$$.data = $regObjArr$$[$i$$28$$].$expressInstall$;
+                $att_cbObj$$.width = $obj$$32_p$$2$$.getAttribute('width') || '0';
+                $att_cbObj$$.height = $obj$$32_p$$2$$.getAttribute('height') || '0';
+                $obj$$32_p$$2$$.getAttribute('class') && ($att_cbObj$$.$styleclass$ = $obj$$32_p$$2$$.getAttribute('class'));
+                $obj$$32_p$$2$$.getAttribute('align') && ($att_cbObj$$.align = $obj$$32_p$$2$$.getAttribute('align'));
+                for (var $par$$ = {}, $obj$$32_p$$2$$ = $obj$$32_p$$2$$.getElementsByTagName('param'), $pl$$ = $obj$$32_p$$2$$.length, $j$$3$$ = 0; $j$$3$$ < $pl$$; $j$$3$$++) {
+                  'movie' != $obj$$32_p$$2$$[$j$$3$$].getAttribute('name').toLowerCase() && ($par$$[$obj$$32_p$$2$$[$j$$3$$].getAttribute('name')] = $obj$$32_p$$2$$[$j$$3$$].getAttribute('value'));
+                }
+                $showExpressInstall$$($att_cbObj$$, $par$$, $id$$1_o$$1$$, $cb$$);
+              }else {
+                $displayAltContent$$($obj$$32_p$$2$$), $cb$$ && $cb$$($att_cbObj$$);
+              }
+            }
+          }
+        }else {
+          if ($setVisibility$$($id$$1_o$$1$$, $JSCompiler_alias_TRUE$$), $cb$$) {
+            if (($id$$1_o$$1$$ = $getObjectById$$($id$$1_o$$1$$)) && typeof $id$$1_o$$1$$.SetVariable != $UNDEF$$) {
+              $att_cbObj$$.success = $JSCompiler_alias_TRUE$$, $att_cbObj$$.$ref$ = $id$$1_o$$1$$;
+            }
+            $cb$$($att_cbObj$$);
+          }
+        }
+      }
+    }
+  }
+  function $getObjectById$$($n$$3_o$$2_objectIdStr$$) {
+    var $r$$1$$ = $JSCompiler_alias_NULL$$;
+    if (($n$$3_o$$2_objectIdStr$$ = $getElementById$$($n$$3_o$$2_objectIdStr$$)) && 'OBJECT' == $n$$3_o$$2_objectIdStr$$.nodeName) {
+      typeof $n$$3_o$$2_objectIdStr$$.SetVariable != $UNDEF$$ ? $r$$1$$ = $n$$3_o$$2_objectIdStr$$ : ($n$$3_o$$2_objectIdStr$$ = $n$$3_o$$2_objectIdStr$$.getElementsByTagName($OBJECT$$)[0]) && ($r$$1$$ = $n$$3_o$$2_objectIdStr$$);
+    }
+    return $r$$1$$;
+  }
+  function $canExpressInstall$$() {
+    return!$isExpressInstallActive$$ && $hasPlayerVersion$$('6.0.65') && ($ua$$.$win$ || $ua$$.$mac$) && !($ua$$.$wk$ && 312 > $ua$$.$wk$);
+  }
+  function $showExpressInstall$$($att$$1$$, $par$$1$$, $replaceElemIdStr$$, $callbackFn_fv_newObj_pt$$) {
+    $isExpressInstallActive$$ = $JSCompiler_alias_TRUE$$;
+    $storedCallbackFn$$ = $callbackFn_fv_newObj_pt$$ || $JSCompiler_alias_NULL$$;
+    $storedCallbackObj$$ = {success: $JSCompiler_alias_FALSE$$, id: $replaceElemIdStr$$};
+    var $obj$$33$$ = $getElementById$$($replaceElemIdStr$$);
+    if ($obj$$33$$) {
+      'OBJECT' == $obj$$33$$.nodeName ? ($storedAltContent$$ = $abstractAltContent$$($obj$$33$$), $storedAltContentId$$ = $JSCompiler_alias_NULL$$) : ($storedAltContent$$ = $obj$$33$$, $storedAltContentId$$ = $replaceElemIdStr$$);
+      $att$$1$$.id = $EXPRESS_INSTALL_ID$$;
+      if (typeof $att$$1$$.width == $UNDEF$$ || !/%$/.test($att$$1$$.width) && 310 > parseInt($att$$1$$.width, 10)) {
+        $att$$1$$.width = '310';
+      }
+      if (typeof $att$$1$$.height == $UNDEF$$ || !/%$/.test($att$$1$$.height) && 137 > parseInt($att$$1$$.height, 10)) {
+        $att$$1$$.height = '137';
+      }
+      $doc$$.title = $doc$$.title.slice(0, 47) + ' - Flash Player Installation';
+      $callbackFn_fv_newObj_pt$$ = $ua$$.$ie$ && $ua$$.$win$ ? 'ActiveX' : 'PlugIn';
+      $callbackFn_fv_newObj_pt$$ = 'MMredirectURL=' + ('' + $win$$.location).replace(/&/g, '%26') + '&MMplayerType=' + $callbackFn_fv_newObj_pt$$ + '&MMdoctitle=' + $doc$$.title;
+      $par$$1$$.$flashvars$ = typeof $par$$1$$.$flashvars$ != $UNDEF$$ ? $par$$1$$.$flashvars$ + ('&' + $callbackFn_fv_newObj_pt$$) : $callbackFn_fv_newObj_pt$$;
+      $ua$$.$ie$ && ($ua$$.$win$ && 4 != $obj$$33$$.readyState) && ($callbackFn_fv_newObj_pt$$ = $doc$$.createElement('div'), $replaceElemIdStr$$ += 'SWFObjectNew', $callbackFn_fv_newObj_pt$$.setAttribute('id', $replaceElemIdStr$$), $obj$$33$$.parentNode.insertBefore($callbackFn_fv_newObj_pt$$, $obj$$33$$), $obj$$33$$.style.display = 'none', function() {
+        $obj$$33$$.readyState == 4 ? $obj$$33$$.parentNode.removeChild($obj$$33$$) : setTimeout(arguments.callee, 10);
+      }());
+      $createSWF$$($att$$1$$, $par$$1$$, $replaceElemIdStr$$);
+    }
+  }
+  function $displayAltContent$$($obj$$34$$) {
+    if ($ua$$.$ie$ && $ua$$.$win$ && 4 != $obj$$34$$.readyState) {
+      var $el$$1$$ = $doc$$.createElement('div');
+      $obj$$34$$.parentNode.insertBefore($el$$1$$, $obj$$34$$);
+      $el$$1$$.parentNode.replaceChild($abstractAltContent$$($obj$$34$$), $el$$1$$);
+      $obj$$34$$.style.display = 'none';
+      (function() {
+        4 == $obj$$34$$.readyState ? $obj$$34$$.parentNode.removeChild($obj$$34$$) : setTimeout(arguments.callee, 10);
+      })();
+    }else {
+      $obj$$34$$.parentNode.replaceChild($abstractAltContent$$($obj$$34$$), $obj$$34$$);
+    }
+  }
+  function $abstractAltContent$$($c$$1_nestedObj_obj$$35$$) {
+    var $ac$$ = $doc$$.createElement('div');
+    if ($ua$$.$win$ && $ua$$.$ie$) {
+      $ac$$.innerHTML = $c$$1_nestedObj_obj$$35$$.innerHTML;
+    }else {
+      if ($c$$1_nestedObj_obj$$35$$ = $c$$1_nestedObj_obj$$35$$.getElementsByTagName($OBJECT$$)[0]) {
+        if ($c$$1_nestedObj_obj$$35$$ = $c$$1_nestedObj_obj$$35$$.childNodes) {
+          for (var $cl$$ = $c$$1_nestedObj_obj$$35$$.length, $i$$29$$ = 0; $i$$29$$ < $cl$$; $i$$29$$++) {
+            !(1 == $c$$1_nestedObj_obj$$35$$[$i$$29$$].nodeType && 'PARAM' == $c$$1_nestedObj_obj$$35$$[$i$$29$$].nodeName) && 8 != $c$$1_nestedObj_obj$$35$$[$i$$29$$].nodeType && $ac$$.appendChild($c$$1_nestedObj_obj$$35$$[$i$$29$$].cloneNode($JSCompiler_alias_TRUE$$));
+          }
+        }
+      }
+    }
+    return $ac$$;
+  }
+  function $createSWF$$($attObj_el$$inline_19$$, $parObj$$, $id$$2_p$$inline_22$$) {
+    var $r$$2$$, $el$$2$$ = $getElementById$$($id$$2_p$$inline_22$$);
+    if ($ua$$.$wk$ && 312 > $ua$$.$wk$) {
+      return $r$$2$$;
+    }
+    if ($el$$2$$) {
+      if (typeof $attObj_el$$inline_19$$.id == $UNDEF$$ && ($attObj_el$$inline_19$$.id = $id$$2_p$$inline_22$$), $ua$$.$ie$ && $ua$$.$win$) {
+        var $att$$2_n$$4$$ = '', $i$$30_pName$$inline_20_par$$2$$;
+        for ($i$$30_pName$$inline_20_par$$2$$ in $attObj_el$$inline_19$$) {
+          $attObj_el$$inline_19$$[$i$$30_pName$$inline_20_par$$2$$] != Object.prototype[$i$$30_pName$$inline_20_par$$2$$] && ('data' == $i$$30_pName$$inline_20_par$$2$$.toLowerCase() ? $parObj$$.$movie$ = $attObj_el$$inline_19$$[$i$$30_pName$$inline_20_par$$2$$] : 'styleclass' == $i$$30_pName$$inline_20_par$$2$$.toLowerCase() ? $att$$2_n$$4$$ += ' class="' + $attObj_el$$inline_19$$[$i$$30_pName$$inline_20_par$$2$$] + '"' : 'classid' != $i$$30_pName$$inline_20_par$$2$$.toLowerCase() && ($att$$2_n$$4$$ +=
+              ' ' + $i$$30_pName$$inline_20_par$$2$$ + '="' + $attObj_el$$inline_19$$[$i$$30_pName$$inline_20_par$$2$$] + '"'));
+        }
+        $i$$30_pName$$inline_20_par$$2$$ = '';
+        for (var $j$$4_o$$3$$ in $parObj$$) {
+          $parObj$$[$j$$4_o$$3$$] != Object.prototype[$j$$4_o$$3$$] && ($i$$30_pName$$inline_20_par$$2$$ += '<param name="' + $j$$4_o$$3$$ + '" value="' + $parObj$$[$j$$4_o$$3$$] + '" />');
+        }
+        $el$$2$$.outerHTML = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"' + $att$$2_n$$4$$ + '>' + $i$$30_pName$$inline_20_par$$2$$ + '</object>';
+        $objIdArr$$[$objIdArr$$.length] = $attObj_el$$inline_19$$.id;
+        $r$$2$$ = $getElementById$$($attObj_el$$inline_19$$.id);
+      }else {
+        $j$$4_o$$3$$ = $doc$$.createElement($OBJECT$$);
+        $j$$4_o$$3$$.setAttribute('type', $FLASH_MIME_TYPE$$);
+        for (var $m_pValue$$inline_21$$ in $attObj_el$$inline_19$$) {
+          $attObj_el$$inline_19$$[$m_pValue$$inline_21$$] != Object.prototype[$m_pValue$$inline_21$$] && ('styleclass' == $m_pValue$$inline_21$$.toLowerCase() ? $j$$4_o$$3$$.setAttribute('class', $attObj_el$$inline_19$$[$m_pValue$$inline_21$$]) : 'classid' != $m_pValue$$inline_21$$.toLowerCase() && $j$$4_o$$3$$.setAttribute($m_pValue$$inline_21$$, $attObj_el$$inline_19$$[$m_pValue$$inline_21$$]));
+        }
+        for ($att$$2_n$$4$$ in $parObj$$) {
+          $parObj$$[$att$$2_n$$4$$] != Object.prototype[$att$$2_n$$4$$] && 'movie' != $att$$2_n$$4$$.toLowerCase() && ($attObj_el$$inline_19$$ = $j$$4_o$$3$$, $i$$30_pName$$inline_20_par$$2$$ = $att$$2_n$$4$$, $m_pValue$$inline_21$$ = $parObj$$[$att$$2_n$$4$$], $id$$2_p$$inline_22$$ = $doc$$.createElement('param'), $id$$2_p$$inline_22$$.setAttribute('name', $i$$30_pName$$inline_20_par$$2$$), $id$$2_p$$inline_22$$.setAttribute('value', $m_pValue$$inline_21$$), $attObj_el$$inline_19$$.appendChild($id$$2_p$$inline_22$$));
+        }
+        $el$$2$$.parentNode.replaceChild($j$$4_o$$3$$, $el$$2$$);
+        $r$$2$$ = $j$$4_o$$3$$;
+      }
+    }
+    return $r$$2$$;
+  }
+  function $removeSWF$$($id$$3$$) {
+    var $obj$$36$$ = $getElementById$$($id$$3$$);
+    $obj$$36$$ && 'OBJECT' == $obj$$36$$.nodeName && ($ua$$.$ie$ && $ua$$.$win$ ? ($obj$$36$$.style.display = 'none', function() {
+      if (4 == $obj$$36$$.readyState) {
+        var $obj$$inline_25$$ = $getElementById$$($id$$3$$);
+        if ($obj$$inline_25$$) {
+          for (var $i$$inline_26$$ in $obj$$inline_25$$) {
+            'function' == typeof $obj$$inline_25$$[$i$$inline_26$$] && ($obj$$inline_25$$[$i$$inline_26$$] = $JSCompiler_alias_NULL$$);
+          }
+          $obj$$inline_25$$.parentNode.removeChild($obj$$inline_25$$);
+        }
+      }else {
+        setTimeout(arguments.callee, 10);
+      }
+    }()) : $obj$$36$$.parentNode.removeChild($obj$$36$$));
+  }
+  function $getElementById$$($id$$5$$) {
+    var $el$$4$$ = $JSCompiler_alias_NULL$$;
+    try {
+      $el$$4$$ = $doc$$.getElementById($id$$5$$);
+    }catch ($e$$9$$) {
+    }
+    return $el$$4$$;
+  }
+  function $addListener$$($target$$45$$, $fn$$2$$) {
+    $target$$45$$.attachEvent('onload', $fn$$2$$);
+    $listenersArr$$[$listenersArr$$.length] = [$target$$45$$, 'onload', $fn$$2$$];
+  }
+  function $hasPlayerVersion$$($rv_v$$2$$) {
+    var $pv$$ = $ua$$.$pv$, $rv_v$$2$$ = $rv_v$$2$$.split('.');
+    $rv_v$$2$$[0] = parseInt($rv_v$$2$$[0], 10);
+    $rv_v$$2$$[1] = parseInt($rv_v$$2$$[1], 10) || 0;
+    $rv_v$$2$$[2] = parseInt($rv_v$$2$$[2], 10) || 0;
+    return $pv$$[0] > $rv_v$$2$$[0] || $pv$$[0] == $rv_v$$2$$[0] && $pv$$[1] > $rv_v$$2$$[1] || $pv$$[0] == $rv_v$$2$$[0] && $pv$$[1] == $rv_v$$2$$[1] && $pv$$[2] >= $rv_v$$2$$[2] ? $JSCompiler_alias_TRUE$$ : $JSCompiler_alias_FALSE$$;
+  }
+  function $createCSS$$($sel$$, $decl$$, $m$$1_media$$1$$, $newStyle_s$$4$$) {
+    if (!$ua$$.$ie$ || !$ua$$.$mac$) {
+      var $h$$5$$ = $doc$$.getElementsByTagName('head')[0];
+      if ($h$$5$$) {
+        $m$$1_media$$1$$ = $m$$1_media$$1$$ && 'string' == typeof $m$$1_media$$1$$ ? $m$$1_media$$1$$ : 'screen';
+        $newStyle_s$$4$$ && ($dynamicStylesheetMedia$$ = $dynamicStylesheet$$ = $JSCompiler_alias_NULL$$);
+        if (!$dynamicStylesheet$$ || $dynamicStylesheetMedia$$ != $m$$1_media$$1$$) {
+          $newStyle_s$$4$$ = $doc$$.createElement('style'), $newStyle_s$$4$$.setAttribute('type', 'text/css'), $newStyle_s$$4$$.setAttribute('media', $m$$1_media$$1$$), $dynamicStylesheet$$ = $h$$5$$.appendChild($newStyle_s$$4$$), $ua$$.$ie$ && ($ua$$.$win$ && typeof $doc$$.styleSheets != $UNDEF$$ && 0 < $doc$$.styleSheets.length) && ($dynamicStylesheet$$ = $doc$$.styleSheets[$doc$$.styleSheets.length - 1]), $dynamicStylesheetMedia$$ = $m$$1_media$$1$$;
+        }
+        $ua$$.$ie$ && $ua$$.$win$ ? $dynamicStylesheet$$ && typeof $dynamicStylesheet$$.addRule == $OBJECT$$ && $dynamicStylesheet$$.addRule($sel$$, $decl$$) : $dynamicStylesheet$$ && typeof $doc$$.createTextNode != $UNDEF$$ && $dynamicStylesheet$$.appendChild($doc$$.createTextNode($sel$$ + ' {' + $decl$$ + '}'));
+      }
+    }
+  }
+  function $setVisibility$$($id$$6$$, $isVisible$$) {
+    if ($autoHideShow$$) {
+      var $v$$3$$ = $isVisible$$ ? 'visible' : 'hidden';
+      $isDomLoaded$$ && $getElementById$$($id$$6$$) ? $getElementById$$($id$$6$$).style.visibility = $v$$3$$ : $createCSS$$('#' + $id$$6$$, 'visibility:' + $v$$3$$);
+    }
+  }
+  function $urlEncodeIfNecessary$$($s$$5$$) {
+    return/[\\\"<>\.;]/.exec($s$$5$$) != $JSCompiler_alias_NULL$$ && typeof encodeURIComponent != $UNDEF$$ ? encodeURIComponent($s$$5$$) : $s$$5$$;
+  }
+  var $UNDEF$$ = 'undefined', $OBJECT$$ = 'object', $FLASH_MIME_TYPE$$ = 'application/x-shockwave-flash', $EXPRESS_INSTALL_ID$$ = 'SWFObjectExprInst', $win$$ = window, $doc$$ = document, $nav$$ = navigator, $plugin$$ = $JSCompiler_alias_FALSE$$, $domLoadFnArr$$ = [function main() {
+    $plugin$$ ? $testPlayerVersion$$() : $matchVersions$$();
+  }], $regObjArr$$ = [], $objIdArr$$ = [], $listenersArr$$ = [], $storedAltContent$$, $storedAltContentId$$, $storedCallbackFn$$, $storedCallbackObj$$, $isDomLoaded$$ = $JSCompiler_alias_FALSE$$, $isExpressInstallActive$$ = $JSCompiler_alias_FALSE$$, $dynamicStylesheet$$, $dynamicStylesheetMedia$$, $autoHideShow$$ = $JSCompiler_alias_TRUE$$, $ua$$ = function() {
+    var $w3cdom$$ = typeof $doc$$.getElementById != $UNDEF$$ && typeof $doc$$.getElementsByTagName != $UNDEF$$ && typeof $doc$$.createElement != $UNDEF$$, $u_webkit$$ = $nav$$.userAgent.toLowerCase(), $mac_p$$4$$ = $nav$$.platform.toLowerCase(), $windows$$ = $mac_p$$4$$ ? /win/.test($mac_p$$4$$) : /win/.test($u_webkit$$), $mac_p$$4$$ = $mac_p$$4$$ ? /mac/.test($mac_p$$4$$) : /mac/.test($u_webkit$$), $u_webkit$$ = /webkit/.test($u_webkit$$) ? parseFloat($u_webkit$$.replace(/^.*webkit\/(\d+(\.\d+)?).*$/,
+        '$1')) : $JSCompiler_alias_FALSE$$, $ie$$ = !+'\v1', $playerVersion$$ = [0, 0, 0], $d$$2$$ = $JSCompiler_alias_NULL$$;
+    if (typeof $nav$$.plugins != $UNDEF$$ && typeof $nav$$.plugins['Shockwave Flash'] == $OBJECT$$) {
+      if (($d$$2$$ = $nav$$.plugins['Shockwave Flash'].description) && !(typeof $nav$$.mimeTypes != $UNDEF$$ && $nav$$.mimeTypes[$FLASH_MIME_TYPE$$] && !$nav$$.mimeTypes[$FLASH_MIME_TYPE$$].enabledPlugin)) {
+        $plugin$$ = $JSCompiler_alias_TRUE$$, $ie$$ = $JSCompiler_alias_FALSE$$, $d$$2$$ = $d$$2$$.replace(/^.*\s+(\S+\s+\S+$)/, '$1'), $playerVersion$$[0] = parseInt($d$$2$$.replace(/^(.*)\..*$/, '$1'), 10), $playerVersion$$[1] = parseInt($d$$2$$.replace(/^.*\.(.*)\s.*$/, '$1'), 10), $playerVersion$$[2] = /[a-zA-Z]/.test($d$$2$$) ? parseInt($d$$2$$.replace(/^.*[a-zA-Z]+(.*)$/, '$1'), 10) : 0;
+      }
+    }else {
+      if (typeof $win$$.ActiveXObject != $UNDEF$$) {
+        try {
+          var $a$$1$$ = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
+          if ($a$$1$$ && ($d$$2$$ = $a$$1$$.GetVariable('$version'))) {
+            $ie$$ = $JSCompiler_alias_TRUE$$, $d$$2$$ = $d$$2$$.split(' ')[1].split(','), $playerVersion$$ = [parseInt($d$$2$$[0], 10), parseInt($d$$2$$[1], 10), parseInt($d$$2$$[2], 10)];
+          }
+        }catch ($e$$10$$) {
+        }
+      }
+    }
+    return{$w3$: $w3cdom$$, $pv$: $playerVersion$$, $wk$: $u_webkit$$, $ie$: $ie$$, $win$: $windows$$, $mac$: $mac_p$$4$$};
+  }();
+  (function() {
+    $ua$$.$w3$ && ((typeof $doc$$.readyState != $UNDEF$$ && 'complete' == $doc$$.readyState || typeof $doc$$.readyState == $UNDEF$$ && ($doc$$.getElementsByTagName('body')[0] || $doc$$.body)) && $callDomLoadFunctions$$(), $isDomLoaded$$ || (typeof $doc$$.addEventListener != $UNDEF$$ && $doc$$.addEventListener('DOMContentLoaded', $callDomLoadFunctions$$, $JSCompiler_alias_FALSE$$), $ua$$.$ie$ && $ua$$.$win$ && ($doc$$.attachEvent('onreadystatechange', function() {
+      'complete' == $doc$$.readyState && ($doc$$.detachEvent('onreadystatechange', arguments.callee), $callDomLoadFunctions$$());
+    }), $win$$ == top && function() {
+      if (!$isDomLoaded$$) {
+        try {
+          $doc$$.documentElement.doScroll('left');
+        }catch ($e$$11$$) {
+          setTimeout(arguments.callee, 0);
+          return;
+        }
+        $callDomLoadFunctions$$();
+      }
+    }()), $ua$$.$wk$ && function() {
+      $isDomLoaded$$ || (/loaded|complete/.test($doc$$.readyState) ? $callDomLoadFunctions$$() : setTimeout(arguments.callee, 0));
+    }(), $addLoadEvent$$($callDomLoadFunctions$$)));
+  })();
+  (function() {
+    $ua$$.$ie$ && $ua$$.$win$ && window.attachEvent('onunload', function() {
+      for (var $il_ll$$ = $listenersArr$$.length, $i$$32_j$$5$$ = 0; $i$$32_j$$5$$ < $il_ll$$; $i$$32_j$$5$$++) {
+        $listenersArr$$[$i$$32_j$$5$$][0].detachEvent($listenersArr$$[$i$$32_j$$5$$][1], $listenersArr$$[$i$$32_j$$5$$][2]);
+      }
+      $il_ll$$ = $objIdArr$$.length;
+      for ($i$$32_j$$5$$ = 0; $i$$32_j$$5$$ < $il_ll$$; $i$$32_j$$5$$++) {
+        $removeSWF$$($objIdArr$$[$i$$32_j$$5$$]);
+      }
+      for (var $k$$ in $ua$$) {
+        $ua$$[$k$$] = $JSCompiler_alias_NULL$$;
+      }
+      $ua$$ = $JSCompiler_alias_NULL$$;
+      for (var $l$$2$$ in $swfobject$$) {
+        $swfobject$$[$l$$2$$] = $JSCompiler_alias_NULL$$;
+      }
+      $swfobject$$ = $JSCompiler_alias_NULL$$;
+    });
+  })();
+  return{$registerObject$: function($objectIdStr$$1$$, $swfVersionStr$$, $xiSwfUrlStr$$, $callbackFn$$1$$) {
+    if ($ua$$.$w3$ && $objectIdStr$$1$$ && $swfVersionStr$$) {
+      var $regObj$$ = {};
+      $regObj$$.id = $objectIdStr$$1$$;
+      $regObj$$.$swfVersion$ = $swfVersionStr$$;
+      $regObj$$.$expressInstall$ = $xiSwfUrlStr$$;
+      $regObj$$.$callbackFn$ = $callbackFn$$1$$;
+      $regObjArr$$[$regObjArr$$.length] = $regObj$$;
+      $setVisibility$$($objectIdStr$$1$$, $JSCompiler_alias_FALSE$$);
+    }else {
+      $callbackFn$$1$$ && $callbackFn$$1$$({success: $JSCompiler_alias_FALSE$$, id: $objectIdStr$$1$$});
+    }
+  }, $getObjectById$: function($objectIdStr$$2$$) {
+    if ($ua$$.$w3$) {
+      return $getObjectById$$($objectIdStr$$2$$);
+    }
+  }, $embedSWF$: function($swfUrlStr$$, $replaceElemIdStr$$1$$, $widthStr$$, $heightStr$$, $swfVersionStr$$1$$, $xiSwfUrlStr$$1$$, $flashvarsObj$$, $parObj$$1$$, $attObj$$1$$, $callbackFn$$2$$) {
+    var $callbackObj$$ = {success: $JSCompiler_alias_FALSE$$, id: $replaceElemIdStr$$1$$};
+    $ua$$.$w3$ && !($ua$$.$wk$ && 312 > $ua$$.$wk$) && $swfUrlStr$$ && $replaceElemIdStr$$1$$ && $widthStr$$ && $heightStr$$ && $swfVersionStr$$1$$ ? ($setVisibility$$($replaceElemIdStr$$1$$, $JSCompiler_alias_FALSE$$), $addDomLoadEvent$$(function() {
+      $widthStr$$ += '';
+      $heightStr$$ += '';
+      var $att$$3$$ = {};
+      if ($attObj$$1$$ && typeof $attObj$$1$$ === $OBJECT$$) {
+        for (var $i$$33_par$$3$$ in $attObj$$1$$) {
+          $att$$3$$[$i$$33_par$$3$$] = $attObj$$1$$[$i$$33_par$$3$$];
+        }
+      }
+      $att$$3$$.data = $swfUrlStr$$;
+      $att$$3$$.width = $widthStr$$;
+      $att$$3$$.height = $heightStr$$;
+      $i$$33_par$$3$$ = {};
+      if ($parObj$$1$$ && typeof $parObj$$1$$ === $OBJECT$$) {
+        for (var $j$$6_obj$$38$$ in $parObj$$1$$) {
+          $i$$33_par$$3$$[$j$$6_obj$$38$$] = $parObj$$1$$[$j$$6_obj$$38$$];
+        }
+      }
+      if ($flashvarsObj$$ && typeof $flashvarsObj$$ === $OBJECT$$) {
+        for (var $k$$1$$ in $flashvarsObj$$) {
+          $i$$33_par$$3$$.$flashvars$ = typeof $i$$33_par$$3$$.$flashvars$ != $UNDEF$$ ? $i$$33_par$$3$$.$flashvars$ + ('&' + $k$$1$$ + '=' + $flashvarsObj$$[$k$$1$$]) : $k$$1$$ + '=' + $flashvarsObj$$[$k$$1$$];
+        }
+      }
+      if ($hasPlayerVersion$$($swfVersionStr$$1$$)) {
+        $j$$6_obj$$38$$ = $createSWF$$($att$$3$$, $i$$33_par$$3$$, $replaceElemIdStr$$1$$), $att$$3$$.id == $replaceElemIdStr$$1$$ && $setVisibility$$($replaceElemIdStr$$1$$, $JSCompiler_alias_TRUE$$), $callbackObj$$.success = $JSCompiler_alias_TRUE$$, $callbackObj$$.$ref$ = $j$$6_obj$$38$$;
+      }else {
+        if ($xiSwfUrlStr$$1$$ && $canExpressInstall$$()) {
+          $att$$3$$.data = $xiSwfUrlStr$$1$$;
+          $showExpressInstall$$($att$$3$$, $i$$33_par$$3$$, $replaceElemIdStr$$1$$, $callbackFn$$2$$);
+          return;
+        }
+        $setVisibility$$($replaceElemIdStr$$1$$, $JSCompiler_alias_TRUE$$);
+      }
+      $callbackFn$$2$$ && $callbackFn$$2$$($callbackObj$$);
+    })) : $callbackFn$$2$$ && $callbackFn$$2$$($callbackObj$$);
+  }, $switchOffAutoHideShow$: function() {
+    $autoHideShow$$ = $JSCompiler_alias_FALSE$$;
+  }, $ua$: $ua$$, $getFlashPlayerVersion$: function() {
+    return{$major$: $ua$$.$pv$[0], $minor$: $ua$$.$pv$[1], release: $ua$$.$pv$[2]};
+  }, $hasFlashPlayerVersion$: $hasPlayerVersion$$, $createSWF$: function($attObj$$2$$, $parObj$$2$$, $replaceElemIdStr$$2$$) {
+    if ($ua$$.$w3$) {
+      return $createSWF$$($attObj$$2$$, $parObj$$2$$, $replaceElemIdStr$$2$$);
+    }
+  }, $showExpressInstall$: function($att$$4$$, $par$$4$$, $replaceElemIdStr$$3$$, $callbackFn$$3$$) {
+    $ua$$.$w3$ && $canExpressInstall$$() && $showExpressInstall$$($att$$4$$, $par$$4$$, $replaceElemIdStr$$3$$, $callbackFn$$3$$);
+  }, $removeSWF$: function($objElemIdStr$$) {
+    $ua$$.$w3$ && $removeSWF$$($objElemIdStr$$);
+  }, $createCSS$: function($selStr$$, $declStr$$, $mediaStr$$, $newStyleBoolean$$) {
+    $ua$$.$w3$ && $createCSS$$($selStr$$, $declStr$$, $mediaStr$$, $newStyleBoolean$$);
+  }, $addDomLoadEvent$: $addDomLoadEvent$$, $addLoadEvent$: $addLoadEvent$$, $getQueryParamValue$: function($param$$3$$) {
+    var $pairs_q$$ = $doc$$.location.search || $doc$$.location.hash;
+    if ($pairs_q$$) {
+      /\?/.test($pairs_q$$) && ($pairs_q$$ = $pairs_q$$.split('?')[1]);
+      if ($param$$3$$ == $JSCompiler_alias_NULL$$) {
+        return $urlEncodeIfNecessary$$($pairs_q$$);
+      }
+      for (var $pairs_q$$ = $pairs_q$$.split('&'), $i$$34$$ = 0; $i$$34$$ < $pairs_q$$.length; $i$$34$$++) {
+        if ($pairs_q$$[$i$$34$$].substring(0, $pairs_q$$[$i$$34$$].indexOf('=')) == $param$$3$$) {
+          return $urlEncodeIfNecessary$$($pairs_q$$[$i$$34$$].substring($pairs_q$$[$i$$34$$].indexOf('=') + 1));
+        }
+      }
+    }
+    return'';
+  }, $expressInstallCallback$: function() {
+    if ($isExpressInstallActive$$) {
+      var $obj$$39$$ = $getElementById$$($EXPRESS_INSTALL_ID$$);
+      $obj$$39$$ && $storedAltContent$$ && ($obj$$39$$.parentNode.replaceChild($storedAltContent$$, $obj$$39$$), $storedAltContentId$$ && ($setVisibility$$($storedAltContentId$$, $JSCompiler_alias_TRUE$$), $ua$$.$ie$ && $ua$$.$win$ && ($storedAltContent$$.style.display = 'block')), $storedCallbackFn$$ && $storedCallbackFn$$($storedCallbackObj$$));
+      $isExpressInstallActive$$ = $JSCompiler_alias_FALSE$$;
+    }
+  }};
+}();
+function $Resampler$$($fromSampleRate$$, $toSampleRate$$, $channels$$1$$, $outputBufferSize$$, $noReturn$$) {
+  this.$fromSampleRate$ = $fromSampleRate$$;
+  this.$toSampleRate$ = $toSampleRate$$;
+  this.$channels$ = $channels$$1$$ | 0;
+  this.$outputBufferSize$ = $outputBufferSize$$;
+  this.$noReturn$ = !!$noReturn$$;
+  this.$initialize$();
+}
+$Resampler$$.prototype.$initialize$ = function $$Resampler$$$$$initialize$$() {
+  if (0 < this.$fromSampleRate$ && 0 < this.$toSampleRate$ && 0 < this.$channels$) {
+    if (this.$fromSampleRate$ == this.$toSampleRate$) {
+      this.$resampler$ = this.$bypassResampler$, this.$ratioWeight$ = 1;
+    }else {
+      for (var $toCompile$$inline_29$$ = 'var bufferLength = Math.min(buffer.length, this.outputBufferSize);  if ((bufferLength % ' + this.$channels$ + ') == 0) {    if (bufferLength > 0) {      var ratioWeight = this.ratioWeight;      var weight = 0;', $channel$$inline_30$$ = 0; $channel$$inline_30$$ < this.$channels$; ++$channel$$inline_30$$) {
+        $toCompile$$inline_29$$ += 'var output' + $channel$$inline_30$$ + ' = 0;';
+      }
+      $toCompile$$inline_29$$ += 'var actualPosition = 0;      var amountToNext = 0;      var alreadyProcessedTail = !this.tailExists;      this.tailExists = false;      var outputBuffer = this.outputBuffer;      var outputOffset = 0;      var currentPosition = 0;      do {        if (alreadyProcessedTail) {          weight = ratioWeight;';
+      for ($channel$$inline_30$$ = 0; $channel$$inline_30$$ < this.$channels$; ++$channel$$inline_30$$) {
+        $toCompile$$inline_29$$ += 'output' + $channel$$inline_30$$ + ' = 0;';
+      }
+      $toCompile$$inline_29$$ += '}        else {          weight = this.lastWeight;';
+      for ($channel$$inline_30$$ = 0; $channel$$inline_30$$ < this.$channels$; ++$channel$$inline_30$$) {
+        $toCompile$$inline_29$$ += 'output' + $channel$$inline_30$$ + ' = this.lastOutput[' + $channel$$inline_30$$ + '];';
+      }
+      $toCompile$$inline_29$$ += 'alreadyProcessedTail = true;        }        while (weight > 0 && actualPosition < bufferLength) {          amountToNext = 1 + actualPosition - currentPosition;          if (weight >= amountToNext) {';
+      for ($channel$$inline_30$$ = 0; $channel$$inline_30$$ < this.$channels$; ++$channel$$inline_30$$) {
+        $toCompile$$inline_29$$ += 'output' + $channel$$inline_30$$ + ' += buffer[actualPosition++] * amountToNext;';
+      }
+      $toCompile$$inline_29$$ += 'currentPosition = actualPosition;            weight -= amountToNext;          }          else {';
+      for ($channel$$inline_30$$ = 0; $channel$$inline_30$$ < this.$channels$; ++$channel$$inline_30$$) {
+        $toCompile$$inline_29$$ += 'output' + $channel$$inline_30$$ + ' += buffer[actualPosition' + (0 < $channel$$inline_30$$ ? ' + ' + $channel$$inline_30$$ : '') + '] * weight;';
+      }
+      $toCompile$$inline_29$$ += 'currentPosition += weight;            weight = 0;            break;          }        }        if (weight == 0) {';
+      for ($channel$$inline_30$$ = 0; $channel$$inline_30$$ < this.$channels$; ++$channel$$inline_30$$) {
+        $toCompile$$inline_29$$ += 'outputBuffer[outputOffset++] = output' + $channel$$inline_30$$ + ' / ratioWeight;';
+      }
+      $toCompile$$inline_29$$ += '}        else {          this.lastWeight = weight;';
+      for ($channel$$inline_30$$ = 0; $channel$$inline_30$$ < this.$channels$; ++$channel$$inline_30$$) {
+        $toCompile$$inline_29$$ += 'this.lastOutput[' + $channel$$inline_30$$ + '] = output' + $channel$$inline_30$$ + ';';
+      }
+      this.$resampler$ = this.$interpolate$ = Function('buffer', $toCompile$$inline_29$$ + 'this.tailExists = true;          break;        }      } while (actualPosition < bufferLength);      return this.bufferSlice(outputOffset);    }    else {      return (this.noReturn) ? 0 : [];    }  }  else {    throw(new Error("Buffer was of incorrect sample length."));  }');
+      this.$ratioWeight$ = this.$fromSampleRate$ / this.$toSampleRate$;
+      this.outputBuffer = $getFloat32$$(this.$outputBufferSize$);
+      $getFloat32$$(this.$channels$);
+    }
+  }else {
+    throw Error('Invalid settings specified for the resampler.');
+  }
+};
+$Resampler$$.prototype.$bypassResampler$ = function $$Resampler$$$$$bypassResampler$$($buffer$$13$$) {
+  return this.$noReturn$ ? (this.outputBuffer = $buffer$$13$$, $buffer$$13$$.length) : $buffer$$13$$;
+};
+function $XAudioServer$$($channels$$2$$, $sampleRate$$2$$, $minBufferSize$$, $maxBufferSize$$, $underRunCallback$$, $volume$$) {
+  this.$audioChannels$ = 2 == $channels$$2$$ ? 2 : 1;
+  $webAudioMono$$ = 1 == this.$audioChannels$;
+  $XAudioJSSampleRate$$ = 0 < $sampleRate$$2$$ && 16777215 >= $sampleRate$$2$$ ? $sampleRate$$2$$ : 44100;
+  $webAudioMinBufferSize$$ = $minBufferSize$$ >= $samplesPerCallback$$ << 1 && $minBufferSize$$ < $maxBufferSize$$ ? $minBufferSize$$ & ($webAudioMono$$ ? 4294967295 : 4294967294) : $samplesPerCallback$$ << 1;
+  $webAudioMaxBufferSize$$ = Math.floor($maxBufferSize$$) > $webAudioMinBufferSize$$ + this.$audioChannels$ ? $maxBufferSize$$ & ($webAudioMono$$ ? 4294967295 : 4294967294) : $minBufferSize$$ << 1;
+  this.$underRunCallback$ = 'function' == typeof $underRunCallback$$ ? $underRunCallback$$ : $JSCompiler_emptyFn$$();
+  $XAudioJSVolume$$ = 0 <= $volume$$ && 1 >= $volume$$ ? $volume$$ : 1;
+  this.$audioType$ = -1;
+  this.$mozAudioTail$ = [];
+  this.$audioHandleFlash$ = this.$audioHandleMoz$ = $JSCompiler_alias_NULL$$;
+  this.$mozAudioFound$ = this.$flashInitialized$ = $JSCompiler_alias_FALSE$$;
+  try {
+    $JSCompiler_StaticMethods_preInitializeMozAudio$$(this);
+    if ('Linux i686' == navigator.platform) {
+      throw Error('');
+    }
+    $JSCompiler_StaticMethods_writeMozAudio$$(this, $getFloat32$$($webAudioMinBufferSize$$));
+    this.$audioType$ = 0;
+  }catch ($error1$$inline_35$$) {
+    try {
+      if ($launchedContext$$) {
+        $resetCallbackAPIAudioBuffer$$($webAudioActualSampleRate$$), this.$audioType$ = 1;
+      }else {
+        throw Error('');
+      }
+    }catch ($error2$$inline_36$$) {
+      try {
+        $JSCompiler_StaticMethods_initializeFlashAudio$$(this);
+      }catch ($error3$$inline_37$$) {
+        throw Error('Browser does not support real time audio output.');
+      }
+    }
+  }
+}
+function $JSCompiler_StaticMethods_callbackBasedWriteAudioNoCallback$$($buffer$$17$$) {
+  for (var $length$$14$$ = $buffer$$17$$.length, $bufferCounter$$ = 0; $bufferCounter$$ < $length$$14$$ && $audioBufferSize$$ < $webAudioMaxBufferSize$$;) {
+    $audioContextSampleBuffer$$[$audioBufferSize$$++] = $buffer$$17$$[$bufferCounter$$++];
+  }
+}
+$XAudioServer$$.prototype.$writeAudio$ = function $$XAudioServer$$$$$writeAudio$$($buffer$$18$$) {
+  0 == this.$audioType$ ? ($JSCompiler_StaticMethods_writeMozAudio$$(this, $buffer$$18$$), $JSCompiler_StaticMethods_MOZExecuteCallback$$(this)) : 1 == this.$audioType$ ? ($JSCompiler_StaticMethods_callbackBasedWriteAudioNoCallback$$($buffer$$18$$), $JSCompiler_StaticMethods_callbackBasedExecuteCallback$$(this)) : 2 == this.$audioType$ && ($JSCompiler_StaticMethods_checkFlashInit$$(this) || $launchedContext$$ ? ($JSCompiler_StaticMethods_callbackBasedWriteAudioNoCallback$$($buffer$$18$$), $JSCompiler_StaticMethods_callbackBasedExecuteCallback$$(this)) :
+      this.$mozAudioFound$ && ($JSCompiler_StaticMethods_writeMozAudio$$(this, $buffer$$18$$), $JSCompiler_StaticMethods_MOZExecuteCallback$$(this)))
+};
+function $JSCompiler_StaticMethods_remainingBuffer$$($JSCompiler_StaticMethods_remainingBuffer$self$$) {
+  if (0 == $JSCompiler_StaticMethods_remainingBuffer$self$$.$audioType$) {
+    return $JSCompiler_StaticMethods_remainingBuffer$self$$.$samplesAlreadyWritten$ - $JSCompiler_StaticMethods_remainingBuffer$self$$.$audioHandleMoz$.mozCurrentSampleOffset();
+  }
+  if (1 == $JSCompiler_StaticMethods_remainingBuffer$self$$.$audioType$) {
+    return ((($resampleBufferStart$$ <= $resampleBufferEnd$$ ? 0 : $resampleBufferSize$$) + $resampleBufferEnd$$ - $resampleBufferStart$$) * $resampleControl$$.$ratioWeight$ >> $JSCompiler_StaticMethods_remainingBuffer$self$$.$audioChannels$ - 1 << $JSCompiler_StaticMethods_remainingBuffer$self$$.$audioChannels$ - 1) + $audioBufferSize$$;
+  }
+  if (2 == $JSCompiler_StaticMethods_remainingBuffer$self$$.$audioType$) {
+    if ($JSCompiler_StaticMethods_checkFlashInit$$($JSCompiler_StaticMethods_remainingBuffer$self$$) || $launchedContext$$) {
+      return ((($resampleBufferStart$$ <= $resampleBufferEnd$$ ? 0 : $resampleBufferSize$$) + $resampleBufferEnd$$ - $resampleBufferStart$$) * $resampleControl$$.$ratioWeight$ >> $JSCompiler_StaticMethods_remainingBuffer$self$$.$audioChannels$ - 1 << $JSCompiler_StaticMethods_remainingBuffer$self$$.$audioChannels$ - 1) + $audioBufferSize$$;
+    }
+    if ($JSCompiler_StaticMethods_remainingBuffer$self$$.$mozAudioFound$) {
+      return $JSCompiler_StaticMethods_remainingBuffer$self$$.$samplesAlreadyWritten$ - $JSCompiler_StaticMethods_remainingBuffer$self$$.$audioHandleMoz$.mozCurrentSampleOffset();
+    }
+  }
+  return 0;
+}
+function $JSCompiler_StaticMethods_MOZExecuteCallback$$($JSCompiler_StaticMethods_MOZExecuteCallback$self$$) {
+  var $samplesRequested$$ = $webAudioMinBufferSize$$ - $JSCompiler_StaticMethods_remainingBuffer$$($JSCompiler_StaticMethods_MOZExecuteCallback$self$$);
+  0 < $samplesRequested$$ && $JSCompiler_StaticMethods_writeMozAudio$$($JSCompiler_StaticMethods_MOZExecuteCallback$self$$, $JSCompiler_StaticMethods_MOZExecuteCallback$self$$.$underRunCallback$($samplesRequested$$));
+}
+function $JSCompiler_StaticMethods_callbackBasedExecuteCallback$$($JSCompiler_StaticMethods_callbackBasedExecuteCallback$self$$) {
+  var $samplesRequested$$1$$ = $webAudioMinBufferSize$$ - $JSCompiler_StaticMethods_remainingBuffer$$($JSCompiler_StaticMethods_callbackBasedExecuteCallback$self$$);
+  0 < $samplesRequested$$1$$ && $JSCompiler_StaticMethods_callbackBasedWriteAudioNoCallback$$($JSCompiler_StaticMethods_callbackBasedExecuteCallback$self$$.$underRunCallback$($samplesRequested$$1$$));
+}
+function $JSCompiler_StaticMethods_preInitializeMozAudio$$($JSCompiler_StaticMethods_preInitializeMozAudio$self$$) {
+  $JSCompiler_StaticMethods_preInitializeMozAudio$self$$.$audioHandleMoz$ = new Audio;
+  $JSCompiler_StaticMethods_preInitializeMozAudio$self$$.$audioHandleMoz$.mozSetup($JSCompiler_StaticMethods_preInitializeMozAudio$self$$.$audioChannels$, $XAudioJSSampleRate$$);
+  $JSCompiler_StaticMethods_preInitializeMozAudio$self$$.$samplesAlreadyWritten$ = 0;
+  var $emptySampleFrame$$ = 2 == $JSCompiler_StaticMethods_preInitializeMozAudio$self$$.$audioChannels$ ? $getFloat32$$(2) : $getFloat32$$(1), $prebufferAmount$$ = 0;
+  if ('MacIntel' != navigator.platform && 'MacPPC' != navigator.platform) {
+    for (; 0 == $JSCompiler_StaticMethods_preInitializeMozAudio$self$$.$audioHandleMoz$.mozCurrentSampleOffset();) {
+      $prebufferAmount$$ += $JSCompiler_StaticMethods_preInitializeMozAudio$self$$.$audioHandleMoz$.mozWriteAudio($emptySampleFrame$$);
+    }
+    for (var $samplesToDoubleBuffer$$ = $prebufferAmount$$ / $JSCompiler_StaticMethods_preInitializeMozAudio$self$$.$audioChannels$, $index$$48$$ = 0; $index$$48$$ < $samplesToDoubleBuffer$$; $index$$48$$++) {
+      $JSCompiler_StaticMethods_preInitializeMozAudio$self$$.$samplesAlreadyWritten$ += $JSCompiler_StaticMethods_preInitializeMozAudio$self$$.$audioHandleMoz$.mozWriteAudio($emptySampleFrame$$);
+    }
+  }
+  $JSCompiler_StaticMethods_preInitializeMozAudio$self$$.$samplesAlreadyWritten$ += $prebufferAmount$$;
+  $webAudioMinBufferSize$$ += $JSCompiler_StaticMethods_preInitializeMozAudio$self$$.$samplesAlreadyWritten$;
+  $JSCompiler_StaticMethods_preInitializeMozAudio$self$$.$mozAudioFound$ = $JSCompiler_alias_TRUE$$;
+}
+function $JSCompiler_StaticMethods_initializeFlashAudio$$($JSCompiler_StaticMethods_initializeFlashAudio$self$$) {
+  var $existingFlashload_mainContainerNode$$ = document.getElementById('XAudioJS');
+  if ($existingFlashload_mainContainerNode$$ == $JSCompiler_alias_NULL$$) {
+    $existingFlashload_mainContainerNode$$ = document.createElement('div');
+    $existingFlashload_mainContainerNode$$.setAttribute('style', 'position: fixed; bottom: 0px; right: 0px; margin: 0px; padding: 0px; border: none; width: 8px; height: 8px; overflow: hidden; z-index: -1000; ');
+    var $containerNode$$ = document.createElement('div');
+    $containerNode$$.setAttribute('style', 'position: static; border: none; width: 0px; height: 0px; visibility: hidden; margin: 8px; padding: 0px;');
+    $containerNode$$.setAttribute('id', 'XAudioJS');
+    $existingFlashload_mainContainerNode$$.appendChild($containerNode$$);
+    document.getElementsByTagName('body')[0].appendChild($existingFlashload_mainContainerNode$$);
+    $swfobject$$.$embedSWF$('XAudioJS.swf', 'XAudioJS', '8', '8', '9.0.0', '', {}, {allowscriptaccess: 'always'}, {style: 'position: static; visibility: hidden; margin: 8px; padding: 0px; border: none'}, function($event$$3$$) {
+      $event$$3$$.success ? $JSCompiler_StaticMethods_initializeFlashAudio$self$$.$audioHandleFlash$ = $event$$3$$.$ref$ : $JSCompiler_StaticMethods_initializeFlashAudio$self$$.$audioType$ = 1;
+    });
+  }else {
+    $JSCompiler_StaticMethods_initializeFlashAudio$self$$.$audioHandleFlash$ = $existingFlashload_mainContainerNode$$;
+  }
+  $JSCompiler_StaticMethods_initializeFlashAudio$self$$.$audioType$ = 2;
+}
+function $JSCompiler_StaticMethods_writeMozAudio$$($JSCompiler_StaticMethods_writeMozAudio$self$$, $buffer$$20$$) {
+  var $length$$15$$ = $JSCompiler_StaticMethods_writeMozAudio$self$$.$mozAudioTail$.length;
+  if (0 < $length$$15$$) {
+    var $samplesAccepted$$ = $JSCompiler_StaticMethods_writeMozAudio$self$$.$audioHandleMoz$.mozWriteAudio($JSCompiler_StaticMethods_writeMozAudio$self$$.$mozAudioTail$);
+    $JSCompiler_StaticMethods_writeMozAudio$self$$.$samplesAlreadyWritten$ += $samplesAccepted$$;
+    $JSCompiler_StaticMethods_writeMozAudio$self$$.$mozAudioTail$.splice(0, $samplesAccepted$$);
+  }
+  $length$$15$$ = Math.min($buffer$$20$$.length, $webAudioMaxBufferSize$$ - $JSCompiler_StaticMethods_writeMozAudio$self$$.$samplesAlreadyWritten$ + $JSCompiler_StaticMethods_writeMozAudio$self$$.$audioHandleMoz$.mozCurrentSampleOffset());
+  $samplesAccepted$$ = $JSCompiler_StaticMethods_writeMozAudio$self$$.$audioHandleMoz$.mozWriteAudio($buffer$$20$$);
+  $JSCompiler_StaticMethods_writeMozAudio$self$$.$samplesAlreadyWritten$ += $samplesAccepted$$;
+  for (var $index$$49$$ = 0; $length$$15$$ > $samplesAccepted$$; --$length$$15$$) {
+    $JSCompiler_StaticMethods_writeMozAudio$self$$.$mozAudioTail$.push($buffer$$20$$[$index$$49$$++]);
+  }
+}
+function $JSCompiler_StaticMethods_checkFlashInit$$($JSCompiler_StaticMethods_checkFlashInit$self$$) {
+  !$JSCompiler_StaticMethods_checkFlashInit$self$$.$flashInitialized$ && ($JSCompiler_StaticMethods_checkFlashInit$self$$.$audioHandleFlash$ && $JSCompiler_StaticMethods_checkFlashInit$self$$.$audioHandleFlash$.$initialize$) && ($JSCompiler_StaticMethods_checkFlashInit$self$$.$flashInitialized$ = $JSCompiler_alias_TRUE$$, $JSCompiler_StaticMethods_checkFlashInit$self$$.$audioHandleFlash$.$initialize$(), $resetCallbackAPIAudioBuffer$$(44100));
+  return $JSCompiler_StaticMethods_checkFlashInit$self$$.$flashInitialized$;
+}
+function $getFloat32$$($size$$11$$) {
+  try {
+    return new Float32Array($size$$11$$);
+  }catch ($error$$3$$) {
+    return Array($size$$11$$);
+  }
+}
+function $getFloat32Flat$$() {
+  var $size$$12$$ = $resampleBufferSize$$;
+  try {
+    var $newBuffer$$ = new Float32Array($size$$12$$);
+  }catch ($error$$4$$) {
+    var $newBuffer$$ = Array($size$$12$$), $audioSampleIndice$$ = 0;
+    do {
+      $newBuffer$$[$audioSampleIndice$$] = 0;
+    }while (++$audioSampleIndice$$ < $size$$12$$);
+  }
+  return $newBuffer$$;
+}
+var $samplesPerCallback$$ = 2048, $audioContextHandle$$ = $JSCompiler_alias_NULL$$, $audioNode$$ = $JSCompiler_alias_NULL$$, $audioSource$$ = $JSCompiler_alias_NULL$$, $launchedContext$$ = $JSCompiler_alias_FALSE$$, $audioContextSampleBuffer$$ = [], $resampled$$ = [], $webAudioMinBufferSize$$ = 15E3, $webAudioMaxBufferSize$$ = 25E3, $webAudioActualSampleRate$$ = 44100, $XAudioJSSampleRate$$ = 0, $webAudioMono$$ = $JSCompiler_alias_FALSE$$, $XAudioJSVolume$$ = 1, $resampleControl$$ = $JSCompiler_alias_NULL$$,
+    $audioBufferSize$$ = 0, $resampleBufferStart$$ = 0, $resampleBufferEnd$$ = 0, $resampleBufferSize$$ = 2;
+function $audioOutputEvent$$($buffer2_event$$4$$) {
+  var $index$$52$$ = 0, $buffer1$$ = $buffer2_event$$4$$.outputBuffer.getChannelData(0), $buffer2_event$$4$$ = $buffer2_event$$4$$.outputBuffer.getChannelData(1);
+  if (0 < $audioBufferSize$$) {
+    for (var $resampleLength$$inline_60$$ = $resampleControl$$.$resampler$($getBufferSamples$$()), $resampledResult$$inline_61$$ = $resampleControl$$.outputBuffer, $index2$$inline_62$$ = 0; $index2$$inline_62$$ < $resampleLength$$inline_60$$; ++$index2$$inline_62$$) {
+      $resampled$$[$resampleBufferEnd$$++] = $resampledResult$$inline_61$$[$index2$$inline_62$$], $resampleBufferEnd$$ == $resampleBufferSize$$ && ($resampleBufferEnd$$ = 0), $resampleBufferStart$$ == $resampleBufferEnd$$ && (++$resampleBufferStart$$, $resampleBufferStart$$ == $resampleBufferSize$$ && ($resampleBufferStart$$ = 0));
+    }
+    $audioBufferSize$$ = 0;
+  }
+  if ($webAudioMono$$) {
+    for (; $index$$52$$ < $samplesPerCallback$$ && $resampleBufferStart$$ != $resampleBufferEnd$$;) {
+      $buffer2_event$$4$$[$index$$52$$] = $buffer1$$[$index$$52$$] = $resampled$$[$resampleBufferStart$$++] * $XAudioJSVolume$$, ++$index$$52$$, $resampleBufferStart$$ == $resampleBufferSize$$ && ($resampleBufferStart$$ = 0);
+    }
+  }else {
+    for (; $index$$52$$ < $samplesPerCallback$$ && $resampleBufferStart$$ != $resampleBufferEnd$$;) {
+      $buffer1$$[$index$$52$$] = $resampled$$[$resampleBufferStart$$++] * $XAudioJSVolume$$, $buffer2_event$$4$$[$index$$52$$++] = $resampled$$[$resampleBufferStart$$++] * $XAudioJSVolume$$, $resampleBufferStart$$ == $resampleBufferSize$$ && ($resampleBufferStart$$ = 0);
+    }
+  }
+  for (; $index$$52$$ < $samplesPerCallback$$;) {
+    $buffer2_event$$4$$[$index$$52$$] = $buffer1$$[$index$$52$$] = 0, ++$index$$52$$;
+  }
+}
+function $getBufferSamples$$() {
+  try {
+    return $audioContextSampleBuffer$$.subarray(0, $audioBufferSize$$);
+  }catch ($error1$$2$$) {
+    try {
+      return $audioContextSampleBuffer$$.length = $audioBufferSize$$, $audioContextSampleBuffer$$;
+    }catch ($error2$$2$$) {
+      return $audioContextSampleBuffer$$.slice(0, $audioBufferSize$$);
+    }
+  }
+}
+function $resetCallbackAPIAudioBuffer$$($APISampleRate$$) {
+  $audioContextSampleBuffer$$ = $getFloat32$$($webAudioMaxBufferSize$$);
+  $audioBufferSize$$ = $webAudioMaxBufferSize$$;
+  $resampleBufferEnd$$ = $resampleBufferStart$$ = 0;
+  $resampleBufferSize$$ = Math.max($webAudioMaxBufferSize$$ * Math.ceil($XAudioJSSampleRate$$ / $APISampleRate$$), $samplesPerCallback$$) << 1;
+  $webAudioMono$$ ? ($resampled$$ = $getFloat32Flat$$(), $resampleControl$$ = new $Resampler$$($XAudioJSSampleRate$$, $APISampleRate$$, 1, $resampleBufferSize$$, $JSCompiler_alias_TRUE$$)) : ($resampleBufferSize$$ <<= 1, $resampled$$ = $getFloat32Flat$$(), $resampleControl$$ = new $Resampler$$($XAudioJSSampleRate$$, $APISampleRate$$, 2, $resampleBufferSize$$, $JSCompiler_alias_TRUE$$));
+}
+a: {
+  if (!$launchedContext$$) {
+    try {
+      $audioContextHandle$$ = new webkitAudioContext;
+    }catch ($error1$$inline_64$$) {
+      try {
+        $audioContextHandle$$ = new AudioContext;
+      }catch ($error2$$inline_65$$) {
+        break a;
+      }
+    }
+    try {
+      $audioSource$$ = $audioContextHandle$$.createBufferSource(), $audioSource$$.loop = $JSCompiler_alias_FALSE$$, $XAudioJSSampleRate$$ = $webAudioActualSampleRate$$ = $audioContextHandle$$.sampleRate, $audioSource$$.buffer = $audioContextHandle$$.createBuffer(1, 1, $webAudioActualSampleRate$$), $audioNode$$ = $audioContextHandle$$.createJavaScriptNode($samplesPerCallback$$, 1, 2), $audioNode$$.onaudioprocess = $audioOutputEvent$$, $audioSource$$.connect($audioNode$$), $audioNode$$.connect($audioContextHandle$$.destination),
+      $audioSource$$.noteOn(0);
+    }catch ($error$$inline_66$$) {
+      break a;
+    }
+    $launchedContext$$ = $JSCompiler_alias_TRUE$$;
+  }
+};
 window.JSSMS = $JSSMS$$;
 jQuery.fn.JSSMSUI = jQuery.fn.$JSSMSUI$;
 
