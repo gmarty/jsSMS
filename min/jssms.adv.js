@@ -3853,7 +3853,7 @@ function $DynamicAudio$$($args$$3$$) {
   if (this instanceof $DynamicAudio$$) {
     'function' === typeof this.$init$ && this.$init$.apply(this, $args$$3$$ && $args$$3$$.callee ? $args$$3$$ : arguments);
   }else {
-    return new arguments.callee(arguments);
+    return new $DynamicAudio$$(arguments);
   }
 }
 var $DynamicAudio$nextId$$ = 1;
@@ -3881,28 +3881,22 @@ $DynamicAudio$$.prototype = {$swf$: 'dynamicaudio.swf', $audioElement$: $JSCompi
     $self$$4$$.$flashElement$ = $e$$8$$.$ref$;
   });
 }, write: function $$DynamicAudio$$$$write$($samples$$) {
+  this.$audioElement$ !== $JSCompiler_alias_NULL$$ ? this.$audioElement$.mozWriteAudio($samples$$) : this.$flashElement$ !== $JSCompiler_alias_NULL$$ && this.$flashElement$.write($samples$$.map(function($sample$$1$$) {
+    return Math.floor(32768 * $sample$$1$$ / 128);
+  }).join(' '));
+}, $writeInt$: function $$DynamicAudio$$$$$writeInt$$($out$$1_samples$$1$$) {
   if (this.$audioElement$ !== $JSCompiler_alias_NULL$$) {
-    this.$audioElement$.mozWriteAudio($samples$$);
-  }else {
-    if (this.$flashElement$ !== $JSCompiler_alias_NULL$$) {
-      for (var $out$$ = Array($samples$$.length), $i$$27$$ = $samples$$.length - 1; 0 !== $i$$27$$; $i$$27$$--) {
-        $out$$[$i$$27$$] = Math.floor(32768 * $samples$$[$i$$27$$]);
-      }
-      this.$flashElement$.write($out$$.join(' '));
-    }
-  }
-}, $writeInt$: function $$DynamicAudio$$$$$writeInt$$($samples$$1$$) {
-  if (this.$audioElement$ !== $JSCompiler_alias_NULL$$) {
-    for (var $out$$1$$ = Array($samples$$1$$.length), $i$$28$$ = $samples$$1$$.length - 1; 0 !== $i$$28$$; $i$$28$$--) {
-      $out$$1$$[$i$$28$$] = $samples$$1$$[$i$$28$$] / 128;
-    }
+    $out$$1_samples$$1$$ = $out$$1_samples$$1$$.map(function($sample$$2$$) {
+      return $sample$$2$$ / 128;
+    });
+    $out$$1_samples$$1$$ = new Float32Array($out$$1_samples$$1$$);
     try {
-      this.$audioElement$.mozWriteAudio($out$$1$$);
+      this.$audioElement$.mozWriteAudio($out$$1_samples$$1$$);
     }catch ($e$$9$$) {
-      console.log($e$$9$$, $out$$1$$);
+      console.log($e$$9$$, $out$$1_samples$$1$$);
     }
   }else {
-    this.$flashElement$ !== $JSCompiler_alias_NULL$$ && this.$flashElement$.write($samples$$1$$.join(' '));
+    this.$flashElement$ !== $JSCompiler_alias_NULL$$ && this.$flashElement$.write($out$$1_samples$$1$$.join(' '));
   }
 }};
 window.JSSMS = $JSSMS$$;
