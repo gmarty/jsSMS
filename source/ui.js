@@ -184,6 +184,11 @@ if (typeof $ !== 'undefined') {
             self.main.keyboard.keyup(evt);
             //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
           });
+
+      // Sound
+      self.sound = new DynamicAudio({
+        'swf': this.main.opts['swfPath'] + 'dynamicaudio.swf'
+      });
     };
 
     UI.prototype = {
@@ -297,6 +302,7 @@ if (typeof $ !== 'undefined') {
        * @param {Array.<number>} buffer
        */
       writeAudio: function(buffer) {
+        return this.sound.writeInt(buffer);
       },
 
 
