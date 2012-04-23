@@ -59,6 +59,21 @@ var PSG_VOLUME = [
 ];
 
 
+/**
+ * Samples high boundary.
+ * Values are clamped between LO_BOUNDARY and HI_BOUNDARY.
+ * @const
+ */
+var HI_BOUNDARY = 0x7F;
+
+
+/**
+ * Samples low boundary.
+ * @const
+ */
+var LO_BOUNDARY = -0x80;
+
+
 
 /**
  * @constructor
@@ -262,8 +277,8 @@ JSSMS.SN76489.prototype = {
       var output = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
 
       // Check boundaries
-      if (output > 0x7F) output = 0x7F;
-      else if (output < -0x80) output = -0x80;
+      if (output > HI_BOUNDARY) output = HI_BOUNDARY;
+      else if (output < LO_BOUNDARY) output = LO_BOUNDARY;
 
       buffer[offset + sample] = output;
 
