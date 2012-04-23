@@ -533,7 +533,7 @@ JSSMS.prototype = {
       this.audioBufferOffset = 0;
 
     var samplesToGenerate = this.samplesPerLine[line];
-    this.audioBuffer = this.psg.update(this.audioBuffer, this.audioBufferOffset, samplesToGenerate);
+    this.audioBuffer = this.psg.update(this.audioBufferOffset, samplesToGenerate);
     this.audioBufferOffset += samplesToGenerate;
   },
 

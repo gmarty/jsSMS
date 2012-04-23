@@ -239,12 +239,12 @@ JSSMS.SN76489.prototype = {
 
 
   /**
-   * @param {Array} buffer
    * @param {number} offset
    * @param {number} samplesToGenerate
-   */
-  update: function(buffer, offset, samplesToGenerate) {
-    var sample, i;
+   * @return {Array}
+  */
+  update: function(offset, samplesToGenerate) {
+    var buffer = [], sample, i;
 
     for (sample = 0; sample < samplesToGenerate; sample++) {
       // Generate Sound from Tone Channels
