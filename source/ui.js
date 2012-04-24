@@ -300,10 +300,6 @@ if (typeof $ !== 'undefined') {
        * @param {Array.<number>} buffer
        */
       writeAudio: function(buffer) {
-        var buffer = buffer.map(function(sample) {
-          return sample / 128;
-        });
-        
         return this.sound.writeAudioNoCallback(buffer);
       },
 

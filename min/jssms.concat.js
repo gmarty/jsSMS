@@ -197,7 +197,7 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
     this.audioBufferOffset = 0;
   }
   var samplesToGenerate = this.samplesPerLine[line];
-  this.audioBuffer = this.psg.update(this.audioBuffer, this.audioBufferOffset, samplesToGenerate);
+  this.audioBuffer = this.psg.update(this.audioBufferOffset, samplesToGenerate);
   this.audioBufferOffset += samplesToGenerate;
 }, readRomDirectly: function(data, fileName) {
   var pages;
@@ -3997,6 +3997,8 @@ var NO_ANTIALIAS = Number.MIN_VALUE;
 var SHIFT_RESET = 32768;
 var FEEDBACK_PATTERN = 9;
 var PSG_VOLUME = [25, 20, 16, 13, 10, 8, 6, 5, 4, 3, 3, 2, 2, 1, 1, 0];
+var HI_BOUNDARY = 1;
+var LO_BOUNDARY = -1;
 JSSMS.SN76489 = function(sms) {
   this.main = sms;
   this.clock = 0;
@@ -4051,8 +4053,8 @@ JSSMS.SN76489.prototype = {init: function(clockSpeed, sampleRate) {
       this.noiseShiftReg = SHIFT_RESET;
       break;
   }
-}, update: function(buffer, offset, samplesToGenerate) {
-  var sample, i;
+}, update: function(offset, samplesToGenerate) {
+  var buffer = [], sample, i;
   for (sample = 0; sample < samplesToGenerate; sample++) {
     for (i = 0; i < 3; i++) {
       if (this.freqPos[i] != NO_ANTIALIAS) {
@@ -4062,12 +4064,12 @@ JSSMS.SN76489.prototype = {init: function(clockSpeed, sampleRate) {
       }
     }
     this.outputChannel[3] = PSG_VOLUME[this.reg[7]] * (this.noiseShiftReg & 1) << 1;
-    var output = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
-    if (output > 127) {
-      output = 127;
+    var output = (this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3]) / 128;
+    if (output > HI_BOUNDARY) {
+      output = HI_BOUNDARY;
     }else {
-      if (output < -128) {
-        output = -128;
+      if (output < LO_BOUNDARY) {
+        output = LO_BOUNDARY;
       }
     }
     buffer[offset + sample] = output;

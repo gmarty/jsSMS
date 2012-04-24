@@ -64,14 +64,14 @@ var PSG_VOLUME = [
  * Values are clamped between LO_BOUNDARY and HI_BOUNDARY.
  * @const
  */
-var HI_BOUNDARY = 0x7F;
+var HI_BOUNDARY = 1;
 
 
 /**
  * Samples low boundary.
  * @const
  */
-var LO_BOUNDARY = -0x80;
+var LO_BOUNDARY = -1;
 
 
 
@@ -274,7 +274,7 @@ JSSMS.SN76489.prototype = {
       this.outputChannel[3] = PSG_VOLUME[this.reg[7]] * (this.noiseShiftReg & 1) << 1; // Double output
 
       // Output sound to buffer
-      var output = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
+      var output = (this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3]) / 128;
 
       // Check boundaries
       if (output > HI_BOUNDARY) output = HI_BOUNDARY;

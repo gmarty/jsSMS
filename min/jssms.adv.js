@@ -118,7 +118,7 @@ $JSSMS$$.prototype = {$isRunning$: $JSCompiler_alias_FALSE$$, $cyclesPerLine$: 0
 }, $updateSound$: function $$JSSMS$$$$$updateSound$$($line_samplesToGenerate$$) {
   0 == $line_samplesToGenerate$$ && (this.$audioBufferOffset$ = 0);
   $line_samplesToGenerate$$ = this.$samplesPerLine$[$line_samplesToGenerate$$];
-  this.$audioBuffer$ = this.$psg$.update(this.$audioBuffer$, this.$audioBufferOffset$, $line_samplesToGenerate$$);
+  this.$audioBuffer$ = this.$psg$.update(this.$audioBufferOffset$, $line_samplesToGenerate$$);
   this.$audioBufferOffset$ += $line_samplesToGenerate$$;
 }, $readRomDirectly$: function $$JSSMS$$$$$readRomDirectly$$($data$$30$$, $fileName$$) {
   var $mode$$9_pages$$;
@@ -3364,15 +3364,15 @@ $JSSMS$SN76489$$.prototype = {$init$: function $$JSSMS$SN76489$$$$$init$$($clock
     case 6:
       this.$noiseFreq$ = 16 << (this.$reg$[6] & 3), this.$noiseShiftReg$ = 32768;
   }
-}, update: function $$JSSMS$SN76489$$$$update$($buffer$$10$$, $offset$$17$$, $samplesToGenerate$$1$$) {
-  var $sample$$, $i$$12_output$$2$$;
+}, update: function $$JSSMS$SN76489$$$$update$($offset$$17$$, $samplesToGenerate$$1$$) {
+  var $buffer$$10$$ = [], $sample$$, $i$$12_output$$2$$;
   for ($sample$$ = 0; $sample$$ < $samplesToGenerate$$1$$; $sample$$++) {
     for ($i$$12_output$$2$$ = 0; 3 > $i$$12_output$$2$$; $i$$12_output$$2$$++) {
       this.$outputChannel$[$i$$12_output$$2$$] = this.$freqPos$[$i$$12_output$$2$$] != $NO_ANTIALIAS$$ ? $PSG_VOLUME$$[this.$reg$[($i$$12_output$$2$$ << 1) + 1]] * this.$freqPos$[$i$$12_output$$2$$] >> 8 : $PSG_VOLUME$$[this.$reg$[($i$$12_output$$2$$ << 1) + 1]] * this.$freqPolarity$[$i$$12_output$$2$$];
     }
     this.$outputChannel$[3] = $PSG_VOLUME$$[this.$reg$[7]] * (this.$noiseShiftReg$ & 1) << 1;
-    $i$$12_output$$2$$ = this.$outputChannel$[0] + this.$outputChannel$[1] + this.$outputChannel$[2] + this.$outputChannel$[3];
-    127 < $i$$12_output$$2$$ ? $i$$12_output$$2$$ = 127 : -128 > $i$$12_output$$2$$ && ($i$$12_output$$2$$ = -128);
+    $i$$12_output$$2$$ = (this.$outputChannel$[0] + this.$outputChannel$[1] + this.$outputChannel$[2] + this.$outputChannel$[3]) / 128;
+    1 < $i$$12_output$$2$$ ? $i$$12_output$$2$$ = 1 : -1 > $i$$12_output$$2$$ && ($i$$12_output$$2$$ = -1);
     $buffer$$10$$[$offset$$17$$ + $sample$$] = $i$$12_output$$2$$;
     this.$clockFrac$ += this.$clock$;
     var $clockCycles$$ = this.$clockFrac$ >> 8, $clockCyclesScaled$$ = $clockCycles$$ << 8;
