@@ -218,8 +218,10 @@ if (typeof $ !== 'undefined') {
         for (var groupName in roms) {
           if (roms.hasOwnProperty(groupName)) {
             var optgroup = $('<optgroup></optgroup>').
-                attr('label', groupName);
-            for (var i = 0; i < roms[groupName].length; i++) {
+                attr('label', groupName),
+                length = roms[groupName].length,
+                i = 0;
+            for (; i < length; i++) {
               $('<option>' + roms[groupName][i][0] + '</option>')
                 .attr('value', roms[groupName][i][1])
                 .appendTo(optgroup);
