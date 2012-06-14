@@ -18,13 +18,14 @@
 */
 'use strict';var DEBUG = true;
 var ACCURATE = true;
+var SAMPLE_RATE = 44100;
 var Setup = {DEBUG_TIMING: DEBUG, REFRESH_EMULATION: false, ACCURATE_INTERRUPT_EMULATION: ACCURATE, LIGHTGUN: false, VDP_SPRITE_COLLISIONS: ACCURATE, PAGE_SIZE: 1024};
 var frameTime = 17;
 var fpsInterval = 500;
 var CLOCK_NTSC = 3579545;
 var CLOCK_PAL = 3546893;
 function JSSMS(opts) {
-  this.opts = {'ui': JSSMS.DummyUI};
+  this.opts = {'ui': JSSMS.DummyUI, 'swfPath': 'lib/'};
   if (typeof opts != 'undefined') {
     var key;
     for (key in this.opts) {
@@ -41,7 +42,7 @@ function JSSMS(opts) {
   this.cpu = new JSSMS.Z80(this);
   this.ui.updateStatus('Ready to load a ROM.');
 }
-JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frameSkip: 0, throttle: true, fps: 0, frameskip_counter: 0, pause_button: false, is_sms: true, is_gg: false, soundEnabled: false, emuWidth: 0, emuHeight: 0, fpsFrameCount: 0, z80Time: 0, drawTime: 0, z80TimeCounter: 0, drawTimeCounter: 0, frameCount: 0, romData: '', romFileName: '', reset: function() {
+JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frameSkip: 0, throttle: true, fps: 0, frameskip_counter: 0, pause_button: false, is_sms: true, is_gg: false, soundEnabled: true, audioBuffer: [], audioBufferOffset: 0, samplesPerFrame: 0, samplesPerLine: [], emuWidth: 0, emuHeight: 0, fpsFrameCount: 0, z80Time: 0, drawTime: 0, z80TimeCounter: 0, drawTimeCounter: 0, frameCount: 0, romData: '', romFileName: '', reset: function() {
   this.setVideoTiming(this.vdp.videoMode);
   this.frameCount = 0;
   this.frameskip_counter = this.frameSkip;
@@ -97,6 +98,9 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
     if (Setup.DEBUG_TIMING) {
       this.z80TimeCounter += +new Date - startTime;
     }
+    if (this.soundEnabled) {
+      this.updateSound(lineno);
+    }
     this.vdp.line = lineno;
     if (this.frameskip_counter == 0 && lineno < 192) {
       if (Setup.DEBUG_TIMING) {
@@ -108,6 +112,9 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
       }
     }
     this.vdp.interrupts(lineno);
+  }
+  if (this.soundEnabled) {
+    this.audioOutput(this.audioBuffer);
   }
   if (Setup.DEBUG_TIMING && ++this.frameCount == 60) {
     this.z80Time = this.z80TimeCounter;
@@ -140,7 +147,7 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
   this.emuWidth = GG_WIDTH;
   this.emuHeight = GG_HEIGHT;
 }, setVideoTiming: function(mode) {
-  var clockSpeedHz = 0;
+  var clockSpeedHz = 0, i, v;
   if (mode == NTSC || this.is_gg) {
     this.fps = 60;
     this.no_of_scanlines = SMS_Y_PIXELS_NTSC;
@@ -154,6 +161,24 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
   }
   this.cyclesPerLine = Math.round(clockSpeedHz / this.fps / this.no_of_scanlines + 1);
   this.vdp.videoMode = mode;
+  if (this.soundEnabled) {
+    this.psg.init(clockSpeedHz, SAMPLE_RATE);
+    this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps);
+    if (this.audioBuffer.length == 0 || this.audioBuffer.length != this.samplesPerFrame) {
+      this.audioBuffer = new Array(this.samplesPerFrame);
+    }
+    if (this.samplesPerLine.length == 0 || this.samplesPerLine.length != this.no_of_scanlines) {
+      this.samplesPerLine = new Array(this.no_of_scanlines);
+      var fractional = 0;
+      for (i = 0; i < this.no_of_scanlines; i++) {
+        v = (this.samplesPerFrame << 16) / this.no_of_scanlines + fractional;
+        fractional = v - (v >> 16 << 16);
+        this.samplesPerLine[i] = v >> 16;
+      }
+    }
+  }
+}, audioOutput: function(buffer) {
+  this.ui.writeAudio(buffer);
 }, doRepaint: function() {
   this.ui.writeFrame(this.vdp.display, []);
 }, printFps: function() {
@@ -167,6 +192,13 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
 }, resetFps: function() {
   this.lastFpsTime = null;
   this.fpsFrameCount = 0;
+}, updateSound: function(line) {
+  if (line == 0) {
+    this.audioBufferOffset = 0;
+  }
+  var samplesToGenerate = this.samplesPerLine[line];
+  this.audioBuffer = this.psg.update(this.audioBufferOffset, samplesToGenerate);
+  this.audioBufferOffset += samplesToGenerate;
 }, readRomDirectly: function(data, fileName) {
   var pages;
   var mode = fileName.substr(-3).toLowerCase() === '.gg' ? 2 : 1;
@@ -3721,41 +3753,42 @@ JSSMS.Z80.prototype = {reset: function() {
 }, readMemWord: function(address) {
   return this.memReadMap[address >> 10][address & 1023] & 255 | (this.memReadMap[++address >> 10][address & 1023] & 255) << 8;
 }, page: function(address, value) {
+  var p, i, offset;
   this.frameReg[address] = value;
   switch (address) {
     case 0:
       if ((value & 8) != 0) {
-        var offset = (value & 4) << 2;
-        for (var i = 32; i < 48; i++) {
+        offset = (value & 4) << 2;
+        for (i = 32; i < 48; i++) {
           this.memReadMap[i] = JSSMS.Utils.copyArray(this.sram[offset]);
           this.memWriteMap[i] = JSSMS.Utils.copyArray(this.sram[offset]);
           offset++;
         }
         this.useSRAM = true;
       }else {
-        var p = this.frameReg[3] % this.number_of_pages << 4;
-        for (var i = 32; i < 48; i++) {
+        p = this.frameReg[3] % this.number_of_pages << 4;
+        for (i = 32; i < 48; i++) {
           this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
           this.memWriteMap[i] = this.getDummyWrite();
         }
       }
       break;
     case 1:
-      var p = (value % this.number_of_pages << 4) + 1;
-      for (var i = 1; i < 16; i++) {
+      p = (value % this.number_of_pages << 4) + 1;
+      for (i = 1; i < 16; i++) {
         this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
       }
       break;
     case 2:
-      var p = value % this.number_of_pages << 4;
-      for (var i = 16; i < 32; i++) {
+      p = value % this.number_of_pages << 4;
+      for (i = 16; i < 32; i++) {
         this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
       }
       break;
     case 3:
       if ((this.frameReg[0] & 8) == 0) {
-        var p = value % this.number_of_pages << 4;
-        for (var i = 32; i < 48; i++) {
+        p = value % this.number_of_pages << 4;
+        for (i = 32; i < 48; i++) {
           this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
         }
       }
@@ -3960,10 +3993,132 @@ JSSMS.Keyboard.prototype = {reset: function() {
   }
   evt.preventDefault();
 }};
+var SCALE = 8;
+var NO_ANTIALIAS = Number.MIN_VALUE;
+var SHIFT_RESET = 32768;
+var FEEDBACK_PATTERN = 9;
+var PSG_VOLUME = [25, 20, 16, 13, 10, 8, 6, 5, 4, 3, 3, 2, 2, 1, 1, 0];
+var HI_BOUNDARY = 127;
+var LO_BOUNDARY = -128;
 JSSMS.SN76489 = function(sms) {
   this.main = sms;
+  this.clock = 0;
+  this.clockFrac = 0;
+  this.reg = new Array(8);
+  this.regLatch = 0;
+  this.freqCounter = new Array(4);
+  this.freqPolarity = new Array(4);
+  this.freqPos = new Array(3);
+  this.noiseFreq = 16;
+  this.noiseShiftReg = SHIFT_RESET;
+  this.outputChannel = new Array(4);
 };
-JSSMS.SN76489.prototype = {write: function(value) {
+JSSMS.SN76489.prototype = {init: function(clockSpeed, sampleRate) {
+  this.clock = (clockSpeed << SCALE) / 16 / sampleRate;
+  this.clockFrac = 0;
+  this.regLatch = 0;
+  this.noiseFreq = 16;
+  this.noiseShiftReg = SHIFT_RESET;
+  for (var i = 0; i < 4; i++) {
+    this.reg[i << 1] = 1;
+    this.reg[(i << 1) + 1] = 15;
+    this.freqCounter[i] = 0;
+    this.freqPolarity[i] = 1;
+    if (i != 3) {
+      this.freqPos[i] = NO_ANTIALIAS;
+    }
+  }
+}, write: function(value) {
+  if ((value & 128) != 0) {
+    this.regLatch = value >> 4 & 7;
+    this.reg[this.regLatch] = this.reg[this.regLatch] & 1008 | value & 15;
+  }else {
+    if (this.regLatch == 0 || this.regLatch == 2 || this.regLatch == 4) {
+      this.reg[this.regLatch] = this.reg[this.regLatch] & 15 | (value & 63) << 4;
+    }else {
+      this.reg[this.regLatch] = value & 15;
+    }
+  }
+  switch (this.regLatch) {
+    case 0:
+;
+    case 2:
+;
+    case 4:
+      if (this.reg[this.regLatch] == 0) {
+        this.reg[this.regLatch] = 1;
+      }
+      break;
+    case 6:
+      this.noiseFreq = 16 << (this.reg[6] & 3);
+      this.noiseShiftReg = SHIFT_RESET;
+      break;
+  }
+}, update: function(offset, samplesToGenerate) {
+  var buffer = [], sample, i;
+  for (sample = 0; sample < samplesToGenerate; sample++) {
+    for (i = 0; i < 3; i++) {
+      if (this.freqPos[i] != NO_ANTIALIAS) {
+        this.outputChannel[i] = PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPos[i] >> SCALE;
+      }else {
+        this.outputChannel[i] = PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPolarity[i];
+      }
+    }
+    this.outputChannel[3] = PSG_VOLUME[this.reg[7]] * (this.noiseShiftReg & 1) << 1;
+    var output = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
+    if (output > HI_BOUNDARY) {
+      output = HI_BOUNDARY;
+    }else {
+      if (output < LO_BOUNDARY) {
+        output = LO_BOUNDARY;
+      }
+    }
+    buffer[offset + sample] = output;
+    this.clockFrac += this.clock;
+    var clockCycles = this.clockFrac >> SCALE;
+    var clockCyclesScaled = clockCycles << SCALE;
+    this.clockFrac -= clockCyclesScaled;
+    this.freqCounter[0] -= clockCycles;
+    this.freqCounter[1] -= clockCycles;
+    this.freqCounter[2] -= clockCycles;
+    if (this.noiseFreq == 128) {
+      this.freqCounter[3] = this.freqCounter[2];
+    }else {
+      this.freqCounter[3] -= clockCycles;
+    }
+    for (i = 0; i < 3; i++) {
+      var counter = this.freqCounter[i];
+      if (counter <= 0) {
+        var tone = this.reg[i << 1];
+        if (tone > 6) {
+          this.freqPos[i] = (clockCyclesScaled - this.clockFrac + (2 << SCALE) * counter << SCALE) * this.freqPolarity[i] / (clockCyclesScaled + this.clockFrac);
+          this.freqPolarity[i] = -this.freqPolarity[i];
+        }else {
+          this.freqPolarity[i] = 1;
+          this.freqPos[i] = NO_ANTIALIAS;
+        }
+        this.freqCounter[i] += tone * (clockCycles / tone + 1);
+      }else {
+        this.freqPos[i] = NO_ANTIALIAS;
+      }
+    }
+    if (this.freqCounter[3] <= 0) {
+      this.freqPolarity[3] = -this.freqPolarity[3];
+      if (this.noiseFreq != 128) {
+        this.freqCounter[3] += this.noiseFreq * (clockCycles / this.noiseFreq + 1);
+      }
+      if (this.freqPolarity[3] == 1) {
+        var feedback;
+        if ((this.reg[6] & 4) != 0) {
+          feedback = (this.noiseShiftReg & FEEDBACK_PATTERN) != 0 && (this.noiseShiftReg & FEEDBACK_PATTERN ^ FEEDBACK_PATTERN) != 0 ? 1 : 0;
+        }else {
+          feedback = this.noiseShiftReg & 1;
+        }
+        this.noiseShiftReg = this.noiseShiftReg >> 1 | feedback << 15;
+      }
+    }
+  }
+  return buffer;
 }};
 var NTSC = 0;
 var PAL = 1;
@@ -4592,8 +4747,8 @@ if (typeof $ !== 'undefined') {
       $('<option>Select a ROM...</option>').appendTo(this.romSelect);
       for (var groupName in roms) {
         if (roms.hasOwnProperty(groupName)) {
-          var optgroup = $('<optgroup></optgroup>').attr('label', groupName);
-          for (var i = 0; i < roms[groupName].length; i++) {
+          var optgroup = $('<optgroup></optgroup>').attr('label', groupName), length = roms[groupName].length, i = 0;
+          for (; i < length; i++) {
             $('<option>' + roms[groupName][i][0] + '</option>').attr('value', roms[groupName][i][1]).appendTo(optgroup);
           }
           this.romSelect.append(optgroup);
@@ -4627,6 +4782,7 @@ if (typeof $ !== 'undefined') {
       }
     }, updateStatus: function(s) {
       this.log.text(s);
+    }, writeAudio: function(buffer) {
     }, writeFrame: function(buffer, prevBuffer) {
       if (this.hiddenPrefix && document[this.hiddenPrefix]) {
         return;

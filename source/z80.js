@@ -3051,6 +3051,8 @@ JSSMS.Z80.prototype = {
    * @param {number} value Value to write.
    */
   page: function(address, value) {
+    var p, i, offset;
+
     this.frameReg[address] = value;
 
     switch (address) {
@@ -3061,10 +3063,10 @@ JSSMS.Z80.prototype = {
           // SRAM banking; BA14 state when $8000-$BFFF is accessed (1= high, 0= low)
 
           // 16K offset into SRAM
-          var offset = (value & 0x04) << 2;
+          offset = (value & 0x04) << 2;
 
           // Map 16K of SRAM
-          for (var i = 32; i < 48; i++) {
+          for (i = 32; i < 48; i++) {
             this.memReadMap[i] = JSSMS.Utils.copyArray(this.sram[offset]);
             this.memWriteMap[i] = JSSMS.Utils.copyArray(this.sram[offset]);
             offset++;
@@ -3073,10 +3075,10 @@ JSSMS.Z80.prototype = {
           this.useSRAM = true;
         } else {
           // 0= ROM mapped to $8000-$BFFF
-          var p = (this.frameReg[3] % this.number_of_pages) << 4;
+          p = (this.frameReg[3] % this.number_of_pages) << 4;
 
           // Map 16K of ROM
-          for (var i = 32; i < 48; i++) {
+          for (i = 32; i < 48; i++) {
             this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
             this.memWriteMap[i] = this.getDummyWrite();
           }
@@ -3086,17 +3088,17 @@ JSSMS.Z80.prototype = {
       // 0xFFFD: Page 0 ROM Bank
       case 1:
         // Note +1 here, because for loop starts at '1'
-        var p = ((value % this.number_of_pages) << 4) + 1;
+        p = ((value % this.number_of_pages) << 4) + 1;
 
-        for (var i = 1; i < 16; i++)
+        for (i = 1; i < 16; i++)
           this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
         break;
 
       // 0xFFFE: Page 1 ROM Bank
       case 2:
-        var p = (value % this.number_of_pages) << 4;
+        p = (value % this.number_of_pages) << 4;
 
-        for (var i = 16; i < 32; i++)
+        for (i = 16; i < 32; i++)
           this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
         break;
 
@@ -3104,9 +3106,9 @@ JSSMS.Z80.prototype = {
       case 3:
         // Map ROM
         if ((this.frameReg[0] & 0x08) == 0) {
-          var p = (value % this.number_of_pages) << 4;
+          p = (value % this.number_of_pages) << 4;
 
-          for (var i = 32; i < 48; i++)
+          for (i = 32; i < 48; i++)
             this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
         }
         break;
