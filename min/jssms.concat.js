@@ -2121,7 +2121,9 @@ JSSMS.Z80.prototype = {reset: function() {
       this.a |= BIT_7;
       break;
     default:
-      DEBUG && console.log('Unimplemented CB Opcode: ' + opcode.toString(16));
+      if (DEBUG) {
+        console.log('Unimplemented CB Opcode: ' + opcode.toString(16));
+      }
       break;
   }
 }, rlc: function(value) {
@@ -2872,7 +2874,9 @@ JSSMS.Z80.prototype = {reset: function() {
       this.writeMem(location, this.readMem(location) | BIT_7);
       break;
     default:
-      DEBUG && console.log('Unimplemented DDCB or FDCB Opcode: ' + (opcode & 255).toString(16));
+      if (DEBUG) {
+        console.log('Unimplemented DDCB or FDCB Opcode: ' + (opcode & 255).toString(16));
+      }
       break;
   }
   this.pc++;
@@ -3356,7 +3360,10 @@ JSSMS.Z80.prototype = {reset: function() {
       }
       break;
     default:
-      DEBUG && console.log('Unimplemented ED Opcode: ' + opcode.toString(16)), this.pc++;
+      if (DEBUG) {
+        console.log('Unimplemented ED Opcode: ' + opcode.toString(16));
+      }
+      this.pc++;
       break;
   }
 }, generateDAATable: function() {

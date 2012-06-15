@@ -1284,7 +1284,9 @@ JSSMS.Z80.prototype = {
 
       // Unimplented CB Opcode
       default:
-        DEBUG && console.log('Unimplemented CB Opcode: ' + opcode.toString(16));
+        if (DEBUG) {
+          console.log('Unimplemented CB Opcode: ' + opcode.toString(16));
+        }
         break;
     }
   },
@@ -1700,7 +1702,9 @@ JSSMS.Z80.prototype = {
       case 0xFE: this.writeMem(location, this.readMem(location) | BIT_7); break;    // SET 7,(IX)
 
       default:
-        DEBUG && console.log('Unimplemented DDCB or FDCB Opcode: ' + (opcode & 0xff).toString(16));
+        if (DEBUG) {
+          console.log('Unimplemented DDCB or FDCB Opcode: ' + (opcode & 0xff).toString(16));
+        }
         break;
 
     } // end of switch
@@ -2247,7 +2251,10 @@ JSSMS.Z80.prototype = {
 
       // -- Unimplented ED Opcode --------------------
       default:
-        DEBUG && console.log('Unimplemented ED Opcode: ' + opcode.toString(16)), this.pc++;
+        if (DEBUG) {
+          console.log('Unimplemented ED Opcode: ' + opcode.toString(16));
+        }
+        this.pc++;
         break;
     } // end of switch
   }, // end of ed ops
