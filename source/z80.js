@@ -506,6 +506,10 @@ JSSMS.Z80.prototype = {
    * @param {number} cyclesTo
    */
   run: function(cycles, cyclesTo) {
+    var location;
+    var opcode;
+    var temp;
+
     this.tstates += cycles;
 
     if (cycles != 0)
@@ -524,7 +528,7 @@ JSSMS.Z80.prototype = {
 
       // Fetch & Interpret Opcodes
       // Main Opcode Switch Rolled In For Speed
-      var opcode = this.readMem(this.pc++);                    // Fetch & Interpret Opcode
+      opcode = this.readMem(this.pc++);                    // Fetch & Interpret Opcode
 
       if (Setup.ACCURATE_INTERRUPT_EMULATION)
         this.EI_inst = false;
@@ -570,7 +574,7 @@ JSSMS.Z80.prototype = {
         case 0x20: this.jr(!((this.f & F_ZERO) != 0)); break;                         // JR NZ,(PC+e)
         case 0x21: this.l = this.readMem(this.pc++); this.h = this.readMem(this.pc++); break;             // LD HL,nn
         case 0x22:                                                        // LD (nn),HL
-          var location = this.readMemWord(this.pc);
+          location = this.readMemWord(this.pc);
           this.writeMem(location, this.l);
           this.writeMem(++location, this.h);
           this.pc += 2;
@@ -583,7 +587,7 @@ JSSMS.Z80.prototype = {
         case 0x28: this.jr(((this.f & F_ZERO) != 0)); break;                          // JR Z,(PC+e)
         case 0x29: this.setHL(this.add16(this.getHL(), this.getHL())); break;                   // ADD HL,HL
         case 0x2A:
-          var location = this.readMemWord(this.pc);
+          location = this.readMemWord(this.pc);
           this.l = this.readMem(location);
           this.h = this.readMem(location + 1);
           this.pc += 2;
@@ -773,7 +777,7 @@ JSSMS.Z80.prototype = {
         case 0xE1: this.setHL(this.readMemWord(this.sp)); this.sp += 2; break;                    // POP HL
         case 0xE2: this.jp((this.f & F_PARITY) == 0); break;                          // JP PO,(nn)
         case 0xE3:                                                       // EX (SP),HL
-          var temp = this.h;
+          temp = this.h;
           this.h = this.readMem(this.sp + 1);
           this.writeMem(this.sp + 1, temp);
           temp = this.l;
@@ -788,7 +792,7 @@ JSSMS.Z80.prototype = {
         case 0xE9: this.pc = this.getHL(); break;                                     // JP (HL)
         case 0xEA: this.jp((this.f & F_PARITY) != 0); break;                          // JP PE,(nn)
         case 0xEB:                                                       // EX DE,HL
-          var temp = this.d;
+          temp = this.d;
           this.d = this.h;
           this.h = temp;
           temp = this.e;
@@ -1420,6 +1424,9 @@ JSSMS.Z80.prototype = {
    * @param {number} opcode Opcode hex value.
    */
   doIndexOpIX: function(opcode) {
+    var location;
+    var temp;
+
     this.tstates -= OP_DD_STATES[opcode];
 
     if (Setup.REFRESH_EMULATION)
@@ -1430,7 +1437,7 @@ JSSMS.Z80.prototype = {
       case 0x19: this.setIX(this.add16(this.getIX(), this.getDE())); break;             // ADD IX,DE
       case 0x21: this.setIX(this.readMemWord(this.pc)); this.pc += 2; break;              // LD IX,nn
       case 0x22:                                                  // LD (nn),IX
-        var location = this.readMemWord(this.pc);
+        location = this.readMemWord(this.pc);
         this.writeMem(location++, this.ixL);
         this.writeMem(location, this.ixH);
         this.pc += 2;
@@ -1441,7 +1448,7 @@ JSSMS.Z80.prototype = {
       case 0x26: this.ixH = this.readMem(this.pc++); break;                        // LD IXh,n *
       case 0x29: this.setIX(this.add16(this.getIX(), this.getIX())); break;             // ADD IX,IX
       case 0x2A:                                                  // LD IX,(nn)
-        var location = this.readMemWord(this.pc);
+        location = this.readMemWord(this.pc);
         this.ixL = this.readMem(location);
         this.ixH = this.readMem(++location);
         this.pc += 2;
@@ -1519,7 +1526,7 @@ JSSMS.Z80.prototype = {
       case 0xCB: this.doIndexCB(this.getIX()); break;                           // CB Opcode
       case 0xE1: this.setIX(this.readMemWord(this.sp)); this.sp += 2; break;    // POP IX
       case 0xE3:                                                                // EX SP,(IX)
-        var temp = this.getIX();
+        temp = this.getIX();
         this.setIX(this.readMemWord(this.sp));
         this.writeMem(this.sp, temp & 0xff);
         this.writeMem(this.sp + 1, temp >> 8);
@@ -1540,6 +1547,9 @@ JSSMS.Z80.prototype = {
    * @param {number} opcode Opcode hex value.
    */
   doIndexOpIY: function(opcode) {
+    var location;
+    var temp;
+
     this.tstates -= OP_DD_STATES[opcode];
 
     if (Setup.REFRESH_EMULATION)
@@ -1550,7 +1560,7 @@ JSSMS.Z80.prototype = {
       case 0x19: this.setIY(this.add16(this.getIY(), this.getDE())); break;             // ADD IY,DE
       case 0x21: this.setIY(this.readMemWord(this.pc)); this.pc += 2; break;              // LD IY,nn
       case 0x22:                                                  // LD (nn),IY
-        var location = this.readMemWord(this.pc);
+        location = this.readMemWord(this.pc);
         this.writeMem(location++, this.iyL);
         this.writeMem(location, this.iyH);
         this.pc += 2;
@@ -1561,7 +1571,7 @@ JSSMS.Z80.prototype = {
       case 0x26: this.iyH = this.readMem(this.pc++); break;                        // LD IYh,n *
       case 0x29: this.setIY(this.add16(this.getIY(), this.getIY())); break;             // ADD IY,IY
       case 0x2A:                                                  // LD IY,(nn)
-        var location = this.readMemWord(this.pc);
+        location = this.readMemWord(this.pc);
         this.iyL = this.readMem(location);
         this.iyH = this.readMem(++location);
         this.pc += 2;
@@ -1639,7 +1649,7 @@ JSSMS.Z80.prototype = {
       case 0xCB: this.doIndexCB(this.getIY()); break;                         // CB Opcode
       case 0xE1: this.setIY(this.readMemWord(this.sp)); this.sp += 2; break;              // POP IY
       case 0xE3:                                                                // EX SP,(IY)
-        var temp = this.getIY();
+        temp = this.getIY();
         this.setIY(this.readMemWord(this.sp));
         this.writeMem(this.sp, temp & 0xff);
         this.writeMem(this.sp + 1, temp >> 8);
@@ -1719,6 +1729,9 @@ JSSMS.Z80.prototype = {
    */
   doED: function(opcode) {
     var temp;
+    var location;
+    var hlmem;
+    var a_copy;
 
     this.tstates -= OP_ED_STATES[opcode];
 
@@ -1737,7 +1750,7 @@ JSSMS.Z80.prototype = {
 
       //  -- ED43 LD (nn),BC ------------------------
       case 0x43:
-        var location = this.readMemWord(this.pc + 1);
+        location = this.readMemWord(this.pc + 1);
         this.writeMem(location++, this.c);
         this.writeMem(location, this.b);
         this.pc += 3;
@@ -1753,7 +1766,7 @@ JSSMS.Z80.prototype = {
       case 0x74:
       case 0x7C:
         // A <- 0-A
-        var a_copy = this.a;
+        a_copy = this.a;
         this.a = 0;
         this.sub_a(a_copy);
         this.pc++;
@@ -1800,7 +1813,7 @@ JSSMS.Z80.prototype = {
 
       //  -- ED4B LD BC, (nn) -----------------------
       case 0x4B:
-        var location = this.readMemWord(this.pc + 1);
+        location = this.readMemWord(this.pc + 1);
         this.c = this.readMem(location++);
         this.b = this.readMem(location);
         this.pc += 3;
@@ -1824,7 +1837,7 @@ JSSMS.Z80.prototype = {
 
       //  -- ED53 LD (nn),DE ------------------------
       case 0x53:
-        var location = this.readMemWord(this.pc + 1);
+        location = this.readMemWord(this.pc + 1);
         this.writeMem(location++, this.e);        //SPl
         this.writeMem(location, this.d);  //SPh
         this.pc += 3;
@@ -1856,7 +1869,7 @@ JSSMS.Z80.prototype = {
 
       //  -- ED5B LD DE, (nn) -----------------------
       case 0x5B:
-        var location = this.readMemWord(this.pc + 1);
+        location = this.readMemWord(this.pc + 1);
         this.e = this.readMem(location++);
         this.d = this.readMem(location);
         this.pc += 3;
@@ -1885,7 +1898,7 @@ JSSMS.Z80.prototype = {
 
       //  -- ED63 LD (nn),HL ------------------------
       case 0x63:
-        var location = this.readMemWord(this.pc + 1);
+        location = this.readMemWord(this.pc + 1);
         this.writeMem(location++, this.l);        //SPl
         this.writeMem(location, this.h);  //SPh
         this.pc += 3;
@@ -1893,8 +1906,8 @@ JSSMS.Z80.prototype = {
 
       //  -- ED67 RRD -------------------------------
       case 0x67:
-        var location = this.getHL();
-        var hlmem = this.readMem(location);
+        location = this.getHL();
+        hlmem = this.readMem(location);
 
         // move high 4 of hl to low 4 of hl
         // move low 4 of a to high 4 of hl
@@ -1921,7 +1934,7 @@ JSSMS.Z80.prototype = {
 
       //  -- ED6B LD HL,(nn) -----------------------
       case 0x6B:
-        var location = this.readMemWord(this.pc + 1);
+        location = this.readMemWord(this.pc + 1);
         this.l = this.readMem(location++);
         this.h = this.readMem(location);
         this.pc += 3;
@@ -1929,8 +1942,8 @@ JSSMS.Z80.prototype = {
 
       //  -- ED6F RLD -------------------------------
       case 0x6F:
-        var location = this.getHL();
-        var hlmem = this.readMem(location);
+        location = this.getHL();
+        hlmem = this.readMem(location);
 
         // move low 4 of hl to high 4 of hl
         // move low 4 of a to low 4 of hl
@@ -1951,7 +1964,7 @@ JSSMS.Z80.prototype = {
 
       //  -- ED73 LD (nn),SP ------------------------
       case 0x73:
-        var location = this.readMemWord(this.pc + 1);
+        location = this.readMemWord(this.pc + 1);
         this.writeMem(location++, this.sp & 0xff);      //SPl
         this.writeMem(location, this.sp >> 8);  //SPh
         this.pc += 3;
@@ -2276,16 +2289,18 @@ JSSMS.Z80.prototype = {
    * f register stored in higher 8 bits
    */
   generateDAATable: function() {
+    var i, c, h, n;
+
     this.DAA_TABLE = new Array(0x800);
 
     // Iterate all possible values of a register (0 to 0xFF)
-    for (var i = 256; i-- != 0;) {
+    for (i = 256; i-- != 0;) {
       // Iterate carry / not-carry set
-      for (var c = 0; c <= 1; c++) {
+      for (c = 0; c <= 1; c++) {
         // Iterate halfcarry / not-halfcarry set
-        for (var h = 0; h <= 1; h++) {
+        for (h = 0; h <= 1; h++) {
           // Iterate negative / not-negative set
-          for (var n = 0; n <= 1; n++) {
+          for (n = 0; n <= 1; n++) {
             this.DAA_TABLE[(c << 8) | (n << 9) | (h << 10) | i] = this.getDAAResult(i, c | (n << 1) | (h << 4));
           }
         }
@@ -2714,6 +2729,10 @@ JSSMS.Z80.prototype = {
    * Copyright (C) 2002 Erik Duijs (erikduijs@yahoo.com)
    */
   generateFlagTables: function() {
+    var i, sf, zf, yf, xf, pf;
+    var padd, padc, psub, psbc;
+    var val, oldval, newval;
+
     this.SZ_TABLE = new Array(256);
     this.SZP_TABLE = new Array(256);
     this.SZHV_INC_TABLE = new Array(256);
@@ -2721,27 +2740,27 @@ JSSMS.Z80.prototype = {
     this.SZ_BIT_TABLE = new Array(256);
 
     // Generate tables
-    for (var i = 0; i < 256; i++) {
+    for (i = 0; i < 256; i++) {
       // Sign bits (0x80)
-      var sf = ((i & 0x80) != 0 ? F_SIGN : 0);
+      sf = ((i & 0x80) != 0 ? F_SIGN : 0);
 
       // Zero bits (0x40)
-      var zf = (i == 0 ? F_ZERO : 0);
+      zf = (i == 0 ? F_ZERO : 0);
 
       // Bit 5 (0x20)
-      var yf = i & 0x20;
+      yf = i & 0x20;
 
       // Halfcarry (0x10)
-      //var hf = 0;
+      //hf = 0;
 
       // Bit 3 (0x08)
-      var xf = i & 0x08;
+      xf = i & 0x08;
 
       // Overflow (0x04)
-      //var vf = 0;
+      //vf = 0;
 
       // Parity bits (0x04)
-      var pf = (this.getParity(i) ? F_PARITY : 0);
+      pf = (this.getParity(i) ? F_PARITY : 0);
 
       // Generate Sign/Zero Table
       this.SZ_TABLE[i] = (sf | zf | yf | xf);
@@ -2768,15 +2787,15 @@ JSSMS.Z80.prototype = {
     this.SZHVC_ADD_TABLE = new Array(2 * 256 * 256);
     this.SZHVC_SUB_TABLE = new Array(2 * 256 * 256);
 
-    var padd = 0 * 256;
-    var padc = 256 * 256;
-    var psub = 0 * 256;
-    var psbc = 256 * 256;
+    padd = 0 * 256;
+    padc = 256 * 256;
+    psub = 0 * 256;
+    psbc = 256 * 256;
 
-    for (var oldval = 0; oldval < 256; oldval++) {
-      for (var newval = 0; newval < 256; newval++) {
+    for (oldval = 0; oldval < 256; oldval++) {
+      for (newval = 0; newval < 256; newval++) {
         /* add or adc w/o carry set */
-        var val = newval - oldval;
+        val = newval - oldval;
 
         if (newval != 0) {
           if ((newval & 0x80) != 0) {
@@ -2886,7 +2905,8 @@ JSSMS.Z80.prototype = {
    */
   getParity: function(value) {
     var parity = true;
-    for (var j = 0; j < 8; j++) {
+    var j;
+    for (j = 0; j < 8; j++) {
       if ((value & (1 << j)) != 0) {
         parity = !parity;
       }
@@ -3133,8 +3153,9 @@ JSSMS.Z80.prototype = {
 
   setSRAM: function(bytes) {
     var length = bytes.length / Setup.PAGE_SIZE;
+    var i;
 
-    for (var i = 0; i < length; i++)
+    for (i = 0; i < length; i++)
       JSSMS.Utils.copyArrayElements(bytes, i * Setup.PAGE_SIZE, this.sram[i], 0, Setup.PAGE_SIZE);
   },
 
