@@ -83,7 +83,6 @@ if (typeof $ !== 'undefined') {
       // ROM loading
       this.romSelect.change(function() {
         self.loadROM();
-        self.buttons.start.removeAttr('disabled');
       });
 
       // Buttons
@@ -261,6 +260,7 @@ if (typeof $ !== 'undefined') {
             self.main.vdp.forceFullRedraw();
             self.main.start();
             self.enable();
+            self.buttons.start.removeAttr('disabled');
           }
         });
       },
