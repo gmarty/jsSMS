@@ -806,7 +806,7 @@ JSSMS.Vdp.prototype = {
               if (!this.spriteCol[x])
                 this.spriteCol[x] = true;
               else
-                this.status |= 0x20; // Bit 5 of status flag indicates collision
+                this.status |= STATUS_COLLISION; // Bit 5 of status flag indicates collision
             }
           }
         }
@@ -823,7 +823,7 @@ JSSMS.Vdp.prototype = {
               if (!this.spriteCol[x])
                 this.spriteCol[x] = true;
               else
-                this.status |= 0x20; // Bit 5 of status flag indicates collision
+                this.status |= STATUS_COLLISION; // Bit 5 of status flag indicates collision
             }
           }
 
@@ -835,7 +835,7 @@ JSSMS.Vdp.prototype = {
               if (!this.spriteCol[x + 1])
                 this.spriteCol[x + 1] = true;
               else
-                this.status |= 0x20; // Bit 5 of status flag indicates collision
+                this.status |= STATUS_COLLISION; // Bit 5 of status flag indicates collision
             }
           }
         }
@@ -844,7 +844,7 @@ JSSMS.Vdp.prototype = {
 
     // Sprite Overflow (more than 8 sprites on line)
     if (sprites[SPRITE_COUNT] >= SPRITES_PER_LINE) {
-      this.status |= 0x40;
+      this.status |= STATUS_OVERFLOW;
     }
   },
 
