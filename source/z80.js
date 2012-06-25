@@ -2294,7 +2294,8 @@ JSSMS.Z80.prototype = {
     this.DAA_TABLE = new Array(0x800);
 
     // Iterate all possible values of a register (0 to 0xFF)
-    for (i = 256; i-- != 0;) {
+    i = 256;
+    while (i--) {
       // Iterate carry / not-carry set
       for (c = 0; c <= 1; c++) {
         // Iterate halfcarry / not-halfcarry set

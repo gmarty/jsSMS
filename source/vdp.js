@@ -607,7 +607,8 @@ JSSMS.Vdp.prototype = {
 
     // Clear sprite collision array if enabled
     if (Setup.VDP_SPRITE_COLLISIONS) {
-      for (var i = this.spriteCol.length; i-- != 0;)
+      var i = this.spriteCol.length;
+      while (i--)
         this.spriteCol[i] = false;
     }
 
@@ -758,7 +759,8 @@ JSSMS.Vdp.prototype = {
     var off = (count * 3);
 
     // Have to iterate backwards here as we've already cached tiles
-    for (var i = count; i-- != 0;) {
+    var i = count;
+    while (i--) {
       // Sprite Pattern Index
       // Also mask on Pattern Index from 100 - 1FFh (if reg 6 bit 3 set)
       var n = sprites[off--] | ((this.vdpreg[6] & 0x04) << 6);
