@@ -50,7 +50,6 @@ if (typeof $ !== 'undefined') {
 
       // Create UI
       var root = $('<div></div>');
-      var romContainer = $('<div class="roms"></div>');
       var controls = $('<div class="controls"></div>');
 
       // General settings
@@ -82,7 +81,8 @@ if (typeof $ !== 'undefined') {
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
       this.resetCanvas();
 
-      this.romSelect = $('<select></select>').appendTo(romContainer);
+      this.romContainer = $('<div></div>');
+      this.romSelect = $('<select></select>');
 
       // ROM loading
       this.romSelect.change(function() {
@@ -173,7 +173,7 @@ if (typeof $ !== 'undefined') {
       this.log = $('<div id="status"></div>');
 
       this.screen.appendTo(root);
-      romContainer.appendTo(root);
+      this.romContainer.appendTo(root);
       controls.appendTo(root);
       this.log.appendTo(root);
       root.appendTo($(parent));
@@ -216,26 +216,36 @@ if (typeof $ !== 'undefined') {
 
 
       /**
-       * Given an array of roms, build a select tag to allow game selection.
+       * Given an map of roms, build a <select> tag to allow game selection.
        *
        * @param {Object.<Array.<string>>} roms The list of roms.
        */
       setRoms: function(roms) {
+        var groupName,
+            optgroup,
+            length,
+            i,
+            count = 0;
+
         this.romSelect.children().remove();
         $('<option>Select a ROM...</option>').appendTo(this.romSelect);
-        for (var groupName in roms) {
+
+        for (groupName in roms) {
           if (roms.hasOwnProperty(groupName)) {
-            var optgroup = $('<optgroup></optgroup>').
-                attr('label', groupName),
-                length = roms[groupName].length,
-                i = 0;
+            optgroup = $('<optgroup></optgroup>').attr('label', groupName);
+            length = roms[groupName].length;
+            i = 0;
             for (; i < length; i++) {
               $('<option>' + roms[groupName][i][0] + '</option>')
                 .attr('value', roms[groupName][i][1])
                 .appendTo(optgroup);
             }
-            this.romSelect.append(optgroup);
+            optgroup.appendTo(this.romSelect);
           }
+          count++;
+        }
+        if (count) {
+          this.romSelect.appendTo(this.romContainer);
         }
       },
 
