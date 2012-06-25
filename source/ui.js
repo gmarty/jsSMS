@@ -60,6 +60,10 @@ if (typeof $ !== 'undefined') {
        */
       var fullscreenSupport = JSSMS.Utils.getPrefix(['fullscreenEnabled', 'mozFullScreenEnabled', 'webkitCancelFullScreen']);
 
+      var i;
+
+      this.zoomed = false;
+
       /**
        * Contains the visibility API prefix or false if not supported.
        * @type {string|boolean}
@@ -87,30 +91,11 @@ if (typeof $ !== 'undefined') {
 
       // Buttons
       this.buttons = {
-        start: $('<input type="button" value="Stop" class="btn" disabled="disabled">').appendTo(controls),
-        restart: $('<input type="button" value="Restart" class="btn" disabled="disabled">').appendTo(controls),
-        sound: $('<input type="button" value="Enable sound" class="btn" disabled="disabled">').appendTo(controls),
-        zoom: $('<input type="button" value="Zoom in" class="btn">').appendTo(controls)
+        start: $('<input type="button" value="Stop" class="btn" disabled="disabled">'),
+        restart: $('<input type="button" value="Restart" class="btn" disabled="disabled">'),
+        sound: $('<input type="button" value="Enable sound" class="btn" disabled="disabled">'),
+        zoom: $('<input type="button" value="Zoom in" class="btn">')
       };
-
-      // @todo Add an exit fullScreen button.
-      if (fullscreenSupport) {
-        $('<input type="button" value="Go fullscreen" class="btn">').
-            appendTo(controls).
-            click(function() {
-              var screen = /** @type {HTMLCanvasElement} */ (self.screen[0]);
-
-              if (screen.requestFullscreen) {
-                screen.requestFullscreen();
-              } else if (screen.mozRequestFullScreen) {
-                screen.mozRequestFullScreen();
-              } else {
-                screen.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-              }
-            });
-      }
-
-      this.log = $('<div id="status"></div>');
 
       this.buttons.start.click(function() {
         if (!self.main.isRunning) {
@@ -143,7 +128,6 @@ if (typeof $ !== 'undefined') {
         }*/
       });
 
-      this.zoomed = false;
       this.buttons.zoom.click(function() {
         if (self.zoomed) {
           self.screen.animate({
@@ -162,6 +146,31 @@ if (typeof $ !== 'undefined') {
         }
         self.zoomed = !self.zoomed;
       });
+
+      // @todo Add an exit fullScreen button.
+      if (fullscreenSupport) {
+        this.buttons.fullsreen = $('<input type="button" value="Go fullscreen" class="btn">').
+            click(function() {
+              var screen = /** @type {HTMLCanvasElement} */ (self.screen[0]);
+
+              if (screen.requestFullscreen) {
+                screen.requestFullscreen();
+              } else if (screen.mozRequestFullScreen) {
+                screen.mozRequestFullScreen();
+              } else {
+                screen.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+              }
+            });
+      }
+
+      // Append buttons to controls div.
+      for (i in this.buttons) {
+        if (this.buttons.hasOwnProperty(i)) {
+          this.buttons[i].appendTo(controls);
+        }
+      }
+
+      this.log = $('<div id="status"></div>');
 
       this.screen.appendTo(root);
       romContainer.appendTo(root);
