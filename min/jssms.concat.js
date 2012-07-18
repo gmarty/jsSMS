@@ -18,13 +18,16 @@
 */
 'use strict';var DEBUG = true;
 var ACCURATE = true;
+var LITTLE_ENDIAN = true;
+var SUPPORT_DATAVIEW = !!(window['DataView'] && window['ArrayBuffer']);
+var SAMPLE_RATE = 44100;
 var Setup = {DEBUG_TIMING: DEBUG, REFRESH_EMULATION: false, ACCURATE_INTERRUPT_EMULATION: ACCURATE, LIGHTGUN: false, VDP_SPRITE_COLLISIONS: ACCURATE, PAGE_SIZE: 1024};
 var frameTime = 17;
 var fpsInterval = 500;
 var CLOCK_NTSC = 3579545;
 var CLOCK_PAL = 3546893;
 function JSSMS(opts) {
-  this.opts = {'ui': JSSMS.DummyUI};
+  this.opts = {'ui': JSSMS.DummyUI, 'swfPath': 'lib/'};
   if (typeof opts != 'undefined') {
     var key;
     for (key in this.opts) {
@@ -41,7 +44,7 @@ function JSSMS(opts) {
   this.cpu = new JSSMS.Z80(this);
   this.ui.updateStatus('Ready to load a ROM.');
 }
-JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frameSkip: 0, throttle: true, fps: 0, frameskip_counter: 0, pause_button: false, is_sms: true, is_gg: false, soundEnabled: false, emuWidth: 0, emuHeight: 0, fpsFrameCount: 0, z80Time: 0, drawTime: 0, z80TimeCounter: 0, drawTimeCounter: 0, frameCount: 0, romData: '', romFileName: '', reset: function() {
+JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frameSkip: 0, throttle: true, fps: 0, frameskip_counter: 0, pause_button: false, is_sms: true, is_gg: false, soundEnabled: true, audioBuffer: [], audioBufferOffset: 0, samplesPerFrame: 0, samplesPerLine: [], emuWidth: 0, emuHeight: 0, fpsFrameCount: 0, z80Time: 0, drawTime: 0, z80TimeCounter: 0, drawTimeCounter: 0, frameCount: 0, romData: '', romFileName: '', reset: function() {
   this.setVideoTiming(this.vdp.videoMode);
   this.frameCount = 0;
   this.frameskip_counter = this.frameSkip;
@@ -97,6 +100,9 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
     if (Setup.DEBUG_TIMING) {
       this.z80TimeCounter += +new Date - startTime;
     }
+    if (this.soundEnabled) {
+      this.updateSound(lineno);
+    }
     this.vdp.line = lineno;
     if (this.frameskip_counter == 0 && lineno < 192) {
       if (Setup.DEBUG_TIMING) {
@@ -108,6 +114,9 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
       }
     }
     this.vdp.interrupts(lineno);
+  }
+  if (this.soundEnabled) {
+    this.audioOutput(this.audioBuffer);
   }
   if (Setup.DEBUG_TIMING && ++this.frameCount == 60) {
     this.z80Time = this.z80TimeCounter;
@@ -140,7 +149,7 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
   this.emuWidth = GG_WIDTH;
   this.emuHeight = GG_HEIGHT;
 }, setVideoTiming: function(mode) {
-  var clockSpeedHz = 0;
+  var clockSpeedHz = 0, i, v;
   if (mode == NTSC || this.is_gg) {
     this.fps = 60;
     this.no_of_scanlines = SMS_Y_PIXELS_NTSC;
@@ -154,6 +163,24 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
   }
   this.cyclesPerLine = Math.round(clockSpeedHz / this.fps / this.no_of_scanlines + 1);
   this.vdp.videoMode = mode;
+  if (this.soundEnabled) {
+    this.psg.init(clockSpeedHz, SAMPLE_RATE);
+    this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps);
+    if (this.audioBuffer.length == 0 || this.audioBuffer.length != this.samplesPerFrame) {
+      this.audioBuffer = new Array(this.samplesPerFrame);
+    }
+    if (this.samplesPerLine.length == 0 || this.samplesPerLine.length != this.no_of_scanlines) {
+      this.samplesPerLine = new Array(this.no_of_scanlines);
+      var fractional = 0;
+      for (i = 0; i < this.no_of_scanlines; i++) {
+        v = (this.samplesPerFrame << 16) / this.no_of_scanlines + fractional;
+        fractional = v - (v >> 16 << 16);
+        this.samplesPerLine[i] = v >> 16;
+      }
+    }
+  }
+}, audioOutput: function(buffer) {
+  this.ui.writeAudio(buffer);
 }, doRepaint: function() {
   this.ui.writeFrame(this.vdp.display, []);
 }, printFps: function() {
@@ -167,6 +194,13 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
 }, resetFps: function() {
   this.lastFpsTime = null;
   this.fpsFrameCount = 0;
+}, updateSound: function(line) {
+  if (line == 0) {
+    this.audioBufferOffset = 0;
+  }
+  var samplesToGenerate = this.samplesPerLine[line];
+  this.audioBuffer = this.psg.update(this.audioBufferOffset, samplesToGenerate);
+  this.audioBufferOffset += samplesToGenerate;
 }, readRomDirectly: function(data, fileName) {
   var pages;
   var mode = fileName.substr(-3).toLowerCase() === '.gg' ? 2 : 1;
@@ -198,9 +232,15 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
   var number_of_pages = Math.round(size / Setup.PAGE_SIZE);
   var pages = new Array(number_of_pages);
   for (i = 0; i < number_of_pages; i++) {
-    pages[i] = new Array(Setup.PAGE_SIZE);
-    for (j = 0; j < Setup.PAGE_SIZE; j++) {
-      pages[i][j] = data.charCodeAt(i * Setup.PAGE_SIZE + j) & 255;
+    pages[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
+    if (SUPPORT_DATAVIEW) {
+      for (j = 0; j < Setup.PAGE_SIZE; j++) {
+        pages[i].setUint8(j, data.charCodeAt(i * Setup.PAGE_SIZE + j));
+      }
+    }else {
+      for (j = 0; j < Setup.PAGE_SIZE; j++) {
+        pages[i][j] = data.charCodeAt(i * Setup.PAGE_SIZE + j) & 255;
+      }
     }
   }
   return pages;
@@ -213,23 +253,114 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
 }};
 JSSMS.Utils = {rndInt: function(range) {
   return Math.round(Math.random() * range);
-}, copyArrayElements: function(src, srcPos, dest, destPos, length) {
-  var i = length;
-  while (i--) {
-    dest[destPos + i] = src[srcPos + i];
+}, Array: function() {
+  if (SUPPORT_DATAVIEW) {
+    return function(length) {
+      if (length === undefined) {
+        length = 0;
+      }
+      return new DataView(new ArrayBuffer(length));
+    }
+  }else {
+    return Array;
   }
-}, copyArray: function(src) {
-  if (src === undefined) {
-    return [];
-  }
-  var i = src.length, dest = new Array(i);
-  while (i--) {
-    if (typeof src[i] != 'undefined') {
-      dest[i] = src[i];
+}(), copyArrayElements: function() {
+  if (SUPPORT_DATAVIEW) {
+    return function(src, srcPos, dest, destPos, length) {
+      while (length--) {
+        dest.setInt8(destPos + length, src.getInt8(srcPos + length));
+      }
+    }
+  }else {
+    return function(src, srcPos, dest, destPos, length) {
+      while (length--) {
+        dest[destPos + length] = src[srcPos + length];
+      }
     }
   }
-  return dest;
-}, getPrefix: function(arr) {
+}(), copyArray: function() {
+  if (SUPPORT_DATAVIEW) {
+    return function(src) {
+      if (src === undefined) {
+        return JSSMS.Utils.Array();
+      }
+      var i, dest;
+      i = src.byteLength;
+      dest = new JSSMS.Utils.Array(i);
+      while (i--) {
+        dest.setInt8(i, src.getInt8(i));
+      }
+      return dest;
+    }
+  }else {
+    return function(src) {
+      if (src === undefined) {
+        return JSSMS.Utils.Array();
+      }
+      var i, dest;
+      i = src.length;
+      dest = new JSSMS.Utils.Array(i);
+      while (i--) {
+        if (typeof src[i] != 'undefined') {
+          dest[i] = src[i];
+        }
+      }
+      return dest;
+    }
+  }
+}(), writeMem: function() {
+  if (SUPPORT_DATAVIEW) {
+    return function(self, address, value) {
+      if (DEBUG && (address >> 10 >= self.memWriteMap.length || !self.memWriteMap[address >> 10] || (address & 1023) >= self.memWriteMap[address >> 10].byteLength)) {
+        console.error(address, address >> 10, address & 1023);
+        debugger;
+      }
+      self.memWriteMap[address >> 10].setInt8(address & 1023, value);
+      if (address >= 65532) {
+        self.page(address & 3, value);
+      }
+    }
+  }else {
+    return function(self, address, value) {
+      self.memWriteMap[address >> 10][address & 1023] = value;
+      if (address >= 65532) {
+        self.page(address & 3, value);
+      }
+    }
+  }
+}(), readMem: function() {
+  if (SUPPORT_DATAVIEW) {
+    return function(array, address) {
+      if (DEBUG && (address >> 10 >= array.length || !array[address >> 10] || (address & 1023) >= array[address >> 10].byteLength)) {
+        console.error(address, address >> 10, address & 1023);
+        debugger;
+      }
+      return array[address >> 10].getUint8(address & 1023);
+    }
+  }else {
+    return function(array, address) {
+      return array[address >> 10][address & 1023] & 255;
+    }
+  }
+}(), readMemWord: function() {
+  if (SUPPORT_DATAVIEW) {
+    return function(array, address) {
+      if (DEBUG && (address >> 10 >= array.length || !array[address >> 10] || (address & 1023) >= array[address >> 10].byteLength)) {
+        console.error(address, address >> 10, address & 1023);
+        debugger;
+      }
+      if ((address & 1023) < 1023) {
+        return array[address >> 10].getUint16(address & 1023, LITTLE_ENDIAN);
+      }else {
+        return array[address >> 10].getUint8(address & 1023) | array[++address >> 10].getUint8(address & 1023) << 8;
+      }
+    }
+  }else {
+    return function(array, address) {
+      return array[address >> 10][address & 1023] & 255 | (array[++address >> 10][address & 1023] & 255) << 8;
+    }
+  }
+}(), getPrefix: function(arr) {
   var prefix = false;
   arr.some(function(prop) {
     if (prop in document) {
@@ -314,15 +445,15 @@ JSSMS.Z80 = function(sms) {
   this.number_of_pages = 0;
   this.memWriteMap = new Array(65);
   this.memReadMap = new Array(65);
-  this.dummyWrite = new Array(Setup.PAGE_SIZE);
-  this.DAA_TABLE = [];
-  this.SZ_TABLE = [];
-  this.SZP_TABLE = [];
-  this.SZHV_INC_TABLE = [];
-  this.SZHV_DEC_TABLE = [];
-  this.SZHVC_ADD_TABLE = [];
-  this.SZHVC_SUB_TABLE = [];
-  this.SZ_BIT_TABLE = [];
+  this.dummyWrite = JSSMS.Utils.Array(Setup.PAGE_SIZE);
+  this.DAA_TABLE = new Array(2048);
+  this.SZ_TABLE = new Array(256);
+  this.SZP_TABLE = new Array(256);
+  this.SZHV_INC_TABLE = new Array(256);
+  this.SZHV_DEC_TABLE = new Array(256);
+  this.SZHVC_ADD_TABLE = new Array(2 * 256 * 256);
+  this.SZHVC_SUB_TABLE = new Array(2 * 256 * 256);
+  this.SZ_BIT_TABLE = new Array(256);
   this.generateFlagTables();
   this.generateDAATable();
   this.generateMemory();
@@ -388,6 +519,9 @@ JSSMS.Z80.prototype = {reset: function() {
   this.exDE();
   this.exHL();
 }, run: function(cycles, cyclesTo) {
+  var location;
+  var opcode;
+  var temp;
   this.tstates += cycles;
   if (cycles != 0) {
     this.totalCycles = cycles;
@@ -403,7 +537,7 @@ JSSMS.Z80.prototype = {reset: function() {
         this.interrupt();
       }
     }
-    var opcode = this.readMem(this.pc++);
+    opcode = this.readMem(this.pc++);
     if (Setup.ACCURATE_INTERRUPT_EMULATION) {
       this.EI_inst = false;
     }
@@ -518,7 +652,7 @@ JSSMS.Z80.prototype = {reset: function() {
         this.h = this.readMem(this.pc++);
         break;
       case 34:
-        var location = this.readMemWord(this.pc);
+        location = this.readMemWord(this.pc);
         this.writeMem(location, this.l);
         this.writeMem(++location, this.h);
         this.pc += 2;
@@ -545,7 +679,7 @@ JSSMS.Z80.prototype = {reset: function() {
         this.setHL(this.add16(this.getHL(), this.getHL()));
         break;
       case 42:
-        var location = this.readMemWord(this.pc);
+        location = this.readMemWord(this.pc);
         this.l = this.readMem(location);
         this.h = this.readMem(location + 1);
         this.pc += 2;
@@ -1116,7 +1250,7 @@ JSSMS.Z80.prototype = {reset: function() {
         this.jp((this.f & F_PARITY) == 0);
         break;
       case 227:
-        var temp = this.h;
+        temp = this.h;
         this.h = this.readMem(this.sp + 1);
         this.writeMem(this.sp + 1, temp);
         temp = this.l;
@@ -1146,7 +1280,7 @@ JSSMS.Z80.prototype = {reset: function() {
         this.jp((this.f & F_PARITY) != 0);
         break;
       case 235:
-        var temp = this.d;
+        temp = this.d;
         this.d = this.h;
         this.h = temp;
         temp = this.e;
@@ -2089,7 +2223,9 @@ JSSMS.Z80.prototype = {reset: function() {
       this.a |= BIT_7;
       break;
     default:
-      DEBUG && console.log('Unimplemented CB Opcode: ' + opcode.toString(16));
+      if (DEBUG) {
+        console.log('Unimplemented CB Opcode: ' + opcode.toString(16));
+      }
       break;
   }
 }, rlc: function(value) {
@@ -2135,6 +2271,8 @@ JSSMS.Z80.prototype = {reset: function() {
 }, bit: function(mask) {
   this.f = this.f & F_CARRY | this.SZ_BIT_TABLE[mask];
 }, doIndexOpIX: function(opcode) {
+  var location;
+  var temp;
   this.tstates -= OP_DD_STATES[opcode];
   if (Setup.REFRESH_EMULATION) {
     this.incR();
@@ -2151,7 +2289,7 @@ JSSMS.Z80.prototype = {reset: function() {
       this.pc += 2;
       break;
     case 34:
-      var location = this.readMemWord(this.pc);
+      location = this.readMemWord(this.pc);
       this.writeMem(location++, this.ixL);
       this.writeMem(location, this.ixH);
       this.pc += 2;
@@ -2172,7 +2310,7 @@ JSSMS.Z80.prototype = {reset: function() {
       this.setIX(this.add16(this.getIX(), this.getIX()));
       break;
     case 42:
-      var location = this.readMemWord(this.pc);
+      location = this.readMemWord(this.pc);
       this.ixL = this.readMem(location);
       this.ixH = this.readMem(++location);
       this.pc += 2;
@@ -2418,7 +2556,7 @@ JSSMS.Z80.prototype = {reset: function() {
       this.sp += 2;
       break;
     case 227:
-      var temp = this.getIX();
+      temp = this.getIX();
       this.setIX(this.readMemWord(this.sp));
       this.writeMem(this.sp, temp & 255);
       this.writeMem(this.sp + 1, temp >> 8);
@@ -2437,6 +2575,8 @@ JSSMS.Z80.prototype = {reset: function() {
       break;
   }
 }, doIndexOpIY: function(opcode) {
+  var location;
+  var temp;
   this.tstates -= OP_DD_STATES[opcode];
   if (Setup.REFRESH_EMULATION) {
     this.incR();
@@ -2453,7 +2593,7 @@ JSSMS.Z80.prototype = {reset: function() {
       this.pc += 2;
       break;
     case 34:
-      var location = this.readMemWord(this.pc);
+      location = this.readMemWord(this.pc);
       this.writeMem(location++, this.iyL);
       this.writeMem(location, this.iyH);
       this.pc += 2;
@@ -2474,7 +2614,7 @@ JSSMS.Z80.prototype = {reset: function() {
       this.setIY(this.add16(this.getIY(), this.getIY()));
       break;
     case 42:
-      var location = this.readMemWord(this.pc);
+      location = this.readMemWord(this.pc);
       this.iyL = this.readMem(location);
       this.iyH = this.readMem(++location);
       this.pc += 2;
@@ -2720,7 +2860,7 @@ JSSMS.Z80.prototype = {reset: function() {
       this.sp += 2;
       break;
     case 227:
-      var temp = this.getIY();
+      temp = this.getIY();
       this.setIY(this.readMemWord(this.sp));
       this.writeMem(this.sp, temp & 255);
       this.writeMem(this.sp + 1, temp >> 8);
@@ -2840,12 +2980,17 @@ JSSMS.Z80.prototype = {reset: function() {
       this.writeMem(location, this.readMem(location) | BIT_7);
       break;
     default:
-      DEBUG && console.log('Unimplemented DDCB or FDCB Opcode: ' + (opcode & 255).toString(16));
+      if (DEBUG) {
+        console.log('Unimplemented DDCB or FDCB Opcode: ' + (opcode & 255).toString(16));
+      }
       break;
   }
   this.pc++;
 }, doED: function(opcode) {
   var temp;
+  var location;
+  var hlmem;
+  var a_copy;
   this.tstates -= OP_ED_STATES[opcode];
   if (Setup.REFRESH_EMULATION) {
     this.incR();
@@ -2865,7 +3010,7 @@ JSSMS.Z80.prototype = {reset: function() {
       this.pc++;
       break;
     case 67:
-      var location = this.readMemWord(this.pc + 1);
+      location = this.readMemWord(this.pc + 1);
       this.writeMem(location++, this.c);
       this.writeMem(location, this.b);
       this.pc += 3;
@@ -2885,7 +3030,7 @@ JSSMS.Z80.prototype = {reset: function() {
     case 116:
 ;
     case 124:
-      var a_copy = this.a;
+      a_copy = this.a;
       this.a = 0;
       this.sub_a(a_copy);
       this.pc++;
@@ -2937,7 +3082,7 @@ JSSMS.Z80.prototype = {reset: function() {
       this.pc++;
       break;
     case 75:
-      var location = this.readMemWord(this.pc + 1);
+      location = this.readMemWord(this.pc + 1);
       this.c = this.readMem(location++);
       this.b = this.readMem(location);
       this.pc += 3;
@@ -2960,7 +3105,7 @@ JSSMS.Z80.prototype = {reset: function() {
       this.pc++;
       break;
     case 83:
-      var location = this.readMemWord(this.pc + 1);
+      location = this.readMemWord(this.pc + 1);
       this.writeMem(location++, this.e);
       this.writeMem(location, this.d);
       this.pc += 3;
@@ -2990,7 +3135,7 @@ JSSMS.Z80.prototype = {reset: function() {
       this.pc++;
       break;
     case 91:
-      var location = this.readMemWord(this.pc + 1);
+      location = this.readMemWord(this.pc + 1);
       this.e = this.readMem(location++);
       this.d = this.readMem(location);
       this.pc += 3;
@@ -3014,14 +3159,14 @@ JSSMS.Z80.prototype = {reset: function() {
       this.pc++;
       break;
     case 99:
-      var location = this.readMemWord(this.pc + 1);
+      location = this.readMemWord(this.pc + 1);
       this.writeMem(location++, this.l);
       this.writeMem(location, this.h);
       this.pc += 3;
       break;
     case 103:
-      var location = this.getHL();
-      var hlmem = this.readMem(location);
+      location = this.getHL();
+      hlmem = this.readMem(location);
       this.writeMem(location, hlmem >> 4 | (this.a & 15) << 4);
       this.a = this.a & 240 | hlmem & 15;
       this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];
@@ -3041,14 +3186,14 @@ JSSMS.Z80.prototype = {reset: function() {
       this.pc++;
       break;
     case 107:
-      var location = this.readMemWord(this.pc + 1);
+      location = this.readMemWord(this.pc + 1);
       this.l = this.readMem(location++);
       this.h = this.readMem(location);
       this.pc += 3;
       break;
     case 111:
-      var location = this.getHL();
-      var hlmem = this.readMem(location);
+      location = this.getHL();
+      hlmem = this.readMem(location);
       this.writeMem(location, (hlmem & 15) << 4 | this.a & 15);
       this.a = this.a & 240 | hlmem >> 4;
       this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];
@@ -3063,7 +3208,7 @@ JSSMS.Z80.prototype = {reset: function() {
       this.pc++;
       break;
     case 115:
-      var location = this.readMemWord(this.pc + 1);
+      location = this.readMemWord(this.pc + 1);
       this.writeMem(location++, this.sp & 255);
       this.writeMem(location, this.sp >> 8);
       this.pc += 3;
@@ -3324,15 +3469,19 @@ JSSMS.Z80.prototype = {reset: function() {
       }
       break;
     default:
-      DEBUG && console.log('Unimplemented ED Opcode: ' + opcode.toString(16)), this.pc++;
+      if (DEBUG) {
+        console.log('Unimplemented ED Opcode: ' + opcode.toString(16));
+      }
+      this.pc++;
       break;
   }
 }, generateDAATable: function() {
-  this.DAA_TABLE = new Array(2048);
-  for (var i = 256; i-- != 0;) {
-    for (var c = 0; c <= 1; c++) {
-      for (var h = 0; h <= 1; h++) {
-        for (var n = 0; n <= 1; n++) {
+  var i, c, h, n;
+  i = 256;
+  while (i--) {
+    for (c = 0; c <= 1; c++) {
+      for (h = 0; h <= 1; h++) {
+        for (n = 0; n <= 1; n++) {
           this.DAA_TABLE[c << 8 | n << 9 | h << 10 | i] = this.getDAAResult(i, c | n << 1 | h << 4);
         }
       }
@@ -3537,17 +3686,15 @@ JSSMS.Z80.prototype = {reset: function() {
 }, incR: function() {
   this.r = this.r & 128 | this.r + 1 & 127;
 }, generateFlagTables: function() {
-  this.SZ_TABLE = new Array(256);
-  this.SZP_TABLE = new Array(256);
-  this.SZHV_INC_TABLE = new Array(256);
-  this.SZHV_DEC_TABLE = new Array(256);
-  this.SZ_BIT_TABLE = new Array(256);
-  for (var i = 0; i < 256; i++) {
-    var sf = (i & 128) != 0 ? F_SIGN : 0;
-    var zf = i == 0 ? F_ZERO : 0;
-    var yf = i & 32;
-    var xf = i & 8;
-    var pf = this.getParity(i) ? F_PARITY : 0;
+  var i, sf, zf, yf, xf, pf;
+  var padd, padc, psub, psbc;
+  var val, oldval, newval;
+  for (i = 0; i < 256; i++) {
+    sf = (i & 128) != 0 ? F_SIGN : 0;
+    zf = i == 0 ? F_ZERO : 0;
+    yf = i & 32;
+    xf = i & 8;
+    pf = this.getParity(i) ? F_PARITY : 0;
     this.SZ_TABLE[i] = sf | zf | yf | xf;
     this.SZP_TABLE[i] = sf | zf | yf | xf | pf;
     this.SZHV_INC_TABLE[i] = sf | zf | yf | xf;
@@ -3559,15 +3706,13 @@ JSSMS.Z80.prototype = {reset: function() {
     this.SZ_BIT_TABLE[i] = i != 0 ? i & 128 : F_ZERO | F_PARITY;
     this.SZ_BIT_TABLE[i] |= yf | xf | F_HALFCARRY;
   }
-  this.SZHVC_ADD_TABLE = new Array(2 * 256 * 256);
-  this.SZHVC_SUB_TABLE = new Array(2 * 256 * 256);
-  var padd = 0 * 256;
-  var padc = 256 * 256;
-  var psub = 0 * 256;
-  var psbc = 256 * 256;
-  for (var oldval = 0; oldval < 256; oldval++) {
-    for (var newval = 0; newval < 256; newval++) {
-      var val = newval - oldval;
+  padd = 0 * 256;
+  padc = 256 * 256;
+  psub = 0 * 256;
+  psbc = 256 * 256;
+  for (oldval = 0; oldval < 256; oldval++) {
+    for (newval = 0; newval < 256; newval++) {
+      val = newval - oldval;
       if (newval != 0) {
         if ((newval & 128) != 0) {
           this.SZHVC_ADD_TABLE[padd] = F_SIGN;
@@ -3655,24 +3800,25 @@ JSSMS.Z80.prototype = {reset: function() {
   }
 }, getParity: function(value) {
   var parity = true;
-  for (var j = 0; j < 8; j++) {
+  var j;
+  for (j = 0; j < 8; j++) {
     if ((value & 1 << j) != 0) {
       parity = !parity;
     }
   }
   return parity;
 }, getDummyWrite: function() {
-  return new Array(Setup.PAGE_SIZE);
+  return JSSMS.Utils.Array(Setup.PAGE_SIZE);
 }, generateMemory: function() {
   for (var i = 0; i < 65; i++) {
-    this.memReadMap[i] = new Array(Setup.PAGE_SIZE);
-    this.memWriteMap[i] = new Array(Setup.PAGE_SIZE);
+    this.memReadMap[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
+    this.memWriteMap[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
   }
   for (i = 0; i < 8; i++) {
-    this.ram[i] = new Array(Setup.PAGE_SIZE);
+    this.ram[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
   }
   if (this.sram == null) {
-    this.sram = new Array(32);
+    this.sram = JSSMS.Utils.Array(32);
     this.useSRAM = false;
   }
   this.memReadMap[64] = this.getDummyWrite();
@@ -3702,60 +3848,50 @@ JSSMS.Z80.prototype = {reset: function() {
     this.memWriteMap[i] = this.ram[i & 7];
   }
 }, writeMem: function(address, value) {
-  if (DEBUG && (address >> 10 >= this.memWriteMap.length || !this.memWriteMap[address >> 10] || (address & 1023) >= this.memWriteMap[address >> 10].length)) {
-    console.log(address, address >> 10, address & 1023);
-    debugger;
-  }
-  this.memWriteMap[address >> 10][address & 1023] = value;
-  if (address >= 65532) {
-    this.page(address & 3, value);
-  }
+  JSSMS.Utils.writeMem(this, address, value);
 }, readMem: function(address) {
-  if (DEBUG && (address >> 10 >= this.memReadMap.length || !this.memReadMap[address >> 10] || (address & 1023) >= this.memReadMap[address >> 10].length)) {
-    console.log(address, address >> 10, address & 1023);
-    debugger;
-  }
-  return this.memReadMap[address >> 10][address & 1023] & 255;
+  return JSSMS.Utils.readMem(this.memReadMap, address);
 }, d_: function() {
-  return this.memReadMap[this.pc >> 10][this.pc & 1023];
+  return JSSMS.Utils.readMem(this.memReadMap, this.pc);
 }, readMemWord: function(address) {
-  return this.memReadMap[address >> 10][address & 1023] & 255 | (this.memReadMap[++address >> 10][address & 1023] & 255) << 8;
+  return JSSMS.Utils.readMemWord(this.memReadMap, address);
 }, page: function(address, value) {
+  var p, i, offset;
   this.frameReg[address] = value;
   switch (address) {
     case 0:
       if ((value & 8) != 0) {
-        var offset = (value & 4) << 2;
-        for (var i = 32; i < 48; i++) {
+        offset = (value & 4) << 2;
+        for (i = 32; i < 48; i++) {
           this.memReadMap[i] = JSSMS.Utils.copyArray(this.sram[offset]);
           this.memWriteMap[i] = JSSMS.Utils.copyArray(this.sram[offset]);
           offset++;
         }
         this.useSRAM = true;
       }else {
-        var p = this.frameReg[3] % this.number_of_pages << 4;
-        for (var i = 32; i < 48; i++) {
+        p = this.frameReg[3] % this.number_of_pages << 4;
+        for (i = 32; i < 48; i++) {
           this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
           this.memWriteMap[i] = this.getDummyWrite();
         }
       }
       break;
     case 1:
-      var p = (value % this.number_of_pages << 4) + 1;
-      for (var i = 1; i < 16; i++) {
+      p = (value % this.number_of_pages << 4) + 1;
+      for (i = 1; i < 16; i++) {
         this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
       }
       break;
     case 2:
-      var p = value % this.number_of_pages << 4;
-      for (var i = 16; i < 32; i++) {
+      p = value % this.number_of_pages << 4;
+      for (i = 16; i < 32; i++) {
         this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
       }
       break;
     case 3:
       if ((this.frameReg[0] & 8) == 0) {
-        var p = value % this.number_of_pages << 4;
-        for (var i = 32; i < 48; i++) {
+        p = value % this.number_of_pages << 4;
+        for (i = 32; i < 48; i++) {
           this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
         }
       }
@@ -3765,7 +3901,8 @@ JSSMS.Z80.prototype = {reset: function() {
   return this.useSRAM;
 }, setSRAM: function(bytes) {
   var length = bytes.length / Setup.PAGE_SIZE;
-  for (var i = 0; i < length; i++) {
+  var i;
+  for (i = 0; i < length; i++) {
     JSSMS.Utils.copyArrayElements(bytes, i * Setup.PAGE_SIZE, this.sram[i], 0, Setup.PAGE_SIZE);
   }
 }, setStateMem: function(state) {
@@ -3960,10 +4097,132 @@ JSSMS.Keyboard.prototype = {reset: function() {
   }
   evt.preventDefault();
 }};
+var SCALE = 8;
+var NO_ANTIALIAS = Number.MIN_VALUE;
+var SHIFT_RESET = 32768;
+var FEEDBACK_PATTERN = 9;
+var PSG_VOLUME = [25, 20, 16, 13, 10, 8, 6, 5, 4, 3, 3, 2, 2, 1, 1, 0];
+var HI_BOUNDARY = 127;
+var LO_BOUNDARY = -128;
 JSSMS.SN76489 = function(sms) {
   this.main = sms;
+  this.clock = 0;
+  this.clockFrac = 0;
+  this.reg = new Array(8);
+  this.regLatch = 0;
+  this.freqCounter = new Array(4);
+  this.freqPolarity = new Array(4);
+  this.freqPos = new Array(3);
+  this.noiseFreq = 16;
+  this.noiseShiftReg = SHIFT_RESET;
+  this.outputChannel = new Array(4);
 };
-JSSMS.SN76489.prototype = {write: function(value) {
+JSSMS.SN76489.prototype = {init: function(clockSpeed, sampleRate) {
+  this.clock = (clockSpeed << SCALE) / 16 / sampleRate;
+  this.clockFrac = 0;
+  this.regLatch = 0;
+  this.noiseFreq = 16;
+  this.noiseShiftReg = SHIFT_RESET;
+  for (var i = 0; i < 4; i++) {
+    this.reg[i << 1] = 1;
+    this.reg[(i << 1) + 1] = 15;
+    this.freqCounter[i] = 0;
+    this.freqPolarity[i] = 1;
+    if (i != 3) {
+      this.freqPos[i] = NO_ANTIALIAS;
+    }
+  }
+}, write: function(value) {
+  if ((value & 128) != 0) {
+    this.regLatch = value >> 4 & 7;
+    this.reg[this.regLatch] = this.reg[this.regLatch] & 1008 | value & 15;
+  }else {
+    if (this.regLatch == 0 || this.regLatch == 2 || this.regLatch == 4) {
+      this.reg[this.regLatch] = this.reg[this.regLatch] & 15 | (value & 63) << 4;
+    }else {
+      this.reg[this.regLatch] = value & 15;
+    }
+  }
+  switch (this.regLatch) {
+    case 0:
+;
+    case 2:
+;
+    case 4:
+      if (this.reg[this.regLatch] == 0) {
+        this.reg[this.regLatch] = 1;
+      }
+      break;
+    case 6:
+      this.noiseFreq = 16 << (this.reg[6] & 3);
+      this.noiseShiftReg = SHIFT_RESET;
+      break;
+  }
+}, update: function(offset, samplesToGenerate) {
+  var buffer = [], sample, i;
+  for (sample = 0; sample < samplesToGenerate; sample++) {
+    for (i = 0; i < 3; i++) {
+      if (this.freqPos[i] != NO_ANTIALIAS) {
+        this.outputChannel[i] = PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPos[i] >> SCALE;
+      }else {
+        this.outputChannel[i] = PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPolarity[i];
+      }
+    }
+    this.outputChannel[3] = PSG_VOLUME[this.reg[7]] * (this.noiseShiftReg & 1) << 1;
+    var output = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
+    if (output > HI_BOUNDARY) {
+      output = HI_BOUNDARY;
+    }else {
+      if (output < LO_BOUNDARY) {
+        output = LO_BOUNDARY;
+      }
+    }
+    buffer[offset + sample] = output;
+    this.clockFrac += this.clock;
+    var clockCycles = this.clockFrac >> SCALE;
+    var clockCyclesScaled = clockCycles << SCALE;
+    this.clockFrac -= clockCyclesScaled;
+    this.freqCounter[0] -= clockCycles;
+    this.freqCounter[1] -= clockCycles;
+    this.freqCounter[2] -= clockCycles;
+    if (this.noiseFreq == 128) {
+      this.freqCounter[3] = this.freqCounter[2];
+    }else {
+      this.freqCounter[3] -= clockCycles;
+    }
+    for (i = 0; i < 3; i++) {
+      var counter = this.freqCounter[i];
+      if (counter <= 0) {
+        var tone = this.reg[i << 1];
+        if (tone > 6) {
+          this.freqPos[i] = (clockCyclesScaled - this.clockFrac + (2 << SCALE) * counter << SCALE) * this.freqPolarity[i] / (clockCyclesScaled + this.clockFrac);
+          this.freqPolarity[i] = -this.freqPolarity[i];
+        }else {
+          this.freqPolarity[i] = 1;
+          this.freqPos[i] = NO_ANTIALIAS;
+        }
+        this.freqCounter[i] += tone * (clockCycles / tone + 1);
+      }else {
+        this.freqPos[i] = NO_ANTIALIAS;
+      }
+    }
+    if (this.freqCounter[3] <= 0) {
+      this.freqPolarity[3] = -this.freqPolarity[3];
+      if (this.noiseFreq != 128) {
+        this.freqCounter[3] += this.noiseFreq * (clockCycles / this.noiseFreq + 1);
+      }
+      if (this.freqPolarity[3] == 1) {
+        var feedback;
+        if ((this.reg[6] & 4) != 0) {
+          feedback = (this.noiseShiftReg & FEEDBACK_PATTERN) != 0 && (this.noiseShiftReg & FEEDBACK_PATTERN ^ FEEDBACK_PATTERN) != 0 ? 1 : 0;
+        }else {
+          feedback = this.noiseShiftReg & 1;
+        }
+        this.noiseShiftReg = this.noiseShiftReg >> 1 | feedback << 15;
+      }
+    }
+  }
+  return buffer;
 }};
 var NTSC = 0;
 var PAL = 1;
@@ -4013,9 +4272,10 @@ JSSMS.Vdp = function(sms) {
   this.bgt = 0;
   this.vScrollLatch = 0;
   this.display = new Array(SMS_WIDTH * SMS_HEIGHT);
-  this.main_JAVA = [];
-  this.GG_JAVA1 = [];
-  this.GG_JAVA2 = [];
+  this.main_JAVA = new Array(64);
+  this.GG_JAVA1 = new Array(256);
+  this.GG_JAVA2 = new Array(16);
+  this.isPalConverted = false;
   this.h_start = 0;
   this.h_end = 0;
   this.sat = 0;
@@ -4032,6 +4292,7 @@ JSSMS.Vdp = function(sms) {
 };
 JSSMS.Vdp.prototype = {reset: function() {
   var i;
+  this.isPalConverted = false;
   this.generateConvertedPals();
   this.firstByte = true;
   this.location = 0;
@@ -4208,7 +4469,8 @@ JSSMS.Vdp.prototype = {reset: function() {
     }
   }
   if (Setup.VDP_SPRITE_COLLISIONS) {
-    for (var i = this.spriteCol.length; i-- != 0;) {
+    var i = this.spriteCol.length;
+    while (i--) {
       this.spriteCol[i] = false;
     }
   }
@@ -4290,7 +4552,8 @@ JSSMS.Vdp.prototype = {reset: function() {
   var zoomed = this.vdpreg[1] & 1;
   var row_precal = lineno << 8;
   var off = count * 3;
-  for (var i = count; i-- != 0;) {
+  var i = count;
+  while (i--) {
     var n = sprites[off--] | (this.vdpreg[6] & 4) << 6;
     var y = sprites[off--];
     var x = sprites[off--] - (this.vdpreg[0] & 8);
@@ -4314,7 +4577,7 @@ JSSMS.Vdp.prototype = {reset: function() {
             if (!this.spriteCol[x]) {
               this.spriteCol[x] = true;
             }else {
-              this.status |= 32;
+              this.status |= STATUS_COLLISION;
             }
           }
         }
@@ -4328,7 +4591,7 @@ JSSMS.Vdp.prototype = {reset: function() {
             if (!this.spriteCol[x]) {
               this.spriteCol[x] = true;
             }else {
-              this.status |= 32;
+              this.status |= STATUS_COLLISION;
             }
           }
         }
@@ -4338,7 +4601,7 @@ JSSMS.Vdp.prototype = {reset: function() {
             if (!this.spriteCol[x + 1]) {
               this.spriteCol[x + 1] = true;
             }else {
-              this.status |= 32;
+              this.status |= STATUS_COLLISION;
             }
           }
         }
@@ -4346,7 +4609,7 @@ JSSMS.Vdp.prototype = {reset: function() {
     }
   }
   if (sprites[SPRITE_COUNT] >= SPRITES_PER_LINE) {
-    this.status |= 64;
+    this.status |= STATUS_OVERFLOW;
   }
 }, drawBGColour: function(lineno) {
   var colour = this.CRAM[16 + (this.vdpreg[7] & 15)];
@@ -4358,18 +4621,16 @@ JSSMS.Vdp.prototype = {reset: function() {
 }, generateConvertedPals: function() {
   var i;
   var r, g, b;
-  if (this.main.is_sms && !this.main_JAVA.length) {
-    this.main_JAVA = new Array(64);
+  if (this.main.is_sms && !this.isPalConverted) {
     for (i = 0; i < 64; i++) {
       r = i & 3;
       g = i >> 2 & 3;
       b = i >> 4 & 3;
       this.main_JAVA[i] = r * 85 | g * 85 << 8 | b * 85 << 16;
+      this.isPalConverted = true;
     }
   }else {
-    if (this.main.is_gg && !this.GG_JAVA1.length) {
-      this.GG_JAVA1 = new Array(256);
-      this.GG_JAVA2 = new Array(16);
+    if (this.main.is_gg && !this.isPalConverted) {
       for (i = 0; i < 256; i++) {
         g = i & 15;
         b = i >> 4 & 15;
@@ -4378,6 +4639,7 @@ JSSMS.Vdp.prototype = {reset: function() {
       for (i = 0; i < 16; i++) {
         this.GG_JAVA2[i] = i << 20;
       }
+      this.isPalConverted = true;
     }
   }
 }, createCachedImages: function() {
@@ -4496,9 +4758,10 @@ if (typeof $ !== 'undefined') {
       this.main = sms;
       var self = this;
       var root = $('<div></div>');
-      var romContainer = $('<div class="roms"></div>');
       var controls = $('<div class="controls"></div>');
       var fullscreenSupport = JSSMS.Utils.getPrefix(['fullscreenEnabled', 'mozFullScreenEnabled', 'webkitCancelFullScreen']);
+      var i;
+      this.zoomed = false;
       this.hiddenPrefix = JSSMS.Utils.getPrefix(['hidden', 'mozHidden', 'webkitHidden', 'msHidden']);
       this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + ' class="screen"></canvas>');
       this.canvasContext = this.screen[0].getContext('2d');
@@ -4508,27 +4771,12 @@ if (typeof $ !== 'undefined') {
       }
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
       this.resetCanvas();
-      this.romSelect = $('<select></select>').appendTo(romContainer);
+      this.romContainer = $('<div></div>');
+      this.romSelect = $('<select></select>');
       this.romSelect.change(function() {
         self.loadROM();
-        self.buttons.start.removeAttr('disabled');
       });
-      this.buttons = {start: $('<input type="button" value="Stop" class="btn" disabled="disabled">').appendTo(controls), restart: $('<input type="button" value="Restart" class="btn" disabled="disabled">').appendTo(controls), sound: $('<input type="button" value="Enable sound" class="btn" disabled="disabled">').appendTo(controls), zoom: $('<input type="button" value="Zoom in" class="btn">').appendTo(controls)};
-      if (fullscreenSupport) {
-        $('<input type="button" value="Go fullscreen" class="btn">').appendTo(controls).click(function() {
-          var screen = self.screen[0];
-          if (screen.requestFullscreen) {
-            screen.requestFullscreen();
-          }else {
-            if (screen.mozRequestFullScreen) {
-              screen.mozRequestFullScreen();
-            }else {
-              screen.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-            }
-          }
-        });
-      }
-      this.log = $('<div id="status"></div>');
+      this.buttons = {start: $('<input type="button" value="Stop" class="btn" disabled="disabled">'), restart: $('<input type="button" value="Restart" class="btn" disabled="disabled">'), sound: $('<input type="button" value="Enable sound" class="btn" disabled="disabled">'), zoom: $('<input type="button" value="Zoom in" class="btn">')};
       this.buttons.start.click(function() {
         if (!self.main.isRunning) {
           self.main.start();
@@ -4550,7 +4798,6 @@ if (typeof $ !== 'undefined') {
       });
       this.buttons.sound.click(function() {
       });
-      this.zoomed = false;
       this.buttons.zoom.click(function() {
         if (self.zoomed) {
           self.screen.animate({width: SMS_WIDTH + 'px', height: SMS_HEIGHT + 'px'}, function() {
@@ -4563,8 +4810,28 @@ if (typeof $ !== 'undefined') {
         }
         self.zoomed = !self.zoomed;
       });
+      if (fullscreenSupport) {
+        this.buttons.fullsreen = $('<input type="button" value="Go fullscreen" class="btn">').click(function() {
+          var screen = self.screen[0];
+          if (screen.requestFullscreen) {
+            screen.requestFullscreen();
+          }else {
+            if (screen.mozRequestFullScreen) {
+              screen.mozRequestFullScreen();
+            }else {
+              screen.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+            }
+          }
+        });
+      }
+      for (i in this.buttons) {
+        if (this.buttons.hasOwnProperty(i)) {
+          this.buttons[i].appendTo(controls);
+        }
+      }
+      this.log = $('<div id="status"></div>');
       this.screen.appendTo(root);
-      romContainer.appendTo(root);
+      this.romContainer.appendTo(root);
       controls.appendTo(root);
       this.log.appendTo(root);
       root.appendTo($(parent));
@@ -4588,16 +4855,23 @@ if (typeof $ !== 'undefined') {
         this.canvasImageData.data[i] = 255;
       }
     }, setRoms: function(roms) {
+      var groupName, optgroup, length, i, count = 0;
       this.romSelect.children().remove();
       $('<option>Select a ROM...</option>').appendTo(this.romSelect);
-      for (var groupName in roms) {
+      for (groupName in roms) {
         if (roms.hasOwnProperty(groupName)) {
-          var optgroup = $('<optgroup></optgroup>').attr('label', groupName);
-          for (var i = 0; i < roms[groupName].length; i++) {
+          optgroup = $('<optgroup></optgroup>').attr('label', groupName);
+          length = roms[groupName].length;
+          i = 0;
+          for (; i < length; i++) {
             $('<option>' + roms[groupName][i][0] + '</option>').attr('value', roms[groupName][i][1]).appendTo(optgroup);
           }
-          this.romSelect.append(optgroup);
+          optgroup.appendTo(this.romSelect);
         }
+        count++;
+      }
+      if (count) {
+        this.romSelect.appendTo(this.romContainer);
       }
     }, loadROM: function() {
       var self = this;
@@ -4617,6 +4891,7 @@ if (typeof $ !== 'undefined') {
         self.main.vdp.forceFullRedraw();
         self.main.start();
         self.enable();
+        self.buttons.start.removeAttr('disabled');
       }});
     }, enable: function() {
       this.buttons.restart.removeAttr('disabled');
@@ -4627,6 +4902,7 @@ if (typeof $ !== 'undefined') {
       }
     }, updateStatus: function(s) {
       this.log.text(s);
+    }, writeAudio: function(buffer) {
     }, writeFrame: function(buffer, prevBuffer) {
       if (this.hiddenPrefix && document[this.hiddenPrefix]) {
         return;
