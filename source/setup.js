@@ -34,6 +34,20 @@ var DEBUG = true;
 var ACCURATE = true;
 
 
+/**
+ * Whether the system uses little endian or big endian.
+ * @const
+ */
+var LITTLE_ENDIAN = true;
+
+
+/**
+ * Does browser support ArrayBuffer and DataView?
+ * @const
+ */
+var SUPPORT_DATAVIEW = !!(window['DataView'] && window['ArrayBuffer']);
+
+
 // Sound Output
 /**
  * Sample Rate

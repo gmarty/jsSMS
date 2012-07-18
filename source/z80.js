@@ -346,7 +346,7 @@ JSSMS.Z80 = function(sms) {
    * Dummy memory writes (never read).
    * @type {Array.<number>}
    */
-  this.dummyWrite = new Array(Setup.PAGE_SIZE);
+  this.dummyWrite = JSSMS.Utils.Array(Setup.PAGE_SIZE);
 
   // Precalculated tables for speed purposes
   /** Pre-calculated result for DAA instruction. */
@@ -2921,7 +2921,7 @@ JSSMS.Z80.prototype = {
    * @return {Array.<number>}
    */
   getDummyWrite: function() {
-    return new Array(Setup.PAGE_SIZE);
+    return JSSMS.Utils.Array(Setup.PAGE_SIZE);
   },
 
 
@@ -2937,19 +2937,19 @@ JSSMS.Z80.prototype = {
     //this.memWriteMap = new Array(65);
 
     for (var i = 0; i < 65; i++) {
-      this.memReadMap[i] = new Array(Setup.PAGE_SIZE);
-      this.memWriteMap[i] = new Array(Setup.PAGE_SIZE);
+      this.memReadMap[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
+      this.memWriteMap[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
     }
 
     // Create 8K System RAM
     //this.ram = new Array(8);
     for (i = 0; i < 8; i++) {
-      this.ram[i] = new Array(Setup.PAGE_SIZE);
+      this.ram[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
     }
 
     // Create 2 x 16K RAM Cartridge Pages
     if (this.sram == null) {
-      this.sram = new Array(32);
+      this.sram = JSSMS.Utils.Array(32);
       this.useSRAM = false;
     }
 
@@ -3006,60 +3006,47 @@ JSSMS.Z80.prototype = {
   /**
    * Write to a memory location.
    *
+   * \@todo We really need currying here.
    * @param {number} address Memory address.
    * @param {number} value Value to write.
    */
   writeMem: function(address, value) {
-    // DEBUG
-    if (DEBUG && ((address >> 10) >= this.memWriteMap.length || !this.memWriteMap[address >> 10] || (address & 0x3FF) >= this.memWriteMap[address >> 10].length)) {
-      console.log(address, (address >> 10), (address & 0x3FF));
-      debugger;
-    }
-
-    this.memWriteMap[address >> 10][address & 0x3FF] = value;
-
-    // Paging registers
-    if (address >= 0xFFFC)
-      this.page(address & 3, value);
+    JSSMS.Utils.writeMem(this, address, value);
   },
 
 
   /**
    * Read from a memory location.
    *
+   * \@todo We really need currying here.
    * @param {number} address Memory location.
    * @return {number} Value from memory location.
    */
   readMem: function(address) {
-    // DEBUG
-    if (DEBUG && ((address >> 10) >= this.memReadMap.length || !this.memReadMap[address >> 10] || (address & 0x3FF) >= this.memReadMap[address >> 10].length)) {
-      console.log(address, (address >> 10), (address & 0x3FF));
-      debugger;
-    }
-
-    return this.memReadMap[address >> 10][address & 0x3FF] & 0xFF;
+    return JSSMS.Utils.readMem(this.memReadMap, address);
   },
 
 
   /**
    * Read a signed value from next memory location.
    *
+   * \@todo We really need currying here.
    * @return {number} Value from memory location.
    */
   d_: function() {
-    return this.memReadMap[this.pc >> 10][this.pc & 0x3FF];
+    return JSSMS.Utils.readMem(this.memReadMap, this.pc);
   },
 
 
   /**
    * Read a word (two bytes) from a memory location.
    *
+   * \@todo We really need currying here.
    * @param {number} address Memory address.
    * @return {number} Value from memory location.
    */
   readMemWord: function(address) {
-    return (this.memReadMap[address >> 10][address & 0x3FF] & 0xFF) |
-        ((this.memReadMap[++address >> 10][address & 0x3FF] & 0xFF) << 8);
+    return JSSMS.Utils.readMemWord(this.memReadMap, address);
   },
 
 

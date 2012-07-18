@@ -596,12 +596,17 @@ JSSMS.prototype = {
     var pages = new Array(number_of_pages);
 
     for (i = 0; i < number_of_pages; i++) {
-      pages[i] = new Array(Setup.PAGE_SIZE);
+      pages[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
       // Read file into pages array
-      // second value is offset, third is length
-      //is.read(pages[i / Setup.PAGE_SIZE], 0x0000, Setup.PAGE_SIZE);
-      for (j = 0; j < Setup.PAGE_SIZE; j++) {
-        pages[i][j] = data.charCodeAt((i * Setup.PAGE_SIZE) + j) & 0xFF;
+      // \@todo Move this part to JSSMS.Utils.
+      if (SUPPORT_DATAVIEW) {
+        for (j = 0; j < Setup.PAGE_SIZE; j++) {
+          pages[i].setUint8(j, data.charCodeAt((i * Setup.PAGE_SIZE) + j) & 0xFF);
+        }
+      } else {
+        for (j = 0; j < Setup.PAGE_SIZE; j++) {
+          pages[i][j] = data.charCodeAt((i * Setup.PAGE_SIZE) + j) & 0xFF;
+        }
       }
     }
 

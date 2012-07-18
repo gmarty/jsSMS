@@ -18,6 +18,8 @@
 */
 'use strict';var DEBUG = true;
 var ACCURATE = true;
+var LITTLE_ENDIAN = true;
+var SUPPORT_DATAVIEW = !!(window['DataView'] && window['ArrayBuffer']);
 var SAMPLE_RATE = 44100;
 var Setup = {DEBUG_TIMING: DEBUG, REFRESH_EMULATION: false, ACCURATE_INTERRUPT_EMULATION: ACCURATE, LIGHTGUN: false, VDP_SPRITE_COLLISIONS: ACCURATE, PAGE_SIZE: 1024};
 var frameTime = 17;
@@ -230,9 +232,15 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
   var number_of_pages = Math.round(size / Setup.PAGE_SIZE);
   var pages = new Array(number_of_pages);
   for (i = 0; i < number_of_pages; i++) {
-    pages[i] = new Array(Setup.PAGE_SIZE);
-    for (j = 0; j < Setup.PAGE_SIZE; j++) {
-      pages[i][j] = data.charCodeAt(i * Setup.PAGE_SIZE + j) & 255;
+    pages[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
+    if (SUPPORT_DATAVIEW) {
+      for (j = 0; j < Setup.PAGE_SIZE; j++) {
+        pages[i].setUint8(j, data.charCodeAt(i * Setup.PAGE_SIZE + j) & 255);
+      }
+    }else {
+      for (j = 0; j < Setup.PAGE_SIZE; j++) {
+        pages[i][j] = data.charCodeAt(i * Setup.PAGE_SIZE + j) & 255;
+      }
     }
   }
   return pages;
@@ -245,23 +253,114 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
 }};
 JSSMS.Utils = {rndInt: function(range) {
   return Math.round(Math.random() * range);
-}, copyArrayElements: function(src, srcPos, dest, destPos, length) {
-  var i = length;
-  while (i--) {
-    dest[destPos + i] = src[srcPos + i];
+}, Array: function() {
+  if (SUPPORT_DATAVIEW) {
+    return function(length) {
+      if (length === undefined) {
+        length = 0;
+      }
+      return new DataView(new ArrayBuffer(length));
+    }
+  }else {
+    return Array;
   }
-}, copyArray: function(src) {
-  if (src === undefined) {
-    return [];
-  }
-  var i = src.length, dest = new Array(i);
-  while (i--) {
-    if (typeof src[i] != 'undefined') {
-      dest[i] = src[i];
+}(), copyArrayElements: function() {
+  if (SUPPORT_DATAVIEW) {
+    return function(src, srcPos, dest, destPos, length) {
+      while (length--) {
+        dest.setUint8(destPos + length, src.getUint8(srcPos + length));
+      }
+    }
+  }else {
+    return function(src, srcPos, dest, destPos, length) {
+      while (length--) {
+        dest[destPos + length] = src[srcPos + length];
+      }
     }
   }
-  return dest;
-}, getPrefix: function(arr) {
+}(), copyArray: function() {
+  if (SUPPORT_DATAVIEW) {
+    return function(src) {
+      if (src === undefined) {
+        return JSSMS.Utils.Array();
+      }
+      var i, dest;
+      i = src.byteLength;
+      dest = new JSSMS.Utils.Array(i);
+      while (i--) {
+        dest.setUint8(i, src.getUint8(i));
+      }
+      return dest;
+    }
+  }else {
+    return function(src) {
+      if (src === undefined) {
+        return JSSMS.Utils.Array();
+      }
+      var i, dest;
+      i = src.length;
+      dest = new JSSMS.Utils.Array(i);
+      while (i--) {
+        if (typeof src[i] != 'undefined') {
+          dest[i] = src[i];
+        }
+      }
+      return dest;
+    }
+  }
+}(), writeMem: function() {
+  if (SUPPORT_DATAVIEW) {
+    return function(self, address, value) {
+      if (DEBUG && (address >> 10 >= self.memWriteMap.length || !self.memWriteMap[address >> 10] || (address & 1023) >= self.memWriteMap[address >> 10].byteLength)) {
+        console.error(address, address >> 10, address & 1023);
+        debugger;
+      }
+      self.memWriteMap[address >> 10].setUint8(address & 1023, value);
+      if (address >= 65532) {
+        self.page(address & 3, value);
+      }
+    }
+  }else {
+    return function(self, address, value) {
+      self.memWriteMap[address >> 10][address & 1023] = value;
+      if (address >= 65532) {
+        self.page(address & 3, value);
+      }
+    }
+  }
+}(), readMem: function() {
+  if (SUPPORT_DATAVIEW) {
+    return function(array, address) {
+      if (DEBUG && (address >> 10 >= array.length || !array[address >> 10] || (address & 1023) >= array[address >> 10].byteLength)) {
+        console.error(address, address >> 10, address & 1023);
+        debugger;
+      }
+      return array[address >> 10].getUint8(address & 1023);
+    }
+  }else {
+    return function(array, address) {
+      return array[address >> 10][address & 1023];
+    }
+  }
+}(), readMemWord: function() {
+  if (SUPPORT_DATAVIEW) {
+    return function(array, address) {
+      if (DEBUG && (address >> 10 >= array.length || !array[address >> 10] || (address & 1023) >= array[address >> 10].byteLength)) {
+        console.error(address, address >> 10, address & 1023);
+        debugger;
+      }
+      if ((address & 1023) < 1023) {
+        return array[address >> 10].getUint16(address & 1023, LITTLE_ENDIAN);
+      }else {
+        return array[address >> 10].getUint8(address & 1023) | array[++address >> 10].getUint8(address & 1023) << 8;
+      }
+    }
+  }else {
+    return function(array, address) {
+      return array[address >> 10][address & 1023] & 255 | (array[++address >> 10][address & 1023] & 255) << 8;
+    }
+  }
+}(), getPrefix: function(arr) {
   var prefix = false;
   arr.some(function(prop) {
     if (prop in document) {
@@ -346,7 +445,7 @@ JSSMS.Z80 = function(sms) {
   this.number_of_pages = 0;
   this.memWriteMap = new Array(65);
   this.memReadMap = new Array(65);
-  this.dummyWrite = new Array(Setup.PAGE_SIZE);
+  this.dummyWrite = JSSMS.Utils.Array(Setup.PAGE_SIZE);
   this.DAA_TABLE = [];
   this.SZ_TABLE = [];
   this.SZP_TABLE = [];
@@ -3379,7 +3478,8 @@ JSSMS.Z80.prototype = {reset: function() {
 }, generateDAATable: function() {
   var i, c, h, n;
   this.DAA_TABLE = new Array(2048);
-  for (i = 256; i-- != 0;) {
+  i = 256;
+  while (i--) {
     for (c = 0; c <= 1; c++) {
       for (h = 0; h <= 1; h++) {
         for (n = 0; n <= 1; n++) {
@@ -3716,17 +3816,17 @@ JSSMS.Z80.prototype = {reset: function() {
   }
   return parity;
 }, getDummyWrite: function() {
-  return new Array(Setup.PAGE_SIZE);
+  return JSSMS.Utils.Array(Setup.PAGE_SIZE);
 }, generateMemory: function() {
   for (var i = 0; i < 65; i++) {
-    this.memReadMap[i] = new Array(Setup.PAGE_SIZE);
-    this.memWriteMap[i] = new Array(Setup.PAGE_SIZE);
+    this.memReadMap[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
+    this.memWriteMap[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
   }
   for (i = 0; i < 8; i++) {
-    this.ram[i] = new Array(Setup.PAGE_SIZE);
+    this.ram[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
   }
   if (this.sram == null) {
-    this.sram = new Array(32);
+    this.sram = JSSMS.Utils.Array(32);
     this.useSRAM = false;
   }
   this.memReadMap[64] = this.getDummyWrite();
@@ -3756,24 +3856,13 @@ JSSMS.Z80.prototype = {reset: function() {
     this.memWriteMap[i] = this.ram[i & 7];
   }
 }, writeMem: function(address, value) {
-  if (DEBUG && (address >> 10 >= this.memWriteMap.length || !this.memWriteMap[address >> 10] || (address & 1023) >= this.memWriteMap[address >> 10].length)) {
-    console.log(address, address >> 10, address & 1023);
-    debugger;
-  }
-  this.memWriteMap[address >> 10][address & 1023] = value;
-  if (address >= 65532) {
-    this.page(address & 3, value);
-  }
+  JSSMS.Utils.writeMem(this, address, value);
 }, readMem: function(address) {
-  if (DEBUG && (address >> 10 >= this.memReadMap.length || !this.memReadMap[address >> 10] || (address & 1023) >= this.memReadMap[address >> 10].length)) {
-    console.log(address, address >> 10, address & 1023);
-    debugger;
-  }
-  return this.memReadMap[address >> 10][address & 1023] & 255;
+  return JSSMS.Utils.readMem(this.memReadMap, address);
 }, d_: function() {
-  return this.memReadMap[this.pc >> 10][this.pc & 1023];
+  return JSSMS.Utils.readMem(this.memReadMap, this.pc);
 }, readMemWord: function(address) {
-  return this.memReadMap[address >> 10][address & 1023] & 255 | (this.memReadMap[++address >> 10][address & 1023] & 255) << 8;
+  return JSSMS.Utils.readMemWord(this.memReadMap, address);
 }, page: function(address, value) {
   var p, i, offset;
   this.frameReg[address] = value;
@@ -4386,7 +4475,8 @@ JSSMS.Vdp.prototype = {reset: function() {
     }
   }
   if (Setup.VDP_SPRITE_COLLISIONS) {
-    for (var i = this.spriteCol.length; i-- != 0;) {
+    var i = this.spriteCol.length;
+    while (i--) {
       this.spriteCol[i] = false;
     }
   }
@@ -4468,7 +4558,8 @@ JSSMS.Vdp.prototype = {reset: function() {
   var zoomed = this.vdpreg[1] & 1;
   var row_precal = lineno << 8;
   var off = count * 3;
-  for (var i = count; i-- != 0;) {
+  var i = count;
+  while (i--) {
     var n = sprites[off--] | (this.vdpreg[6] & 4) << 6;
     var y = sprites[off--];
     var x = sprites[off--] - (this.vdpreg[0] & 8);
@@ -4492,7 +4583,7 @@ JSSMS.Vdp.prototype = {reset: function() {
             if (!this.spriteCol[x]) {
               this.spriteCol[x] = true;
             }else {
-              this.status |= 32;
+              this.status |= STATUS_COLLISION;
             }
           }
         }
@@ -4506,7 +4597,7 @@ JSSMS.Vdp.prototype = {reset: function() {
             if (!this.spriteCol[x]) {
               this.spriteCol[x] = true;
             }else {
-              this.status |= 32;
+              this.status |= STATUS_COLLISION;
             }
           }
         }
@@ -4516,7 +4607,7 @@ JSSMS.Vdp.prototype = {reset: function() {
             if (!this.spriteCol[x + 1]) {
               this.spriteCol[x + 1] = true;
             }else {
-              this.status |= 32;
+              this.status |= STATUS_COLLISION;
             }
           }
         }
@@ -4524,7 +4615,7 @@ JSSMS.Vdp.prototype = {reset: function() {
     }
   }
   if (sprites[SPRITE_COUNT] >= SPRITES_PER_LINE) {
-    this.status |= 64;
+    this.status |= STATUS_OVERFLOW;
   }
 }, drawBGColour: function(lineno) {
   var colour = this.CRAM[16 + (this.vdpreg[7] & 15)];
@@ -4674,9 +4765,10 @@ if (typeof $ !== 'undefined') {
       this.main = sms;
       var self = this;
       var root = $('<div></div>');
-      var romContainer = $('<div class="roms"></div>');
       var controls = $('<div class="controls"></div>');
       var fullscreenSupport = JSSMS.Utils.getPrefix(['fullscreenEnabled', 'mozFullScreenEnabled', 'webkitCancelFullScreen']);
+      var i;
+      this.zoomed = false;
       this.hiddenPrefix = JSSMS.Utils.getPrefix(['hidden', 'mozHidden', 'webkitHidden', 'msHidden']);
       this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + ' class="screen"></canvas>');
       this.canvasContext = this.screen[0].getContext('2d');
@@ -4686,27 +4778,12 @@ if (typeof $ !== 'undefined') {
       }
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
       this.resetCanvas();
-      this.romSelect = $('<select></select>').appendTo(romContainer);
+      this.romContainer = $('<div></div>');
+      this.romSelect = $('<select></select>');
       this.romSelect.change(function() {
         self.loadROM();
-        self.buttons.start.removeAttr('disabled');
       });
-      this.buttons = {start: $('<input type="button" value="Stop" class="btn" disabled="disabled">').appendTo(controls), restart: $('<input type="button" value="Restart" class="btn" disabled="disabled">').appendTo(controls), sound: $('<input type="button" value="Enable sound" class="btn" disabled="disabled">').appendTo(controls), zoom: $('<input type="button" value="Zoom in" class="btn">').appendTo(controls)};
-      if (fullscreenSupport) {
-        $('<input type="button" value="Go fullscreen" class="btn">').appendTo(controls).click(function() {
-          var screen = self.screen[0];
-          if (screen.requestFullscreen) {
-            screen.requestFullscreen();
-          }else {
-            if (screen.mozRequestFullScreen) {
-              screen.mozRequestFullScreen();
-            }else {
-              screen.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-            }
-          }
-        });
-      }
-      this.log = $('<div id="status"></div>');
+      this.buttons = {start: $('<input type="button" value="Stop" class="btn" disabled="disabled">'), restart: $('<input type="button" value="Restart" class="btn" disabled="disabled">'), sound: $('<input type="button" value="Enable sound" class="btn" disabled="disabled">'), zoom: $('<input type="button" value="Zoom in" class="btn">')};
       this.buttons.start.click(function() {
         if (!self.main.isRunning) {
           self.main.start();
@@ -4728,7 +4805,6 @@ if (typeof $ !== 'undefined') {
       });
       this.buttons.sound.click(function() {
       });
-      this.zoomed = false;
       this.buttons.zoom.click(function() {
         if (self.zoomed) {
           self.screen.animate({width: SMS_WIDTH + 'px', height: SMS_HEIGHT + 'px'}, function() {
@@ -4741,8 +4817,28 @@ if (typeof $ !== 'undefined') {
         }
         self.zoomed = !self.zoomed;
       });
+      if (fullscreenSupport) {
+        this.buttons.fullsreen = $('<input type="button" value="Go fullscreen" class="btn">').click(function() {
+          var screen = self.screen[0];
+          if (screen.requestFullscreen) {
+            screen.requestFullscreen();
+          }else {
+            if (screen.mozRequestFullScreen) {
+              screen.mozRequestFullScreen();
+            }else {
+              screen.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+            }
+          }
+        });
+      }
+      for (i in this.buttons) {
+        if (this.buttons.hasOwnProperty(i)) {
+          this.buttons[i].appendTo(controls);
+        }
+      }
+      this.log = $('<div id="status"></div>');
       this.screen.appendTo(root);
-      romContainer.appendTo(root);
+      this.romContainer.appendTo(root);
       controls.appendTo(root);
       this.log.appendTo(root);
       root.appendTo($(parent));
@@ -4766,16 +4862,23 @@ if (typeof $ !== 'undefined') {
         this.canvasImageData.data[i] = 255;
       }
     }, setRoms: function(roms) {
+      var groupName, optgroup, length, i, count = 0;
       this.romSelect.children().remove();
       $('<option>Select a ROM...</option>').appendTo(this.romSelect);
-      for (var groupName in roms) {
+      for (groupName in roms) {
         if (roms.hasOwnProperty(groupName)) {
-          var optgroup = $('<optgroup></optgroup>').attr('label', groupName), length = roms[groupName].length, i = 0;
+          optgroup = $('<optgroup></optgroup>').attr('label', groupName);
+          length = roms[groupName].length;
+          i = 0;
           for (; i < length; i++) {
             $('<option>' + roms[groupName][i][0] + '</option>').attr('value', roms[groupName][i][1]).appendTo(optgroup);
           }
-          this.romSelect.append(optgroup);
+          optgroup.appendTo(this.romSelect);
         }
+        count++;
+      }
+      if (count) {
+        this.romSelect.appendTo(this.romContainer);
       }
     }, loadROM: function() {
       var self = this;
@@ -4795,6 +4898,7 @@ if (typeof $ !== 'undefined') {
         self.main.vdp.forceFullRedraw();
         self.main.start();
         self.enable();
+        self.buttons.start.removeAttr('disabled');
       }});
     }, enable: function() {
       this.buttons.restart.removeAttr('disabled');

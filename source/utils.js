@@ -33,45 +33,226 @@ JSSMS.Utils = {
 
 
   /**
+   * Simple polyfill for DataView and ArrayBuffer.
+   * \@todo We must use Uint8Array for browsers supporting them but not DataView.
+   */
+  Array: function() {
+    if (SUPPORT_DATAVIEW) {
+      /**
+       * @param {number=} length
+       * @return {DataView}
+       */
+      return function(length) {
+        if (length === undefined) {
+          length = 0;
+        }
+
+        return new DataView(new ArrayBuffer(length));
+      }
+    } else {
+      /**
+       * @param {number=} length
+       * @return {Array}
+       */
+      return Array;
+    }
+  }(),
+
+
+  /**
    * Copies an array from the specified source array, beginning at the
    * specified position, to the specified position of the destination array.
-   *
-   * @param {Array.<*>} src The source array.
-   * @param {number} srcPos The specified position of the source array.
-   * @param {Array.<*>} dest The destination array.
-   * @param {number} destPos The specified position of the destination array.
-   * @param {number} length The length of the source array portion to copy.
    */
-  copyArrayElements: function(src, srcPos, dest, destPos, length) {
-    var i = length;
-
-    //for (var i = 0; i < length; ++i) {
-    while (i--) {
-      dest[destPos + i] = src[srcPos + i];
+  copyArrayElements: function() {
+    if (SUPPORT_DATAVIEW) {
+      /**
+       * @param {DataView} src The source DataView.
+       * @param {number} srcPos The specified position of the source array.
+       * @param {DataView} dest The destination DataView.
+       * @param {number} destPos The specified position of the destination array.
+       * @param {number} length The length of the source array portion to copy.
+       */
+      return function(src, srcPos, dest, destPos, length) {
+        while (length--) {
+          dest.setUint8(destPos + length, src.getUint8(srcPos + length));
+        }
+      };
+    } else {
+      /**
+       * @param {Array.<number>} src The source array.
+       * @param {number} srcPos The specified position of the source array.
+       * @param {Array.<number>} dest The destination array.
+       * @param {number} destPos The specified position of the destination array.
+       * @param {number} length The length of the source array portion to copy.
+       */
+      return function(src, srcPos, dest, destPos, length) {
+        while (length--) {
+          dest[destPos + length] = src[srcPos + length];
+        }
+      };
     }
-  },
+  }(),
 
 
   /**
    * Returns a clone of the source array. Not safe for array of objects.
-   *
-   * @param {Array.<number>} src The source array.
-   * @return {Array.<number>} A copy of source array.
    */
-  copyArray: function(src) {
-    if (src === undefined) {
-      return [];
-    }
+  copyArray: function() {
+    if (SUPPORT_DATAVIEW) {
+      /**
+       * @param {DataView} src The source array.
+       * @return {DataView} A copy of source array.
+       */
+      return function(src) {
+        if (src === undefined) {
+          return JSSMS.Utils.Array();
+        }
 
-    var i = src.length,
-        dest = new Array(i);
+        var i, dest;
 
-    while (i--) {
-      if (typeof src[i] != 'undefined')
-        dest[i] = src[i];
+        i = src.byteLength;
+        dest = new JSSMS.Utils.Array(i);
+
+        while (i--) {
+          dest.setUint8(i, src.getUint8(i));
+        }
+
+        return dest;
+      };
+    } else {
+      /**
+       * @param {Array.<number>} src The source array.
+       * @return {Array.<number>} A copy of source array.
+       */
+      return function(src) {
+        if (src === undefined) {
+          return JSSMS.Utils.Array();
+        }
+
+        var i, dest;
+
+        i = src.length;
+        dest = new JSSMS.Utils.Array(i);
+
+        while (i--) {
+          if (typeof src[i] != 'undefined')
+            dest[i] = src[i];
+        }
+
+        return dest;
+      };
     }
-    return dest;
-  },
+  }(),
+
+
+  /**
+   * Write to a memory location.
+   */
+  writeMem: function() {
+    if (SUPPORT_DATAVIEW) {
+      /**
+       * @param {*} self A context.
+       * @param {number} address Memory address.
+       * @param {number} value Value to write.
+       */
+      return function(self, address, value) {
+        // DEBUG
+        if (DEBUG && ((address >> 10) >= self.memWriteMap.length || !self.memWriteMap[address >> 10] || (address & 0x3FF) >= self.memWriteMap[address >> 10].byteLength)) {
+          console.error(address, (address >> 10), (address & 0x3FF));
+          debugger;
+        }
+
+        self.memWriteMap[address >> 10].setUint8(address & 0x3FF, value);
+
+        // Paging registers
+        if (address >= 0xFFFC)
+          self.page(address & 3, value);
+      }
+    } else {
+      /**
+       * @param {*} self A context.
+       * @param {number} address Memory address.
+       * @param {number} value Value to write.
+       */
+      return function(self, address, value) {
+        self.memWriteMap[address >> 10][address & 0x3FF] = value;
+
+        // Paging registers
+        if (address >= 0xFFFC)
+          self.page(address & 3, value);
+      }
+    }
+  }(),
+
+
+  /**
+   * Read a signed value from next memory location.
+   */
+  readMem: function() {
+    if (SUPPORT_DATAVIEW) {
+      /**
+       * @param {Array.<DataView>} array
+       * @param {number} address
+       * @return {number} Value from memory location.
+       */
+      return function(array, address) {
+        // DEBUG
+        if (DEBUG && ((address >> 10) >= array.length || !array[address >> 10] || (address & 0x3FF) >= array[address >> 10].byteLength)) {
+          console.error(address, (address >> 10), (address & 0x3FF));
+          debugger;
+        }
+
+        return array[address >> 10].getUint8(address & 0x3FF);
+      }
+    } else {
+      /**
+       * @param {Array.<Array.<number>>} array
+       * @param {number} address
+       * @return {number} Value from memory location.
+       */
+      return function(array, address) {
+        return array[address >> 10][address & 0x3FF];
+      }
+    }
+  }(),
+
+
+  /**
+   * Read a word (two bytes) from a memory location.
+   */
+  readMemWord: function() {
+    if (SUPPORT_DATAVIEW) {
+      /**
+       * @param {Array.<DataView>} array
+       * @param {number} address
+       * @return {number} Value from memory location.
+       */
+      return function(array, address) {
+        // DEBUG
+        if (DEBUG && ((address >> 10) >= array.length || !array[address >> 10] || (address & 0x3FF) >= array[address >> 10].byteLength)) {
+          console.error(address, (address >> 10), (address & 0x3FF));
+          debugger;
+        }
+
+        if ((address & 0x3FF) < 1023) {
+          return array[address >> 10].getUint16(address & 0x3FF, LITTLE_ENDIAN);
+        } else {
+          return (array[address >> 10].getUint8(address & 0x3FF)) |
+              ((array[++address >> 10].getUint8(address & 0x3FF)) << 8);
+        }
+      }
+    } else {
+      /**
+       * @param {Array.<Array.<number>>} array
+       * @param {number} address
+       * @return {number} Value from memory location.
+       */
+      return function(array, address) {
+        return (array[address >> 10][address & 0x3FF] & 0xFF) |
+            ((array[++address >> 10][address & 0x3FF] & 0xFF) << 8);
+      }
+    }
+  }(),
 
 
   /**
