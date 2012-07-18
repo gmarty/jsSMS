@@ -350,28 +350,28 @@ JSSMS.Z80 = function(sms) {
 
   // Precalculated tables for speed purposes
   /** Pre-calculated result for DAA instruction. */
-  this.DAA_TABLE = [];
+  this.DAA_TABLE = new Array(0x800);
 
   /** Sign, Zero table. */
-  this.SZ_TABLE = [];
+  this.SZ_TABLE = new Array(256);
 
   /** Sign, Zero, Parity table. */
-  this.SZP_TABLE = [];
+  this.SZP_TABLE = new Array(256);
 
   /** Flag lookup table for inc8 instruction. */
-  this.SZHV_INC_TABLE = [];
+  this.SZHV_INC_TABLE = new Array(256);
 
   /** Flag lookup table for dec8 instruction. */
-  this.SZHV_DEC_TABLE = [];
+  this.SZHV_DEC_TABLE = new Array(256);
 
   /** Flag lookup table for add/adc instruction. */
-  this.SZHVC_ADD_TABLE = [];
+  this.SZHVC_ADD_TABLE = new Array(2 * 256 * 256);
 
   /** Flag lookup table for dec/sbc instruction. */
-  this.SZHVC_SUB_TABLE = [];
+  this.SZHVC_SUB_TABLE = new Array(2 * 256 * 256);
 
   /** Flag lookup table for bit instruction. */
-  this.SZ_BIT_TABLE = [];
+  this.SZ_BIT_TABLE = new Array(256);
 
   // Generate flag lookups
   this.generateFlagTables();
@@ -2291,8 +2291,6 @@ JSSMS.Z80.prototype = {
   generateDAATable: function() {
     var i, c, h, n;
 
-    this.DAA_TABLE = new Array(0x800);
-
     // Iterate all possible values of a register (0 to 0xFF)
     i = 256;
     while (i--) {
@@ -2734,12 +2732,6 @@ JSSMS.Z80.prototype = {
     var padd, padc, psub, psbc;
     var val, oldval, newval;
 
-    this.SZ_TABLE = new Array(256);
-    this.SZP_TABLE = new Array(256);
-    this.SZHV_INC_TABLE = new Array(256);
-    this.SZHV_DEC_TABLE = new Array(256);
-    this.SZ_BIT_TABLE = new Array(256);
-
     // Generate tables
     for (i = 0; i < 256; i++) {
       // Sign bits (0x80)
@@ -2785,9 +2777,6 @@ JSSMS.Z80.prototype = {
     }
 
     // Generate fast lookups for ADD/SUB/ADC/SBC instructions
-    this.SZHVC_ADD_TABLE = new Array(2 * 256 * 256);
-    this.SZHVC_SUB_TABLE = new Array(2 * 256 * 256);
-
     padd = 0 * 256;
     padc = 256 * 256;
     psub = 0 * 256;

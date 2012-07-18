@@ -238,11 +238,17 @@ JSSMS.Vdp = function(sms) {
    * SMS colours converted to RGB hex.
    * @type {Array.<number>}
    */
-  this.main_JAVA = [];
+  this.main_JAVA = new Array(0x40);
 
   /** GG colours converted to RGB hex. */
-  /** @type {Array.<number>} */ this.GG_JAVA1 = [];
-  /** @type {Array.<number>} */ this.GG_JAVA2 = [];
+  /** @type {Array.<number>} */ this.GG_JAVA1 = new Array(0x100);
+  /** @type {Array.<number>} */ this.GG_JAVA2 = new Array(0x10);
+
+  /**
+   * Keep a reference of palette being converted.
+   * @type {boolean}
+   */
+  this.isPalConverted = false;
 
   /**
    * Horizontal viewport start.
@@ -305,6 +311,7 @@ JSSMS.Vdp.prototype = {
   reset: function() {
     var i;
 
+    this.isPalConverted = false;
     this.generateConvertedPals();
 
     this.firstByte = true;
@@ -878,20 +885,17 @@ JSSMS.Vdp.prototype = {
     var i;
     var r, g, b;
 
-    if (this.main.is_sms && !this.main_JAVA.length) {
-      this.main_JAVA = new Array(0x40);
-
+    if (this.main.is_sms && !this.isPalConverted) {
       for (i = 0; i < 0x40; i++) {
         r = i & 0x03;
         g = (i >> 2) & 0x03;
         b = (i >> 4) & 0x03;
 
         this.main_JAVA[i] = ((r * 85)) | ((g * 85) << 8) | (b * 85 << 16);
-      }
-    } else if (this.main.is_gg && !this.GG_JAVA1.length) {
-      this.GG_JAVA1 = new Array(0x100);
-      this.GG_JAVA2 = new Array(0x10);
 
+        this.isPalConverted = true;
+      }
+    } else if (this.main.is_gg && !this.isPalConverted) {
       // Green & Blue
       for (i = 0; i < 0x100; i++) {
         g = i & 0x0F;
@@ -908,6 +912,8 @@ JSSMS.Vdp.prototype = {
         //this.GG_JAVA2[i] = (i << 4) | i;
         this.GG_JAVA2[i] = (i << 20);
       }
+
+      this.isPalConverted = true;
     }
   },
 

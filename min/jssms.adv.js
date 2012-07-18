@@ -416,21 +416,15 @@ function $JSSMS$Z80$$($i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sm
   this.$memWriteMap$ = Array(65);
   this.$memReadMap$ = Array(65);
   this.$dummyWrite$ = $JSSMS$Utils$Array$$(1024);
-  this.$DAA_TABLE$ = [];
-  this.$SZ_TABLE$ = [];
-  this.$SZP_TABLE$ = [];
-  this.$SZHV_INC_TABLE$ = [];
-  this.$SZHV_DEC_TABLE$ = [];
-  this.$SZHVC_ADD_TABLE$ = [];
-  this.$SZHVC_SUB_TABLE$ = [];
-  this.$SZ_BIT_TABLE$ = [];
-  var $c$$inline_44_padc$$inline_35_sf$$inline_29$$, $h$$inline_45_psub$$inline_36_zf$$inline_30$$, $n$$inline_46_psbc$$inline_37_yf$$inline_31$$, $JSCompiler_temp_const$$588_val$$inline_38_xf$$inline_32$$, $JSCompiler_temp_const$$587_oldval$$inline_39_pf$$inline_33$$, $flags$$inline_613_newval$$inline_40$$;
+  this.$DAA_TABLE$ = Array(2048);
   this.$SZ_TABLE$ = Array(256);
   this.$SZP_TABLE$ = Array(256);
   this.$SZHV_INC_TABLE$ = Array(256);
   this.$SZHV_DEC_TABLE$ = Array(256);
+  this.$SZHVC_ADD_TABLE$ = Array(131072);
+  this.$SZHVC_SUB_TABLE$ = Array(131072);
   this.$SZ_BIT_TABLE$ = Array(256);
-  for($i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ = 0;256 > $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$;$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$++) {
+  for(var $c$$inline_44_padc$$inline_35_sf$$inline_29$$, $h$$inline_45_psub$$inline_36_zf$$inline_30$$, $n$$inline_46_psbc$$inline_37_yf$$inline_31$$, $JSCompiler_temp_const$$588_val$$inline_38_xf$$inline_32$$, $JSCompiler_temp_const$$587_oldval$$inline_39_pf$$inline_33$$, $flags$$inline_613_newval$$inline_40$$, $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ = 0;256 > $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$;$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$++) {
     $c$$inline_44_padc$$inline_35_sf$$inline_29$$ = 0 != ($i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ & 128) ? 128 : 0, $h$$inline_45_psub$$inline_36_zf$$inline_30$$ = 0 == $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ ? 64 : 0, $n$$inline_46_psbc$$inline_37_yf$$inline_31$$ = $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ & 32, $JSCompiler_temp_const$$588_val$$inline_38_xf$$inline_32$$ = $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ & 
     8, $JSCompiler_temp_const$$587_oldval$$inline_39_pf$$inline_33$$ = $JSCompiler_StaticMethods_getParity$$($i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$) ? 4 : 0, this.$SZ_TABLE$[$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$] = $c$$inline_44_padc$$inline_35_sf$$inline_29$$ | $h$$inline_45_psub$$inline_36_zf$$inline_30$$ | $n$$inline_46_psbc$$inline_37_yf$$inline_31$$ | $JSCompiler_temp_const$$588_val$$inline_38_xf$$inline_32$$, this.$SZP_TABLE$[$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$] = 
     $c$$inline_44_padc$$inline_35_sf$$inline_29$$ | $h$$inline_45_psub$$inline_36_zf$$inline_30$$ | $n$$inline_46_psbc$$inline_37_yf$$inline_31$$ | $JSCompiler_temp_const$$588_val$$inline_38_xf$$inline_32$$ | $JSCompiler_temp_const$$587_oldval$$inline_39_pf$$inline_33$$, this.$SZHV_INC_TABLE$[$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$] = $c$$inline_44_padc$$inline_35_sf$$inline_29$$ | $h$$inline_45_psub$$inline_36_zf$$inline_30$$ | $n$$inline_46_psbc$$inline_37_yf$$inline_31$$ | 
@@ -438,8 +432,6 @@ function $JSSMS$Z80$$($i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sm
     $h$$inline_45_psub$$inline_36_zf$$inline_30$$ | $n$$inline_46_psbc$$inline_37_yf$$inline_31$$ | $JSCompiler_temp_const$$588_val$$inline_38_xf$$inline_32$$ | 2, this.$SZHV_DEC_TABLE$[$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$] |= 127 == $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ ? 4 : 0, this.$SZHV_DEC_TABLE$[$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$] |= 15 == ($i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ & 15) ? 16 : 0, 
     this.$SZ_BIT_TABLE$[$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$] = 0 != $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ ? $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ & 128 : 68, this.$SZ_BIT_TABLE$[$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$] |= $n$$inline_46_psbc$$inline_37_yf$$inline_31$$ | $JSCompiler_temp_const$$588_val$$inline_38_xf$$inline_32$$ | 16
   }
-  this.$SZHVC_ADD_TABLE$ = Array(131072);
-  this.$SZHVC_SUB_TABLE$ = Array(131072);
   $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ = 0;
   $c$$inline_44_padc$$inline_35_sf$$inline_29$$ = 65536;
   $h$$inline_45_psub$$inline_36_zf$$inline_30$$ = 0;
@@ -458,7 +450,6 @@ function $JSSMS$Z80$$($i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sm
       $JSCompiler_temp_const$$587_oldval$$inline_39_pf$$inline_33$$) & ($JSCompiler_temp_const$$587_oldval$$inline_39_pf$$inline_33$$ ^ $flags$$inline_613_newval$$inline_40$$) & 128) && (this.$SZHVC_SUB_TABLE$[$n$$inline_46_psbc$$inline_37_yf$$inline_31$$] |= 4), $n$$inline_46_psbc$$inline_37_yf$$inline_31$$++
     }
   }
-  this.$DAA_TABLE$ = Array(2048);
   for($i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ = 256;$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$--;) {
     for($c$$inline_44_padc$$inline_35_sf$$inline_29$$ = 0;1 >= $c$$inline_44_padc$$inline_35_sf$$inline_29$$;$c$$inline_44_padc$$inline_35_sf$$inline_29$$++) {
       for($h$$inline_45_psub$$inline_36_zf$$inline_30$$ = 0;1 >= $h$$inline_45_psub$$inline_36_zf$$inline_30$$;$h$$inline_45_psub$$inline_36_zf$$inline_30$$++) {
@@ -3725,9 +3716,10 @@ function $JSSMS$Vdp$$($i$$13_i$$inline_560_sms$$3$$) {
   this.$spriteCol$ = Array(256);
   this.$vScrollLatch$ = this.$bgt$ = 0;
   this.display = Array(49152);
-  this.$main_JAVA$ = [];
-  this.$GG_JAVA1$ = [];
-  this.$GG_JAVA2$ = [];
+  this.$main_JAVA$ = Array(64);
+  this.$GG_JAVA1$ = Array(256);
+  this.$GG_JAVA2$ = Array(16);
+  this.$isPalConverted$ = $JSCompiler_alias_FALSE$$;
   this.$sat$ = this.$h_end$ = this.$h_start$ = 0;
   this.$isSatDirty$ = $JSCompiler_alias_FALSE$$;
   this.$lineSprites$ = Array(192);
@@ -3741,22 +3733,22 @@ function $JSSMS$Vdp$$($i$$13_i$$inline_560_sms$$3$$) {
   }
 }
 $JSSMS$Vdp$$.prototype = {reset:function $$JSSMS$Vdp$$$$reset$() {
-  var $i$$14_i$$inline_563$$, $r$$inline_564$$, $g$$inline_565$$, $b$$inline_566$$;
-  if(this.$main$.$is_sms$ && !this.$main_JAVA$.length) {
-    this.$main_JAVA$ = Array(64);
+  var $i$$14_i$$inline_563$$;
+  this.$isPalConverted$ = $JSCompiler_alias_FALSE$$;
+  var $r$$inline_564$$, $g$$inline_565$$, $b$$inline_566$$;
+  if(this.$main$.$is_sms$ && !this.$isPalConverted$) {
     for($i$$14_i$$inline_563$$ = 0;64 > $i$$14_i$$inline_563$$;$i$$14_i$$inline_563$$++) {
-      $r$$inline_564$$ = $i$$14_i$$inline_563$$ & 3, $g$$inline_565$$ = $i$$14_i$$inline_563$$ >> 2 & 3, $b$$inline_566$$ = $i$$14_i$$inline_563$$ >> 4 & 3, this.$main_JAVA$[$i$$14_i$$inline_563$$] = 85 * $r$$inline_564$$ | 85 * $g$$inline_565$$ << 8 | 85 * $b$$inline_566$$ << 16
+      $r$$inline_564$$ = $i$$14_i$$inline_563$$ & 3, $g$$inline_565$$ = $i$$14_i$$inline_563$$ >> 2 & 3, $b$$inline_566$$ = $i$$14_i$$inline_563$$ >> 4 & 3, this.$main_JAVA$[$i$$14_i$$inline_563$$] = 85 * $r$$inline_564$$ | 85 * $g$$inline_565$$ << 8 | 85 * $b$$inline_566$$ << 16, this.$isPalConverted$ = $JSCompiler_alias_TRUE$$
     }
   }else {
-    if(this.$main$.$is_gg$ && !this.$GG_JAVA1$.length) {
-      this.$GG_JAVA1$ = Array(256);
-      this.$GG_JAVA2$ = Array(16);
+    if(this.$main$.$is_gg$ && !this.$isPalConverted$) {
       for($i$$14_i$$inline_563$$ = 0;256 > $i$$14_i$$inline_563$$;$i$$14_i$$inline_563$$++) {
         $g$$inline_565$$ = $i$$14_i$$inline_563$$ & 15, $b$$inline_566$$ = $i$$14_i$$inline_563$$ >> 4 & 15, this.$GG_JAVA1$[$i$$14_i$$inline_563$$] = $b$$inline_566$$ << 12 | $b$$inline_566$$ << 8 | $g$$inline_565$$ << 4 | $g$$inline_565$$
       }
       for($i$$14_i$$inline_563$$ = 0;16 > $i$$14_i$$inline_563$$;$i$$14_i$$inline_563$$++) {
         this.$GG_JAVA2$[$i$$14_i$$inline_563$$] = $i$$14_i$$inline_563$$ << 20
       }
+      this.$isPalConverted$ = $JSCompiler_alias_TRUE$$
     }
   }
   this.$firstByte$ = $JSCompiler_alias_TRUE$$;

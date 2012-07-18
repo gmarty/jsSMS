@@ -446,14 +446,14 @@ JSSMS.Z80 = function(sms) {
   this.memWriteMap = new Array(65);
   this.memReadMap = new Array(65);
   this.dummyWrite = JSSMS.Utils.Array(Setup.PAGE_SIZE);
-  this.DAA_TABLE = [];
-  this.SZ_TABLE = [];
-  this.SZP_TABLE = [];
-  this.SZHV_INC_TABLE = [];
-  this.SZHV_DEC_TABLE = [];
-  this.SZHVC_ADD_TABLE = [];
-  this.SZHVC_SUB_TABLE = [];
-  this.SZ_BIT_TABLE = [];
+  this.DAA_TABLE = new Array(2048);
+  this.SZ_TABLE = new Array(256);
+  this.SZP_TABLE = new Array(256);
+  this.SZHV_INC_TABLE = new Array(256);
+  this.SZHV_DEC_TABLE = new Array(256);
+  this.SZHVC_ADD_TABLE = new Array(2 * 256 * 256);
+  this.SZHVC_SUB_TABLE = new Array(2 * 256 * 256);
+  this.SZ_BIT_TABLE = new Array(256);
   this.generateFlagTables();
   this.generateDAATable();
   this.generateMemory();
@@ -3477,7 +3477,6 @@ JSSMS.Z80.prototype = {reset: function() {
   }
 }, generateDAATable: function() {
   var i, c, h, n;
-  this.DAA_TABLE = new Array(2048);
   i = 256;
   while (i--) {
     for (c = 0; c <= 1; c++) {
@@ -3690,11 +3689,6 @@ JSSMS.Z80.prototype = {reset: function() {
   var i, sf, zf, yf, xf, pf;
   var padd, padc, psub, psbc;
   var val, oldval, newval;
-  this.SZ_TABLE = new Array(256);
-  this.SZP_TABLE = new Array(256);
-  this.SZHV_INC_TABLE = new Array(256);
-  this.SZHV_DEC_TABLE = new Array(256);
-  this.SZ_BIT_TABLE = new Array(256);
   for (i = 0; i < 256; i++) {
     sf = (i & 128) != 0 ? F_SIGN : 0;
     zf = i == 0 ? F_ZERO : 0;
@@ -3712,8 +3706,6 @@ JSSMS.Z80.prototype = {reset: function() {
     this.SZ_BIT_TABLE[i] = i != 0 ? i & 128 : F_ZERO | F_PARITY;
     this.SZ_BIT_TABLE[i] |= yf | xf | F_HALFCARRY;
   }
-  this.SZHVC_ADD_TABLE = new Array(2 * 256 * 256);
-  this.SZHVC_SUB_TABLE = new Array(2 * 256 * 256);
   padd = 0 * 256;
   padc = 256 * 256;
   psub = 0 * 256;
@@ -4280,9 +4272,10 @@ JSSMS.Vdp = function(sms) {
   this.bgt = 0;
   this.vScrollLatch = 0;
   this.display = new Array(SMS_WIDTH * SMS_HEIGHT);
-  this.main_JAVA = [];
-  this.GG_JAVA1 = [];
-  this.GG_JAVA2 = [];
+  this.main_JAVA = new Array(64);
+  this.GG_JAVA1 = new Array(256);
+  this.GG_JAVA2 = new Array(16);
+  this.isPalConverted = false;
   this.h_start = 0;
   this.h_end = 0;
   this.sat = 0;
@@ -4299,6 +4292,7 @@ JSSMS.Vdp = function(sms) {
 };
 JSSMS.Vdp.prototype = {reset: function() {
   var i;
+  this.isPalConverted = false;
   this.generateConvertedPals();
   this.firstByte = true;
   this.location = 0;
@@ -4627,18 +4621,16 @@ JSSMS.Vdp.prototype = {reset: function() {
 }, generateConvertedPals: function() {
   var i;
   var r, g, b;
-  if (this.main.is_sms && !this.main_JAVA.length) {
-    this.main_JAVA = new Array(64);
+  if (this.main.is_sms && !this.isPalConverted) {
     for (i = 0; i < 64; i++) {
       r = i & 3;
       g = i >> 2 & 3;
       b = i >> 4 & 3;
       this.main_JAVA[i] = r * 85 | g * 85 << 8 | b * 85 << 16;
+      this.isPalConverted = true;
     }
   }else {
-    if (this.main.is_gg && !this.GG_JAVA1.length) {
-      this.GG_JAVA1 = new Array(256);
-      this.GG_JAVA2 = new Array(16);
+    if (this.main.is_gg && !this.isPalConverted) {
       for (i = 0; i < 256; i++) {
         g = i & 15;
         b = i >> 4 & 15;
@@ -4647,6 +4639,7 @@ JSSMS.Vdp.prototype = {reset: function() {
       for (i = 0; i < 16; i++) {
         this.GG_JAVA2[i] = i << 20;
       }
+      this.isPalConverted = true;
     }
   }
 }, createCachedImages: function() {
