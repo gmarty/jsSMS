@@ -601,7 +601,7 @@ JSSMS.prototype = {
       // \@todo Move this part to JSSMS.Utils.
       if (SUPPORT_DATAVIEW) {
         for (j = 0; j < Setup.PAGE_SIZE; j++) {
-          pages[i].setUint8(j, data.charCodeAt((i * Setup.PAGE_SIZE) + j) & 0xFF);
+          pages[i].setUint8(j, data.charCodeAt((i * Setup.PAGE_SIZE) + j));
         }
       } else {
         for (j = 0; j < Setup.PAGE_SIZE; j++) {

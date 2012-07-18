@@ -74,7 +74,7 @@ JSSMS.Utils = {
        */
       return function(src, srcPos, dest, destPos, length) {
         while (length--) {
-          dest.setUint8(destPos + length, src.getUint8(srcPos + length));
+          dest.setInt8(destPos + length, src.getInt8(srcPos + length));
         }
       };
     } else {
@@ -114,7 +114,7 @@ JSSMS.Utils = {
         dest = new JSSMS.Utils.Array(i);
 
         while (i--) {
-          dest.setUint8(i, src.getUint8(i));
+          dest.setInt8(i, src.getInt8(i));
         }
 
         return dest;
@@ -162,7 +162,7 @@ JSSMS.Utils = {
           debugger;
         }
 
-        self.memWriteMap[address >> 10].setUint8(address & 0x3FF, value);
+        self.memWriteMap[address >> 10].setInt8(address & 0x3FF, value);
 
         // Paging registers
         if (address >= 0xFFFC)
@@ -211,7 +211,7 @@ JSSMS.Utils = {
        * @return {number} Value from memory location.
        */
       return function(array, address) {
-        return array[address >> 10][address & 0x3FF];
+        return array[address >> 10][address & 0x3FF] & 0xFF;
       }
     }
   }(),

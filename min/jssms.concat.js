@@ -235,7 +235,7 @@ JSSMS.prototype = {isRunning: false, cyclesPerLine: 0, no_of_scanlines: 0, frame
     pages[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
     if (SUPPORT_DATAVIEW) {
       for (j = 0; j < Setup.PAGE_SIZE; j++) {
-        pages[i].setUint8(j, data.charCodeAt(i * Setup.PAGE_SIZE + j) & 255);
+        pages[i].setUint8(j, data.charCodeAt(i * Setup.PAGE_SIZE + j));
       }
     }else {
       for (j = 0; j < Setup.PAGE_SIZE; j++) {
@@ -268,7 +268,7 @@ JSSMS.Utils = {rndInt: function(range) {
   if (SUPPORT_DATAVIEW) {
     return function(src, srcPos, dest, destPos, length) {
       while (length--) {
-        dest.setUint8(destPos + length, src.getUint8(srcPos + length));
+        dest.setInt8(destPos + length, src.getInt8(srcPos + length));
       }
     }
   }else {
@@ -288,7 +288,7 @@ JSSMS.Utils = {rndInt: function(range) {
       i = src.byteLength;
       dest = new JSSMS.Utils.Array(i);
       while (i--) {
-        dest.setUint8(i, src.getUint8(i));
+        dest.setInt8(i, src.getInt8(i));
       }
       return dest;
     }
@@ -315,7 +315,7 @@ JSSMS.Utils = {rndInt: function(range) {
         console.error(address, address >> 10, address & 1023);
         debugger;
       }
-      self.memWriteMap[address >> 10].setUint8(address & 1023, value);
+      self.memWriteMap[address >> 10].setInt8(address & 1023, value);
       if (address >= 65532) {
         self.page(address & 3, value);
       }
@@ -339,7 +339,7 @@ JSSMS.Utils = {rndInt: function(range) {
     }
   }else {
     return function(array, address) {
-      return array[address >> 10][address & 1023];
+      return array[address >> 10][address & 1023] & 255;
     }
   }
 }(), readMemWord: function() {

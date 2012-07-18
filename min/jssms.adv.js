@@ -300,7 +300,7 @@ $romData$:"", $romFileName$:"", reset:function $$JSSMS$$$$reset$() {
   for($i$$2$$ = 0;$i$$2$$ < $number_of_pages$$;$i$$2$$++) {
     if($pages$$1$$[$i$$2$$] = $JSSMS$Utils$Array$$(1024), $SUPPORT_DATAVIEW$$) {
       for($j$$ = 0;1024 > $j$$;$j$$++) {
-        $pages$$1$$[$i$$2$$].setUint8($j$$, $data$$31$$.charCodeAt(1024 * $i$$2$$ + $j$$) & 255)
+        $pages$$1$$[$i$$2$$].setUint8($j$$, $data$$31$$.charCodeAt(1024 * $i$$2$$ + $j$$))
       }
     }else {
       for($j$$ = 0;1024 > $j$$;$j$$++) {
@@ -345,7 +345,7 @@ function $JSCompiler_StaticMethods_printFps$$($JSCompiler_StaticMethods_printFps
   var $i$$3$$, $dest$$2$$;
   $i$$3$$ = $src$$3$$.byteLength;
   for($dest$$2$$ = new $JSSMS$Utils$Array$$($i$$3$$);$i$$3$$--;) {
-    $dest$$2$$.setUint8($i$$3$$, $src$$3$$.getUint8($i$$3$$))
+    $dest$$2$$.setInt8($i$$3$$, $src$$3$$.getInt8($i$$3$$))
   }
   return $dest$$2$$
 } : function($src$$4$$) {
@@ -363,7 +363,7 @@ function $JSCompiler_StaticMethods_printFps$$($JSCompiler_StaticMethods_printFps
     console.error($address$$, $address$$ >> 10, $address$$ & 1023);
     debugger
   }
-  $self$$2$$.$memWriteMap$[$address$$ >> 10].setUint8($address$$ & 1023, $value$$48$$);
+  $self$$2$$.$memWriteMap$[$address$$ >> 10].setInt8($address$$ & 1023, $value$$48$$);
   65532 <= $address$$ && $self$$2$$.page($address$$ & 3, $value$$48$$)
 } : function($self$$3$$, $address$$1$$, $value$$49$$) {
   $self$$3$$.$memWriteMap$[$address$$1$$ >> 10][$address$$1$$ & 1023] = $value$$49$$;
@@ -375,7 +375,7 @@ function $JSCompiler_StaticMethods_printFps$$($JSCompiler_StaticMethods_printFps
   }
   return $array$$9$$[$address$$2$$ >> 10].getUint8($address$$2$$ & 1023)
 } : function($array$$10$$, $address$$3$$) {
-  return $array$$10$$[$address$$3$$ >> 10][$address$$3$$ & 1023]
+  return $array$$10$$[$address$$3$$ >> 10][$address$$3$$ & 1023] & 255
 }, $JSSMS$Utils$readMemWord$$ = $SUPPORT_DATAVIEW$$ ? function($array$$11$$, $address$$4$$) {
   if($address$$4$$ >> 10 >= $array$$11$$.length || !$array$$11$$[$address$$4$$ >> 10] || ($address$$4$$ & 1023) >= $array$$11$$[$address$$4$$ >> 10].byteLength) {
     console.error($address$$4$$, $address$$4$$ >> 10, $address$$4$$ & 1023);
