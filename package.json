@@ -1,0 +1,26 @@
+{
+    "name":         "jsSMS",
+    "version":      "0.0.1",
+    "description":  "A Sega Master System & GameGear emulator in JavaScript.",
+    "main":         "",
+    "scripts":      {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository":   {
+        "type": "git",
+        "url":  "git://github.com/gmarty/jsSMS.git"
+    },
+    "dependencies": {
+        "grunt":                  "~0.3.17",
+        "grunt-closure-compiler": "~0.0.13"
+    },
+    "keywords":     [
+        "SMS",
+        "Sega Master System",
+        "GG",
+        "GameGear",
+        "emulator"
+    ],
+    "author":       "G. Cedric Marty",
+    "license":      "GNU GPL"
+}

@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-'use strict';var $JSCompiler_alias_VOID$$ = undefined, $JSCompiler_alias_TRUE$$ = !0, $JSCompiler_alias_NULL$$ = null, $JSCompiler_alias_FALSE$$ = !1;
+'use strict';var $JSCompiler_alias_VOID$$ = void 0, $JSCompiler_alias_TRUE$$ = !0, $JSCompiler_alias_NULL$$ = null, $JSCompiler_alias_FALSE$$ = !1;
 function $JSCompiler_emptyFn$$() {
   return function() {
   }
@@ -25,8 +25,8 @@ var $SUPPORT_DATAVIEW$$ = !(!window.DataView || !window.ArrayBuffer);
 function $JSSMS$$($opts$$) {
   this.$opts$ = {ui:$JSSMS$DummyUI$$, swfPath:"lib/"};
   if("undefined" != typeof $opts$$) {
-    for(var $key$$15$$ in this.$opts$) {
-      "undefined" != typeof $opts$$[$key$$15$$] && (this.$opts$[$key$$15$$] = $opts$$[$key$$15$$])
+    for(var $key$$16$$ in this.$opts$) {
+      "undefined" != typeof $opts$$[$key$$16$$] && (this.$opts$[$key$$16$$] = $opts$$[$key$$16$$])
     }
   }
   this.$keyboard$ = new $JSSMS$Keyboard$$(this);
@@ -227,15 +227,13 @@ $romData$:"", $romFileName$:"", reset:function $$JSSMS$$$$reset$() {
                 }
               }else {
                 for(;8 > $address3$$inline_903_pix$$inline_949_secondbyte$$inline_918_y$$inline_945$$ && 256 > $address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$;$address3$$inline_903_pix$$inline_949_secondbyte$$inline_918_y$$inline_945$$++, $address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$ += 2) {
-                  if($colour$$inline_905_colour$$inline_951_sx$$inline_920$$ = $address2$$inline_902_n$$inline_944_tile$$inline_948_tx$$inline_916$$[$bit$$inline_904_offset$$inline_950_pal$$inline_919_tileRow$$inline_947$$++], 0 != $colour$$inline_905_colour$$inline_951_sx$$inline_920$$ && !$JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.$bgPriority$[$address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$] && 
+                  $colour$$inline_905_colour$$inline_951_sx$$inline_920$$ = $address2$$inline_902_n$$inline_944_tile$$inline_948_tx$$inline_916$$[$bit$$inline_904_offset$$inline_950_pal$$inline_919_tileRow$$inline_947$$++], 0 != $colour$$inline_905_colour$$inline_951_sx$$inline_920$$ && !$JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.$bgPriority$[$address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$] && 
                   ($JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.display[$address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$ + $address$$inline_898_lineno$$inline_931_row_precal$$inline_941_tile_column$$inline_912$$] = $JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.$CRAM$[$colour$$inline_905_colour$$inline_951_sx$$inline_920$$ + 
                   16], $JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.$spriteCol$[$address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$] ? $JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.status |= 
                   32 : $JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.$spriteCol$[$address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$] = $JSCompiler_alias_TRUE$$), 0 != $colour$$inline_905_colour$$inline_951_sx$$inline_920$$ && !$JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.$bgPriority$[$address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$ + 
-                  1]) {
-                    $JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.display[$address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$ + $address$$inline_898_lineno$$inline_931_row_precal$$inline_941_tile_column$$inline_912$$ + 1] = $JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.$CRAM$[$colour$$inline_905_colour$$inline_951_sx$$inline_920$$ + 
-                    16], $JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.$spriteCol$[$address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$ + 1] ? $JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.status |= 
-                    32 : $JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.$spriteCol$[$address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$ + 1] = $JSCompiler_alias_TRUE$$
-                  }
+                  1] && ($JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.display[$address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$ + $address$$inline_898_lineno$$inline_931_row_precal$$inline_941_tile_column$$inline_912$$ + 1] = $JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.$CRAM$[$colour$$inline_905_colour$$inline_951_sx$$inline_920$$ + 
+                  16], $JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.$spriteCol$[$address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$ + 1] ? $JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.status |= 
+                  32 : $JSCompiler_StaticMethods_decodeSat$self$$inline_926_JSCompiler_StaticMethods_decodeTiles$self$$inline_894_JSCompiler_StaticMethods_drawBg$self$$inline_907_JSCompiler_StaticMethods_drawSprite$self$$inline_936_colour$$inline_603_colour$$inline_955_i$$inline_602$$.$spriteCol$[$address$$inline_934_address1$$inline_901_rowprecal$$inline_915_x$$inline_946$$ + 1] = $JSCompiler_alias_TRUE$$)
                 }
               }
             }
@@ -274,18 +272,11 @@ $romData$:"", $romFileName$:"", reset:function $$JSSMS$$$$reset$() {
     }
     $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$ = this.$vdp$;
     $JSCompiler_StaticMethods_setVBlankFlag$self$$inline_594_lineno$$inline_601_lineno$$inline_607_location$$inline_604_row_precal$$inline_956$$ = $JSCompiler_StaticMethods_nmi$self$$inline_609_JSCompiler_inline_result$$3_lineno$$inline_19$$;
-    if(192 >= $JSCompiler_StaticMethods_setVBlankFlag$self$$inline_594_lineno$$inline_601_lineno$$inline_607_location$$inline_604_row_precal$$inline_956$$) {
-      if(0 == $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$counter$ ? ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$counter$ = $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$vdpreg$[10], $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.status |= 
-      4) : $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$counter$--, 0 != ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.status & 4) && 0 != ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$vdpreg$[0] & 16)) {
-        $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$main$.$cpu$.$interruptLine$ = $JSCompiler_alias_TRUE$$
-      }
-    }else {
-      if($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$counter$ = $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$vdpreg$[10], 0 != ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.status & 128) && (0 != ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$vdpreg$[1] & 
-      32) && 224 > $JSCompiler_StaticMethods_setVBlankFlag$self$$inline_594_lineno$$inline_601_lineno$$inline_607_location$$inline_604_row_precal$$inline_956$$) && ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$main$.$cpu$.$interruptLine$ = $JSCompiler_alias_TRUE$$), $JSCompiler_StaticMethods_setVBlankFlag$self$$inline_594_lineno$$inline_601_lineno$$inline_607_location$$inline_604_row_precal$$inline_956$$ == $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$main$.$no_of_scanlines$ - 
-      1) {
-        $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$vScrollLatch$ = $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$vdpreg$[9]
-      }
-    }
+    192 >= $JSCompiler_StaticMethods_setVBlankFlag$self$$inline_594_lineno$$inline_601_lineno$$inline_607_location$$inline_604_row_precal$$inline_956$$ ? (0 == $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$counter$ ? ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$counter$ = $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$vdpreg$[10], 
+    $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.status |= 4) : $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$counter$--, 0 != ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.status & 4) && 0 != ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$vdpreg$[0] & 
+    16) && ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$main$.$cpu$.$interruptLine$ = $JSCompiler_alias_TRUE$$)) : ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$counter$ = $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$vdpreg$[10], 0 != ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.status & 
+    128) && (0 != ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$vdpreg$[1] & 32) && 224 > $JSCompiler_StaticMethods_setVBlankFlag$self$$inline_594_lineno$$inline_601_lineno$$inline_607_location$$inline_604_row_precal$$inline_956$$) && ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$main$.$cpu$.$interruptLine$ = $JSCompiler_alias_TRUE$$), $JSCompiler_StaticMethods_setVBlankFlag$self$$inline_594_lineno$$inline_601_lineno$$inline_607_location$$inline_604_row_precal$$inline_956$$ == 
+    $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$main$.$no_of_scanlines$ - 1 && ($JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$vScrollLatch$ = $JSCompiler_StaticMethods_interrupts$self$$inline_606_line$$inline_597_samplesToGenerate$$inline_598_startTime$$inline_18$$.$vdpreg$[9]))
   }
   60 == ++this.$frameCount$ && (this.$z80Time$ = this.$z80TimeCounter$, this.$drawTime$ = this.$drawTimeCounter$, this.$frameCount$ = this.$drawTimeCounter$ = this.$z80TimeCounter$ = 0);
   this.$pause_button$ && ($JSCompiler_StaticMethods_nmi$self$$inline_609_JSCompiler_inline_result$$3_lineno$$inline_19$$ = this.$cpu$, $JSCompiler_StaticMethods_nmi$self$$inline_609_JSCompiler_inline_result$$3_lineno$$inline_19$$.$iff2$ = $JSCompiler_StaticMethods_nmi$self$$inline_609_JSCompiler_inline_result$$3_lineno$$inline_19$$.$iff1$, $JSCompiler_StaticMethods_nmi$self$$inline_609_JSCompiler_inline_result$$3_lineno$$inline_19$$.$iff1$ = $JSCompiler_alias_FALSE$$, $JSCompiler_StaticMethods_nmi$self$$inline_609_JSCompiler_inline_result$$3_lineno$$inline_19$$.$halt$ && 
@@ -296,15 +287,15 @@ $romData$:"", $romFileName$:"", reset:function $$JSSMS$$$$reset$() {
   this.$fpsFrameCount$++
 }, $loadROM$:function $$JSSMS$$$$$loadROM$$($data$$31$$, $size$$11$$) {
   0 != $size$$11$$ % 1024 && ($data$$31$$ = $data$$31$$.substr(512), $size$$11$$ -= 512);
-  var $i$$2$$, $j$$, $number_of_pages$$ = Math.round($size$$11$$ / 1024), $pages$$1$$ = Array($number_of_pages$$);
-  for($i$$2$$ = 0;$i$$2$$ < $number_of_pages$$;$i$$2$$++) {
-    if($pages$$1$$[$i$$2$$] = $JSSMS$Utils$Array$$(1024), $SUPPORT_DATAVIEW$$) {
+  var $i$$3$$, $j$$, $number_of_pages$$ = Math.round($size$$11$$ / 1024), $pages$$1$$ = Array($number_of_pages$$);
+  for($i$$3$$ = 0;$i$$3$$ < $number_of_pages$$;$i$$3$$++) {
+    if($pages$$1$$[$i$$3$$] = $JSSMS$Utils$Array$$(1024), $SUPPORT_DATAVIEW$$) {
       for($j$$ = 0;1024 > $j$$;$j$$++) {
-        $pages$$1$$[$i$$2$$].setUint8($j$$, $data$$31$$.charCodeAt(1024 * $i$$2$$ + $j$$))
+        $pages$$1$$[$i$$3$$].setUint8($j$$, $data$$31$$.charCodeAt(1024 * $i$$3$$ + $j$$))
       }
     }else {
       for($j$$ = 0;1024 > $j$$;$j$$++) {
-        $pages$$1$$[$i$$2$$][$j$$] = $data$$31$$.charCodeAt(1024 * $i$$2$$ + $j$$) & 255
+        $pages$$1$$[$i$$3$$][$j$$] = $data$$31$$.charCodeAt(1024 * $i$$3$$ + $j$$) & 255
       }
     }
   }
@@ -342,20 +333,20 @@ function $JSCompiler_StaticMethods_printFps$$($JSCompiler_StaticMethods_printFps
   if($src$$3$$ === $JSCompiler_alias_VOID$$) {
     return $JSSMS$Utils$Array$$()
   }
-  var $i$$3$$, $dest$$2$$;
-  $i$$3$$ = $src$$3$$.byteLength;
-  for($dest$$2$$ = new $JSSMS$Utils$Array$$($i$$3$$);$i$$3$$--;) {
-    $dest$$2$$.setInt8($i$$3$$, $src$$3$$.getInt8($i$$3$$))
+  var $i$$4$$, $dest$$2$$;
+  $i$$4$$ = $src$$3$$.byteLength;
+  for($dest$$2$$ = new $JSSMS$Utils$Array$$($i$$4$$);$i$$4$$--;) {
+    $dest$$2$$.setInt8($i$$4$$, $src$$3$$.getInt8($i$$4$$))
   }
   return $dest$$2$$
 } : function($src$$4$$) {
   if($src$$4$$ === $JSCompiler_alias_VOID$$) {
     return $JSSMS$Utils$Array$$()
   }
-  var $i$$4$$, $dest$$3$$;
-  $i$$4$$ = $src$$4$$.length;
-  for($dest$$3$$ = new $JSSMS$Utils$Array$$($i$$4$$);$i$$4$$--;) {
-    "undefined" != typeof $src$$4$$[$i$$4$$] && ($dest$$3$$[$i$$4$$] = $src$$4$$[$i$$4$$])
+  var $i$$5$$, $dest$$3$$;
+  $i$$5$$ = $src$$4$$.length;
+  for($dest$$3$$ = new $JSSMS$Utils$Array$$($i$$5$$);$i$$5$$--;) {
+    "undefined" != typeof $src$$4$$[$i$$5$$] && ($dest$$3$$[$i$$5$$] = $src$$4$$[$i$$5$$])
   }
   return $dest$$3$$
 }, $JSSMS$Utils$writeMem$$ = $SUPPORT_DATAVIEW$$ ? function($self$$2$$, $address$$, $value$$48$$) {
@@ -424,7 +415,8 @@ function $JSSMS$Z80$$($i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sm
   this.$SZHVC_ADD_TABLE$ = Array(131072);
   this.$SZHVC_SUB_TABLE$ = Array(131072);
   this.$SZ_BIT_TABLE$ = Array(256);
-  for(var $c$$inline_44_padc$$inline_35_sf$$inline_29$$, $h$$inline_45_psub$$inline_36_zf$$inline_30$$, $n$$inline_46_psbc$$inline_37_yf$$inline_31$$, $JSCompiler_temp_const$$588_val$$inline_38_xf$$inline_32$$, $JSCompiler_temp_const$$587_oldval$$inline_39_pf$$inline_33$$, $flags$$inline_613_newval$$inline_40$$, $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ = 0;256 > $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$;$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$++) {
+  var $c$$inline_44_padc$$inline_35_sf$$inline_29$$, $h$$inline_45_psub$$inline_36_zf$$inline_30$$, $n$$inline_46_psbc$$inline_37_yf$$inline_31$$, $JSCompiler_temp_const$$588_val$$inline_38_xf$$inline_32$$, $JSCompiler_temp_const$$587_oldval$$inline_39_pf$$inline_33$$, $flags$$inline_613_newval$$inline_40$$;
+  for($i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ = 0;256 > $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$;$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$++) {
     $c$$inline_44_padc$$inline_35_sf$$inline_29$$ = 0 != ($i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ & 128) ? 128 : 0, $h$$inline_45_psub$$inline_36_zf$$inline_30$$ = 0 == $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ ? 64 : 0, $n$$inline_46_psbc$$inline_37_yf$$inline_31$$ = $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ & 32, $JSCompiler_temp_const$$588_val$$inline_38_xf$$inline_32$$ = $i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$ & 
     8, $JSCompiler_temp_const$$587_oldval$$inline_39_pf$$inline_33$$ = $JSCompiler_StaticMethods_getParity$$($i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$) ? 4 : 0, this.$SZ_TABLE$[$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$] = $c$$inline_44_padc$$inline_35_sf$$inline_29$$ | $h$$inline_45_psub$$inline_36_zf$$inline_30$$ | $n$$inline_46_psbc$$inline_37_yf$$inline_31$$ | $JSCompiler_temp_const$$588_val$$inline_38_xf$$inline_32$$, this.$SZP_TABLE$[$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$] = 
     $c$$inline_44_padc$$inline_35_sf$$inline_29$$ | $h$$inline_45_psub$$inline_36_zf$$inline_30$$ | $n$$inline_46_psbc$$inline_37_yf$$inline_31$$ | $JSCompiler_temp_const$$588_val$$inline_38_xf$$inline_32$$ | $JSCompiler_temp_const$$587_oldval$$inline_39_pf$$inline_33$$, this.$SZHV_INC_TABLE$[$i$$inline_28_i$$inline_43_i$$inline_49_padd$$inline_34_sms$$] = $c$$inline_44_padc$$inline_35_sf$$inline_29$$ | $h$$inline_45_psub$$inline_36_zf$$inline_30$$ | $n$$inline_46_psbc$$inline_37_yf$$inline_31$$ | 
@@ -505,40 +497,40 @@ $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
     $address$$inline_52_address$$inline_56_address$$inline_60_address$$inline_64$$ = --this.$sp$, $JSSMS$Utils$writeMem$$(this, $address$$inline_52_address$$inline_56_address$$inline_60_address$$inline_64$$, $value$$50$$), $address$$inline_52_address$$inline_56_address$$inline_60_address$$inline_64$$ = --this.$sp$, $JSSMS$Utils$writeMem$$(this, $address$$inline_52_address$$inline_56_address$$inline_60_address$$inline_64$$, $l$$)
   }
 }, page:function $$JSSMS$Z80$$$$page$($address$$9$$, $value$$77$$) {
-  var $offset$$16_p$$1$$, $i$$9$$;
+  var $offset$$16_p$$1$$, $i$$10$$;
   this.$frameReg$[$address$$9$$] = $value$$77$$;
   switch($address$$9$$) {
     case 0:
       if(0 != ($value$$77$$ & 8)) {
         $offset$$16_p$$1$$ = ($value$$77$$ & 4) << 2;
-        for($i$$9$$ = 32;48 > $i$$9$$;$i$$9$$++) {
-          this.$memReadMap$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$sram$[$offset$$16_p$$1$$]), this.$memWriteMap$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$sram$[$offset$$16_p$$1$$]), $offset$$16_p$$1$$++
+        for($i$$10$$ = 32;48 > $i$$10$$;$i$$10$$++) {
+          this.$memReadMap$[$i$$10$$] = $JSSMS$Utils$copyArray$$(this.$sram$[$offset$$16_p$$1$$]), this.$memWriteMap$[$i$$10$$] = $JSSMS$Utils$copyArray$$(this.$sram$[$offset$$16_p$$1$$]), $offset$$16_p$$1$$++
         }
         this.$useSRAM$ = $JSCompiler_alias_TRUE$$
       }else {
         $offset$$16_p$$1$$ = this.$frameReg$[3] % this.$number_of_pages$ << 4;
-        for($i$$9$$ = 32;48 > $i$$9$$;$i$$9$$++) {
-          this.$memReadMap$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++]), this.$memWriteMap$[$i$$9$$] = $JSSMS$Utils$Array$$(1024)
+        for($i$$10$$ = 32;48 > $i$$10$$;$i$$10$$++) {
+          this.$memReadMap$[$i$$10$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++]), this.$memWriteMap$[$i$$10$$] = $JSSMS$Utils$Array$$(1024)
         }
       }
       break;
     case 1:
       $offset$$16_p$$1$$ = ($value$$77$$ % this.$number_of_pages$ << 4) + 1;
-      for($i$$9$$ = 1;16 > $i$$9$$;$i$$9$$++) {
-        this.$memReadMap$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++])
+      for($i$$10$$ = 1;16 > $i$$10$$;$i$$10$$++) {
+        this.$memReadMap$[$i$$10$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++])
       }
       break;
     case 2:
       $offset$$16_p$$1$$ = $value$$77$$ % this.$number_of_pages$ << 4;
-      for($i$$9$$ = 16;32 > $i$$9$$;$i$$9$$++) {
-        this.$memReadMap$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++])
+      for($i$$10$$ = 16;32 > $i$$10$$;$i$$10$$++) {
+        this.$memReadMap$[$i$$10$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++])
       }
       break;
     case 3:
       if(0 == (this.$frameReg$[0] & 8)) {
         $offset$$16_p$$1$$ = $value$$77$$ % this.$number_of_pages$ << 4;
-        for($i$$9$$ = 32;48 > $i$$9$$;$i$$9$$++) {
-          this.$memReadMap$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++])
+        for($i$$10$$ = 32;48 > $i$$10$$;$i$$10$$++) {
+          this.$memReadMap$[$i$$10$$] = $JSSMS$Utils$copyArray$$(this.$rom$[$offset$$16_p$$1$$++])
         }
       }
   }
@@ -833,42 +825,50 @@ function $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_bit$self$$, $
   $JSCompiler_StaticMethods_bit$self$$.$f$ = $JSCompiler_StaticMethods_bit$self$$.$f$ & 1 | $JSCompiler_StaticMethods_bit$self$$.$SZ_BIT_TABLE$[$mask$$5$$]
 }
 function $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_srl$self$$, $value$$58$$) {
-  var $carry$$7$$ = $value$$58$$ & 1, $value$$58$$ = $value$$58$$ >> 1 & 255;
+  var $carry$$7$$ = $value$$58$$ & 1;
+  $value$$58$$ = $value$$58$$ >> 1 & 255;
   $JSCompiler_StaticMethods_srl$self$$.$f$ = $carry$$7$$ | $JSCompiler_StaticMethods_srl$self$$.$SZP_TABLE$[$value$$58$$];
   return $value$$58$$
 }
 function $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_sra$self$$, $value$$57$$) {
-  var $carry$$6$$ = $value$$57$$ & 1, $value$$57$$ = $value$$57$$ >> 1 | $value$$57$$ & 128;
+  var $carry$$6$$ = $value$$57$$ & 1;
+  $value$$57$$ = $value$$57$$ >> 1 | $value$$57$$ & 128;
   $JSCompiler_StaticMethods_sra$self$$.$f$ = $carry$$6$$ | $JSCompiler_StaticMethods_sra$self$$.$SZP_TABLE$[$value$$57$$];
   return $value$$57$$
 }
 function $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_sll$self$$, $value$$56$$) {
-  var $carry$$5$$ = ($value$$56$$ & 128) >> 7, $value$$56$$ = ($value$$56$$ << 1 | 1) & 255;
+  var $carry$$5$$ = ($value$$56$$ & 128) >> 7;
+  $value$$56$$ = ($value$$56$$ << 1 | 1) & 255;
   $JSCompiler_StaticMethods_sll$self$$.$f$ = $carry$$5$$ | $JSCompiler_StaticMethods_sll$self$$.$SZP_TABLE$[$value$$56$$];
   return $value$$56$$
 }
 function $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_sla$self$$, $value$$55$$) {
-  var $carry$$4$$ = ($value$$55$$ & 128) >> 7, $value$$55$$ = $value$$55$$ << 1 & 255;
+  var $carry$$4$$ = ($value$$55$$ & 128) >> 7;
+  $value$$55$$ = $value$$55$$ << 1 & 255;
   $JSCompiler_StaticMethods_sla$self$$.$f$ = $carry$$4$$ | $JSCompiler_StaticMethods_sla$self$$.$SZP_TABLE$[$value$$55$$];
   return $value$$55$$
 }
 function $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_rr$self$$, $value$$54$$) {
-  var $carry$$3$$ = $value$$54$$ & 1, $value$$54$$ = ($value$$54$$ >> 1 | $JSCompiler_StaticMethods_rr$self$$.$f$ << 7) & 255;
+  var $carry$$3$$ = $value$$54$$ & 1;
+  $value$$54$$ = ($value$$54$$ >> 1 | $JSCompiler_StaticMethods_rr$self$$.$f$ << 7) & 255;
   $JSCompiler_StaticMethods_rr$self$$.$f$ = $carry$$3$$ | $JSCompiler_StaticMethods_rr$self$$.$SZP_TABLE$[$value$$54$$];
   return $value$$54$$
 }
 function $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_rl$self$$, $value$$53$$) {
-  var $carry$$2$$ = ($value$$53$$ & 128) >> 7, $value$$53$$ = ($value$$53$$ << 1 | $JSCompiler_StaticMethods_rl$self$$.$f$ & 1) & 255;
+  var $carry$$2$$ = ($value$$53$$ & 128) >> 7;
+  $value$$53$$ = ($value$$53$$ << 1 | $JSCompiler_StaticMethods_rl$self$$.$f$ & 1) & 255;
   $JSCompiler_StaticMethods_rl$self$$.$f$ = $carry$$2$$ | $JSCompiler_StaticMethods_rl$self$$.$SZP_TABLE$[$value$$53$$];
   return $value$$53$$
 }
 function $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_rrc$self$$, $value$$52$$) {
-  var $carry$$1$$ = $value$$52$$ & 1, $value$$52$$ = ($value$$52$$ >> 1 | $value$$52$$ << 7) & 255;
+  var $carry$$1$$ = $value$$52$$ & 1;
+  $value$$52$$ = ($value$$52$$ >> 1 | $value$$52$$ << 7) & 255;
   $JSCompiler_StaticMethods_rrc$self$$.$f$ = $carry$$1$$ | $JSCompiler_StaticMethods_rrc$self$$.$SZP_TABLE$[$value$$52$$];
   return $value$$52$$
 }
 function $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_rlc$self$$, $value$$51$$) {
-  var $carry$$ = ($value$$51$$ & 128) >> 7, $value$$51$$ = ($value$$51$$ << 1 | $value$$51$$ >> 7) & 255;
+  var $carry$$ = ($value$$51$$ & 128) >> 7;
+  $value$$51$$ = ($value$$51$$ << 1 | $value$$51$$ >> 7) & 255;
   $JSCompiler_StaticMethods_rlc$self$$.$f$ = $carry$$ | $JSCompiler_StaticMethods_rlc$self$$.$SZP_TABLE$[$value$$51$$];
   return $value$$51$$
 }
@@ -902,8 +902,8 @@ function $JSCompiler_StaticMethods_run$$($JSCompiler_StaticMethods_run$self$$, $
   for(;$JSCompiler_StaticMethods_run$self$$.$tstates$ > $cyclesTo$$;) {
     if($JSCompiler_StaticMethods_run$self$$.$interruptLine$) {
       var $JSCompiler_StaticMethods_interrupt$self$$inline_438$$ = $JSCompiler_StaticMethods_run$self$$;
-      $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$iff1$ && !$JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$EI_inst$ && (($JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$halt$ && ($JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$pc$++, $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$halt$ = $JSCompiler_alias_FALSE$$), $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$iff1$ = $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$iff2$ = $JSCompiler_alias_FALSE$$, 
-      $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$interruptLine$ = $JSCompiler_alias_FALSE$$, $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.push($JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$pc$), 0 == $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$im$) ? ($JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$pc$ = 0 == $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$interruptVector$ || 255 == $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$interruptVector$ ? 
+      $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$iff1$ && !$JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$EI_inst$ && ($JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$halt$ && ($JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$pc$++, $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$halt$ = $JSCompiler_alias_FALSE$$), $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$iff1$ = $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$iff2$ = $JSCompiler_alias_FALSE$$, 
+      $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$interruptLine$ = $JSCompiler_alias_FALSE$$, $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.push($JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$pc$), 0 == $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$im$ ? ($JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$pc$ = 0 == $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$interruptVector$ || 255 == $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$interruptVector$ ? 
       56 : $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$interruptVector$, $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$tstates$ -= 13) : 1 == $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$im$ ? ($JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$pc$ = 56, $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$tstates$ -= 13) : ($JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$pc$ = $JSCompiler_StaticMethods_readMemWord$$($JSCompiler_StaticMethods_interrupt$self$$inline_438$$, 
       ($JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$i$ << 8) + $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$interruptVector$), $JSCompiler_StaticMethods_interrupt$self$$inline_438$$.$tstates$ -= 19))
     }
@@ -3546,8 +3546,8 @@ function $JSCompiler_StaticMethods_run$$($JSCompiler_StaticMethods_run$self$$, $
 $JSSMS$Keyboard$$.prototype = {reset:function $$JSSMS$Keyboard$$$$reset$() {
   this.$ggstart$ = this.$controller2$ = this.$controller1$ = 255;
   this.$pause_button$ = $JSCompiler_alias_FALSE$$
-}, keydown:function $$JSSMS$Keyboard$$$$keydown$($evt$$14$$) {
-  switch($evt$$14$$.keyCode) {
+}, keydown:function $$JSSMS$Keyboard$$$$keydown$($evt$$16$$) {
+  switch($evt$$16$$.keyCode) {
     case 38:
       this.$controller1$ &= -2;
       break;
@@ -3593,9 +3593,9 @@ $JSSMS$Keyboard$$.prototype = {reset:function $$JSSMS$Keyboard$$$$reset$() {
     default:
       return
   }
-  $evt$$14$$.preventDefault()
-}, keyup:function $$JSSMS$Keyboard$$$$keyup$($evt$$15$$) {
-  switch($evt$$15$$.keyCode) {
+  $evt$$16$$.preventDefault()
+}, keyup:function $$JSSMS$Keyboard$$$$keyup$($evt$$17$$) {
+  switch($evt$$17$$.keyCode) {
     case 38:
       this.$controller1$ |= 1;
       break;
@@ -3641,7 +3641,7 @@ $JSSMS$Keyboard$$.prototype = {reset:function $$JSSMS$Keyboard$$$$reset$() {
     default:
       return
   }
-  $evt$$15$$.preventDefault()
+  $evt$$17$$.preventDefault()
 }};
 var $NO_ANTIALIAS$$ = Number.MIN_VALUE, $PSG_VOLUME$$ = [25, 20, 16, 13, 10, 8, 6, 5, 4, 3, 3, 2, 2, 1, 1, 0];
 function $JSSMS$SN76489$$($sms$$2$$) {
@@ -3670,15 +3670,15 @@ $JSSMS$SN76489$$.prototype = {write:function $$JSSMS$SN76489$$$$write$($value$$7
       this.$noiseFreq$ = 16 << (this.$reg$[6] & 3), this.$noiseShiftReg$ = 32768
   }
 }, update:function $$JSSMS$SN76489$$$$update$($offset$$17$$, $samplesToGenerate$$1$$) {
-  var $buffer$$9$$ = [], $sample$$, $i$$12_output$$;
+  var $buffer$$9$$ = [], $sample$$, $i$$13_output$$;
   for($sample$$ = 0;$sample$$ < $samplesToGenerate$$1$$;$sample$$++) {
-    for($i$$12_output$$ = 0;3 > $i$$12_output$$;$i$$12_output$$++) {
-      this.$outputChannel$[$i$$12_output$$] = this.$freqPos$[$i$$12_output$$] != $NO_ANTIALIAS$$ ? $PSG_VOLUME$$[this.$reg$[($i$$12_output$$ << 1) + 1]] * this.$freqPos$[$i$$12_output$$] >> 8 : $PSG_VOLUME$$[this.$reg$[($i$$12_output$$ << 1) + 1]] * this.$freqPolarity$[$i$$12_output$$]
+    for($i$$13_output$$ = 0;3 > $i$$13_output$$;$i$$13_output$$++) {
+      this.$outputChannel$[$i$$13_output$$] = this.$freqPos$[$i$$13_output$$] != $NO_ANTIALIAS$$ ? $PSG_VOLUME$$[this.$reg$[($i$$13_output$$ << 1) + 1]] * this.$freqPos$[$i$$13_output$$] >> 8 : $PSG_VOLUME$$[this.$reg$[($i$$13_output$$ << 1) + 1]] * this.$freqPolarity$[$i$$13_output$$]
     }
     this.$outputChannel$[3] = $PSG_VOLUME$$[this.$reg$[7]] * (this.$noiseShiftReg$ & 1) << 1;
-    $i$$12_output$$ = this.$outputChannel$[0] + this.$outputChannel$[1] + this.$outputChannel$[2] + this.$outputChannel$[3];
-    127 < $i$$12_output$$ ? $i$$12_output$$ = 127 : -128 > $i$$12_output$$ && ($i$$12_output$$ = -128);
-    $buffer$$9$$[$offset$$17$$ + $sample$$] = $i$$12_output$$;
+    $i$$13_output$$ = this.$outputChannel$[0] + this.$outputChannel$[1] + this.$outputChannel$[2] + this.$outputChannel$[3];
+    127 < $i$$13_output$$ ? $i$$13_output$$ = 127 : -128 > $i$$13_output$$ && ($i$$13_output$$ = -128);
+    $buffer$$9$$[$offset$$17$$ + $sample$$] = $i$$13_output$$;
     this.$clockFrac$ += this.$clock$;
     var $clockCycles$$ = this.$clockFrac$ >> 8, $clockCyclesScaled$$ = $clockCycles$$ << 8;
     this.$clockFrac$ -= $clockCyclesScaled$$;
@@ -3686,27 +3686,27 @@ $JSSMS$SN76489$$.prototype = {write:function $$JSSMS$SN76489$$$$write$($value$$7
     this.$freqCounter$[1] -= $clockCycles$$;
     this.$freqCounter$[2] -= $clockCycles$$;
     this.$freqCounter$[3] = 128 == this.$noiseFreq$ ? this.$freqCounter$[2] : this.$freqCounter$[3] - $clockCycles$$;
-    for($i$$12_output$$ = 0;3 > $i$$12_output$$;$i$$12_output$$++) {
-      var $counter$$ = this.$freqCounter$[$i$$12_output$$];
+    for($i$$13_output$$ = 0;3 > $i$$13_output$$;$i$$13_output$$++) {
+      var $counter$$ = this.$freqCounter$[$i$$13_output$$];
       if(0 >= $counter$$) {
-        var $tone$$ = this.$reg$[$i$$12_output$$ << 1];
-        6 < $tone$$ ? (this.$freqPos$[$i$$12_output$$] = ($clockCyclesScaled$$ - this.$clockFrac$ + 512 * $counter$$ << 8) * this.$freqPolarity$[$i$$12_output$$] / ($clockCyclesScaled$$ + this.$clockFrac$), this.$freqPolarity$[$i$$12_output$$] = -this.$freqPolarity$[$i$$12_output$$]) : (this.$freqPolarity$[$i$$12_output$$] = 1, this.$freqPos$[$i$$12_output$$] = $NO_ANTIALIAS$$);
-        this.$freqCounter$[$i$$12_output$$] += $tone$$ * ($clockCycles$$ / $tone$$ + 1)
+        var $tone$$ = this.$reg$[$i$$13_output$$ << 1];
+        6 < $tone$$ ? (this.$freqPos$[$i$$13_output$$] = ($clockCyclesScaled$$ - this.$clockFrac$ + 512 * $counter$$ << 8) * this.$freqPolarity$[$i$$13_output$$] / ($clockCyclesScaled$$ + this.$clockFrac$), this.$freqPolarity$[$i$$13_output$$] = -this.$freqPolarity$[$i$$13_output$$]) : (this.$freqPolarity$[$i$$13_output$$] = 1, this.$freqPos$[$i$$13_output$$] = $NO_ANTIALIAS$$);
+        this.$freqCounter$[$i$$13_output$$] += $tone$$ * ($clockCycles$$ / $tone$$ + 1)
       }else {
-        this.$freqPos$[$i$$12_output$$] = $NO_ANTIALIAS$$
+        this.$freqPos$[$i$$13_output$$] = $NO_ANTIALIAS$$
       }
     }
     0 >= this.$freqCounter$[3] && (this.$freqPolarity$[3] = -this.$freqPolarity$[3], 128 != this.$noiseFreq$ && (this.$freqCounter$[3] += this.$noiseFreq$ * ($clockCycles$$ / this.$noiseFreq$ + 1)), 1 == this.$freqPolarity$[3] && (this.$noiseShiftReg$ = this.$noiseShiftReg$ >> 1 | (0 != (this.$reg$[6] & 4) ? 0 != (this.$noiseShiftReg$ & 9) && 0 != (this.$noiseShiftReg$ & 9 ^ 9) ? 1 : 0 : this.$noiseShiftReg$ & 1) << 15))
   }
   return $buffer$$9$$
 }};
-function $JSSMS$Vdp$$($i$$13_i$$inline_560_sms$$3$$) {
-  this.$main$ = $i$$13_i$$inline_560_sms$$3$$;
+function $JSSMS$Vdp$$($i$$14_i$$inline_560_sms$$3$$) {
+  this.$main$ = $i$$14_i$$inline_560_sms$$3$$;
   this.$videoMode$ = 0;
   this.$VRAM$ = Array(16384);
   this.$CRAM$ = Array(32);
-  for($i$$13_i$$inline_560_sms$$3$$ = 0;32 > $i$$13_i$$inline_560_sms$$3$$;$i$$13_i$$inline_560_sms$$3$$++) {
-    this.$CRAM$[$i$$13_i$$inline_560_sms$$3$$] = 0
+  for($i$$14_i$$inline_560_sms$$3$$ = 0;32 > $i$$14_i$$inline_560_sms$$3$$;$i$$14_i$$inline_560_sms$$3$$++) {
+    this.$CRAM$[$i$$14_i$$inline_560_sms$$3$$] = 0
   }
   this.$vdpreg$ = Array(16);
   this.status = 0;
@@ -3723,37 +3723,37 @@ function $JSSMS$Vdp$$($i$$13_i$$inline_560_sms$$3$$) {
   this.$sat$ = this.$h_end$ = this.$h_start$ = 0;
   this.$isSatDirty$ = $JSCompiler_alias_FALSE$$;
   this.$lineSprites$ = Array(192);
-  for($i$$13_i$$inline_560_sms$$3$$ = 0;192 > $i$$13_i$$inline_560_sms$$3$$;$i$$13_i$$inline_560_sms$$3$$++) {
-    this.$lineSprites$[$i$$13_i$$inline_560_sms$$3$$] = Array(25)
+  for($i$$14_i$$inline_560_sms$$3$$ = 0;192 > $i$$14_i$$inline_560_sms$$3$$;$i$$14_i$$inline_560_sms$$3$$++) {
+    this.$lineSprites$[$i$$14_i$$inline_560_sms$$3$$] = Array(25)
   }
   this.$tiles$ = Array(512);
   this.$isTileDirty$ = Array(512);
-  for($i$$13_i$$inline_560_sms$$3$$ = this.$maxDirty$ = this.$minDirty$ = 0;512 > $i$$13_i$$inline_560_sms$$3$$;$i$$13_i$$inline_560_sms$$3$$++) {
-    this.$tiles$[$i$$13_i$$inline_560_sms$$3$$] = Array(64)
+  for($i$$14_i$$inline_560_sms$$3$$ = this.$maxDirty$ = this.$minDirty$ = 0;512 > $i$$14_i$$inline_560_sms$$3$$;$i$$14_i$$inline_560_sms$$3$$++) {
+    this.$tiles$[$i$$14_i$$inline_560_sms$$3$$] = Array(64)
   }
 }
 $JSSMS$Vdp$$.prototype = {reset:function $$JSSMS$Vdp$$$$reset$() {
-  var $i$$14_i$$inline_563$$;
+  var $i$$15_i$$inline_563$$;
   this.$isPalConverted$ = $JSCompiler_alias_FALSE$$;
   var $r$$inline_564$$, $g$$inline_565$$, $b$$inline_566$$;
   if(this.$main$.$is_sms$ && !this.$isPalConverted$) {
-    for($i$$14_i$$inline_563$$ = 0;64 > $i$$14_i$$inline_563$$;$i$$14_i$$inline_563$$++) {
-      $r$$inline_564$$ = $i$$14_i$$inline_563$$ & 3, $g$$inline_565$$ = $i$$14_i$$inline_563$$ >> 2 & 3, $b$$inline_566$$ = $i$$14_i$$inline_563$$ >> 4 & 3, this.$main_JAVA$[$i$$14_i$$inline_563$$] = 85 * $r$$inline_564$$ | 85 * $g$$inline_565$$ << 8 | 85 * $b$$inline_566$$ << 16, this.$isPalConverted$ = $JSCompiler_alias_TRUE$$
+    for($i$$15_i$$inline_563$$ = 0;64 > $i$$15_i$$inline_563$$;$i$$15_i$$inline_563$$++) {
+      $r$$inline_564$$ = $i$$15_i$$inline_563$$ & 3, $g$$inline_565$$ = $i$$15_i$$inline_563$$ >> 2 & 3, $b$$inline_566$$ = $i$$15_i$$inline_563$$ >> 4 & 3, this.$main_JAVA$[$i$$15_i$$inline_563$$] = 85 * $r$$inline_564$$ | 85 * $g$$inline_565$$ << 8 | 85 * $b$$inline_566$$ << 16, this.$isPalConverted$ = $JSCompiler_alias_TRUE$$
     }
   }else {
     if(this.$main$.$is_gg$ && !this.$isPalConverted$) {
-      for($i$$14_i$$inline_563$$ = 0;256 > $i$$14_i$$inline_563$$;$i$$14_i$$inline_563$$++) {
-        $g$$inline_565$$ = $i$$14_i$$inline_563$$ & 15, $b$$inline_566$$ = $i$$14_i$$inline_563$$ >> 4 & 15, this.$GG_JAVA1$[$i$$14_i$$inline_563$$] = $b$$inline_566$$ << 12 | $b$$inline_566$$ << 8 | $g$$inline_565$$ << 4 | $g$$inline_565$$
+      for($i$$15_i$$inline_563$$ = 0;256 > $i$$15_i$$inline_563$$;$i$$15_i$$inline_563$$++) {
+        $g$$inline_565$$ = $i$$15_i$$inline_563$$ & 15, $b$$inline_566$$ = $i$$15_i$$inline_563$$ >> 4 & 15, this.$GG_JAVA1$[$i$$15_i$$inline_563$$] = $b$$inline_566$$ << 12 | $b$$inline_566$$ << 8 | $g$$inline_565$$ << 4 | $g$$inline_565$$
       }
-      for($i$$14_i$$inline_563$$ = 0;16 > $i$$14_i$$inline_563$$;$i$$14_i$$inline_563$$++) {
-        this.$GG_JAVA2$[$i$$14_i$$inline_563$$] = $i$$14_i$$inline_563$$ << 20
+      for($i$$15_i$$inline_563$$ = 0;16 > $i$$15_i$$inline_563$$;$i$$15_i$$inline_563$$++) {
+        this.$GG_JAVA2$[$i$$15_i$$inline_563$$] = $i$$15_i$$inline_563$$ << 20
       }
       this.$isPalConverted$ = $JSCompiler_alias_TRUE$$
     }
   }
   this.$firstByte$ = $JSCompiler_alias_TRUE$$;
-  for($i$$14_i$$inline_563$$ = this.$operation$ = this.status = this.$counter$ = this.location = 0;16 > $i$$14_i$$inline_563$$;$i$$14_i$$inline_563$$++) {
-    this.$vdpreg$[$i$$14_i$$inline_563$$] = 0
+  for($i$$15_i$$inline_563$$ = this.$operation$ = this.status = this.$counter$ = this.location = 0;16 > $i$$15_i$$inline_563$$;$i$$15_i$$inline_563$$++) {
+    this.$vdpreg$[$i$$15_i$$inline_563$$] = 0
   }
   this.$vdpreg$[2] = 14;
   this.$vdpreg$[5] = 126;
@@ -3762,19 +3762,19 @@ $JSSMS$Vdp$$.prototype = {reset:function $$JSSMS$Vdp$$$$reset$() {
   this.$isSatDirty$ = $JSCompiler_alias_TRUE$$;
   this.$minDirty$ = 512;
   this.$maxDirty$ = -1;
-  for($i$$14_i$$inline_563$$ = 0;16384 > $i$$14_i$$inline_563$$;$i$$14_i$$inline_563$$++) {
-    this.$VRAM$[$i$$14_i$$inline_563$$] = 0
+  for($i$$15_i$$inline_563$$ = 0;16384 > $i$$15_i$$inline_563$$;$i$$15_i$$inline_563$$++) {
+    this.$VRAM$[$i$$15_i$$inline_563$$] = 0
   }
-  for($i$$14_i$$inline_563$$ = 0;49152 > $i$$14_i$$inline_563$$;$i$$14_i$$inline_563$$++) {
-    this.display[$i$$14_i$$inline_563$$] = 0
+  for($i$$15_i$$inline_563$$ = 0;49152 > $i$$15_i$$inline_563$$;$i$$15_i$$inline_563$$++) {
+    this.display[$i$$15_i$$inline_563$$] = 0
   }
 }};
 function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_forceFullRedraw$self$$) {
   $JSCompiler_StaticMethods_forceFullRedraw$self$$.$bgt$ = ($JSCompiler_StaticMethods_forceFullRedraw$self$$.$vdpreg$[2] & 14) << 10;
   $JSCompiler_StaticMethods_forceFullRedraw$self$$.$minDirty$ = 0;
   $JSCompiler_StaticMethods_forceFullRedraw$self$$.$maxDirty$ = 511;
-  for(var $i$$15$$ = 0, $l$$1$$ = $JSCompiler_StaticMethods_forceFullRedraw$self$$.$isTileDirty$.length;$i$$15$$ < $l$$1$$;$i$$15$$++) {
-    $JSCompiler_StaticMethods_forceFullRedraw$self$$.$isTileDirty$[$i$$15$$] = $JSCompiler_alias_TRUE$$
+  for(var $i$$16$$ = 0, $l$$1$$ = $JSCompiler_StaticMethods_forceFullRedraw$self$$.$isTileDirty$.length;$i$$16$$ < $l$$1$$;$i$$16$$++) {
+    $JSCompiler_StaticMethods_forceFullRedraw$self$$.$isTileDirty$[$i$$16$$] = $JSCompiler_alias_TRUE$$
   }
   $JSCompiler_StaticMethods_forceFullRedraw$self$$.$sat$ = ($JSCompiler_StaticMethods_forceFullRedraw$self$$.$vdpreg$[5] & -130) << 7;
   $JSCompiler_StaticMethods_forceFullRedraw$self$$.$isSatDirty$ = $JSCompiler_alias_TRUE$$
@@ -3789,7 +3789,9 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
 "undefined" !== typeof $ && ($.fn.$JSSMSUI$ = function $$$fn$$JSSMSUI$$($roms$$) {
   function $UI$$($root_sms$$5$$) {
     this.$main$ = $root_sms$$5$$;
-    var $self$$4$$ = this, $root_sms$$5$$ = $("<div></div>"), $controls$$ = $('<div class="controls"></div>'), $fullscreenSupport$$ = $JSSMS$Utils$getPrefix$$(["fullscreenEnabled", "mozFullScreenEnabled", "webkitCancelFullScreen"]), $i$$23$$;
+    var $self$$4$$ = this;
+    $root_sms$$5$$ = $("<div></div>");
+    var $controls$$ = $('<div class="controls"></div>'), $fullscreenSupport$$ = $JSSMS$Utils$getPrefix$$(["fullscreenEnabled", "mozFullScreenEnabled", "webkitCancelFullScreen"]), $i$$24$$;
     this.$zoomed$ = $JSCompiler_alias_FALSE$$;
     this.$hiddenPrefix$ = $JSSMS$Utils$getPrefix$$(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
     this.screen = $('<canvas width=256 height=192 class="screen"></canvas>');
@@ -3820,8 +3822,8 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
         var $screen$$1$$ = $self$$4$$.screen[0];
         $screen$$1$$.requestFullscreen ? $screen$$1$$.requestFullscreen() : $screen$$1$$.mozRequestFullScreen ? $screen$$1$$.mozRequestFullScreen() : $screen$$1$$.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT)
       }));
-      for($i$$23$$ in this.$buttons$) {
-        this.$buttons$.hasOwnProperty($i$$23$$) && this.$buttons$[$i$$23$$].appendTo($controls$$)
+      for($i$$24$$ in this.$buttons$) {
+        this.$buttons$.hasOwnProperty($i$$24$$) && this.$buttons$[$i$$24$$].appendTo($controls$$)
       }
       this.log = $('<div id="status"></div>');
       this.screen.appendTo($root_sms$$5$$);
@@ -3830,10 +3832,10 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
       this.log.appendTo($root_sms$$5$$);
       $root_sms$$5$$.appendTo($($parent$$2$$));
       "undefined" != typeof $roms$$ && this.$setRoms$($roms$$);
-      $(document).bind("keydown", function($evt$$16$$) {
-        $self$$4$$.$main$.$keyboard$.keydown($evt$$16$$)
-      }).bind("keyup", function($evt$$17$$) {
-        $self$$4$$.$main$.$keyboard$.keyup($evt$$17$$)
+      $(document).bind("keydown", function($evt$$18$$) {
+        $self$$4$$.$main$.$keyboard$.keydown($evt$$18$$)
+      }).bind("keyup", function($evt$$19$$) {
+        $self$$4$$.$main$.$keyboard$.keyup($evt$$19$$)
       })
     }else {
       $($parent$$2$$).html('<div class="alert-message error"><p><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</p></div>')
@@ -3847,19 +3849,19 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
   }, $resetCanvas$:function $$UI$$$$$resetCanvas$$() {
     this.$canvasContext$.fillStyle = "black";
     this.$canvasContext$.fillRect(0, 0, 256, 192);
-    for(var $i$$24$$ = 3;$i$$24$$ <= this.$canvasImageData$.data.length - 3;$i$$24$$ += 4) {
-      this.$canvasImageData$.data[$i$$24$$] = 255
+    for(var $i$$25$$ = 3;$i$$25$$ <= this.$canvasImageData$.data.length - 3;$i$$25$$ += 4) {
+      this.$canvasImageData$.data[$i$$25$$] = 255
     }
   }, $setRoms$:function $$UI$$$$$setRoms$$($roms$$1$$) {
-    var $groupName$$, $optgroup$$, $length$$16$$, $i$$25$$, $count$$7$$ = 0;
+    var $groupName$$, $optgroup$$, $length$$16$$, $i$$26$$, $count$$7$$ = 0;
     this.$romSelect$.children().remove();
     $("<option>Select a ROM...</option>").appendTo(this.$romSelect$);
     for($groupName$$ in $roms$$1$$) {
       if($roms$$1$$.hasOwnProperty($groupName$$)) {
         $optgroup$$ = $("<optgroup></optgroup>").attr("label", $groupName$$);
         $length$$16$$ = $roms$$1$$[$groupName$$].length;
-        for($i$$25$$ = 0;$i$$25$$ < $length$$16$$;$i$$25$$++) {
-          $("<option>" + $roms$$1$$[$groupName$$][$i$$25$$][0] + "</option>").attr("value", $roms$$1$$[$groupName$$][$i$$25$$][1]).appendTo($optgroup$$)
+        for($i$$26$$ = 0;$i$$26$$ < $length$$16$$;$i$$26$$++) {
+          $("<option>" + $roms$$1$$[$groupName$$][$i$$26$$][0] + "</option>").attr("value", $roms$$1$$[$groupName$$][$i$$26$$][1]).appendTo($optgroup$$)
         }
         $optgroup$$.appendTo(this.$romSelect$)
       }
@@ -3888,9 +3890,9 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
     this.log.text($s$$3$$)
   }, $writeAudio$:$JSCompiler_emptyFn$$(), $writeFrame$:function $$UI$$$$$writeFrame$$($buffer$$11$$) {
     if(!this.$hiddenPrefix$ || !document[this.$hiddenPrefix$]) {
-      var $imageData$$ = this.$canvasImageData$.data, $pixel$$, $i$$27$$, $j$$2$$;
-      for($i$$27$$ = 0;49152 >= $i$$27$$;$i$$27$$++) {
-        $pixel$$ = $buffer$$11$$[$i$$27$$], $j$$2$$ = 4 * $i$$27$$, $imageData$$[$j$$2$$] = $pixel$$ & 255, $imageData$$[$j$$2$$ + 1] = $pixel$$ >> 8 & 255, $imageData$$[$j$$2$$ + 2] = $pixel$$ >> 16 & 255
+      var $imageData$$ = this.$canvasImageData$.data, $pixel$$, $i$$28$$, $j$$2$$;
+      for($i$$28$$ = 0;49152 >= $i$$28$$;$i$$28$$++) {
+        $pixel$$ = $buffer$$11$$[$i$$28$$], $j$$2$$ = 4 * $i$$28$$, $imageData$$[$j$$2$$] = $pixel$$ & 255, $imageData$$[$j$$2$$ + 1] = $pixel$$ >> 8 & 255, $imageData$$[$j$$2$$ + 2] = $pixel$$ >> 16 & 255
       }
       this.$canvasContext$.putImageData(this.$canvasImageData$, 0, 0)
     }

@@ -5,4 +5,6 @@ JavaGear_ME_v0.97s
 *.gz
 roms/sms
 roms/gg
-
+*.report.txt
+node_modules/
+.idea/
