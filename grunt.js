@@ -20,7 +20,7 @@ module.exports = function(grunt) {
       externs: [
         '<%= process.env.CLOSURE_PATH %>/contrib/externs/webkit_console.js',
         '<%= process.env.CLOSURE_PATH %>/contrib/externs/jquery-1.7.js',
-        'source/build/externs/fullscreen.js'
+        '<%= process.env.CLOSURE_PATH %>/contrib/html5.js'
       ],
 
       // Generates a minified version of the script.
