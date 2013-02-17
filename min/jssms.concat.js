@@ -59,36 +59,35 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   if(!this.isRunning) {
     this.isRunning = true
   }
-  this.frameInterval = setInterval(function() {
-    self.frame()
-  }, frameTime);
+  requestAnimationFrame(this.frame.bind(this));
   this.resetFps();
   this.printFps();
   this.fpsInterval = setInterval(function() {
     self.printFps()
   }, fpsInterval)
 }, stop:function() {
-  clearInterval(this.frameInterval);
   clearInterval(this.fpsInterval);
   this.isRunning = false
 }, frame:function() {
-  if(!this.throttle) {
-    if(this.emulateNextFrame()) {
-      this.doRepaint()
+  if(this.isRunning) {
+    if(!this.throttle) {
+      if(this.emulateNextFrame()) {
+        this.doRepaint()
+      }
+    }else {
+      if(this.emulateNextFrame()) {
+        this.doRepaint()
+      }
     }
-  }else {
-    var startTime = +new Date;
-    if(this.emulateNextFrame()) {
-      this.doRepaint()
-    }
+    this.fpsFrameCount++;
+    requestAnimationFrame(this.frame.bind(this))
   }
-  this.fpsFrameCount++
 }, emulateNextFrame:function() {
   var startTime;
   var lineno;
   for(lineno = 0;lineno < this.no_of_scanlines;lineno++) {
     if(Setup.DEBUG_TIMING) {
-      startTime = +new Date
+      startTime = JSSMS.Utils.getTimestamp()
     }
     if(Setup.ACCURATE_INTERRUPT_EMULATION && lineno == 193) {
       this.cpu.run(this.cyclesPerLine, 8);
@@ -98,7 +97,7 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
       this.cpu.run(this.cyclesPerLine, 0)
     }
     if(Setup.DEBUG_TIMING) {
-      this.z80TimeCounter += +new Date - startTime
+      this.z80TimeCounter += JSSMS.Utils.getTimestamp() - startTime
     }
     if(this.soundEnabled) {
       this.updateSound(lineno)
@@ -106,11 +105,11 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
     this.vdp.line = lineno;
     if(this.frameskip_counter == 0 && lineno < 192) {
       if(Setup.DEBUG_TIMING) {
-        startTime = +new Date
+        startTime = JSSMS.Utils.getTimestamp()
       }
       this.vdp.drawLine(lineno);
       if(Setup.DEBUG_TIMING) {
-        this.drawTimeCounter += +new Date - startTime
+        this.drawTimeCounter += JSSMS.Utils.getTimestamp() - startTime
       }
     }
     this.vdp.interrupts(lineno)
@@ -184,7 +183,7 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
 }, doRepaint:function() {
   this.ui.writeFrame(this.vdp.display, [])
 }, printFps:function() {
-  var now = +new Date, s = "Running";
+  var now = JSSMS.Utils.getTimestamp(), s = "Running";
   if(this.lastFpsTime) {
     s += ": " + (this.fpsFrameCount / ((now - this.lastFpsTime) / 1E3)).toFixed(2) + " (/ " + (1E3 / frameTime).toFixed(2) + ") FPS"
   }
@@ -360,6 +359,10 @@ JSSMS.Utils = {rndInt:function(range) {
       return array[address >> 10][address & 1023] & 255 | (array[++address >> 10][address & 1023] & 255) << 8
     }
   }
+}(), getTimestamp:function() {
+  return Date.now || (Date.now = function() {
+    return(new Date).getTime()
+  })
 }(), getPrefix:function(arr) {
   var prefix = false;
   arr.some(function(prop) {
@@ -4884,7 +4887,11 @@ if(typeof $ !== "undefined") {
         self.xhr = xhr;
         return xhr
       }, complete:function(xhr, status) {
-        var i, data;
+        var data;
+        if(status === "error") {
+          self.updateStatus("The selected rom could not be loaded.");
+          return
+        }
         data = xhr.responseText;
         self.main.readRomDirectly(data, self.romSelect.val());
         self.main.reset();
@@ -4921,7 +4928,32 @@ if(typeof $ !== "undefined") {
     return UI
   }
 }
-;var IO_TR_DIRECTION = 0;
+(function() {
+  var lastTime = 0;
+  var vendors = ["ms", "moz", "webkit", "o"];
+  var x;
+  for(x = 0;x < vendors.length && !window.requestAnimationFrame;++x) {
+    window.requestAnimationFrame = window[vendors[x] + "RequestAnimationFrame"];
+    window.cancelAnimationFrame = window[vendors[x] + "CancelAnimationFrame"] || window[vendors[x] + "CancelRequestAnimationFrame"]
+  }
+  if(!window.requestAnimationFrame) {
+    window.requestAnimationFrame = function(callback, element) {
+      var currTime = JSSMS.Utils.getTimestamp();
+      var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+      var id = window.setTimeout(function() {
+        callback(currTime + timeToCall)
+      }, timeToCall);
+      lastTime = currTime + timeToCall;
+      return id
+    }
+  }
+  if(!window.cancelAnimationFrame) {
+    window.cancelAnimationFrame = function(id) {
+      clearTimeout(id)
+    }
+  }
+})();
+var IO_TR_DIRECTION = 0;
 var IO_TH_DIRECTION = 1;
 var IO_TR_OUTPUT = 2;
 var IO_TH_OUTPUT = 3;

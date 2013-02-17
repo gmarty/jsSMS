@@ -256,6 +256,18 @@ JSSMS.Utils = {
 
 
   /**
+   * Return the current timestamp in a fast way.
+   *
+   * @return {number} The current timestamp.
+   */
+  getTimestamp: function() {
+    return Date.now || (Date.now = function () {
+      return new Date().getTime();
+    });
+  }(),
+
+
+  /**
    * Determine support and prefix of HTML5 features. Returns the prefix of the
    * implementation, or false otherwise.
    *

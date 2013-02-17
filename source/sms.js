@@ -307,7 +307,7 @@ JSSMS.prototype = {
       //Thread.sleep(minSleep);
       // Throttling, also try a minimum sleep per tick
       } else {
-        //var startTime = +new Date();
+        //var startTime = JSSMS.Utils.getTimestamp();
 
         if (this.emulateNextFrame())
           this.doRepaint();
@@ -339,7 +339,7 @@ JSSMS.prototype = {
 
     // Draw one frame
     for (lineno = 0; lineno < this.no_of_scanlines; lineno++) {
-      if (Setup.DEBUG_TIMING) startTime = +new Date();
+      if (Setup.DEBUG_TIMING) startTime = JSSMS.Utils.getTimestamp();
 
       // Run Z80
       //
@@ -358,7 +358,7 @@ JSSMS.prototype = {
         this.cpu.run(this.cyclesPerLine, 0);
       }
 
-      if (Setup.DEBUG_TIMING) this.z80TimeCounter += +new Date() - startTime;
+      if (Setup.DEBUG_TIMING) this.z80TimeCounter += JSSMS.Utils.getTimestamp() - startTime;
 
       // PSG
       if (this.soundEnabled)
@@ -369,9 +369,9 @@ JSSMS.prototype = {
 
       // Draw Next Line
       if (this.frameskip_counter == 0 && lineno < 192) {
-        if (Setup.DEBUG_TIMING) startTime = +new Date();
+        if (Setup.DEBUG_TIMING) startTime = JSSMS.Utils.getTimestamp();
         this.vdp.drawLine(lineno);
-        if (Setup.DEBUG_TIMING) this.drawTimeCounter += +new Date() - startTime;
+        if (Setup.DEBUG_TIMING) this.drawTimeCounter += JSSMS.Utils.getTimestamp() - startTime;
       }
 
       // Assert Interrupt Line if Necessary
@@ -504,7 +504,7 @@ JSSMS.prototype = {
 
 
   printFps: function() {
-    var now = +new Date(),
+    var now = JSSMS.Utils.getTimestamp(),
         s = 'Running';
 
     if (this.lastFpsTime) {

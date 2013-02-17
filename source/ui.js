@@ -381,7 +381,7 @@ if (typeof $ !== 'undefined') {
 
   if (!window.requestAnimationFrame) {
     window.requestAnimationFrame = function (callback, element) {
-      var currTime = new Date().getTime();
+      var currTime = JSSMS.Utils.getTimestamp();
       var timeToCall = Math.max(0, 16 - (currTime - lastTime));
       var id = window.setTimeout(function () { callback(currTime + timeToCall); },
         timeToCall);
