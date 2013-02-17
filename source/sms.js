@@ -281,9 +281,7 @@ JSSMS.prototype = {
       this.isRunning = true;
     }
 
-    this.frameInterval = setInterval(function() {
-      self.frame();
-    }, frameTime);
+    requestAnimationFrame(this.frame.bind(this));
 
     this.resetFps();
     this.printFps();
@@ -294,38 +292,41 @@ JSSMS.prototype = {
 
 
   stop: function() {
-    clearInterval(this.frameInterval);
     clearInterval(this.fpsInterval);
     this.isRunning = false;
   },
 
 
   frame: function() {
-    // No throttling: faster code if phone is slow
-    if (!this.throttle) {
-      if (this.emulateNextFrame())
-        this.doRepaint();
-      //if (minSleep != 0)
-    //Thread.sleep(minSleep);
-    // Throttling, also try a minimum sleep per tick
-    } else {
-      var startTime = +new Date();
+    if (this.isRunning) {
+      // No throttling: faster code if phone is slow
+      if (!this.throttle) {
+        if (this.emulateNextFrame())
+          this.doRepaint();
+        //if (minSleep != 0)
+      //Thread.sleep(minSleep);
+      // Throttling, also try a minimum sleep per tick
+      } else {
+        //var startTime = +new Date();
 
-      if (this.emulateNextFrame())
-        this.doRepaint();
+        if (this.emulateNextFrame())
+          this.doRepaint();
 
-      /*if (ID == J2ME) {
-        long frameTime = JSSMS.Utils.currentTimeMillis() - startTime;
+        /*if (ID == J2ME) {
+          long frameTime = JSSMS.Utils.currentTimeMillis() - startTime;
 
-        if (frameTime < targetFrameTime - minSleep) {
-                            Thread.sleep(targetFrameTime - frameTime);
-        } else if (minSleep != 0)
-                            Thread.sleep(minSleep);
-      } else if (ID == J2SE) {
-        platformFunction(this, PLATFORM_THROTTLE);
-      }*/
+          if (frameTime < targetFrameTime - minSleep) {
+                              Thread.sleep(targetFrameTime - frameTime);
+          } else if (minSleep != 0)
+                              Thread.sleep(minSleep);
+        } else if (ID == J2SE) {
+          platformFunction(this, PLATFORM_THROTTLE);
+        }*/
+      }
+
+      this.fpsFrameCount++;
+      requestAnimationFrame(this.frame.bind(this));
     }
-    this.fpsFrameCount++;
   },
 
 
