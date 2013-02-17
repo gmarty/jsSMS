@@ -266,7 +266,13 @@ if (typeof $ !== 'undefined') {
             return xhr;
           },
           complete: function(xhr, status) {
-            var i, data;
+            var data;
+
+            if (status === 'error') {
+              self.updateStatus('The selected rom could not be loaded.');
+              return;
+            }
+
             /*if (JSSMS.Utils.isIE()) {
               var charCodes = JSNESBinaryToArray(xhr.responseBody).toArray();
               data = String.fromCharCode.apply(undefined, charCodes);
