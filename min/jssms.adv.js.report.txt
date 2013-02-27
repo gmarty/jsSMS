@@ -1,0 +1,9 @@
+source\sms.js:72: WARNING - cannot instantiate non-constructor
+  this.ui = new opts['ui'](this);
+            ^
+
+source\z80.js:482: WARNING - Missing return statement. Function expected to return string.
+  getMnu: function() {
+          ^
+
+0 error(s), 2 warning(s), 98.3% typed
