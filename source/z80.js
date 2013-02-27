@@ -934,7 +934,11 @@ JSSMS.Z80.prototype = {
   jr: function(condition) {
     if (condition) {
       var d = this.d_() + 1;
-      this.pc += d < 128 ? d : d - 256;
+      // The previous syntax had Firefox to mark these lines as unknown arithmetic type.
+      if (d >= 128) {
+        d = d - 256;
+      }
+      this.pc += d;
       this.tstates -= 5;
     }
     else this.pc++;
