@@ -314,7 +314,7 @@ JSSMS.Z80 = function(sms) {
   this.sram = null;
 
   /**
-   * Catridge uses SRAM.
+   * Cartridge uses SRAM.
    * @type {boolean}
    */
   this.useSRAM = false;
@@ -326,7 +326,7 @@ JSSMS.Z80 = function(sms) {
   this.frameReg = new Array(4);
 
   /**
-   * Total number of 16K catridge pages.
+   * Total number of 16K cartridge pages.
    * @type {number}
    */
   this.number_of_pages = 0;
@@ -341,12 +341,6 @@ JSSMS.Z80 = function(sms) {
    * @type {Array.<Array>}
    */
   this.memReadMap = new Array(65);
-
-  /**
-   * Dummy memory writes (never read).
-   * @type {Array.<number>}
-   */
-  this.dummyWrite = JSSMS.Utils.Array(Setup.PAGE_SIZE);
 
   // Precalculated tables for speed purposes
   /** Pre-calculated result for DAA instruction. */
