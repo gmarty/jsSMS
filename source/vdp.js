@@ -614,7 +614,7 @@ JSSMS.Vdp.prototype = {
 
     // Clear sprite collision array if enabled
     if (Setup.VDP_SPRITE_COLLISIONS) {
-      var i = this.spriteCol.length;
+      var i = SMS_WIDTH; // this.spriteCol.length
       while (i--)
         this.spriteCol[i] = false;
     }
