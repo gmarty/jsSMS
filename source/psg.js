@@ -259,9 +259,11 @@ JSSMS.SN76489.prototype = {
    * @return {Array}
   */
   update: function(offset, samplesToGenerate) {
-    var buffer = [], sample, i;
+    var buffer = [];
+    var sample = 0;
+    var i = 0;
 
-    for (sample = 0; sample < samplesToGenerate; sample++) {
+    for (; sample < samplesToGenerate; sample++) {
       // Generate Sound from Tone Channels
       for (i = 0; i < 3; i++) {
         if (this.freqPos[i] != NO_ANTIALIAS)
@@ -353,7 +355,7 @@ JSSMS.SN76489.prototype = {
 
         // Positive Amplitude i.e. We only want to do this once per cycle
         if (this.freqPolarity[3] == 1) {
-          var feedback;
+          var feedback = 0;
 
           // White Noise Selected
           if ((this.reg[6] & 0x04) != 0) {

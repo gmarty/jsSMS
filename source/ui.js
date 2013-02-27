@@ -341,9 +341,11 @@ if (typeof $ != 'undefined') {
         }
 
         var imageData = this.canvasImageData.data;
-        var pixel, i, j;
+        var pixel = 0;
+        var i = 0;
+        var j = 0;
 
-        for (i = 0; i <= SMS_WIDTH * SMS_HEIGHT; i++) {
+        for (; i <= SMS_WIDTH * SMS_HEIGHT; i++) {
           pixel = buffer[i];
 
           //if (pixel != prevBuffer[i]) {

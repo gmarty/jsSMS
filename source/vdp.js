@@ -864,9 +864,9 @@ JSSMS.Vdp.prototype = {
   drawBGColour: function(lineno) {
     var colour = this.CRAM[16 + (this.vdpreg[7] & 0x0F)];
     var row_precal = lineno << 8;
-    var i;
+    var i = 0;
 
-    for (i = 0; i < SMS_WIDTH; i++) {
+    for (; i < SMS_WIDTH; i++) {
       this.display[row_precal++] = colour;
     }
   },

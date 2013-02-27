@@ -527,9 +527,9 @@ JSSMS.Z80.prototype = {
    * @param {number} cyclesTo
    */
   run: function(cycles, cyclesTo) {
-    var location;
-    var opcode;
-    var temp;
+    var location = 0;
+    var opcode = 0;
+    var temp = 0;
 
     this.tstates += cycles;
 
@@ -1455,8 +1455,8 @@ JSSMS.Z80.prototype = {
    * @param {number} opcode Opcode hex value.
    */
   doIndexOpIX: function(opcode) {
-    var location;
-    var temp;
+    var location = 0;
+    var temp = 0;
 
     this.tstates -= OP_DD_STATES[opcode];
 
@@ -1759,10 +1759,9 @@ JSSMS.Z80.prototype = {
    * @param {number} opcode Opcode hex value.
    */
   doED: function(opcode) {
-    var temp;
-    var location;
-    var hlmem;
-    var a_copy;
+    var temp = 0;
+    var location = 0;
+    var hlmem = 0;
 
     this.tstates -= OP_ED_STATES[opcode];
 
@@ -1797,9 +1796,9 @@ JSSMS.Z80.prototype = {
       case 0x74:
       case 0x7C:
         // A <- 0-A
-        a_copy = this.a;
+        temp = this.a;
         this.a = 0;
-        this.sub_a(a_copy);
+        this.sub_a(temp);
         this.pc++;
         break;
 

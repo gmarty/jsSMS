@@ -334,11 +334,11 @@ JSSMS.prototype = {
    * @return {boolean} Whether a screen update is required or not.
    */
   emulateNextFrame: function() {
-    var startTime;
-    var lineno;
+    var startTime = 0;
+    var lineno = 0;
 
     // Draw one frame
-    for (lineno = 0; lineno < this.no_of_scanlines; lineno++) {
+    for (; lineno < this.no_of_scanlines; lineno++) {
       if (Setup.DEBUG_TIMING) startTime = JSSMS.Utils.getTimestamp();
 
       // Run Z80
