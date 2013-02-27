@@ -36,7 +36,7 @@ JSSMS.DummyUI = function(sms) {
   this.writeFrame = function() {};
 };
 
-if (typeof $ !== 'undefined') {
+if (typeof $ != 'undefined') {
   /**
    * @constructor
    * @param {Object.<string, Object.<string, string>>} roms A list of rom files.
@@ -258,7 +258,7 @@ if (typeof $ !== 'undefined') {
           url: escape(this.romSelect.val()),
           xhr: function() {
             var xhr = $.ajaxSettings.xhr();
-            if (typeof xhr.overrideMimeType !== 'undefined') {
+            if (typeof xhr.overrideMimeType != 'undefined') {
               // Download as binary
               xhr.overrideMimeType('text/plain; charset=x-user-defined');
             }
@@ -268,7 +268,7 @@ if (typeof $ !== 'undefined') {
           complete: function(xhr, status) {
             var data;
 
-            if (status === 'error') {
+            if (status == 'error') {
               self.updateStatus('The selected rom could not be loaded.');
               return;
             }

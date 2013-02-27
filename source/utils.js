@@ -43,7 +43,7 @@ JSSMS.Utils = {
        * @return {DataView}
        */
       return function(length) {
-        if (length === undefined) {
+        if (!length) {
           length = 0;
         }
 
@@ -104,7 +104,7 @@ JSSMS.Utils = {
        * @return {DataView} A copy of source array.
        */
       return function(src) {
-        if (src === undefined) {
+        if (!src) {
           return JSSMS.Utils.Array();
         }
 
@@ -125,7 +125,7 @@ JSSMS.Utils = {
        * @return {Array.<number>} A copy of source array.
        */
       return function(src) {
-        if (src === undefined) {
+        if (!src) {
           return JSSMS.Utils.Array();
         }
 

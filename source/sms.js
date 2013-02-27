@@ -551,7 +551,7 @@ JSSMS.prototype = {
    */
   readRomDirectly: function(data, fileName) {
     var pages;
-    var mode = fileName.substr(-3).toLowerCase() === '.gg' ? 2 : 1;
+    var mode = fileName.substr(-3).toLowerCase() == '.gg' ? 2 : 1;
     var size = data.length;
 
     // Toggle SMS / GG emulation mode
@@ -622,7 +622,7 @@ JSSMS.prototype = {
    * @return {boolean}
    */
   reloadRom: function() {
-    if (this.romData !== '' && this.romFileName !== '') {
+    if (this.romData != '' && this.romFileName != '') {
       return this.readRomDirectly(this.romData, this.romFileName);
     } else {
       return false;
