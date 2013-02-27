@@ -375,6 +375,33 @@ JSSMS.Z80 = function(sms) {
 
   // Generate memory arrays
   this.generateMemory();
+
+
+  /**
+   * Write to a memory location.
+   *
+   * @param {number} address Memory address.
+   * @param {number} value Value to write.
+   */
+  this.writeMem = JSSMS.Utils.writeMem.bind(this, this);
+
+
+  /**
+   * Read from a memory location.
+   *
+   * @param {number} address Memory location.
+   * @return {number} Value from memory location.
+   */
+  this.readMem = JSSMS.Utils.readMem.bind(this, this.memReadMap);
+
+
+  /**
+   * Read a word (two bytes) from a memory location.
+   *
+   * @param {number} address Memory address.
+   * @return {number} Value from memory location.
+   */
+  this.readMemWord = JSSMS.Utils.readMemWord.bind(this, this.memReadMap);
 };
 
 JSSMS.Z80.prototype = {
@@ -2987,49 +3014,12 @@ JSSMS.Z80.prototype = {
 
 
   /**
-   * Write to a memory location.
-   *
-   * \@todo We really need currying here.
-   * @param {number} address Memory address.
-   * @param {number} value Value to write.
-   */
-  writeMem: function(address, value) {
-    JSSMS.Utils.writeMem(this, address, value);
-  },
-
-
-  /**
-   * Read from a memory location.
-   *
-   * \@todo We really need currying here.
-   * @param {number} address Memory location.
-   * @return {number} Value from memory location.
-   */
-  readMem: function(address) {
-    return JSSMS.Utils.readMem(this.memReadMap, address);
-  },
-
-
-  /**
    * Read a signed value from next memory location.
    *
-   * \@todo We really need currying here.
    * @return {number} Value from memory location.
    */
   d_: function() {
-    return JSSMS.Utils.readMem(this.memReadMap, this.pc);
-  },
-
-
-  /**
-   * Read a word (two bytes) from a memory location.
-   *
-   * \@todo We really need currying here.
-   * @param {number} address Memory address.
-   * @return {number} Value from memory location.
-   */
-  readMemWord: function(address) {
-    return JSSMS.Utils.readMemWord(this.memReadMap, address);
+    return this.readMem(this.pc);
   },
 
 
