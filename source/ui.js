@@ -340,23 +340,6 @@ if (typeof $ != 'undefined') {
           return;
         }
 
-        var imageData = this.canvasImageData.data;
-        var pixel = 0;
-        var i = 0;
-        var j = 0;
-
-        for (; i <= SMS_WIDTH * SMS_HEIGHT; i++) {
-          pixel = buffer[i];
-
-          //if (pixel != prevBuffer[i]) {
-          j = i * 4;
-          imageData[j] = pixel & 0xFF;
-          imageData[j + 1] = (pixel >> 8) & 0xFF;
-          imageData[j + 2] = (pixel >> 16) & 0xFF;
-          //prevBuffer[i] = pixel;
-          //}
-        }
-
         this.canvasContext.putImageData(this.canvasImageData, 0, 0);
       }
     };
@@ -371,29 +354,29 @@ if (typeof $ != 'undefined') {
 
 // requestAnimationFrame polyfill by Erik Möller
 // fixes from Paul Irish and Tino Zijdel
-(function () {
+(function() {
   var lastTime = 0;
   var vendors = ['ms', 'moz', 'webkit', 'o'];
   var x;
   for (x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-    window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-    window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] ||
-      window[vendors[x]+'CancelRequestAnimationFrame'];
+    window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+    window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] ||
+        window[vendors[x] + 'CancelRequestAnimationFrame'];
   }
 
   if (!window.requestAnimationFrame) {
-    window.requestAnimationFrame = function (callback, element) {
+    window.requestAnimationFrame = function(callback, element) {
       var currTime = JSSMS.Utils.getTimestamp();
       var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-      var id = window.setTimeout(function () { callback(currTime + timeToCall); },
-        timeToCall);
+      var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+          timeToCall);
       lastTime = currTime + timeToCall;
       return id;
     };
   }
 
   if (!window.cancelAnimationFrame) {
-    window.cancelAnimationFrame = function (id) {
+    window.cancelAnimationFrame = function(id) {
       clearTimeout(id);
     };
   }

@@ -141,9 +141,9 @@ JSSMS.Vdp = function(sms) {
    * 64 bytes.
    * @type {Array.<number>}
    */
-  this.CRAM = new Array(0x20);
-  for (i = 0; i < 0x20; i++) {
-    this.CRAM[i] = 0;
+  this.CRAM = new Array(0x20 * 3);
+  for (i = 0; i < 0x20 * 3; i++) {
+    this.CRAM[i] = 255;
   }
 
   /**
@@ -230,9 +230,9 @@ JSSMS.Vdp = function(sms) {
   // Emulation Related
   /**
    * Emulated display.
-   * @type {Array.<number>}
+   * @type {Uint8ClampedArray.<number>}
    */
-  this.display = new Array(SMS_WIDTH * SMS_HEIGHT);
+  this.display = sms.ui.canvasImageData.data;
 
   /**
    * SMS colours converted to RGB hex.
@@ -339,8 +339,8 @@ JSSMS.Vdp.prototype = {
       this.VRAM[i] = 0;
     }
 
-    for (i = 0; i < (SMS_WIDTH * SMS_HEIGHT); i++) {
-      this.display[i] = 0;
+    for (i = 0; i < (SMS_WIDTH * SMS_HEIGHT * 4); i++) {
+      this.display[i] = 255;
     }
   },
 
@@ -495,6 +495,8 @@ JSSMS.Vdp.prototype = {
    * @param {number} value Value to Write.
    */
   dataWrite: function(value) {
+    var temp = 0;
+
     // Reset flag
     this.firstByte = true;
 
@@ -529,13 +531,25 @@ JSSMS.Vdp.prototype = {
       // Instead of writing real colour to CRAM, write converted Java palette colours for speed.
       // Slightly inaccurate, as CRAM doesn't contain real values, but it is never read by software.
       case 0x03:
-        if (this.main.is_sms)
-          this.CRAM[this.location & 0x1F] = this.main_JAVA[value & 0x3F];
+        if (this.main.is_sms) {
+          temp = (this.location & 0x1F) * 3;
+          this.CRAM[temp] = this.main_JAVA[value & 0x3F] & 0xFF;
+          this.CRAM[temp + 1] = (this.main_JAVA[value & 0x3F] >> 8) & 0xFF;
+          this.CRAM[temp + 2] = (this.main_JAVA[value & 0x3F] >> 16) & 0xFF;
+        }
         else if (this.main.is_gg) {
-          if ((this.location & 1) == 0) // first byte
-            this.CRAM[(this.location & 0x3F) >> 1] = this.GG_JAVA1[value]; // GG
-          else
-            this.CRAM[(this.location & 0x3F) >> 1] |= this.GG_JAVA2[value & 0x0F];
+          temp = ((this.location & 0x3F) >> 1) * 3;
+          if ((this.location & 1) == 0) {
+            // first byte
+            this.CRAM[temp] = this.GG_JAVA1[value] & 0xFF; // GG
+            this.CRAM[temp + 1] = (this.GG_JAVA1[value] >> 8) & 0xFF; // GG
+            this.CRAM[temp + 2] = (this.GG_JAVA1[value] >> 16) & 0xFF; // GG
+          }
+          else {
+            this.CRAM[temp] |= this.GG_JAVA2[value & 0x0F] & 0xFF;
+            this.CRAM[temp + 1] |= (this.GG_JAVA2[value & 0x0F] >> 8) & 0xFF;
+            this.CRAM[temp + 2] |= (this.GG_JAVA2[value & 0x0F] >> 8) & 0xFF;
+          }
         }
         break;
     }
@@ -606,6 +620,10 @@ JSSMS.Vdp.prototype = {
    * @param {number} lineno Line Number to Render.
    */
   drawLine: function(lineno) {
+    var i = 0;
+    var temp = 0;
+    var temp2 = 0;
+
     // Check we are in the visible drawing region
     if (this.main.is_gg) {
       if (lineno < GG_Y_OFFSET || lineno >= GG_Y_OFFSET + GG_HEIGHT)
@@ -614,7 +632,7 @@ JSSMS.Vdp.prototype = {
 
     // Clear sprite collision array if enabled
     if (Setup.VDP_SPRITE_COLLISIONS) {
-      var i = SMS_WIDTH; // this.spriteCol.length
+      i = SMS_WIDTH; // this.spriteCol.length
       while (i--)
         this.spriteCol[i] = false;
     }
@@ -636,7 +654,6 @@ JSSMS.Vdp.prototype = {
 
       // Blank Leftmost Column (SMS Only)
       if (this.main.is_sms && (this.vdpreg[0] & 0x20) != 0) {
-        var colour = this.CRAM[16 + (this.vdpreg[7] & 0x0F)];
         var location = lineno << 8;
 
         // DEBUG
@@ -648,14 +665,13 @@ JSSMS.Vdp.prototype = {
         }
 
         // Don't use a loop here for speed purposes
-        this.display[location++] = colour;
-        this.display[location++] = colour;
-        this.display[location++] = colour;
-        this.display[location++] = colour;
-        this.display[location++] = colour;
-        this.display[location++] = colour;
-        this.display[location++] = colour;
-        this.display[location] = colour;
+        temp = location * 4;
+        temp2 = (16 + (this.vdpreg[7] & 0x0F)) * 3;
+        for (i = 0; i < 8; i++) {
+          this.display[temp + i] = this.CRAM[temp2];
+          this.display[temp + i + 1] = this.CRAM[temp2];
+          this.display[temp + i + 2] = this.CRAM[temp2];
+        }
       }
     } else {
       // Blank Display
@@ -668,6 +684,11 @@ JSSMS.Vdp.prototype = {
    * @param {number} lineno
    */
   drawBg: function(lineno) {
+    var pixX = 0;
+    var colour = 0;
+    var temp = 0;
+    var temp2 = 0;
+
     // Horizontal Scroll
     var hscroll = this.vdpreg[8];
 
@@ -695,7 +716,7 @@ JSSMS.Vdp.prototype = {
     var tile_y = ((lineno + (vscroll & 7)) & 7) << 3;
 
     // Array Position
-    var rowprecal = lineno << 8;
+    var row_precal = lineno << 8;
 
     // Cycle through background table
     for (var tx = this.h_start; tx < this.h_end; tx++) {
@@ -716,21 +737,29 @@ JSSMS.Vdp.prototype = {
 
       // Plot 8 Pixel Row (No H-Flip)
       if ((secondbyte & 0x02) == 0) {
-        for (var pixX = 0; pixX < 8 && sx < SMS_WIDTH; pixX++, sx++) {
-          var colour = tile[pixX + pixY];
+        for (pixX = 0; pixX < 8 && sx < SMS_WIDTH; pixX++, sx++) {
+          colour = tile[pixX + pixY];
+          temp = (sx + row_precal) * 4;
+          temp2 = (colour + pal) * 3;
 
           // Set Priority Array (Sprites over/under background tile)
           this.bgPriority[sx] = ((secondbyte & 0x10) != 0) && (colour != 0);
-          this.display[sx + rowprecal] = this.CRAM[colour + pal];
+          this.display[temp] = this.CRAM[temp2];
+          this.display[temp + 1] = this.CRAM[temp2 + 1];
+          this.display[temp + 2] = this.CRAM[temp2 + 2];
         }
       } else {
         // Plot 8 Pixel Row (H-Flip)
-        for (var pixX = 7; pixX >= 0 && sx < SMS_WIDTH; pixX--, sx++) {
-          var colour = tile[pixX + pixY];
+        for (pixX = 7; pixX >= 0 && sx < SMS_WIDTH; pixX--, sx++) {
+          colour = tile[pixX + pixY];
+          temp = (sx + row_precal) * 4;
+          temp2 = (colour + pal) * 3;
 
           // Set Priority Array (Sprites over/under background tile)
           this.bgPriority[sx] = ((secondbyte & 0x10) != 0) && (colour != 0);
-          this.display[sx + rowprecal] = this.CRAM[colour + pal];
+          this.display[temp] = this.CRAM[temp2];
+          this.display[temp + 1] = this.CRAM[temp2 + 1];
+          this.display[temp + 2] = this.CRAM[temp2 + 2];
         }
       }
       tile_column++;
@@ -751,6 +780,10 @@ JSSMS.Vdp.prototype = {
    * @param {number} lineno Line Number to Render.
    */
   drawSprite: function(lineno) {
+    var colour = 0;
+    var temp = 0;
+    var temp2 = 0;
+
     // Reference to the sprites that should appear on this line
     var sprites = this.lineSprites[lineno];
 
@@ -803,10 +836,15 @@ JSSMS.Vdp.prototype = {
       // Plot Normal Sprites (Width = 8)
       if (zoomed == 0) {
         for (; pix < 8 && x < SMS_WIDTH; pix++, x++) {
-          var colour = tile[offset++];
+          colour = tile[offset++];
 
           if (colour != 0 && !this.bgPriority[x]) {
-            this.display[x + row_precal] = this.CRAM[colour + 16];
+            temp = (x + row_precal) * 4;
+            temp2 = (colour + 16) * 3;
+
+            this.display[temp] = this.CRAM[temp2];
+            this.display[temp + 1] = this.CRAM[temp2 + 1];
+            this.display[temp + 2] = this.CRAM[temp2 + 2];
 
             // Emulate sprite collision (when two opaque pixels overlap)
             if (Setup.VDP_SPRITE_COLLISIONS) {
@@ -820,11 +858,16 @@ JSSMS.Vdp.prototype = {
       } else {
         // Plot Zoomed Sprites (Width = 16)
         for (; pix < 8 && x < SMS_WIDTH; pix++, x += 2) {
-          var colour = tile[offset++];
+          colour = tile[offset++];
 
           // Plot first pixel
           if (colour != 0 && !this.bgPriority[x]) {
-            this.display[x + row_precal] = this.CRAM[colour + 16];
+            temp = (x + row_precal) * 4;
+            temp2 = (colour + 16) * 3;
+
+            this.display[temp] = this.CRAM[temp2];
+            this.display[temp + 1] = this.CRAM[temp2 + 1];
+            this.display[temp + 2] = this.CRAM[temp2 + 2];
 
             if (Setup.VDP_SPRITE_COLLISIONS) {
               if (!this.spriteCol[x])
@@ -836,7 +879,12 @@ JSSMS.Vdp.prototype = {
 
           // Plot second pixel
           if (colour != 0 && !this.bgPriority[x + 1]) {
-            this.display[x + row_precal + 1] = this.CRAM[colour + 16];
+            temp = (x + row_precal + 1) * 4;
+            temp2 = (colour + 16) * 3;
+
+            this.display[temp] = this.CRAM[temp2];
+            this.display[temp + 1] = this.CRAM[temp2 + 1];
+            this.display[temp + 2] = this.CRAM[temp2 + 2];
 
             if (Setup.VDP_SPRITE_COLLISIONS) {
               if (!this.spriteCol[x + 1])
@@ -862,12 +910,17 @@ JSSMS.Vdp.prototype = {
    * @param {number} lineno Line number to render.
    */
   drawBGColour: function(lineno) {
-    var colour = this.CRAM[16 + (this.vdpreg[7] & 0x0F)];
     var row_precal = lineno << 8;
+    var temp = 0;
+    var temp2 = (16 + (this.vdpreg[7] & 0x0F)) * 3;
     var i = 0;
 
-    for (; i < SMS_WIDTH; i++) {
-      this.display[row_precal++] = colour;
+    for (; i < SMS_WIDTH * 4; i++) {
+      temp = row_precal * 4;
+      this.display[temp] = this.CRAM[temp2];
+      this.display[temp + 1] = this.CRAM[temp2 + 1];
+      this.display[temp + 2] = this.CRAM[temp2 + 2];
+      row_precal++;
     }
   },
 
@@ -1093,7 +1146,7 @@ JSSMS.Vdp.prototype = {
     state[2] = this.counter | (this.vScrollLatch << 8) | (this.line << 16);
 
     JSSMS.Utils.copyArrayElements(this.vdpreg, 0, state, 3, 16 /*this.vdpreg.length*/);
-    JSSMS.Utils.copyArrayElements(this.CRAM, 0, state, 3 + 16 /*this.vdpreg.length*/, 0x20 /*this.CRAM.length*/);
+    JSSMS.Utils.copyArrayElements(this.CRAM, 0, state, 3 + 16 /*this.vdpreg.length*/, 0x20 * 3 /*this.CRAM.length*/);
 
     return state;
   },
@@ -1120,7 +1173,7 @@ JSSMS.Vdp.prototype = {
     this.line = (temp >> 16) & 0xFFFF;
 
     JSSMS.Utils.copyArrayElements(state, 3, this.vdpreg, 0, 16 /*this.vdpreg.length*/);
-    JSSMS.Utils.copyArrayElements(state, 3 + 16 /*this.vdpreg.length*/, this.CRAM, 0, 0x20 /*this.CRAM.length*/);
+    JSSMS.Utils.copyArrayElements(state, 3 + 16 /*this.vdpreg.length*/, this.CRAM, 0, 0x20 * 3 /*this.CRAM.length*/);
 
     // Force redraw of all cached tile data
     this.forceFullRedraw();
