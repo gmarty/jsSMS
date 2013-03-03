@@ -37,7 +37,7 @@
 /** bit3 (usually a copy of bit 3 of the result). */
 /** @const */ var F_BIT3 = 0x08;
 
-/** half carry (set when a carry occured between bit 3 / 4 of result - used for BCD. */
+/** half carry (set when a carry occurred between bit 3 / 4 of result - used for BCD. */
 /** @const */ var F_HALFCARRY = 0x10;
 
 /** bit5 (usually a copy of bit 5 of the result). */

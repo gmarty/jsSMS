@@ -260,11 +260,9 @@ JSSMS.Utils = {
    *
    * @return {number} The current timestamp.
    */
-  getTimestamp: function() {
-    return Date.now || (Date.now = function () {
-      return new Date().getTime();
-    });
-  }(),
+  getTimestamp: Date.now || function() {
+    return new Date().getTime();
+  },
 
 
   /**
