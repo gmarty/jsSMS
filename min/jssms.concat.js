@@ -359,11 +359,9 @@ JSSMS.Utils = {rndInt:function(range) {
       return array[address >> 10][address & 1023] & 255 | (array[++address >> 10][address & 1023] & 255) << 8
     }
   }
-}(), getTimestamp:function() {
-  return Date.now || (Date.now = function() {
-    return(new Date).getTime()
-  })
-}(), getPrefix:function(arr) {
+}(), getTimestamp:Date.now || function() {
+  return(new Date).getTime()
+}, getPrefix:function(arr) {
   var prefix = false;
   arr.some(function(prop) {
     if(prop in document) {
