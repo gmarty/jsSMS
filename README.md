@@ -19,7 +19,7 @@ Though state save and load functions are ported, there are not used and should b
 
 Many parts of the script are borrowed from JSNES, a NES emulator in JavaScript by Ben Firsh.
 
-This script is shipped with a minified version of about 13 kb gzipped.
+This script is shipped with a minified version of about 14 kb gzipped.
 The ant task for build uses Closure Compiler in advanced optimizations mode.
 
 If you are looking for another SMS emulator in JavaScript, go to [Miracle](http://github.com/mattgodbolt/Miracle).

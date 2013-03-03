@@ -83,9 +83,9 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
     requestAnimationFrame(this.frame.bind(this))
   }
 }, emulateNextFrame:function() {
-  var startTime;
-  var lineno;
-  for(lineno = 0;lineno < this.no_of_scanlines;lineno++) {
+  var startTime = 0;
+  var lineno = 0;
+  for(;lineno < this.no_of_scanlines;lineno++) {
     if(Setup.DEBUG_TIMING) {
       startTime = JSSMS.Utils.getTimestamp()
     }
@@ -202,7 +202,7 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   this.audioBufferOffset += samplesToGenerate
 }, readRomDirectly:function(data, fileName) {
   var pages;
-  var mode = fileName.substr(-3).toLowerCase() === ".gg" ? 2 : 1;
+  var mode = fileName.substr(-3).toLowerCase() == ".gg" ? 2 : 1;
   var size = data.length;
   if(mode == 1) {
     this.setSMS()
@@ -244,7 +244,7 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   }
   return pages
 }, reloadRom:function() {
-  if(this.romData !== "" && this.romFileName !== "") {
+  if(this.romData != "" && this.romFileName != "") {
     return this.readRomDirectly(this.romData, this.romFileName)
   }else {
     return false
@@ -255,7 +255,7 @@ JSSMS.Utils = {rndInt:function(range) {
 }, Array:function() {
   if(SUPPORT_DATAVIEW) {
     return function(length) {
-      if(length === undefined) {
+      if(!length) {
         length = 0
       }
       return new DataView(new ArrayBuffer(length))
@@ -280,7 +280,7 @@ JSSMS.Utils = {rndInt:function(range) {
 }(), copyArray:function() {
   if(SUPPORT_DATAVIEW) {
     return function(src) {
-      if(src === undefined) {
+      if(!src) {
         return JSSMS.Utils.Array()
       }
       var i, dest;
@@ -293,7 +293,7 @@ JSSMS.Utils = {rndInt:function(range) {
     }
   }else {
     return function(src) {
-      if(src === undefined) {
+      if(!src) {
         return JSSMS.Utils.Array()
       }
       var i, dest;
@@ -359,11 +359,9 @@ JSSMS.Utils = {rndInt:function(range) {
       return array[address >> 10][address & 1023] & 255 | (array[++address >> 10][address & 1023] & 255) << 8
     }
   }
-}(), getTimestamp:function() {
-  return Date.now || (Date.now = function() {
-    return(new Date).getTime()
-  })
-}(), getPrefix:function(arr) {
+}(), getTimestamp:Date.now || function() {
+  return(new Date).getTime()
+}, getPrefix:function(arr) {
   var prefix = false;
   arr.some(function(prop) {
     if(prop in document) {
@@ -448,7 +446,6 @@ JSSMS.Z80 = function(sms) {
   this.number_of_pages = 0;
   this.memWriteMap = new Array(65);
   this.memReadMap = new Array(65);
-  this.dummyWrite = JSSMS.Utils.Array(Setup.PAGE_SIZE);
   this.DAA_TABLE = new Array(2048);
   this.SZ_TABLE = new Array(256);
   this.SZP_TABLE = new Array(256);
@@ -459,7 +456,10 @@ JSSMS.Z80 = function(sms) {
   this.SZ_BIT_TABLE = new Array(256);
   this.generateFlagTables();
   this.generateDAATable();
-  this.generateMemory()
+  this.generateMemory();
+  this.writeMem = JSSMS.Utils.writeMem.bind(this, this);
+  this.readMem = JSSMS.Utils.readMem.bind(this, this.memReadMap);
+  this.readMemWord = JSSMS.Utils.readMemWord.bind(this, this.memReadMap)
 };
 JSSMS.Z80.prototype = {reset:function() {
   this.a = this.a2 = 0;
@@ -522,9 +522,9 @@ JSSMS.Z80.prototype = {reset:function() {
   this.exDE();
   this.exHL()
 }, run:function(cycles, cyclesTo) {
-  var location;
-  var opcode;
-  var temp;
+  var location = 0;
+  var opcode = 0;
+  var temp = 0;
   this.tstates += cycles;
   if(cycles != 0) {
     this.totalCycles = cycles
@@ -1153,13 +1153,13 @@ JSSMS.Z80.prototype = {reset:function() {
         this.call((this.f & F_ZERO) == 0);
         break;
       case 197:
-        this.push(this.b, this.c);
+        this.push2(this.b, this.c);
         break;
       case 198:
         this.add_a(this.readMem(this.pc++));
         break;
       case 199:
-        this.push(this.pc);
+        this.push1(this.pc);
         this.pc = 0;
         break;
       case 200:
@@ -1179,14 +1179,14 @@ JSSMS.Z80.prototype = {reset:function() {
         this.call((this.f & F_ZERO) != 0);
         break;
       case 205:
-        this.push(this.pc + 2);
+        this.push1(this.pc + 2);
         this.pc = this.readMemWord(this.pc);
         break;
       case 206:
         this.adc_a(this.readMem(this.pc++));
         break;
       case 207:
-        this.push(this.pc);
+        this.push1(this.pc);
         this.pc = 8;
         break;
       case 208:
@@ -1206,13 +1206,13 @@ JSSMS.Z80.prototype = {reset:function() {
         this.call((this.f & F_CARRY) == 0);
         break;
       case 213:
-        this.push(this.d, this.e);
+        this.push2(this.d, this.e);
         break;
       case 214:
         this.sub_a(this.readMem(this.pc++));
         break;
       case 215:
-        this.push(this.pc);
+        this.push1(this.pc);
         this.pc = 16;
         break;
       case 216:
@@ -1239,7 +1239,7 @@ JSSMS.Z80.prototype = {reset:function() {
         this.sbc_a(this.readMem(this.pc++));
         break;
       case 223:
-        this.push(this.pc);
+        this.push1(this.pc);
         this.pc = 24;
         break;
       case 224:
@@ -1264,13 +1264,13 @@ JSSMS.Z80.prototype = {reset:function() {
         this.call((this.f & F_PARITY) == 0);
         break;
       case 229:
-        this.push(this.h, this.l);
+        this.push2(this.h, this.l);
         break;
       case 230:
         this.f = this.SZP_TABLE[this.a &= this.readMem(this.pc++)] | F_HALFCARRY;
         break;
       case 231:
-        this.push(this.pc);
+        this.push1(this.pc);
         this.pc = 32;
         break;
       case 232:
@@ -1300,7 +1300,7 @@ JSSMS.Z80.prototype = {reset:function() {
         this.f = this.SZP_TABLE[this.a ^= this.readMem(this.pc++)];
         break;
       case 239:
-        this.push(this.pc);
+        this.push1(this.pc);
         this.pc = 40;
         break;
       case 240:
@@ -1321,13 +1321,13 @@ JSSMS.Z80.prototype = {reset:function() {
         this.call((this.f & F_SIGN) == 0);
         break;
       case 245:
-        this.push(this.a, this.f);
+        this.push2(this.a, this.f);
         break;
       case 246:
         this.f = this.SZP_TABLE[this.a |= this.readMem(this.pc++)];
         break;
       case 247:
-        this.push(this.pc);
+        this.push1(this.pc);
         this.pc = 48;
         break;
       case 248:
@@ -1352,7 +1352,7 @@ JSSMS.Z80.prototype = {reset:function() {
         this.cp_a(this.readMem(this.pc++));
         break;
       case 255:
-        this.push(this.pc);
+        this.push1(this.pc);
         this.pc = 56;
         break
     }
@@ -1369,7 +1369,7 @@ JSSMS.Z80.prototype = {reset:function() {
     this.pc++;
     this.halt = false
   }
-  this.push(this.pc);
+  this.push1(this.pc);
   this.pc = 102;
   this.tstates -= 11
 }, interrupt:function() {
@@ -1385,7 +1385,7 @@ JSSMS.Z80.prototype = {reset:function() {
   }
   this.iff1 = this.iff2 = false;
   this.interruptLine = false;
-  this.push(this.pc);
+  this.push1(this.pc);
   if(this.im == 0) {
     this.pc = this.interruptVector == 0 || this.interruptVector == 255 ? 56 : this.interruptVector;
     this.tstates -= 13
@@ -1407,14 +1407,17 @@ JSSMS.Z80.prototype = {reset:function() {
 }, jr:function(condition) {
   if(condition) {
     var d = this.d_() + 1;
-    this.pc += d < 128 ? d : d - 256;
+    if(d >= 128) {
+      d = d - 256
+    }
+    this.pc += d;
     this.tstates -= 5
   }else {
     this.pc++
   }
 }, call:function(condition) {
   if(condition) {
-    this.push(this.pc + 2);
+    this.push1(this.pc + 2);
     this.pc = this.readMemWord(this.pc);
     this.tstates -= 7
   }else {
@@ -1426,14 +1429,12 @@ JSSMS.Z80.prototype = {reset:function() {
     this.sp += 2;
     this.tstates -= 6
   }
-}, push:function(value, l) {
-  if(typeof l === "undefined") {
-    this.writeMem(--this.sp, value >> 8);
-    this.writeMem(--this.sp, value & 255)
-  }else {
-    this.writeMem(--this.sp, value);
-    this.writeMem(--this.sp, l)
-  }
+}, push1:function(value) {
+  this.writeMem(--this.sp, value >> 8);
+  this.writeMem(--this.sp, value & 255)
+}, push2:function(value, l) {
+  this.writeMem(--this.sp, value);
+  this.writeMem(--this.sp, l)
 }, incMem:function(offset) {
   this.writeMem(offset, this.inc8(this.readMem(offset)))
 }, decMem:function(offset) {
@@ -2274,8 +2275,8 @@ JSSMS.Z80.prototype = {reset:function() {
 }, bit:function(mask) {
   this.f = this.f & F_CARRY | this.SZ_BIT_TABLE[mask]
 }, doIndexOpIX:function(opcode) {
-  var location;
-  var temp;
+  var location = 0;
+  var temp = 0;
   this.tstates -= OP_DD_STATES[opcode];
   if(Setup.REFRESH_EMULATION) {
     this.incR()
@@ -2565,7 +2566,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.writeMem(this.sp + 1, temp >> 8);
       break;
     case 229:
-      this.push(this.ixH, this.ixL);
+      this.push2(this.ixH, this.ixL);
       break;
     case 233:
       this.pc = this.getIX();
@@ -2869,7 +2870,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.writeMem(this.sp + 1, temp >> 8);
       break;
     case 229:
-      this.push(this.iyH, this.iyL);
+      this.push2(this.iyH, this.iyL);
       break;
     case 233:
       this.pc = this.getIY();
@@ -2990,10 +2991,9 @@ JSSMS.Z80.prototype = {reset:function() {
   }
   this.pc++
 }, doED:function(opcode) {
-  var temp;
-  var location;
-  var hlmem;
-  var a_copy;
+  var temp = 0;
+  var location = 0;
+  var hlmem = 0;
   this.tstates -= OP_ED_STATES[opcode];
   if(Setup.REFRESH_EMULATION) {
     this.incR()
@@ -3033,9 +3033,9 @@ JSSMS.Z80.prototype = {reset:function() {
     case 116:
     ;
     case 124:
-      a_copy = this.a;
+      temp = this.a;
       this.a = 0;
-      this.sub_a(a_copy);
+      this.sub_a(temp);
       this.pc++;
       break;
     case 69:
@@ -3850,14 +3850,8 @@ JSSMS.Z80.prototype = {reset:function() {
     this.memReadMap[i] = this.ram[i & 7];
     this.memWriteMap[i] = this.ram[i & 7]
   }
-}, writeMem:function(address, value) {
-  JSSMS.Utils.writeMem(this, address, value)
-}, readMem:function(address) {
-  return JSSMS.Utils.readMem(this.memReadMap, address)
 }, d_:function() {
-  return JSSMS.Utils.readMem(this.memReadMap, this.pc)
-}, readMemWord:function(address) {
-  return JSSMS.Utils.readMemWord(this.memReadMap, address)
+  return this.readMem(this.pc)
 }, page:function(address, value) {
   var p, i, offset;
   this.frameReg[address] = value;
@@ -4162,8 +4156,10 @@ JSSMS.SN76489.prototype = {init:function(clockSpeed, sampleRate) {
       break
   }
 }, update:function(offset, samplesToGenerate) {
-  var buffer = [], sample, i;
-  for(sample = 0;sample < samplesToGenerate;sample++) {
+  var buffer = [];
+  var sample = 0;
+  var i = 0;
+  for(;sample < samplesToGenerate;sample++) {
     for(i = 0;i < 3;i++) {
       if(this.freqPos[i] != NO_ANTIALIAS) {
         this.outputChannel[i] = PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPos[i] >> SCALE
@@ -4215,7 +4211,7 @@ JSSMS.SN76489.prototype = {init:function(clockSpeed, sampleRate) {
         this.freqCounter[3] += this.noiseFreq * (clockCycles / this.noiseFreq + 1)
       }
       if(this.freqPolarity[3] == 1) {
-        var feedback;
+        var feedback = 0;
         if((this.reg[6] & 4) != 0) {
           feedback = (this.noiseShiftReg & FEEDBACK_PATTERN) != 0 && (this.noiseShiftReg & FEEDBACK_PATTERN ^ FEEDBACK_PATTERN) != 0 ? 1 : 0
         }else {
@@ -4255,9 +4251,9 @@ JSSMS.Vdp = function(sms) {
   var i;
   this.videoMode = NTSC;
   this.VRAM = new Array(16384);
-  this.CRAM = new Array(32);
-  for(i = 0;i < 32;i++) {
-    this.CRAM[i] = 0
+  this.CRAM = new Array(32 * 3);
+  for(i = 0;i < 32 * 3;i++) {
+    this.CRAM[i] = 255
   }
   this.vdpreg = new Array(16);
   this.status = 0;
@@ -4274,7 +4270,7 @@ JSSMS.Vdp = function(sms) {
   }
   this.bgt = 0;
   this.vScrollLatch = 0;
-  this.display = new Array(SMS_WIDTH * SMS_HEIGHT);
+  this.display = sms.ui.canvasImageData.data;
   this.main_JAVA = new Array(64);
   this.GG_JAVA1 = new Array(256);
   this.GG_JAVA2 = new Array(16);
@@ -4315,8 +4311,8 @@ JSSMS.Vdp.prototype = {reset:function() {
   for(i = 0;i < 16384;i++) {
     this.VRAM[i] = 0
   }
-  for(i = 0;i < SMS_WIDTH * SMS_HEIGHT;i++) {
-    this.display[i] = 0
+  for(i = 0;i < SMS_WIDTH * SMS_HEIGHT * 4;i++) {
+    this.display[i] = 255
   }
 }, forceFullRedraw:function() {
   this.bgt = (this.vdpreg[2] & 15 & ~1) << 10;
@@ -4394,6 +4390,7 @@ JSSMS.Vdp.prototype = {reset:function() {
   this.readBuffer = this.VRAM[this.location++ & 16383] & 255;
   return value
 }, dataWrite:function(value) {
+  var temp = 0;
   this.firstByte = true;
   switch(this.operation) {
     case 0:
@@ -4424,13 +4421,21 @@ JSSMS.Vdp.prototype = {reset:function() {
       break;
     case 3:
       if(this.main.is_sms) {
-        this.CRAM[this.location & 31] = this.main_JAVA[value & 63]
+        temp = (this.location & 31) * 3;
+        this.CRAM[temp] = this.main_JAVA[value & 63] & 255;
+        this.CRAM[temp + 1] = this.main_JAVA[value & 63] >> 8 & 255;
+        this.CRAM[temp + 2] = this.main_JAVA[value & 63] >> 16 & 255
       }else {
         if(this.main.is_gg) {
+          temp = ((this.location & 63) >> 1) * 3;
           if((this.location & 1) == 0) {
-            this.CRAM[(this.location & 63) >> 1] = this.GG_JAVA1[value]
+            this.CRAM[temp] = this.GG_JAVA1[value] & 255;
+            this.CRAM[temp + 1] = this.GG_JAVA1[value] >> 8 & 255;
+            this.CRAM[temp + 2] = this.GG_JAVA1[value] >> 16 & 255
           }else {
-            this.CRAM[(this.location & 63) >> 1] |= this.GG_JAVA2[value & 15]
+            this.CRAM[temp] |= this.GG_JAVA2[value & 15] & 255;
+            this.CRAM[temp + 1] |= this.GG_JAVA2[value & 15] >> 8 & 255;
+            this.CRAM[temp + 2] |= this.GG_JAVA2[value & 15] >> 8 & 255
           }
         }
       }
@@ -4466,13 +4471,16 @@ JSSMS.Vdp.prototype = {reset:function() {
 }, setVBlankFlag:function() {
   this.status |= STATUS_VINT
 }, drawLine:function(lineno) {
+  var i = 0;
+  var temp = 0;
+  var temp2 = 0;
   if(this.main.is_gg) {
     if(lineno < GG_Y_OFFSET || lineno >= GG_Y_OFFSET + GG_HEIGHT) {
       return
     }
   }
   if(Setup.VDP_SPRITE_COLLISIONS) {
-    var i = this.spriteCol.length;
+    i = SMS_WIDTH;
     while(i--) {
       this.spriteCol[i] = false
     }
@@ -4489,7 +4497,6 @@ JSSMS.Vdp.prototype = {reset:function() {
       this.drawSprite(lineno)
     }
     if(this.main.is_sms && (this.vdpreg[0] & 32) != 0) {
-      var colour = this.CRAM[16 + (this.vdpreg[7] & 15)];
       var location = lineno << 8;
       if(16 + (this.vdpreg[7] & 15) > 32) {
         debugger
@@ -4497,19 +4504,22 @@ JSSMS.Vdp.prototype = {reset:function() {
       if(location > SMS_WIDTH * SMS_HEIGHT) {
         debugger
       }
-      this.display[location++] = colour;
-      this.display[location++] = colour;
-      this.display[location++] = colour;
-      this.display[location++] = colour;
-      this.display[location++] = colour;
-      this.display[location++] = colour;
-      this.display[location++] = colour;
-      this.display[location] = colour
+      temp = location * 4;
+      temp2 = (16 + (this.vdpreg[7] & 15)) * 3;
+      for(i = 0;i < 8;i++) {
+        this.display[temp + i] = this.CRAM[temp2];
+        this.display[temp + i + 1] = this.CRAM[temp2];
+        this.display[temp + i + 2] = this.CRAM[temp2]
+      }
     }
   }else {
     this.drawBGColour(lineno)
   }
 }, drawBg:function(lineno) {
+  var pixX = 0;
+  var colour = 0;
+  var temp = 0;
+  var temp2 = 0;
   var hscroll = this.vdpreg[8];
   var vscroll = ACCURATE ? this.vScrollLatch : this.vdpreg[9];
   if(lineno < 16 && (this.vdpreg[0] & 64) != 0) {
@@ -4522,7 +4532,7 @@ JSSMS.Vdp.prototype = {reset:function() {
     tile_row -= 28
   }
   var tile_y = (lineno + (vscroll & 7) & 7) << 3;
-  var rowprecal = lineno << 8;
+  var row_precal = lineno << 8;
   for(var tx = this.h_start;tx < this.h_end;tx++) {
     var tile_props = this.bgt + ((tile_column & 31) << 1) + (tile_row << 6);
     var secondbyte = this.VRAM[tile_props + 1];
@@ -4531,16 +4541,24 @@ JSSMS.Vdp.prototype = {reset:function() {
     var pixY = (secondbyte & 4) == 0 ? tile_y : (7 << 3) - tile_y;
     var tile = this.tiles[(this.VRAM[tile_props] & 255) + ((secondbyte & 1) << 8)];
     if((secondbyte & 2) == 0) {
-      for(var pixX = 0;pixX < 8 && sx < SMS_WIDTH;pixX++, sx++) {
-        var colour = tile[pixX + pixY];
+      for(pixX = 0;pixX < 8 && sx < SMS_WIDTH;pixX++, sx++) {
+        colour = tile[pixX + pixY];
+        temp = (sx + row_precal) * 4;
+        temp2 = (colour + pal) * 3;
         this.bgPriority[sx] = (secondbyte & 16) != 0 && colour != 0;
-        this.display[sx + rowprecal] = this.CRAM[colour + pal]
+        this.display[temp] = this.CRAM[temp2];
+        this.display[temp + 1] = this.CRAM[temp2 + 1];
+        this.display[temp + 2] = this.CRAM[temp2 + 2]
       }
     }else {
-      for(var pixX = 7;pixX >= 0 && sx < SMS_WIDTH;pixX--, sx++) {
-        var colour = tile[pixX + pixY];
+      for(pixX = 7;pixX >= 0 && sx < SMS_WIDTH;pixX--, sx++) {
+        colour = tile[pixX + pixY];
+        temp = (sx + row_precal) * 4;
+        temp2 = (colour + pal) * 3;
         this.bgPriority[sx] = (secondbyte & 16) != 0 && colour != 0;
-        this.display[sx + rowprecal] = this.CRAM[colour + pal]
+        this.display[temp] = this.CRAM[temp2];
+        this.display[temp + 1] = this.CRAM[temp2 + 1];
+        this.display[temp + 2] = this.CRAM[temp2 + 2]
       }
     }
     tile_column++;
@@ -4550,6 +4568,9 @@ JSSMS.Vdp.prototype = {reset:function() {
     }
   }
 }, drawSprite:function(lineno) {
+  var colour = 0;
+  var temp = 0;
+  var temp2 = 0;
   var sprites = this.lineSprites[lineno];
   var count = Math.min(SPRITES_PER_LINE, sprites[SPRITE_COUNT]);
   var zoomed = this.vdpreg[1] & 1;
@@ -4573,9 +4594,13 @@ JSSMS.Vdp.prototype = {reset:function() {
     var offset = pix + ((tileRow & 7) << 3);
     if(zoomed == 0) {
       for(;pix < 8 && x < SMS_WIDTH;pix++, x++) {
-        var colour = tile[offset++];
+        colour = tile[offset++];
         if(colour != 0 && !this.bgPriority[x]) {
-          this.display[x + row_precal] = this.CRAM[colour + 16];
+          temp = (x + row_precal) * 4;
+          temp2 = (colour + 16) * 3;
+          this.display[temp] = this.CRAM[temp2];
+          this.display[temp + 1] = this.CRAM[temp2 + 1];
+          this.display[temp + 2] = this.CRAM[temp2 + 2];
           if(Setup.VDP_SPRITE_COLLISIONS) {
             if(!this.spriteCol[x]) {
               this.spriteCol[x] = true
@@ -4587,9 +4612,13 @@ JSSMS.Vdp.prototype = {reset:function() {
       }
     }else {
       for(;pix < 8 && x < SMS_WIDTH;pix++, x += 2) {
-        var colour = tile[offset++];
+        colour = tile[offset++];
         if(colour != 0 && !this.bgPriority[x]) {
-          this.display[x + row_precal] = this.CRAM[colour + 16];
+          temp = (x + row_precal) * 4;
+          temp2 = (colour + 16) * 3;
+          this.display[temp] = this.CRAM[temp2];
+          this.display[temp + 1] = this.CRAM[temp2 + 1];
+          this.display[temp + 2] = this.CRAM[temp2 + 2];
           if(Setup.VDP_SPRITE_COLLISIONS) {
             if(!this.spriteCol[x]) {
               this.spriteCol[x] = true
@@ -4599,7 +4628,11 @@ JSSMS.Vdp.prototype = {reset:function() {
           }
         }
         if(colour != 0 && !this.bgPriority[x + 1]) {
-          this.display[x + row_precal + 1] = this.CRAM[colour + 16];
+          temp = (x + row_precal + 1) * 4;
+          temp2 = (colour + 16) * 3;
+          this.display[temp] = this.CRAM[temp2];
+          this.display[temp + 1] = this.CRAM[temp2 + 1];
+          this.display[temp + 2] = this.CRAM[temp2 + 2];
           if(Setup.VDP_SPRITE_COLLISIONS) {
             if(!this.spriteCol[x + 1]) {
               this.spriteCol[x + 1] = true
@@ -4615,11 +4648,16 @@ JSSMS.Vdp.prototype = {reset:function() {
     this.status |= STATUS_OVERFLOW
   }
 }, drawBGColour:function(lineno) {
-  var colour = this.CRAM[16 + (this.vdpreg[7] & 15)];
   var row_precal = lineno << 8;
-  var i;
-  for(i = 0;i < SMS_WIDTH;i++) {
-    this.display[row_precal++] = colour
+  var temp = 0;
+  var temp2 = (16 + (this.vdpreg[7] & 15)) * 3;
+  var i = 0;
+  for(;i < SMS_WIDTH * 4;i++) {
+    temp = row_precal * 4;
+    this.display[temp] = this.CRAM[temp2];
+    this.display[temp + 1] = this.CRAM[temp2 + 1];
+    this.display[temp + 2] = this.CRAM[temp2 + 2];
+    row_precal++
   }
 }, generateConvertedPals:function() {
   var i;
@@ -4723,7 +4761,7 @@ JSSMS.Vdp.prototype = {reset:function() {
   state[1] = this.location | this.operation << 16 | this.readBuffer << 24;
   state[2] = this.counter | this.vScrollLatch << 8 | this.line << 16;
   JSSMS.Utils.copyArrayElements(this.vdpreg, 0, state, 3, 16);
-  JSSMS.Utils.copyArrayElements(this.CRAM, 0, state, 3 + 16, 32);
+  JSSMS.Utils.copyArrayElements(this.CRAM, 0, state, 3 + 16, 32 * 3);
   return state
 }, setState:function(state) {
   var temp = state[0];
@@ -4740,7 +4778,7 @@ JSSMS.Vdp.prototype = {reset:function() {
   this.vScrollLatch = temp >> 8 & 255;
   this.line = temp >> 16 & 65535;
   JSSMS.Utils.copyArrayElements(state, 3, this.vdpreg, 0, 16);
-  JSSMS.Utils.copyArrayElements(state, 3 + 16, this.CRAM, 0, 32);
+  JSSMS.Utils.copyArrayElements(state, 3 + 16, this.CRAM, 0, 32 * 3);
   this.forceFullRedraw()
 }};
 JSSMS.DummyUI = function(sms) {
@@ -4754,7 +4792,7 @@ JSSMS.DummyUI = function(sms) {
   this.writeFrame = function() {
   }
 };
-if(typeof $ !== "undefined") {
+if(typeof $ != "undefined") {
   $.fn.JSSMSUI = function(roms) {
     var parent = this;
     var UI = function(sms) {
@@ -4881,14 +4919,14 @@ if(typeof $ !== "undefined") {
       this.updateStatus("Downloading...");
       $.ajax({url:escape(this.romSelect.val()), xhr:function() {
         var xhr = $.ajaxSettings.xhr();
-        if(typeof xhr.overrideMimeType !== "undefined") {
+        if(typeof xhr.overrideMimeType != "undefined") {
           xhr.overrideMimeType("text/plain; charset=x-user-defined")
         }
         self.xhr = xhr;
         return xhr
       }, complete:function(xhr, status) {
         var data;
-        if(status === "error") {
+        if(status == "error") {
           self.updateStatus("The selected rom could not be loaded.");
           return
         }
@@ -4913,15 +4951,6 @@ if(typeof $ !== "undefined") {
     }, writeFrame:function(buffer, prevBuffer) {
       if(this.hiddenPrefix && document[this.hiddenPrefix]) {
         return
-      }
-      var imageData = this.canvasImageData.data;
-      var pixel, i, j;
-      for(i = 0;i <= SMS_WIDTH * SMS_HEIGHT;i++) {
-        pixel = buffer[i];
-        j = i * 4;
-        imageData[j] = pixel & 255;
-        imageData[j + 1] = pixel >> 8 & 255;
-        imageData[j + 2] = pixel >> 16 & 255
       }
       this.canvasContext.putImageData(this.canvasImageData, 0, 0)
     }};
