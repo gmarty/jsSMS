@@ -607,7 +607,7 @@ JSSMS.Z80.prototype = {
         case 0x27: this.daa(); break;                                            // DAA
         case 0x28: this.jr(((this.f & F_ZERO) != 0)); break;                          // JR Z,(PC+e)
         case 0x29: this.setHL(this.add16(this.getHL(), this.getHL())); break;                   // ADD HL,HL
-        case 0x2A:
+        case 0x2A:                                                        // LD HL,(nn)
           location = this.readMemWord(this.pc);
           this.l = this.readMem(location);
           this.h = this.readMem(location + 1);
