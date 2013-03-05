@@ -281,7 +281,7 @@ JSSMS.prototype = {
       this.isRunning = true;
     }
 
-    requestAnimationFrame(this.frame.bind(this));
+    this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
 
     this.resetFps();
     this.printFps();
@@ -325,7 +325,7 @@ JSSMS.prototype = {
       }
 
       this.fpsFrameCount++;
-      requestAnimationFrame(this.frame.bind(this));
+      this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
     }
   },
 

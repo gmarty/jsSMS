@@ -270,13 +270,18 @@ JSSMS.Utils = {
    * implementation, or false otherwise.
    *
    * @param {Array.<string>} arr An array of prefixes.
+   * @param {Object=} obj An object to check the prefix against, default to `window.document`.
    * @return {string|boolean} The implementation prefix or false.
    */
-  getPrefix: function(arr) {
+  getPrefix: function(arr, obj) {
     var prefix = false;
 
+    if (obj == undefined) {
+      obj = document;
+    }
+
     arr.some(function(prop) {
-      if (prop in document) {
+      if (prop in obj) {
         prefix = prop;
         return true;
       }
