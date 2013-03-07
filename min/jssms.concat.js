@@ -17,7 +17,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 'use strict';var DEBUG = true;
-var ACCURATE = true;
+var ACCURATE = false;
 var LITTLE_ENDIAN = true;
 var SUPPORT_DATAVIEW = !!(window["DataView"] && window["ArrayBuffer"]);
 var SAMPLE_RATE = 44100;
@@ -59,7 +59,7 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   if(!this.isRunning) {
     this.isRunning = true
   }
-  requestAnimationFrame(this.frame.bind(this));
+  this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
   this.resetFps();
   this.printFps();
   this.fpsInterval = setInterval(function() {
@@ -80,7 +80,7 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
       }
     }
     this.fpsFrameCount++;
-    requestAnimationFrame(this.frame.bind(this))
+    this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen)
   }
 }, emulateNextFrame:function() {
   var startTime = 0;
@@ -361,10 +361,13 @@ JSSMS.Utils = {rndInt:function(range) {
   }
 }(), getTimestamp:Date.now || function() {
   return(new Date).getTime()
-}, getPrefix:function(arr) {
+}, getPrefix:function(arr, obj) {
   var prefix = false;
+  if(obj == undefined) {
+    obj = document
+  }
   arr.some(function(prop) {
-    if(prop in document) {
+    if(prop in obj) {
       prefix = prop;
       return true
     }
@@ -374,7 +377,7 @@ JSSMS.Utils = {rndInt:function(range) {
 }, isIE:function() {
   return/msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent)
 }};
-var HALT_SPEEDUP = false;
+var HALT_SPEEDUP = true;
 var F_CARRY = 1;
 var F_NEGATIVE = 2;
 var F_PARITY = 4;
@@ -4801,7 +4804,21 @@ if(typeof $ != "undefined") {
       var root = $("<div></div>");
       var controls = $('<div class="controls"></div>');
       var fullscreenSupport = JSSMS.Utils.getPrefix(["fullscreenEnabled", "mozFullScreenEnabled", "webkitCancelFullScreen"]);
+      var requestAnimationFramePrefix = JSSMS.Utils.getPrefix(["requestAnimationFrame", "msRequestAnimationFrame", "mozRequestAnimationFrame", "webkitRequestAnimationFrame", "oRequestAnimationFrame"], window);
       var i;
+      if(requestAnimationFramePrefix) {
+        this.requestAnimationFrame = window[requestAnimationFramePrefix].bind(window)
+      }else {
+        var lastTime = 0;
+        this.requestAnimationFrame = function(callback) {
+          var currTime = JSSMS.Utils.getTimestamp();
+          var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+          window.setTimeout(function() {
+            callback(currTime + timeToCall)
+          }, timeToCall);
+          lastTime = currTime + timeToCall
+        }
+      }
       this.zoomed = false;
       this.hiddenPrefix = JSSMS.Utils.getPrefix(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
       this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + ' class="screen"></canvas>');
@@ -4957,32 +4974,7 @@ if(typeof $ != "undefined") {
     return UI
   }
 }
-(function() {
-  var lastTime = 0;
-  var vendors = ["ms", "moz", "webkit", "o"];
-  var x;
-  for(x = 0;x < vendors.length && !window.requestAnimationFrame;++x) {
-    window.requestAnimationFrame = window[vendors[x] + "RequestAnimationFrame"];
-    window.cancelAnimationFrame = window[vendors[x] + "CancelAnimationFrame"] || window[vendors[x] + "CancelRequestAnimationFrame"]
-  }
-  if(!window.requestAnimationFrame) {
-    window.requestAnimationFrame = function(callback, element) {
-      var currTime = JSSMS.Utils.getTimestamp();
-      var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-      var id = window.setTimeout(function() {
-        callback(currTime + timeToCall)
-      }, timeToCall);
-      lastTime = currTime + timeToCall;
-      return id
-    }
-  }
-  if(!window.cancelAnimationFrame) {
-    window.cancelAnimationFrame = function(id) {
-      clearTimeout(id)
-    }
-  }
-})();
-var IO_TR_DIRECTION = 0;
+;var IO_TR_DIRECTION = 0;
 var IO_TH_DIRECTION = 1;
 var IO_TR_OUTPUT = 2;
 var IO_TH_OUTPUT = 3;
