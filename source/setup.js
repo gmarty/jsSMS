@@ -31,7 +31,7 @@ var DEBUG = true;
 /**
  * @type {boolean}
  */
-var ACCURATE = true;
+var ACCURATE = false;
 
 
 /**

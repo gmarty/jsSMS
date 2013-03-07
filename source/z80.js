@@ -20,7 +20,7 @@
 'use strict';
 
 /** Speedup hack to set tstates to '0' on halt instruction. */
-/** @const */ var HALT_SPEEDUP = false;
+/** @const */ var HALT_SPEEDUP = true;
 
 /** carry (set when a standard carry occurred). */
 /** @const */ var F_CARRY = 0x01;

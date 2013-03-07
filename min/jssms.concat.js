@@ -17,7 +17,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 'use strict';var DEBUG = true;
-var ACCURATE = true;
+var ACCURATE = false;
 var LITTLE_ENDIAN = true;
 var SUPPORT_DATAVIEW = !!(window["DataView"] && window["ArrayBuffer"]);
 var SAMPLE_RATE = 44100;
@@ -377,7 +377,7 @@ JSSMS.Utils = {rndInt:function(range) {
 }, isIE:function() {
   return/msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent)
 }};
-var HALT_SPEEDUP = false;
+var HALT_SPEEDUP = true;
 var F_CARRY = 1;
 var F_NEGATIVE = 2;
 var F_PARITY = 4;
