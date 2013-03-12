@@ -543,12 +543,9 @@ JSSMS.Vdp.prototype = {
             // first byte
             this.CRAM[temp] = this.GG_JAVA1[value] & 0xFF; // GG
             this.CRAM[temp + 1] = (this.GG_JAVA1[value] >> 8) & 0xFF; // GG
-            this.CRAM[temp + 2] = (this.GG_JAVA1[value] >> 16) & 0xFF; // GG
           }
           else {
-            this.CRAM[temp] |= this.GG_JAVA2[value & 0x0F] & 0xFF;
-            this.CRAM[temp + 1] |= (this.GG_JAVA2[value & 0x0F] >> 8) & 0xFF;
-            this.CRAM[temp + 2] |= (this.GG_JAVA2[value & 0x0F] >> 8) & 0xFF;
+            this.CRAM[temp + 2] = (this.GG_JAVA2[value & 0x0F] >> 16) & 0xFF;
           }
         }
         break;
