@@ -4314,8 +4314,11 @@ JSSMS.Vdp.prototype = {reset:function() {
   for(i = 0;i < 16384;i++) {
     this.VRAM[i] = 0
   }
-  for(i = 0;i < SMS_WIDTH * SMS_HEIGHT * 4;i++) {
-    this.display[i] = 255
+  for(i = 0;i < SMS_WIDTH * SMS_HEIGHT * 4;i = i + 4) {
+    this.display[i] = 0;
+    this.display[i + 1] = 0;
+    this.display[i + 2] = 0;
+    this.display[i + 3] = 255
   }
 }, forceFullRedraw:function() {
   this.bgt = (this.vdpreg[2] & 15 & ~1) << 10;
@@ -4433,12 +4436,9 @@ JSSMS.Vdp.prototype = {reset:function() {
           temp = ((this.location & 63) >> 1) * 3;
           if((this.location & 1) == 0) {
             this.CRAM[temp] = this.GG_JAVA1[value] & 255;
-            this.CRAM[temp + 1] = this.GG_JAVA1[value] >> 8 & 255;
-            this.CRAM[temp + 2] = this.GG_JAVA1[value] >> 16 & 255
+            this.CRAM[temp + 1] = this.GG_JAVA1[value] >> 8 & 255
           }else {
-            this.CRAM[temp] |= this.GG_JAVA2[value & 15] & 255;
-            this.CRAM[temp + 1] |= this.GG_JAVA2[value & 15] >> 8 & 255;
-            this.CRAM[temp + 2] |= this.GG_JAVA2[value & 15] >> 8 & 255
+            this.CRAM[temp + 2] = this.GG_JAVA2[value & 15] >> 16 & 255
           }
         }
       }
@@ -4828,7 +4828,6 @@ if(typeof $ != "undefined") {
         return
       }
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
-      this.resetCanvas();
       this.romContainer = $("<div></div>");
       this.romSelect = $("<select></select>");
       this.romSelect.change(function() {
@@ -4906,12 +4905,6 @@ if(typeof $ != "undefined") {
       this.screen[0].width = SMS_WIDTH;
       this.screen[0].height = SMS_HEIGHT;
       this.log.text("")
-    }, resetCanvas:function() {
-      this.canvasContext.fillStyle = "black";
-      this.canvasContext.fillRect(0, 0, SMS_WIDTH, SMS_HEIGHT);
-      for(var i = 3;i <= this.canvasImageData.data.length - 3;i += 4) {
-        this.canvasImageData.data[i] = 255
-      }
     }, setRoms:function(roms) {
       var groupName, optgroup, length, i, count = 0;
       this.romSelect.children().remove();

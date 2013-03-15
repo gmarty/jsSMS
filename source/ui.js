@@ -94,7 +94,6 @@ if (typeof $ != 'undefined') {
       }
 
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
-      this.resetCanvas();
 
       this.romContainer = $('<div></div>');
       this.romSelect = $('<select></select>');
@@ -215,18 +214,6 @@ if (typeof $ != 'undefined') {
         this.screen[0].height = SMS_HEIGHT;
 
         this.log.text('');
-      },
-
-
-      resetCanvas: function() {
-        this.canvasContext.fillStyle = 'black';
-        // set alpha to opaque
-        this.canvasContext.fillRect(0, 0, SMS_WIDTH, SMS_HEIGHT);
-
-        // Set alpha
-        for (var i = 3; i <= this.canvasImageData.data.length - 3; i += 4) {
-          this.canvasImageData.data[i] = 0xFF;
-        }
       },
 
 

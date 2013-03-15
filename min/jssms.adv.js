@@ -3618,8 +3618,8 @@ $JSSMS$Vdp$$.prototype = {reset:function $$JSSMS$Vdp$$$$reset$() {
   for($i$$15_i$$inline_68$$ = 0;16384 > $i$$15_i$$inline_68$$;$i$$15_i$$inline_68$$++) {
     this.$VRAM$[$i$$15_i$$inline_68$$] = 0
   }
-  for($i$$15_i$$inline_68$$ = 0;196608 > $i$$15_i$$inline_68$$;$i$$15_i$$inline_68$$++) {
-    this.display[$i$$15_i$$inline_68$$] = 255
+  for($i$$15_i$$inline_68$$ = 0;196608 > $i$$15_i$$inline_68$$;$i$$15_i$$inline_68$$ += 4) {
+    this.display[$i$$15_i$$inline_68$$] = 0, this.display[$i$$15_i$$inline_68$$ + 1] = 0, this.display[$i$$15_i$$inline_68$$ + 2] = 0, this.display[$i$$15_i$$inline_68$$ + 3] = 255
   }
 }};
 function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_forceFullRedraw$self$$) {
@@ -3663,7 +3663,6 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
     this.$canvasContext$ = this.screen[0].getContext("2d");
     if(this.$canvasContext$.getImageData) {
       this.$canvasImageData$ = this.$canvasContext$.getImageData(0, 0, 256, 192);
-      this.$resetCanvas$();
       this.$romContainer$ = $("<div></div>");
       this.$romSelect$ = $("<select></select>");
       this.$romSelect$.change(function() {
@@ -3711,22 +3710,16 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
     this.screen[0].width = 256;
     this.screen[0].height = 192;
     this.log.text("")
-  }, $resetCanvas$:function $$UI$$$$$resetCanvas$$() {
-    this.$canvasContext$.fillStyle = "black";
-    this.$canvasContext$.fillRect(0, 0, 256, 192);
-    for(var $i$$25$$ = 3;$i$$25$$ <= this.$canvasImageData$.data.length - 3;$i$$25$$ += 4) {
-      this.$canvasImageData$.data[$i$$25$$] = 255
-    }
   }, $setRoms$:function $$UI$$$$$setRoms$$($roms$$1$$) {
-    var $groupName$$, $optgroup$$, $length$$16$$, $i$$26$$, $count$$7$$ = 0;
+    var $groupName$$, $optgroup$$, $length$$16$$, $i$$25$$, $count$$7$$ = 0;
     this.$romSelect$.children().remove();
     $("<option>Select a ROM...</option>").appendTo(this.$romSelect$);
     for($groupName$$ in $roms$$1$$) {
       if($roms$$1$$.hasOwnProperty($groupName$$)) {
         $optgroup$$ = $("<optgroup></optgroup>").attr("label", $groupName$$);
         $length$$16$$ = $roms$$1$$[$groupName$$].length;
-        for($i$$26$$ = 0;$i$$26$$ < $length$$16$$;$i$$26$$++) {
-          $("<option>" + $roms$$1$$[$groupName$$][$i$$26$$][0] + "</option>").attr("value", $roms$$1$$[$groupName$$][$i$$26$$][1]).appendTo($optgroup$$)
+        for($i$$25$$ = 0;$i$$25$$ < $length$$16$$;$i$$25$$++) {
+          $("<option>" + $roms$$1$$[$groupName$$][$i$$25$$][0] + "</option>").attr("value", $roms$$1$$[$groupName$$][$i$$25$$][1]).appendTo($optgroup$$)
         }
         $optgroup$$.appendTo(this.$romSelect$)
       }
@@ -3866,9 +3859,7 @@ function $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_controlWrite$
             63] >> 8 & 255, $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$ + 2] = $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$main_JAVA$[$reg$$inline_89_value$$82$$ & 63] >> 16 & 255) : $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$main$.$is_gg$ && 
             ($address$$inline_84_old$$inline_90_port_temp$$inline_83$$ = 3 * (($JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.location & 63) >> 1), 0 == ($JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.location & 1) ? ($JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$] = 
             $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA1$[$reg$$inline_89_value$$82$$] & 255, $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$ + 1] = $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA1$[$reg$$inline_89_value$$82$$] >> 
-            8 & 255, $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$ + 2] = $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA1$[$reg$$inline_89_value$$82$$] >> 16 & 255) : ($JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$] |= 
-            $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA2$[$reg$$inline_89_value$$82$$ & 15] & 255, $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$ + 1] |= $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA2$[$reg$$inline_89_value$$82$$ & 
-            15] >> 8 & 255, $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$ + 2] |= $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA2$[$reg$$inline_89_value$$82$$ & 15] >> 8 & 255))
+            8 & 255) : $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$ + 2] = $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA2$[$reg$$inline_89_value$$82$$ & 15] >> 16 & 255)
         }
         $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.location++;
         break;

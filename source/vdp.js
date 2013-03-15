@@ -339,8 +339,11 @@ JSSMS.Vdp.prototype = {
       this.VRAM[i] = 0;
     }
 
-    for (i = 0; i < (SMS_WIDTH * SMS_HEIGHT * 4); i++) {
-      this.display[i] = 255;
+    for (i = 0; i < (SMS_WIDTH * SMS_HEIGHT * 4); i = i + 4) {
+      this.display[i] = 0x00;
+      this.display[i + 1] = 0x00;
+      this.display[i + 2] = 0x00;
+      this.display[i + 3] = 0xFF; // Alpha channel
     }
   },
 
