@@ -89,7 +89,7 @@ if (typeof $ != 'undefined') {
       this.canvasContext = this.screen[0].getContext('2d');
 
       if (!this.canvasContext.getImageData) {
-        $(parent).html('<div class="alert-message error"><p><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</p></div>');
+        $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</div>');
         return;
       }
 
