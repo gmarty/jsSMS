@@ -114,7 +114,7 @@ if (typeof $ != 'undefined') {
         start: $('<input type="button" value="Stop" class="btn" disabled="disabled">'),
         restart: $('<input type="button" value="Restart" class="btn" disabled="disabled">'),
         sound: $('<input type="button" value="Enable sound" class="btn" disabled="disabled">'),
-        zoom: $('<input type="button" value="Zoom in" class="btn">')
+        zoom: $('<input type="button" value="Zoom in" class="btn hidden-phone">')
       };
 
       this.buttons.start.click(function() {
