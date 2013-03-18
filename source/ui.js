@@ -46,6 +46,12 @@ if (typeof $ != 'undefined') {
     var UI = function(sms) {
       this.main = sms;
 
+      // Exit if ran from Opera Mini.
+      if (Object.prototype.toString.call(window['operamini']) == '[object OperaMini]') {
+        $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser can\'t run this emulator. Try the latest version of Firefox, Google Chrome, Opera or Safari!</div>');
+        return;
+      }
+
       var self = this;
 
       // Create UI
@@ -71,7 +77,7 @@ if (typeof $ != 'undefined') {
           var currTime = JSSMS.Utils.getTimestamp();
           var timeToCall = Math.max(0, 16 - (currTime - lastTime));
           window.setTimeout(function() { callback(currTime + timeToCall); },
-            timeToCall);
+              timeToCall);
           lastTime = currTime + timeToCall;
         };
       }
@@ -89,7 +95,7 @@ if (typeof $ != 'undefined') {
       this.canvasContext = this.screen[0].getContext('2d');
 
       if (!this.canvasContext.getImageData) {
-        $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</div>');
+        $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest version of Firefox, Google Chrome, Opera or Safari!</div>');
         return;
       }
 
