@@ -4800,6 +4800,10 @@ if(typeof $ != "undefined") {
     var parent = this;
     var UI = function(sms) {
       this.main = sms;
+      if(Object.prototype.toString.call(window.operamini) == "[object OperaMini]") {
+        $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser can\'t run this emulator. Try the latest version of Firefox, Google Chrome, Opera or Safari!</div>');
+        return
+      }
       var self = this;
       var root = $("<div></div>");
       var controls = $('<div class="controls"></div>');
@@ -4824,7 +4828,7 @@ if(typeof $ != "undefined") {
       this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + ' class="screen"></canvas>');
       this.canvasContext = this.screen[0].getContext("2d");
       if(!this.canvasContext.getImageData) {
-        $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</div>');
+        $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest version of Firefox, Google Chrome, Opera or Safari!</div>');
         return
       }
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
