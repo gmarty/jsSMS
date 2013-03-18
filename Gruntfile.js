@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-closure-compiler');
+  grunt.loadNpmTasks('grunt-contrib-concat');
 
   // Project configuration.
   grunt.initConfig({
@@ -86,6 +87,24 @@ module.exports = function(grunt) {
           formatting: 'PRETTY_PRINT'
         }
       }
+    },
+
+    concat: {
+      options: {
+        banner: grunt.file.read('source/license.js')
+      },
+      min: {
+        src: ['min/jssms.min.js'],
+        dest: 'min/jssms.min.js'
+      },
+      debug: {
+        src: ['min/jssms.adv.js'],
+        dest: 'min/jssms.adv.js'
+      },
+      concat: {
+        src: ['min/jssms.concat.js'],
+        dest: 'min/jssms.concat.js'
+      }
     }
 
   });
@@ -94,7 +113,10 @@ module.exports = function(grunt) {
   grunt.registerTask('default', [
     'closure-compiler:min',
     'closure-compiler:debug',
-    'closure-compiler:concat'
+    'closure-compiler:concat',
+    'concat:min',
+    'concat:debug',
+    'concat:concat'
   ]);
 
 };

@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "grunt": "~0.4.0",
-    "grunt-closure-compiler": "~0.0.16"
+    "grunt-closure-compiler": "~0.0.16",
+    "grunt-contrib-concat": "0.1.x"
   },
   "keywords": [
     "SMS",
