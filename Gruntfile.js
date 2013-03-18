@@ -38,6 +38,7 @@ module.exports = function(grunt) {
           language_in: 'ECMASCRIPT5_STRICT',
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
+          output_wrapper: '(function(){%output%})();',
           define: [
             '"DEBUG=false"'
           ],
