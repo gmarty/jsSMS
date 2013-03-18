@@ -1,22 +1,22 @@
 /*
- jsSMS - A Sega Master System/GameGear emulator in JavaScript
- Copyright (C) 2012  Guillaume Marty (https://github.com/gmarty)
- Based on JavaGear Copyright (c) 2002-2008 Chris White.
+jsSMS - A Sega Master System/GameGear emulator in JavaScript
+Copyright (C) 2012 Guillaume Marty (https://github.com/gmarty)
+Based on JavaGear Copyright (c) 2002-2008 Chris White
 
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-'use strict';var $JSCompiler_alias_TRUE$$ = !0, $JSCompiler_alias_NULL$$ = null, $JSCompiler_alias_FALSE$$ = !1;
+'use strict';var $JSCompiler_alias_VOID$$ = void 0, $JSCompiler_alias_TRUE$$ = !0, $JSCompiler_alias_NULL$$ = null, $JSCompiler_alias_FALSE$$ = !1;
 function $JSCompiler_emptyFn$$() {
   return function() {
   }
@@ -24,9 +24,9 @@ function $JSCompiler_emptyFn$$() {
 var $SUPPORT_DATAVIEW$$ = !(!window.DataView || !window.ArrayBuffer);
 function $JSSMS$$($opts$$) {
   this.$opts$ = {ui:$JSSMS$DummyUI$$, swfPath:"lib/"};
-  if("undefined" != typeof $opts$$) {
+  if($opts$$ != $JSCompiler_alias_VOID$$) {
     for(var $key$$16$$ in this.$opts$) {
-      "undefined" != typeof $opts$$[$key$$16$$] && (this.$opts$[$key$$16$$] = $opts$$[$key$$16$$])
+      $opts$$[$key$$16$$] != $JSCompiler_alias_VOID$$ && (this.$opts$[$key$$16$$] = $opts$$[$key$$16$$])
     }
   }
   this.$keyboard$ = new $JSSMS$Keyboard$$(this);
@@ -2371,7 +2371,7 @@ $romData$:"", $romFileName$:"", reset:function $$JSSMS$$$$reset$() {
             $JSCompiler_StaticMethods_run$self$$inline_100$$.call(0 != ($JSCompiler_StaticMethods_run$self$$inline_100$$.$f$ & 128));
             break;
           case 253:
-            var $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_189$$ = $JSCompiler_StaticMethods_run$self$$inline_100$$, $opcode$$inline_190$$ = $JSCompiler_StaticMethods_run$self$$inline_100$$.$readMem$($JSCompiler_StaticMethods_run$self$$inline_100$$.$pc$++), $location$$inline_191$$ = void 0, $temp$$inline_192$$ = void 0;
+            var $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_189$$ = $JSCompiler_StaticMethods_run$self$$inline_100$$, $opcode$$inline_190$$ = $JSCompiler_StaticMethods_run$self$$inline_100$$.$readMem$($JSCompiler_StaticMethods_run$self$$inline_100$$.$pc$++), $location$$inline_191$$ = $JSCompiler_alias_VOID$$, $temp$$inline_192$$ = $JSCompiler_alias_VOID$$;
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_189$$.$tstates$ -= $OP_DD_STATES$$[$opcode$$inline_190$$];
             switch($opcode$$inline_190$$) {
               case 9:
@@ -2895,7 +2895,7 @@ function $JSCompiler_StaticMethods_printFps$$($JSCompiler_StaticMethods_printFps
   var $i$$5$$, $dest$$3$$;
   $i$$5$$ = $src$$4$$.length;
   for($dest$$3$$ = new $JSSMS$Utils$Array$$($i$$5$$);$i$$5$$--;) {
-    "undefined" != typeof $src$$4$$[$i$$5$$] && ($dest$$3$$[$i$$5$$] = $src$$4$$[$i$$5$$])
+    $src$$4$$[$i$$5$$] != $JSCompiler_alias_VOID$$ && ($dest$$3$$[$i$$5$$] = $src$$4$$[$i$$5$$])
   }
   return $dest$$3$$
 }, $JSSMS$Utils$writeMem$$ = $SUPPORT_DATAVIEW$$ ? function($self$$2$$, $address$$, $value$$48$$) {
@@ -2929,7 +2929,7 @@ function $JSCompiler_StaticMethods_printFps$$($JSCompiler_StaticMethods_printFps
 };
 function $JSSMS$Utils$getPrefix$$($arr$$16$$, $obj$$35$$) {
   var $prefix$$2$$ = $JSCompiler_alias_FALSE$$;
-  void 0 == $obj$$35$$ && ($obj$$35$$ = document);
+  $obj$$35$$ == $JSCompiler_alias_VOID$$ && ($obj$$35$$ = document);
   $arr$$16$$.some(function($prop$$4$$) {
     return $prop$$4$$ in $obj$$35$$ ? ($prefix$$2$$ = $prop$$4$$, $JSCompiler_alias_TRUE$$) : $JSCompiler_alias_FALSE$$
   });
@@ -3618,8 +3618,8 @@ $JSSMS$Vdp$$.prototype = {reset:function $$JSSMS$Vdp$$$$reset$() {
   for($i$$15_i$$inline_68$$ = 0;16384 > $i$$15_i$$inline_68$$;$i$$15_i$$inline_68$$++) {
     this.$VRAM$[$i$$15_i$$inline_68$$] = 0
   }
-  for($i$$15_i$$inline_68$$ = 0;196608 > $i$$15_i$$inline_68$$;$i$$15_i$$inline_68$$++) {
-    this.display[$i$$15_i$$inline_68$$] = 255
+  for($i$$15_i$$inline_68$$ = 0;196608 > $i$$15_i$$inline_68$$;$i$$15_i$$inline_68$$ += 4) {
+    this.display[$i$$15_i$$inline_68$$] = 0, this.display[$i$$15_i$$inline_68$$ + 1] = 0, this.display[$i$$15_i$$inline_68$$ + 2] = 0, this.display[$i$$15_i$$inline_68$$ + 3] = 255
   }
 }};
 function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_forceFullRedraw$self$$) {
@@ -3663,7 +3663,6 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
     this.$canvasContext$ = this.screen[0].getContext("2d");
     if(this.$canvasContext$.getImageData) {
       this.$canvasImageData$ = this.$canvasContext$.getImageData(0, 0, 256, 192);
-      this.$resetCanvas$();
       this.$romContainer$ = $("<div></div>");
       this.$romSelect$ = $("<select></select>");
       this.$romSelect$.change(function() {
@@ -3696,14 +3695,14 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
       $controls$$.appendTo($root_sms$$5$$);
       this.log.appendTo($root_sms$$5$$);
       $root_sms$$5$$.appendTo($($parent$$2$$));
-      "undefined" != typeof $roms$$ && this.$setRoms$($roms$$);
+      $roms$$ != $JSCompiler_alias_VOID$$ && this.$setRoms$($roms$$);
       $(document).bind("keydown", function($evt$$18$$) {
         $self$$4$$.$main$.$keyboard$.keydown($evt$$18$$)
       }).bind("keyup", function($evt$$19$$) {
         $self$$4$$.$main$.$keyboard$.keyup($evt$$19$$)
       })
     }else {
-      $($parent$$2$$).html('<div class="alert-message error"><p><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</p></div>')
+      $($parent$$2$$).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</div>')
     }
   }
   var $parent$$2$$ = this;
@@ -3711,22 +3710,16 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
     this.screen[0].width = 256;
     this.screen[0].height = 192;
     this.log.text("")
-  }, $resetCanvas$:function $$UI$$$$$resetCanvas$$() {
-    this.$canvasContext$.fillStyle = "black";
-    this.$canvasContext$.fillRect(0, 0, 256, 192);
-    for(var $i$$25$$ = 3;$i$$25$$ <= this.$canvasImageData$.data.length - 3;$i$$25$$ += 4) {
-      this.$canvasImageData$.data[$i$$25$$] = 255
-    }
   }, $setRoms$:function $$UI$$$$$setRoms$$($roms$$1$$) {
-    var $groupName$$, $optgroup$$, $length$$16$$, $i$$26$$, $count$$7$$ = 0;
+    var $groupName$$, $optgroup$$, $length$$16$$, $i$$25$$, $count$$7$$ = 0;
     this.$romSelect$.children().remove();
     $("<option>Select a ROM...</option>").appendTo(this.$romSelect$);
     for($groupName$$ in $roms$$1$$) {
       if($roms$$1$$.hasOwnProperty($groupName$$)) {
         $optgroup$$ = $("<optgroup></optgroup>").attr("label", $groupName$$);
         $length$$16$$ = $roms$$1$$[$groupName$$].length;
-        for($i$$26$$ = 0;$i$$26$$ < $length$$16$$;$i$$26$$++) {
-          $("<option>" + $roms$$1$$[$groupName$$][$i$$26$$][0] + "</option>").attr("value", $roms$$1$$[$groupName$$][$i$$26$$][1]).appendTo($optgroup$$)
+        for($i$$25$$ = 0;$i$$25$$ < $length$$16$$;$i$$25$$++) {
+          $("<option>" + $roms$$1$$[$groupName$$][$i$$25$$][0] + "</option>").attr("value", $roms$$1$$[$groupName$$][$i$$25$$][1]).appendTo($optgroup$$)
         }
         $optgroup$$.appendTo(this.$romSelect$)
       }
@@ -3738,7 +3731,7 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
     this.updateStatus("Downloading...");
     $.ajax({url:escape(this.$romSelect$.val()), xhr:function() {
       var $xhr$$ = $.ajaxSettings.xhr();
-      "undefined" != typeof $xhr$$.overrideMimeType && $xhr$$.overrideMimeType("text/plain; charset=x-user-defined");
+      $xhr$$.overrideMimeType != $JSCompiler_alias_VOID$$ && $xhr$$.overrideMimeType("text/plain; charset=x-user-defined");
       return $self$$5$$.xhr = $xhr$$
     }, complete:function($xhr$$1$$, $status$$) {
       var $data$$32$$;
@@ -3866,9 +3859,7 @@ function $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_controlWrite$
             63] >> 8 & 255, $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$ + 2] = $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$main_JAVA$[$reg$$inline_89_value$$82$$ & 63] >> 16 & 255) : $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$main$.$is_gg$ && 
             ($address$$inline_84_old$$inline_90_port_temp$$inline_83$$ = 3 * (($JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.location & 63) >> 1), 0 == ($JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.location & 1) ? ($JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$] = 
             $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA1$[$reg$$inline_89_value$$82$$] & 255, $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$ + 1] = $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA1$[$reg$$inline_89_value$$82$$] >> 
-            8 & 255, $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$ + 2] = $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA1$[$reg$$inline_89_value$$82$$] >> 16 & 255) : ($JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$] |= 
-            $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA2$[$reg$$inline_89_value$$82$$ & 15] & 255, $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$ + 1] |= $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA2$[$reg$$inline_89_value$$82$$ & 
-            15] >> 8 & 255, $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$ + 2] |= $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA2$[$reg$$inline_89_value$$82$$ & 15] >> 8 & 255))
+            8 & 255) : $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$CRAM$[$address$$inline_84_old$$inline_90_port_temp$$inline_83$$ + 2] = $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.$GG_JAVA2$[$reg$$inline_89_value$$82$$ & 15] >> 16 & 255)
         }
         $JSCompiler_StaticMethods_controlWrite$self$$inline_87_JSCompiler_StaticMethods_dataWrite$self$$inline_81_JSCompiler_StaticMethods_out$self$$.location++;
         break;

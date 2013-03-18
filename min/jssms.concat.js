@@ -1,20 +1,20 @@
 /*
- jsSMS - A Sega Master System/GameGear emulator in JavaScript
- Copyright (C) 2012  Guillaume Marty (https://github.com/gmarty)
- Based on JavaGear Copyright (c) 2002-2008 Chris White.
+jsSMS - A Sega Master System/GameGear emulator in JavaScript
+Copyright (C) 2012 Guillaume Marty (https://github.com/gmarty)
+Based on JavaGear Copyright (c) 2002-2008 Chris White
 
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 'use strict';var DEBUG = true;
 var ACCURATE = false;
@@ -28,10 +28,10 @@ var CLOCK_NTSC = 3579545;
 var CLOCK_PAL = 3546893;
 function JSSMS(opts) {
   this.opts = {"ui":JSSMS.DummyUI, "swfPath":"lib/"};
-  if(typeof opts != "undefined") {
+  if(opts != undefined) {
     var key;
     for(key in this.opts) {
-      if(typeof opts[key] != "undefined") {
+      if(opts[key] != undefined) {
         this.opts[key] = opts[key]
       }
     }
@@ -300,7 +300,7 @@ JSSMS.Utils = {rndInt:function(range) {
       i = src.length;
       dest = new JSSMS.Utils.Array(i);
       while(i--) {
-        if(typeof src[i] != "undefined") {
+        if(src[i] != undefined) {
           dest[i] = src[i]
         }
       }
@@ -4314,8 +4314,11 @@ JSSMS.Vdp.prototype = {reset:function() {
   for(i = 0;i < 16384;i++) {
     this.VRAM[i] = 0
   }
-  for(i = 0;i < SMS_WIDTH * SMS_HEIGHT * 4;i++) {
-    this.display[i] = 255
+  for(i = 0;i < SMS_WIDTH * SMS_HEIGHT * 4;i = i + 4) {
+    this.display[i] = 0;
+    this.display[i + 1] = 0;
+    this.display[i + 2] = 0;
+    this.display[i + 3] = 255
   }
 }, forceFullRedraw:function() {
   this.bgt = (this.vdpreg[2] & 15 & ~1) << 10;
@@ -4433,12 +4436,9 @@ JSSMS.Vdp.prototype = {reset:function() {
           temp = ((this.location & 63) >> 1) * 3;
           if((this.location & 1) == 0) {
             this.CRAM[temp] = this.GG_JAVA1[value] & 255;
-            this.CRAM[temp + 1] = this.GG_JAVA1[value] >> 8 & 255;
-            this.CRAM[temp + 2] = this.GG_JAVA1[value] >> 16 & 255
+            this.CRAM[temp + 1] = this.GG_JAVA1[value] >> 8 & 255
           }else {
-            this.CRAM[temp] |= this.GG_JAVA2[value & 15] & 255;
-            this.CRAM[temp + 1] |= this.GG_JAVA2[value & 15] >> 8 & 255;
-            this.CRAM[temp + 2] |= this.GG_JAVA2[value & 15] >> 8 & 255
+            this.CRAM[temp + 2] = this.GG_JAVA2[value & 15] >> 16 & 255
           }
         }
       }
@@ -4824,11 +4824,10 @@ if(typeof $ != "undefined") {
       this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + ' class="screen"></canvas>');
       this.canvasContext = this.screen[0].getContext("2d");
       if(!this.canvasContext.getImageData) {
-        $(parent).html('<div class="alert-message error"><p><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</p></div>');
+        $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</div>');
         return
       }
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
-      this.resetCanvas();
       this.romContainer = $("<div></div>");
       this.romSelect = $("<select></select>");
       this.romSelect.change(function() {
@@ -4893,7 +4892,7 @@ if(typeof $ != "undefined") {
       controls.appendTo(root);
       this.log.appendTo(root);
       root.appendTo($(parent));
-      if(typeof roms != "undefined") {
+      if(roms != undefined) {
         this.setRoms(roms)
       }
       $(document).bind("keydown", function(evt) {
@@ -4906,12 +4905,6 @@ if(typeof $ != "undefined") {
       this.screen[0].width = SMS_WIDTH;
       this.screen[0].height = SMS_HEIGHT;
       this.log.text("")
-    }, resetCanvas:function() {
-      this.canvasContext.fillStyle = "black";
-      this.canvasContext.fillRect(0, 0, SMS_WIDTH, SMS_HEIGHT);
-      for(var i = 3;i <= this.canvasImageData.data.length - 3;i += 4) {
-        this.canvasImageData.data[i] = 255
-      }
     }, setRoms:function(roms) {
       var groupName, optgroup, length, i, count = 0;
       this.romSelect.children().remove();
@@ -4936,7 +4929,7 @@ if(typeof $ != "undefined") {
       this.updateStatus("Downloading...");
       $.ajax({url:escape(this.romSelect.val()), xhr:function() {
         var xhr = $.ajaxSettings.xhr();
-        if(typeof xhr.overrideMimeType != "undefined") {
+        if(xhr.overrideMimeType != undefined) {
           xhr.overrideMimeType("text/plain; charset=x-user-defined")
         }
         self.xhr = xhr;

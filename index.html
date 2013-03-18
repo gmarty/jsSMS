@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>jsSMS - A Sega Master System &amp; GameGear emulator in JavaScript</title>
-<link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+<title>jsSMS - JavaScript Sega Master System &amp; GameGear emulator</title>
+<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
+<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css">
 <style>
 html, body {
   background: #eee;
 }
 .container {
-  width: 752px;
   margin-top: 20px;
 }
 .content {
@@ -25,16 +25,10 @@ html, body {
   border-radius: 10px 10px 0 0;
   border: 0;
 }
-.span9 {
-  width: 512px;
-}
-.content .span4 {
-  margin-left: 0;
-  padding-left: 19px;
-}
 .screen {
-  image-rendering: -webkit-optimize-contrast; // Webkit (Safari now, Chrome soon)
+  background: #000;
   image-rendering: -moz-crisp-edges;          // FF 6.0+
+  image-rendering: -webkit-optimize-contrast; // Webkit (Safari now, Chrome soon)
   image-rendering: optimizeSpeed;             // Older versions of FF
   image-rendering: optimize-contrast;         // Possible future browsers.
   -ms-interpolation-mode: nearest-neighbor;   // IE
@@ -45,15 +39,13 @@ html, body {
 select, .btn {
   margin: 0 5px 5px 0;
 }
-.alert-message {
-  width: 482px;
-}
-#status {
-  font-size: 120%;
-}
 footer {
-  width: 772px;
-  margin: 0 auto;
+  padding-top: 10px;
+}
+@media (max-width: 768px) {
+  .container {
+    margin-top: 0;
+  }
 }
 </style>
 </head>
@@ -61,15 +53,15 @@ footer {
 <div class="container">
   <div class="content">
     <div class="page-header">
-      <h1>jsSMS <small>A Sega Master System &amp; GameGear emulator in JavaScript</small></h1>
+      <h1>jsSMS<small> JavaScript Sega Master System &amp; GameGear emulator</small></h1>
     </div>
-    <div class="row">
-      <div class="span9">
+    <div class="row-fluid">
+      <div class="span8">
         <div id="emulator"></div>
       </div>
       <div class="span4">
         <h3>Controllers</h3>
-        <table class="zebra-striped">
+        <table class="table table-striped">
           <tr>
             <th>Button</th>
             <th>Player 1</th>
@@ -113,10 +105,10 @@ footer {
       </div>
     </div>
   </div>
+  <footer>
+    <p>© 2012 Guillaume Marty (<a href="https://github.com/gmarty">https://github.com/gmarty</a>)</p>
+  </footer>
 </div>
-<footer>
-  <p>© 2012  Guillaume Marty (<a href="https://github.com/gmarty">https://github.com/gmarty</a>)</p>
-</footer>
 <a href="http://github.com/gmarty/jsSMS"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork jsSMS on GitHub"></a>
 <script src="lib/jquery.min.js" type="text/javascript"></script>
 <script src="min/jssms.min.js" type="text/javascript"></script>
@@ -144,6 +136,18 @@ var sms = new JSSMS({
     'GameGear': [
       ['Wakiyanland', 'roms/gg/Wakiyarando (Wagyan Land) (J).gg'],
       ['Kaitô Saint Tail', 'roms/gg/Kyoto Saint Tale (J).gg']
+    ],
+    'Master System technical roms': [
+      ['Checkstate v.1.0', 'roms/technical/chkstate.sms'],
+      ['Color Check v.1.0', 'roms/technical/ColorCheck.sms'],
+      ['Fullscreen Palette Test v.1.0', 'roms/technical/FullscreenPaletteTestProgram.sms'],
+      ['Palette v.1.0', 'roms/technical/smspal.sms'],
+      ['Pause Test v1.00', 'roms/technical/PauseTest.sms'],
+      ['PFR detect v.2.00', 'roms/technical/PFR_Detect200.sms'],
+      ['Sound Test v.1.1', 'roms/technical/SMSSoundTest1.1.sms'],
+      ['V Counter Test v.1.0', 'roms/technical/VCounterTest.sms'],
+      ['VDP Test v.1.31', 'roms/technical/VDPTEST.sms'],
+      ['ZEXALL v.0.15', 'roms/technical/zexall.sms']
     ]
   })
 });
