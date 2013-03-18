@@ -3642,7 +3642,7 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
 "undefined" != typeof $ && ($.fn.$JSSMSUI$ = function $$$fn$$JSSMSUI$$($roms$$) {
   function $UI$$($root_sms$$5$$) {
     this.$main$ = $root_sms$$5$$;
-    if("[object OperaMini]" == Object.prototype.toString.call(window.$operamini$)) {
+    if("[object OperaMini]" == Object.prototype.toString.call(window.operamini)) {
       $($parent$$2$$).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser can\'t run this emulator. Try the latest version of Firefox, Google Chrome, Opera or Safari!</div>')
     }else {
       var $self$$4$$ = this;

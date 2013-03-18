@@ -4800,7 +4800,7 @@ if(typeof $ != "undefined") {
     var parent = this;
     var UI = function(sms) {
       this.main = sms;
-      if(Object.prototype.toString.call(window.operamini) == "[object OperaMini]") {
+      if(Object.prototype.toString.call(window["operamini"]) == "[object OperaMini]") {
         $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser can\'t run this emulator. Try the latest version of Firefox, Google Chrome, Opera or Safari!</div>');
         return
       }
