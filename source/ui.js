@@ -192,7 +192,7 @@ if (typeof $ != 'undefined') {
       this.log.appendTo(root);
       root.appendTo($(parent));
 
-      if (typeof roms != 'undefined') {
+      if (roms != undefined) {
         this.setRoms(roms);
       }
 
@@ -260,7 +260,7 @@ if (typeof $ != 'undefined') {
           url: escape(this.romSelect.val()),
           xhr: function() {
             var xhr = $.ajaxSettings.xhr();
-            if (typeof xhr.overrideMimeType != 'undefined') {
+            if (xhr.overrideMimeType != undefined) {
               // Download as binary
               xhr.overrideMimeType('text/plain; charset=x-user-defined');
             }

@@ -135,7 +135,7 @@ JSSMS.Utils = {
         dest = new JSSMS.Utils.Array(i);
 
         while (i--) {
-          if (typeof src[i] != 'undefined')
+          if (src[i] != undefined)
             dest[i] = src[i];
         }
 

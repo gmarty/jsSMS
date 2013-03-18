@@ -59,10 +59,10 @@ function JSSMS(opts) {
     'ui': JSSMS.DummyUI,
     'swfPath': 'lib/'
   };
-  if (typeof opts != 'undefined') {
+  if (opts != undefined) {
     var key;
     for (key in this.opts) {
-      if (typeof opts[key] != 'undefined') {
+      if (opts[key] != undefined) {
         this.opts[key] = opts[key];
       }
     }

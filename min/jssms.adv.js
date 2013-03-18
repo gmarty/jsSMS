@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-'use strict';var $JSCompiler_alias_TRUE$$ = !0, $JSCompiler_alias_NULL$$ = null, $JSCompiler_alias_FALSE$$ = !1;
+'use strict';var $JSCompiler_alias_VOID$$ = void 0, $JSCompiler_alias_TRUE$$ = !0, $JSCompiler_alias_NULL$$ = null, $JSCompiler_alias_FALSE$$ = !1;
 function $JSCompiler_emptyFn$$() {
   return function() {
   }
@@ -24,9 +24,9 @@ function $JSCompiler_emptyFn$$() {
 var $SUPPORT_DATAVIEW$$ = !(!window.DataView || !window.ArrayBuffer);
 function $JSSMS$$($opts$$) {
   this.$opts$ = {ui:$JSSMS$DummyUI$$, swfPath:"lib/"};
-  if("undefined" != typeof $opts$$) {
+  if($opts$$ != $JSCompiler_alias_VOID$$) {
     for(var $key$$16$$ in this.$opts$) {
-      "undefined" != typeof $opts$$[$key$$16$$] && (this.$opts$[$key$$16$$] = $opts$$[$key$$16$$])
+      $opts$$[$key$$16$$] != $JSCompiler_alias_VOID$$ && (this.$opts$[$key$$16$$] = $opts$$[$key$$16$$])
     }
   }
   this.$keyboard$ = new $JSSMS$Keyboard$$(this);
@@ -2371,7 +2371,7 @@ $romData$:"", $romFileName$:"", reset:function $$JSSMS$$$$reset$() {
             $JSCompiler_StaticMethods_run$self$$inline_100$$.call(0 != ($JSCompiler_StaticMethods_run$self$$inline_100$$.$f$ & 128));
             break;
           case 253:
-            var $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_189$$ = $JSCompiler_StaticMethods_run$self$$inline_100$$, $opcode$$inline_190$$ = $JSCompiler_StaticMethods_run$self$$inline_100$$.$readMem$($JSCompiler_StaticMethods_run$self$$inline_100$$.$pc$++), $location$$inline_191$$ = void 0, $temp$$inline_192$$ = void 0;
+            var $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_189$$ = $JSCompiler_StaticMethods_run$self$$inline_100$$, $opcode$$inline_190$$ = $JSCompiler_StaticMethods_run$self$$inline_100$$.$readMem$($JSCompiler_StaticMethods_run$self$$inline_100$$.$pc$++), $location$$inline_191$$ = $JSCompiler_alias_VOID$$, $temp$$inline_192$$ = $JSCompiler_alias_VOID$$;
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_189$$.$tstates$ -= $OP_DD_STATES$$[$opcode$$inline_190$$];
             switch($opcode$$inline_190$$) {
               case 9:
@@ -2895,7 +2895,7 @@ function $JSCompiler_StaticMethods_printFps$$($JSCompiler_StaticMethods_printFps
   var $i$$5$$, $dest$$3$$;
   $i$$5$$ = $src$$4$$.length;
   for($dest$$3$$ = new $JSSMS$Utils$Array$$($i$$5$$);$i$$5$$--;) {
-    "undefined" != typeof $src$$4$$[$i$$5$$] && ($dest$$3$$[$i$$5$$] = $src$$4$$[$i$$5$$])
+    $src$$4$$[$i$$5$$] != $JSCompiler_alias_VOID$$ && ($dest$$3$$[$i$$5$$] = $src$$4$$[$i$$5$$])
   }
   return $dest$$3$$
 }, $JSSMS$Utils$writeMem$$ = $SUPPORT_DATAVIEW$$ ? function($self$$2$$, $address$$, $value$$48$$) {
@@ -2929,7 +2929,7 @@ function $JSCompiler_StaticMethods_printFps$$($JSCompiler_StaticMethods_printFps
 };
 function $JSSMS$Utils$getPrefix$$($arr$$16$$, $obj$$35$$) {
   var $prefix$$2$$ = $JSCompiler_alias_FALSE$$;
-  void 0 == $obj$$35$$ && ($obj$$35$$ = document);
+  $obj$$35$$ == $JSCompiler_alias_VOID$$ && ($obj$$35$$ = document);
   $arr$$16$$.some(function($prop$$4$$) {
     return $prop$$4$$ in $obj$$35$$ ? ($prefix$$2$$ = $prop$$4$$, $JSCompiler_alias_TRUE$$) : $JSCompiler_alias_FALSE$$
   });
@@ -3695,14 +3695,14 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
       $controls$$.appendTo($root_sms$$5$$);
       this.log.appendTo($root_sms$$5$$);
       $root_sms$$5$$.appendTo($($parent$$2$$));
-      "undefined" != typeof $roms$$ && this.$setRoms$($roms$$);
+      $roms$$ != $JSCompiler_alias_VOID$$ && this.$setRoms$($roms$$);
       $(document).bind("keydown", function($evt$$18$$) {
         $self$$4$$.$main$.$keyboard$.keydown($evt$$18$$)
       }).bind("keyup", function($evt$$19$$) {
         $self$$4$$.$main$.$keyboard$.keyup($evt$$19$$)
       })
     }else {
-      $($parent$$2$$).html('<div class="alert-message error"><p><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</p></div>')
+      $($parent$$2$$).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</div>')
     }
   }
   var $parent$$2$$ = this;
@@ -3731,7 +3731,7 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
     this.updateStatus("Downloading...");
     $.ajax({url:escape(this.$romSelect$.val()), xhr:function() {
       var $xhr$$ = $.ajaxSettings.xhr();
-      "undefined" != typeof $xhr$$.overrideMimeType && $xhr$$.overrideMimeType("text/plain; charset=x-user-defined");
+      $xhr$$.overrideMimeType != $JSCompiler_alias_VOID$$ && $xhr$$.overrideMimeType("text/plain; charset=x-user-defined");
       return $self$$5$$.xhr = $xhr$$
     }, complete:function($xhr$$1$$, $status$$) {
       var $data$$32$$;

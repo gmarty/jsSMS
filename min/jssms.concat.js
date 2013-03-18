@@ -28,10 +28,10 @@ var CLOCK_NTSC = 3579545;
 var CLOCK_PAL = 3546893;
 function JSSMS(opts) {
   this.opts = {"ui":JSSMS.DummyUI, "swfPath":"lib/"};
-  if(typeof opts != "undefined") {
+  if(opts != undefined) {
     var key;
     for(key in this.opts) {
-      if(typeof opts[key] != "undefined") {
+      if(opts[key] != undefined) {
         this.opts[key] = opts[key]
       }
     }
@@ -300,7 +300,7 @@ JSSMS.Utils = {rndInt:function(range) {
       i = src.length;
       dest = new JSSMS.Utils.Array(i);
       while(i--) {
-        if(typeof src[i] != "undefined") {
+        if(src[i] != undefined) {
           dest[i] = src[i]
         }
       }
@@ -4824,7 +4824,7 @@ if(typeof $ != "undefined") {
       this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + ' class="screen"></canvas>');
       this.canvasContext = this.screen[0].getContext("2d");
       if(!this.canvasContext.getImageData) {
-        $(parent).html('<div class="alert-message error"><p><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</p></div>');
+        $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest versions of Firefox, Google Chrome, Opera or Safari!</div>');
         return
       }
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
@@ -4892,7 +4892,7 @@ if(typeof $ != "undefined") {
       controls.appendTo(root);
       this.log.appendTo(root);
       root.appendTo($(parent));
-      if(typeof roms != "undefined") {
+      if(roms != undefined) {
         this.setRoms(roms)
       }
       $(document).bind("keydown", function(evt) {
@@ -4929,7 +4929,7 @@ if(typeof $ != "undefined") {
       this.updateStatus("Downloading...");
       $.ajax({url:escape(this.romSelect.val()), xhr:function() {
         var xhr = $.ajaxSettings.xhr();
-        if(typeof xhr.overrideMimeType != "undefined") {
+        if(xhr.overrideMimeType != undefined) {
           xhr.overrideMimeType("text/plain; charset=x-user-defined")
         }
         self.xhr = xhr;
