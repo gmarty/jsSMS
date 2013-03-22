@@ -49,7 +49,7 @@ module.exports = function(grunt) {
       // Generates a minified version of the script for debugging.
       debug: {
         js: '<%= js %>',
-        jsOutputFile: 'min/jssms.adv.js',
+        jsOutputFile: 'min/jssms.debug.js',
         options: {
           externs: '<%= externs %>',
           compilation_level: 'ADVANCED_OPTIMIZATIONS',
@@ -99,8 +99,8 @@ module.exports = function(grunt) {
         dest: 'min/jssms.min.js'
       },
       debug: {
-        src: ['min/jssms.adv.js'],
-        dest: 'min/jssms.adv.js'
+        src: ['min/jssms.debug.js'],
+        dest: 'min/jssms.debug.js'
       },
       concat: {
         src: ['min/jssms.concat.js'],
