@@ -284,10 +284,11 @@ JSSMS.prototype = {
     this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
 
     this.resetFps();
-    this.printFps();
     this.fpsInterval = setInterval(function() {
       self.printFps();
     }, fpsInterval);
+
+    this.ui.updateStatus('Running');
   },
 
 
@@ -504,16 +505,10 @@ JSSMS.prototype = {
 
 
   printFps: function() {
-    var now = JSSMS.Utils.getTimestamp(),
-        s = 'Running';
-
-    if (this.lastFpsTime) {
-      s += ': '
-        + (this.fpsFrameCount / ((now - this.lastFpsTime) / 1000)).toFixed(2)
-        + ' (/ '
-        + (1000 / frameTime).toFixed(2)
-        + ') FPS';
-    }
+    var now = JSSMS.Utils.getTimestamp();
+    var s = 'Running: '
+      + (this.fpsFrameCount / ((now - this.lastFpsTime) / 1000)).toFixed(2)
+      + ' FPS';
     this.ui.updateStatus(s);
     this.fpsFrameCount = 0;
     this.lastFpsTime = now;
@@ -521,7 +516,7 @@ JSSMS.prototype = {
 
 
   resetFps: function() {
-    this.lastFpsTime = null;
+    this.lastFpsTime = JSSMS.Utils.getTimestamp();
     this.fpsFrameCount = 0;
   },
 
