@@ -2480,7 +2480,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
       $JSCompiler_StaticMethods_doIndexCB$self$$.$writeMem$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$readMem$($location$$24$$) | 128);
       break;
     default:
-      console.log("Unimplemented DDCB or FDCB Opcode: " + ($opcode$$4$$ & 255).toString(16))
+      console.log("Unimplemented DDCB or FDCB Opcode: " + $JSSMS$Utils$toHex$$($opcode$$4$$))
   }
   $JSCompiler_StaticMethods_doIndexCB$self$$.$pc$++
 }
@@ -4452,7 +4452,7 @@ function $JSCompiler_StaticMethods_run$$($JSCompiler_StaticMethods_run$self$$, $
             128;
             break;
           default:
-            console.log("Unimplemented CB Opcode: " + $carry$$inline_81_carry$$inline_87_carry$$inline_90_carry$$inline_93_opcode$$inline_106_opcode$$inline_121_opcode$$inline_126_opcode$$inline_132_temp$$inline_112_temp$$inline_115_temp$$inline_118_temp$$inline_84_temp$$inline_96_value$$inline_103_value$$inline_109$$.toString(16))
+            console.log("Unimplemented CB Opcode: " + $JSSMS$Utils$toHex$$($carry$$inline_81_carry$$inline_87_carry$$inline_90_carry$$inline_93_opcode$$inline_106_opcode$$inline_121_opcode$$inline_126_opcode$$inline_132_temp$$inline_112_temp$$inline_115_temp$$inline_118_temp$$inline_84_temp$$inline_96_value$$inline_103_value$$inline_109$$))
         }
         break;
       case 204:
@@ -5702,7 +5702,7 @@ function $JSCompiler_StaticMethods_run$$($JSCompiler_StaticMethods_run$self$$, $
             -3;
             break;
           default:
-            console.log("Unimplemented ED Opcode: " + $carry$$inline_81_carry$$inline_87_carry$$inline_90_carry$$inline_93_opcode$$inline_106_opcode$$inline_121_opcode$$inline_126_opcode$$inline_132_temp$$inline_112_temp$$inline_115_temp$$inline_118_temp$$inline_84_temp$$inline_96_value$$inline_103_value$$inline_109$$.toString(16)), $JSCompiler_StaticMethods_ccf$self$$inline_100_JSCompiler_StaticMethods_cpl_a$self$$inline_98_JSCompiler_StaticMethods_daa$self$$inline_95_JSCompiler_StaticMethods_decIX$self$$inline_287_JSCompiler_StaticMethods_decIY$self$$inline_291_JSCompiler_StaticMethods_doCB$self$$inline_105_JSCompiler_StaticMethods_doED$self$$inline_125_JSCompiler_StaticMethods_doIndexOpIX$self$$inline_120_JSCompiler_StaticMethods_doIndexOpIY$self$$inline_131_JSCompiler_StaticMethods_exAF$self$$inline_83_JSCompiler_StaticMethods_exBC$self$$inline_111_JSCompiler_StaticMethods_exDE$self$$inline_114_JSCompiler_StaticMethods_exHL$self$$inline_117_JSCompiler_StaticMethods_incBC$self$$inline_78_JSCompiler_StaticMethods_incIX$self$$inline_285_JSCompiler_StaticMethods_incIY$self$$inline_289_JSCompiler_StaticMethods_rla_a$self$$inline_89_JSCompiler_StaticMethods_rlca_a$self$$inline_80_JSCompiler_StaticMethods_rra_a$self$$inline_92_JSCompiler_StaticMethods_rrca_a$self$$inline_86_JSCompiler_StaticMethods_setBC$self$$inline_102_JSCompiler_StaticMethods_setDE$self$$inline_108_location$$21_opcode_temp$$.$pc$++
+            console.log("Unimplemented ED Opcode: " + $JSSMS$Utils$toHex$$($carry$$inline_81_carry$$inline_87_carry$$inline_90_carry$$inline_93_opcode$$inline_106_opcode$$inline_121_opcode$$inline_126_opcode$$inline_132_temp$$inline_112_temp$$inline_115_temp$$inline_118_temp$$inline_84_temp$$inline_96_value$$inline_103_value$$inline_109$$)), $JSCompiler_StaticMethods_ccf$self$$inline_100_JSCompiler_StaticMethods_cpl_a$self$$inline_98_JSCompiler_StaticMethods_daa$self$$inline_95_JSCompiler_StaticMethods_decIX$self$$inline_287_JSCompiler_StaticMethods_decIY$self$$inline_291_JSCompiler_StaticMethods_doCB$self$$inline_105_JSCompiler_StaticMethods_doED$self$$inline_125_JSCompiler_StaticMethods_doIndexOpIX$self$$inline_120_JSCompiler_StaticMethods_doIndexOpIY$self$$inline_131_JSCompiler_StaticMethods_exAF$self$$inline_83_JSCompiler_StaticMethods_exBC$self$$inline_111_JSCompiler_StaticMethods_exDE$self$$inline_114_JSCompiler_StaticMethods_exHL$self$$inline_117_JSCompiler_StaticMethods_incBC$self$$inline_78_JSCompiler_StaticMethods_incIX$self$$inline_285_JSCompiler_StaticMethods_incIY$self$$inline_289_JSCompiler_StaticMethods_rla_a$self$$inline_89_JSCompiler_StaticMethods_rlca_a$self$$inline_80_JSCompiler_StaticMethods_rra_a$self$$inline_92_JSCompiler_StaticMethods_rrca_a$self$$inline_86_JSCompiler_StaticMethods_setBC$self$$inline_102_JSCompiler_StaticMethods_setDE$self$$inline_108_location$$21_opcode_temp$$.$pc$++
         }
         break;
       case 238:

@@ -2226,7 +2226,7 @@ JSSMS.Z80.prototype = {reset:function() {
       break;
     default:
       if(DEBUG) {
-        console.log("Unimplemented CB Opcode: " + opcode.toString(16))
+        console.log("Unimplemented CB Opcode: " + JSSMS.Utils.toHex(opcode))
       }
       break
   }
@@ -2983,7 +2983,7 @@ JSSMS.Z80.prototype = {reset:function() {
       break;
     default:
       if(DEBUG) {
-        console.log("Unimplemented DDCB or FDCB Opcode: " + (opcode & 255).toString(16))
+        console.log("Unimplemented DDCB or FDCB Opcode: " + JSSMS.Utils.toHex(opcode))
       }
       break
   }
@@ -3471,7 +3471,7 @@ JSSMS.Z80.prototype = {reset:function() {
       break;
     default:
       if(DEBUG) {
-        console.log("Unimplemented ED Opcode: " + opcode.toString(16))
+        console.log("Unimplemented ED Opcode: " + JSSMS.Utils.toHex(opcode))
       }
       this.pc++;
       break
