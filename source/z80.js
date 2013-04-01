@@ -402,6 +402,13 @@ JSSMS.Z80 = function(sms) {
    * @return {number} Value from memory location.
    */
   this.readMemWord = JSSMS.Utils.readMemWord.bind(this, this.memReadMap);
+
+  if (DEBUG) {
+    // Augment JSSMS.Z80 with methods from JSSMS.Disassembler.
+    for (var method in JSSMS.Debugger.prototype) {
+      this[method] = JSSMS.Debugger.prototype[method];
+    }
+  }
 };
 
 JSSMS.Z80.prototype = {
@@ -445,82 +452,6 @@ JSSMS.Z80.prototype = {
 
 
   /**
-   * Return next opcode for debugging purposes.
-   *
-   * @return {string} String containing opcode bytes.
-   */
-  getOp: function() {
-    var opcode = this.readMem(this.pc);
-    var oplist = (opcode & 0xff).toString(16);
-
-    switch (opcode) {
-      case 0xCB:
-      case 0xED: opcode = this.readMem(this.pc + 1); oplist += ' ' + (opcode & 0xff).toString(16); break;
-      case 0xDD:
-      case 0xFD:
-        opcode = this.readMem(this.pc + 1);
-        oplist += ' ' + (opcode & 0xff).toString(16);
-        if (opcode == 0xCB) {
-          // DDCB etc
-          opcode = this.readMem(this.pc + 3);
-          oplist += ' ' + (opcode & 0xff).toString(16);
-        }
-        break;
-      default:
-        break;
-    }
-
-    return oplist.toUpperCase();
-  },
-
-
-  /**
-   * Return Mnemonic of next opcode for debugging purposes.
-   *
-   * @return {string} String containing opcode bytes.
-   */
-  getMnu: function() {
-    var opcode = this.readMem(this.pc);
-    /*var mnu = new Mnemonic();
-
-    switch (opcode) {
-      // special cases
-      case 0xDD:
-      case 0xFD:
-        opcode = this.readMem(this.pc + 1); return mnu.getIndex(opcode);
-      case 0xCB:
-        opcode = this.readMem(this.pc + 1); return mnu.getCB(opcode);
-      case 0xED:
-        opcode = this.readMem(this.pc + 1); return mnu.getED(opcode);
-      default:
-        return mnu.getOP(opcode);
-    }*/
-  },
-
-
-  /**
-   * Output contents of Z80 registers to console for debugging purposes.
-   */
-  consoledebug: function() {
-    console.log('----------------------------------------------------------------------------');
-    console.log(this.pc.toString(16) + ' 0x' + this.getOp() + ' ' /*+ this.getMnu()*/);
-    console.log('A: ' + this.a.toString(16) + ' BC: ' + this.getBC().toString(16) +
-        ' DE: ' + this.getDE().toString(16) + ' HL: ' + this.getHL().toString(16) +
-        ' IX: ' + this.getIX().toString(16) + ' IY: ' + this.getIY().toString(16));
-
-    this.exAF(); this.exBC(); this.exDE(); this.exHL();
-
-    console.log("A': " + this.a.toString(16) + " BC': " + this.getBC().toString(16) +
-        " DE': " + this.getDE().toString(16) + " HL': " + this.getHL().toString(16) +
-        ' SP: ' + this.sp.toString(16));
-
-    this.exAF(); this.exBC(); this.exDE(); this.exHL();
-
-    //console.log('FS: ' + this.getSign() + ' FZ: ' + this.getZero() + ' FHC: ' + this.getHc() + ' FP: ' + this.getParity() + ' FN: ' + this.getNegative() + ' FC: ' + this.getCarry());
-  },
-
-
-  /**
    * Run Z80.
    *
    * @param {number} cycles Machine cycles to run for in total.
@@ -545,6 +476,10 @@ JSSMS.Z80.prototype = {
       if (Setup.ACCURATE_INTERRUPT_EMULATION) {
         if (this.interruptLine)
           this.interrupt();                  // Check for interrupt
+      }
+
+      if (DEBUG) {
+        this.main.ui.updateDisassembly(this.pc);
       }
 
       // Fetch & Interpret Opcodes
@@ -578,7 +513,7 @@ JSSMS.Z80.prototype = {
         case 0x0F: this.rrca_a(); break;                                         // RRCA
         case 0x10: this.b = (this.b - 1) & 0xff; this.jr(this.b != 0); break;                                      // DJNZ (PC+e)
         case 0x11: this.e = this.readMem(this.pc++); this.d = this.readMem(this.pc++); break;             // LD DE,nn
-        case 0x12: this.writeMem(this.getDE(), this.a); break;                             // LD (DE), A
+        case 0x12: this.writeMem(this.getDE(), this.a); break;                             // LD (DE),A
         case 0x13: this.incDE(); break;                                          // INC DE
         case 0x14: this.d = this.inc8(this.d); break;                                      // INC D
         case 0x15: this.d = this.dec8(this.d); break;                                      // DEC D
@@ -590,7 +525,7 @@ JSSMS.Z80.prototype = {
         case 0x1B: this.decDE(); break;                                          // DEC DE
         case 0x1C: this.e = this.inc8(this.e); break;                                      // INC E
         case 0x1D: this.e = this.dec8(this.e); break;                                      // DEC E
-        case 0x1E: this.e = this.readMem(this.pc++); break;                                // LD E,N
+        case 0x1E: this.e = this.readMem(this.pc++); break;                                // LD E,n
         case 0x1F: this.rra_a(); break;                                          // RRA
         case 0x20: this.jr(!((this.f & F_ZERO) != 0)); break;                         // JR NZ,(PC+e)
         case 0x21: this.l = this.readMem(this.pc++); this.h = this.readMem(this.pc++); break;             // LD HL,nn
@@ -736,7 +671,7 @@ JSSMS.Z80.prototype = {
         case 0xA3: this.f = this.SZP_TABLE[this.a &= this.e] | F_HALFCARRY; break;              // AND A,E
         case 0xA4: this.f = this.SZP_TABLE[this.a &= this.h] | F_HALFCARRY; break;              // AND A,H
         case 0xA5: this.f = this.SZP_TABLE[this.a &= this.l] | F_HALFCARRY; break;              // AND A,L
-        case 0xA6: this.f = this.SZP_TABLE[this.a &= this.readMem(this.getHL())] | F_HALFCARRY;break; // AND A,(HL)
+        case 0xA6: this.f = this.SZP_TABLE[this.a &= this.readMem(this.getHL())] | F_HALFCARRY; break; // AND A,(HL)
         case 0xA7: this.f = this.SZP_TABLE[this.a] | F_HALFCARRY; break;                   // AND A,A
         case 0xA8: this.f = this.SZP_TABLE[this.a ^= this.b]; break;                            // XOR A,B
         case 0xA9: this.f = this.SZP_TABLE[this.a ^= this.c]; break;                            // XOR A,C
@@ -842,6 +777,10 @@ JSSMS.Z80.prototype = {
         case 0xFF: this.push1(this.pc); this.pc = 0x38; break;                                // RST 38H
       } // end switch
     }
+  },
+
+  nextStep: function() {
+
   },
 
 
@@ -1317,7 +1256,7 @@ JSSMS.Z80.prototype = {
       case 0xFE: this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_7); break;  // SET 7,(HL)
       case 0xFF: this.a |= BIT_7; break;                                   // SET 7,A
 
-      // Unimplented CB Opcode
+      // Unimplemented CB Opcode
       default:
         if (DEBUG) {
           console.log('Unimplemented CB Opcode: ' + opcode.toString(16));
@@ -1474,8 +1413,8 @@ JSSMS.Z80.prototype = {
         this.pc += 2;
         break;
       case 0x23: this.incIX(); break;                                    // INC IX
-      case 0x24: this.ixH = this.inc8(this.ixH); break;                            // INC IXh *
-      case 0x25: this.ixH = this.dec8(this.ixH); break;                            // DEC IXh *
+      case 0x24: this.ixH = this.inc8(this.ixH); break;                            // INC IXH *
+      case 0x25: this.ixH = this.dec8(this.ixH); break;                            // DEC IXH *
       case 0x26: this.ixH = this.readMem(this.pc++); break;                        // LD IXh,n *
       case 0x29: this.setIX(this.add16(this.getIX(), this.getIX())); break;             // ADD IX,IX
       case 0x2A:                                                  // LD IX,(nn)
@@ -1485,39 +1424,39 @@ JSSMS.Z80.prototype = {
         this.pc += 2;
         break;
       case 0x2B: this.decIX(); break;                                    // DEC IX
-      case 0x2C: this.ixL = this.inc8(this.ixL); break;                            // INC IXl *
-      case 0x2D: this.ixL = this.dec8(this.ixL); break;                            // DEC IXl *
+      case 0x2C: this.ixL = this.inc8(this.ixL); break;                            // INC IXL *
+      case 0x2D: this.ixL = this.dec8(this.ixL); break;                            // DEC IXL *
       case 0x2E: this.ixL = this.readMem(this.pc++); break;                        // LD IXl,n
       case 0x34: this.incMem(this.getIX() + this.d_()); this.pc++; break;                  // INC (IX+d)
       case 0x35: this.decMem(this.getIX() + this.d_()); this.pc++; break;                  // DEC (IX+d)
-      case 0x36: this.writeMem(this.getIX() + this.d_(), this.readMem(++this.pc)); this.pc++; break; // LD (IX+d), n
+      case 0x36: this.writeMem(this.getIX() + this.d_(), this.readMem(++this.pc)); this.pc++; break; // LD (IX+d),n
       case 0x39: this.setIX(this.add16(this.getIX(), this.sp)); break;                  // ADD IX,SP
-      case 0x44: this.b = this.ixH; break;                                    // LD B,IXh *
-      case 0x45: this.b = this.ixL; break;                                    // LD B,IXl *
+      case 0x44: this.b = this.ixH; break;                                    // LD B,IXH *
+      case 0x45: this.b = this.ixL; break;                                    // LD B,IXL *
       case 0x46: this.b = this.readMem(this.getIX() + this.d_()); this.pc++; break;             // LD B,(IX+d)
-      case 0x4C: this.c = this.ixH; break;                                    // LD C,IXh *
-      case 0x4D: this.c = this.ixL; break;                                    // LD C,IXl *
+      case 0x4C: this.c = this.ixH; break;                                    // LD C,IXH *
+      case 0x4D: this.c = this.ixL; break;                                    // LD C,IXL *
       case 0x4E: this.c = this.readMem(this.getIX() + this.d_()); this.pc++; break;             // LD C,(IX+d)
-      case 0x54: this.d = this.ixH; break;                                    // LD D,IXh *
-      case 0x55: this.d = this.ixL; break;                                    // LD D,IXl *
+      case 0x54: this.d = this.ixH; break;                                    // LD D,IXH *
+      case 0x55: this.d = this.ixL; break;                                    // LD D,IXL *
       case 0x56: this.d = this.readMem(this.getIX() + this.d_()); this.pc++; break;             // LD D,(IX+d)
-      case 0x5C: this.e = this.ixH; break;                                    // LD E,IXh *
-      case 0x5D: this.e = this.ixL; break;                                    // LD E,IXl *
+      case 0x5C: this.e = this.ixH; break;                                    // LD E,IXH *
+      case 0x5D: this.e = this.ixL; break;                                    // LD E,IXL *
       case 0x5E: this.e = this.readMem(this.getIX() + this.d_()); this.pc++; break;             // LD E,(IX+d)
-      case 0x60: this.ixH = this.b; break;                                    // LD IXh,B *
-      case 0x61: this.ixH = this.c; break;                                    // LD IXh,C *
-      case 0x62: this.ixH = this.d; break;                                    // LD IXh,D *
-      case 0x63: this.ixH = this.e; break;                                    // LD IXh,E *
+      case 0x60: this.ixH = this.b; break;                                    // LD IXH,B *
+      case 0x61: this.ixH = this.c; break;                                    // LD IXH,C *
+      case 0x62: this.ixH = this.d; break;                                    // LD IXH,D *
+      case 0x63: this.ixH = this.e; break;                                    // LD IXH,E *
       case 0x64: break;                                             // LD IXH,IXH*
       case 0x65: this.ixH = this.ixL; break;                                  // LD IXH,IXL *
       case 0x66: this.h = this.readMem(this.getIX() + this.d_()); this.pc++; break;             // LD H,(IX+d)
-      case 0x67: this.ixH = this.a; break;                                    // LD IXh,A *
+      case 0x67: this.ixH = this.a; break;                                    // LD IXH,A *
       case 0x68: this.ixL = this.b; break;                                    // LD IXL,B *
       case 0x69: this.ixL = this.c; break;                                    // LD IXl,C *
       case 0x6A: this.ixL = this.d; break;                                    // LD IXL,D *
       case 0x6B: this.ixL = this.e; break;                                    // LD IXl,E *
-      case 0x6C: this.ixL = this.ixH; break;                                  // LD IXl,IXh *
-      case 0x6D: break;                                             // LD IXl,IXl *
+      case 0x6C: this.ixL = this.ixH; break;                                  // LD IXl,IXH *
+      case 0x6D: break;                                             // LD IXl,IXL *
       case 0x6E: this.l = this.readMem(this.getIX() + this.d_()); this.pc++; break;            // LD L,(IX+d)
       case 0x6F: this.ixL = this.a; break;                                    // LD IXl,A *
       case 0x70: this.writeMem(this.getIX() + this.d_(), this.b); this.pc++; break;             // LD (IX+d),B
@@ -1527,32 +1466,32 @@ JSSMS.Z80.prototype = {
       case 0x74: this.writeMem(this.getIX() + this.d_(), this.h); this.pc++; break;             // LD (IX+d),H
       case 0x75: this.writeMem(this.getIX() + this.d_(), this.l); this.pc++; break;             // LD (IX+d),L
       case 0x77: this.writeMem(this.getIX() + this.d_(), this.a); this.pc++; break;             // LD (IX+d),A
-      case 0x7C: this.a = this.ixH; break;                                    // LD A,IXh *
-      case 0x7D: this.a = this.ixL; break;                                    // LD A,IXl *
+      case 0x7C: this.a = this.ixH; break;                                    // LD A,IXH *
+      case 0x7D: this.a = this.ixL; break;                                    // LD A,IXL *
       case 0x7E: this.a = this.readMem(this.getIX() + this.d_()); this.pc++; break;             // LD A,(IX+d)
-      case 0x84: this.add_a(this.ixH); break;                                 // ADD A,IXh *
-      case 0x85: this.add_a(this.ixL); break;                                 // ADD A,IXl *
+      case 0x84: this.add_a(this.ixH); break;                                 // ADD A,IXH *
+      case 0x85: this.add_a(this.ixL); break;                                 // ADD A,IXL *
       case 0x86: this.add_a(this.readMem(this.getIX() + this.d_())); this.pc++; break;          // ADD A,(IX+d)
       case 0x8C: this.adc_a(this.ixH); break;                                 // ADC A,IXH *
       case 0x8D: this.adc_a(this.ixL); break;                                 // ADC A,IXL *
       case 0x8E: this.adc_a(this.readMem(this.getIX() + this.d_())); this.pc++; break;          // ADC A,(IX+d)
-      case 0x94: this.sub_a(this.ixH); break;                                 // SUB IXh *
-      case 0x95: this.sub_a(this.ixL); break;                                 // SUB IXl *
+      case 0x94: this.sub_a(this.ixH); break;                                 // SUB IXH *
+      case 0x95: this.sub_a(this.ixL); break;                                 // SUB IXL *
       case 0x96: this.sub_a(this.readMem(this.getIX() + this.d_())); this.pc++; break;          // SUB A,(IX+d)
       case 0x9C: this.sbc_a(this.ixH); break;                                 // SBC A,IXH *
       case 0x9D: this.sbc_a(this.ixL); break;                                 // SBC A,IXL *
       case 0x9E: this.sbc_a(this.readMem(this.getIX() + this.d_())); this.pc++; break;          // SBC A,(IX+d)
-      case 0xA4: this.f = this.SZP_TABLE[this.a &= this.ixH] | F_HALFCARRY; break;      // AND IXh *
-      case 0xA5: this.f = this.SZP_TABLE[this.a &= this.ixL] | F_HALFCARRY; break;      // AND IXl *
+      case 0xA4: this.f = this.SZP_TABLE[this.a &= this.ixH] | F_HALFCARRY; break;      // AND IXH *
+      case 0xA5: this.f = this.SZP_TABLE[this.a &= this.ixL] | F_HALFCARRY; break;      // AND IXL *
       case 0xA6: this.f = this.SZP_TABLE[this.a &= this.readMem(this.getIX() + this.d_())] | F_HALFCARRY; this.pc++; break;      // AND A,(IX+d)
       case 0xAC: this.f = this.SZP_TABLE[this.a ^= this.ixH]; break;                    // XOR A IXH*
       case 0xAD: this.f = this.SZP_TABLE[this.a ^= this.ixL]; break;                    // XOR A IXL*
-      case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIX() + this.d_())];this.pc++;break;// XOR A,(IX+d)
+      case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIX() + this.d_())];this.pc++; break;// XOR A,(IX+d)
       case 0xB4: this.f = this.SZP_TABLE[this.a |= this.ixH]; break;                    // OR A IXH*
       case 0xB5: this.f = this.SZP_TABLE[this.a |= this.ixL]; break;                    // OR A IXL*
-      case 0xB6: this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIX() + this.d_())];this.pc++;break;// OR A,(IX+d)
-      case 0xBC: this.cp_a(this.ixH); break;                                    // CP IXh *
-      case 0xBD: this.cp_a(this.ixL); break;                                    // CP IXl *
+      case 0xB6: this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIX() + this.d_())];this.pc++; break;// OR A,(IX+d)
+      case 0xBC: this.cp_a(this.ixH); break;                                    // CP IXH *
+      case 0xBD: this.cp_a(this.ixL); break;                                    // CP IXL *
       case 0xBE: this.cp_a(this.readMem(this.getIX() + this.d_())); this.pc++; break; // CP (IX+d)
       case 0xCB: this.doIndexCB(this.getIX()); break;                           // CB Opcode
       case 0xE1: this.setIX(this.readMemWord(this.sp)); this.sp += 2; break;    // POP IX
@@ -1566,7 +1505,7 @@ JSSMS.Z80.prototype = {
       case 0xE9: this.pc = this.getIX(); break;                                 // JP (IX)
       case 0xF9: this.sp = this.getIX(); break;                                 // LD SP,IX
 
-      // Unimplented DD/FD Opcode
+      // Unimplemented DD/FD Opcode
       default:
         this.pc--;
         break;
@@ -1597,9 +1536,9 @@ JSSMS.Z80.prototype = {
         this.pc += 2;
         break;
       case 0x23: this.incIY(); break;                                    // INC IY
-      case 0x24: this.iyH = this.inc8(this.iyH); break;                            // INC IYh *
-      case 0x25: this.iyH = this.dec8(this.iyH); break;                            // DEC IYh *
-      case 0x26: this.iyH = this.readMem(this.pc++); break;                        // LD IYh,n *
+      case 0x24: this.iyH = this.inc8(this.iyH); break;                            // INC IYH *
+      case 0x25: this.iyH = this.dec8(this.iyH); break;                            // DEC IYH *
+      case 0x26: this.iyH = this.readMem(this.pc++); break;                        // LD IYH,n *
       case 0x29: this.setIY(this.add16(this.getIY(), this.getIY())); break;             // ADD IY,IY
       case 0x2A:                                                  // LD IY,(nn)
         location = this.readMemWord(this.pc);
@@ -1608,41 +1547,41 @@ JSSMS.Z80.prototype = {
         this.pc += 2;
         break;
       case 0x2B: this.decIY(); break;                                    // DEC IY
-      case 0x2C: this.iyL = this.inc8(this.iyL); break;                            // INC IYl *
-      case 0x2D: this.iyL = this.dec8(this.iyL); break;                            // DEC IYl *
-      case 0x2E: this.iyL = this.readMem(this.pc++); break;                        // LD IYl,n
+      case 0x2C: this.iyL = this.inc8(this.iyL); break;                            // INC IYL *
+      case 0x2D: this.iyL = this.dec8(this.iyL); break;                            // DEC IYL *
+      case 0x2E: this.iyL = this.readMem(this.pc++); break;                        // LD IYL,n
       case 0x34: this.incMem(this.getIY() + this.d_()); this.pc++; break;                  // INC (IY+d)
       case 0x35: this.decMem(this.getIY() + this.d_()); this.pc++; break;                  // DEC (IY+d)
-      case 0x36: this.writeMem(this.getIY() + this.d_(), this.readMem(++this.pc)); this.pc++; break; // LD (IY+d), n
+      case 0x36: this.writeMem(this.getIY() + this.d_(), this.readMem(++this.pc)); this.pc++; break; // LD (IY+d),n
       case 0x39: this.setIY(this.add16(this.getIY(), this.sp)); break;                  // ADD IY,SP
-      case 0x44: this.b = this.iyH; break;                                    // LD B,IYh *
-      case 0x45: this.b = this.iyL; break;                                    // LD B,IYl *
+      case 0x44: this.b = this.iyH; break;                                    // LD B,IYH *
+      case 0x45: this.b = this.iyL; break;                                    // LD B,IYL *
       case 0x46: this.b = this.readMem(this.getIY() + this.d_()); this.pc++; break;             // LD B,(IY+d)
-      case 0x4C: this.c = this.iyH; break;                                    // LD C,IYh *
-      case 0x4D: this.c = this.iyL; break;                                    // LD C,IYl *
+      case 0x4C: this.c = this.iyH; break;                                    // LD C,IYH *
+      case 0x4D: this.c = this.iyL; break;                                    // LD C,IYL *
       case 0x4E: this.c = this.readMem(this.getIY() + this.d_()); this.pc++; break;             // LD C,(IY+d)
-      case 0x54: this.d = this.iyH; break;                                    // LD D,IYh *
-      case 0x55: this.d = this.iyL; break;                                    // LD D,IYl *
+      case 0x54: this.d = this.iyH; break;                                    // LD D,IYH *
+      case 0x55: this.d = this.iyL; break;                                    // LD D,IYL *
       case 0x56: this.d = this.readMem(this.getIY() + this.d_()); this.pc++; break;             // LD D,(IY+d)
-      case 0x5C: this.e = this.iyH; break;                                    // LD E,IYh *
-      case 0x5D: this.e = this.iyL; break;                                    // LD E,IYl *
+      case 0x5C: this.e = this.iyH; break;                                    // LD E,IYH *
+      case 0x5D: this.e = this.iyL; break;                                    // LD E,IYL *
       case 0x5E: this.e = this.readMem(this.getIY() + this.d_()); this.pc++; break;             // LD E,(IY+d)
-      case 0x60: this.iyH = this.b; break;                                    // LD IYh,B *
-      case 0x61: this.iyH = this.c; break;                                    // LD IYh,C *
-      case 0x62: this.iyH = this.d; break;                                    // LD IYh,D *
-      case 0x63: this.iyH = this.e; break;                                    // LD IYh,E *
+      case 0x60: this.iyH = this.b; break;                                    // LD IYH,B *
+      case 0x61: this.iyH = this.c; break;                                    // LD IYH,C *
+      case 0x62: this.iyH = this.d; break;                                    // LD IYH,D *
+      case 0x63: this.iyH = this.e; break;                                    // LD IYH,E *
       case 0x64: break;                                             // LD IYH,IYH*
       case 0x65: this.iyH = this.iyL; break;                                  // LD IYH,IYL *
       case 0x66: this.h = this.readMem(this.getIY() + this.d_()); this.pc++; break;             // LD H,(IY+d)
-      case 0x67: this.iyH = this.a; break;                                    // LD IYh,A *
+      case 0x67: this.iyH = this.a; break;                                    // LD IYH,A *
       case 0x68: this.iyL = this.b; break;                                    // LD IYL,B *
-      case 0x69: this.iyL = this.c; break;                                    // LD IYl,C *
+      case 0x69: this.iyL = this.c; break;                                    // LD IYL,C *
       case 0x6A: this.iyL = this.d; break;                                    // LD IYL,D *
-      case 0x6B: this.iyL = this.e; break;                                    // LD IYl,E *
-      case 0x6C: this.iyL = this.iyH; break;                                  // LD IYl,IYh *
-      case 0x6D: break;                                             // LD IYl,IYl *
+      case 0x6B: this.iyL = this.e; break;                                    // LD IYL,E *
+      case 0x6C: this.iyL = this.iyH; break;                                  // LD IYL,IYH *
+      case 0x6D: break;                                             // LD IYL,IYL *
       case 0x6E: this.l = this.readMem(this.getIY() + this.d_()); this.pc++; break;            // LD L,(IY+d)
-      case 0x6F: this.iyL = this.a; break;                                    // LD IYl,A *
+      case 0x6F: this.iyL = this.a; break;                                    // LD IYL,A *
       case 0x70: this.writeMem(this.getIY() + this.d_(), this.b); this.pc++; break;             // LD (IY+d),B
       case 0x71: this.writeMem(this.getIY() + this.d_(), this.c); this.pc++; break;             // LD (IY+d),C
       case 0x72: this.writeMem(this.getIY() + this.d_(), this.d); this.pc++; break;             // LD (IY+d),D
@@ -1650,32 +1589,32 @@ JSSMS.Z80.prototype = {
       case 0x74: this.writeMem(this.getIY() + this.d_(), this.h); this.pc++; break;             // LD (IY+d),H
       case 0x75: this.writeMem(this.getIY() + this.d_(), this.l); this.pc++; break;             // LD (IY+d),L
       case 0x77: this.writeMem(this.getIY() + this.d_(), this.a); this.pc++; break;             // LD (IY+d),A
-      case 0x7C: this.a = this.iyH; break;                                    // LD A,IYh *
-      case 0x7D: this.a = this.iyL; break;                                    // LD A,IYl *
+      case 0x7C: this.a = this.iyH; break;                                    // LD A,IYH *
+      case 0x7D: this.a = this.iyL; break;                                    // LD A,IYL *
       case 0x7E: this.a = this.readMem(this.getIY() + this.d_()); this.pc++; break;             // LD A,(IY+d)
-      case 0x84: this.add_a(this.iyH); break;                                 // ADD A,IYh *
-      case 0x85: this.add_a(this.iyL); break;                                 // ADD A,IYl *
+      case 0x84: this.add_a(this.iyH); break;                                 // ADD A,IYH *
+      case 0x85: this.add_a(this.iyL); break;                                 // ADD A,IYL *
       case 0x86: this.add_a(this.readMem(this.getIY() + this.d_())); this.pc++; break;          // ADD A,(IY+d)
       case 0x8C: this.adc_a(this.iyH); break;                                 // ADC A,IYH *
       case 0x8D: this.adc_a(this.iyL); break;                                 // ADC A,IYL *
       case 0x8E: this.adc_a(this.readMem(this.getIY() + this.d_())); this.pc++; break;          // ADC A,(IY+d)
-      case 0x94: this.sub_a(this.iyH); break;                                 // SUB IYh *
-      case 0x95: this.sub_a(this.iyL); break;                                 // SUB IYl *
+      case 0x94: this.sub_a(this.iyH); break;                                 // SUB IYH *
+      case 0x95: this.sub_a(this.iyL); break;                                 // SUB IYL *
       case 0x96: this.sub_a(this.readMem(this.getIY() + this.d_())); this.pc++; break;          // SUB A,(IY+d)
       case 0x9C: this.sbc_a(this.iyH); break;                                 // SBC A,IYH *
       case 0x9D: this.sbc_a(this.iyL); break;                                 // SBC A,IYL *
       case 0x9E: this.sbc_a(this.readMem(this.getIY() + this.d_())); this.pc++; break;          // SBC A,(IY+d)
-      case 0xA4: this.f = this.SZP_TABLE[this.a &= this.iyH] | F_HALFCARRY; break;      // AND IYh *
-      case 0xA5: this.f = this.SZP_TABLE[this.a &= this.iyL] | F_HALFCARRY; break;      // AND IYl *
+      case 0xA4: this.f = this.SZP_TABLE[this.a &= this.iyH] | F_HALFCARRY; break;      // AND IYH *
+      case 0xA5: this.f = this.SZP_TABLE[this.a &= this.iyL] | F_HALFCARRY; break;      // AND IYL *
       case 0xA6: this.f = this.SZP_TABLE[this.a &= this.readMem(this.getIY() + this.d_())] | F_HALFCARRY; this.pc++; break; // AND A,(IY+d)
       case 0xAC: this.f = this.SZP_TABLE[this.a ^= this.iyH]; break;                    // XOR A IYH*
       case 0xAD: this.f = this.SZP_TABLE[this.a ^= this.iyL]; break;                    // XOR A IYL*
-      case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIY() + this.d_())];this.pc++;break;// XOR A,(IY+d)
+      case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIY() + this.d_())];this.pc++; break;// XOR A,(IY+d)
       case 0xB4: this.f = this.SZP_TABLE[this.a |= this.iyH]; break;                    // OR A IYH*
       case 0xB5: this.f = this.SZP_TABLE[this.a |= this.iyL]; break;                    // OR A IYL*
-      case 0xB6: this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIY() + this.d_())];this.pc++;break;// OR A,(IY+d)
-      case 0xBC: this.cp_a(this.iyH); break;                                  // CP IYh *
-      case 0xBD: this.cp_a(this.iyL); break;                                  // CP IYl *
+      case 0xB6: this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIY() + this.d_())];this.pc++; break;// OR A,(IY+d)
+      case 0xBC: this.cp_a(this.iyH); break;                                  // CP IYH *
+      case 0xBD: this.cp_a(this.iyL); break;                                  // CP IYL *
       case 0xBE: this.cp_a(this.readMem(this.getIY() + this.d_())); this.pc++; break;           // CP (IY+d)
       case 0xCB: this.doIndexCB(this.getIY()); break;                         // CB Opcode
       case 0xE1: this.setIY(this.readMemWord(this.sp)); this.sp += 2; break;              // POP IY
@@ -1689,7 +1628,7 @@ JSSMS.Z80.prototype = {
       case 0xE9: this.pc = this.getIY(); break;                                 // JP (IY)
       case 0xF9: this.sp = this.getIY(); break;                                 // LD SP,IY
 
-      // Unimplented DD/FD Opcode
+      // Unimplemented DD/FD Opcode
       default:
         this.pc--;
         break;
@@ -1775,7 +1714,7 @@ JSSMS.Z80.prototype = {
       //  -- ED41 OUT (C),B -------------------------
       case 0x41: this.port.out(this.c, this.b); this.pc++; break;
 
-      // --  ED42 SBC HL, BC ------------------------
+      // --  ED42 SBC HL,BC ------------------------
       case 0x42: this.sbc16(this.getBC()); this.pc++; break;
 
       //  -- ED43 LD (nn),BC ------------------------
@@ -1825,7 +1764,7 @@ JSSMS.Z80.prototype = {
         this.pc++;
         break;
 
-      //  -- ED47 LD I, A ---------------------------
+      //  -- ED47 LD I,A ---------------------------
       case 0x47: this.i = this.a; this.pc++; break;
 
       //  -- ED48 IN C,(C) -------------------------
@@ -1838,10 +1777,10 @@ JSSMS.Z80.prototype = {
       //  -- ED49 OUT (C),C -------------------------
       case 0x49: this.port.out(this.c, this.c); this.pc++; break;
 
-      //  -- ED4A ADC HL, BC ------------------------
+      //  -- ED4A ADC HL,BC ------------------------
       case 0x4A: this.adc16(this.getBC()); this.pc++; break;
 
-      //  -- ED4B LD BC, (nn) -----------------------
+      //  -- ED4B LD BC,(nn) -----------------------
       case 0x4B:
         location = this.readMemWord(this.pc + 1);
         this.c = this.readMem(location++);
@@ -1849,7 +1788,7 @@ JSSMS.Z80.prototype = {
         this.pc += 3;
         break;
 
-      //  -- ED4F LD R, A ---------------------------
+      //  -- ED4F LD R,A ---------------------------
       case 0x4F: this.r = this.a; this.pc++; break;
 
       //  -- ED50 IN D,(C) -------------------------
@@ -1862,7 +1801,7 @@ JSSMS.Z80.prototype = {
       //  -- ED51 OUT (C),D -------------------------
       case 0x51: this.port.out(this.c, this.d); this.pc++; break;
 
-      // --  ED52 SBC HL, DE ------------------------
+      // --  ED52 SBC HL,DE ------------------------
       case 0x52: this.sbc16(this.getDE()); this.pc++; break;
 
       //  -- ED53 LD (nn),DE ------------------------
@@ -1877,7 +1816,7 @@ JSSMS.Z80.prototype = {
       case 0x56:
       case 0x76: this.im = 1; this.pc++; break;
 
-      //  -- ED57 LD A, I ---------------------------
+      //  -- ED57 LD A,I ---------------------------
       case 0x57:
         this.a = this.i;
         this.f = (this.f & F_CARRY) | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);
@@ -1894,10 +1833,10 @@ JSSMS.Z80.prototype = {
       //  -- ED59 OUT (C),E -------------------------
       case 0x59: this.port.out(this.c, this.e); this.pc++; break;
 
-      //  -- ED5A ADC HL, DE ------------------------
+      //  -- ED5A ADC HL,DE ------------------------
       case 0x5A: this.adc16(this.getDE()); this.pc++; break;
 
-      //  -- ED5B LD DE, (nn) -----------------------
+      //  -- ED5B LD DE,(nn) -----------------------
       case 0x5B:
         location = this.readMemWord(this.pc + 1);
         this.e = this.readMem(location++);
@@ -1923,7 +1862,7 @@ JSSMS.Z80.prototype = {
       //  -- ED61 OUT (C),H -------------------------
       case 0x61: this.port.out(this.c, this.h); this.pc++; break;
 
-      // --  ED62 SBC HL, HL ------------------------
+      // --  ED62 SBC HL,HL ------------------------
       case 0x62: this.sbc16(this.getHL()); this.pc++; break;
 
       //  -- ED63 LD (nn),HL ------------------------
@@ -1959,7 +1898,7 @@ JSSMS.Z80.prototype = {
       //  -- ED69 OUT (C),L -------------------------
       case 0x69: this.port.out(this.c, this.l); this.pc++; break;
 
-      //  -- ED6A ADC HL, HL ------------------------
+      //  -- ED6A ADC HL,HL ------------------------
       case 0x6A: this.adc16(this.getHL()); this.pc++; break;
 
       //  -- ED6B LD HL,(nn) -----------------------
@@ -1989,7 +1928,7 @@ JSSMS.Z80.prototype = {
       //  *- ED71 OUT (C),0 -------------------------
       case 0x71: this.port.out(this.c, 0); this.pc++; break;
 
-      // --  ED72 SBC HL, SP ------------------------
+      // --  ED72 SBC HL,SP ------------------------
       case 0x72: this.sbc16(this.sp); this.pc++; break;
 
       //  -- ED73 LD (nn),SP ------------------------
@@ -2010,10 +1949,10 @@ JSSMS.Z80.prototype = {
       //  -- ED79 OUT (C),A -------------------------
       case 0x79: this.port.out(this.c, this.a); this.pc++; break;
 
-      // --  ED7A ADC HL, SP ------------------------
+      // --  ED7A ADC HL,SP ------------------------
       case 0x7A: this.adc16(this.sp); this.pc++; break;
 
-      //  -- ED7B LD SP, (nn) -----------------------
+      //  -- ED7B LD SP,(nn) -----------------------
       case 0x7B:
         this.sp = this.readMemWord(this.readMemWord(this.pc + 1));
         this.pc += 3;
@@ -2292,7 +2231,7 @@ JSSMS.Z80.prototype = {
         else this.f &= ~ F_NEGATIVE;
         break;
 
-      // -- Unimplented ED Opcode --------------------
+      // -- Unimplemented ED Opcode --------------------
       default:
         if (DEBUG) {
           console.log('Unimplemented ED Opcode: ' + opcode.toString(16));
@@ -2986,10 +2925,12 @@ JSSMS.Z80.prototype = {
   /**
    * Reset memory to default values.
    *
-   * @param {Array.<Array.<number>>} p
+   * @param {Array.<Array.<number>>=} p
    */
   resetMemory: function(p) {
-    if (p != null) this.rom = p;
+    if (p) {
+      this.rom = p;
+    }
 
     this.frameReg[0] = 0;
     this.frameReg[1] = 0;
@@ -2997,10 +2938,16 @@ JSSMS.Z80.prototype = {
     this.frameReg[3] = 0;
 
     // Default Mapping
-    if (this.rom != null) {
+    if (this.rom.length) {
       // 16K Page Chunks :)
       this.number_of_pages = this.rom.length / 16;
       this.setDefaultMemoryMapping();
+
+      if (DEBUG) {
+        this.main.ui.updateStatus('Parsing instructions...');
+        this.parseInstructions();
+        this.main.ui.updateStatus('Instructions parsed');
+      }
     } else {
       this.number_of_pages = 0;
     }

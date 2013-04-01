@@ -266,6 +266,21 @@ JSSMS.Utils = {
 
 
   /**
+   * Get a hex from a decimal. Pad with 0 if necessary.
+   *
+   * @param {number} dec A decimal integer.
+   * @return {string} A hex representation of the input.
+   */
+  toHex: function(dec) {
+    var hex = (dec).toString(16);
+    if (hex.length == 1) {
+      hex = '0' + hex;
+    }
+    return '0x' + hex;
+  },
+
+
+  /**
    * Determine support and prefix of HTML5 features. Returns the prefix of the
    * implementation, or false otherwise.
    *

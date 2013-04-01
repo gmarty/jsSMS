@@ -255,6 +255,10 @@ JSSMS.prototype = {
   romFileName: '',
 
 
+  // Debugger
+  lineno: 0,
+
+
   /**
    * Reset all emulation.
    */
@@ -270,7 +274,10 @@ JSSMS.prototype = {
     this.vdp.reset();
     this.ports.reset();
     this.cpu.reset();
-    this.cpu.resetMemory(null);
+    if (DEBUG) {
+      this.cpu.resetDebug();
+    }
+    this.cpu.resetMemory();
   },
 
 
@@ -327,6 +334,40 @@ JSSMS.prototype = {
 
       this.fpsFrameCount++;
       this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
+    }
+  },
+
+
+  /**
+   * At the moment, execute one scan line worth of instructions, but should be changed to execute
+   * at each instruction.
+   */
+  nextStep: function() {
+    if (Setup.ACCURATE_INTERRUPT_EMULATION && this.lineno == 193) {
+      this.cpu.run(this.cyclesPerLine, 8);  // Run until 8 cycles remaining
+      this.vdp.setVBlankFlag();        // Then set VBlank flag
+      this.cpu.run(0, 0);              // Run for remaining 8 cycles
+    } else {
+      this.cpu.run(this.cyclesPerLine, 0);
+    }
+
+    // VDP
+    this.vdp.line = this.lineno;
+
+    // Draw Next Line
+    if (this.frameskip_counter == 0 && this.lineno < 192) {
+      this.vdp.drawLine(this.lineno);
+    }
+
+    // Assert Interrupt Line if Necessary
+    this.vdp.interrupts(this.lineno);
+
+    this.lineno++;
+
+    // Render after every frames.
+    if (this.lineno >= this.no_of_scanlines) {
+      this.lineno = 0;
+      this.doRepaint();
     }
   },
 

@@ -110,17 +110,39 @@ if (typeof $ != 'undefined') {
       });
 
       // Buttons
-      this.buttons = {
-        start: $('<input type="button" value="Stop" class="btn" disabled="disabled">'),
-        restart: $('<input type="button" value="Restart" class="btn" disabled="disabled">'),
-        sound: $('<input type="button" value="Enable sound" class="btn" disabled="disabled">'),
-        zoom: $('<input type="button" value="Zoom in" class="btn hidden-phone">')
-      };
+      this.buttons = Object.create(null);
+
+      this.buttons.start = $('<input type="button" value="Start" class="btn btn-primary" disabled="disabled">');
+      this.buttons.reset = $('<input type="button" value="Reset" class="btn" disabled="disabled">');
+
+      if (DEBUG) {
+        this.dissambler = $('<div id="dissambler"></div>');
+        $(parent).after(this.dissambler);
+        this.buttons.nextStep = $('<input type="button" value="Next step" class="btn" disabled="disabled">')
+          .click(function() {
+              self.main.nextStep();
+            });
+      }
+
+      if (this.main.soundEnabled) {
+        this.buttons.sound = $('<input type="button" value="Enable sound" class="btn" disabled="disabled">')
+          .click(function() {
+              if (self.main.soundEnabled) {
+                self.main.soundEnabled = false;
+                self.buttons.sound.attr('value', 'Enable sound');
+              } else {
+                self.main.soundEnabled = true;
+                self.buttons.sound.attr('value', 'Disable sound');
+              }
+            });
+      }
+
+      this.buttons.zoom = $('<input type="button" value="Zoom in" class="btn hidden-phone">');
 
       this.buttons.start.click(function() {
         if (!self.main.isRunning) {
           self.main.start();
-          self.buttons.start.attr('value', 'Stop');
+          self.buttons.start.attr('value', 'Pause');
         } else {
           self.main.stop();
           self.updateStatus('Paused');
@@ -128,7 +150,7 @@ if (typeof $ != 'undefined') {
         }
       });
 
-      this.buttons.restart.click(function() {
+      this.buttons.reset.click(function() {
         if (!self.main.reloadRom()) {
           $(this).attr('disabled', 'disabled');
           return;
@@ -136,16 +158,6 @@ if (typeof $ != 'undefined') {
         self.main.reset();
         self.main.vdp.forceFullRedraw();
         self.main.start();
-      });
-
-      this.buttons.sound.click(function() {
-        /*if (self.main.soundEnabled) {
-          self.main.soundEnabled = false;
-          self.buttons.sound.attr('value', 'Enable sound');
-        } else {
-          self.nes.soundEnabled = true;
-          self.buttons.sound.attr('value', 'Disable sound');
-        }*/
       });
 
       this.buttons.zoom.click(function() {
@@ -169,7 +181,7 @@ if (typeof $ != 'undefined') {
 
       // @todo Add an exit fullScreen button.
       if (fullscreenSupport) {
-        this.buttons.fullsreen = $('<input type="button" value="Go fullscreen" class="btn">').
+        this.buttons.fullscreen = $('<input type="button" value="Go fullscreen" class="btn">').
             click(function() {
               var screen = /** @type {HTMLCanvasElement} */ (self.screen[0]);
 
@@ -185,9 +197,7 @@ if (typeof $ != 'undefined') {
 
       // Append buttons to controls div.
       for (i in this.buttons) {
-        if (this.buttons.hasOwnProperty(i)) {
-          this.buttons[i].appendTo(controls);
-        }
+        this.buttons[i].appendTo(controls);
       }
 
       this.log = $('<div id="status"></div>');
@@ -219,7 +229,11 @@ if (typeof $ != 'undefined') {
         this.screen[0].width = SMS_WIDTH;
         this.screen[0].height = SMS_HEIGHT;
 
-        this.log.text('');
+        this.log.empty();
+
+        if (DEBUG) {
+          this.dissambler.empty();
+        }
       },
 
 
@@ -288,10 +302,10 @@ if (typeof $ != 'undefined') {
             data = xhr.responseText;
             //}
 
-            self.main.readRomDirectly(data, self.romSelect.val());
             self.main.reset();
+            self.main.readRomDirectly(data, self.romSelect.val());
             self.main.vdp.forceFullRedraw();
-            self.main.start();
+            //self.main.start();
             self.enable();
             self.buttons.start.removeAttr('disabled');
           }
@@ -309,8 +323,11 @@ if (typeof $ != 'undefined') {
         } else {
           this.buttons.pause.attr('value', 'resume');
         }*/
-        this.buttons.restart.removeAttr('disabled');
-        if (this.main.soundEnabled) {
+        this.buttons.reset.removeAttr('disabled');
+        if (DEBUG) {
+          this.buttons.nextStep.removeAttr('disabled');
+        }
+        if (this.buttons.sound) {
           this.buttons.sound.attr('value', 'Disable sound');
         } else {
           this.buttons.sound.attr('value', 'Enable sound');
@@ -349,6 +366,24 @@ if (typeof $ != 'undefined') {
         }
 
         this.canvasContext.putImageData(this.canvasImageData, 0, 0);
+      },
+
+
+      /**
+       * A function called at each cpu instruction and display information relative to debug.
+       */
+      updateDisassembly: function(currentAddress) {
+        var index = this.main.cpu.addressMap[currentAddress];
+        var startAddress = (index - 8) < 0 ? 0 : index - 8;
+        var addresses = this.main.cpu.instructions.slice(startAddress, startAddress + 16);
+        var html = addresses
+          .map(function(address) {
+              return '<div' + (address.address == currentAddress ? ' class="current"' : '') + '>' + address.hexAddress +
+                  (address.isJumpTarget ? ':' : ' ') +
+                  '<code>' + address.inst + '</code></div>';
+            })
+          .join('');
+        this.dissambler.html(html);
       }
     };
 
