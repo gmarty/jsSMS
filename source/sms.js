@@ -21,14 +21,6 @@
 
 
 /**
- * The frequency in ms at which each frame is displayed, calculated this way:
- * frameTime = 1 sec. / frame_number_per_second
- * @const
- */
-var frameTime = 17 /*Math.round(1000 / 60)*/;
-
-
-/**
  * The frequency in ms at which the fps rate is displayed.
  * @const
  */
@@ -278,6 +270,8 @@ JSSMS.prototype = {
       this.cpu.resetDebug();
     }
     this.cpu.resetMemory();
+
+    clearInterval(this.fpsInterval);
   },
 
 

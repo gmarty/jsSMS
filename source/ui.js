@@ -300,12 +300,11 @@ if (typeof $ != 'undefined') {
             data = xhr.responseText;
             //}
 
+            self.main.stop();
             self.main.reset();
             self.main.readRomDirectly(data, self.romSelect.val());
             self.main.vdp.forceFullRedraw();
-            //self.main.start();
             self.enable();
-            self.buttons.start.removeAttr('disabled');
           }
         });
       },
@@ -321,6 +320,8 @@ if (typeof $ != 'undefined') {
         } else {
           this.buttons.pause.attr('value', 'resume');
         }*/
+        this.buttons.start.removeAttr('disabled');
+        this.buttons.start.attr('value', 'Start');
         this.buttons.reset.removeAttr('disabled');
         if (DEBUG) {
           this.buttons.nextStep.removeAttr('disabled');

@@ -18,10 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 'use strict';var $JSCompiler_alias_VOID$$ = void 0, $JSCompiler_alias_TRUE$$ = !0, $JSCompiler_alias_NULL$$ = null, $JSCompiler_alias_FALSE$$ = !1, $SUPPORT_DATAVIEW$$ = !(!window.DataView || !window.ArrayBuffer);
 function $JSSMS$$($opts$$) {
-  this.$e$ = {ui:$JSSMS$DummyUI$$, swfPath:"lib/"};
+  this.$f$ = {ui:$JSSMS$DummyUI$$, swfPath:"lib/"};
   if($opts$$ != $JSCompiler_alias_VOID$$) {
-    for(var $key$$16$$ in this.$e$) {
-      $opts$$[$key$$16$$] != $JSCompiler_alias_VOID$$ && (this.$e$[$key$$16$$] = $opts$$[$key$$16$$])
+    for(var $key$$16$$ in this.$f$) {
+      $opts$$[$key$$16$$] != $JSCompiler_alias_VOID$$ && (this.$f$[$key$$16$$] = $opts$$[$key$$16$$])
     }
   }
   this.$keyboard$ = new $JSSMS$Keyboard$$(this);
@@ -73,22 +73,23 @@ reset:function $$JSSMS$$$$reset$() {
   $JSCompiler_StaticMethods_resetDebug$self$$inline_19_clockSpeedHz$$inline_14_i$$inline_15_i$$inline_244$$ = this.$cpu$;
   $JSCompiler_StaticMethods_resetDebug$self$$inline_19_clockSpeedHz$$inline_14_i$$inline_15_i$$inline_244$$.$instructions$ = [];
   $JSCompiler_StaticMethods_resetDebug$self$$inline_19_clockSpeedHz$$inline_14_i$$inline_15_i$$inline_244$$.$addressMap$ = Object.create($JSCompiler_alias_NULL$$);
-  $JSCompiler_StaticMethods_resetMemory$$(this.$cpu$)
+  $JSCompiler_StaticMethods_resetMemory$$(this.$cpu$);
+  clearInterval(this.$d$)
 }, start:function $$JSSMS$$$$start$() {
   var $self$$1$$ = this;
   this.$isRunning$ || (this.$isRunning$ = $JSCompiler_alias_TRUE$$);
   this.$a$.requestAnimationFrame(this.$JSSMS_prototype$frame$.bind(this), this.$a$.screen);
-  this.$d$ = $JSSMS$Utils$getTimestamp$$();
+  this.$e$ = $JSSMS$Utils$getTimestamp$$();
   this.$fpsFrameCount$ = 0;
-  this.$f$ = setInterval(function() {
+  this.$d$ = setInterval(function() {
     var $now$$inline_24$$ = $JSSMS$Utils$getTimestamp$$();
-    $self$$1$$.$a$.updateStatus("Running: " + ($self$$1$$.$fpsFrameCount$ / (($now$$inline_24$$ - $self$$1$$.$d$) / 1E3)).toFixed(2) + " FPS");
+    $self$$1$$.$a$.updateStatus("Running: " + ($self$$1$$.$fpsFrameCount$ / (($now$$inline_24$$ - $self$$1$$.$e$) / 1E3)).toFixed(2) + " FPS");
     $self$$1$$.$fpsFrameCount$ = 0;
-    $self$$1$$.$d$ = $now$$inline_24$$
+    $self$$1$$.$e$ = $now$$inline_24$$
   }, 500);
   this.$a$.updateStatus("Running")
 }, stop:function $$JSSMS$$$$stop$() {
-  clearInterval(this.$f$);
+  clearInterval(this.$d$);
   this.$isRunning$ = $JSCompiler_alias_FALSE$$
 }, $JSSMS_prototype$frame$:function $$JSSMS$$$$$JSSMS_prototype$frame$$() {
   if(this.$isRunning$) {
@@ -7001,9 +7002,11 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
       return $self$$5$$.xhr = $xhr$$
     }, complete:function($xhr$$1$$, $status$$) {
       var $data$$32$$;
-      "error" == $status$$ ? $self$$5$$.updateStatus("The selected rom could not be loaded.") : ($data$$32$$ = $xhr$$1$$.responseText, $self$$5$$.$main$.reset(), $JSCompiler_StaticMethods_readRomDirectly$$($self$$5$$.$main$, $data$$32$$, $self$$5$$.$romSelect$.val()), $JSCompiler_StaticMethods_forceFullRedraw$$($self$$5$$.$main$.$vdp$), $self$$5$$.enable(), $self$$5$$.$buttons$.start.removeAttr("disabled"))
+      "error" == $status$$ ? $self$$5$$.updateStatus("The selected rom could not be loaded.") : ($data$$32$$ = $xhr$$1$$.responseText, $self$$5$$.$main$.stop(), $self$$5$$.$main$.reset(), $JSCompiler_StaticMethods_readRomDirectly$$($self$$5$$.$main$, $data$$32$$, $self$$5$$.$romSelect$.val()), $JSCompiler_StaticMethods_forceFullRedraw$$($self$$5$$.$main$.$vdp$), $self$$5$$.enable())
     }})
   }, enable:function $$UI$$$$enable$() {
+    this.$buttons$.start.removeAttr("disabled");
+    this.$buttons$.start.attr("value", "Start");
     this.$buttons$.reset.removeAttr("disabled");
     this.$buttons$.$nextStep$.removeAttr("disabled");
     this.$buttons$.$sound$ ? this.$buttons$.$sound$.attr("value", "Disable sound") : this.$buttons$.$sound$.attr("value", "Enable sound")

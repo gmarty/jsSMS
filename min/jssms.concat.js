@@ -22,7 +22,6 @@ var LITTLE_ENDIAN = true;
 var SUPPORT_DATAVIEW = !!(window["DataView"] && window["ArrayBuffer"]);
 var SAMPLE_RATE = 44100;
 var Setup = {DEBUG_TIMING:DEBUG, REFRESH_EMULATION:false, ACCURATE_INTERRUPT_EMULATION:ACCURATE, LIGHTGUN:false, VDP_SPRITE_COLLISIONS:ACCURATE, PAGE_SIZE:1024};
-var frameTime = 17;
 var fpsInterval = 500;
 var CLOCK_NTSC = 3579545;
 var CLOCK_PAL = 3546893;
@@ -56,7 +55,8 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   if(DEBUG) {
     this.cpu.resetDebug()
   }
-  this.cpu.resetMemory()
+  this.cpu.resetMemory();
+  clearInterval(this.fpsInterval)
 }, start:function() {
   var self = this;
   if(!this.isRunning) {
@@ -7302,13 +7302,15 @@ if(typeof $ != "undefined") {
           return
         }
         data = xhr.responseText;
+        self.main.stop();
         self.main.reset();
         self.main.readRomDirectly(data, self.romSelect.val());
         self.main.vdp.forceFullRedraw();
-        self.enable();
-        self.buttons.start.removeAttr("disabled")
+        self.enable()
       }})
     }, enable:function() {
+      this.buttons.start.removeAttr("disabled");
+      this.buttons.start.attr("value", "Start");
       this.buttons.reset.removeAttr("disabled");
       if(DEBUG) {
         this.buttons.nextStep.removeAttr("disabled")
