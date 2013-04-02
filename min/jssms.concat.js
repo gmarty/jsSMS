@@ -7162,7 +7162,6 @@ if(typeof $ != "undefined") {
           lastTime = currTime + timeToCall
         }
       }
-      this.zoomed = false;
       this.hiddenPrefix = JSSMS.Utils.getPrefix(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
       this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + ' class="screen"></canvas>');
       this.canvasContext = this.screen[0].getContext("2d");
@@ -7177,8 +7176,25 @@ if(typeof $ != "undefined") {
         self.loadROM()
       });
       this.buttons = Object.create(null);
-      this.buttons.start = $('<input type="button" value="Start" class="btn btn-primary" disabled="disabled">');
-      this.buttons.reset = $('<input type="button" value="Reset" class="btn" disabled="disabled">');
+      this.buttons.start = $('<input type="button" value="Start" class="btn btn-primary" disabled="disabled">').click(function() {
+        if(!self.main.isRunning) {
+          self.main.start();
+          self.buttons.start.attr("value", "Pause")
+        }else {
+          self.main.stop();
+          self.updateStatus("Paused");
+          self.buttons.start.attr("value", "Start")
+        }
+      });
+      this.buttons.reset = $('<input type="button" value="Reset" class="btn" disabled="disabled">').click(function() {
+        if(!self.main.reloadRom()) {
+          $(this).attr("disabled", "disabled");
+          return
+        }
+        self.main.reset();
+        self.main.vdp.forceFullRedraw();
+        self.main.start()
+      });
       if(DEBUG) {
         this.dissambler = $('<div id="dissambler"></div>');
         $(parent).after(this.dissambler);
@@ -7197,38 +7213,6 @@ if(typeof $ != "undefined") {
           }
         })
       }
-      this.buttons.zoom = $('<input type="button" value="Zoom in" class="btn hidden-phone">');
-      this.buttons.start.click(function() {
-        if(!self.main.isRunning) {
-          self.main.start();
-          self.buttons.start.attr("value", "Pause")
-        }else {
-          self.main.stop();
-          self.updateStatus("Paused");
-          self.buttons.start.attr("value", "Start")
-        }
-      });
-      this.buttons.reset.click(function() {
-        if(!self.main.reloadRom()) {
-          $(this).attr("disabled", "disabled");
-          return
-        }
-        self.main.reset();
-        self.main.vdp.forceFullRedraw();
-        self.main.start()
-      });
-      this.buttons.zoom.click(function() {
-        if(self.zoomed) {
-          self.screen.animate({width:SMS_WIDTH + "px", height:SMS_HEIGHT + "px"}, function() {
-            $(this).removeAttr("style")
-          });
-          self.buttons.zoom.attr("value", "Zoom in")
-        }else {
-          self.screen.animate({width:SMS_WIDTH * 2 + "px", height:SMS_HEIGHT * 2 + "px"});
-          self.buttons.zoom.attr("value", "Zoom out")
-        }
-        self.zoomed = !self.zoomed
-      });
       if(fullscreenSupport) {
         this.buttons.fullscreen = $('<input type="button" value="Go fullscreen" class="btn">').click(function() {
           var screen = self.screen[0];
@@ -7241,6 +7225,20 @@ if(typeof $ != "undefined") {
               screen.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT)
             }
           }
+        })
+      }else {
+        this.zoomed = false;
+        this.buttons.zoom = $('<input type="button" value="Zoom in" class="btn hidden-phone">').click(function() {
+          if(self.zoomed) {
+            self.screen.animate({width:SMS_WIDTH + "px", height:SMS_HEIGHT + "px"}, function() {
+              $(this).removeAttr("style")
+            });
+            self.buttons.zoom.attr("value", "Zoom in")
+          }else {
+            self.screen.animate({width:SMS_WIDTH * 2 + "px", height:SMS_HEIGHT * 2 + "px"});
+            self.buttons.zoom.attr("value", "Zoom out")
+          }
+          self.zoomed = !self.zoomed
         })
       }
       for(i in this.buttons) {

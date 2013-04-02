@@ -6930,7 +6930,6 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
           $lastTime$$ = $currTime$$ + $timeToCall$$
         }
       }
-      this.$zoomed$ = $JSCompiler_alias_FALSE$$;
       this.$hiddenPrefix$ = $JSSMS$Utils$getPrefix$$(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
       this.screen = $('<canvas width=256 height=192 class="screen"></canvas>');
       this.$canvasContext$ = this.screen[0].getContext("2d");
@@ -6942,8 +6941,12 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
           $self$$4$$.$loadROM$()
         });
         this.$buttons$ = Object.create($JSCompiler_alias_NULL$$);
-        this.$buttons$.start = $('<input type="button" value="Start" class="btn btn-primary" disabled="disabled">');
-        this.$buttons$.reset = $('<input type="button" value="Reset" class="btn" disabled="disabled">');
+        this.$buttons$.start = $('<input type="button" value="Start" class="btn btn-primary" disabled="disabled">').click(function() {
+          $self$$4$$.$main$.$isRunning$ ? ($self$$4$$.$main$.stop(), $self$$4$$.updateStatus("Paused"), $self$$4$$.$buttons$.start.attr("value", "Start")) : ($self$$4$$.$main$.start(), $self$$4$$.$buttons$.start.attr("value", "Pause"))
+        });
+        this.$buttons$.reset = $('<input type="button" value="Reset" class="btn" disabled="disabled">').click(function() {
+          "" != $self$$4$$.$main$.$romData$ && "" != $self$$4$$.$main$.$romFileName$ && $JSCompiler_StaticMethods_readRomDirectly$$($self$$4$$.$main$, $self$$4$$.$main$.$romData$, $self$$4$$.$main$.$romFileName$) ? ($self$$4$$.$main$.reset(), $JSCompiler_StaticMethods_forceFullRedraw$$($self$$4$$.$main$.$vdp$), $self$$4$$.$main$.start()) : $(this).attr("disabled", "disabled")
+        });
         this.$dissambler$ = $('<div id="dissambler"></div>');
         $($parent$$2$$).after(this.$dissambler$);
         this.$buttons$.$nextStep$ = $('<input type="button" value="Next step" class="btn" disabled="disabled">').click(function() {
@@ -6952,22 +6955,14 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
         this.$main$.$soundEnabled$ && (this.$buttons$.$sound$ = $('<input type="button" value="Enable sound" class="btn" disabled="disabled">').click(function() {
           $self$$4$$.$main$.$soundEnabled$ ? ($self$$4$$.$main$.$soundEnabled$ = $JSCompiler_alias_FALSE$$, $self$$4$$.$buttons$.$sound$.attr("value", "Enable sound")) : ($self$$4$$.$main$.$soundEnabled$ = $JSCompiler_alias_TRUE$$, $self$$4$$.$buttons$.$sound$.attr("value", "Disable sound"))
         }));
-        this.$buttons$.zoom = $('<input type="button" value="Zoom in" class="btn hidden-phone">');
-        this.$buttons$.start.click(function() {
-          $self$$4$$.$main$.$isRunning$ ? ($self$$4$$.$main$.stop(), $self$$4$$.updateStatus("Paused"), $self$$4$$.$buttons$.start.attr("value", "Start")) : ($self$$4$$.$main$.start(), $self$$4$$.$buttons$.start.attr("value", "Pause"))
-        });
-        this.$buttons$.reset.click(function() {
-          "" != $self$$4$$.$main$.$romData$ && "" != $self$$4$$.$main$.$romFileName$ && $JSCompiler_StaticMethods_readRomDirectly$$($self$$4$$.$main$, $self$$4$$.$main$.$romData$, $self$$4$$.$main$.$romFileName$) ? ($self$$4$$.$main$.reset(), $JSCompiler_StaticMethods_forceFullRedraw$$($self$$4$$.$main$.$vdp$), $self$$4$$.$main$.start()) : $(this).attr("disabled", "disabled")
-        });
-        this.$buttons$.zoom.click(function() {
+        $fullscreenSupport$$ ? this.$buttons$.$fullscreen$ = $('<input type="button" value="Go fullscreen" class="btn">').click(function() {
+          var $screen$$1$$ = $self$$4$$.screen[0];
+          $screen$$1$$.requestFullscreen ? $screen$$1$$.requestFullscreen() : $screen$$1$$.mozRequestFullScreen ? $screen$$1$$.mozRequestFullScreen() : $screen$$1$$.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT)
+        }) : (this.$zoomed$ = $JSCompiler_alias_FALSE$$, this.$buttons$.zoom = $('<input type="button" value="Zoom in" class="btn hidden-phone">').click(function() {
           $self$$4$$.$zoomed$ ? ($self$$4$$.screen.animate({width:"256px", height:"192px"}, function() {
             $(this).removeAttr("style")
           }), $self$$4$$.$buttons$.zoom.attr("value", "Zoom in")) : ($self$$4$$.screen.animate({width:"512px", height:"384px"}), $self$$4$$.$buttons$.zoom.attr("value", "Zoom out"));
           $self$$4$$.$zoomed$ = !$self$$4$$.$zoomed$
-        });
-        $fullscreenSupport$$ && (this.$buttons$.$fullscreen$ = $('<input type="button" value="Go fullscreen" class="btn">').click(function() {
-          var $screen$$1$$ = $self$$4$$.screen[0];
-          $screen$$1$$.requestFullscreen ? $screen$$1$$.requestFullscreen() : $screen$$1$$.mozRequestFullScreen ? $screen$$1$$.mozRequestFullScreen() : $screen$$1$$.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT)
         }));
         for($i$$25$$ in this.$buttons$) {
           this.$buttons$[$i$$25$$].appendTo($controls$$)
