@@ -37,6 +37,7 @@ module.exports = function(grunt) {
           externs: '<%= externs %>',
           compilation_level: 'ADVANCED_OPTIMIZATIONS',
           language_in: 'ECMASCRIPT5_STRICT',
+          use_types_for_optimization: null,
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
           output_wrapper: '(function(){%output%})();',
@@ -55,6 +56,7 @@ module.exports = function(grunt) {
           externs: '<%= externs %>',
           compilation_level: 'ADVANCED_OPTIMIZATIONS',
           language_in: 'ECMASCRIPT5_STRICT',
+          use_types_for_optimization: null,
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
           define: [

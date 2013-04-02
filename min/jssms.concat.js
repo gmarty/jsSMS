@@ -7215,7 +7215,7 @@ if(typeof $ != "undefined") {
       }
       if(fullscreenSupport) {
         this.buttons.fullscreen = $('<input type="button" value="Go fullscreen" class="btn">').click(function() {
-          var screen = self.screen[0];
+          var screen = (self.screen[0]);
           if(screen.requestFullscreen) {
             screen.requestFullscreen()
           }else {
