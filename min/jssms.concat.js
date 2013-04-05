@@ -1430,9 +1430,9 @@ JSSMS.Z80.prototype = {reset:function() {
 }, push1:function(value) {
   this.writeMem(--this.sp, value >> 8);
   this.writeMem(--this.sp, value & 255)
-}, push2:function(value, l) {
-  this.writeMem(--this.sp, value);
-  this.writeMem(--this.sp, l)
+}, push2:function(hi, lo) {
+  this.writeMem(--this.sp, hi);
+  this.writeMem(--this.sp, lo)
 }, incMem:function(offset) {
   this.writeMem(offset, this.inc8(this.readMem(offset)))
 }, decMem:function(offset) {
@@ -3971,65 +3971,77 @@ JSSMS.Z80.prototype = {reset:function() {
 }};
 JSSMS.Debugger = function() {
 };
-JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), resetDebug:function() {
-  this.instructions = [];
-  this.addressMap = Object.create(null)
+JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
+  this.instructions = []
 }, parseInstructions:function() {
   var toHex = JSSMS.Utils.toHex;
-  var romSize = this.rom.length * Setup.PAGE_SIZE;
-  var addr = 0;
+  var romSize = Setup.PAGE_SIZE * this.rom.length;
+  var instruction;
+  var currentAddress;
+  var addresses = [];
   var branch;
-  var inst;
   var i = 0;
   var length = 0;
-  while(addr < romSize) {
-    try {
-      inst = this.disassemble(addr);
-      branch = new Instruction(addr);
-      branch.nextAddress = inst.nextAddress;
-      branch.opcode = inst.opcode;
-      branch.inst = inst.inst;
-      branch.target = inst.target;
-      addr = inst.nextAddress;
-      this.instructions.push(branch)
-    }catch(e) {
+  addresses.push(0);
+  addresses.push(56);
+  addresses.push(102);
+  console.time("Instructions parsing");
+  while(addresses.length) {
+    currentAddress = addresses.shift();
+    if(this.instructions[currentAddress]) {
+      continue
+    }
+    if(currentAddress >= romSize || currentAddress >> 10 >= this.memReadMap.length) {
+      console.log("Invalid address", currentAddress);
+      continue
+    }
+    instruction = this.disassemble(currentAddress);
+    branch = Instruction(currentAddress);
+    branch.label = toHex(instruction.address) + " " + instruction.opcode + " " + instruction.inst;
+    branch.nextAddress = instruction.nextAddress;
+    branch.opcode = instruction.opcode;
+    branch.inst = instruction.inst;
+    branch.target = instruction.target;
+    this.instructions[currentAddress] = branch;
+    if(instruction.nextAddress != null) {
+      addresses.push(instruction.nextAddress)
+    }
+    if(instruction.target != null) {
+      addresses.push(instruction.target)
     }
   }
-  for(i = 0, length = this.instructions.length;i < length;i++) {
-    this.addressMap[this.instructions[i].address] = i
+  console.timeEnd("Instructions parsing");
+  for(length = this.instructions.length;i < length;i++) {
+    if(this.instructions[i] && this.instructions[i].target != null) {
+      this.instructions[this.instructions[i].target].isJumpTarget = true
+    }
   }
-  for(i = 0;i < length;i++) {
-    if(this.instructions[i].target != 0) {
-      if(this.instructions[i].target < Setup.PAGE_SIZE) {
-        if(this.instructions[this.addressMap[this.instructions[i].target]]) {
-          this.instructions[this.addressMap[this.instructions[i].target]].isJumpTarget = true
-        }else {
-          console.log("Missing jump target", this.instructions[i])
-        }
+}, writeGraphViz:function() {
+  var tree = this.instructions;
+  console.time("DOT generation");
+  var dotFile = "digraph G {\n";
+  for(var i = 0, length = tree.length;i < length;i++) {
+    if(tree[i]) {
+      dotFile += " " + i + ' [label="' + tree[i].label + '"];\n';
+      if(tree[i].nextAddress != null) {
+        dotFile += " " + i + " -> " + tree[i].nextAddress + ";\n"
+      }
+      if(tree[i].target != null) {
+        dotFile += " " + i + " -> " + tree[i].target + ";\n"
       }
     }
   }
-  if(console.table) {
-    console.table(this.instructions)
-  }else {
-    console.dir(this.instructions)
-  }
-  function Instruction(address) {
-    this.address = address;
-    this.opcode = "";
-    this.inst = "";
-    this.hexAddress = toHex(address);
-    this.nextAddress = 0;
-    this.target = 0;
-    this.isJumpTarget = false
-  }
+  dotFile += "}";
+  dotFile = dotFile.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
+  console.timeEnd("DOT generation");
+  console.log(dotFile)
 }, disassemble:function(address) {
   var toHex = JSSMS.Utils.toHex;
   var opcode = this.readMem(address);
   var opcode_ = toHex(opcode);
   var inst = "Unknown Opcode";
   var currAddr = address;
-  var target = 0;
+  var target = null;
   address++;
   switch(opcode) {
     case 0:
@@ -4114,7 +4126,7 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
     case 24:
       target = address + this.signExtend(this.readMem(address)) + 1;
       inst = "JR (" + toHex(target) + ")";
-      address++;
+      address = null;
       break;
     case 25:
       inst = "ADD HL,DE";
@@ -4586,7 +4598,7 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "XOR A,(HL)";
       break;
     case 175:
-      inst = "XOR A,A (=0)";
+      inst = "XOR A,A";
       break;
     case 176:
       inst = "OR A,B";
@@ -4650,7 +4662,7 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
     case 195:
       target = this.readMemWord(address);
       inst = "JP (" + toHex(target) + ")";
-      address += 2;
+      address = null;
       break;
     case 196:
       target = this.readMemWord(address);
@@ -4667,12 +4679,14 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
     case 199:
       target = 0;
       inst = "RST " + toHex(target);
+      address = null;
       break;
     case 200:
       inst = "RET Z";
       break;
     case 201:
       inst = "RET";
+      address = null;
       break;
     case 202:
       target = this.readMemWord(address);
@@ -4702,6 +4716,7 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
     case 207:
       target = 8;
       inst = "RST " + toHex(target);
+      address = null;
       break;
     case 208:
       inst = "RET NC";
@@ -4730,8 +4745,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "SUB " + toHex(this.readMem(address));
       break;
     case 215:
-      target = 10;
+      target = 16;
       inst = "RST " + toHex(target);
+      address = null;
       break;
     case 216:
       inst = "RET C";
@@ -4764,8 +4780,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       address++;
       break;
     case 223:
-      target = 18;
+      target = 24;
       inst = "RST " + toHex(target);
+      address = null;
       break;
     case 224:
       inst = "RET PO";
@@ -4794,14 +4811,16 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       address++;
       break;
     case 231:
-      target = 20;
+      target = 32;
       inst = "RST " + toHex(target);
+      address = null;
       break;
     case 232:
       inst = "RET PE";
       break;
     case 233:
       inst = "JP (HL)";
+      address = null;
       break;
     case 234:
       target = this.readMemWord(address);
@@ -4827,8 +4846,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       address++;
       break;
     case 239:
-      target = 28;
+      target = 40;
       inst = "RST " + toHex(target);
+      address = null;
       break;
     case 240:
       inst = "RET P";
@@ -4857,8 +4877,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       address++;
       break;
     case 247:
-      target = 30;
+      target = 48;
       inst = "RST " + toHex(target);
+      address = null;
       break;
     case 248:
       inst = "RET M";
@@ -4890,8 +4911,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       address++;
       break;
     case 255:
-      target = 38;
+      target = 56;
       inst = "RST " + toHex(target);
+      address = null;
       break
   }
   return{opcode:opcode_, inst:inst, address:currAddr, nextAddress:address, target:target}
@@ -5725,6 +5747,7 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
     ;
     case 125:
       inst = "RETN / RETI";
+      address = null;
       break;
     case 70:
     ;
@@ -5899,6 +5922,7 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
 }, getIndex:function(index, address) {
   var toHex = JSSMS.Utils.toHex;
   var opcode = this.readMem(address);
+  var opcode_ = toHex(opcode);
   var inst = "Unimplemented DD/FD Opcode";
   var currAddr = address;
   address++;
@@ -5951,15 +5975,21 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       address++;
       break;
     case 52:
-      inst = "INC (" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "INC (" + index + sign + toHex(offset) + ")";
       address++;
       break;
     case 53:
-      inst = "DEC (" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "DEC (" + index + sign + toHex(offset) + ")";
       address++;
       break;
     case 54:
-      inst = "LD (" + index + "+d)," + toHex(this.readMem(address));
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + ")," + toHex(this.readMem(address));
       address++;
       break;
     case 57:
@@ -5972,7 +6002,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "LD B," + index + "L *";
       break;
     case 70:
-      inst = "LD B,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD B,(" + index + sign + toHex(offset) + ")";
       address++;
       break;
     case 76:
@@ -5982,7 +6014,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "LD C," + index + "L *";
       break;
     case 78:
-      inst = "LD C,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD C,(" + index + sign + toHex(offset) + ")";
       address++;
       break;
     case 84:
@@ -5992,7 +6026,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "LD D," + index + "L *";
       break;
     case 86:
-      inst = "LD D,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD D,(" + index + sign + toHex(offset) + ")";
       address++;
       break;
     case 92:
@@ -6002,7 +6038,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "LD E," + index + "L *";
       break;
     case 94:
-      inst = "LD E,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD E,(" + index + sign + toHex(offset) + ")";
       address++;
       break;
     case 96:
@@ -6024,7 +6062,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "LD " + index + "H," + index + "L *";
       break;
     case 102:
-      inst = "LD H,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD H,(" + index + sign + toHex(offset) + ")";
       address++;
       break;
     case 103:
@@ -6049,38 +6089,54 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "LD " + index + "L," + index + "L *";
       break;
     case 110:
-      inst = "LD L,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD L,(" + index + sign + toHex(offset) + ")";
       address++;
       break;
     case 111:
       inst = "LD " + index + "L,A *";
       break;
     case 112:
-      inst = "LD (" + index + "+d),B";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),B";
       address++;
       break;
     case 113:
-      inst = "LD (" + index + "+d),C";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),C";
       address++;
       break;
     case 114:
-      inst = "LD (" + index + "+d),D";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),D";
       address++;
       break;
     case 115:
-      inst = "LD (" + index + "+d),E";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),E";
       address++;
       break;
     case 116:
-      inst = "LD (" + index + "+d),H";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),H";
       address++;
       break;
     case 117:
-      inst = "LD (" + index + "+d),L";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),L";
       address++;
       break;
     case 119:
-      inst = "LD (" + index + "+d),A";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),A";
       address++;
       break;
     case 124:
@@ -6090,7 +6146,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "LD A," + index + "L *";
       break;
     case 126:
-      inst = "LD A,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD A,(" + index + sign + toHex(offset) + "))";
       address++;
       break;
     case 132:
@@ -6100,7 +6158,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "ADD A," + index + "L *";
       break;
     case 134:
-      inst = "ADD A,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "ADD A,(" + index + sign + toHex(offset) + "))";
       address++;
       break;
     case 140:
@@ -6110,7 +6170,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "ADC A," + index + "L *";
       break;
     case 142:
-      inst = "ADC A,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "ADC A,(" + index + sign + toHex(offset) + "))";
       address++;
       break;
     case 148:
@@ -6120,7 +6182,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "SUB " + index + "L *";
       break;
     case 150:
-      inst = "SUB A,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "SUB A,(" + index + sign + toHex(offset) + "))";
       address++;
       break;
     case 156:
@@ -6130,7 +6194,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "SBC A," + index + "L *";
       break;
     case 158:
-      inst = "SBC A,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "SBC A,(" + index + sign + toHex(offset) + "))";
       address++;
       break;
     case 164:
@@ -6140,7 +6206,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "AND " + index + "L *";
       break;
     case 166:
-      inst = "AND A,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "AND A,(" + index + sign + toHex(offset) + "))";
       address++;
       break;
     case 172:
@@ -6150,7 +6218,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "XOR A " + index + "L*";
       break;
     case 174:
-      inst = "XOR A,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "XOR A,(" + index + sign + toHex(offset) + "))";
       address++;
       break;
     case 180:
@@ -6160,7 +6230,9 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "OR A " + index + "L*";
       break;
     case 182:
-      inst = "OR A,(" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "OR A,(" + index + sign + toHex(offset) + "))";
       address++;
       break;
     case 188:
@@ -6170,11 +6242,16 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       inst = "CP " + index + "L *";
       break;
     case 190:
-      inst = "CP (" + index + "+d)";
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "CP (" + index + sign + toHex(offset) + "))";
       address++;
       break;
     case 203:
-      inst = "CB Opcode";
+      var _inst = this.getIndexCB(index, address);
+      inst = _inst.inst;
+      opcode_ += " " + _inst.opcode;
+      address = _inst.nextAddress;
       break;
     case 225:
       inst = "POP " + index;
@@ -6187,12 +6264,13 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
       break;
     case 233:
       inst = "JP (" + index + ")";
+      address = null;
       break;
     case 249:
       inst = "LD SP," + index;
       break
   }
-  return{opcode:toHex(opcode), inst:inst, address:currAddr, nextAddress:address}
+  return{opcode:opcode_, inst:inst, address:currAddr, nextAddress:address}
 }, getIndexCB:function(index, address) {
   var toHex = JSSMS.Utils.toHex;
   var opcode = this.readMem(address);
@@ -6308,7 +6386,10 @@ JSSMS.Debugger.prototype = {instructions:[], addressMap:Object.create(null), res
   }
   return d
 }};
-var KEY_UP = 1;
+function Instruction(address) {
+  return{address:address, opcode:"", inst:"", hexAddress:JSSMS.Utils.toHex(address), nextAddress:0, target:0, isJumpTarget:false}
+}
+;var KEY_UP = 1;
 var KEY_DOWN = 2;
 var KEY_LEFT = 4;
 var KEY_RIGHT = 8;
@@ -7329,12 +7410,18 @@ if(typeof $ != "undefined") {
       }
       this.canvasContext.putImageData(this.canvasImageData, 0, 0)
     }, updateDisassembly:function(currentAddress) {
-      var index = this.main.cpu.addressMap[currentAddress];
-      var startAddress = index - 8 < 0 ? 0 : index - 8;
-      var addresses = this.main.cpu.instructions.slice(startAddress, startAddress + 16);
-      var html = addresses.map(function(address) {
-        return"<div" + (address.address == currentAddress ? ' class="current"' : "") + ">" + address.hexAddress + (address.isJumpTarget ? ":" : " ") + "<code>" + address.inst + "</code></div>"
-      }).join("");
+      var startAddress = currentAddress < 8 ? 0 : currentAddress - 8;
+      var instructions = this.main.cpu.instructions;
+      var length = instructions.length;
+      var html = "";
+      var i = startAddress;
+      var num = 0;
+      for(;num < 16 && i <= length;i++) {
+        if(instructions[i]) {
+          html += "<div" + (instructions[i].address == currentAddress ? ' class="current"' : "") + ">" + instructions[i].hexAddress + (instructions[i].isJumpTarget ? ":" : " ") + "<code>" + instructions[i].inst + "</code></div>";
+          num++
+        }
+      }
       this.dissambler.html(html)
     }};
     return UI

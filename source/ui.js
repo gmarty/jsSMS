@@ -370,18 +370,26 @@ if (typeof $ != 'undefined') {
 
       /**
        * A function called at each cpu instruction and display information relative to debug.
+       * \@todo If currentAddress is not in this.main.cpu.instructions, then start parsing from it.
        */
       updateDisassembly: function(currentAddress) {
-        var index = this.main.cpu.addressMap[currentAddress];
-        var startAddress = (index - 8) < 0 ? 0 : index - 8;
-        var addresses = this.main.cpu.instructions.slice(startAddress, startAddress + 16);
-        var html = addresses
-          .map(function(address) {
-              return '<div' + (address.address == currentAddress ? ' class="current"' : '') + '>' + address.hexAddress +
-                  (address.isJumpTarget ? ':' : ' ') +
-                  '<code>' + address.inst + '</code></div>';
-            })
-          .join('');
+        var startAddress = currentAddress < 8 ? 0 : currentAddress - 8;
+        var instructions = this.main.cpu.instructions;
+        var length = instructions.length;
+        var html = '';
+        var i = startAddress;
+        var num = 0;
+
+        for (; num < 16 && i <= length; i++) {
+          if (instructions[i]) {
+            html += '<div' + (instructions[i].address == currentAddress ? ' class="current"' : '') + '>' + instructions[i].hexAddress +
+                (instructions[i].isJumpTarget ? ':' : ' ') +
+                '<code>' + instructions[i].inst + '</code></div>';
+
+            num++;
+          }
+        }
+
         this.dissambler.html(html);
       }
     };

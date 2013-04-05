@@ -24,7 +24,6 @@
 /**
  * A class extending JSSMS.Z80 to debug the internal cpu logic.
  *
- * \@todo Rename to debug.
  * @constructor
  * @extends {JSSMS.Z80}
  */
@@ -32,10 +31,8 @@ JSSMS.Debugger = function() {
 };
 
 JSSMS.Debugger.prototype = {
+  // Hold the ROM instructions parsed.
   instructions: [],
-
-
-  addressMap: Object.create(null),
 
 
   /**
@@ -44,7 +41,6 @@ JSSMS.Debugger.prototype = {
    */
   resetDebug: function() {
     this.instructions = [];
-    this.addressMap = Object.create(null);
   },
 
 
@@ -53,71 +49,95 @@ JSSMS.Debugger.prototype = {
    */
   parseInstructions: function() {
     var toHex = JSSMS.Utils.toHex;
-    var romSize = this.rom.length * Setup.PAGE_SIZE;
-    var addr = 0x00;
+    var romSize = Setup.PAGE_SIZE * this.rom.length;
+    var instruction;
+    var currentAddress;
+    var addresses = [];
     var branch;
-    var inst;
     var i = 0;
     var length = 0;
 
-    while (addr < romSize) {
-      try {
-        inst = this.disassemble(addr);
-        branch = new Instruction(addr);
-        branch.nextAddress = inst.nextAddress;
-        branch.opcode = inst.opcode;
-        branch.inst = inst.inst;
-        branch.target = inst.target;
-        addr = inst.nextAddress;
-        this.instructions.push(branch);
-      } catch (e) {
+    addresses.push(0x00); // Add program entry point to the list of addresses to visit.
+    /*addresses.push(0x08); // And below: set by RST.
+     addresses.push(0x10);
+     addresses.push(0x18);
+     addresses.push(0x20);
+     addresses.push(0x28);
+     addresses.push(0x30);*/
+    addresses.push(0x38); // RST 38h and Interrupt.
+    addresses.push(0x66); // Set by NMI.
+
+    console.time('Instructions parsing');
+
+    while (addresses.length) {
+      currentAddress = addresses.shift();
+
+      if (this.instructions[currentAddress]) {
+        continue;
+      }
+
+      if (currentAddress >= romSize || (currentAddress >> 10) >= this.memReadMap.length) {
+        console.log('Invalid address', currentAddress);
+
+        continue;
+      }
+
+      // @todo Move to a separate function to allow adding code entry points later.
+      instruction = this.disassemble(currentAddress);
+      branch = Instruction(currentAddress);
+      branch.label = toHex(instruction.address) + ' ' + instruction.opcode + ' ' + instruction.inst;
+      branch.nextAddress = instruction.nextAddress;
+      branch.opcode = instruction.opcode;
+      branch.inst = instruction.inst;
+      branch.target = instruction.target;
+      this.instructions[currentAddress] = branch;
+
+      if (instruction.nextAddress != null) {
+        addresses.push(instruction.nextAddress);
+      }
+
+      if (instruction.target != null) {
+        addresses.push(instruction.target);
       }
     }
 
-    // Map addresses to their index on the instructions array.
-    //this.instructions.forEach(function(address, index) {
-    for (i = 0, length = this.instructions.length; i < length; i++) {
-      this.addressMap[this.instructions[i].address] = i;
-    }
+    console.timeEnd('Instructions parsing');
 
     // Flag any instructions that are jump targets.
-    for (i = 0; i < length; i++) {
-      if (this.instructions[i].target != 0) {
-        if (this.instructions[i].target < Setup.PAGE_SIZE) {
-          if (this.instructions[this.addressMap[this.instructions[i].target]]) {
-            this.instructions[this.addressMap[this.instructions[i].target]].isJumpTarget = true;
-          } else {
-            console.log('Missing jump target', this.instructions[i]);
-          }
-        }
+    for (length = this.instructions.length; i < length; i++) {
+      if (this.instructions[i] && this.instructions[i].target != null) {
+        this.instructions[this.instructions[i].target].isJumpTarget = true;
       }
     }
-
-    if (console.table)
-      console.table(this.instructions);
-    else
-      console.dir(this.instructions);
+  },
 
 
-    /**
-     * \@todo Move elsewhere.
-     * @param {number} address
-     * @constructor
-     */
-    function Instruction(address) {
-      this.address = address;
-      this.opcode = '';
-      this.inst = '';
-      this.hexAddress = toHex(address);
-      this.nextAddress = 0;
-      this.target = 0;
-      this.isJumpTarget = false;
-      // Memory can be registry or offset, read or write mode, 8 or 16 bit.
-      /*this.memory = null;
+  /**
+   * Write a dot file representation of parsed instructions to the console.
+   */
+  writeGraphViz: function() {
+    var tree = this.instructions;
 
-      this.srcRegs = {};
-      this.dstRegs = {};*/
+    console.time('DOT generation');
+
+    var dotFile = 'digraph G {\n';
+    for (var i = 0, length = tree.length; i < length; i++) {
+      if (tree[i]) {
+        dotFile += ' ' + i + ' [label="' + tree[i].label + '"];\n';
+        if (tree[i].nextAddress != null)
+          dotFile += ' ' + i + ' -> ' + tree[i].nextAddress + ';\n';
+        if (tree[i].target != null)
+          dotFile += ' ' + i + ' -> ' + tree[i].target + ';\n';
+      }
     }
+    dotFile += '}';
+
+    // Inject entry point styling.
+    dotFile = dotFile.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
+
+    console.timeEnd('DOT generation');
+
+    console.log(dotFile);
   },
 
 
@@ -133,7 +153,7 @@ JSSMS.Debugger.prototype = {
     var opcode_ = toHex(opcode);
     var inst = 'Unknown Opcode';
     var currAddr = address;
-    var target = 0;
+    var target = null;
     address++;
 
     switch (opcode) {
@@ -219,7 +239,7 @@ JSSMS.Debugger.prototype = {
       case 0x18:
         target = address + this.signExtend(this.readMem(address)) + 1;
         inst = 'JR (' + toHex(target) + ')';
-        address++;
+        address = null;
         break;
       case 0x19:
         inst = 'ADD HL,DE';
@@ -691,7 +711,7 @@ JSSMS.Debugger.prototype = {
         inst = 'XOR A,(HL)';
         break;
       case 0xAF:
-        inst = 'XOR A,A (=0)';
+        inst = 'XOR A,A'; // =0
         break;
       case 0xB0:
         inst = 'OR A,B';
@@ -755,7 +775,7 @@ JSSMS.Debugger.prototype = {
       case 0xC3:
         target = this.readMemWord(address);
         inst = 'JP (' + toHex(target) + ')';
-        address += 2;
+        address = null;
         break;
       case 0xC4:
         target = this.readMemWord(address);
@@ -770,14 +790,16 @@ JSSMS.Debugger.prototype = {
         address++;
         break;
       case 0xC7:
-        target = 0;
+        target = 0x00;
         inst = 'RST ' + toHex(target);
+        address = null;
         break;
       case 0xC8:
         inst = 'RET Z';
         break;
       case 0xC9:
         inst = 'RET';
+        address = null;
         break;
       case 0xCA:
         target = this.readMemWord(address);
@@ -806,8 +828,9 @@ JSSMS.Debugger.prototype = {
         address++;
         break;
       case 0xCF:
-        target = 8;
+        target = 0x08;
         inst = 'RST ' + toHex(target);
+        address = null;
         break;
       case 0xD0:
         inst = 'RET NC';
@@ -836,8 +859,9 @@ JSSMS.Debugger.prototype = {
         inst = 'SUB ' + toHex(this.readMem(address));
         break;
       case 0xD7:
-        target = 10;
+        target = 0x10;
         inst = 'RST ' + toHex(target);
+        address = null;
         break;
       case 0xD8:
         inst = 'RET C';
@@ -871,8 +895,9 @@ JSSMS.Debugger.prototype = {
         address++;
         break;
       case 0xDF:
-        target = 18;
+        target = 0x18;
         inst = 'RST ' + toHex(target);
+        address = null;
         break;
       case 0xE0:
         inst = 'RET PO';
@@ -901,14 +926,17 @@ JSSMS.Debugger.prototype = {
         address++;
         break;
       case 0xE7:
-        target = 20;
+        target = 0x20;
         inst = 'RST ' + toHex(target);
+        address = null;
         break;
       case 0xE8:
         inst = 'RET PE';
         break;
       case 0xE9:
+        // This target can't be determined using static analysis.
         inst = 'JP (HL)';
+        address = null;
         break;
       case 0xEA:
         target = this.readMemWord(address);
@@ -935,8 +963,9 @@ JSSMS.Debugger.prototype = {
         address++;
         break;
       case 0xEF:
-        target = 28;
+        target = 0x28;
         inst = 'RST ' + toHex(target);
+        address = null;
         break;
       case 0xF0:
         inst = 'RET P';
@@ -965,8 +994,9 @@ JSSMS.Debugger.prototype = {
         address++;
         break;
       case 0xF7:
-        target = 30;
+        target = 0x30;
         inst = 'RST ' + toHex(target);
+        address = null;
         break;
       case 0xF8:
         inst = 'RET M';
@@ -999,8 +1029,9 @@ JSSMS.Debugger.prototype = {
         address++;
         break;
       case 0xFF:
-        target = 38;
+        target = 0x38;
         inst = 'RST ' + toHex(target);
+        address = null;
         break;
     }
 
@@ -1853,6 +1884,7 @@ JSSMS.Debugger.prototype = {
       case 0x75:
       case 0x7D:
         inst = 'RETN / RETI';
+        address = null;
         break;
       case 0x46:
       case 0x4E:
@@ -2039,6 +2071,7 @@ JSSMS.Debugger.prototype = {
   getIndex: function(index, address) {
     var toHex = JSSMS.Utils.toHex;
     var opcode = this.readMem(address);
+    var opcode_ = toHex(opcode);
     var inst = 'Unimplemented DD/FD Opcode';
     var currAddr = address;
     address++;
@@ -2092,18 +2125,21 @@ JSSMS.Debugger.prototype = {
         address++;
         break;
       case 0x34:
-        inst = 'INC (' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'INC (' + index + sign + toHex(offset) + ')';
         address++;
         break;
       case 0x35:
-        inst = 'DEC (' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'DEC (' + index + sign + toHex(offset) + ')';
         address++;
         break;
       case 0x36:
-        inst = 'LD (' + index + '+d),' + toHex(this.readMem(address));
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD (' + index + sign + toHex(offset) + '),' + toHex(this.readMem(address));
         address++;
         break;
       case 0x39:
@@ -2116,8 +2152,9 @@ JSSMS.Debugger.prototype = {
         inst = 'LD B,' + index + 'L *';
         break;
       case 0x46:
-        inst = 'LD B,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD B,(' + index + sign + toHex(offset) + ')';
         address++;
         break;
       case 0x4C:
@@ -2127,8 +2164,9 @@ JSSMS.Debugger.prototype = {
         inst = 'LD C,' + index + 'L *';
         break;
       case 0x4E:
-        inst = 'LD C,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD C,(' + index + sign + toHex(offset) + ')';
         address++;
         break;
       case 0x54:
@@ -2138,8 +2176,9 @@ JSSMS.Debugger.prototype = {
         inst = 'LD D,' + index + 'L *';
         break;
       case 0x56:
-        inst = 'LD D,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD D,(' + index + sign + toHex(offset) + ')';
         address++;
         break;
       case 0x5C:
@@ -2149,8 +2188,9 @@ JSSMS.Debugger.prototype = {
         inst = 'LD E,' + index + 'L *';
         break;
       case 0x5E:
-        inst = 'LD E,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD E,(' + index + sign + toHex(offset) + ')';
         address++;
         break;
       case 0x60:
@@ -2172,8 +2212,9 @@ JSSMS.Debugger.prototype = {
         inst = 'LD ' + index + 'H,' + index + 'L *';
         break;
       case 0x66:
-        inst = 'LD H,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD H,(' + index + sign + toHex(offset) + ')';
         address++;
         break;
       case 0x67:
@@ -2198,46 +2239,54 @@ JSSMS.Debugger.prototype = {
         inst = 'LD ' + index + 'L,' + index + 'L *';
         break;
       case 0x6E:
-        inst = 'LD L,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD L,(' + index + sign + toHex(offset) + ')';
         address++;
         break;
       case 0x6F:
         inst = 'LD ' + index + 'L,A *';
         break;
       case 0x70:
-        inst = 'LD (' + index + '+d),B';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD (' + index + sign + toHex(offset) + '),B';
         address++;
         break;
       case 0x71:
-        inst = 'LD (' + index + '+d),C';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD (' + index + sign + toHex(offset) + '),C';
         address++;
         break;
       case 0x72:
-        inst = 'LD (' + index + '+d),D';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD (' + index + sign + toHex(offset) + '),D';
         address++;
         break;
       case 0x73:
-        inst = 'LD (' + index + '+d),E';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD (' + index + sign + toHex(offset) + '),E';
         address++;
         break;
       case 0x74:
-        inst = 'LD (' + index + '+d),H';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD (' + index + sign + toHex(offset) + '),H';
         address++;
         break;
       case 0x75:
-        inst = 'LD (' + index + '+d),L';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD (' + index + sign + toHex(offset) + '),L';
         address++;
         break;
       case 0x77:
-        inst = 'LD (' + index + '+d),A';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD (' + index + sign + toHex(offset) + '),A';
         address++;
         break;
       case 0x7C:
@@ -2247,8 +2296,9 @@ JSSMS.Debugger.prototype = {
         inst = 'LD A,' + index + 'L *';
         break;
       case 0x7E:
-        inst = 'LD A,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'LD A,(' + index + sign + toHex(offset) + '))';
         address++;
         break;
       case 0x84:
@@ -2258,8 +2308,9 @@ JSSMS.Debugger.prototype = {
         inst = 'ADD A,' + index + 'L *';
         break;
       case 0x86:
-        inst = 'ADD A,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'ADD A,(' + index + sign + toHex(offset) + '))';
         address++;
         break;
       case 0x8C:
@@ -2269,8 +2320,9 @@ JSSMS.Debugger.prototype = {
         inst = 'ADC A,' + index + 'L *';
         break;
       case 0x8E:
-        inst = 'ADC A,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'ADC A,(' + index + sign + toHex(offset) + '))';
         address++;
         break;
       case 0x94:
@@ -2280,8 +2332,9 @@ JSSMS.Debugger.prototype = {
         inst = 'SUB ' + index + 'L *';
         break;
       case 0x96:
-        inst = 'SUB A,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'SUB A,(' + index + sign + toHex(offset) + '))';
         address++;
         break;
       case 0x9C:
@@ -2291,8 +2344,9 @@ JSSMS.Debugger.prototype = {
         inst = 'SBC A,' + index + 'L *';
         break;
       case 0x9E:
-        inst = 'SBC A,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'SBC A,(' + index + sign + toHex(offset) + '))';
         address++;
         break;
       case 0xA4:
@@ -2302,8 +2356,9 @@ JSSMS.Debugger.prototype = {
         inst = 'AND ' + index + 'L *';
         break;
       case 0xA6:
-        inst = 'AND A,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'AND A,(' + index + sign + toHex(offset) + '))';
         address++;
         break;
       case 0xAC:
@@ -2313,8 +2368,9 @@ JSSMS.Debugger.prototype = {
         inst = 'XOR A ' + index + 'L*';
         break;
       case 0xAE:
-        inst = 'XOR A,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'XOR A,(' + index + sign + toHex(offset) + '))';
         address++;
         break;
       case 0xB4:
@@ -2324,8 +2380,9 @@ JSSMS.Debugger.prototype = {
         inst = 'OR A ' + index + 'L*';
         break;
       case 0xB6:
-        inst = 'OR A,(' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'OR A,(' + index + sign + toHex(offset) + '))';
         address++;
         break;
       case 0xBC:
@@ -2335,14 +2392,17 @@ JSSMS.Debugger.prototype = {
         inst = 'CP ' + index + 'L *';
         break;
       case 0xBE:
-        inst = 'CP (' + index + '+d)';
-        // @todo
+        var offset = this.signExtend(this.readMem(address));
+        var sign = offset > 0 ? '+' : '-';
+        inst = 'CP (' + index + sign + toHex(offset) + '))';
         address++;
         break;
       case 0xCB:
-        inst = 'CB Opcode';
+        var _inst = this.getIndexCB(index, address);
+        inst = _inst.inst;
+        opcode_ += ' ' + _inst.opcode;
+        address = _inst.nextAddress;
         // @todo
-        //this.getIndexCB(index, address);
         break;
       case 0xE1:
         inst = 'POP ' + index;
@@ -2355,6 +2415,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xE9:
         inst = 'JP (' + index + ')';
+        address = null;
         break;
       case 0xF9:
         inst = 'LD SP,' + index;
@@ -2362,7 +2423,7 @@ JSSMS.Debugger.prototype = {
     }
 
     return {
-      opcode: toHex(opcode),
+      opcode: opcode_,
       inst: inst,
       address: currAddr,
       nextAddress: address
@@ -2527,3 +2588,25 @@ JSSMS.Debugger.prototype = {
     return d;
   }
 };
+
+
+/**
+ * \@todo Move elsewhere.
+ * @param {number} address
+ */
+function Instruction(address) {
+  return {
+    address: address,
+    opcode: '',
+    inst: '',
+    hexAddress: JSSMS.Utils.toHex(address),
+    nextAddress: 0,
+    target: 0,
+    isJumpTarget: false
+    // Memory can be registry or offset, read or write mode, 8 or 16 bit.
+    /*memory: null,
+
+     srcRegs: {},
+     dstRegs: {}*/
+  };
+}
