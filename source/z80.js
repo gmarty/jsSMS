@@ -680,7 +680,7 @@ JSSMS.Z80.prototype = {
         case 0xAC: this.f = this.SZP_TABLE[this.a ^= this.h]; break;                            // XOR A,H
         case 0xAD: this.f = this.SZP_TABLE[this.a ^= this.l]; break;                            // XOR A,L
         case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getHL())]; break;             // XOR A,(HL)
-        case 0xAF: this.f = this.SZP_TABLE[this.a = 0]; break;                             // XOR A,A (=0)
+        case 0xAF: this.f = this.SZP_TABLE[this.a = 0]; break;                             // XOR A,A
         case 0xB0: this.f = this.SZP_TABLE[this.a |= this.b]; break;                            // OR A,B
         case 0xB1: this.f = this.SZP_TABLE[this.a |= this.c]; break;                            // OR A,C
         case 0xB2: this.f = this.SZP_TABLE[this.a |= this.d]; break;                            // OR A,D
@@ -927,12 +927,12 @@ JSSMS.Z80.prototype = {
   /**
    * Push value onto stack.
    *
-   * @param {number} value Value to push.
-   * @param {number} l Value to push.
+   * @param {number} hi Value to push.
+   * @param {number} lo Value to push.
    */
-  push2: function(value, l) {
-    this.writeMem(--this.sp, value);        // (SP - 1) <- high
-    this.writeMem(--this.sp, l);            // (SP - 2) <- low
+  push2: function(hi, lo) {
+    this.writeMem(--this.sp, hi);           // (SP - 1) <- high
+    this.writeMem(--this.sp, lo);           // (SP - 2) <- low
   },
 
 
@@ -1639,6 +1639,7 @@ JSSMS.Z80.prototype = {
   /**
    * Execute DDCB/FDCB prefixed opcode.
    *
+   * @todo Implement missing opcodes.
    * @param {number} index Index register to use.
    */
   doIndexCB: function(index) {
