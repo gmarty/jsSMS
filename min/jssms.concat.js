@@ -22,7 +22,6 @@ var LITTLE_ENDIAN = true;
 var SUPPORT_DATAVIEW = !!(window["DataView"] && window["ArrayBuffer"]);
 var SAMPLE_RATE = 44100;
 var Setup = {DEBUG_TIMING:DEBUG, REFRESH_EMULATION:false, ACCURATE_INTERRUPT_EMULATION:ACCURATE, LIGHTGUN:false, VDP_SPRITE_COLLISIONS:ACCURATE, PAGE_SIZE:1024};
-var frameTime = 17;
 var fpsInterval = 500;
 var CLOCK_NTSC = 3579545;
 var CLOCK_PAL = 3546893;
@@ -44,7 +43,7 @@ function JSSMS(opts) {
   this.cpu = new JSSMS.Z80(this);
   this.ui.updateStatus("Ready to load a ROM.")
 }
-JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0, throttle:true, fps:0, frameskip_counter:0, pause_button:false, is_sms:true, is_gg:false, soundEnabled:true, audioBuffer:[], audioBufferOffset:0, samplesPerFrame:0, samplesPerLine:[], emuWidth:0, emuHeight:0, fpsFrameCount:0, z80Time:0, drawTime:0, z80TimeCounter:0, drawTimeCounter:0, frameCount:0, romData:"", romFileName:"", reset:function() {
+JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0, throttle:true, fps:0, frameskip_counter:0, pause_button:false, is_sms:true, is_gg:false, soundEnabled:false, audioBuffer:[], audioBufferOffset:0, samplesPerFrame:0, samplesPerLine:[], emuWidth:0, emuHeight:0, fpsFrameCount:0, z80Time:0, drawTime:0, z80TimeCounter:0, drawTimeCounter:0, frameCount:0, romData:"", romFileName:"", lineno:0, reset:function() {
   this.setVideoTiming(this.vdp.videoMode);
   this.frameCount = 0;
   this.frameskip_counter = this.frameSkip;
@@ -53,7 +52,11 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   this.vdp.reset();
   this.ports.reset();
   this.cpu.reset();
-  this.cpu.resetMemory(null)
+  if(DEBUG) {
+    this.cpu.resetDebug()
+  }
+  this.cpu.resetMemory();
+  clearInterval(this.fpsInterval)
 }, start:function() {
   var self = this;
   if(!this.isRunning) {
@@ -61,10 +64,10 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   }
   this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
   this.resetFps();
-  this.printFps();
   this.fpsInterval = setInterval(function() {
     self.printFps()
-  }, fpsInterval)
+  }, fpsInterval);
+  this.ui.updateStatus("Running")
 }, stop:function() {
   clearInterval(this.fpsInterval);
   this.isRunning = false
@@ -81,6 +84,24 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
     }
     this.fpsFrameCount++;
     this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen)
+  }
+}, nextStep:function() {
+  if(Setup.ACCURATE_INTERRUPT_EMULATION && this.lineno == 193) {
+    this.cpu.run(this.cyclesPerLine, 8);
+    this.vdp.setVBlankFlag();
+    this.cpu.run(0, 0)
+  }else {
+    this.cpu.run(this.cyclesPerLine, 0)
+  }
+  this.vdp.line = this.lineno;
+  if(this.frameskip_counter == 0 && this.lineno < 192) {
+    this.vdp.drawLine(this.lineno)
+  }
+  this.vdp.interrupts(this.lineno);
+  this.lineno++;
+  if(this.lineno >= this.no_of_scanlines) {
+    this.lineno = 0;
+    this.doRepaint()
   }
 }, emulateNextFrame:function() {
   var startTime = 0;
@@ -183,15 +204,13 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
 }, doRepaint:function() {
   this.ui.writeFrame(this.vdp.display, [])
 }, printFps:function() {
-  var now = JSSMS.Utils.getTimestamp(), s = "Running";
-  if(this.lastFpsTime) {
-    s += ": " + (this.fpsFrameCount / ((now - this.lastFpsTime) / 1E3)).toFixed(2) + " (/ " + (1E3 / frameTime).toFixed(2) + ") FPS"
-  }
+  var now = JSSMS.Utils.getTimestamp();
+  var s = "Running: " + (this.fpsFrameCount / ((now - this.lastFpsTime) / 1E3)).toFixed(2) + " FPS";
   this.ui.updateStatus(s);
   this.fpsFrameCount = 0;
   this.lastFpsTime = now
 }, resetFps:function() {
-  this.lastFpsTime = null;
+  this.lastFpsTime = JSSMS.Utils.getTimestamp();
   this.fpsFrameCount = 0
 }, updateSound:function(line) {
   if(line == 0) {
@@ -361,6 +380,12 @@ JSSMS.Utils = {rndInt:function(range) {
   }
 }(), getTimestamp:Date.now || function() {
   return(new Date).getTime()
+}, toHex:function(dec) {
+  var hex = dec.toString(16);
+  if(hex.length == 1) {
+    hex = "0" + hex
+  }
+  return"0x" + hex
 }, getPrefix:function(arr, obj) {
   var prefix = false;
   if(obj == undefined) {
@@ -401,8 +426,9 @@ var OP_CB_STATES = [8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8
 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8];
 var OP_DD_STATES = [4, 4, 4, 4, 4, 4, 4, 4, 4, 15, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 15, 4, 4, 4, 4, 4, 4, 4, 14, 20, 10, 8, 8, 11, 4, 4, 15, 20, 10, 8, 8, 11, 4, 4, 4, 4, 4, 23, 23, 19, 4, 4, 15, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 8, 8, 8, 8, 8, 8, 19, 8, 8, 8, 8, 8, 8, 8, 19, 8, 19, 19, 19, 19, 19, 19, 4, 19, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 
 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 14, 4, 23, 4, 15, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 10, 4, 4, 4, 4, 4, 4];
-var OP_INDEX_CB_STATES = [0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 
-0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 23, 0];
+var OP_INDEX_CB_STATES = [23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 
+20, 20, 20, 20, 20, 20, 20, 20, 20, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 
+23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23];
 var OP_ED_STATES = [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 18, 12, 12, 15, 20, 8, 14, 8, 18, 8, 12, 15, 20, 8, 14, 8, 8, 12, 12, 15, 20, 8, 14, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8];
 JSSMS.Z80 = function(sms) {
@@ -462,7 +488,12 @@ JSSMS.Z80 = function(sms) {
   this.generateMemory();
   this.writeMem = JSSMS.Utils.writeMem.bind(this, this);
   this.readMem = JSSMS.Utils.readMem.bind(this, this.memReadMap);
-  this.readMemWord = JSSMS.Utils.readMemWord.bind(this, this.memReadMap)
+  this.readMemWord = JSSMS.Utils.readMemWord.bind(this, this.memReadMap);
+  if(DEBUG) {
+    for(var method in JSSMS.Debugger.prototype) {
+      this[method] = JSSMS.Debugger.prototype[method]
+    }
+  }
 };
 JSSMS.Z80.prototype = {reset:function() {
   this.a = this.a2 = 0;
@@ -485,45 +516,6 @@ JSSMS.Z80.prototype = {reset:function() {
   this.EI_inst = false;
   this.interruptVector = 0;
   this.halt = false
-}, getOp:function() {
-  var opcode = this.readMem(this.pc);
-  var oplist = (opcode & 255).toString(16);
-  switch(opcode) {
-    case 203:
-    ;
-    case 237:
-      opcode = this.readMem(this.pc + 1);
-      oplist += " " + (opcode & 255).toString(16);
-      break;
-    case 221:
-    ;
-    case 253:
-      opcode = this.readMem(this.pc + 1);
-      oplist += " " + (opcode & 255).toString(16);
-      if(opcode == 203) {
-        opcode = this.readMem(this.pc + 3);
-        oplist += " " + (opcode & 255).toString(16)
-      }
-      break;
-    default:
-      break
-  }
-  return oplist.toUpperCase()
-}, getMnu:function() {
-  var opcode = this.readMem(this.pc)
-}, consoledebug:function() {
-  console.log("----------------------------------------------------------------------------");
-  console.log(this.pc.toString(16) + " 0x" + this.getOp() + " ");
-  console.log("A: " + this.a.toString(16) + " BC: " + this.getBC().toString(16) + " DE: " + this.getDE().toString(16) + " HL: " + this.getHL().toString(16) + " IX: " + this.getIX().toString(16) + " IY: " + this.getIY().toString(16));
-  this.exAF();
-  this.exBC();
-  this.exDE();
-  this.exHL();
-  console.log("A': " + this.a.toString(16) + " BC': " + this.getBC().toString(16) + " DE': " + this.getDE().toString(16) + " HL': " + this.getHL().toString(16) + " SP: " + this.sp.toString(16));
-  this.exAF();
-  this.exBC();
-  this.exDE();
-  this.exHL()
 }, run:function(cycles, cyclesTo) {
   var location = 0;
   var opcode = 0;
@@ -542,6 +534,9 @@ JSSMS.Z80.prototype = {reset:function() {
       if(this.interruptLine) {
         this.interrupt()
       }
+    }
+    if(DEBUG) {
+      this.main.ui.updateDisassembly(this.pc)
     }
     opcode = this.readMem(this.pc++);
     if(Setup.ACCURATE_INTERRUPT_EMULATION) {
@@ -1360,6 +1355,7 @@ JSSMS.Z80.prototype = {reset:function() {
         break
     }
   }
+}, nextStep:function() {
 }, getCycle:function() {
   return this.totalCycles - this.tstates
 }, nmi:function() {
@@ -1435,9 +1431,9 @@ JSSMS.Z80.prototype = {reset:function() {
 }, push1:function(value) {
   this.writeMem(--this.sp, value >> 8);
   this.writeMem(--this.sp, value & 255)
-}, push2:function(value, l) {
-  this.writeMem(--this.sp, value);
-  this.writeMem(--this.sp, l)
+}, push2:function(hi, lo) {
+  this.writeMem(--this.sp, hi);
+  this.writeMem(--this.sp, lo)
 }, incMem:function(offset) {
   this.writeMem(offset, this.inc8(this.readMem(offset)))
 }, decMem:function(offset) {
@@ -2231,7 +2227,7 @@ JSSMS.Z80.prototype = {reset:function() {
       break;
     default:
       if(DEBUG) {
-        console.log("Unimplemented CB Opcode: " + opcode.toString(16))
+        console.log("Unimplemented CB Opcode: " + JSSMS.Utils.toHex(opcode))
       }
       break
   }
@@ -2890,105 +2886,665 @@ JSSMS.Z80.prototype = {reset:function() {
   var opcode = this.readMem(++this.pc);
   this.tstates -= OP_INDEX_CB_STATES[opcode];
   switch(opcode) {
+    case 0:
+      this.b = this.rlc(this.readMem(location));
+      this.writeMem(location, this.b);
+      break;
+    case 1:
+      this.c = this.rlc(this.readMem(location));
+      this.writeMem(location, this.c);
+      break;
+    case 2:
+      this.d = this.rlc(this.readMem(location));
+      this.writeMem(location, this.d);
+      break;
+    case 3:
+      this.e = this.rlc(this.readMem(location));
+      this.writeMem(location, this.e);
+      break;
+    case 4:
+      this.h = this.rlc(this.readMem(location));
+      this.writeMem(location, this.h);
+      break;
+    case 5:
+      this.l = this.rlc(this.readMem(location));
+      this.writeMem(location, this.l);
+      break;
     case 6:
       this.writeMem(location, this.rlc(this.readMem(location)));
+      break;
+    case 7:
+      this.a = this.rlc(this.readMem(location));
+      this.writeMem(location, this.a);
+      break;
+    case 8:
+      this.b = this.rrc(this.readMem(location));
+      this.writeMem(location, this.b);
+      break;
+    case 9:
+      this.c = this.rrc(this.readMem(location));
+      this.writeMem(location, this.c);
+      break;
+    case 10:
+      this.d = this.rrc(this.readMem(location));
+      this.writeMem(location, this.d);
+      break;
+    case 11:
+      this.e = this.rrc(this.readMem(location));
+      this.writeMem(location, this.e);
+      break;
+    case 12:
+      this.h = this.rrc(this.readMem(location));
+      this.writeMem(location, this.h);
+      break;
+    case 13:
+      this.l = this.rrc(this.readMem(location));
+      this.writeMem(location, this.l);
       break;
     case 14:
       this.writeMem(location, this.rrc(this.readMem(location)));
       break;
+    case 15:
+      this.a = this.rrc(this.readMem(location));
+      this.writeMem(location, this.a);
+      break;
+    case 16:
+      this.b = this.rl(this.readMem(location));
+      this.writeMem(location, this.b);
+      break;
+    case 17:
+      this.c = this.rl(this.readMem(location));
+      this.writeMem(location, this.c);
+      break;
+    case 18:
+      this.d = this.rl(this.readMem(location));
+      this.writeMem(location, this.d);
+      break;
+    case 19:
+      this.e = this.rl(this.readMem(location));
+      this.writeMem(location, this.e);
+      break;
+    case 20:
+      this.h = this.rl(this.readMem(location));
+      this.writeMem(location, this.h);
+      break;
+    case 21:
+      this.l = this.rl(this.readMem(location));
+      this.writeMem(location, this.l);
+      break;
     case 22:
       this.writeMem(location, this.rl(this.readMem(location)));
+      break;
+    case 23:
+      this.a = this.rl(this.readMem(location));
+      this.writeMem(location, this.a);
+      break;
+    case 24:
+      this.b = this.rr(this.readMem(location));
+      this.writeMem(location, this.b);
+      break;
+    case 25:
+      this.c = this.rr(this.readMem(location));
+      this.writeMem(location, this.c);
+      break;
+    case 26:
+      this.d = this.rr(this.readMem(location));
+      this.writeMem(location, this.d);
+      break;
+    case 27:
+      this.e = this.rr(this.readMem(location));
+      this.writeMem(location, this.e);
+      break;
+    case 28:
+      this.h = this.rr(this.readMem(location));
+      this.writeMem(location, this.h);
+      break;
+    case 29:
+      this.l = this.rr(this.readMem(location));
+      this.writeMem(location, this.l);
       break;
     case 30:
       this.writeMem(location, this.rr(this.readMem(location)));
       break;
+    case 31:
+      this.a = this.rr(this.readMem(location));
+      this.writeMem(location, this.a);
+      break;
+    case 32:
+      this.b = this.sla(this.readMem(location));
+      this.writeMem(location, this.b);
+      break;
+    case 33:
+      this.c = this.sla(this.readMem(location));
+      this.writeMem(location, this.c);
+      break;
+    case 34:
+      this.d = this.sla(this.readMem(location));
+      this.writeMem(location, this.d);
+      break;
+    case 35:
+      this.e = this.sla(this.readMem(location));
+      this.writeMem(location, this.e);
+      break;
+    case 36:
+      this.h = this.sla(this.readMem(location));
+      this.writeMem(location, this.h);
+      break;
+    case 37:
+      this.l = this.sla(this.readMem(location));
+      this.writeMem(location, this.l);
+      break;
     case 38:
       this.writeMem(location, this.sla(this.readMem(location)));
+      break;
+    case 39:
+      this.a = this.sla(this.readMem(location));
+      this.writeMem(location, this.a);
+      break;
+    case 40:
+      this.b = this.sra(this.readMem(location));
+      this.writeMem(location, this.b);
+      break;
+    case 41:
+      this.c = this.sra(this.readMem(location));
+      this.writeMem(location, this.c);
+      break;
+    case 42:
+      this.d = this.sra(this.readMem(location));
+      this.writeMem(location, this.d);
+      break;
+    case 43:
+      this.e = this.sra(this.readMem(location));
+      this.writeMem(location, this.e);
+      break;
+    case 44:
+      this.h = this.sra(this.readMem(location));
+      this.writeMem(location, this.h);
+      break;
+    case 45:
+      this.l = this.sra(this.readMem(location));
+      this.writeMem(location, this.l);
       break;
     case 46:
       this.writeMem(location, this.sra(this.readMem(location)));
       break;
+    case 47:
+      this.a = this.sra(this.readMem(location));
+      this.writeMem(location, this.a);
+      break;
+    case 48:
+      this.b = this.sll(this.readMem(location));
+      this.writeMem(location, this.b);
+      break;
+    case 49:
+      this.c = this.sll(this.readMem(location));
+      this.writeMem(location, this.c);
+      break;
+    case 50:
+      this.d = this.sll(this.readMem(location));
+      this.writeMem(location, this.d);
+      break;
+    case 51:
+      this.e = this.sll(this.readMem(location));
+      this.writeMem(location, this.e);
+      break;
+    case 52:
+      this.h = this.sll(this.readMem(location));
+      this.writeMem(location, this.h);
+      break;
+    case 53:
+      this.l = this.sll(this.readMem(location));
+      this.writeMem(location, this.l);
+      break;
     case 54:
       this.writeMem(location, this.sll(this.readMem(location)));
+      break;
+    case 55:
+      this.a = this.sll(this.readMem(location));
+      this.writeMem(location, this.a);
+      break;
+    case 56:
+      this.b = this.srl(this.readMem(location));
+      this.writeMem(location, this.b);
+      break;
+    case 57:
+      this.c = this.srl(this.readMem(location));
+      this.writeMem(location, this.c);
+      break;
+    case 58:
+      this.d = this.srl(this.readMem(location));
+      this.writeMem(location, this.d);
+      break;
+    case 59:
+      this.e = this.srl(this.readMem(location));
+      this.writeMem(location, this.e);
+      break;
+    case 60:
+      this.h = this.srl(this.readMem(location));
+      this.writeMem(location, this.h);
+      break;
+    case 61:
+      this.l = this.srl(this.readMem(location));
+      this.writeMem(location, this.l);
       break;
     case 62:
       this.writeMem(location, this.srl(this.readMem(location)));
       break;
+    case 63:
+      this.a = this.srl(this.readMem(location));
+      this.writeMem(location, this.a);
+      break;
+    case 64:
+    ;
+    case 65:
+    ;
+    case 66:
+    ;
+    case 67:
+    ;
+    case 68:
+    ;
+    case 69:
+    ;
     case 70:
+    ;
+    case 71:
       this.bit(this.readMem(location) & BIT_0);
       break;
+    case 72:
+    ;
+    case 73:
+    ;
+    case 74:
+    ;
+    case 75:
+    ;
+    case 76:
+    ;
+    case 77:
+    ;
     case 78:
+    ;
+    case 79:
       this.bit(this.readMem(location) & BIT_1);
       break;
+    case 80:
+    ;
+    case 81:
+    ;
+    case 82:
+    ;
+    case 83:
+    ;
+    case 84:
+    ;
+    case 85:
+    ;
     case 86:
+    ;
+    case 87:
       this.bit(this.readMem(location) & BIT_2);
       break;
+    case 88:
+    ;
+    case 89:
+    ;
+    case 90:
+    ;
+    case 91:
+    ;
+    case 92:
+    ;
+    case 93:
+    ;
     case 94:
+    ;
+    case 95:
       this.bit(this.readMem(location) & BIT_3);
       break;
+    case 96:
+    ;
+    case 97:
+    ;
+    case 98:
+    ;
+    case 99:
+    ;
+    case 100:
+    ;
+    case 101:
+    ;
     case 102:
+    ;
+    case 103:
       this.bit(this.readMem(location) & BIT_4);
       break;
+    case 104:
+    ;
+    case 105:
+    ;
+    case 106:
+    ;
+    case 107:
+    ;
+    case 108:
+    ;
+    case 109:
+    ;
     case 110:
+    ;
+    case 111:
       this.bit(this.readMem(location) & BIT_5);
       break;
+    case 112:
+    ;
+    case 113:
+    ;
+    case 114:
+    ;
+    case 115:
+    ;
+    case 116:
+    ;
+    case 117:
+    ;
     case 118:
+    ;
+    case 119:
       this.bit(this.readMem(location) & BIT_6);
       break;
+    case 120:
+    ;
+    case 121:
+    ;
+    case 122:
+    ;
+    case 123:
+    ;
+    case 124:
+    ;
+    case 125:
+    ;
     case 126:
+    ;
+    case 127:
       this.bit(this.readMem(location) & BIT_7);
       break;
+    case 128:
+    ;
+    case 129:
+    ;
+    case 130:
+    ;
+    case 131:
+    ;
+    case 132:
+    ;
+    case 133:
+    ;
     case 134:
+    ;
+    case 135:
       this.writeMem(location, this.readMem(location) & ~BIT_0);
       break;
+    case 136:
+    ;
+    case 137:
+    ;
+    case 138:
+    ;
+    case 139:
+    ;
+    case 140:
+    ;
+    case 141:
+    ;
     case 142:
+    ;
+    case 143:
       this.writeMem(location, this.readMem(location) & ~BIT_1);
       break;
+    case 144:
+    ;
+    case 145:
+    ;
+    case 146:
+    ;
+    case 147:
+    ;
+    case 148:
+    ;
+    case 149:
+    ;
     case 150:
+    ;
+    case 151:
       this.writeMem(location, this.readMem(location) & ~BIT_2);
       break;
+    case 152:
+    ;
+    case 153:
+    ;
+    case 154:
+    ;
+    case 155:
+    ;
+    case 156:
+    ;
+    case 157:
+    ;
     case 158:
+    ;
+    case 159:
       this.writeMem(location, this.readMem(location) & ~BIT_3);
       break;
+    case 160:
+    ;
+    case 161:
+    ;
+    case 162:
+    ;
+    case 163:
+    ;
+    case 164:
+    ;
+    case 165:
+    ;
     case 166:
+    ;
+    case 167:
       this.writeMem(location, this.readMem(location) & ~BIT_4);
       break;
+    case 168:
+    ;
+    case 169:
+    ;
+    case 170:
+    ;
+    case 171:
+    ;
+    case 172:
+    ;
+    case 173:
+    ;
     case 174:
+    ;
+    case 175:
       this.writeMem(location, this.readMem(location) & ~BIT_5);
       break;
+    case 176:
+    ;
+    case 177:
+    ;
+    case 178:
+    ;
+    case 179:
+    ;
+    case 180:
+    ;
+    case 181:
+    ;
     case 182:
+    ;
+    case 183:
       this.writeMem(location, this.readMem(location) & ~BIT_6);
       break;
+    case 184:
+    ;
+    case 185:
+    ;
+    case 186:
+    ;
+    case 187:
+    ;
+    case 188:
+    ;
+    case 189:
+    ;
     case 190:
+    ;
+    case 191:
       this.writeMem(location, this.readMem(location) & ~BIT_7);
       break;
+    case 192:
+    ;
+    case 193:
+    ;
+    case 194:
+    ;
+    case 195:
+    ;
+    case 196:
+    ;
+    case 197:
+    ;
     case 198:
+    ;
+    case 199:
       this.writeMem(location, this.readMem(location) | BIT_0);
       break;
+    case 200:
+    ;
+    case 201:
+    ;
+    case 202:
+    ;
+    case 203:
+    ;
+    case 204:
+    ;
+    case 205:
+    ;
     case 206:
+    ;
+    case 207:
       this.writeMem(location, this.readMem(location) | BIT_1);
       break;
+    case 208:
+    ;
+    case 209:
+    ;
+    case 210:
+    ;
+    case 211:
+    ;
+    case 212:
+    ;
+    case 213:
+    ;
     case 214:
+    ;
+    case 215:
       this.writeMem(location, this.readMem(location) | BIT_2);
       break;
+    case 216:
+    ;
+    case 217:
+    ;
+    case 218:
+    ;
+    case 219:
+    ;
+    case 220:
+    ;
+    case 221:
+    ;
     case 222:
+    ;
+    case 223:
       this.writeMem(location, this.readMem(location) | BIT_3);
       break;
+    case 224:
+    ;
+    case 225:
+    ;
+    case 226:
+    ;
+    case 227:
+    ;
+    case 228:
+    ;
+    case 229:
+    ;
     case 230:
+    ;
+    case 231:
       this.writeMem(location, this.readMem(location) | BIT_4);
       break;
+    case 232:
+    ;
+    case 233:
+    ;
+    case 234:
+    ;
+    case 235:
+    ;
+    case 236:
+    ;
+    case 237:
+    ;
     case 238:
+    ;
+    case 239:
       this.writeMem(location, this.readMem(location) | BIT_5);
       break;
+    case 240:
+    ;
+    case 241:
+    ;
+    case 242:
+    ;
+    case 243:
+    ;
+    case 244:
+    ;
+    case 245:
+    ;
     case 246:
+    ;
+    case 247:
       this.writeMem(location, this.readMem(location) | BIT_6);
       break;
+    case 248:
+    ;
+    case 249:
+    ;
+    case 250:
+    ;
+    case 251:
+    ;
+    case 252:
+    ;
+    case 253:
+    ;
     case 254:
+    ;
+    case 255:
       this.writeMem(location, this.readMem(location) | BIT_7);
       break;
     default:
       if(DEBUG) {
-        console.log("Unimplemented DDCB or FDCB Opcode: " + (opcode & 255).toString(16))
+        console.log("Unimplemented DDCB or FDCB Opcode: " + JSSMS.Utils.toHex(opcode))
       }
       break
   }
@@ -3476,7 +4032,7 @@ JSSMS.Z80.prototype = {reset:function() {
       break;
     default:
       if(DEBUG) {
-        console.log("Unimplemented ED Opcode: " + opcode.toString(16))
+        console.log("Unimplemented ED Opcode: " + JSSMS.Utils.toHex(opcode))
       }
       this.pc++;
       break
@@ -3831,16 +4387,21 @@ JSSMS.Z80.prototype = {reset:function() {
   this.memWriteMap[64] = this.getDummyWrite();
   this.number_of_pages = 2
 }, resetMemory:function(p) {
-  if(p != null) {
+  if(p) {
     this.rom = p
   }
   this.frameReg[0] = 0;
   this.frameReg[1] = 0;
   this.frameReg[2] = 1;
   this.frameReg[3] = 0;
-  if(this.rom != null) {
+  if(this.rom.length) {
     this.number_of_pages = this.rom.length / 16;
-    this.setDefaultMemoryMapping()
+    this.setDefaultMemoryMapping();
+    if(DEBUG) {
+      this.main.ui.updateStatus("Parsing instructions...");
+      this.parseInstructions();
+      this.main.ui.updateStatus("Instructions parsed")
+    }
   }else {
     this.number_of_pages = 0
   }
@@ -3969,7 +4530,2935 @@ JSSMS.Z80.prototype = {reset:function() {
   this.exDE();
   this.exHL()
 }};
-var KEY_UP = 1;
+JSSMS.Debugger = function() {
+};
+JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
+  this.instructions = []
+}, parseInstructions:function() {
+  var toHex = JSSMS.Utils.toHex;
+  var romSize = Setup.PAGE_SIZE * this.rom.length;
+  var instruction;
+  var currentAddress;
+  var addresses = [];
+  var branch;
+  var i = 0;
+  var length = 0;
+  addresses.push(0);
+  addresses.push(56);
+  addresses.push(102);
+  console.time("Instructions parsing");
+  while(addresses.length) {
+    currentAddress = addresses.shift();
+    if(this.instructions[currentAddress]) {
+      continue
+    }
+    if(currentAddress >= romSize || currentAddress >> 10 >= this.memReadMap.length) {
+      console.log("Invalid address", currentAddress);
+      continue
+    }
+    instruction = this.disassemble(currentAddress);
+    branch = Instruction(currentAddress);
+    branch.label = toHex(instruction.address) + " " + instruction.opcode + " " + instruction.inst;
+    branch.nextAddress = instruction.nextAddress;
+    branch.opcode = instruction.opcode;
+    branch.inst = instruction.inst;
+    branch.target = instruction.target;
+    this.instructions[currentAddress] = branch;
+    if(instruction.nextAddress != null) {
+      addresses.push(instruction.nextAddress)
+    }
+    if(instruction.target != null) {
+      addresses.push(instruction.target)
+    }
+  }
+  console.timeEnd("Instructions parsing");
+  for(length = this.instructions.length;i < length;i++) {
+    if(this.instructions[i] && this.instructions[i].target != null) {
+      if(this.instructions[this.instructions[i].target]) {
+        this.instructions[this.instructions[i].target].isJumpTarget = true
+      }else {
+        console.log("Invalid target address", this.instructions[i].target)
+      }
+    }
+  }
+}, writeGraphViz:function() {
+  var tree = this.instructions;
+  console.time("DOT generation");
+  var dotFile = "digraph G {\n";
+  for(var i = 0, length = tree.length;i < length;i++) {
+    if(tree[i]) {
+      dotFile += " " + i + ' [label="' + tree[i].label + '"];\n';
+      if(tree[i].nextAddress != null) {
+        dotFile += " " + i + " -> " + tree[i].nextAddress + ";\n"
+      }
+      if(tree[i].target != null) {
+        dotFile += " " + i + " -> " + tree[i].target + ";\n"
+      }
+    }
+  }
+  dotFile += "}";
+  dotFile = dotFile.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
+  console.timeEnd("DOT generation");
+  console.log(dotFile)
+}, disassemble:function(address) {
+  var toHex = JSSMS.Utils.toHex;
+  var opcode = this.readMem(address);
+  var opcode_ = toHex(opcode);
+  var inst = "Unknown Opcode";
+  var currAddr = address;
+  var target = null;
+  address++;
+  switch(opcode) {
+    case 0:
+      inst = "NOP";
+      break;
+    case 1:
+      inst = "LD BC," + toHex(this.readMemWord(address));
+      address += 2;
+      break;
+    case 2:
+      inst = "LD (BC),A";
+      break;
+    case 3:
+      inst = "INC BC";
+      break;
+    case 4:
+      inst = "INC B";
+      break;
+    case 5:
+      inst = "DEC B";
+      break;
+    case 6:
+      inst = "LD B," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 7:
+      inst = "RLCA";
+      break;
+    case 8:
+      inst = "EX AF AF'";
+      break;
+    case 9:
+      inst = "ADD HL,BC";
+      break;
+    case 10:
+      inst = "LD A,(BC)";
+      break;
+    case 11:
+      inst = "DEC BC";
+      break;
+    case 12:
+      inst = "INC C";
+      break;
+    case 13:
+      inst = "DEC C";
+      break;
+    case 14:
+      inst = "LD C," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 15:
+      inst = "RRCA";
+      break;
+    case 16:
+      target = address + this.signExtend(this.readMem(address)) + 1;
+      inst = "DJNZ (" + toHex(target) + ")";
+      address++;
+      break;
+    case 17:
+      inst = "LD DE," + toHex(this.readMemWord(address));
+      address += 2;
+      break;
+    case 18:
+      inst = "LD (DE),A";
+      break;
+    case 19:
+      inst = "INC DE";
+      break;
+    case 20:
+      inst = "INC D";
+      break;
+    case 21:
+      inst = "DEC D";
+      break;
+    case 22:
+      inst = "LD D," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 23:
+      inst = "RLA";
+      break;
+    case 24:
+      target = address + this.signExtend(this.readMem(address)) + 1;
+      inst = "JR (" + toHex(target) + ")";
+      address = null;
+      break;
+    case 25:
+      inst = "ADD HL,DE";
+      break;
+    case 26:
+      inst = "LD A,(DE)";
+      break;
+    case 27:
+      inst = "DEC DE";
+      break;
+    case 28:
+      inst = "INC E";
+      break;
+    case 29:
+      inst = "DEC E";
+      break;
+    case 30:
+      inst = "LD E," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 31:
+      inst = "RRA";
+      break;
+    case 32:
+      target = address + this.signExtend(this.readMem(address)) + 1;
+      inst = "JR NZ,(" + toHex(target) + ")";
+      address++;
+      break;
+    case 33:
+      inst = "LD HL," + toHex(this.readMemWord(address));
+      address += 2;
+      break;
+    case 34:
+      inst = "LD (" + toHex(this.readMemWord(address)) + "),HL";
+      address += 2;
+      break;
+    case 35:
+      inst = "INC HL";
+      break;
+    case 36:
+      inst = "INC H";
+      break;
+    case 37:
+      inst = "DEC H";
+      break;
+    case 38:
+      inst = "LD H," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 39:
+      inst = "DAA";
+      break;
+    case 40:
+      target = address + this.signExtend(this.readMem(address)) + 1;
+      inst = "JR Z,(" + toHex(target) + ")";
+      address++;
+      break;
+    case 41:
+      inst = "ADD HL,HL";
+      break;
+    case 42:
+      inst = "LD HL,(" + toHex(this.readMemWord(address)) + ")";
+      address += 2;
+      break;
+    case 43:
+      inst = "DEC HL";
+      break;
+    case 44:
+      inst = "INC L";
+      break;
+    case 45:
+      inst = "DEC L";
+      break;
+    case 46:
+      inst = "LD L," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 47:
+      inst = "CPL";
+      break;
+    case 48:
+      target = address + this.signExtend(this.readMem(address)) + 1;
+      inst = "JR NC,(" + toHex(target) + ")";
+      address++;
+      break;
+    case 49:
+      inst = "LD SP," + toHex(this.readMemWord(address));
+      address += 2;
+      break;
+    case 50:
+      inst = "LD (" + toHex(this.readMemWord(address)) + "),A";
+      address += 2;
+      break;
+    case 51:
+      inst = "INC SP";
+      break;
+    case 52:
+      inst = "INC (HL)";
+      break;
+    case 53:
+      inst = "DEC (HL)";
+      break;
+    case 54:
+      inst = "LD (HL)," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 55:
+      inst = "SCF";
+      break;
+    case 56:
+      target = address + this.signExtend(this.readMem(address)) + 1;
+      inst = "JR C,(" + toHex(target) + ")";
+      address++;
+      break;
+    case 57:
+      inst = "ADD HL,SP";
+      break;
+    case 58:
+      inst = "LD A,(" + toHex(this.readMemWord(address)) + ")";
+      address += 2;
+      break;
+    case 59:
+      inst = "DEC SP";
+      break;
+    case 60:
+      inst = "INC A";
+      break;
+    case 61:
+      inst = "DEC A";
+      break;
+    case 62:
+      inst = "LD A," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 63:
+      inst = "CCF";
+      break;
+    case 64:
+      inst = "LD B,B";
+      break;
+    case 65:
+      inst = "LD B,C";
+      break;
+    case 66:
+      inst = "LD B,D";
+      break;
+    case 67:
+      inst = "LD B,E";
+      break;
+    case 68:
+      inst = "LD B,H";
+      break;
+    case 69:
+      inst = "LD B,L";
+      break;
+    case 70:
+      inst = "LD B,(HL)";
+      break;
+    case 71:
+      inst = "LD B,A";
+      break;
+    case 72:
+      inst = "LD C,B";
+      break;
+    case 73:
+      inst = "LD C,C";
+      break;
+    case 74:
+      inst = "LD C,D";
+      break;
+    case 75:
+      inst = "LD C,E";
+      break;
+    case 76:
+      inst = "LD C,H";
+      break;
+    case 77:
+      inst = "LD C,L";
+      break;
+    case 78:
+      inst = "LD C,(HL)";
+      break;
+    case 79:
+      inst = "LD C,A";
+      break;
+    case 80:
+      inst = "LD D,B";
+      break;
+    case 81:
+      inst = "LD D,C";
+      break;
+    case 82:
+      inst = "LD D,D";
+      break;
+    case 83:
+      inst = "LD D,E";
+      break;
+    case 84:
+      inst = "LD D,H";
+      break;
+    case 85:
+      inst = "LD D,L";
+      break;
+    case 86:
+      inst = "LD D,(HL)";
+      break;
+    case 87:
+      inst = "LD D,A";
+      break;
+    case 88:
+      inst = "LD E,B";
+      break;
+    case 89:
+      inst = "LD E,C";
+      break;
+    case 90:
+      inst = "LD E,D";
+      break;
+    case 91:
+      inst = "LD E,E";
+      break;
+    case 92:
+      inst = "LD E,H";
+      break;
+    case 93:
+      inst = "LD E,L";
+      break;
+    case 94:
+      inst = "LD E,(HL)";
+      break;
+    case 95:
+      inst = "LD E,A";
+      break;
+    case 96:
+      inst = "LD H,B";
+      break;
+    case 97:
+      inst = "LD H,C";
+      break;
+    case 98:
+      inst = "LD H,D";
+      break;
+    case 99:
+      inst = "LD H,E";
+      break;
+    case 100:
+      inst = "LD H,H";
+      break;
+    case 101:
+      inst = "LD H,L";
+      break;
+    case 102:
+      inst = "LD H,(HL)";
+      break;
+    case 103:
+      inst = "LD H,A";
+      break;
+    case 104:
+      inst = "LD L,B";
+      break;
+    case 105:
+      inst = "LD L,C";
+      break;
+    case 106:
+      inst = "LD L,D";
+      break;
+    case 107:
+      inst = "LD L,E";
+      break;
+    case 108:
+      inst = "LD L,H";
+      break;
+    case 109:
+      inst = "LD L,L";
+      break;
+    case 110:
+      inst = "LD L,(HL)";
+      break;
+    case 111:
+      inst = "LD L,A";
+      break;
+    case 112:
+      inst = "LD (HL),B";
+      break;
+    case 113:
+      inst = "LD (HL),C";
+      break;
+    case 114:
+      inst = "LD (HL),D";
+      break;
+    case 115:
+      inst = "LD (HL),E";
+      break;
+    case 116:
+      inst = "LD (HL),H";
+      break;
+    case 117:
+      inst = "LD (HL),L";
+      break;
+    case 118:
+      inst = "HALT";
+      break;
+    case 119:
+      inst = "LD (HL),A";
+      break;
+    case 120:
+      inst = "LD A,B";
+      break;
+    case 121:
+      inst = "LD A,C";
+      break;
+    case 122:
+      inst = "LD A,D";
+      break;
+    case 123:
+      inst = "LD A,E";
+      break;
+    case 124:
+      inst = "LD A,H";
+      break;
+    case 125:
+      inst = "LD A,L";
+      break;
+    case 126:
+      inst = "LD A,(HL)";
+      break;
+    case 127:
+      inst = "LD A,A";
+      break;
+    case 128:
+      inst = "ADD A,B";
+      break;
+    case 129:
+      inst = "ADD A,C";
+      break;
+    case 130:
+      inst = "ADD A,D";
+      break;
+    case 131:
+      inst = "ADD A,E";
+      break;
+    case 132:
+      inst = "ADD A,H";
+      break;
+    case 133:
+      inst = "ADD A,L";
+      break;
+    case 134:
+      inst = "ADD A,(HL)";
+      break;
+    case 135:
+      inst = "ADD A,A";
+      break;
+    case 136:
+      inst = "ADC A,B";
+      break;
+    case 137:
+      inst = "ADC A,C";
+      break;
+    case 138:
+      inst = "ADC A,D";
+      break;
+    case 139:
+      inst = "ADC A,E";
+      break;
+    case 140:
+      inst = "ADC A,H";
+      break;
+    case 141:
+      inst = "ADC A,L";
+      break;
+    case 142:
+      inst = "ADC A,(HL)";
+      break;
+    case 143:
+      inst = "ADC A,A";
+      break;
+    case 144:
+      inst = "SUB A,B";
+      break;
+    case 145:
+      inst = "SUB A,C";
+      break;
+    case 146:
+      inst = "SUB A,D";
+      break;
+    case 147:
+      inst = "SUB A,E";
+      break;
+    case 148:
+      inst = "SUB A,H";
+      break;
+    case 149:
+      inst = "SUB A,L";
+      break;
+    case 150:
+      inst = "SUB A,(HL)";
+      break;
+    case 151:
+      inst = "SUB A,A";
+      break;
+    case 152:
+      inst = "SBC A,B";
+      break;
+    case 153:
+      inst = "SBC A,C";
+      break;
+    case 154:
+      inst = "SBC A,D";
+      break;
+    case 155:
+      inst = "SBC A,E";
+      break;
+    case 156:
+      inst = "SBC A,H";
+      break;
+    case 157:
+      inst = "SBC A,L";
+      break;
+    case 158:
+      inst = "SBC A,(HL)";
+      break;
+    case 159:
+      inst = "SBC A,A";
+      break;
+    case 160:
+      inst = "AND A,B";
+      break;
+    case 161:
+      inst = "AND A,C";
+      break;
+    case 162:
+      inst = "AND A,D";
+      break;
+    case 163:
+      inst = "AND A,E";
+      break;
+    case 164:
+      inst = "AND A,H";
+      break;
+    case 165:
+      inst = "AND A,L";
+      break;
+    case 166:
+      inst = "AND A,(HL)";
+      break;
+    case 167:
+      inst = "AND A,A";
+      break;
+    case 168:
+      inst = "XOR A,B";
+      break;
+    case 169:
+      inst = "XOR A,C";
+      break;
+    case 170:
+      inst = "XOR A,D";
+      break;
+    case 171:
+      inst = "XOR A,E";
+      break;
+    case 172:
+      inst = "XOR A,H";
+      break;
+    case 173:
+      inst = "XOR A,L";
+      break;
+    case 174:
+      inst = "XOR A,(HL)";
+      break;
+    case 175:
+      inst = "XOR A,A";
+      break;
+    case 176:
+      inst = "OR A,B";
+      break;
+    case 177:
+      inst = "OR A,C";
+      break;
+    case 178:
+      inst = "OR A,D";
+      break;
+    case 179:
+      inst = "OR A,E";
+      break;
+    case 180:
+      inst = "OR A,H";
+      break;
+    case 181:
+      inst = "OR A,L";
+      break;
+    case 182:
+      inst = "OR A,(HL)";
+      break;
+    case 183:
+      inst = "OR A,A";
+      break;
+    case 184:
+      inst = "CP A,B";
+      break;
+    case 185:
+      inst = "CP A,C";
+      break;
+    case 186:
+      inst = "CP A,D";
+      break;
+    case 187:
+      inst = "CP A,E";
+      break;
+    case 188:
+      inst = "CP A,H";
+      break;
+    case 189:
+      inst = "CP A,L";
+      break;
+    case 190:
+      inst = "CP A,(HL)";
+      break;
+    case 191:
+      inst = "CP A,A";
+      break;
+    case 192:
+      inst = "RET NZ";
+      break;
+    case 193:
+      inst = "POP BC";
+      break;
+    case 194:
+      target = this.readMemWord(address);
+      inst = "JP NZ,(" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 195:
+      target = this.readMemWord(address);
+      inst = "JP (" + toHex(target) + ")";
+      address = null;
+      break;
+    case 196:
+      target = this.readMemWord(address);
+      inst = "CALL NZ (" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 197:
+      inst = "PUSH BC";
+      break;
+    case 198:
+      inst = "ADD A," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 199:
+      target = 0;
+      inst = "RST " + toHex(target);
+      address = null;
+      break;
+    case 200:
+      inst = "RET Z";
+      break;
+    case 201:
+      inst = "RET";
+      address = null;
+      break;
+    case 202:
+      target = this.readMemWord(address);
+      inst = "JP Z,(" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 203:
+      var _inst = this.getCB(address);
+      inst = _inst.inst;
+      opcode_ += " " + _inst.opcode;
+      address = _inst.nextAddress;
+      break;
+    case 204:
+      target = this.readMemWord(address);
+      inst = "CALL Z (" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 205:
+      target = this.readMemWord(address);
+      inst = "CALL (" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 206:
+      inst = "ADC ," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 207:
+      target = 8;
+      inst = "RST " + toHex(target);
+      address = null;
+      break;
+    case 208:
+      inst = "RET NC";
+      break;
+    case 209:
+      inst = "POP DE";
+      break;
+    case 210:
+      target = this.readMemWord(address);
+      inst = "JP NC,(" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 211:
+      inst = "OUT (" + toHex(this.readMem(address)) + "),A";
+      address++;
+      break;
+    case 212:
+      target = this.readMemWord(address);
+      inst = "CALL NC (" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 213:
+      inst = "PUSH DE";
+      break;
+    case 214:
+      inst = "SUB " + toHex(this.readMem(address));
+      break;
+    case 215:
+      target = 16;
+      inst = "RST " + toHex(target);
+      address = null;
+      break;
+    case 216:
+      inst = "RET C";
+      break;
+    case 217:
+      inst = "EXX";
+      break;
+    case 218:
+      target = this.readMemWord(address);
+      inst = "JP C,(" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 219:
+      inst = "IN A,(" + toHex(this.readMem(address)) + ")";
+      address++;
+      break;
+    case 220:
+      target = this.readMemWord(address);
+      inst = "CALL C (" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 221:
+      var _inst = this.getIndexOpIX(address);
+      inst = _inst.inst;
+      opcode_ += " " + _inst.opcode;
+      address = _inst.nextAddress;
+      break;
+    case 222:
+      inst = "SBC A," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 223:
+      target = 24;
+      inst = "RST " + toHex(target);
+      address = null;
+      break;
+    case 224:
+      inst = "RET PO";
+      break;
+    case 225:
+      inst = "POP HL";
+      break;
+    case 226:
+      target = this.readMemWord(address);
+      inst = "JP PO,(" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 227:
+      inst = "EX (SP),HL";
+      break;
+    case 228:
+      target = this.readMemWord(address);
+      inst = "CALL PO (" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 229:
+      inst = "PUSH HL";
+      break;
+    case 230:
+      inst = "AND (" + toHex(this.readMem(address)) + ")";
+      address++;
+      break;
+    case 231:
+      target = 32;
+      inst = "RST " + toHex(target);
+      address = null;
+      break;
+    case 232:
+      inst = "RET PE";
+      break;
+    case 233:
+      inst = "JP (HL)";
+      address = null;
+      break;
+    case 234:
+      target = this.readMemWord(address);
+      inst = "JP PE,(" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 235:
+      inst = "EX DE,HL";
+      break;
+    case 236:
+      target = this.readMemWord(address);
+      inst = "CALL PE (" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 237:
+      var _inst = this.getED(address);
+      inst = _inst.inst;
+      opcode_ += " " + _inst.opcode;
+      address = _inst.nextAddress;
+      break;
+    case 238:
+      inst = "XOR A," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 239:
+      target = 40;
+      inst = "RST " + toHex(target);
+      address = null;
+      break;
+    case 240:
+      inst = "RET P";
+      break;
+    case 241:
+      inst = "POP AF";
+      break;
+    case 242:
+      target = this.readMemWord(address);
+      inst = "JP P,(" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 243:
+      inst = "DI";
+      break;
+    case 244:
+      target = this.readMemWord(address);
+      inst = "CALL P (" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 245:
+      inst = "PUSH AF";
+      break;
+    case 246:
+      inst = "OR " + toHex(this.readMem(address));
+      address++;
+      break;
+    case 247:
+      target = 48;
+      inst = "RST " + toHex(target);
+      address = null;
+      break;
+    case 248:
+      inst = "RET M";
+      break;
+    case 249:
+      inst = "LD SP,HL";
+      break;
+    case 250:
+      target = this.readMemWord(address);
+      inst = "JP M,(" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 251:
+      inst = "EI";
+      break;
+    case 252:
+      target = this.readMemWord(address);
+      inst = "CALL M (" + toHex(target) + ")";
+      address += 2;
+      break;
+    case 253:
+      var _inst = this.getIndexOpIY(address);
+      inst = _inst.inst;
+      opcode_ += " " + _inst.opcode;
+      address = _inst.nextAddress;
+      break;
+    case 254:
+      inst = "CP " + toHex(this.readMem(address));
+      address++;
+      break;
+    case 255:
+      target = 56;
+      inst = "RST " + toHex(target);
+      address = null;
+      break
+  }
+  return{opcode:opcode_, inst:inst, address:currAddr, nextAddress:address, target:target}
+}, getCB:function(address) {
+  var toHex = JSSMS.Utils.toHex;
+  var opcode = this.readMem(address);
+  var inst = "Unimplemented CB Opcode";
+  var currAddr = address;
+  address++;
+  switch(opcode) {
+    case 0:
+      inst = "RLC B";
+      break;
+    case 1:
+      inst = "RLC C";
+      break;
+    case 2:
+      inst = "RLC D";
+      break;
+    case 3:
+      inst = "RLC E";
+      break;
+    case 4:
+      inst = "RLC H";
+      break;
+    case 5:
+      inst = "RLC L";
+      break;
+    case 6:
+      inst = "RLC (HL)";
+      break;
+    case 7:
+      inst = "RLC A";
+      break;
+    case 8:
+      inst = "RRC B";
+      break;
+    case 9:
+      inst = "RRC C";
+      break;
+    case 10:
+      inst = "RRC D";
+      break;
+    case 11:
+      inst = "RRC E";
+      break;
+    case 12:
+      inst = "RRC H";
+      break;
+    case 13:
+      inst = "RRC L";
+      break;
+    case 14:
+      inst = "RRC (HL)";
+      break;
+    case 15:
+      inst = "RRC A";
+      break;
+    case 16:
+      inst = "RL B";
+      break;
+    case 17:
+      inst = "RL C";
+      break;
+    case 18:
+      inst = "RL D";
+      break;
+    case 19:
+      inst = "RL E";
+      break;
+    case 20:
+      inst = "RL H";
+      break;
+    case 21:
+      inst = "RL L";
+      break;
+    case 22:
+      inst = "RL (HL)";
+      break;
+    case 23:
+      inst = "RL A";
+      break;
+    case 24:
+      inst = "RR B";
+      break;
+    case 25:
+      inst = "RR C";
+      break;
+    case 26:
+      inst = "RR D";
+      break;
+    case 27:
+      inst = "RR E";
+      break;
+    case 28:
+      inst = "RR H";
+      break;
+    case 29:
+      inst = "RR L";
+      break;
+    case 30:
+      inst = "RR (HL)";
+      break;
+    case 31:
+      inst = "RR A";
+      break;
+    case 32:
+      inst = "SLA B";
+      break;
+    case 33:
+      inst = "SLA C";
+      break;
+    case 34:
+      inst = "SLA D";
+      break;
+    case 35:
+      inst = "SLA E";
+      break;
+    case 36:
+      inst = "SLA H";
+      break;
+    case 37:
+      inst = "SLA L";
+      break;
+    case 38:
+      inst = "SLA (HL)";
+      break;
+    case 39:
+      inst = "SLA A";
+      break;
+    case 40:
+      inst = "SRA B";
+      break;
+    case 41:
+      inst = "SRA C";
+      break;
+    case 42:
+      inst = "SRA D";
+      break;
+    case 43:
+      inst = "SRA E";
+      break;
+    case 44:
+      inst = "SRA H";
+      break;
+    case 45:
+      inst = "SRA L";
+      break;
+    case 46:
+      inst = "SRA (HL)";
+      break;
+    case 47:
+      inst = "SRA A";
+      break;
+    case 48:
+      inst = "SLL B";
+      break;
+    case 49:
+      inst = "SLL C";
+      break;
+    case 50:
+      inst = "SLL D";
+      break;
+    case 51:
+      inst = "SLL E";
+      break;
+    case 52:
+      inst = "SLL H";
+      break;
+    case 53:
+      inst = "SLL L";
+      break;
+    case 54:
+      inst = "SLL (HL)";
+      break;
+    case 55:
+      inst = "SLL A";
+      break;
+    case 56:
+      inst = "SRL B";
+      break;
+    case 57:
+      inst = "SRL C";
+      break;
+    case 58:
+      inst = "SRL D";
+      break;
+    case 59:
+      inst = "SRL E";
+      break;
+    case 60:
+      inst = "SRL H";
+      break;
+    case 61:
+      inst = "SRL L";
+      break;
+    case 62:
+      inst = "SRL (HL)";
+      break;
+    case 63:
+      inst = "SRL A";
+      break;
+    case 64:
+      inst = "BIT 0,B";
+      break;
+    case 65:
+      inst = "BIT 0,C";
+      break;
+    case 66:
+      inst = "BIT 0,D";
+      break;
+    case 67:
+      inst = "BIT 0,E";
+      break;
+    case 68:
+      inst = "BIT 0,H";
+      break;
+    case 69:
+      inst = "BIT 0,L";
+      break;
+    case 70:
+      inst = "BIT 0,(HL)";
+      break;
+    case 71:
+      inst = "BIT 0,A";
+      break;
+    case 72:
+      inst = "BIT 1,B";
+      break;
+    case 73:
+      inst = "BIT 1,C";
+      break;
+    case 74:
+      inst = "BIT 1,D";
+      break;
+    case 75:
+      inst = "BIT 1,E";
+      break;
+    case 76:
+      inst = "BIT 1,H";
+      break;
+    case 77:
+      inst = "BIT 1,L";
+      break;
+    case 78:
+      inst = "BIT 1,(HL)";
+      break;
+    case 79:
+      inst = "BIT 1,A";
+      break;
+    case 80:
+      inst = "BIT 2,B";
+      break;
+    case 81:
+      inst = "BIT 2,C";
+      break;
+    case 82:
+      inst = "BIT 2,D";
+      break;
+    case 83:
+      inst = "BIT 2,E";
+      break;
+    case 84:
+      inst = "BIT 2,H";
+      break;
+    case 85:
+      inst = "BIT 2,L";
+      break;
+    case 86:
+      inst = "BIT 2,(HL)";
+      break;
+    case 87:
+      inst = "BIT 2,A";
+      break;
+    case 88:
+      inst = "BIT 3,B";
+      break;
+    case 89:
+      inst = "BIT 3,C";
+      break;
+    case 90:
+      inst = "BIT 3,D";
+      break;
+    case 91:
+      inst = "BIT 3,E";
+      break;
+    case 92:
+      inst = "BIT 3,H";
+      break;
+    case 93:
+      inst = "BIT 3,L";
+      break;
+    case 94:
+      inst = "BIT 3,(HL)";
+      break;
+    case 95:
+      inst = "BIT 3,A";
+      break;
+    case 96:
+      inst = "BIT 4,B";
+      break;
+    case 97:
+      inst = "BIT 4,C";
+      break;
+    case 98:
+      inst = "BIT 4,D";
+      break;
+    case 99:
+      inst = "BIT 4,E";
+      break;
+    case 100:
+      inst = "BIT 4,H";
+      break;
+    case 101:
+      inst = "BIT 4,L";
+      break;
+    case 102:
+      inst = "BIT 4,(HL)";
+      break;
+    case 103:
+      inst = "BIT 4,A";
+      break;
+    case 104:
+      inst = "BIT 5,B";
+      break;
+    case 105:
+      inst = "BIT 5,C";
+      break;
+    case 106:
+      inst = "BIT 5,D";
+      break;
+    case 107:
+      inst = "BIT 5,E";
+      break;
+    case 108:
+      inst = "BIT 5,H";
+      break;
+    case 109:
+      inst = "BIT 5,L";
+      break;
+    case 110:
+      inst = "BIT 5,(HL)";
+      break;
+    case 111:
+      inst = "BIT 5,A";
+      break;
+    case 112:
+      inst = "BIT 6,B";
+      break;
+    case 113:
+      inst = "BIT 6,C";
+      break;
+    case 114:
+      inst = "BIT 6,D";
+      break;
+    case 115:
+      inst = "BIT 6,E";
+      break;
+    case 116:
+      inst = "BIT 6,H";
+      break;
+    case 117:
+      inst = "BIT 6,L";
+      break;
+    case 118:
+      inst = "BIT 6,(HL)";
+      break;
+    case 119:
+      inst = "BIT 6,A";
+      break;
+    case 120:
+      inst = "BIT 7,B";
+      break;
+    case 121:
+      inst = "BIT 7,C";
+      break;
+    case 122:
+      inst = "BIT 7,D";
+      break;
+    case 123:
+      inst = "BIT 7,E";
+      break;
+    case 124:
+      inst = "BIT 7,H";
+      break;
+    case 125:
+      inst = "BIT 7,L";
+      break;
+    case 126:
+      inst = "BIT 7,(HL)";
+      break;
+    case 127:
+      inst = "BIT 7,A";
+      break;
+    case 128:
+      inst = "RES 0,B";
+      break;
+    case 129:
+      inst = "RES 0,C";
+      break;
+    case 130:
+      inst = "RES 0,D";
+      break;
+    case 131:
+      inst = "RES 0,E";
+      break;
+    case 132:
+      inst = "RES 0,H";
+      break;
+    case 133:
+      inst = "RES 0,L";
+      break;
+    case 134:
+      inst = "RES 0,(HL)";
+      break;
+    case 135:
+      inst = "RES 0,A";
+      break;
+    case 136:
+      inst = "RES 1,B";
+      break;
+    case 137:
+      inst = "RES 1,C";
+      break;
+    case 138:
+      inst = "RES 1,D";
+      break;
+    case 139:
+      inst = "RES 1,E";
+      break;
+    case 140:
+      inst = "RES 1,H";
+      break;
+    case 141:
+      inst = "RES 1,L";
+      break;
+    case 142:
+      inst = "RES 1,(HL)";
+      break;
+    case 143:
+      inst = "RES 1,A";
+      break;
+    case 144:
+      inst = "RES 2,B";
+      break;
+    case 145:
+      inst = "RES 2,C";
+      break;
+    case 146:
+      inst = "RES 2,D";
+      break;
+    case 147:
+      inst = "RES 2,E";
+      break;
+    case 148:
+      inst = "RES 2,H";
+      break;
+    case 149:
+      inst = "RES 2,L";
+      break;
+    case 150:
+      inst = "RES 2,(HL)";
+      break;
+    case 151:
+      inst = "RES 2,A";
+      break;
+    case 152:
+      inst = "RES 3,B";
+      break;
+    case 153:
+      inst = "RES 3,C";
+      break;
+    case 154:
+      inst = "RES 3,D";
+      break;
+    case 155:
+      inst = "RES 3,E";
+      break;
+    case 156:
+      inst = "RES 3,H";
+      break;
+    case 157:
+      inst = "RES 3,L";
+      break;
+    case 158:
+      inst = "RES 3,(HL)";
+      break;
+    case 159:
+      inst = "RES 3,A";
+      break;
+    case 160:
+      inst = "RES 4,B";
+      break;
+    case 161:
+      inst = "RES 4,C";
+      break;
+    case 162:
+      inst = "RES 4,D";
+      break;
+    case 163:
+      inst = "RES 4,E";
+      break;
+    case 164:
+      inst = "RES 4,H";
+      break;
+    case 165:
+      inst = "RES 4,L";
+      break;
+    case 166:
+      inst = "RES 4,(HL)";
+      break;
+    case 167:
+      inst = "RES 4,A";
+      break;
+    case 168:
+      inst = "RES 5,B";
+      break;
+    case 169:
+      inst = "RES 5,C";
+      break;
+    case 170:
+      inst = "RES 5,D";
+      break;
+    case 171:
+      inst = "RES 5,E";
+      break;
+    case 172:
+      inst = "RES 5,H";
+      break;
+    case 173:
+      inst = "RES 5,L";
+      break;
+    case 174:
+      inst = "RES 5,(HL)";
+      break;
+    case 175:
+      inst = "RES 5,A";
+      break;
+    case 176:
+      inst = "RES 6,B";
+      break;
+    case 177:
+      inst = "RES 6,C";
+      break;
+    case 178:
+      inst = "RES 6,D";
+      break;
+    case 179:
+      inst = "RES 6,E";
+      break;
+    case 180:
+      inst = "RES 6,H";
+      break;
+    case 181:
+      inst = "RES 6,L";
+      break;
+    case 182:
+      inst = "RES 6,(HL)";
+      break;
+    case 183:
+      inst = "RES 6,A";
+      break;
+    case 184:
+      inst = "RES 7,B";
+      break;
+    case 185:
+      inst = "RES 7,C";
+      break;
+    case 186:
+      inst = "RES 7,D";
+      break;
+    case 187:
+      inst = "RES 7,E";
+      break;
+    case 188:
+      inst = "RES 7,H";
+      break;
+    case 189:
+      inst = "RES 7,L";
+      break;
+    case 190:
+      inst = "RES 7,(HL)";
+      break;
+    case 191:
+      inst = "RES 7,A";
+      break;
+    case 192:
+      inst = "SET 0,B";
+      break;
+    case 193:
+      inst = "SET 0,C";
+      break;
+    case 194:
+      inst = "SET 0,D";
+      break;
+    case 195:
+      inst = "SET 0,E";
+      break;
+    case 196:
+      inst = "SET 0,H";
+      break;
+    case 197:
+      inst = "SET 0,L";
+      break;
+    case 198:
+      inst = "SET 0,(HL)";
+      break;
+    case 199:
+      inst = "SET 0,A";
+      break;
+    case 200:
+      inst = "SET 1,B";
+      break;
+    case 201:
+      inst = "SET 1,C";
+      break;
+    case 202:
+      inst = "SET 1,D";
+      break;
+    case 203:
+      inst = "SET 1,E";
+      break;
+    case 204:
+      inst = "SET 1,H";
+      break;
+    case 205:
+      inst = "SET 1,L";
+      break;
+    case 206:
+      inst = "SET 1,(HL)";
+      break;
+    case 207:
+      inst = "SET 1,A";
+      break;
+    case 208:
+      inst = "SET 2,B";
+      break;
+    case 209:
+      inst = "SET 2,C";
+      break;
+    case 210:
+      inst = "SET 2,D";
+      break;
+    case 211:
+      inst = "SET 2,E";
+      break;
+    case 212:
+      inst = "SET 2,H";
+      break;
+    case 213:
+      inst = "SET 2,L";
+      break;
+    case 214:
+      inst = "SET 2,(HL)";
+      break;
+    case 215:
+      inst = "SET 2,A";
+      break;
+    case 216:
+      inst = "SET 3,B";
+      break;
+    case 217:
+      inst = "SET 3,C";
+      break;
+    case 218:
+      inst = "SET 3,D";
+      break;
+    case 219:
+      inst = "SET 3,E";
+      break;
+    case 220:
+      inst = "SET 3,H";
+      break;
+    case 221:
+      inst = "SET 3,L";
+      break;
+    case 222:
+      inst = "SET 3,(HL)";
+      break;
+    case 223:
+      inst = "SET 3,A";
+      break;
+    case 224:
+      inst = "SET 4,B";
+      break;
+    case 225:
+      inst = "SET 4,C";
+      break;
+    case 226:
+      inst = "SET 4,D";
+      break;
+    case 227:
+      inst = "SET 4,E";
+      break;
+    case 228:
+      inst = "SET 4,H";
+      break;
+    case 229:
+      inst = "SET 4,L";
+      break;
+    case 230:
+      inst = "SET 4,(HL)";
+      break;
+    case 231:
+      inst = "SET 4,A";
+      break;
+    case 232:
+      inst = "SET 5,B";
+      break;
+    case 233:
+      inst = "SET 5,C";
+      break;
+    case 234:
+      inst = "SET 5,D";
+      break;
+    case 235:
+      inst = "SET 5,E";
+      break;
+    case 236:
+      inst = "SET 5,H";
+      break;
+    case 237:
+      inst = "SET 5,L";
+      break;
+    case 238:
+      inst = "SET 5,(HL)";
+      break;
+    case 239:
+      inst = "SET 5,A";
+      break;
+    case 240:
+      inst = "SET 6,B";
+      break;
+    case 241:
+      inst = "SET 6,C";
+      break;
+    case 242:
+      inst = "SET 6,D";
+      break;
+    case 243:
+      inst = "SET 6,E";
+      break;
+    case 244:
+      inst = "SET 6,H";
+      break;
+    case 245:
+      inst = "SET 6,L";
+      break;
+    case 246:
+      inst = "SET 6,(HL)";
+      break;
+    case 247:
+      inst = "SET 6,A";
+      break;
+    case 248:
+      inst = "SET 7,B";
+      break;
+    case 249:
+      inst = "SET 7,C";
+      break;
+    case 250:
+      inst = "SET 7,D";
+      break;
+    case 251:
+      inst = "SET 7,E";
+      break;
+    case 252:
+      inst = "SET 7,H";
+      break;
+    case 253:
+      inst = "SET 7,L";
+      break;
+    case 254:
+      inst = "SET 7,(HL)";
+      break;
+    case 255:
+      inst = "SET 7,A";
+      break
+  }
+  return{opcode:toHex(opcode), inst:inst, address:currAddr, nextAddress:address}
+}, getED:function(address) {
+  var toHex = JSSMS.Utils.toHex;
+  var opcode = this.readMem(address);
+  var inst = "Unimplemented ED Opcode";
+  var currAddr = address;
+  address++;
+  switch(opcode) {
+    case 64:
+      inst = "IN B,(C)";
+      break;
+    case 65:
+      inst = "OUT (C),B";
+      break;
+    case 66:
+      inst = "SBC HL,BC";
+      break;
+    case 67:
+      inst = "LD (" + toHex(this.readMemWord(address)) + "),BC";
+      address = address + 2;
+      break;
+    case 68:
+    ;
+    case 76:
+    ;
+    case 84:
+    ;
+    case 92:
+    ;
+    case 100:
+    ;
+    case 108:
+    ;
+    case 116:
+    ;
+    case 124:
+      inst = "NEG";
+      break;
+    case 69:
+    ;
+    case 77:
+    ;
+    case 85:
+    ;
+    case 93:
+    ;
+    case 101:
+    ;
+    case 109:
+    ;
+    case 117:
+    ;
+    case 125:
+      inst = "RETN / RETI";
+      address = null;
+      break;
+    case 70:
+    ;
+    case 78:
+    ;
+    case 102:
+    ;
+    case 110:
+      inst = "IM 0";
+      break;
+    case 71:
+      inst = "LD I,A";
+      break;
+    case 72:
+      inst = "IN C,(C)";
+      break;
+    case 73:
+      inst = "OUT (C),C";
+      break;
+    case 74:
+      inst = "ADC HL,BC";
+      break;
+    case 75:
+      inst = "LD BC,(" + toHex(this.readMemWord(address)) + ")";
+      address = address + 2;
+      break;
+    case 79:
+      inst = "LD R,A";
+      break;
+    case 80:
+      inst = "IN D,(C)";
+      break;
+    case 81:
+      inst = "OUT (C),D";
+      break;
+    case 82:
+      inst = "SBC HL,DE";
+      break;
+    case 83:
+      inst = "LD (" + toHex(this.readMemWord(address)) + "),DE";
+      address = address + 2;
+      break;
+    case 86:
+    ;
+    case 118:
+      inst = "IM 1";
+      break;
+    case 87:
+      inst = "LD A,I";
+      break;
+    case 88:
+      inst = "IN E,(C)";
+      break;
+    case 89:
+      inst = "OUT (C),E";
+      break;
+    case 90:
+      inst = "ADC HL,DE";
+      break;
+    case 91:
+      inst = "LD DE,(" + toHex(this.readMemWord(address)) + ")";
+      address = address + 2;
+      break;
+    case 95:
+      inst = "LD A,R";
+      break;
+    case 96:
+      inst = "IN H,(C)";
+      break;
+    case 97:
+      inst = "OUT (C),H";
+      break;
+    case 98:
+      inst = "SBC HL,HL";
+      break;
+    case 99:
+      inst = "LD (" + toHex(this.readMemWord(address)) + "),HL";
+      address = address + 2;
+      break;
+    case 103:
+      inst = "RRD";
+      break;
+    case 104:
+      inst = "IN L,(C)";
+      break;
+    case 105:
+      inst = "OUT (C),L";
+      break;
+    case 106:
+      inst = "ADC HL,HL";
+      break;
+    case 107:
+      inst = "LD HL,(" + toHex(this.readMemWord(address)) + ")";
+      address = address + 2;
+      break;
+    case 111:
+      inst = "RLD";
+      break;
+    case 113:
+      inst = "OUT (C),0";
+      break;
+    case 114:
+      inst = "SBC HL,SP";
+      break;
+    case 115:
+      inst = "LD (" + toHex(this.readMemWord(address)) + "),SP";
+      address = address + 2;
+      break;
+    case 120:
+      inst = "IN A,(C)";
+      break;
+    case 121:
+      inst = "OUT (C),A";
+      break;
+    case 122:
+      inst = "ADC HL,SP";
+      break;
+    case 123:
+      inst = "LD SP,(" + toHex(this.readMemWord(address)) + ")";
+      address = address + 2;
+      break;
+    case 160:
+      inst = "LDI";
+      break;
+    case 161:
+      inst = "CPI";
+      break;
+    case 162:
+      inst = "INI";
+      break;
+    case 163:
+      inst = "OUTI";
+      break;
+    case 168:
+      inst = "LDD";
+      break;
+    case 169:
+      inst = "CPD";
+      break;
+    case 170:
+      inst = "IND";
+      break;
+    case 171:
+      inst = "OUTD";
+      break;
+    case 176:
+      inst = "LDIR";
+      break;
+    case 177:
+      inst = "CPIR";
+      break;
+    case 178:
+      inst = "INIR";
+      break;
+    case 179:
+      inst = "OTIR";
+      break;
+    case 184:
+      inst = "LDDR";
+      break;
+    case 185:
+      inst = "CPDR";
+      break;
+    case 186:
+      inst = "INDR";
+      break;
+    case 187:
+      inst = "OTDR";
+      break
+  }
+  return{opcode:toHex(opcode), inst:inst, address:currAddr, nextAddress:address}
+}, getIndex:function(index, address) {
+  var toHex = JSSMS.Utils.toHex;
+  var opcode = this.readMem(address);
+  var opcode_ = toHex(opcode);
+  var inst = "Unimplemented DD/FD Opcode";
+  var currAddr = address;
+  address++;
+  switch(opcode) {
+    case 9:
+      inst = "ADD " + index + ",BC";
+      break;
+    case 25:
+      inst = "ADD " + index + ",DE";
+      break;
+    case 33:
+      inst = "LD " + index + "," + toHex(this.readMemWord(address));
+      address = address + 2;
+      break;
+    case 34:
+      inst = "LD (" + toHex(this.readMemWord(address)) + ")," + index;
+      address = address + 2;
+      break;
+    case 35:
+      inst = "INC " + index;
+      break;
+    case 36:
+      inst = "INC " + index + "H *";
+      break;
+    case 37:
+      inst = "DEC " + index + "H *";
+      break;
+    case 38:
+      inst = "LD " + index + "H," + toHex(this.readMem(address)) + " *";
+      address++;
+      break;
+    case 41:
+      inst = "ADD " + index + "  " + index;
+      break;
+    case 42:
+      inst = "LD " + index + " (" + toHex(this.readMemWord(address)) + ")";
+      address = address + 2;
+      break;
+    case 43:
+      inst = "DEC " + index;
+      break;
+    case 44:
+      inst = "INC " + index + "L *";
+      break;
+    case 45:
+      inst = "DEC " + index + "L *";
+      break;
+    case 46:
+      inst = "LD " + index + "L," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 52:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "INC (" + index + sign + toHex(offset) + ")";
+      address++;
+      break;
+    case 53:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "DEC (" + index + sign + toHex(offset) + ")";
+      address++;
+      break;
+    case 54:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + ")," + toHex(this.readMem(address));
+      address++;
+      break;
+    case 57:
+      inst = "ADD " + index + " SP";
+      break;
+    case 68:
+      inst = "LD B," + index + "H *";
+      break;
+    case 69:
+      inst = "LD B," + index + "L *";
+      break;
+    case 70:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD B,(" + index + sign + toHex(offset) + ")";
+      address++;
+      break;
+    case 76:
+      inst = "LD C," + index + "H *";
+      break;
+    case 77:
+      inst = "LD C," + index + "L *";
+      break;
+    case 78:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD C,(" + index + sign + toHex(offset) + ")";
+      address++;
+      break;
+    case 84:
+      inst = "LD D," + index + "H *";
+      break;
+    case 85:
+      inst = "LD D," + index + "L *";
+      break;
+    case 86:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD D,(" + index + sign + toHex(offset) + ")";
+      address++;
+      break;
+    case 92:
+      inst = "LD E," + index + "H *";
+      break;
+    case 93:
+      inst = "LD E," + index + "L *";
+      break;
+    case 94:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD E,(" + index + sign + toHex(offset) + ")";
+      address++;
+      break;
+    case 96:
+      inst = "LD " + index + "H,B *";
+      break;
+    case 97:
+      inst = "LD " + index + "H,C *";
+      break;
+    case 98:
+      inst = "LD " + index + "H,D *";
+      break;
+    case 99:
+      inst = "LD " + index + "H,E *";
+      break;
+    case 100:
+      inst = "LD " + index + "H," + index + "H*";
+      break;
+    case 101:
+      inst = "LD " + index + "H," + index + "L *";
+      break;
+    case 102:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD H,(" + index + sign + toHex(offset) + ")";
+      address++;
+      break;
+    case 103:
+      inst = "LD " + index + "H,A *";
+      break;
+    case 104:
+      inst = "LD " + index + "L,B *";
+      break;
+    case 105:
+      inst = "LD " + index + "L,C *";
+      break;
+    case 106:
+      inst = "LD " + index + "L,D *";
+      break;
+    case 107:
+      inst = "LD " + index + "L,E *";
+      break;
+    case 108:
+      inst = "LD " + index + "L," + index + "H *";
+      break;
+    case 109:
+      inst = "LD " + index + "L," + index + "L *";
+      break;
+    case 110:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD L,(" + index + sign + toHex(offset) + ")";
+      address++;
+      break;
+    case 111:
+      inst = "LD " + index + "L,A *";
+      break;
+    case 112:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),B";
+      address++;
+      break;
+    case 113:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),C";
+      address++;
+      break;
+    case 114:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),D";
+      address++;
+      break;
+    case 115:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),E";
+      address++;
+      break;
+    case 116:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),H";
+      address++;
+      break;
+    case 117:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),L";
+      address++;
+      break;
+    case 119:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD (" + index + sign + toHex(offset) + "),A";
+      address++;
+      break;
+    case 124:
+      inst = "LD A," + index + "H *";
+      break;
+    case 125:
+      inst = "LD A," + index + "L *";
+      break;
+    case 126:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "LD A,(" + index + sign + toHex(offset) + "))";
+      address++;
+      break;
+    case 132:
+      inst = "ADD A," + index + "H *";
+      break;
+    case 133:
+      inst = "ADD A," + index + "L *";
+      break;
+    case 134:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "ADD A,(" + index + sign + toHex(offset) + "))";
+      address++;
+      break;
+    case 140:
+      inst = "ADC A," + index + "H *";
+      break;
+    case 141:
+      inst = "ADC A," + index + "L *";
+      break;
+    case 142:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "ADC A,(" + index + sign + toHex(offset) + "))";
+      address++;
+      break;
+    case 148:
+      inst = "SUB " + index + "H *";
+      break;
+    case 149:
+      inst = "SUB " + index + "L *";
+      break;
+    case 150:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "SUB A,(" + index + sign + toHex(offset) + "))";
+      address++;
+      break;
+    case 156:
+      inst = "SBC A," + index + "H *";
+      break;
+    case 157:
+      inst = "SBC A," + index + "L *";
+      break;
+    case 158:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "SBC A,(" + index + sign + toHex(offset) + "))";
+      address++;
+      break;
+    case 164:
+      inst = "AND " + index + "H *";
+      break;
+    case 165:
+      inst = "AND " + index + "L *";
+      break;
+    case 166:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "AND A,(" + index + sign + toHex(offset) + "))";
+      address++;
+      break;
+    case 172:
+      inst = "XOR A " + index + "H*";
+      break;
+    case 173:
+      inst = "XOR A " + index + "L*";
+      break;
+    case 174:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "XOR A,(" + index + sign + toHex(offset) + "))";
+      address++;
+      break;
+    case 180:
+      inst = "OR A " + index + "H*";
+      break;
+    case 181:
+      inst = "OR A " + index + "L*";
+      break;
+    case 182:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "OR A,(" + index + sign + toHex(offset) + "))";
+      address++;
+      break;
+    case 188:
+      inst = "CP " + index + "H *";
+      break;
+    case 189:
+      inst = "CP " + index + "L *";
+      break;
+    case 190:
+      var offset = this.signExtend(this.readMem(address));
+      var sign = offset > 0 ? "+" : "-";
+      inst = "CP (" + index + sign + toHex(offset) + "))";
+      address++;
+      break;
+    case 203:
+      var _inst = this.getIndexCB(index, address);
+      inst = _inst.inst;
+      opcode_ += " " + _inst.opcode;
+      address = _inst.nextAddress;
+      break;
+    case 225:
+      inst = "POP " + index;
+      break;
+    case 227:
+      inst = "EX SP,(" + index + ")";
+      break;
+    case 229:
+      inst = "PUSH " + index;
+      break;
+    case 233:
+      inst = "JP (" + index + ")";
+      address = null;
+      break;
+    case 249:
+      inst = "LD SP," + index;
+      break
+  }
+  return{opcode:opcode_, inst:inst, address:currAddr, nextAddress:address}
+}, getIndexCB:function(index, address) {
+  var toHex = JSSMS.Utils.toHex;
+  var opcode = this.readMem(address);
+  var inst = "Unimplemented DDCB or FDCB Opcode";
+  var currAddr = address;
+  address++;
+  switch(opcode) {
+    case 0:
+      inst = "LD B,RLC (" + index + ")";
+      break;
+    case 1:
+      inst = "LD C,RLC (" + index + ")";
+      break;
+    case 2:
+      inst = "LD D,RLC (" + index + ")";
+      break;
+    case 3:
+      inst = "LD E,RLC (" + index + ")";
+      break;
+    case 4:
+      inst = "LD H,RLC (" + index + ")";
+      break;
+    case 5:
+      inst = "LD L,RLC (" + index + ")";
+      break;
+    case 6:
+      inst = "RLC (" + index + ")";
+      break;
+    case 7:
+      inst = "LD A,RLC (" + index + ")";
+      break;
+    case 8:
+      inst = "LD B,RRC (" + index + ")";
+      break;
+    case 9:
+      inst = "LD C,RRC (" + index + ")";
+      break;
+    case 10:
+      inst = "LD D,RRC (" + index + ")";
+      break;
+    case 11:
+      inst = "LD E,RRC (" + index + ")";
+      break;
+    case 12:
+      inst = "LD H,RRC (" + index + ")";
+      break;
+    case 13:
+      inst = "LD L,RRC (" + index + ")";
+      break;
+    case 14:
+      inst = "RRC (" + index + ")";
+      break;
+    case 15:
+      inst = "LD A,RRC (" + index + ")";
+      break;
+    case 16:
+      inst = "LD B,RL (" + index + ")";
+      break;
+    case 17:
+      inst = "LD C,RL (" + index + ")";
+      break;
+    case 18:
+      inst = "LD D,RL (" + index + ")";
+      break;
+    case 19:
+      inst = "LD E,RL (" + index + ")";
+      break;
+    case 20:
+      inst = "LD H,RL (" + index + ")";
+      break;
+    case 21:
+      inst = "LD L,RL (" + index + ")";
+      break;
+    case 22:
+      inst = "RL (" + index + ")";
+      break;
+    case 23:
+      inst = "LD A,RL (" + index + ")";
+      break;
+    case 24:
+      inst = "LD B,RR (" + index + ")";
+      break;
+    case 25:
+      inst = "LD C,RR (" + index + ")";
+      break;
+    case 26:
+      inst = "LD D,RR (" + index + ")";
+      break;
+    case 27:
+      inst = "LD E,RR (" + index + ")";
+      break;
+    case 28:
+      inst = "LD H,RR (" + index + ")";
+      break;
+    case 29:
+      inst = "LD L,RR (" + index + ")";
+      break;
+    case 30:
+      inst = "RR (" + index + ")";
+      break;
+    case 31:
+      inst = "LD A,RR (" + index + ")";
+      break;
+    case 32:
+      inst = "LD B,SLA (" + index + ")";
+      break;
+    case 33:
+      inst = "LD C,SLA (" + index + ")";
+      break;
+    case 34:
+      inst = "LD D,SLA (" + index + ")";
+      break;
+    case 35:
+      inst = "LD E,SLA (" + index + ")";
+      break;
+    case 36:
+      inst = "LD H,SLA (" + index + ")";
+      break;
+    case 37:
+      inst = "LD L,SLA (" + index + ")";
+      break;
+    case 38:
+      inst = "SLA (" + index + ")";
+      break;
+    case 39:
+      inst = "LD A,SLA (" + index + ")";
+      break;
+    case 40:
+      inst = "LD B,SRA (" + index + ")";
+      break;
+    case 41:
+      inst = "LD C,SRA (" + index + ")";
+      break;
+    case 42:
+      inst = "LD D,SRA (" + index + ")";
+      break;
+    case 43:
+      inst = "LD E,SRA (" + index + ")";
+      break;
+    case 44:
+      inst = "LD H,SRA (" + index + ")";
+      break;
+    case 45:
+      inst = "LD L,SRA (" + index + ")";
+      break;
+    case 46:
+      inst = "SRA (" + index + ")";
+      break;
+    case 47:
+      inst = "LD A,SRA (" + index + ")";
+      break;
+    case 48:
+      inst = "LD B,SLL (" + index + ")";
+      break;
+    case 49:
+      inst = "LD C,SLL (" + index + ")";
+      break;
+    case 50:
+      inst = "LD D,SLL (" + index + ")";
+      break;
+    case 51:
+      inst = "LD E,SLL (" + index + ")";
+      break;
+    case 52:
+      inst = "LD H,SLL (" + index + ")";
+      break;
+    case 53:
+      inst = "LD L,SLL (" + index + ")";
+      break;
+    case 54:
+      inst = "SLL (" + index + ") *";
+      break;
+    case 55:
+      inst = "LD A,SLL (" + index + ")";
+      break;
+    case 56:
+      inst = "LD B,SRL (" + index + ")";
+      break;
+    case 57:
+      inst = "LD C,SRL (" + index + ")";
+      break;
+    case 58:
+      inst = "LD D,SRL (" + index + ")";
+      break;
+    case 59:
+      inst = "LD E,SRL (" + index + ")";
+      break;
+    case 60:
+      inst = "LD H,SRL (" + index + ")";
+      break;
+    case 61:
+      inst = "LD L,SRL (" + index + ")";
+      break;
+    case 62:
+      inst = "SRL (" + index + ")";
+      break;
+    case 63:
+      inst = "LD A,SRL (" + index + ")";
+      break;
+    case 64:
+    ;
+    case 65:
+    ;
+    case 66:
+    ;
+    case 67:
+    ;
+    case 68:
+    ;
+    case 69:
+    ;
+    case 70:
+    ;
+    case 71:
+      inst = "BIT 0,(" + index + ")";
+      break;
+    case 72:
+    ;
+    case 73:
+    ;
+    case 74:
+    ;
+    case 75:
+    ;
+    case 76:
+    ;
+    case 77:
+    ;
+    case 78:
+    ;
+    case 79:
+      inst = "BIT 1,(" + index + ")";
+      break;
+    case 80:
+    ;
+    case 81:
+    ;
+    case 82:
+    ;
+    case 83:
+    ;
+    case 84:
+    ;
+    case 85:
+    ;
+    case 86:
+    ;
+    case 87:
+      inst = "BIT 2,(" + index + ")";
+      break;
+    case 88:
+    ;
+    case 89:
+    ;
+    case 90:
+    ;
+    case 91:
+    ;
+    case 92:
+    ;
+    case 93:
+    ;
+    case 94:
+    ;
+    case 95:
+      inst = "BIT 3,(" + index + ")";
+      break;
+    case 96:
+    ;
+    case 97:
+    ;
+    case 98:
+    ;
+    case 99:
+    ;
+    case 100:
+    ;
+    case 101:
+    ;
+    case 102:
+    ;
+    case 103:
+      inst = "BIT 4,(" + index + ")";
+      break;
+    case 104:
+    ;
+    case 105:
+    ;
+    case 106:
+    ;
+    case 107:
+    ;
+    case 108:
+    ;
+    case 109:
+    ;
+    case 110:
+    ;
+    case 111:
+      inst = "BIT 5,(" + index + ")";
+      break;
+    case 112:
+    ;
+    case 113:
+    ;
+    case 114:
+    ;
+    case 115:
+    ;
+    case 116:
+    ;
+    case 117:
+    ;
+    case 118:
+    ;
+    case 119:
+      inst = "BIT 6,(" + index + ")";
+      break;
+    case 120:
+    ;
+    case 121:
+    ;
+    case 122:
+    ;
+    case 123:
+    ;
+    case 124:
+    ;
+    case 125:
+    ;
+    case 126:
+    ;
+    case 127:
+      inst = "BIT 7,(" + index + ")";
+      break;
+    case 128:
+    ;
+    case 129:
+    ;
+    case 130:
+    ;
+    case 131:
+    ;
+    case 132:
+    ;
+    case 133:
+    ;
+    case 134:
+    ;
+    case 135:
+      inst = "RES 0,(" + index + ")";
+      break;
+    case 136:
+    ;
+    case 137:
+    ;
+    case 138:
+    ;
+    case 139:
+    ;
+    case 140:
+    ;
+    case 141:
+    ;
+    case 142:
+    ;
+    case 143:
+      inst = "RES 1,(" + index + ")";
+      break;
+    case 144:
+    ;
+    case 145:
+    ;
+    case 146:
+    ;
+    case 147:
+    ;
+    case 148:
+    ;
+    case 149:
+    ;
+    case 150:
+    ;
+    case 151:
+      inst = "RES 2,(" + index + ")";
+      break;
+    case 152:
+    ;
+    case 153:
+    ;
+    case 154:
+    ;
+    case 155:
+    ;
+    case 156:
+    ;
+    case 157:
+    ;
+    case 158:
+    ;
+    case 159:
+      inst = "RES 3,(" + index + ")";
+      break;
+    case 160:
+    ;
+    case 161:
+    ;
+    case 162:
+    ;
+    case 163:
+    ;
+    case 164:
+    ;
+    case 165:
+    ;
+    case 166:
+    ;
+    case 167:
+      inst = "RES 4,(" + index + ")";
+      break;
+    case 168:
+    ;
+    case 169:
+    ;
+    case 170:
+    ;
+    case 171:
+    ;
+    case 172:
+    ;
+    case 173:
+    ;
+    case 174:
+    ;
+    case 175:
+      inst = "RES 5,(" + index + ")";
+      break;
+    case 176:
+    ;
+    case 177:
+    ;
+    case 178:
+    ;
+    case 179:
+    ;
+    case 180:
+    ;
+    case 181:
+    ;
+    case 182:
+    ;
+    case 183:
+      inst = "RES 6,(" + index + ")";
+      break;
+    case 184:
+    ;
+    case 185:
+    ;
+    case 186:
+    ;
+    case 187:
+    ;
+    case 188:
+    ;
+    case 189:
+    ;
+    case 190:
+    ;
+    case 191:
+      inst = "RES 7,(" + index + ")";
+      break;
+    case 192:
+    ;
+    case 193:
+    ;
+    case 194:
+    ;
+    case 195:
+    ;
+    case 196:
+    ;
+    case 197:
+    ;
+    case 198:
+    ;
+    case 199:
+      inst = "SET 0,(" + index + ")";
+      break;
+    case 200:
+    ;
+    case 201:
+    ;
+    case 202:
+    ;
+    case 203:
+    ;
+    case 204:
+    ;
+    case 205:
+    ;
+    case 206:
+    ;
+    case 207:
+      inst = "SET 1,(" + index + ")";
+      break;
+    case 208:
+    ;
+    case 209:
+    ;
+    case 210:
+    ;
+    case 211:
+    ;
+    case 212:
+    ;
+    case 213:
+    ;
+    case 214:
+    ;
+    case 215:
+      inst = "SET 2,(" + index + ")";
+      break;
+    case 216:
+    ;
+    case 217:
+    ;
+    case 218:
+    ;
+    case 219:
+    ;
+    case 220:
+    ;
+    case 221:
+    ;
+    case 222:
+    ;
+    case 223:
+      inst = "SET 3,(" + index + ")";
+      break;
+    case 224:
+    ;
+    case 225:
+    ;
+    case 226:
+    ;
+    case 227:
+    ;
+    case 228:
+    ;
+    case 229:
+    ;
+    case 230:
+    ;
+    case 231:
+      inst = "SET 4,(" + index + ")";
+      break;
+    case 232:
+    ;
+    case 233:
+    ;
+    case 234:
+    ;
+    case 235:
+    ;
+    case 236:
+    ;
+    case 237:
+    ;
+    case 238:
+    ;
+    case 239:
+      inst = "SET 5,(" + index + ")";
+      break;
+    case 240:
+    ;
+    case 241:
+    ;
+    case 242:
+    ;
+    case 243:
+    ;
+    case 244:
+    ;
+    case 245:
+    ;
+    case 246:
+    ;
+    case 247:
+      inst = "SET 6,(" + index + ")";
+      break;
+    case 248:
+    ;
+    case 249:
+    ;
+    case 250:
+    ;
+    case 251:
+    ;
+    case 252:
+    ;
+    case 253:
+    ;
+    case 254:
+    ;
+    case 255:
+      inst = "SET 7,(" + index + ")";
+      break
+  }
+  return{opcode:toHex(opcode), inst:inst, address:currAddr, nextAddress:address}
+}, getIndexOpIX:function(opcode) {
+  return this.getIndex("IX", opcode)
+}, getIndexOpIY:function(opcode) {
+  return this.getIndex("IY", opcode)
+}, signExtend:function(d) {
+  if(d >= 128) {
+    d = d - 256
+  }
+  return d
+}};
+function Instruction(address) {
+  return{address:address, opcode:"", inst:"", hexAddress:JSSMS.Utils.toHex(address), nextAddress:0, target:0, isJumpTarget:false}
+}
+;var KEY_UP = 1;
 var KEY_DOWN = 2;
 var KEY_LEFT = 4;
 var KEY_RIGHT = 8;
@@ -4823,7 +8312,6 @@ if(typeof $ != "undefined") {
           lastTime = currTime + timeToCall
         }
       }
-      this.zoomed = false;
       this.hiddenPrefix = JSSMS.Utils.getPrefix(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
       this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + ' class="screen"></canvas>');
       this.canvasContext = this.screen[0].getContext("2d");
@@ -4837,18 +8325,18 @@ if(typeof $ != "undefined") {
       this.romSelect.change(function() {
         self.loadROM()
       });
-      this.buttons = {start:$('<input type="button" value="Stop" class="btn" disabled="disabled">'), restart:$('<input type="button" value="Restart" class="btn" disabled="disabled">'), sound:$('<input type="button" value="Enable sound" class="btn" disabled="disabled">'), zoom:$('<input type="button" value="Zoom in" class="btn">')};
-      this.buttons.start.click(function() {
+      this.buttons = Object.create(null);
+      this.buttons.start = $('<input type="button" value="Start" class="btn btn-primary" disabled="disabled">').click(function() {
         if(!self.main.isRunning) {
           self.main.start();
-          self.buttons.start.attr("value", "Stop")
+          self.buttons.start.attr("value", "Pause")
         }else {
           self.main.stop();
           self.updateStatus("Paused");
           self.buttons.start.attr("value", "Start")
         }
       });
-      this.buttons.restart.click(function() {
+      this.buttons.reset = $('<input type="button" value="Reset" class="btn" disabled="disabled">').click(function() {
         if(!self.main.reloadRom()) {
           $(this).attr("disabled", "disabled");
           return
@@ -4857,23 +8345,27 @@ if(typeof $ != "undefined") {
         self.main.vdp.forceFullRedraw();
         self.main.start()
       });
-      this.buttons.sound.click(function() {
-      });
-      this.buttons.zoom.click(function() {
-        if(self.zoomed) {
-          self.screen.animate({width:SMS_WIDTH + "px", height:SMS_HEIGHT + "px"}, function() {
-            $(this).removeAttr("style")
-          });
-          self.buttons.zoom.attr("value", "Zoom in")
-        }else {
-          self.screen.animate({width:SMS_WIDTH * 2 + "px", height:SMS_HEIGHT * 2 + "px"});
-          self.buttons.zoom.attr("value", "Zoom out")
-        }
-        self.zoomed = !self.zoomed
-      });
+      if(DEBUG) {
+        this.dissambler = $('<div id="dissambler"></div>');
+        $(parent).after(this.dissambler);
+        this.buttons.nextStep = $('<input type="button" value="Next step" class="btn" disabled="disabled">').click(function() {
+          self.main.nextStep()
+        })
+      }
+      if(this.main.soundEnabled) {
+        this.buttons.sound = $('<input type="button" value="Enable sound" class="btn" disabled="disabled">').click(function() {
+          if(self.main.soundEnabled) {
+            self.main.soundEnabled = false;
+            self.buttons.sound.attr("value", "Enable sound")
+          }else {
+            self.main.soundEnabled = true;
+            self.buttons.sound.attr("value", "Disable sound")
+          }
+        })
+      }
       if(fullscreenSupport) {
-        this.buttons.fullsreen = $('<input type="button" value="Go fullscreen" class="btn">').click(function() {
-          var screen = self.screen[0];
+        this.buttons.fullscreen = $('<input type="button" value="Go fullscreen" class="btn">').click(function() {
+          var screen = (self.screen[0]);
           if(screen.requestFullscreen) {
             screen.requestFullscreen()
           }else {
@@ -4884,11 +8376,23 @@ if(typeof $ != "undefined") {
             }
           }
         })
+      }else {
+        this.zoomed = false;
+        this.buttons.zoom = $('<input type="button" value="Zoom in" class="btn hidden-phone">').click(function() {
+          if(self.zoomed) {
+            self.screen.animate({width:SMS_WIDTH + "px", height:SMS_HEIGHT + "px"}, function() {
+              $(this).removeAttr("style")
+            });
+            self.buttons.zoom.attr("value", "Zoom in")
+          }else {
+            self.screen.animate({width:SMS_WIDTH * 2 + "px", height:SMS_HEIGHT * 2 + "px"});
+            self.buttons.zoom.attr("value", "Zoom out")
+          }
+          self.zoomed = !self.zoomed
+        })
       }
       for(i in this.buttons) {
-        if(this.buttons.hasOwnProperty(i)) {
-          this.buttons[i].appendTo(controls)
-        }
+        this.buttons[i].appendTo(controls)
       }
       this.log = $('<div id="status"></div>');
       this.screen.appendTo(root);
@@ -4908,7 +8412,10 @@ if(typeof $ != "undefined") {
     UI.prototype = {reset:function() {
       this.screen[0].width = SMS_WIDTH;
       this.screen[0].height = SMS_HEIGHT;
-      this.log.text("")
+      this.log.empty();
+      if(DEBUG) {
+        this.dissambler.empty()
+      }
     }, setRoms:function(roms) {
       var groupName, optgroup, length, i, count = 0;
       this.romSelect.children().remove();
@@ -4945,19 +8452,25 @@ if(typeof $ != "undefined") {
           return
         }
         data = xhr.responseText;
-        self.main.readRomDirectly(data, self.romSelect.val());
+        self.main.stop();
         self.main.reset();
+        self.main.readRomDirectly(data, self.romSelect.val());
         self.main.vdp.forceFullRedraw();
-        self.main.start();
-        self.enable();
-        self.buttons.start.removeAttr("disabled")
+        self.enable()
       }})
     }, enable:function() {
-      this.buttons.restart.removeAttr("disabled");
+      this.buttons.start.removeAttr("disabled");
+      this.buttons.start.attr("value", "Start");
+      this.buttons.reset.removeAttr("disabled");
+      if(DEBUG) {
+        this.buttons.nextStep.removeAttr("disabled")
+      }
       if(this.main.soundEnabled) {
-        this.buttons.sound.attr("value", "Disable sound")
-      }else {
-        this.buttons.sound.attr("value", "Enable sound")
+        if(this.buttons.sound) {
+          this.buttons.sound.attr("value", "Disable sound")
+        }else {
+          this.buttons.sound.attr("value", "Enable sound")
+        }
       }
     }, updateStatus:function(s) {
       this.log.text(s)
@@ -4967,6 +8480,20 @@ if(typeof $ != "undefined") {
         return
       }
       this.canvasContext.putImageData(this.canvasImageData, 0, 0)
+    }, updateDisassembly:function(currentAddress) {
+      var startAddress = currentAddress < 8 ? 0 : currentAddress - 8;
+      var instructions = this.main.cpu.instructions;
+      var length = instructions.length;
+      var html = "";
+      var i = startAddress;
+      var num = 0;
+      for(;num < 16 && i <= length;i++) {
+        if(instructions[i]) {
+          html += "<div" + (instructions[i].address == currentAddress ? ' class="current"' : "") + ">" + instructions[i].hexAddress + (instructions[i].isJumpTarget ? ":" : " ") + "<code>" + instructions[i].inst + "</code></div>";
+          num++
+        }
+      }
+      this.dissambler.html(html)
     }};
     return UI
   }

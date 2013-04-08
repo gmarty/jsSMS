@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <title>jsSMS - JavaScript Sega Master System &amp; GameGear emulator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
-<link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css">
+<link rel="stylesheet" href="http://twitter.github.io/bootstrap/assets/css/bootstrap.css">
+<link rel="stylesheet" href="http://twitter.github.io/bootstrap/assets/css/bootstrap-responsive.css">
 <style>
 html, body {
   background: #eee;
@@ -47,6 +47,28 @@ footer {
   .container {
     margin-top: 0;
   }
+}
+/* Debugger */
+div.row-fluid .span8 {
+  position: relative;
+}
+#dissambler {
+  font-family: monospace;
+  font-size: small;
+  color: #aaa;
+  right: 0;
+  position: absolute;
+  top: 0;
+}
+.current {
+  color: #333;
+}
+.current code {
+  background: pink;
+  border-color: #DD1144;
+}
+code {
+  padding: 0 2px;
 }
 </style>
 </head>
@@ -132,7 +154,8 @@ var sms = new JSSMS({
     ],
     'Master System': [
       ['Alex Kidd in Miracle World', 'roms/sms/Alex Kidd in Miracle World (J) [!].sms'],
-      ['Alex Kidd in High Tech World', 'roms/sms/Alex Kidd in High Tech World (UE) [!].sms']
+      ['Alex Kidd in High Tech World', 'roms/sms/Alex Kidd in High Tech World (UE) [!].sms'],
+      ['Sonic the Hedgehog', 'roms/sms/Sonic the Hedgehog.sms']
     ],
     'GameGear': [
       ['Wakiyanland', 'roms/gg/Wakiyarando (Wagyan Land) (J).gg'],
