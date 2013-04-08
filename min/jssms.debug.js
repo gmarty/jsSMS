@@ -32,7 +32,7 @@ function $JSSMS$$($opts$$) {
   this.$cpu$ = new $JSSMS$Z80$$(this);
   this.$a$.updateStatus("Ready to load a ROM.")
 }
-$JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, $no_of_scanlines$:0, $frameSkip$:0, $fps$:0, $frameskip_counter$:0, $pause_button$:$JSCompiler_alias_FALSE$$, $is_sms$:$JSCompiler_alias_TRUE$$, $is_gg$:$JSCompiler_alias_FALSE$$, $soundEnabled$:$JSCompiler_alias_TRUE$$, $audioBuffer$:[], $audioBufferOffset$:0, $samplesPerFrame$:0, $samplesPerLine$:[], $fpsFrameCount$:0, $z80TimeCounter$:0, $drawTimeCounter$:0, $frameCount$:0, $romData$:"", $romFileName$:"", $lineno$:0, 
+$JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, $no_of_scanlines$:0, $frameSkip$:0, $fps$:0, $frameskip_counter$:0, $pause_button$:$JSCompiler_alias_FALSE$$, $is_sms$:$JSCompiler_alias_TRUE$$, $is_gg$:$JSCompiler_alias_FALSE$$, $soundEnabled$:$JSCompiler_alias_FALSE$$, $audioBuffer$:[], $audioBufferOffset$:0, $samplesPerFrame$:0, $samplesPerLine$:[], $fpsFrameCount$:0, $z80TimeCounter$:0, $drawTimeCounter$:0, $frameCount$:0, $romData$:"", $romFileName$:"", $lineno$:0, 
 reset:function $$JSSMS$$$$reset$() {
   var $JSCompiler_StaticMethods_init$self$$inline_266_mode$$inline_13_v$$inline_16$$ = this.$vdp$.$C$, $clockSpeedHz$$inline_14_i$$inline_15_i$$inline_268$$ = 0;
   0 == $JSCompiler_StaticMethods_init$self$$inline_266_mode$$inline_13_v$$inline_16$$ || this.$is_gg$ ? (this.$fps$ = 60, this.$no_of_scanlines$ = 262, $clockSpeedHz$$inline_14_i$$inline_15_i$$inline_268$$ = 3579545) : 1 == $JSCompiler_StaticMethods_init$self$$inline_266_mode$$inline_13_v$$inline_16$$ && (this.$fps$ = 50, this.$no_of_scanlines$ = 313, $clockSpeedHz$$inline_14_i$$inline_15_i$$inline_268$$ = 3546893);
@@ -8216,7 +8216,7 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
     this.$buttons$.start.attr("value", "Start");
     this.$buttons$.reset.removeAttr("disabled");
     this.$buttons$.$nextStep$.removeAttr("disabled");
-    this.$buttons$.$sound$ ? this.$buttons$.$sound$.attr("value", "Disable sound") : this.$buttons$.$sound$.attr("value", "Enable sound")
+    this.$main$.$soundEnabled$ && (this.$buttons$.$sound$ ? this.$buttons$.$sound$.attr("value", "Disable sound") : this.$buttons$.$sound$.attr("value", "Enable sound"))
   }, updateStatus:function $$UI$$$$updateStatus$($s$$3$$) {
     this.log.text($s$$3$$)
   }, $writeFrame$:function $$UI$$$$$writeFrame$$() {

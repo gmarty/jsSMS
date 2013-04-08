@@ -146,7 +146,7 @@ JSSMS.prototype = {
    * Sound enabled.
    * @type {boolean}
    */
-  soundEnabled: true,
+  soundEnabled: false,
 
 
   /**

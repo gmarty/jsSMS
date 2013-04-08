@@ -326,10 +326,12 @@ if (typeof $ != 'undefined') {
         if (DEBUG) {
           this.buttons.nextStep.removeAttr('disabled');
         }
-        if (this.buttons.sound) {
-          this.buttons.sound.attr('value', 'Disable sound');
-        } else {
-          this.buttons.sound.attr('value', 'Enable sound');
+        if (this.main.soundEnabled) {
+          if (this.buttons.sound) {
+            this.buttons.sound.attr('value', 'Disable sound');
+          } else {
+            this.buttons.sound.attr('value', 'Enable sound');
+          }
         }
       },
 

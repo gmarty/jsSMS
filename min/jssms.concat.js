@@ -43,7 +43,7 @@ function JSSMS(opts) {
   this.cpu = new JSSMS.Z80(this);
   this.ui.updateStatus("Ready to load a ROM.")
 }
-JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0, throttle:true, fps:0, frameskip_counter:0, pause_button:false, is_sms:true, is_gg:false, soundEnabled:true, audioBuffer:[], audioBufferOffset:0, samplesPerFrame:0, samplesPerLine:[], emuWidth:0, emuHeight:0, fpsFrameCount:0, z80Time:0, drawTime:0, z80TimeCounter:0, drawTimeCounter:0, frameCount:0, romData:"", romFileName:"", lineno:0, reset:function() {
+JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0, throttle:true, fps:0, frameskip_counter:0, pause_button:false, is_sms:true, is_gg:false, soundEnabled:false, audioBuffer:[], audioBufferOffset:0, samplesPerFrame:0, samplesPerLine:[], emuWidth:0, emuHeight:0, fpsFrameCount:0, z80Time:0, drawTime:0, z80TimeCounter:0, drawTimeCounter:0, frameCount:0, romData:"", romFileName:"", lineno:0, reset:function() {
   this.setVideoTiming(this.vdp.videoMode);
   this.frameCount = 0;
   this.frameskip_counter = this.frameSkip;
@@ -8465,10 +8465,12 @@ if(typeof $ != "undefined") {
       if(DEBUG) {
         this.buttons.nextStep.removeAttr("disabled")
       }
-      if(this.buttons.sound) {
-        this.buttons.sound.attr("value", "Disable sound")
-      }else {
-        this.buttons.sound.attr("value", "Enable sound")
+      if(this.main.soundEnabled) {
+        if(this.buttons.sound) {
+          this.buttons.sound.attr("value", "Disable sound")
+        }else {
+          this.buttons.sound.attr("value", "Enable sound")
+        }
       }
     }, updateStatus:function(s) {
       this.log.text(s)
