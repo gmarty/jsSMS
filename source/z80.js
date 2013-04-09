@@ -1516,6 +1516,9 @@ JSSMS.Z80.prototype = {
 
       // Unimplemented DD/FD Opcode
       default:
+        if (DEBUG) {
+          console.log('Unimplemented DD/FD Opcode: ' + JSSMS.Utils.toHex(opcode));
+        }
         this.pc--;
         break;
     } // end of switch
@@ -1639,6 +1642,9 @@ JSSMS.Z80.prototype = {
 
       // Unimplemented DD/FD Opcode
       default:
+        if (DEBUG) {
+          console.log('Unimplemented DD/FD Opcode: ' + JSSMS.Utils.toHex(opcode));
+        }
         this.pc--;
         break;
     } // end of switch
@@ -1915,9 +1921,10 @@ JSSMS.Z80.prototype = {
       case 0xFE:
       case 0xFF: this.writeMem(location, this.readMem(location) | BIT_7); break;    // SET 7,(IX)
 
+      // Unimplemented DDCB/FDCB Opcode
       default:
         if (DEBUG) {
-          console.log('Unimplemented DDCB or FDCB Opcode: ' + JSSMS.Utils.toHex(opcode));
+          console.log('Unimplemented DDCB/FDCB Opcode: ' + JSSMS.Utils.toHex(opcode));
         }
         break;
 
@@ -2327,7 +2334,7 @@ JSSMS.Z80.prototype = {
         this.incHL();
         this.decBC();
 
-        temp |= this.getBC() == 0 ? 0 : F_PARITY;
+        temp |= (this.getBC() == 0 ? 0 : F_PARITY);
 
         // Repeat instruction until a = (hl) or bc == 0
         if (((temp & F_PARITY) != 0) && ((this.f & F_ZERO) == 0)) {
@@ -2465,7 +2472,7 @@ JSSMS.Z80.prototype = {
         else this.f &= ~ F_NEGATIVE;
         break;
 
-      // -- Unimplemented ED Opcode --------------------
+      // Unimplemented ED Opcode
       default:
         if (DEBUG) {
           console.log('Unimplemented ED Opcode: ' + JSSMS.Utils.toHex(opcode));
@@ -2473,7 +2480,7 @@ JSSMS.Z80.prototype = {
         this.pc++;
         break;
     } // end of switch
-  }, // end of ed ops
+  },
 
 
   /**
@@ -2879,7 +2886,7 @@ JSSMS.Z80.prototype = {
   add16: function(reg, value) {
     var result = reg + value;
     this.f = (this.f & 0xc4) | (((reg ^ result ^ value) >> 8) & 0x10) | ((result >> 16) & 1);
-    return (result & 0xffff);
+    return result & 0xffff;
   },
 
 
@@ -2890,7 +2897,7 @@ JSSMS.Z80.prototype = {
    * @param {number} value
    */
   adc16: function(value) {
-    var hl = (this.h << 8) | this.l;
+    var hl = this.getHL();
 
     var result = hl + value + (this.f & F_CARRY);
     this.f = (((hl ^ result ^ value) >> 8) & 0x10) | ((result >> 16) & 1) | ((result >> 8) & 0x80) | (((result & 0xffff) != 0) ? 0 : 0x40) | (((value ^ hl ^ 0x8000) & (value ^ result) & 0x8000) >> 13);
@@ -2906,7 +2913,7 @@ JSSMS.Z80.prototype = {
    * @param {number} value
    */
   sbc16: function(value) {
-    var hl = (this.h << 8) | this.l;
+    var hl = this.getHL();
 
     var result = hl - value - (this.f & F_CARRY);
     this.f = (((hl ^ result ^ value) >> 8) & 0x10) | 0x02 | ((result >> 16) & 1) | ((result >> 8) & 0x80) | (((result & 0xffff) != 0) ? 0 : 0x40) | (((value ^ hl) & (hl ^ result) & 0x8000) >> 13);
