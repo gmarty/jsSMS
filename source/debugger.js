@@ -128,10 +128,10 @@ JSSMS.Debugger.prototype = {
     for (var i = 0, length = tree.length; i < length; i++) {
       if (tree[i]) {
         dotFile += ' ' + i + ' [label="' + tree[i].label + '"];\n';
-        if (tree[i].nextAddress != null)
-          dotFile += ' ' + i + ' -> ' + tree[i].nextAddress + ';\n';
         if (tree[i].target != null)
           dotFile += ' ' + i + ' -> ' + tree[i].target + ';\n';
+        if (tree[i].nextAddress != null)
+          dotFile += ' ' + i + ' -> ' + tree[i].nextAddress + ';\n';
       }
     }
     dotFile += '}';
