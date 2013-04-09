@@ -10,17 +10,17 @@ module.exports = function(grunt) {
       return process.env.CLOSURE_PATH;
     }(),
     js: [
-      'source/setup.js',
-      'source/sms.js',
-      'source/utils.js',
-      'source/z80.js',
-      'source/debugger.js',
-      'source/keyboard.js',
-      'source/psg.js',
-      'source/vdp.js',
-      'source/ui.js',
-      'source/ports.js',
-      'source/build/exports.js'
+      'src/setup.js',
+      'src/sms.js',
+      'src/utils.js',
+      'src/z80.js',
+      'src/debugger.js',
+      'src/keyboard.js',
+      'src/psg.js',
+      'src/vdp.js',
+      'src/ui.js',
+      'src/ports.js',
+      'src/build/exports.js'
     ],
     externs: [
       '<%= closurePath %>/contrib/externs/webkit_console.js',
@@ -68,19 +68,19 @@ module.exports = function(grunt) {
       },
 
       // Generates a unminified concatenated version.
-      // @todo Refactor to remove 'source/build/exports.js' from object `js` prop.
+      // @todo Refactor to remove 'src/build/exports.js' from object `js` prop.
       concat: {
         js: [
-          'source/setup.js',
-          'source/sms.js',
-          'source/utils.js',
-          'source/z80.js',
-          'source/debugger.js',
-          'source/keyboard.js',
-          'source/psg.js',
-          'source/vdp.js',
-          'source/ui.js',
-          'source/ports.js'
+          'src/setup.js',
+          'src/sms.js',
+          'src/utils.js',
+          'src/z80.js',
+          'src/debugger.js',
+          'src/keyboard.js',
+          'src/psg.js',
+          'src/vdp.js',
+          'src/ui.js',
+          'src/ports.js'
         ],
         jsOutputFile: 'min/jssms.concat.js',
         options: {
@@ -96,7 +96,7 @@ module.exports = function(grunt) {
 
     concat: {
       options: {
-        banner: grunt.file.read('source/license.js')
+        banner: grunt.file.read('src/license.js')
       },
       min: {
         src: ['min/jssms.min.js'],
