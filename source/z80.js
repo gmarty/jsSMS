@@ -519,7 +519,7 @@ JSSMS.Z80.prototype = {
         case 0x15: this.d = this.dec8(this.d); break;                                      // DEC D
         case 0x16: this.d = (this.readMem(this.pc++)); break;                              // LD D,n
         case 0x17: this.rla_a(); break;                                          // RLA
-        case 0x18: this.pc += this.d_() + 1; break;                                      // JR (PC+e)
+        case 0x18: this.pc += this.signExtend(this.d_() + 1); break;                                      // JR (PC+e)
         case 0x19: this.setHL(this.add16(this.getHL(), this.getDE())); break;                   // ADD HL,DE
         case 0x1A: this.a = this.readMem(this.getDE()); break;                             // LD A,(DE)
         case 0x1B: this.decDE(); break;                                          // DEC DE
@@ -872,15 +872,24 @@ JSSMS.Z80.prototype = {
    */
   jr: function(condition) {
     if (condition) {
-      var d = this.d_() + 1;
-      // The previous syntax had Firefox to mark these lines as unknown arithmetic type.
-      if (d >= 128) {
-        d = d - 256;
-      }
-      this.pc += d;
+      this.pc += this.signExtend(this.d_() + 1);
       this.tstates -= 5;
     }
     else this.pc++;
+  },
+
+
+  /**
+   * Sign extend.
+   *
+   * @param {number} d
+   * @return {number}
+   */
+  signExtend: function(d) {
+    if (d >= 128) {
+      d = d - 256;
+    }
+    return d;
   },
 
 
