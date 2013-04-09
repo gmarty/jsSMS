@@ -622,7 +622,7 @@ JSSMS.Z80.prototype = {reset:function() {
         this.rla_a();
         break;
       case 24:
-        this.pc += this.d_() + 1;
+        this.pc += this.signExtend(this.d_() + 1);
         break;
       case 25:
         this.setHL(this.add16(this.getHL(), this.getDE()));
@@ -1405,15 +1405,16 @@ JSSMS.Z80.prototype = {reset:function() {
   }
 }, jr:function(condition) {
   if(condition) {
-    var d = this.d_() + 1;
-    if(d >= 128) {
-      d = d - 256
-    }
-    this.pc += d;
+    this.pc += this.signExtend(this.d_() + 1);
     this.tstates -= 5
   }else {
     this.pc++
   }
+}, signExtend:function(d) {
+  if(d >= 128) {
+    d = d - 256
+  }
+  return d
 }, call:function(condition) {
   if(condition) {
     this.push1(this.pc + 2);
@@ -4661,7 +4662,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "RRCA";
       break;
     case 16:
-      target = address + this.signExtend(this.readMem(address)) + 1;
+      target = address + this.signExtend(this.readMem(address) + 1);
       inst = "DJNZ (" + toHex(target) + ")";
       address++;
       break;
@@ -4689,7 +4690,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "RLA";
       break;
     case 24:
-      target = address + this.signExtend(this.readMem(address)) + 1;
+      target = address + this.signExtend(this.readMem(address) + 1);
       inst = "JR (" + toHex(target) + ")";
       address = null;
       break;
@@ -4716,7 +4717,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "RRA";
       break;
     case 32:
-      target = address + this.signExtend(this.readMem(address)) + 1;
+      target = address + this.signExtend(this.readMem(address) + 1);
       inst = "JR NZ,(" + toHex(target) + ")";
       address++;
       break;
@@ -4745,7 +4746,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "DAA";
       break;
     case 40:
-      target = address + this.signExtend(this.readMem(address)) + 1;
+      target = address + this.signExtend(this.readMem(address) + 1);
       inst = "JR Z,(" + toHex(target) + ")";
       address++;
       break;
@@ -4773,7 +4774,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "CPL";
       break;
     case 48:
-      target = address + this.signExtend(this.readMem(address)) + 1;
+      target = address + this.signExtend(this.readMem(address) + 1);
       inst = "JR NC,(" + toHex(target) + ")";
       address++;
       break;
@@ -4802,7 +4803,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "SCF";
       break;
     case 56:
-      target = address + this.signExtend(this.readMem(address)) + 1;
+      target = address + this.signExtend(this.readMem(address) + 1);
       inst = "JR C,(" + toHex(target) + ")";
       address++;
       break;
