@@ -2575,6 +2575,9 @@ JSSMS.Z80.prototype = {reset:function() {
       this.sp = this.getIX();
       break;
     default:
+      if(DEBUG) {
+        console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex(opcode))
+      }
       this.pc--;
       break
   }
@@ -2879,6 +2882,9 @@ JSSMS.Z80.prototype = {reset:function() {
       this.sp = this.getIY();
       break;
     default:
+      if(DEBUG) {
+        console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex(opcode))
+      }
       this.pc--;
       break
   }
@@ -3545,7 +3551,7 @@ JSSMS.Z80.prototype = {reset:function() {
       break;
     default:
       if(DEBUG) {
-        console.log("Unimplemented DDCB or FDCB Opcode: " + JSSMS.Utils.toHex(opcode))
+        console.log("Unimplemented DDCB/FDCB Opcode: " + JSSMS.Utils.toHex(opcode))
       }
       break
   }
@@ -4235,13 +4241,13 @@ JSSMS.Z80.prototype = {reset:function() {
   this.f = this.f & 196 | (reg ^ result ^ value) >> 8 & 16 | result >> 16 & 1;
   return result & 65535
 }, adc16:function(value) {
-  var hl = this.h << 8 | this.l;
+  var hl = this.getHL();
   var result = hl + value + (this.f & F_CARRY);
   this.f = (hl ^ result ^ value) >> 8 & 16 | result >> 16 & 1 | result >> 8 & 128 | ((result & 65535) != 0 ? 0 : 64) | ((value ^ hl ^ 32768) & (value ^ result) & 32768) >> 13;
   this.h = result >> 8 & 255;
   this.l = result & 255
 }, sbc16:function(value) {
-  var hl = this.h << 8 | this.l;
+  var hl = this.getHL();
   var result = hl - value - (this.f & F_CARRY);
   this.f = (hl ^ result ^ value) >> 8 & 16 | 2 | result >> 16 & 1 | result >> 8 & 128 | ((result & 65535) != 0 ? 0 : 64) | ((value ^ hl) & (hl ^ result) & 32768) >> 13;
   this.h = result >> 8 & 255;
@@ -4589,11 +4595,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   for(var i = 0, length = tree.length;i < length;i++) {
     if(tree[i]) {
       dotFile += " " + i + ' [label="' + tree[i].label + '"];\n';
-      if(tree[i].nextAddress != null) {
-        dotFile += " " + i + " -> " + tree[i].nextAddress + ";\n"
-      }
       if(tree[i].target != null) {
         dotFile += " " + i + " -> " + tree[i].target + ";\n"
+      }
+      if(tree[i].nextAddress != null) {
+        dotFile += " " + i + " -> " + tree[i].nextAddress + ";\n"
       }
     }
   }
