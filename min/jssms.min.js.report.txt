@@ -1,9 +1,89 @@
-source\sms.js:72: WARNING - cannot instantiate non-constructor
+src\debugger.js:246: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\debugger.js:782: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\debugger.js:799: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\debugger.js:806: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\debugger.js:837: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\debugger.js:868: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\debugger.js:904: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\debugger.js:935: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\debugger.js:943: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\debugger.js:972: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\debugger.js:1003: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\debugger.js:1038: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\debugger.js:1891: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\debugger.js:2422: WARNING - assignment
+found   : null
+required: number
+        address = null;
+        ^
+
+src\sms.js:64: WARNING - cannot instantiate non-constructor
   this.ui = new opts['ui'](this);
             ^
 
-source\z80.js:482: WARNING - Missing return statement. Function expected to return string.
-  getMnu: function() {
-          ^
-
-0 error(s), 2 warning(s), 98.3% typed
+0 error(s), 15 warning(s), 97.0% typed
