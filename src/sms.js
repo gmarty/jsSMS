@@ -266,7 +266,7 @@ JSSMS.prototype = {
     this.vdp.reset();
     this.ports.reset();
     this.cpu.reset();
-    if (DEBUG) {
+    if (DEBUGGER) {
       this.cpu.resetDebug();
     }
     this.cpu.resetMemory();

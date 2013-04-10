@@ -403,7 +403,7 @@ JSSMS.Z80 = function(sms) {
    */
   this.readMemWord = JSSMS.Utils.readMemWord.bind(this, this.memReadMap);
 
-  if (DEBUG) {
+  if (DEBUGGER) {
     // Augment JSSMS.Z80 with methods from JSSMS.Disassembler.
     for (var method in JSSMS.Debugger.prototype) {
       this[method] = JSSMS.Debugger.prototype[method];
@@ -478,7 +478,7 @@ JSSMS.Z80.prototype = {
           this.interrupt();                  // Check for interrupt
       }
 
-      if (DEBUG) {
+      if (DEBUGGER) {
         this.main.ui.updateDisassembly(this.pc);
       }
 
@@ -3184,7 +3184,7 @@ JSSMS.Z80.prototype = {
       this.number_of_pages = this.rom.length / 16;
       this.setDefaultMemoryMapping();
 
-      if (DEBUG) {
+      if (DEBUGGER) {
         this.main.ui.updateStatus('Parsing instructions...');
         this.parseInstructions();
         this.main.ui.updateStatus('Instructions parsed');

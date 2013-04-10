@@ -29,6 +29,13 @@ var DEBUG = true;
 
 
 /**
+ * Whether to activate debugger.
+ * @define {boolean}
+ */
+var DEBUGGER = false;
+
+
+/**
  * @type {boolean}
  */
 var ACCURATE = false;

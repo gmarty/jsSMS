@@ -42,7 +42,8 @@ module.exports = function(grunt) {
           warning_level: 'VERBOSE',
           output_wrapper: '(function(){%output%})();',
           define: [
-            '"DEBUG=false"'
+            '"DEBUG=false"',
+            '"DEBUGGER=false"'
           ],
           debug: false
         }
@@ -60,10 +61,11 @@ module.exports = function(grunt) {
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
           define: [
-            '"DEBUG=true"'
+            '"DEBUG=true"',
+            '"DEBUGGER=true"'
           ],
           debug: true,
-          formatting: 'pretty_print'
+          formatting: 'PRETTY_PRINT'
         }
       },
 

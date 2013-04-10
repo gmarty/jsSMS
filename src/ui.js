@@ -133,7 +133,7 @@ if (typeof $ != 'undefined') {
             self.main.start();
           });
 
-      if (DEBUG) {
+      if (DEBUGGER) {
         this.dissambler = $('<div id="dissambler"></div>');
         $(parent).after(this.dissambler);
         this.buttons.nextStep = $('<input type="button" value="Next step" class="btn" disabled="disabled">')
@@ -229,7 +229,7 @@ if (typeof $ != 'undefined') {
 
         this.log.empty();
 
-        if (DEBUG) {
+        if (DEBUGGER) {
           this.dissambler.empty();
         }
       },
@@ -323,7 +323,7 @@ if (typeof $ != 'undefined') {
         this.buttons.start.removeAttr('disabled');
         this.buttons.start.attr('value', 'Start');
         this.buttons.reset.removeAttr('disabled');
-        if (DEBUG) {
+        if (DEBUGGER) {
           this.buttons.nextStep.removeAttr('disabled');
         }
         if (this.main.soundEnabled) {
