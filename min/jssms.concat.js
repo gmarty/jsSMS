@@ -381,7 +381,7 @@ JSSMS.Utils = {rndInt:function(range) {
 }(), getTimestamp:Date.now || function() {
   return(new Date).getTime()
 }, toHex:function(dec) {
-  var hex = dec.toString(16);
+  var hex = dec.toString(16).toUpperCase();
   if(hex.length == 1) {
     hex = "0" + hex
   }
@@ -7456,11 +7456,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   return this.getIndex("IX", opcode)
 }, getIndexOpIY:function(opcode) {
   return this.getIndex("IY", opcode)
-}, signExtend:function(d) {
-  if(d >= 128) {
-    d = d - 256
-  }
-  return d
 }};
 function Instruction(address) {
   return{address:address, opcode:"", inst:"", hexAddress:JSSMS.Utils.toHex(address), nextAddress:0, target:0, isJumpTarget:false}

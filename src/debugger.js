@@ -2914,18 +2914,6 @@ JSSMS.Debugger.prototype = {
    */
   getIndexOpIY: function(opcode) {
     return this.getIndex('IY', opcode);
-  },
-
-
-  /**
-   * @param {number} d
-   * @return {number}
-   */
-  signExtend: function(d) {
-    if (d >= 128) {
-      d = d - 256;
-    }
-    return d;
   }
 };
 
