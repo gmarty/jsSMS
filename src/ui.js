@@ -66,7 +66,7 @@ if (typeof $ != 'undefined') {
        */
       var fullscreenSupport = JSSMS.Utils.getPrefix(['fullscreenEnabled', 'mozFullScreenEnabled', 'webkitCancelFullScreen']);
 
-      var requestAnimationFramePrefix = JSSMS.Utils.getPrefix(['requestAnimationFrame', 'msRequestAnimationFrame', 'mozRequestAnimationFrame', 'webkitRequestAnimationFrame', 'oRequestAnimationFrame'], window);
+      var requestAnimationFramePrefix = JSSMS.Utils.getPrefix(['requestAnimationFrame', 'msRequestAnimationFrame', 'mozRequestAnimationFrame', 'webkitRequestAnimationFrame'], window);
 
       var i;
 
