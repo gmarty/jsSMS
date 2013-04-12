@@ -8106,7 +8106,7 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
     }else {
       var $self$$4$$ = this;
       $root_sms$$5$$ = $("<div></div>");
-      var $controls$$ = $('<div class="controls"></div>'), $fullscreenSupport$$ = $JSSMS$Utils$getPrefix$$(["fullscreenEnabled", "mozFullScreenEnabled", "webkitCancelFullScreen"]), $requestAnimationFramePrefix$$ = $JSSMS$Utils$getPrefix$$(["requestAnimationFrame", "msRequestAnimationFrame", "mozRequestAnimationFrame", "webkitRequestAnimationFrame", "oRequestAnimationFrame"], window), $i$$25$$;
+      var $controls$$ = $('<div class="controls"></div>'), $screenContainer$$ = $('<div class="screen"></div>'), $fullscreenSupport$$ = $JSSMS$Utils$getPrefix$$(["fullscreenEnabled", "mozFullScreenEnabled", "webkitCancelFullScreen"]), $requestAnimationFramePrefix$$ = $JSSMS$Utils$getPrefix$$(["requestAnimationFrame", "msRequestAnimationFrame", "mozRequestAnimationFrame", "webkitRequestAnimationFrame", "oRequestAnimationFrame"], window), $i$$25$$;
       if($requestAnimationFramePrefix$$) {
         this.requestAnimationFrame = window[$requestAnimationFramePrefix$$].bind(window)
       }else {
@@ -8120,7 +8120,7 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
         }
       }
       this.$hiddenPrefix$ = $JSSMS$Utils$getPrefix$$(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
-      this.screen = $('<canvas width=256 height=192 class="screen"></canvas>');
+      this.screen = $("<canvas width=256 height=192></canvas>");
       this.$canvasContext$ = this.screen[0].getContext("2d");
       if(this.$canvasContext$.getImageData) {
         this.$canvasImageData$ = this.$canvasContext$.getImageData(0, 0, 256, 192);
@@ -8145,7 +8145,7 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
           $self$$4$$.$main$.$soundEnabled$ ? ($self$$4$$.$main$.$soundEnabled$ = $JSCompiler_alias_FALSE$$, $self$$4$$.$buttons$.$sound$.attr("value", "Enable sound")) : ($self$$4$$.$main$.$soundEnabled$ = $JSCompiler_alias_TRUE$$, $self$$4$$.$buttons$.$sound$.attr("value", "Disable sound"))
         }));
         $fullscreenSupport$$ ? this.$buttons$.$fullscreen$ = $('<input type="button" value="Go fullscreen" class="btn">').click(function() {
-          var $screen$$1$$ = $self$$4$$.screen[0];
+          var $screen$$1$$ = $screenContainer$$[0];
           $screen$$1$$.requestFullscreen ? $screen$$1$$.requestFullscreen() : $screen$$1$$.mozRequestFullScreen ? $screen$$1$$.mozRequestFullScreen() : $screen$$1$$.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT)
         }) : (this.$zoomed$ = $JSCompiler_alias_FALSE$$, this.$buttons$.zoom = $('<input type="button" value="Zoom in" class="btn hidden-phone">').click(function() {
           $self$$4$$.$zoomed$ ? ($self$$4$$.screen.animate({width:"256px", height:"192px"}, function() {
@@ -8157,7 +8157,8 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
           this.$buttons$[$i$$25$$].appendTo($controls$$)
         }
         this.log = $('<div id="status"></div>');
-        this.screen.appendTo($root_sms$$5$$);
+        this.screen.appendTo($screenContainer$$);
+        $screenContainer$$.appendTo($root_sms$$5$$);
         this.$romContainer$.appendTo($root_sms$$5$$);
         $controls$$.appendTo($root_sms$$5$$);
         this.log.appendTo($root_sms$$5$$);
