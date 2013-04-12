@@ -261,7 +261,7 @@ JSSMS.Utils = {
    * @return {number} The current timestamp.
    */
   getTimestamp: function() {
-    if (window['performance'].now) {
+    if (window.performance && window.performance.now) {
       return function() {
         return window['performance'].now();
       }
