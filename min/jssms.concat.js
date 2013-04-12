@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 'use strict';var DEBUG = true;
+var DEBUGGER = false;
 var ACCURATE = false;
 var LITTLE_ENDIAN = true;
 var SUPPORT_DATAVIEW = !!(window["DataView"] && window["ArrayBuffer"]);
@@ -52,7 +53,7 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   this.vdp.reset();
   this.ports.reset();
   this.cpu.reset();
-  if(DEBUG) {
+  if(DEBUGGER) {
     this.cpu.resetDebug()
   }
   this.cpu.resetMemory();
@@ -378,10 +379,18 @@ JSSMS.Utils = {rndInt:function(range) {
       return array[address >> 10][address & 1023] & 255 | (array[++address >> 10][address & 1023] & 255) << 8
     }
   }
-}(), getTimestamp:Date.now || function() {
-  return(new Date).getTime()
-}, toHex:function(dec) {
-  var hex = dec.toString(16);
+}(), getTimestamp:function() {
+  if(window["performance"].now) {
+    return function() {
+      return window["performance"].now()
+    }
+  }else {
+    return function() {
+      return(new Date).getTime()
+    }
+  }
+}(), toHex:function(dec) {
+  var hex = dec.toString(16).toUpperCase();
   if(hex.length == 1) {
     hex = "0" + hex
   }
@@ -489,7 +498,7 @@ JSSMS.Z80 = function(sms) {
   this.writeMem = JSSMS.Utils.writeMem.bind(this, this);
   this.readMem = JSSMS.Utils.readMem.bind(this, this.memReadMap);
   this.readMemWord = JSSMS.Utils.readMemWord.bind(this, this.memReadMap);
-  if(DEBUG) {
+  if(DEBUGGER) {
     for(var method in JSSMS.Debugger.prototype) {
       this[method] = JSSMS.Debugger.prototype[method]
     }
@@ -535,7 +544,7 @@ JSSMS.Z80.prototype = {reset:function() {
         this.interrupt()
       }
     }
-    if(DEBUG) {
+    if(DEBUGGER) {
       this.main.ui.updateDisassembly(this.pc)
     }
     opcode = this.readMem(this.pc++);
@@ -4404,7 +4413,7 @@ JSSMS.Z80.prototype = {reset:function() {
   if(this.rom.length) {
     this.number_of_pages = this.rom.length / 16;
     this.setDefaultMemoryMapping();
-    if(DEBUG) {
+    if(DEBUGGER) {
       this.main.ui.updateStatus("Parsing instructions...");
       this.parseInstructions();
       this.main.ui.updateStatus("Instructions parsed")
@@ -7456,11 +7465,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   return this.getIndex("IX", opcode)
 }, getIndexOpIY:function(opcode) {
   return this.getIndex("IY", opcode)
-}, signExtend:function(d) {
-  if(d >= 128) {
-    d = d - 256
-  }
-  return d
 }};
 function Instruction(address) {
   return{address:address, opcode:"", inst:"", hexAddress:JSSMS.Utils.toHex(address), nextAddress:0, target:0, isJumpTarget:false}
@@ -8352,7 +8356,7 @@ if(typeof $ != "undefined") {
         self.main.vdp.forceFullRedraw();
         self.main.start()
       });
-      if(DEBUG) {
+      if(DEBUGGER) {
         this.dissambler = $('<div id="dissambler"></div>');
         $(parent).after(this.dissambler);
         this.buttons.nextStep = $('<input type="button" value="Next step" class="btn" disabled="disabled">').click(function() {
@@ -8420,7 +8424,7 @@ if(typeof $ != "undefined") {
       this.screen[0].width = SMS_WIDTH;
       this.screen[0].height = SMS_HEIGHT;
       this.log.empty();
-      if(DEBUG) {
+      if(DEBUGGER) {
         this.dissambler.empty()
       }
     }, setRoms:function(roms) {
@@ -8469,7 +8473,7 @@ if(typeof $ != "undefined") {
       this.buttons.start.removeAttr("disabled");
       this.buttons.start.attr("value", "Start");
       this.buttons.reset.removeAttr("disabled");
-      if(DEBUG) {
+      if(DEBUGGER) {
         this.buttons.nextStep.removeAttr("disabled")
       }
       if(this.main.soundEnabled) {
