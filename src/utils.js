@@ -263,7 +263,7 @@ JSSMS.Utils = {
   getTimestamp: function() {
     if (window.performance && window.performance.now) {
       return function() {
-        return window['performance'].now();
+        return window.performance.now();
       }
     } else {
       return function() {

@@ -382,7 +382,7 @@ JSSMS.Utils = {rndInt:function(range) {
 }(), getTimestamp:function() {
   if(window.performance && window.performance.now) {
     return function() {
-      return window["performance"].now()
+      return window.performance.now()
     }
   }else {
     return function() {
@@ -8309,7 +8309,7 @@ if(typeof $ != "undefined") {
       var controls = $('<div class="controls"></div>');
       var screenContainer = $('<div class="screen"></div>');
       var fullscreenSupport = JSSMS.Utils.getPrefix(["fullscreenEnabled", "mozFullScreenEnabled", "webkitCancelFullScreen"]);
-      var requestAnimationFramePrefix = JSSMS.Utils.getPrefix(["requestAnimationFrame", "msRequestAnimationFrame", "mozRequestAnimationFrame", "webkitRequestAnimationFrame", "oRequestAnimationFrame"], window);
+      var requestAnimationFramePrefix = JSSMS.Utils.getPrefix(["requestAnimationFrame", "msRequestAnimationFrame", "mozRequestAnimationFrame", "webkitRequestAnimationFrame"], window);
       var i;
       if(requestAnimationFramePrefix) {
         this.requestAnimationFrame = window[requestAnimationFramePrefix].bind(window)
@@ -8324,7 +8324,6 @@ if(typeof $ != "undefined") {
           lastTime = currTime + timeToCall
         }
       }
-      this.hiddenPrefix = JSSMS.Utils.getPrefix(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
       this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + "></canvas>");
       this.canvasContext = this.screen[0].getContext("2d");
       if(!this.canvasContext.getImageData) {
@@ -8489,11 +8488,21 @@ if(typeof $ != "undefined") {
       this.log.text(s)
     }, writeAudio:function(buffer) {
     }, writeFrame:function(buffer, prevBuffer) {
-      if(this.hiddenPrefix && document[this.hiddenPrefix]) {
-        return
+      var self = this;
+      var hiddenPrefix = JSSMS.Utils.getPrefix(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
+      if(hiddenPrefix) {
+        return function(buffer, prevBuffer) {
+          if(document[hiddenPrefix]) {
+            return
+          }
+          this.canvasContext.putImageData(this.canvasImageData, 0, 0)
+        }
+      }else {
+        return function(buffer, prevBuffer) {
+          this.canvasContext.putImageData(this.canvasImageData, 0, 0)
+        }
       }
-      this.canvasContext.putImageData(this.canvasImageData, 0, 0)
-    }, updateDisassembly:function(currentAddress) {
+    }(), updateDisassembly:function(currentAddress) {
       var startAddress = currentAddress < 8 ? 0 : currentAddress - 8;
       var instructions = this.main.cpu.instructions;
       var length = instructions.length;

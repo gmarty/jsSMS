@@ -8106,7 +8106,7 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
     }else {
       var $self$$4$$ = this;
       $root_sms$$5$$ = $("<div></div>");
-      var $controls$$ = $('<div class="controls"></div>'), $screenContainer$$ = $('<div class="screen"></div>'), $fullscreenSupport$$ = $JSSMS$Utils$getPrefix$$(["fullscreenEnabled", "mozFullScreenEnabled", "webkitCancelFullScreen"]), $requestAnimationFramePrefix$$ = $JSSMS$Utils$getPrefix$$(["requestAnimationFrame", "msRequestAnimationFrame", "mozRequestAnimationFrame", "webkitRequestAnimationFrame", "oRequestAnimationFrame"], window), $i$$25$$;
+      var $controls$$ = $('<div class="controls"></div>'), $screenContainer$$ = $('<div class="screen"></div>'), $fullscreenSupport$$ = $JSSMS$Utils$getPrefix$$(["fullscreenEnabled", "mozFullScreenEnabled", "webkitCancelFullScreen"]), $requestAnimationFramePrefix$$ = $JSSMS$Utils$getPrefix$$(["requestAnimationFrame", "msRequestAnimationFrame", "mozRequestAnimationFrame", "webkitRequestAnimationFrame"], window), $i$$25$$;
       if($requestAnimationFramePrefix$$) {
         this.requestAnimationFrame = window[$requestAnimationFramePrefix$$].bind(window)
       }else {
@@ -8119,7 +8119,6 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
           $lastTime$$ = $currTime$$ + $timeToCall$$
         }
       }
-      this.$hiddenPrefix$ = $JSSMS$Utils$getPrefix$$(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
       this.screen = $("<canvas width=256 height=192></canvas>");
       this.$canvasContext$ = this.screen[0].getContext("2d");
       if(this.$canvasContext$.getImageData) {
@@ -8215,9 +8214,14 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
     this.$main$.$soundEnabled$ && (this.$buttons$.$sound$ ? this.$buttons$.$sound$.attr("value", "Disable sound") : this.$buttons$.$sound$.attr("value", "Enable sound"))
   }, updateStatus:function $$UI$$$$updateStatus$($s$$3$$) {
     this.log.text($s$$3$$)
-  }, $writeFrame$:function $$UI$$$$$writeFrame$$() {
-    (!this.$hiddenPrefix$ || !document[this.$hiddenPrefix$]) && this.$canvasContext$.putImageData(this.$canvasImageData$, 0, 0)
-  }, $updateDisassembly$:function $$UI$$$$$updateDisassembly$$($currentAddress$$1$$) {
+  }, $writeFrame$:function() {
+    var $hiddenPrefix$$ = $JSSMS$Utils$getPrefix$$(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
+    return $hiddenPrefix$$ ? function() {
+      document[$hiddenPrefix$$] || this.$canvasContext$.putImageData(this.$canvasImageData$, 0, 0)
+    } : function() {
+      this.$canvasContext$.putImageData(this.$canvasImageData$, 0, 0)
+    }
+  }(), $updateDisassembly$:function $$UI$$$$$updateDisassembly$$($currentAddress$$1$$) {
     for(var $instructions$$ = this.$main$.$cpu$.$instructions$, $length$$19$$ = $instructions$$.length, $html$$ = "", $i$$27$$ = 8 > $currentAddress$$1$$ ? 0 : $currentAddress$$1$$ - 8, $num$$4$$ = 0;16 > $num$$4$$ && $i$$27$$ <= $length$$19$$;$i$$27$$++) {
       $instructions$$[$i$$27$$] && ($html$$ += "<div" + ($instructions$$[$i$$27$$].$address$ == $currentAddress$$1$$ ? ' class="current"' : "") + ">" + $instructions$$[$i$$27$$].$hexAddress$ + ($instructions$$[$i$$27$$].$isJumpTarget$ ? ":" : " ") + "<code>" + $instructions$$[$i$$27$$].$inst$ + "</code></div>", $num$$4$$++)
     }

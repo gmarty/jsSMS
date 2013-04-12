@@ -83,12 +83,6 @@ if (typeof $ != 'undefined') {
         };
       }
 
-      /**
-       * Contains the visibility API prefix or false if not supported.
-       * @type {string|boolean}
-       */
-      this.hiddenPrefix = JSSMS.Utils.getPrefix(['hidden', 'mozHidden', 'webkitHidden', 'msHidden']);
-
       // Screen
       this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + '></canvas>');
       this.canvasContext = this.screen[0].getContext('2d');
@@ -363,13 +357,29 @@ if (typeof $ != 'undefined') {
        * @param {Array.<number>} prevBuffer
        */
       writeFrame: function(buffer, prevBuffer) {
-        // If browser supports visibility API and this page is hidden, we exit.
-        if (this.hiddenPrefix && document[this.hiddenPrefix]) {
-          return;
-        }
+        var self = this;
 
-        this.canvasContext.putImageData(this.canvasImageData, 0, 0);
-      },
+        /**
+         * Contains the visibility API prefix or false if not supported.
+         * @type {string|boolean}
+         */
+        var hiddenPrefix = JSSMS.Utils.getPrefix(['hidden', 'mozHidden', 'webkitHidden', 'msHidden']);
+
+        if (hiddenPrefix) {
+          // If browser supports visibility API and this page is hidden, we exit.
+          return function (buffer, prevBuffer) {
+            if (document[hiddenPrefix]) {
+              return;
+            }
+
+            this.canvasContext.putImageData(this.canvasImageData, 0, 0);
+          }
+        } else {
+          return function (buffer, prevBuffer) {
+            this.canvasContext.putImageData(this.canvasImageData, 0, 0);
+          }
+        }
+      }(),
 
 
       /**
