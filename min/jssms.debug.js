@@ -237,7 +237,9 @@ function $JSCompiler_StaticMethods_readRomDirectly$$($JSCompiler_StaticMethods_r
   return 1023 > ($address$$4$$ & 1023) ? $array$$11$$[$address$$4$$ >> 10].getUint16($address$$4$$ & 1023, $JSCompiler_alias_TRUE$$) : $array$$11$$[$address$$4$$ >> 10].getUint8($address$$4$$ & 1023) | $array$$11$$[++$address$$4$$ >> 10].getUint8($address$$4$$ & 1023) << 8
 } : function($array$$12$$, $address$$5$$) {
   return $array$$12$$[$address$$5$$ >> 10][$address$$5$$ & 1023] & 255 | ($array$$12$$[++$address$$5$$ >> 10][$address$$5$$ & 1023] & 255) << 8
-}, $JSSMS$Utils$getTimestamp$$ = Date.now || function() {
+}, $JSSMS$Utils$getTimestamp$$ = window.performance.now ? function() {
+  return window.performance.now()
+} : function() {
   return(new Date).getTime()
 };
 function $JSSMS$Utils$toHex$$($dec_hex$$) {

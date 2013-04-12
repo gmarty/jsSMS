@@ -260,9 +260,17 @@ JSSMS.Utils = {
    *
    * @return {number} The current timestamp.
    */
-  getTimestamp: Date.now || function() {
-    return new Date().getTime();
-  },
+  getTimestamp: function() {
+    if (window['performance'].now) {
+      return function() {
+        return window['performance'].now();
+      }
+    } else {
+      return function() {
+        return new Date().getTime();
+      }
+    }
+  }(),
 
 
   /**

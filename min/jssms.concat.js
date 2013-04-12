@@ -379,9 +379,17 @@ JSSMS.Utils = {rndInt:function(range) {
       return array[address >> 10][address & 1023] & 255 | (array[++address >> 10][address & 1023] & 255) << 8
     }
   }
-}(), getTimestamp:Date.now || function() {
-  return(new Date).getTime()
-}, toHex:function(dec) {
+}(), getTimestamp:function() {
+  if(window["performance"].now) {
+    return function() {
+      return window["performance"].now()
+    }
+  }else {
+    return function() {
+      return(new Date).getTime()
+    }
+  }
+}(), toHex:function(dec) {
   var hex = dec.toString(16).toUpperCase();
   if(hex.length == 1) {
     hex = "0" + hex
