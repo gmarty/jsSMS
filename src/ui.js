@@ -57,6 +57,7 @@ if (typeof $ != 'undefined') {
       // Create UI
       var root = $('<div></div>');
       var controls = $('<div class="controls"></div>');
+      var screenContainer = $('<div class="screen"></div>');
 
       // General settings
       /**
@@ -89,7 +90,7 @@ if (typeof $ != 'undefined') {
       this.hiddenPrefix = JSSMS.Utils.getPrefix(['hidden', 'mozHidden', 'webkitHidden', 'msHidden']);
 
       // Screen
-      this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + ' class="screen"></canvas>');
+      this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + '></canvas>');
       this.canvasContext = this.screen[0].getContext('2d');
 
       if (!this.canvasContext.getImageData) {
@@ -159,7 +160,7 @@ if (typeof $ != 'undefined') {
         // @todo Add an exit fullScreen button.
         this.buttons.fullscreen = $('<input type="button" value="Go fullscreen" class="btn">')
           .click(function() {
-              var screen = /** @type {HTMLCanvasElement} */ (self.screen[0]);
+              var screen = /** @type {HTMLDivElement} */ (screenContainer[0]);
 
               if (screen.requestFullscreen) {
                 screen.requestFullscreen();
@@ -200,7 +201,8 @@ if (typeof $ != 'undefined') {
 
       this.log = $('<div id="status"></div>');
 
-      this.screen.appendTo(root);
+      this.screen.appendTo(screenContainer);
+      screenContainer.appendTo(root);
       this.romContainer.appendTo(root);
       controls.appendTo(root);
       this.log.appendTo(root);

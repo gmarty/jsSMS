@@ -8307,6 +8307,7 @@ if(typeof $ != "undefined") {
       var self = this;
       var root = $("<div></div>");
       var controls = $('<div class="controls"></div>');
+      var screenContainer = $('<div class="screen"></div>');
       var fullscreenSupport = JSSMS.Utils.getPrefix(["fullscreenEnabled", "mozFullScreenEnabled", "webkitCancelFullScreen"]);
       var requestAnimationFramePrefix = JSSMS.Utils.getPrefix(["requestAnimationFrame", "msRequestAnimationFrame", "mozRequestAnimationFrame", "webkitRequestAnimationFrame", "oRequestAnimationFrame"], window);
       var i;
@@ -8324,7 +8325,7 @@ if(typeof $ != "undefined") {
         }
       }
       this.hiddenPrefix = JSSMS.Utils.getPrefix(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
-      this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + ' class="screen"></canvas>');
+      this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + "></canvas>");
       this.canvasContext = this.screen[0].getContext("2d");
       if(!this.canvasContext.getImageData) {
         $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest version of Firefox, Google Chrome, Opera or Safari!</div>');
@@ -8376,7 +8377,7 @@ if(typeof $ != "undefined") {
       }
       if(fullscreenSupport) {
         this.buttons.fullscreen = $('<input type="button" value="Go fullscreen" class="btn">').click(function() {
-          var screen = (self.screen[0]);
+          var screen = (screenContainer[0]);
           if(screen.requestFullscreen) {
             screen.requestFullscreen()
           }else {
@@ -8406,7 +8407,8 @@ if(typeof $ != "undefined") {
         this.buttons[i].appendTo(controls)
       }
       this.log = $('<div id="status"></div>');
-      this.screen.appendTo(root);
+      this.screen.appendTo(screenContainer);
+      screenContainer.appendTo(root);
       this.romContainer.appendTo(root);
       controls.appendTo(root);
       this.log.appendTo(root);
