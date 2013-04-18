@@ -121,20 +121,22 @@ JSSMS.Debugger.prototype = {
    */
   writeGraphViz: function() {
     var tree = this.instructions;
+    var INDENT = ' ';
 
     console.time('DOT generation');
 
-    var dotFile = 'digraph G {\n';
+    var dotFile = ['digraph G {'];
     for (var i = 0, length = tree.length; i < length; i++) {
       if (tree[i]) {
-        dotFile += ' ' + i + ' [label="' + tree[i].label + '"];\n';
+        dotFile.push(INDENT + i + ' [label="' + tree[i].label + '"];');
         if (tree[i].target != null)
-          dotFile += ' ' + i + ' -> ' + tree[i].target + ';\n';
+          dotFile.push(INDENT + i + ' -> ' + tree[i].target + ';');
         if (tree[i].nextAddress != null)
-          dotFile += ' ' + i + ' -> ' + tree[i].nextAddress + ';\n';
+          dotFile.push(INDENT + i + ' -> ' + tree[i].nextAddress + ';');
       }
     }
-    dotFile += '}';
+    dotFile.push('}');
+    dotFile = dotFile.join('\n');
 
     // Inject entry point styling.
     dotFile = dotFile.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
