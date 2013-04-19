@@ -48,14 +48,11 @@ JSSMS.Debugger.prototype = {
    * Parse the rom instructions.
    */
   parseInstructions: function() {
-    var toHex = JSSMS.Utils.toHex;
     var romSize = Setup.PAGE_SIZE * this.rom.length;
     var instruction;
     var currentAddress;
-    var addresses = [];
-    var branch;
+    var addresses = []; //Array(romSize);
     var i = 0;
-    var length = 0;
 
     addresses.push(0x00); // Add program entry point to the list of addresses to visit.
     /*addresses.push(0x08); // And below: set by RST.
@@ -76,7 +73,7 @@ JSSMS.Debugger.prototype = {
         continue;
       }
 
-      if (currentAddress >= romSize || (currentAddress >> 10) >= this.memReadMap.length) {
+      if (currentAddress >= romSize || (currentAddress >> 10) >= 65) {
         console.log('Invalid address', currentAddress);
 
         continue;
@@ -84,13 +81,7 @@ JSSMS.Debugger.prototype = {
 
       // @todo Move to a separate function to allow adding code entry points later.
       instruction = this.disassemble(currentAddress);
-      branch = Instruction(currentAddress);
-      branch.label = toHex(instruction.address) + ' ' + instruction.opcode + ' ' + instruction.inst;
-      branch.nextAddress = instruction.nextAddress;
-      branch.opcode = instruction.opcode;
-      branch.inst = instruction.inst;
-      branch.target = instruction.target;
-      this.instructions[currentAddress] = branch;
+      this.instructions[currentAddress] = instruction;
 
       if (instruction.nextAddress != null) {
         addresses.push(instruction.nextAddress);
@@ -101,10 +92,8 @@ JSSMS.Debugger.prototype = {
       }
     }
 
-    console.timeEnd('Instructions parsing');
-
     // Flag any instructions that are jump targets.
-    for (length = this.instructions.length; i < length; i++) {
+    for (; i < romSize; i++) {
       if (this.instructions[i] && this.instructions[i].target != null) {
         if (this.instructions[this.instructions[i].target]) {
           this.instructions[this.instructions[i].target].isJumpTarget = true;
@@ -113,6 +102,8 @@ JSSMS.Debugger.prototype = {
         }
       }
     }
+
+    console.timeEnd('Instructions parsing');
   },
 
 
@@ -156,7 +147,7 @@ JSSMS.Debugger.prototype = {
   disassemble: function(address) {
     var toHex = JSSMS.Utils.toHex;
     var opcode = this.readMem(address);
-    var opcode_ = toHex(opcode);
+    var opcodesArray = [opcode];
     var inst = 'Unknown Opcode';
     var currAddr = address;
     var target = null;
@@ -815,7 +806,7 @@ JSSMS.Debugger.prototype = {
       case 0xCB:
         var _inst = this.getCB(address);
         inst = _inst.inst;
-        opcode_ += ' ' + _inst.opcode;
+        opcodesArray = opcodesArray.concat(_inst.opcodes);
         address = _inst.nextAddress;
         // @todo
         break;
@@ -892,7 +883,7 @@ JSSMS.Debugger.prototype = {
       case 0xDD:
         var _inst = this.getIndexOpIX(address);
         inst = _inst.inst;
-        opcode_ += ' ' + _inst.opcode;
+        opcodesArray = opcodesArray.concat(_inst.opcodes);
         address = _inst.nextAddress;
         // @todo
         break;
@@ -960,7 +951,7 @@ JSSMS.Debugger.prototype = {
       case 0xED:
         var _inst = this.getED(address);
         inst = _inst.inst;
-        opcode_ += ' ' + _inst.opcode;
+        opcodesArray = opcodesArray.concat(_inst.opcodes);
         address = _inst.nextAddress;
         // @todo
         break;
@@ -1026,7 +1017,7 @@ JSSMS.Debugger.prototype = {
       case 0xFD:
         var _inst = this.getIndexOpIY(address);
         inst = _inst.inst;
-        opcode_ += ' ' + _inst.opcode;
+        opcodesArray = opcodesArray.concat(_inst.opcodes);
         address = _inst.nextAddress;
         // @todo
         break;
@@ -1041,13 +1032,14 @@ JSSMS.Debugger.prototype = {
         break;
     }
 
-    return {
-      opcode: opcode_,
+    return Instruction({
+      opcode: opcode,
+      opcodes: opcodesArray,
       inst: inst,
       address: currAddr,
       nextAddress: address,
       target: target
-    };
+    });
   },
 
 
@@ -1058,9 +1050,9 @@ JSSMS.Debugger.prototype = {
    * @return {Object}
    */
   getCB: function(address) {
-    var toHex = JSSMS.Utils.toHex;
     var opcode = this.readMem(address);
-    var inst = 'Unimplemented CB Opcode';
+    var opcodesArray = [opcode];
+    var inst = 'Unimplemented 0xCB prefixed opcode';
     var currAddr = address;
     address++;
 
@@ -1836,7 +1828,8 @@ JSSMS.Debugger.prototype = {
     }
 
     return {
-      opcode: toHex(opcode),
+      opcode: opcode,
+      opcodes: opcodesArray,
       inst: inst,
       address: currAddr,
       nextAddress: address
@@ -1853,7 +1846,8 @@ JSSMS.Debugger.prototype = {
   getED: function(address) {
     var toHex = JSSMS.Utils.toHex;
     var opcode = this.readMem(address);
-    var inst = 'Unimplemented ED Opcode';
+    var opcodesArray = [opcode];
+    var inst = 'Unimplemented 0xED prefixed opcode';
     var currAddr = address;
     address++;
 
@@ -2059,7 +2053,8 @@ JSSMS.Debugger.prototype = {
     }
 
     return {
-      opcode: toHex(opcode),
+      opcode: opcode,
+      opcodes: opcodesArray,
       inst: inst,
       address: currAddr,
       nextAddress: address
@@ -2077,8 +2072,8 @@ JSSMS.Debugger.prototype = {
   getIndex: function(index, address) {
     var toHex = JSSMS.Utils.toHex;
     var opcode = this.readMem(address);
-    var opcode_ = toHex(opcode);
-    var inst = 'Unimplemented DD/FD Opcode';
+    var opcodesArray = [opcode];
+    var inst = 'Unimplemented 0xDD or 0xFD prefixed opcode';
     var currAddr = address;
     address++;
 
@@ -2406,7 +2401,7 @@ JSSMS.Debugger.prototype = {
       case 0xCB:
         var _inst = this.getIndexCB(index, address);
         inst = _inst.inst;
-        opcode_ += ' ' + _inst.opcode;
+        opcodesArray = opcodesArray.concat(_inst.opcodes);
         address = _inst.nextAddress;
         // @todo
         break;
@@ -2429,7 +2424,8 @@ JSSMS.Debugger.prototype = {
     }
 
     return {
-      opcode: opcode_,
+      opcode: opcode,
+      opcodes: opcodesArray,
       inst: inst,
       address: currAddr,
       nextAddress: address
@@ -2445,9 +2441,9 @@ JSSMS.Debugger.prototype = {
    * @return {Object}
    */
   getIndexCB: function(index, address) {
-    var toHex = JSSMS.Utils.toHex;
     var opcode = this.readMem(address);
-    var inst = 'Unimplemented DDCB or FDCB Opcode';
+    var opcodesArray = [opcode];
+    var inst = 'Unimplemented 0xDDCB or 0xFDCB prefixed opcode';
     var currAddr = address;
     address++;
 
@@ -2887,7 +2883,8 @@ JSSMS.Debugger.prototype = {
     }
 
     return {
-      opcode: toHex(opcode),
+      opcode: opcode,
+      opcodes: opcodesArray,
       inst: inst,
       address: currAddr,
       nextAddress: address
@@ -2922,21 +2919,48 @@ JSSMS.Debugger.prototype = {
 
 /**
  * \@todo Move elsewhere.
- * @param {number} address
+ * @param {Object.<string,*>} options
  */
-function Instruction(address) {
-  return {
-    address: address,
-    opcode: '',
+function Instruction(options) {
+  var toHex = JSSMS.Utils.toHex;
+
+  var defaultInstruction = {
+    address: 0,
+    hexAddress: '',
+    opcode: 0,
+    opcodes: [],
     inst: '',
-    hexAddress: JSSMS.Utils.toHex(address),
-    nextAddress: 0,
+    nextAddress: null,
     target: 0,
-    isJumpTarget: false
+    isJumpTarget: false,
+    label: ''
     // Memory can be registry or offset, read or write mode, 8 or 16 bit.
     /*memory: null,
 
      srcRegs: {},
      dstRegs: {}*/
   };
+  var prop;
+  var hexOpcodes = '';
+
+  // Merge passed values.
+  for (prop in defaultInstruction) {
+    if (options[prop] != undefined) {
+      defaultInstruction[prop] = options[prop];
+    }
+  }
+
+  // Computing additional properties
+  defaultInstruction.hexAddress = toHex(defaultInstruction.address);
+  if (defaultInstruction.opcodes.length) {
+    hexOpcodes = defaultInstruction.opcodes
+      .map(toHex)
+      .join(' ')
+      + ' ';
+  }
+  defaultInstruction.label = defaultInstruction.hexAddress + ' ' +
+      hexOpcodes +
+      defaultInstruction.inst;
+
+  return defaultInstruction;
 }

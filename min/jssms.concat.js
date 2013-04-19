@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 'use strict';var DEBUG = true;
-var DEBUGGER = false;
+var DEBUGGER = true;
 var ACCURATE = false;
 var LITTLE_ENDIAN = true;
 var SUPPORT_DATAVIEW = !!(window["DataView"] && window["ArrayBuffer"]);
@@ -4551,14 +4551,11 @@ JSSMS.Debugger = function() {
 JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   this.instructions = []
 }, parseInstructions:function() {
-  var toHex = JSSMS.Utils.toHex;
   var romSize = Setup.PAGE_SIZE * this.rom.length;
   var instruction;
   var currentAddress;
   var addresses = [];
-  var branch;
   var i = 0;
-  var length = 0;
   addresses.push(0);
   addresses.push(56);
   addresses.push(102);
@@ -4568,18 +4565,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     if(this.instructions[currentAddress]) {
       continue
     }
-    if(currentAddress >= romSize || currentAddress >> 10 >= this.memReadMap.length) {
+    if(currentAddress >= romSize || currentAddress >> 10 >= 65) {
       console.log("Invalid address", currentAddress);
       continue
     }
     instruction = this.disassemble(currentAddress);
-    branch = Instruction(currentAddress);
-    branch.label = toHex(instruction.address) + " " + instruction.opcode + " " + instruction.inst;
-    branch.nextAddress = instruction.nextAddress;
-    branch.opcode = instruction.opcode;
-    branch.inst = instruction.inst;
-    branch.target = instruction.target;
-    this.instructions[currentAddress] = branch;
+    this.instructions[currentAddress] = instruction;
     if(instruction.nextAddress != null) {
       addresses.push(instruction.nextAddress)
     }
@@ -4587,8 +4578,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       addresses.push(instruction.target)
     }
   }
-  console.timeEnd("Instructions parsing");
-  for(length = this.instructions.length;i < length;i++) {
+  for(;i < romSize;i++) {
     if(this.instructions[i] && this.instructions[i].target != null) {
       if(this.instructions[this.instructions[i].target]) {
         this.instructions[this.instructions[i].target].isJumpTarget = true
@@ -4597,29 +4587,32 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       }
     }
   }
+  console.timeEnd("Instructions parsing")
 }, writeGraphViz:function() {
   var tree = this.instructions;
+  var INDENT = " ";
   console.time("DOT generation");
-  var dotFile = "digraph G {\n";
+  var dotFile = ["digraph G {"];
   for(var i = 0, length = tree.length;i < length;i++) {
     if(tree[i]) {
-      dotFile += " " + i + ' [label="' + tree[i].label + '"];\n';
+      dotFile.push(INDENT + i + ' [label="' + tree[i].label + '"];');
       if(tree[i].target != null) {
-        dotFile += " " + i + " -> " + tree[i].target + ";\n"
+        dotFile.push(INDENT + i + " -> " + tree[i].target + ";")
       }
       if(tree[i].nextAddress != null) {
-        dotFile += " " + i + " -> " + tree[i].nextAddress + ";\n"
+        dotFile.push(INDENT + i + " -> " + tree[i].nextAddress + ";")
       }
     }
   }
-  dotFile += "}";
+  dotFile.push("}");
+  dotFile = dotFile.join("\n");
   dotFile = dotFile.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
   console.timeEnd("DOT generation");
   console.log(dotFile)
 }, disassemble:function(address) {
   var toHex = JSSMS.Utils.toHex;
   var opcode = this.readMem(address);
-  var opcode_ = toHex(opcode);
+  var opcodesArray = [opcode];
   var inst = "Unknown Opcode";
   var currAddr = address;
   var target = null;
@@ -5277,7 +5270,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 203:
       var _inst = this.getCB(address);
       inst = _inst.inst;
-      opcode_ += " " + _inst.opcode;
+      opcodesArray = opcodesArray.concat(_inst.opcodes);
       address = _inst.nextAddress;
       break;
     case 204:
@@ -5353,7 +5346,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 221:
       var _inst = this.getIndexOpIX(address);
       inst = _inst.inst;
-      opcode_ += " " + _inst.opcode;
+      opcodesArray = opcodesArray.concat(_inst.opcodes);
       address = _inst.nextAddress;
       break;
     case 222:
@@ -5419,7 +5412,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 237:
       var _inst = this.getED(address);
       inst = _inst.inst;
-      opcode_ += " " + _inst.opcode;
+      opcodesArray = opcodesArray.concat(_inst.opcodes);
       address = _inst.nextAddress;
       break;
     case 238:
@@ -5484,7 +5477,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 253:
       var _inst = this.getIndexOpIY(address);
       inst = _inst.inst;
-      opcode_ += " " + _inst.opcode;
+      opcodesArray = opcodesArray.concat(_inst.opcodes);
       address = _inst.nextAddress;
       break;
     case 254:
@@ -5497,11 +5490,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       address = null;
       break
   }
-  return{opcode:opcode_, inst:inst, address:currAddr, nextAddress:address, target:target}
+  return Instruction({opcode:opcode, opcodes:opcodesArray, inst:inst, address:currAddr, nextAddress:address, target:target})
 }, getCB:function(address) {
-  var toHex = JSSMS.Utils.toHex;
   var opcode = this.readMem(address);
-  var inst = "Unimplemented CB Opcode";
+  var opcodesArray = [opcode];
+  var inst = "Unimplemented 0xCB prefixed opcode";
   var currAddr = address;
   address++;
   switch(opcode) {
@@ -6274,11 +6267,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "SET 7,A";
       break
   }
-  return{opcode:toHex(opcode), inst:inst, address:currAddr, nextAddress:address}
+  return{opcode:opcode, opcodes:opcodesArray, inst:inst, address:currAddr, nextAddress:address}
 }, getED:function(address) {
   var toHex = JSSMS.Utils.toHex;
   var opcode = this.readMem(address);
-  var inst = "Unimplemented ED Opcode";
+  var opcodesArray = [opcode];
+  var inst = "Unimplemented 0xED prefixed opcode";
   var currAddr = address;
   address++;
   switch(opcode) {
@@ -6499,12 +6493,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "OTDR";
       break
   }
-  return{opcode:toHex(opcode), inst:inst, address:currAddr, nextAddress:address}
+  return{opcode:opcode, opcodes:opcodesArray, inst:inst, address:currAddr, nextAddress:address}
 }, getIndex:function(index, address) {
   var toHex = JSSMS.Utils.toHex;
   var opcode = this.readMem(address);
-  var opcode_ = toHex(opcode);
-  var inst = "Unimplemented DD/FD Opcode";
+  var opcodesArray = [opcode];
+  var inst = "Unimplemented 0xDD or 0xFD prefixed opcode";
   var currAddr = address;
   address++;
   switch(opcode) {
@@ -6831,7 +6825,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 203:
       var _inst = this.getIndexCB(index, address);
       inst = _inst.inst;
-      opcode_ += " " + _inst.opcode;
+      opcodesArray = opcodesArray.concat(_inst.opcodes);
       address = _inst.nextAddress;
       break;
     case 225:
@@ -6851,11 +6845,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD SP," + index;
       break
   }
-  return{opcode:opcode_, inst:inst, address:currAddr, nextAddress:address}
+  return{opcode:opcode, opcodes:opcodesArray, inst:inst, address:currAddr, nextAddress:address}
 }, getIndexCB:function(index, address) {
-  var toHex = JSSMS.Utils.toHex;
   var opcode = this.readMem(address);
-  var inst = "Unimplemented DDCB or FDCB Opcode";
+  var opcodesArray = [opcode];
+  var inst = "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";
   var currAddr = address;
   address++;
   switch(opcode) {
@@ -7460,14 +7454,28 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "SET 7,(" + index + ")";
       break
   }
-  return{opcode:toHex(opcode), inst:inst, address:currAddr, nextAddress:address}
+  return{opcode:opcode, opcodes:opcodesArray, inst:inst, address:currAddr, nextAddress:address}
 }, getIndexOpIX:function(opcode) {
   return this.getIndex("IX", opcode)
 }, getIndexOpIY:function(opcode) {
   return this.getIndex("IY", opcode)
 }};
-function Instruction(address) {
-  return{address:address, opcode:"", inst:"", hexAddress:JSSMS.Utils.toHex(address), nextAddress:0, target:0, isJumpTarget:false}
+function Instruction(options) {
+  var toHex = JSSMS.Utils.toHex;
+  var defaultInstruction = {address:0, hexAddress:"", opcode:0, opcodes:[], inst:"", nextAddress:null, target:0, isJumpTarget:false, label:""};
+  var prop;
+  var hexOpcodes = "";
+  for(prop in defaultInstruction) {
+    if(options[prop] != undefined) {
+      defaultInstruction[prop] = options[prop]
+    }
+  }
+  defaultInstruction.hexAddress = toHex(defaultInstruction.address);
+  if(defaultInstruction.opcodes.length) {
+    hexOpcodes = defaultInstruction.opcodes.map(toHex).join(" ") + " "
+  }
+  defaultInstruction.label = defaultInstruction.hexAddress + " " + hexOpcodes + defaultInstruction.inst;
+  return defaultInstruction
 }
 ;var KEY_UP = 1;
 var KEY_DOWN = 2;
