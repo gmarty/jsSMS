@@ -496,7 +496,7 @@ JSSMS.Z80.prototype = {
 
       switch (opcode) {
         case 0x00: break;                                                   // NOP
-        case 0x01: this.c = this.readMem(this.pc++); this.b = this.readMem(this.pc++); break;             // LD BC,nn
+        case 0x01: this.setBC(this.readMemWord(this.pc++)); this.pc++; break;             // LD BC,nn
         case 0x02: this.writeMem(this.getBC(), this.a); break;                             // LD (BC),A
         case 0x03: this.incBC(); break;                                          // INC BC
         case 0x04: this.b = this.inc8(this.b); break;                                      // INC B
@@ -512,7 +512,7 @@ JSSMS.Z80.prototype = {
         case 0x0E: this.c = this.readMem(this.pc++); break;                                // LD C,n
         case 0x0F: this.rrca_a(); break;                                         // RRCA
         case 0x10: this.b = (this.b - 1) & 0xff; this.jr(this.b != 0); break;                                      // DJNZ (PC+e)
-        case 0x11: this.e = this.readMem(this.pc++); this.d = this.readMem(this.pc++); break;             // LD DE,nn
+        case 0x11: this.setDE(this.readMemWord(this.pc++)); this.pc++; break;             // LD DE,nn
         case 0x12: this.writeMem(this.getDE(), this.a); break;                             // LD (DE),A
         case 0x13: this.incDE(); break;                                          // INC DE
         case 0x14: this.d = this.inc8(this.d); break;                                      // INC D
@@ -528,7 +528,7 @@ JSSMS.Z80.prototype = {
         case 0x1E: this.e = this.readMem(this.pc++); break;                                // LD E,n
         case 0x1F: this.rra_a(); break;                                          // RRA
         case 0x20: this.jr(!((this.f & F_ZERO) != 0)); break;                         // JR NZ,(PC+e)
-        case 0x21: this.l = this.readMem(this.pc++); this.h = this.readMem(this.pc++); break;             // LD HL,nn
+        case 0x21: this.setHL(this.readMemWord(this.pc++)); this.pc++; break;             // LD HL,nn
         case 0x22:                                                        // LD (nn),HL
           location = this.readMemWord(this.pc);
           this.writeMem(location, this.l);
@@ -542,12 +542,7 @@ JSSMS.Z80.prototype = {
         case 0x27: this.daa(); break;                                            // DAA
         case 0x28: this.jr(((this.f & F_ZERO) != 0)); break;                          // JR Z,(PC+e)
         case 0x29: this.setHL(this.add16(this.getHL(), this.getHL())); break;                   // ADD HL,HL
-        case 0x2A:                                                        // LD HL,(nn)
-          location = this.readMemWord(this.pc);
-          this.l = this.readMem(location);
-          this.h = this.readMem(location + 1);
-          this.pc += 2;
-          break;
+        case 0x2A: this.setHL(this.readMemWord(this.readMemWord(this.pc))); this.pc += 2; break; // LD HL,(nn)
         case 0x2B: this.decHL(); break;                                          // DEC HL
         case 0x2C: this.l = this.inc8(this.l); break;                                      // INC L
         case 0x2D: this.l = this.dec8(this.l); break;                                      // DEC L
@@ -2023,9 +2018,7 @@ JSSMS.Z80.prototype = {
 
       //  -- ED4B LD BC,(nn) -----------------------
       case 0x4B:
-        location = this.readMemWord(this.pc + 1);
-        this.c = this.readMem(location++);
-        this.b = this.readMem(location);
+        this.setBC(this.readMemWord(this.readMemWord(this.pc + 1)));
         this.pc += 3;
         break;
 
@@ -2079,9 +2072,7 @@ JSSMS.Z80.prototype = {
 
       //  -- ED5B LD DE,(nn) -----------------------
       case 0x5B:
-        location = this.readMemWord(this.pc + 1);
-        this.e = this.readMem(location++);
-        this.d = this.readMem(location);
+        this.setDE(this.readMemWord(this.readMemWord(this.pc + 1)));
         this.pc += 3;
         break;
 
@@ -2144,9 +2135,7 @@ JSSMS.Z80.prototype = {
 
       //  -- ED6B LD HL,(nn) -----------------------
       case 0x6B:
-        location = this.readMemWord(this.pc + 1);
-        this.l = this.readMem(location++);
-        this.h = this.readMem(location);
+        this.setHL(this.readMemWord(this.readMemWord(this.pc + 1)));
         this.pc += 3;
         break;
 

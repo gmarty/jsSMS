@@ -559,8 +559,8 @@ JSSMS.Z80.prototype = {reset:function() {
       case 0:
         break;
       case 1:
-        this.c = this.readMem(this.pc++);
-        this.b = this.readMem(this.pc++);
+        this.setBC(this.readMemWord(this.pc++));
+        this.pc++;
         break;
       case 2:
         this.writeMem(this.getBC(), this.a);
@@ -609,8 +609,8 @@ JSSMS.Z80.prototype = {reset:function() {
         this.jr(this.b != 0);
         break;
       case 17:
-        this.e = this.readMem(this.pc++);
-        this.d = this.readMem(this.pc++);
+        this.setDE(this.readMemWord(this.pc++));
+        this.pc++;
         break;
       case 18:
         this.writeMem(this.getDE(), this.a);
@@ -658,8 +658,8 @@ JSSMS.Z80.prototype = {reset:function() {
         this.jr(!((this.f & F_ZERO) != 0));
         break;
       case 33:
-        this.l = this.readMem(this.pc++);
-        this.h = this.readMem(this.pc++);
+        this.setHL(this.readMemWord(this.pc++));
+        this.pc++;
         break;
       case 34:
         location = this.readMemWord(this.pc);
@@ -689,9 +689,7 @@ JSSMS.Z80.prototype = {reset:function() {
         this.setHL(this.add16(this.getHL(), this.getHL()));
         break;
       case 42:
-        location = this.readMemWord(this.pc);
-        this.l = this.readMem(location);
-        this.h = this.readMem(location + 1);
+        this.setHL(this.readMemWord(this.readMemWord(this.pc)));
         this.pc += 2;
         break;
       case 43:
@@ -3660,9 +3658,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 75:
-      location = this.readMemWord(this.pc + 1);
-      this.c = this.readMem(location++);
-      this.b = this.readMem(location);
+      this.setBC(this.readMemWord(this.readMemWord(this.pc + 1)));
       this.pc += 3;
       break;
     case 79:
@@ -3713,9 +3709,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 91:
-      location = this.readMemWord(this.pc + 1);
-      this.e = this.readMem(location++);
-      this.d = this.readMem(location);
+      this.setDE(this.readMemWord(this.readMemWord(this.pc + 1)));
       this.pc += 3;
       break;
     case 95:
@@ -3764,9 +3758,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 107:
-      location = this.readMemWord(this.pc + 1);
-      this.l = this.readMem(location++);
-      this.h = this.readMem(location);
+      this.setHL(this.readMemWord(this.readMemWord(this.pc + 1)));
       this.pc += 3;
       break;
     case 111:
