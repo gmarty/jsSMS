@@ -139,6 +139,80 @@ JSSMS.Debugger.prototype = {
 
 
   /**
+   * Return a string representing a JavaScript code for the ROM instructions.
+   * The format is a big switch unrolling the value of this.pc.
+   * The idea is to avoid using this.readMem() and this.readMemWord().
+   */
+  writeJavaScript: function() {
+    var tree = this.instructions;
+    var toHex = JSSMS.Utils.toHex;
+    var INDENT = '  ';
+    var tstates = 0;
+
+    console.time('JavaScript generation');
+
+    var code = [
+      'switch(this.pc) {'
+    ];
+
+    for (var i = 0, length = tree.length; i < length; i++) {
+      if (tree[i]) {
+        code.push(INDENT + 'case ' + toHex(tree[i].address) + ':');
+
+        // Comment for debugging.
+        code.push(INDENT + '// ' + tree[i].label);
+
+        // Decrement tstates.
+        tstates = getTotalTStates(tree[i].opcodes);
+        if (tstates)
+          code.push(INDENT + 'this.tstates -= ' + tstates + ';   // Decrement TStates');
+
+        // Instruction.
+
+        // Move program counter.
+        if (tree[i].nextAddress)
+          code.push(INDENT + 'this.pc = ' + toHex(tree[i].nextAddress) + ';');
+        code.push(INDENT + 'break;');
+      }
+    }
+    code.push(INDENT + 'default:');
+    code.push(INDENT + 'console.log("Bad address", this.pc);');
+    code.push(INDENT + 'break;');
+    code.push('}');
+    code = code.join('\n');
+
+    console.timeEnd('JavaScript generation');
+
+    return code;
+
+    function getTotalTStates(opcodes) {
+      var tstates = 0;
+
+      switch (opcodes[0]) {
+        case 0xCB:
+          tstates = OP_CB_STATES[opcodes[1]];
+          break;
+        case 0xDD:
+        case 0xFD:
+          if (opcodes.length == 2)
+            tstates = OP_DD_STATES[opcodes[1]];
+          else
+            tstates = OP_INDEX_CB_STATES[opcodes[2]];
+          break;
+        case 0xED:
+          tstates = OP_ED_STATES[opcodes[1]];
+          break;
+        default:
+          tstates = OP_STATES[opcodes[0]];
+          break;
+      }
+
+      return tstates;
+    }
+  },
+
+
+  /**
    * Returns the instruction associated to an opcode for debugging purposes
    *
    * @param {number} address
@@ -789,7 +863,6 @@ JSSMS.Debugger.prototype = {
       case 0xC7:
         target = 0x00;
         inst = 'RST ' + toHex(target);
-        address = null;
         break;
       case 0xC8:
         inst = 'RET Z';
@@ -827,7 +900,6 @@ JSSMS.Debugger.prototype = {
       case 0xCF:
         target = 0x08;
         inst = 'RST ' + toHex(target);
-        address = null;
         break;
       case 0xD0:
         inst = 'RET NC';
@@ -858,7 +930,6 @@ JSSMS.Debugger.prototype = {
       case 0xD7:
         target = 0x10;
         inst = 'RST ' + toHex(target);
-        address = null;
         break;
       case 0xD8:
         inst = 'RET C';
@@ -894,7 +965,6 @@ JSSMS.Debugger.prototype = {
       case 0xDF:
         target = 0x18;
         inst = 'RST ' + toHex(target);
-        address = null;
         break;
       case 0xE0:
         inst = 'RET PO';
@@ -925,7 +995,6 @@ JSSMS.Debugger.prototype = {
       case 0xE7:
         target = 0x20;
         inst = 'RST ' + toHex(target);
-        address = null;
         break;
       case 0xE8:
         inst = 'RET PE';
@@ -962,7 +1031,6 @@ JSSMS.Debugger.prototype = {
       case 0xEF:
         target = 0x28;
         inst = 'RST ' + toHex(target);
-        address = null;
         break;
       case 0xF0:
         inst = 'RET P';
@@ -993,7 +1061,6 @@ JSSMS.Debugger.prototype = {
       case 0xF7:
         target = 0x30;
         inst = 'RST ' + toHex(target);
-        address = null;
         break;
       case 0xF8:
         inst = 'RET M';
@@ -1028,7 +1095,6 @@ JSSMS.Debugger.prototype = {
       case 0xFF:
         target = 0x38;
         inst = 'RST ' + toHex(target);
-        address = null;
         break;
     }
 
@@ -2931,7 +2997,7 @@ function Instruction(options) {
     opcodes: [],
     inst: '',
     nextAddress: null,
-    target: 0,
+    target: null,
     isJumpTarget: false,
     label: ''
     // Memory can be registry or offset, read or write mode, 8 or 16 bit.

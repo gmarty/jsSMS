@@ -4609,6 +4609,58 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   dotFile = dotFile.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
   console.timeEnd("DOT generation");
   console.log(dotFile)
+}, writeJavaScript:function() {
+  var tree = this.instructions;
+  var toHex = JSSMS.Utils.toHex;
+  var INDENT = "  ";
+  var tstates = 0;
+  console.time("JavaScript generation");
+  var code = ["switch(this.pc) {"];
+  for(var i = 0, length = tree.length;i < length;i++) {
+    if(tree[i]) {
+      code.push(INDENT + "case " + toHex(tree[i].address) + ":");
+      code.push(INDENT + "// " + tree[i].label);
+      tstates = getTotalTStates(tree[i].opcodes);
+      if(tstates) {
+        code.push(INDENT + "this.tstates -= " + tstates + ";   // Decrement TStates")
+      }
+      if(tree[i].nextAddress) {
+        code.push(INDENT + "this.pc = " + toHex(tree[i].nextAddress) + ";")
+      }
+      code.push(INDENT + "break;")
+    }
+  }
+  code.push(INDENT + "default:");
+  code.push(INDENT + 'console.log("Bad address", this.pc);');
+  code.push(INDENT + "break;");
+  code.push("}");
+  code = code.join("\n");
+  console.timeEnd("JavaScript generation");
+  return code;
+  function getTotalTStates(opcodes) {
+    var tstates = 0;
+    switch(opcodes[0]) {
+      case 203:
+        tstates = OP_CB_STATES[opcodes[1]];
+        break;
+      case 221:
+      ;
+      case 253:
+        if(opcodes.length == 2) {
+          tstates = OP_DD_STATES[opcodes[1]]
+        }else {
+          tstates = OP_INDEX_CB_STATES[opcodes[2]]
+        }
+        break;
+      case 237:
+        tstates = OP_ED_STATES[opcodes[1]];
+        break;
+      default:
+        tstates = OP_STATES[opcodes[0]];
+        break
+    }
+    return tstates
+  }
 }, disassemble:function(address) {
   var toHex = JSSMS.Utils.toHex;
   var opcode = this.readMem(address);
@@ -5253,7 +5305,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 199:
       target = 0;
       inst = "RST " + toHex(target);
-      address = null;
       break;
     case 200:
       inst = "RET Z";
@@ -5290,7 +5341,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 207:
       target = 8;
       inst = "RST " + toHex(target);
-      address = null;
       break;
     case 208:
       inst = "RET NC";
@@ -5321,7 +5371,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 215:
       target = 16;
       inst = "RST " + toHex(target);
-      address = null;
       break;
     case 216:
       inst = "RET C";
@@ -5356,7 +5405,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 223:
       target = 24;
       inst = "RST " + toHex(target);
-      address = null;
       break;
     case 224:
       inst = "RET PO";
@@ -5387,7 +5435,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 231:
       target = 32;
       inst = "RST " + toHex(target);
-      address = null;
       break;
     case 232:
       inst = "RET PE";
@@ -5422,7 +5469,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 239:
       target = 40;
       inst = "RST " + toHex(target);
-      address = null;
       break;
     case 240:
       inst = "RET P";
@@ -5453,7 +5499,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 247:
       target = 48;
       inst = "RST " + toHex(target);
-      address = null;
       break;
     case 248:
       inst = "RET M";
@@ -5487,7 +5532,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 255:
       target = 56;
       inst = "RST " + toHex(target);
-      address = null;
       break
   }
   return Instruction({opcode:opcode, opcodes:opcodesArray, inst:inst, address:currAddr, nextAddress:address, target:target})
@@ -7462,7 +7506,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
 }};
 function Instruction(options) {
   var toHex = JSSMS.Utils.toHex;
-  var defaultInstruction = {address:0, hexAddress:"", opcode:0, opcodes:[], inst:"", nextAddress:null, target:0, isJumpTarget:false, label:""};
+  var defaultInstruction = {address:0, hexAddress:"", opcode:0, opcodes:[], inst:"", nextAddress:null, target:null, isJumpTarget:false, label:""};
   var prop;
   var hexOpcodes = "";
   for(prop in defaultInstruction) {
