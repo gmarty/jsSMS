@@ -281,7 +281,7 @@ JSSMS.Utils = {
    */
   toHex: function(dec) {
     var hex = (dec).toString(16).toUpperCase();
-    if (hex.length == 1) {
+    if (hex.length % 2) {
       hex = '0' + hex;
     }
     return '0x' + hex;
