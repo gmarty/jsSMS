@@ -540,7 +540,7 @@ JSSMS.Z80.prototype = {
         case 0x25: this.h = this.dec8(this.h); break;                                      // DEC H
         case 0x26: this.h = this.readMem(this.pc++); break;                                // LD H,n
         case 0x27: this.daa(); break;                                            // DAA
-        case 0x28: this.jr(((this.f & F_ZERO) != 0)); break;                          // JR Z,(PC+e)
+        case 0x28: this.jr((this.f & F_ZERO) != 0); break;                          // JR Z,(PC+e)
         case 0x29: this.setHL(this.add16(this.getHL(), this.getHL())); break;                   // ADD HL,HL
         case 0x2A: this.setHL(this.readMemWord(this.readMemWord(this.pc))); this.pc += 2; break; // LD HL,(nn)
         case 0x2B: this.decHL(); break;                                          // DEC HL
@@ -716,7 +716,7 @@ JSSMS.Z80.prototype = {
         case 0xD5: this.push2(this.d, this.e); break;                                       // PUSH DE
         case 0xD6: this.sub_a(this.readMem(this.pc++)); break;                             // SUB n
         case 0xD7: this.push1(this.pc); this.pc = 0x10; break;                                // RST 10H
-        case 0xD8: this.ret(((this.f & F_CARRY) != 0)); break;                        // RET C
+        case 0xD8: this.ret((this.f & F_CARRY) != 0); break;                        // RET C
         case 0xD9: this.exBC(); this.exDE(); this.exHL(); break;                           // EXX
         case 0xDA: this.jp((this.f & F_CARRY) != 0); break;                           // JP C,(nn)
         case 0xDB: this.a = this.port.in_(this.readMem(this.pc++)); break;                       // IN A,(n)
@@ -2326,7 +2326,7 @@ JSSMS.Z80.prototype = {
         temp |= (this.getBC() == 0 ? 0 : F_PARITY);
 
         // Repeat instruction until a = (hl) or bc == 0
-        if (((temp & F_PARITY) != 0) && ((this.f & F_ZERO) == 0)) {
+        if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {
           this.tstates -= 5;
           this.pc--;
         } else {
@@ -2407,7 +2407,7 @@ JSSMS.Z80.prototype = {
         temp |= (this.getBC() == 0 ? 0 : F_PARITY);
 
         // Repeat instruction until a = (hl) or bc == 0
-        if (((temp & F_PARITY) != 0) && ((this.f & F_ZERO) == 0)) {
+        if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {
           this.tstates -= 5;
           this.pc--;
         } else {
@@ -2523,7 +2523,7 @@ JSSMS.Z80.prototype = {
     var correction = 0;
     var carry = (flags & F_CARRY);
     var carry_copy = carry;
-    if (((flags & F_HALFCARRY) != 0) || ((a_copy & 0x0f) > 0x09)) {
+    if ((flags & F_HALFCARRY) != 0 || (a_copy & 0x0f) > 0x09) {
       correction |= 0x06;
     }
     if ((carry == 1) || (a_copy > 0x9f) || ((a_copy > 0x8f) && ((a_copy & 0x0f) > 0x09))) {
