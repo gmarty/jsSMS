@@ -928,7 +928,11 @@ JSSMS.Vdp.prototype = {
     var i;
     var r, g, b;
 
-    if (this.main.is_sms && !this.isPalConverted) {
+    if (this.isPalConverted) {
+      return;
+    }
+
+    if (this.main.is_sms) {
       for (i = 0; i < 0x40; i++) {
         r = i & 0x03;
         g = (i >> 2) & 0x03;
@@ -938,7 +942,7 @@ JSSMS.Vdp.prototype = {
         this.main_JAVA_G[i] = (g * 85) & 0xFF;
         this.main_JAVA_B[i] = (b * 85) & 0xFF;
       }
-    } else if (this.main.is_gg && !this.isPalConverted) {
+    } else if (this.main.is_gg) {
       // Green & Blue
       for (i = 0; i < 0x100; i++) {
         g = i & 0x0F;

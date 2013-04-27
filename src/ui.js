@@ -297,8 +297,8 @@ if (typeof $ != 'undefined') {
             //}
 
             self.main.stop();
-            self.main.reset();
             self.main.readRomDirectly(data, self.romSelect.val());
+            self.main.reset();
             self.main.vdp.forceFullRedraw();
             self.enable();
           }
@@ -367,7 +367,7 @@ if (typeof $ != 'undefined') {
 
         if (hiddenPrefix) {
           // If browser supports visibility API and this page is hidden, we exit.
-          return function (buffer, prevBuffer) {
+          return function(buffer, prevBuffer) {
             if (document[hiddenPrefix]) {
               return;
             }
@@ -375,7 +375,7 @@ if (typeof $ != 'undefined') {
             this.canvasContext.putImageData(this.canvasImageData, 0, 0);
           }
         } else {
-          return function (buffer, prevBuffer) {
+          return function(buffer, prevBuffer) {
             this.canvasContext.putImageData(this.canvasImageData, 0, 0);
           }
         }
