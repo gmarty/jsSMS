@@ -234,16 +234,15 @@ JSSMS.Vdp = function(sms) {
    */
   this.display = sms.ui.canvasImageData.data;
 
-  /**
-   * SMS colours converted to RGB hex.
-   */
+  /** SMS colours converted to RGB hex. */
   /** @type {Array.<number>} */ this.main_JAVA_R = new Array(0x40);
   /** @type {Array.<number>} */ this.main_JAVA_G = new Array(0x40);
   /** @type {Array.<number>} */ this.main_JAVA_B = new Array(0x40);
 
   /** GG colours converted to RGB hex. */
-  /** @type {Array.<number>} */ this.GG_JAVA1 = new Array(0x100);
-  /** @type {Array.<number>} */ this.GG_JAVA2 = new Array(0x10);
+  /** @type {Array.<number>} */ this.GG_JAVA_R = new Array(0x10);
+  /** @type {Array.<number>} */ this.GG_JAVA_G = new Array(0x100);
+  /** @type {Array.<number>} */ this.GG_JAVA_B = new Array(0x100);
 
   /**
    * Keep a reference of palette being converted.
@@ -543,11 +542,11 @@ JSSMS.Vdp.prototype = {
           temp = ((this.location & 0x3F) >> 1) * 3;
           if ((this.location & 1) == 0) {
             // first byte
-            this.CRAM[temp] = this.GG_JAVA1[value] & 0xFF; // GG
-            this.CRAM[temp + 1] = (this.GG_JAVA1[value] >> 8) & 0xFF; // GG
+            this.CRAM[temp] = this.GG_JAVA_G[value]; // GG
+            this.CRAM[temp + 1] = this.GG_JAVA_B[value]; // GG
           }
           else {
-            this.CRAM[temp + 2] = (this.GG_JAVA2[value & 0x0F] >> 16) & 0xFF;
+            this.CRAM[temp + 2] = this.GG_JAVA_R[value & 0x0F];
           }
         }
         break;
@@ -943,6 +942,11 @@ JSSMS.Vdp.prototype = {
         this.main_JAVA_B[i] = (b * 85) & 0xFF;
       }
     } else if (this.main.is_gg) {
+      // Red
+      for (i = 0; i < 0x10; i++) {
+        this.GG_JAVA_R[i] = (i << 4) | i;
+      }
+
       // Green & Blue
       for (i = 0; i < 0x100; i++) {
         g = i & 0x0F;
@@ -950,14 +954,8 @@ JSSMS.Vdp.prototype = {
 
         // Shift and fill with the original bitpattern
         // so %1111 becomes %11111111, %1010 becomes %10101010
-        //this.GG_JAVA1[i] = (g << 20) | (g << 16) | (b << 12) | (b << 8);
-        this.GG_JAVA1[i] = (b << 12) | (b << 8) | (g << 4) | (g);
-      }
-
-      // Red
-      for (i = 0; i < 0x10; i++) {
-        //this.GG_JAVA2[i] = (i << 4) | i;
-        this.GG_JAVA2[i] = (i << 20);
+        this.GG_JAVA_G[i] = ((g << 4) | g) & 0xFF;
+        this.GG_JAVA_B[i] = ((b << 4) | b) & 0xFF;
       }
     }
 
