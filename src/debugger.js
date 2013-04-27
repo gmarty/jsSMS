@@ -152,8 +152,32 @@ JSSMS.Debugger.prototype = {
     console.time('JavaScript generation');
 
     var code = [
-      'switch(this.pc) {'
+      'function run(cycles, cyclesTo) {',
+      'var location = 0;',
+      'var opcode = 0;',
+      'var temp = 0;',
+      '',
+      'this.tstates += cycles;',
+      '',
+      'if (cycles != 0)',
+      '  this.totalCycles = cycles;'
     ];
+
+    if (!Setup.ACCURATE_INTERRUPT_EMULATION)
+      code.push('if (this.interruptLine) this.interrupt(); // Check for interrupt');
+
+    code.push('while (this.tstates > cyclesTo) {');
+
+    if (Setup.ACCURATE_INTERRUPT_EMULATION) {
+      code.push('if (this.interruptLine) this.interrupt(); // Check for interrupt');
+      code.push('this.EI_inst = false;');
+    }
+
+    if (Setup.REFRESH_EMULATION)
+      code.push('this.incR();');
+
+    code.push('');
+    code.push('switch(this.pc) {');
 
     for (var i = 0, length = tree.length; i < length; i++) {
       if (tree[i]) {
@@ -165,9 +189,11 @@ JSSMS.Debugger.prototype = {
         // Decrement tstates.
         tstates = getTotalTStates(tree[i].opcodes);
         if (tstates)
-          code.push(INDENT + 'this.tstates -= ' + tstates + ';   // Decrement TStates');
+          code.push(INDENT + 'this.tstates -= ' + tstates + ';');
 
         // Instruction.
+        if (code != '')
+          code.push(INDENT + tree[i].code);
 
         // Move program counter.
         if (tree[i].nextAddress)
@@ -178,7 +204,9 @@ JSSMS.Debugger.prototype = {
     code.push(INDENT + 'default:');
     code.push(INDENT + 'console.log("Bad address", this.pc);');
     code.push(INDENT + 'break;');
-    code.push('}');
+    code.push('}'); // End of switch
+    code.push('}'); // End of while
+    code.push('}'); // End of function
     code = code.join('\n');
 
     console.timeEnd('JavaScript generation');
@@ -225,660 +253,931 @@ JSSMS.Debugger.prototype = {
     var inst = 'Unknown Opcode';
     var currAddr = address;
     var target = null;
+    var code = 'throw "Unimplemented opcode ' + toHex(opcode) + '";';
+    var operand = '';
+    var location = 0;
     address++;
 
     switch (opcode) {
       case 0x00:
         inst = 'NOP';
+        code = '';
         break;
       case 0x01:
-        inst = 'LD BC,' + toHex(this.readMemWord(address));
+        operand = toHex(this.readMemWord(address));
+        inst = 'LD BC,' + operand;
+        code = 'this.setBC(' + operand + ');';
         address += 2;
         break;
       case 0x02:
         inst = 'LD (BC),A';
+        code = 'this.writeMem(this.getBC(), this.a);';
         break;
       case 0x03:
         inst = 'INC BC';
+        code = 'this.incBC();';
         break;
       case 0x04:
         inst = 'INC B';
+        code = 'this.b = this.inc8(this.b);';
         break;
       case 0x05:
         inst = 'DEC B';
+        code = 'this.b = this.dec8(this.b);';
         break;
       case 0x06:
-        inst = 'LD B,' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'LD B,' + operand;
+        code = 'this.b = ' + operand + ';';
         address++;
         break;
       case 0x07:
         inst = 'RLCA';
+        code = 'this.rlca_a();';
         break;
       case 0x08:
         inst = 'EX AF AF\'';
+        code = 'this.exAF();';
         break;
       case 0x09:
         inst = 'ADD HL,BC';
+        code = 'this.setHL(this.add16(this.getHL(), this.getBC()));';
         break;
       case 0x0A:
         inst = 'LD A,(BC)';
+        code = 'this.a = this.readMem(this.getBC());';
         break;
       case 0x0B:
         inst = 'DEC BC';
+        code = 'this.decBC();';
         break;
       case 0x0C:
         inst = 'INC C';
+        code = 'this.c = this.inc8(this.c);';
         break;
       case 0x0D:
         inst = 'DEC C';
+        code = 'this.c = this.dec8(this.c);';
         break;
       case 0x0E:
-        inst = 'LD C,' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'LD C,' + operand;
+        code = 'this.c = ' + operand + ';';
         address++;
         break;
       case 0x0F:
         inst = 'RRCA';
+        code = 'this.rrca_a();';
         break;
       case 0x10:
         target = address + this.signExtend(this.readMem(address) + 1);
         inst = 'DJNZ (' + toHex(target) + ')';
+        code = 'this.b = (this.b - 1) & 0xff;' +
+            'if (this.b != 0) {' +
+            'this.pc = ' + toHex(target) + ';' +
+            'this.tstates -= 5;' +
+            'return;' +
+            '}';
         address++;
         break;
       case 0x11:
-        inst = 'LD DE,' + toHex(this.readMemWord(address));
+        operand = toHex(this.readMemWord(address));
+        inst = 'LD DE,' + operand;
+        code = 'this.setDE(' + operand + ');';
         address += 2;
         break;
       case 0x12:
         inst = 'LD (DE),A';
+        code = 'this.writeMem(this.getDE(), this.a);';
         break;
       case 0x13:
         inst = 'INC DE';
+        code = 'this.incDE();';
         break;
       case 0x14:
         inst = 'INC D';
+        code = 'this.d = this.inc8(this.d);';
         break;
       case 0x15:
         inst = 'DEC D';
+        code = 'this.d = this.dec8(this.d);';
         break;
       case 0x16:
-        inst = 'LD D,' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'LD D,' + operand;
+        code = 'this.d = ' + operand + ';';
         address++;
         break;
       case 0x17:
         inst = 'RLA';
+        code = 'this.rla_a();';
         break;
       case 0x18:
         target = address + this.signExtend(this.readMem(address) + 1);
         inst = 'JR (' + toHex(target) + ')';
+        code = 'this.pc = ' + target + ';';
         address = null;
         break;
       case 0x19:
         inst = 'ADD HL,DE';
+        code = 'this.setHL(this.add16(this.getHL(), this.getDE()));';
         break;
       case 0x1A:
         inst = 'LD A,(DE)';
+        code = 'this.a = this.readMem(this.getDE());';
         break;
       case 0x1B:
         inst = 'DEC DE';
+        code = 'this.decDE();';
         break;
       case 0x1C:
         inst = 'INC E';
+        code = 'this.e = this.inc8(this.e);';
         break;
       case 0x1D:
         inst = 'DEC E';
+        code = 'this.e = this.dec8(this.e);';
         break;
       case 0x1E:
-        inst = 'LD E,' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'LD E,' + operand;
+        code = 'this.e = ' + operand + ';';
         address++;
         break;
       case 0x1F:
         inst = 'RRA';
+        code = 'this.rra_a();';
         break;
       case 0x20:
         target = address + this.signExtend(this.readMem(address) + 1);
         inst = 'JR NZ,(' + toHex(target) + ')';
+        code = 'if (!((this.f & F_ZERO) != 0)) {' +
+            'this.pc = ' + toHex(target) + ';' +
+            'this.tstates -= 5;' +
+            'return;' +
+            '}';
         address++;
         break;
       case 0x21:
-        inst = 'LD HL,' + toHex(this.readMemWord(address));
+        operand = toHex(this.readMemWord(address));
+        inst = 'LD HL,' + operand;
+        code = 'this.setHL(' + operand + ');';
         address += 2;
         break;
       case 0x22:
-        inst = 'LD (' + toHex(this.readMemWord(address)) + '),HL';
+        location = this.readMemWord(address);
+        operand = toHex(location);
+        inst = 'LD (' + operand + '),HL';
+        code = 'this.writeMem(' + operand + ', this.l);' +
+            'this.writeMem(' + toHex(location + 1) + ', this.h);';
         address += 2;
         break;
       case 0x23:
         inst = 'INC HL';
+        code = 'this.incHL();';
         break;
       case 0x24:
         inst = 'INC H';
+        code = 'this.h = this.inc8(this.h);';
         break;
       case 0x25:
         inst = 'DEC H';
+        code = 'this.h = this.dec8(this.h);';
         break;
       case 0x26:
-        inst = 'LD H,' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'LD H,' + operand;
+        code = 'this.h = ' + operand + ';';
         address++;
         break;
       case 0x27:
         inst = 'DAA';
+        code = 'this.daa();';
         break;
       case 0x28:
         target = address + this.signExtend(this.readMem(address) + 1);
         inst = 'JR Z,(' + toHex(target) + ')';
+        code = 'if ((this.f & F_ZERO) != 0) {' +
+            'this.pc = ' + toHex(target) + ';' +
+            'this.tstates -= 5;' +
+            'return;' +
+            '}';
         address++;
         break;
       case 0x29:
         inst = 'ADD HL,HL';
+        code = 'this.setHL(this.add16(this.getHL(), this.getHL()));';
         break;
       case 0x2A:
-        inst = 'LD HL,(' + toHex(this.readMemWord(address)) + ')';
+        operand = toHex(this.readMemWord(address));
+        inst = 'LD HL,(' + operand + ')';
+        code = 'this.setHL(this.readMemWord(' + operand + '));';
         address += 2;
         break;
       case 0x2B:
         inst = 'DEC HL';
+        code = 'this.decHL();';
         break;
       case 0x2C:
         inst = 'INC L';
+        code = 'this.l = this.inc8(this.l);';
         break;
       case 0x2D:
         inst = 'DEC L';
+        code = 'this.l = this.dec8(this.l);';
         break;
       case 0x2E:
-        inst = 'LD L,' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'LD L,' + operand;
+        code = 'this.l = ' + operand + ';';
         address++;
         break;
       case 0x2F:
         inst = 'CPL';
+        code = 'this.cpl_a();';
         break;
       case 0x30:
         target = address + this.signExtend(this.readMem(address) + 1);
         inst = 'JR NC,(' + toHex(target) + ')';
+        code = 'if (!((this.f & F_CARRY) != 0)) {' +
+            'this.pc = ' + toHex(target) + ';' +
+            'this.tstates -= 5;' +
+            'return;' +
+            '}';
         address++;
         break;
       case 0x31:
-        inst = 'LD SP,' + toHex(this.readMemWord(address));
+        operand = toHex(this.readMemWord(address));
+        inst = 'LD SP,' + operand;
+        code = 'this.sp = ' + operand + ';';
         address += 2;
         break;
       case 0x32:
-        inst = 'LD (' + toHex(this.readMemWord(address)) + '),A';
+        operand = toHex(this.readMemWord(address));
+        inst = 'LD (' + operand + '),A';
+        code = 'this.writeMem(' + operand + ', this.a);';
         address += 2;
         break;
       case 0x33:
         inst = 'INC SP';
+        code = 'this.sp++;';
         break;
       case 0x34:
         inst = 'INC (HL)';
+        code = 'this.incMem(this.getHL());';
         break;
       case 0x35:
         inst = 'DEC (HL)';
+        code = 'this.decMem(this.getHL());';
         break;
       case 0x36:
-        inst = 'LD (HL),' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'LD (HL),' + operand;
+        code = 'this.writeMem(this.getHL(), ' + operand + ');';
         address++;
         break;
       case 0x37:
         inst = 'SCF';
+        code = 'this.f |= F_CARRY; this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;';
         break;
       case 0x38:
         target = address + this.signExtend(this.readMem(address) + 1);
         inst = 'JR C,(' + toHex(target) + ')';
+        code = 'if ((this.f & F_CARRY) != 0) {' +
+            'this.pc = ' + toHex(target) + ';' +
+            'this.tstates -= 5;' +
+            '}';
         address++;
         break;
       case 0x39:
         inst = 'ADD HL,SP';
+        code = 'this.setHL(this.add16(this.getHL(), this.sp));';
         break;
       case 0x3A:
-        inst = 'LD A,(' + toHex(this.readMemWord(address)) + ')';
+        operand = toHex(this.readMemWord(address));
+        inst = 'LD A,(' + operand + ')';
+        code = 'this.a = this.readMem(' + operand + ');';
         address += 2;
         break;
       case 0x3B:
         inst = 'DEC SP';
+        code = 'this.sp--;';
         break;
       case 0x3C:
         inst = 'INC A';
+        code = 'this.a = this.inc8(this.a);';
         break;
       case 0x3D:
         inst = 'DEC A';
+        code = 'this.a = this.dec8(this.a);';
         break;
       case 0x3E:
-        inst = 'LD A,' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'LD A,' + operand;
+        code = 'this.a = ' + operand + ';';
         address++;
         break;
       case 0x3F:
         inst = 'CCF';
+        code = 'this.ccf();';
         break;
       case 0x40:
         inst = 'LD B,B';
+        code = '';
         break;
       case 0x41:
         inst = 'LD B,C';
+        code = 'this.b = this.c;';
         break;
       case 0x42:
         inst = 'LD B,D';
+        code = 'this.b = this.d;';
         break;
       case 0x43:
         inst = 'LD B,E';
+        code = 'this.b = this.e;';
         break;
       case 0x44:
         inst = 'LD B,H';
+        code = 'this.b = this.h;';
         break;
       case 0x45:
         inst = 'LD B,L';
+        code = 'this.b = this.l;';
         break;
       case 0x46:
         inst = 'LD B,(HL)';
+        code = 'this.b = this.readMem(this.getHL());';
         break;
       case 0x47:
         inst = 'LD B,A';
+        code = 'this.b = this.a;';
         break;
       case 0x48:
         inst = 'LD C,B';
+        code = 'this.c = this.b;';
         break;
       case 0x49:
         inst = 'LD C,C';
+        code = '';
         break;
       case 0x4A:
         inst = 'LD C,D';
+        code = 'this.c = this.d;';
         break;
       case 0x4B:
         inst = 'LD C,E';
+        code = 'this.c = this.e;';
         break;
       case 0x4C:
         inst = 'LD C,H';
+        code = 'this.c = this.h;';
         break;
       case 0x4D:
         inst = 'LD C,L';
+        code = 'this.c = this.l;';
         break;
       case 0x4E:
         inst = 'LD C,(HL)';
+        code = 'this.c = this.readMem(this.getHL());';
         break;
       case 0x4F:
         inst = 'LD C,A';
+        code = 'this.c = this.a;';
         break;
       case 0x50:
         inst = 'LD D,B';
+        code = 'this.d = this.b;';
         break;
       case 0x51:
         inst = 'LD D,C';
+        code = 'this.d = this.c;';
         break;
       case 0x52:
         inst = 'LD D,D';
+        code = '';
         break;
       case 0x53:
         inst = 'LD D,E';
+        code = 'this.d = this.e;';
         break;
       case 0x54:
         inst = 'LD D,H';
+        code = 'this.d = this.h;';
         break;
       case 0x55:
         inst = 'LD D,L';
+        code = 'this.d = this.l;';
         break;
       case 0x56:
         inst = 'LD D,(HL)';
+        code = 'this.d = this.readMem(this.getHL());';
         break;
       case 0x57:
         inst = 'LD D,A';
+        code = 'this.d = this.a;';
         break;
       case 0x58:
         inst = 'LD E,B';
+        code = 'this.e = this.b;';
         break;
       case 0x59:
         inst = 'LD E,C';
+        code = 'this.e = this.c;';
         break;
       case 0x5A:
         inst = 'LD E,D';
+        code = 'this.e = this.d;';
         break;
       case 0x5B:
         inst = 'LD E,E';
+        code = '';
         break;
       case 0x5C:
         inst = 'LD E,H';
+        code = 'this.e = this.h;';
         break;
       case 0x5D:
         inst = 'LD E,L';
+        code = 'this.e = this.l;';
         break;
       case 0x5E:
         inst = 'LD E,(HL)';
+        code = 'this.e = this.readMem(this.getHL());';
         break;
       case 0x5F:
         inst = 'LD E,A';
+        code = 'this.e = this.a;';
         break;
       case 0x60:
         inst = 'LD H,B';
+        code = 'this.h = this.b;';
         break;
       case 0x61:
         inst = 'LD H,C';
+        code = 'this.h = this.c;';
         break;
       case 0x62:
         inst = 'LD H,D';
+        code = 'this.h = this.d;';
         break;
       case 0x63:
         inst = 'LD H,E';
+        code = 'this.h = this.e;';
         break;
       case 0x64:
         inst = 'LD H,H';
+        code = '';
         break;
       case 0x65:
         inst = 'LD H,L';
+        code = 'this.h = this.l;';
         break;
       case 0x66:
         inst = 'LD H,(HL)';
+        code = 'this.h = this.readMem(this.getHL());';
         break;
       case 0x67:
         inst = 'LD H,A';
+        code = 'this.h = this.a;';
         break;
       case 0x68:
         inst = 'LD L,B';
+        code = 'this.l = this.b;';
         break;
       case 0x69:
         inst = 'LD L,C';
+        code = 'this.l = this.c;';
         break;
       case 0x6A:
         inst = 'LD L,D';
+        code = 'this.l = this.d;';
         break;
       case 0x6B:
         inst = 'LD L,E';
+        code = 'this.l = this.e;';
         break;
       case 0x6C:
         inst = 'LD L,H';
+        code = 'this.l = this.h;';
         break;
       case 0x6D:
         inst = 'LD L,L';
+        code = '';
         break;
       case 0x6E:
         inst = 'LD L,(HL)';
+        code = 'this.l = this.readMem(this.getHL());';
         break;
       case 0x6F:
         inst = 'LD L,A';
+        code = 'this.l = this.a;';
         break;
       case 0x70:
         inst = 'LD (HL),B';
+        code = 'this.writeMem(this.getHL(), this.b);';
         break;
       case 0x71:
         inst = 'LD (HL),C';
+        code = 'this.writeMem(this.getHL(), this.c);';
         break;
       case 0x72:
         inst = 'LD (HL),D';
+        code = 'this.writeMem(this.getHL(), this.d);';
         break;
       case 0x73:
         inst = 'LD (HL),E';
+        code = 'this.writeMem(this.getHL(), this.e);';
         break;
       case 0x74:
         inst = 'LD (HL),H';
+        code = 'this.writeMem(this.getHL(), this.h);';
         break;
       case 0x75:
         inst = 'LD (HL),L';
+        code = 'this.writeMem(this.getHL(), this.l);';
         break;
       case 0x76:
         inst = 'HALT';
+        if (HALT_SPEEDUP)
+          code = 'this.tstates = 0;';
+        else
+          code = '';
+        code += 'this.halt = true; this.pc--; return;';
+        // @todo Do we need `this.pc--;`?
         break;
       case 0x77:
         inst = 'LD (HL),A';
+        code = 'this.writeMem(this.getHL(), this.a);';
         break;
       case 0x78:
         inst = 'LD A,B';
+        code = 'this.a = this.b;';
         break;
       case 0x79:
         inst = 'LD A,C';
+        code = 'this.a = this.c;';
         break;
       case 0x7A:
         inst = 'LD A,D';
+        code = 'this.a = this.d;';
         break;
       case 0x7B:
         inst = 'LD A,E';
+        code = 'this.a = this.e;';
         break;
       case 0x7C:
         inst = 'LD A,H';
+        code = 'this.a = this.h;';
         break;
       case 0x7D:
         inst = 'LD A,L';
+        code = 'this.a = this.l;';
         break;
       case 0x7E:
         inst = 'LD A,(HL)';
+        code = 'this.a = this.readMem(this.getHL());';
         break;
       case 0x7F:
         inst = 'LD A,A';
+        code = '';
         break;
       case 0x80:
         inst = 'ADD A,B';
+        code = 'this.add_a(this.b);';
         break;
       case 0x81:
         inst = 'ADD A,C';
+        code = 'this.add_a(this.c);';
         break;
       case 0x82:
         inst = 'ADD A,D';
+        code = 'this.add_a(this.d);';
         break;
       case 0x83:
         inst = 'ADD A,E';
+        code = 'this.add_a(this.e);';
         break;
       case 0x84:
         inst = 'ADD A,H';
+        code = 'this.add_a(this.h);';
         break;
       case 0x85:
         inst = 'ADD A,L';
+        code = 'this.add_a(this.l);';
         break;
       case 0x86:
         inst = 'ADD A,(HL)';
+        code = 'this.add_a(this.readMem(this.getHL()));';
         break;
       case 0x87:
         inst = 'ADD A,A';
+        code = 'this.add_a(this.a);';
         break;
       case 0x88:
         inst = 'ADC A,B';
+        code = 'this.adc_a(this.b);';
         break;
       case 0x89:
         inst = 'ADC A,C';
+        code = 'this.adc_a(this.c);';
         break;
       case 0x8A:
         inst = 'ADC A,D';
+        code = 'this.adc_a(this.d);';
         break;
       case 0x8B:
         inst = 'ADC A,E';
+        code = 'this.adc_a(this.e);';
         break;
       case 0x8C:
         inst = 'ADC A,H';
+        code = 'this.adc_a(this.h);';
         break;
       case 0x8D:
         inst = 'ADC A,L';
+        code = 'this.adc_a(this.l);';
         break;
       case 0x8E:
         inst = 'ADC A,(HL)';
+        code = 'this.adc_a(this.readMem(this.getHL()));';
         break;
       case 0x8F:
         inst = 'ADC A,A';
+        code = 'this.adc_a(this.a);';
         break;
       case 0x90:
         inst = 'SUB A,B';
+        code = 'this.sub_a(this.b);';
         break;
       case 0x91:
         inst = 'SUB A,C';
+        code = 'this.sub_a(this.c);';
         break;
       case 0x92:
         inst = 'SUB A,D';
+        code = 'this.sub_a(this.d);';
         break;
       case 0x93:
         inst = 'SUB A,E';
+        code = 'this.sub_a(this.e);';
         break;
       case 0x94:
         inst = 'SUB A,H';
+        code = 'this.sub_a(this.h);';
         break;
       case 0x95:
         inst = 'SUB A,L';
+        code = 'this.sub_a(this.l);';
         break;
       case 0x96:
         inst = 'SUB A,(HL)';
+        code = 'this.sub_a(this.readMem(this.getHL()));';
         break;
       case 0x97:
         inst = 'SUB A,A';
+        code = 'this.sub_a(this.a);';
         break;
       case 0x98:
         inst = 'SBC A,B';
+        code = 'this.sbc_a(this.b);';
         break;
       case 0x99:
         inst = 'SBC A,C';
+        code = 'this.sbc_a(this.c);';
         break;
       case 0x9A:
         inst = 'SBC A,D';
+        code = 'this.sbc_a(this.d);';
         break;
       case 0x9B:
         inst = 'SBC A,E';
+        code = 'this.sbc_a(this.e);';
         break;
       case 0x9C:
         inst = 'SBC A,H';
+        code = 'this.sbc_a(this.h);';
         break;
       case 0x9D:
         inst = 'SBC A,L';
+        code = 'this.sbc_a(this.l);';
         break;
       case 0x9E:
         inst = 'SBC A,(HL)';
+        code = 'this.sbc_a(this.readMem(this.getHL()));';
         break;
       case 0x9F:
         inst = 'SBC A,A';
+        code = 'this.sbc_a(this.a);';
         break;
       case 0xA0:
         inst = 'AND A,B';
+        code = 'this.f = this.SZP_TABLE[this.a &= this.b] | F_HALFCARRY;';
         break;
       case 0xA1:
         inst = 'AND A,C';
+        code = 'this.f = this.SZP_TABLE[this.a &= this.c] | F_HALFCARRY;';
         break;
       case 0xA2:
         inst = 'AND A,D';
+        code = 'this.f = this.SZP_TABLE[this.a &= this.d] | F_HALFCARRY;';
         break;
       case 0xA3:
         inst = 'AND A,E';
+        code = 'this.f = this.SZP_TABLE[this.a &= this.e] | F_HALFCARRY;';
         break;
       case 0xA4:
         inst = 'AND A,H';
+        code = 'this.f = this.SZP_TABLE[this.a &= this.h] | F_HALFCARRY;';
         break;
       case 0xA5:
         inst = 'AND A,L';
+        code = 'this.f = this.SZP_TABLE[this.a &= this.l] | F_HALFCARRY;';
         break;
       case 0xA6:
         inst = 'AND A,(HL)';
+        code = 'this.f = this.SZP_TABLE[this.a &= this.readMem(this.getHL())] | F_HALFCARRY;';
         break;
       case 0xA7:
         inst = 'AND A,A';
+        code = 'this.f = this.SZP_TABLE[this.a] | F_HALFCARRY;';
         break;
       case 0xA8:
         inst = 'XOR A,B';
+        code = 'this.f = this.SZP_TABLE[this.a ^= this.b];';
         break;
       case 0xA9:
         inst = 'XOR A,C';
+        code = 'this.f = this.SZP_TABLE[this.a ^= this.c];';
         break;
       case 0xAA:
         inst = 'XOR A,D';
+        code = 'this.f = this.SZP_TABLE[this.a ^= this.d];';
         break;
       case 0xAB:
         inst = 'XOR A,E';
+        code = 'this.f = this.SZP_TABLE[this.a ^= this.e];';
         break;
       case 0xAC:
         inst = 'XOR A,H';
+        code = 'this.f = this.SZP_TABLE[this.a ^= this.h];';
         break;
       case 0xAD:
         inst = 'XOR A,L';
+        code = 'this.f = this.SZP_TABLE[this.a ^= this.l];';
         break;
       case 0xAE:
         inst = 'XOR A,(HL)';
+        code = 'this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getHL())];';
         break;
       case 0xAF:
         inst = 'XOR A,A'; // =0
+        code = 'this.f = ' + toHex(this.SZP_TABLE[0]) + '; this.a = ' + toHex(0) + ';';
         break;
       case 0xB0:
         inst = 'OR A,B';
+        code = 'this.f = this.SZP_TABLE[this.a |= this.b];';
         break;
       case 0xB1:
         inst = 'OR A,C';
+        code = 'this.f = this.SZP_TABLE[this.a |= this.c];';
         break;
       case 0xB2:
         inst = 'OR A,D';
+        code = 'this.f = this.SZP_TABLE[this.a |= this.d];';
         break;
       case 0xB3:
         inst = 'OR A,E';
+        code = 'this.f = this.SZP_TABLE[this.a |= this.e];';
         break;
       case 0xB4:
         inst = 'OR A,H';
+        code = 'this.f = this.SZP_TABLE[this.a |= this.h];';
         break;
       case 0xB5:
         inst = 'OR A,L';
+        code = 'this.f = this.SZP_TABLE[this.a |= this.l];';
         break;
       case 0xB6:
         inst = 'OR A,(HL)';
+        code = 'this.f = this.SZP_TABLE[this.a |= this.readMem(this.getHL())];';
         break;
       case 0xB7:
         inst = 'OR A,A';
+        code = 'this.f = this.SZP_TABLE[this.a];';
         break;
       case 0xB8:
         inst = 'CP A,B';
+        code = 'this.cp_a(this.b);';
         break;
       case 0xB9:
         inst = 'CP A,C';
+        code = 'this.cp_a(this.c);';
         break;
       case 0xBA:
         inst = 'CP A,D';
+        code = 'this.cp_a(this.d);';
         break;
       case 0xBB:
         inst = 'CP A,E';
+        code = 'this.cp_a(this.e);';
         break;
       case 0xBC:
         inst = 'CP A,H';
+        code = 'this.cp_a(this.h);';
         break;
       case 0xBD:
         inst = 'CP A,L';
+        code = 'this.cp_a(this.l);';
         break;
       case 0xBE:
         inst = 'CP A,(HL)';
+        code = 'this.cp_a(this.readMem(this.getHL()));';
         break;
       case 0xBF:
         inst = 'CP A,A';
+        code = 'this.cp_a(this.a);';
         break;
       case 0xC0:
         inst = 'RET NZ';
+        code = 'if ((this.f & F_ZERO) == 0) {' +
+            'this.pc = this.readMemWord(this.sp);' +
+            'this.sp += 2;' +
+            'this.tstates -= 6;' +
+            'return;' +
+            '}';
         break;
       case 0xC1:
         inst = 'POP BC';
+        code = 'this.setBC(this.readMemWord(this.sp)); this.sp += 2;';
         break;
       case 0xC2:
         target = this.readMemWord(address);
         inst = 'JP NZ,(' + toHex(target) + ')';
+        code = 'if ((this.f & F_ZERO) == 0) {' +
+            'this.pc = ' + toHex(target) + ';' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xC3:
         target = this.readMemWord(address);
         inst = 'JP (' + toHex(target) + ')';
+        code = 'this.pc = ' + toHex(target) + ';';
         address = null;
         break;
       case 0xC4:
         target = this.readMemWord(address);
         inst = 'CALL NZ (' + toHex(target) + ')';
+        code = 'if ((this.f & F_ZERO) == 0) {' +
+            'this.push1(' + toHex(address + 2) + ');' + // write value of PC to stack
+            'this.pc = ' + toHex(target) + ';' +
+            'this.tstates -= 7;' +
+            '}';
         address += 2;
         break;
       case 0xC5:
         inst = 'PUSH BC';
+        code = 'this.push2(this.b, this.c);';
         break;
       case 0xC6:
-        inst = 'ADD A,' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'ADD A,' + operand;
+        code = 'this.add_a(' + operand + ');';
         address++;
         break;
       case 0xC7:
         target = 0x00;
         inst = 'RST ' + toHex(target);
+        code = 'this.push1(' + toHex(address) + '); this.pc = ' + toHex(target) + '; return;';
         break;
       case 0xC8:
         inst = 'RET Z';
+        code = 'if ((this.f & F_ZERO) != 0) {' +
+            'this.pc = this.readMemWord(this.sp);' +
+            'this.sp += 2;' +
+            'this.tstates -= 6;' +
+            'return;' +
+            '}';
         break;
       case 0xC9:
         inst = 'RET';
+        code = 'this.pc = this.readMemWord(this.sp); this.sp += 2;';
         address = null;
         break;
       case 0xCA:
         target = this.readMemWord(address);
         inst = 'JP Z,(' + toHex(target) + ')';
+        code = 'if ((this.f & F_ZERO) != 0) {' +
+            'this.pc = ' + toHex(target) + ';' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xCB:
         var _inst = this.getCB(address);
         inst = _inst.inst;
+        code = _inst.code;
         opcodesArray = opcodesArray.concat(_inst.opcodes);
         address = _inst.nextAddress;
         // @todo
@@ -886,215 +1185,367 @@ JSSMS.Debugger.prototype = {
       case 0xCC:
         target = this.readMemWord(address);
         inst = 'CALL Z (' + toHex(target) + ')';
+        code = 'if ((this.f & F_ZERO) != 0) {' +
+            'this.push1(' + toHex(address + 2) + ');' + // write value of PC to stack
+            'this.pc = ' + toHex(target) + ';' +
+            'this.tstates -= 7;' +
+            '}';
         address += 2;
         break;
       case 0xCD:
         target = this.readMemWord(address);
         inst = 'CALL (' + toHex(target) + ')';
+        code = 'this.push1(' + toHex(address + 2) + '); this.pc = ' + toHex(target) + '; return;';
         address += 2;
         break;
       case 0xCE:
-        inst = 'ADC ,' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'ADC ,' + operand;
+        code = 'this.adc_a(' + operand + ');';
         address++;
         break;
       case 0xCF:
         target = 0x08;
         inst = 'RST ' + toHex(target);
+        code = 'this.push1(' + toHex(address) + '); this.pc = ' + toHex(target) + '; return;';
         break;
       case 0xD0:
         inst = 'RET NC';
+        code = 'if ((this.f & F_CARRY) == 0) {' +
+            'this.pc = this.readMemWord(this.sp);' +
+            'this.sp += 2;' +
+            'this.tstates -= 6;' +
+            'return;' +
+            '}';
         break;
       case 0xD1:
         inst = 'POP DE';
+        code = 'this.setDE(this.readMemWord(this.sp)); this.sp += 2;';
         break;
       case 0xD2:
         target = this.readMemWord(address);
         inst = 'JP NC,(' + toHex(target) + ')';
+        code = 'if ((this.f & F_CARRY) == 0) {' +
+            'this.pc = ' + toHex(target) + ';' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xD3:
         inst = 'OUT (' + toHex(this.readMem(address)) + '),A';
+        code = 'this.port.out(' + toHex(this.readMem(address)) + ', this.a);';
         address++;
         break;
       case 0xD4:
         target = this.readMemWord(address);
         inst = 'CALL NC (' + toHex(target) + ')';
+        code = 'if ((this.f & F_CARRY) == 0) {' +
+            'this.push1(' + toHex(address + 2) + ');' + // write value of PC to stack
+            'this.pc = ' + toHex(target) + ';' +
+            'this.tstates -= 7;' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xD5:
         inst = 'PUSH DE';
+        code = 'this.push2(this.d, this.e);';
         break;
       case 0xD6:
         inst = 'SUB ' + toHex(this.readMem(address));
+        code = '';
         break;
       case 0xD7:
         target = 0x10;
         inst = 'RST ' + toHex(target);
+        code = 'this.push1(' + toHex(address) + '); this.pc = ' + toHex(target) + '; return;';
         break;
       case 0xD8:
         inst = 'RET C';
+        code = 'if ((this.f & F_CARRY) != 0) {' +
+            'this.pc = this.readMemWord(this.sp);' +
+            'this.sp += 2;' +
+            'this.tstates -= 6;' +
+            'return;' +
+            '}';
         break;
       case 0xD9:
         inst = 'EXX';
+        // @todo Expand these functions?
+        code = 'this.exBC(); this.exDE(); this.exHL();';
         break;
       case 0xDA:
         target = this.readMemWord(address);
         inst = 'JP C,(' + toHex(target) + ')';
+        code = 'if ((this.f & F_CARRY) != 0) {' +
+            'this.pc = ' + toHex(target) + ';' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xDB:
-        inst = 'IN A,(' + toHex(this.readMem(address)) + ')';
+        operand = toHex(this.readMem(address));
+        inst = 'IN A,(' + operand + ')';
+        code = 'this.a = this.port.in_(' + operand + ');';
         address++;
         break;
       case 0xDC:
         target = this.readMemWord(address);
         inst = 'CALL C (' + toHex(target) + ')';
+        code = 'if ((this.f & F_CARRY) != 0) {' +
+            'this.push1(' + toHex(address + 2) + ');' + // write value of PC to stack
+            'this.pc = ' + toHex(target) + ';' +
+            'this.tstates -= 7;' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xDD:
         var _inst = this.getIndexOpIX(address);
         inst = _inst.inst;
+        code = _inst.code;
         opcodesArray = opcodesArray.concat(_inst.opcodes);
         address = _inst.nextAddress;
         // @todo
         break;
       case 0xDE:
-        inst = 'SBC A,' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'SBC A,' + operand;
+        code = 'this.sbc_a(' + operand + ');';
         address++;
         break;
       case 0xDF:
         target = 0x18;
         inst = 'RST ' + toHex(target);
+        code = 'this.push1(' + toHex(address) + '); this.pc = ' + toHex(target) + '; return;';
         break;
       case 0xE0:
         inst = 'RET PO';
+        code = 'if ((this.f & F_PARITY) == 0) {' +
+            'this.pc = this.readMemWord(this.sp);' +
+            'this.sp += 2;' +
+            'this.tstates -= 6;' +
+            'return;' +
+            '}';
         break;
       case 0xE1:
         inst = 'POP HL';
+        code = 'this.setHL(this.readMemWord(this.sp)); this.sp += 2;';
         break;
       case 0xE2:
         target = this.readMemWord(address);
         inst = 'JP PO,(' + toHex(target) + ')';
+        code = 'if ((this.f & F_PARITY) == 0) {' +
+            'this.pc = ' + toHex(target) + ';' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xE3:
         inst = 'EX (SP),HL';
+        code = 'temp = this.h;' +
+            'this.h = this.readMem(this.sp + 1);' +
+            'this.writeMem(this.sp + 1, temp);' +
+            'temp = this.l;' +
+            'this.l = this.readMem(this.sp);' +
+            'this.writeMem(this.sp, temp);';
         break;
       case 0xE4:
         target = this.readMemWord(address);
         inst = 'CALL PO (' + toHex(target) + ')';
+        code = 'if ((this.f & F_PARITY) == 0) {' +
+            'this.push1(' + toHex(address + 2) + ');' + // write value of PC to stack
+            'this.pc = ' + toHex(target) + ';' +
+            'this.tstates -= 7;' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xE5:
         inst = 'PUSH HL';
+        code = 'this.push2(this.h, this.l);';
         break;
       case 0xE6:
-        inst = 'AND (' + toHex(this.readMem(address)) + ')';
+        operand = toHex(this.readMem(address));
+        inst = 'AND (' + operand + ')';
+        code = 'this.f = this.SZP_TABLE[this.a &= ' + operand + '] | F_HALFCARRY;';
         address++;
         break;
       case 0xE7:
         target = 0x20;
         inst = 'RST ' + toHex(target);
+        code = 'this.push1(' + toHex(address) + '); this.pc = ' + toHex(target) + '; return;';
         break;
       case 0xE8:
         inst = 'RET PE';
+        code = 'if ((this.f & F_PARITY) != 0) {' +
+            'this.pc = this.readMemWord(this.sp);' +
+            'this.sp += 2;' +
+            'this.tstates -= 6;' +
+            'return;' +
+            '}';
         break;
       case 0xE9:
         // This target can't be determined using static analysis.
         inst = 'JP (HL)';
+        code = 'this.pc = this.getHL();';
         address = null;
         break;
       case 0xEA:
         target = this.readMemWord(address);
         inst = 'JP PE,(' + toHex(target) + ')';
+        code = 'if ((this.f & F_PARITY) != 0) {' +
+            'this.pc = ' + toHex(target) + ';' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xEB:
         inst = 'EX DE,HL';
+        code = 'temp = this.d;' +
+            'this.d = this.h;' +
+            'this.h = temp;' +
+            'temp = this.e;' +
+            'this.e = this.l;' +
+            'this.l = temp;';
         break;
       case 0xEC:
         target = this.readMemWord(address);
         inst = 'CALL PE (' + toHex(target) + ')';
+        code = 'if ((this.f & F_PARITY) != 0) {' +
+            'this.push1(' + toHex(address + 2) + ');' + // write value of PC to stack
+            'this.pc = ' + toHex(target) + ';' +
+            'this.tstates -= 7;' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xED:
         var _inst = this.getED(address);
         inst = _inst.inst;
+        code = _inst.code;
         opcodesArray = opcodesArray.concat(_inst.opcodes);
         address = _inst.nextAddress;
         // @todo
         break;
       case 0xEE:
-        inst = 'XOR A,' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'XOR A,' + operand;
+        code = 'this.f = this.SZP_TABLE[this.a ^= ' + operand + '];';
         address++;
         break;
       case 0xEF:
         target = 0x28;
         inst = 'RST ' + toHex(target);
+        code = 'this.push1(' + toHex(address) + '); this.pc = ' + toHex(target) + '; return;';
         break;
       case 0xF0:
         inst = 'RET P';
+        code = 'if ((this.f & F_SIGN) == 0) {' +
+            'this.pc = this.readMemWord(this.sp);' +
+            'this.sp += 2;' +
+            'this.tstates -= 6;' +
+            'return;' +
+            '}';
         break;
       case 0xF1:
         inst = 'POP AF';
+        code = 'this.f = this.readMem(this.sp++); this.a = this.readMem(this.sp++);';
         break;
       case 0xF2:
         target = this.readMemWord(address);
         inst = 'JP P,(' + toHex(target) + ')';
+        code = 'if ((this.f & F_SIGN) == 0) {' +
+            'this.pc = ' + toHex(target) + ';' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xF3:
         inst = 'DI';
+        code = 'this.iff1 = this.iff2 = false; this.EI_inst = true;';
         break;
       case 0xF4:
         target = this.readMemWord(address);
         inst = 'CALL P (' + toHex(target) + ')';
+        code = 'if ((this.f & F_SIGN) == 0) {' +
+            'this.push1(' + toHex(address + 2) + ');' + // write value of PC to stack
+            'this.pc = ' + toHex(target) + ';' +
+            'this.tstates -= 7;' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xF5:
         inst = 'PUSH AF';
+        code = 'this.push2(this.a, this.f);';
         break;
       case 0xF6:
-        inst = 'OR ' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'OR ' + operand;
+        code = 'this.f = this.SZP_TABLE[this.a |= ' + operand + '];';
         address++;
         break;
       case 0xF7:
         target = 0x30;
         inst = 'RST ' + toHex(target);
+        code = 'this.push1(' + toHex(address) + '); this.pc = ' + toHex(target) + '; return;';
         break;
       case 0xF8:
         inst = 'RET M';
+        code = 'if ((this.f & F_SIGN) != 0) {' +
+            'this.pc = this.readMemWord(this.sp);' +
+            'this.sp += 2;' +
+            'this.tstates -= 6;' +
+            'return;' +
+            '}';
         break;
       case 0xF9:
         inst = 'LD SP,HL';
+        code = 'this.sp = this.getHL()';
         break;
       case 0xFA:
         target = this.readMemWord(address);
         inst = 'JP M,(' + toHex(target) + ')';
+        code = 'if ((this.f & F_SIGN) != 0) {' +
+            'this.pc = ' + toHex(target) + ';' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xFB:
         inst = 'EI';
+        code = 'this.iff1 = this.iff2 = this.EI_inst = true;';
         break;
       case 0xFC:
         target = this.readMemWord(address);
         inst = 'CALL M (' + toHex(target) + ')';
+        code = 'if ((this.f & F_SIGN) != 0) {' +
+            'this.push1(' + toHex(address + 2) + ');' + // write value of PC to stack
+            'this.pc = ' + toHex(target) + ';' +
+            'this.tstates -= 7;' +
+            'return;' +
+            '}';
         address += 2;
         break;
       case 0xFD:
         var _inst = this.getIndexOpIY(address);
         inst = _inst.inst;
+        code = _inst.code;
         opcodesArray = opcodesArray.concat(_inst.opcodes);
         address = _inst.nextAddress;
         // @todo
         break;
       case 0xFE:
-        inst = 'CP ' + toHex(this.readMem(address));
+        operand = toHex(this.readMem(address));
+        inst = 'CP ' + operand;
+        code = 'this.cp_a(' + operand + ');';
         address++;
         break;
       case 0xFF:
         target = 0x38;
         inst = 'RST ' + toHex(target);
+        code = 'this.push1(' + toHex(address) + '); this.pc = ' + toHex(target) + '; return;';
         break;
     }
 
@@ -1102,6 +1553,7 @@ JSSMS.Debugger.prototype = {
       opcode: opcode,
       opcodes: opcodesArray,
       inst: inst,
+      code: code,
       address: currAddr,
       nextAddress: address,
       target: target
@@ -1120,11 +1572,13 @@ JSSMS.Debugger.prototype = {
     var opcodesArray = [opcode];
     var inst = 'Unimplemented 0xCB prefixed opcode';
     var currAddr = address;
+    var code = 'throw "Unimplemented 0xCB prefixed opcode";';
     address++;
 
     switch (opcode) {
       case 0x00:
         inst = 'RLC B';
+        code = 'this.b = (this.rlc(this.b));';
         break;
       case 0x01:
         inst = 'RLC C';
@@ -1897,6 +2351,7 @@ JSSMS.Debugger.prototype = {
       opcode: opcode,
       opcodes: opcodesArray,
       inst: inst,
+      code: code,
       address: currAddr,
       nextAddress: address
     };
@@ -1915,6 +2370,7 @@ JSSMS.Debugger.prototype = {
     var opcodesArray = [opcode];
     var inst = 'Unimplemented 0xED prefixed opcode';
     var currAddr = address;
+    var code = 'throw "Unimplemented 0xED prefixed opcode";';
     address++;
 
     switch (opcode) {
@@ -1940,6 +2396,10 @@ JSSMS.Debugger.prototype = {
       case 0x74:
       case 0x7C:
         inst = 'NEG';
+        // A <- 0-A
+        code = 'temp = this.a;' +
+            'this.a = 0;' +
+            'this.sub_a(temp);';
         break;
       case 0x45:
       case 0x4D:
@@ -1993,6 +2453,7 @@ JSSMS.Debugger.prototype = {
       case 0x56:
       case 0x76:
         inst = 'IM 1';
+        code = 'this.im = 1;';
         break;
       case 0x57:
         inst = 'LD A,I';
@@ -2012,6 +2473,13 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x5F:
         inst = 'LD A,R';
+        if (Setup.REFRESH_EMULATION) {
+          code = 'this.a = this.r;';
+        } else {
+          // Note, to fake refresh emulation we use the random number generator
+          code = 'this.a = JSSMS.Utils.rndInt(255);';
+        }
+        code += 'this.f = (this.f & F_CARRY) | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);';
         break;
       case 0x60:
         inst = 'IN H,(C)';
@@ -2079,6 +2547,20 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xA3:
         inst = 'OUTI';
+        code = 'temp = this.readMem(this.getHL());' +
+            // (C) <- (HL)
+            'this.port.out(this.c, temp);' +
+            // HL <- HL + 1
+            'this.incHL();' +
+            // B <- B -1
+            'this.b = this.dec8(this.b);' + // Flags in OUTI adjusted in same way as dec b anyway.
+            'if ((this.l + temp) > 255) {' +
+            'this.f |= F_CARRY; this.f |= F_HALFCARRY;' +
+            '} else {' +
+            'this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;' +
+            '}' +
+            'if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;' +
+            'else this.f &= ~ F_NEGATIVE;';
         break;
       case 0xA8:
         inst = 'LDD';
@@ -2094,6 +2576,23 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xB0:
         inst = 'LDIR';
+        code = 'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
+            'this.incDE();' +
+            'this.incHL();' +
+            'this.decBC();' +
+            '' +
+            'if (this.getBC() != 0) {' +
+            'this.f |= F_PARITY;' +
+            'this.tstates -= 5;' +
+            'this.pc = ' + toHex(address - 2) + ';' +
+            '} else {' +
+            'this.f &= ~ F_PARITY;' +
+            'this.pc = ' + toHex(address) + ';' +
+            '}' +
+            '' +
+            'this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;' +
+            '' +
+            'return;';
         break;
       case 0xB1:
         inst = 'CPIR';
@@ -2103,6 +2602,30 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xB3:
         inst = 'OTIR';
+        code = 'temp = this.readMem(this.getHL());' +
+            // (C) <- (HL)
+            'this.port.out(this.c, temp);' +
+            // B <- B -1
+            'this.b = this.dec8(this.b);' +
+            // HL <- HL + 1
+            'this.incHL();' +
+            '' +
+            'if (this.b != 0) {' +
+            'this.tstates -= 5;' +
+            'this.pc = ' + toHex(address - 2) + ';' +
+            '} else {' +
+            'this.pc = ' + toHex(address) + ';' +
+            '}' +
+            'if ((this.l + temp) > 255) {' +
+            'this.f |= F_CARRY; this.f |= F_HALFCARRY;' +
+            '} else {' +
+            'this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;' +
+            '}' +
+            '' +
+            'if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;' +
+            'else this.f &= ~ F_NEGATIVE;' +
+            '' +
+            'return;';
         break;
       case 0xB8:
         inst = 'LDDR';
@@ -2122,6 +2645,7 @@ JSSMS.Debugger.prototype = {
       opcode: opcode,
       opcodes: opcodesArray,
       inst: inst,
+      code: code,
       address: currAddr,
       nextAddress: address
     };
@@ -2141,25 +2665,37 @@ JSSMS.Debugger.prototype = {
     var opcodesArray = [opcode];
     var inst = 'Unimplemented 0xDD or 0xFD prefixed opcode';
     var currAddr = address;
+    var code = 'throw "Unimplemented 0xDD or 0xFD prefixed opcode";';
+    var operand = '';
     address++;
 
     switch (opcode) {
       case 0x09:
         inst = 'ADD ' + index + ',BC';
+        code = 'this.set' + index + '(this.add16(this.get' + index + '(), this.getBC()));';
         break;
       case 0x19:
         inst = 'ADD ' + index + ',DE';
+        code = 'this.set' + index + '(this.add16(this.get' + index + '(), this.getDE()));';
         break;
       case 0x21:
-        inst = 'LD ' + index + ',' + toHex(this.readMemWord(address));
+        operand = toHex(this.readMemWord(address));
+        inst = 'LD ' + index + ',' + operand;
+        code = 'this.set' + index + '(' + operand + ');';
         address = address + 2;
         break;
       case 0x22:
-        inst = 'LD (' + toHex(this.readMemWord(address)) + '),' + index;
+        operand = toHex(this.readMemWord(address));
+        inst = 'LD (' + operand + '),' + index;
+        code = 'location = ' + operand + ';' +
+            'this.writeMem(location++, this.' + index.toLowerCase() + 'L);' +
+            'this.writeMem(location, this.' + index.toLowerCase() + 'H);' +
+            'this.pc += 2;';
         address = address + 2;
         break;
       case 0x23:
         inst = 'INC ' + index;
+        code = 'this.inc' + index + '();';
         break;
       case 0x24:
         inst = 'INC ' + index + 'H *';
@@ -2180,6 +2716,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x2B:
         inst = 'DEC ' + index;
+        code = 'this.dec' + index + '();';
         break;
       case 0x2C:
         inst = 'INC ' + index + 'L *';
@@ -2366,6 +2903,7 @@ JSSMS.Debugger.prototype = {
         var offset = this.signExtend(this.readMem(address));
         var sign = offset > 0 ? '+' : '-';
         inst = 'LD A,(' + index + sign + toHex(offset) + '))';
+        code = 'this.a = this.readMem(this.getIX() ' + sign + ' ' + toHex(offset) + ');';
         address++;
         break;
       case 0x84:
@@ -2493,6 +3031,7 @@ JSSMS.Debugger.prototype = {
       opcode: opcode,
       opcodes: opcodesArray,
       inst: inst,
+      code: code,
       address: currAddr,
       nextAddress: address
     };
@@ -2511,6 +3050,7 @@ JSSMS.Debugger.prototype = {
     var opcodesArray = [opcode];
     var inst = 'Unimplemented 0xDDCB or 0xFDCB prefixed opcode';
     var currAddr = address;
+    var code = 'throw "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";';
     address++;
 
     switch (opcode) {
@@ -2952,6 +3492,7 @@ JSSMS.Debugger.prototype = {
       opcode: opcode,
       opcodes: opcodesArray,
       inst: inst,
+      code: code,
       address: currAddr,
       nextAddress: address
     };
@@ -2996,6 +3537,7 @@ function Instruction(options) {
     opcode: 0,
     opcodes: [],
     inst: '',
+    code: '',
     nextAddress: null,
     target: null,
     isJumpTarget: false,
