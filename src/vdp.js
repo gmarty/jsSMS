@@ -118,7 +118,7 @@ var GG_Y_OFFSET = 24;
 JSSMS.Vdp = function(sms) {
   this.main = sms;
 
-  /** @type {number}*/ var i;
+  var i = 0;
 
   /**
    * NTSC / PAL emulation.
@@ -236,9 +236,10 @@ JSSMS.Vdp = function(sms) {
 
   /**
    * SMS colours converted to RGB hex.
-   * @type {Array.<number>}
    */
-  this.main_JAVA = new Array(0x40);
+  /** @type {Array.<number>} */ this.main_JAVA_R = new Array(0x40);
+  /** @type {Array.<number>} */ this.main_JAVA_G = new Array(0x40);
+  /** @type {Array.<number>} */ this.main_JAVA_B = new Array(0x40);
 
   /** GG colours converted to RGB hex. */
   /** @type {Array.<number>} */ this.GG_JAVA1 = new Array(0x100);
@@ -534,9 +535,9 @@ JSSMS.Vdp.prototype = {
       case 0x03:
         if (this.main.is_sms) {
           temp = (this.location & 0x1F) * 3;
-          this.CRAM[temp] = this.main_JAVA[value & 0x3F] & 0xFF;
-          this.CRAM[temp + 1] = (this.main_JAVA[value & 0x3F] >> 8) & 0xFF;
-          this.CRAM[temp + 2] = (this.main_JAVA[value & 0x3F] >> 16) & 0xFF;
+          this.CRAM[temp] = this.main_JAVA_R[value & 0x3F];
+          this.CRAM[temp + 1] = this.main_JAVA_G[value & 0x3F];
+          this.CRAM[temp + 2] = this.main_JAVA_B[value & 0x3F];
         }
         else if (this.main.is_gg) {
           temp = ((this.location & 0x3F) >> 1) * 3;
@@ -630,8 +631,7 @@ JSSMS.Vdp.prototype = {
 
     // Clear sprite collision array if enabled
     if (Setup.VDP_SPRITE_COLLISIONS) {
-      i = SMS_WIDTH; // this.spriteCol.length
-      while (i--)
+      for (i = 0; i < SMS_WIDTH /* this.spriteCol.length */; i++)
         this.spriteCol[i] = false;
     }
 
@@ -773,6 +773,7 @@ JSSMS.Vdp.prototype = {
     var colour = 0;
     var temp = 0;
     var temp2 = 0;
+    var i = 0;
 
     // Reference to the sprites that should appear on this line
     var sprites = this.lineSprites[lineno];
@@ -789,8 +790,7 @@ JSSMS.Vdp.prototype = {
     var off = (count * 3);
 
     // Have to iterate backwards here as we've already cached tiles
-    var i = count;
-    while (i--) {
+    for (; i < count; i++) {
       // Sprite Pattern Index
       // Also mask on Pattern Index from 100 - 1FFh (if reg 6 bit 3 set)
       var n = sprites[off--] | ((this.vdpreg[6] & 0x04) << 6);
@@ -934,7 +934,9 @@ JSSMS.Vdp.prototype = {
         g = (i >> 2) & 0x03;
         b = (i >> 4) & 0x03;
 
-        this.main_JAVA[i] = ((r * 85)) | ((g * 85) << 8) | (b * 85 << 16);
+        this.main_JAVA_R[i] = (r * 85) & 0xFF;
+        this.main_JAVA_G[i] = (g * 85) & 0xFF;
+        this.main_JAVA_B[i] = (b * 85) & 0xFF;
       }
     } else if (this.main.is_gg && !this.isPalConverted) {
       // Green & Blue
