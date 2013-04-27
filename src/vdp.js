@@ -461,7 +461,7 @@ JSSMS.Vdp.prototype = {
           case 5:
             var old = this.sat;
             // Address of Sprite Attribute Table in RAM
-            this.sat = (this.commandByte & ~ 0x01 & ~ 0x80) << 7;
+            this.sat = (this.commandByte & ~0x01 & ~0x80) << 7;
 
             if (old != this.sat) {
               // Should also probably update tiles here?
@@ -504,7 +504,7 @@ JSSMS.Vdp.prototype = {
     this.firstByte = true;
 
     switch (this.operation) {
-    // VRAM Write
+      // VRAM Write
       case 0x00:
       case 0x01:
       case 0x02:
@@ -527,8 +527,6 @@ JSSMS.Vdp.prototype = {
 
           this.VRAM[address] = value;
         }
-        // DEBUG
-        //debugger;
         break;
       // CRAM Write
       // Instead of writing real colour to CRAM, write converted Java palette colours for speed.
@@ -656,21 +654,13 @@ JSSMS.Vdp.prototype = {
       if (this.main.is_sms && (this.vdpreg[0] & 0x20) != 0) {
         var location = lineno << 8;
 
-        // DEBUG
-        if (16 + (this.vdpreg[7] & 0x0F) > 0x20) {
-          debugger;
-        }
-        if (location > SMS_WIDTH * SMS_HEIGHT) {
-          debugger;
-        }
-
         // Don't use a loop here for speed purposes
         temp = location * 4;
         temp2 = (16 + (this.vdpreg[7] & 0x0F)) * 3;
         for (i = 0; i < 8; i++) {
           this.display[temp + i] = this.CRAM[temp2];
-          this.display[temp + i + 1] = this.CRAM[temp2];
-          this.display[temp + i + 2] = this.CRAM[temp2];
+          this.display[temp + i + 1] = this.CRAM[temp2 + 1];
+          this.display[temp + i + 2] = this.CRAM[temp2 + 2];
         }
       }
     } else {
@@ -945,8 +935,6 @@ JSSMS.Vdp.prototype = {
         b = (i >> 4) & 0x03;
 
         this.main_JAVA[i] = ((r * 85)) | ((g * 85) << 8) | (b * 85 << 16);
-
-        this.isPalConverted = true;
       }
     } else if (this.main.is_gg && !this.isPalConverted) {
       // Green & Blue
@@ -965,9 +953,9 @@ JSSMS.Vdp.prototype = {
         //this.GG_JAVA2[i] = (i << 4) | i;
         this.GG_JAVA2[i] = (i << 20);
       }
-
-      this.isPalConverted = true;
     }
+
+    this.isPalConverted = true;
   },
 
 
