@@ -647,7 +647,7 @@ JSSMS.Vdp.prototype = {
 
         // Don't use a loop here for speed purposes
         temp = location * 4;
-        temp2 = (16 + (this.vdpreg[7] & 0x0F)) * 3;
+        temp2 = ((this.vdpreg[7] & 0x0F) + 16) * 3;
         for (i = 0; i < 8; i++) {
           this.display[temp + i] = this.CRAM[temp2];
           this.display[temp + i + 1] = this.CRAM[temp2 + 1];
@@ -892,16 +892,13 @@ JSSMS.Vdp.prototype = {
    */
   drawBGColour: function(lineno) {
     var row_precal = lineno << 8;
-    var temp = 0;
-    var temp2 = (16 + (this.vdpreg[7] & 0x0F)) * 3;
-    var i = 0;
+    var length = (row_precal + (SMS_WIDTH * 4)) * 4;
+    var temp = ((this.vdpreg[7] & 0x0F) + 16) * 3;
 
-    for (; i < SMS_WIDTH * 4; i++) {
-      temp = row_precal * 4;
-      this.display[temp] = this.CRAM[temp2];
-      this.display[temp + 1] = this.CRAM[temp2 + 1];
-      this.display[temp + 2] = this.CRAM[temp2 + 2];
-      row_precal++;
+    for (row_precal = row_precal * 4; row_precal < length; row_precal = row_precal + 4) {
+      this.display[row_precal] = this.CRAM[temp];
+      this.display[row_precal + 1] = this.CRAM[temp + 1];
+      this.display[row_precal + 2] = this.CRAM[temp + 2];
     }
   },
 
