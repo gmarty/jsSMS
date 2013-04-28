@@ -534,19 +534,19 @@ JSSMS.Vdp.prototype = {
       case 0x03:
         if (this.main.is_sms) {
           temp = (this.location & 0x1F) * 3;
-          this.CRAM[temp] = this.main_JAVA_R[value & 0x3F];
-          this.CRAM[temp + 1] = this.main_JAVA_G[value & 0x3F];
-          this.CRAM[temp + 2] = this.main_JAVA_B[value & 0x3F];
+          this.CRAM[temp] = this.main_JAVA_R[value];
+          this.CRAM[temp + 1] = this.main_JAVA_G[value];
+          this.CRAM[temp + 2] = this.main_JAVA_B[value];
         }
         else if (this.main.is_gg) {
           temp = ((this.location & 0x3F) >> 1) * 3;
-          if ((this.location & 1) == 0) {
+          if ((this.location & 0x01) == 0) {
             // first byte
             this.CRAM[temp] = this.GG_JAVA_G[value]; // GG
             this.CRAM[temp + 1] = this.GG_JAVA_B[value]; // GG
           }
           else {
-            this.CRAM[temp + 2] = this.GG_JAVA_R[value & 0x0F];
+            this.CRAM[temp + 2] = this.GG_JAVA_R[value];
           }
         }
         break;
