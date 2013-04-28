@@ -34,10 +34,10 @@ function $JSSMS$$($opts$$) {
 }
 $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, $no_of_scanlines$:0, $frameSkip$:0, $fps$:0, $frameskip_counter$:0, $pause_button$:$JSCompiler_alias_FALSE$$, $is_sms$:$JSCompiler_alias_TRUE$$, $is_gg$:$JSCompiler_alias_FALSE$$, $soundEnabled$:$JSCompiler_alias_FALSE$$, $audioBuffer$:[], $audioBufferOffset$:0, $samplesPerFrame$:0, $samplesPerLine$:[], $fpsFrameCount$:0, $z80TimeCounter$:0, $drawTimeCounter$:0, $frameCount$:0, $romData$:"", $romFileName$:"", $lineno$:0, 
 reset:function $$JSSMS$$$$reset$() {
-  var $JSCompiler_StaticMethods_init$self$$inline_269_mode$$inline_14_v$$inline_17$$ = this.$vdp$.$B$, $clockSpeedHz$$inline_15_i$$inline_16_i$$inline_271$$ = 0;
+  var $JSCompiler_StaticMethods_init$self$$inline_269_mode$$inline_14_v$$inline_17$$ = this.$vdp$.$z$, $clockSpeedHz$$inline_15_i$$inline_16_i$$inline_271$$ = 0;
   0 == $JSCompiler_StaticMethods_init$self$$inline_269_mode$$inline_14_v$$inline_17$$ || this.$is_gg$ ? (this.$fps$ = 60, this.$no_of_scanlines$ = 262, $clockSpeedHz$$inline_15_i$$inline_16_i$$inline_271$$ = 3579545) : 1 == $JSCompiler_StaticMethods_init$self$$inline_269_mode$$inline_14_v$$inline_17$$ && (this.$fps$ = 50, this.$no_of_scanlines$ = 313, $clockSpeedHz$$inline_15_i$$inline_16_i$$inline_271$$ = 3546893);
   this.$cyclesPerLine$ = Math.round($clockSpeedHz$$inline_15_i$$inline_16_i$$inline_271$$ / this.$fps$ / this.$no_of_scanlines$ + 1);
-  this.$vdp$.$B$ = $JSCompiler_StaticMethods_init$self$$inline_269_mode$$inline_14_v$$inline_17$$;
+  this.$vdp$.$z$ = $JSCompiler_StaticMethods_init$self$$inline_269_mode$$inline_14_v$$inline_17$$;
   if(this.$soundEnabled$) {
     $JSCompiler_StaticMethods_init$self$$inline_269_mode$$inline_14_v$$inline_17$$ = this.$b$;
     $JSCompiler_StaticMethods_init$self$$inline_269_mode$$inline_14_v$$inline_17$$.$j$ = ($clockSpeedHz$$inline_15_i$$inline_16_i$$inline_271$$ << 8) / 16 / 44100;
@@ -174,8 +174,8 @@ function $JSCompiler_StaticMethods_readRomDirectly$$($JSCompiler_StaticMethods_r
   var $mode$$9_pages$$;
   $mode$$9_pages$$ = ".gg" == $fileName$$.substr(-3).toLowerCase() ? 2 : 1;
   var $size$$10$$ = $data$$30$$.length;
-  1 == $mode$$9_pages$$ ? ($JSCompiler_StaticMethods_readRomDirectly$self$$.$is_sms$ = $JSCompiler_alias_TRUE$$, $JSCompiler_StaticMethods_readRomDirectly$self$$.$is_gg$ = $JSCompiler_alias_FALSE$$, $JSCompiler_StaticMethods_readRomDirectly$self$$.$vdp$.$s$ = 0, $JSCompiler_StaticMethods_readRomDirectly$self$$.$vdp$.$z$ = 32) : 2 == $mode$$9_pages$$ && ($JSCompiler_StaticMethods_readRomDirectly$self$$.$is_gg$ = $JSCompiler_alias_TRUE$$, $JSCompiler_StaticMethods_readRomDirectly$self$$.$is_sms$ = 
-  $JSCompiler_alias_FALSE$$, $JSCompiler_StaticMethods_readRomDirectly$self$$.$vdp$.$s$ = 5, $JSCompiler_StaticMethods_readRomDirectly$self$$.$vdp$.$z$ = 27);
+  1 == $mode$$9_pages$$ ? ($JSCompiler_StaticMethods_readRomDirectly$self$$.$is_sms$ = $JSCompiler_alias_TRUE$$, $JSCompiler_StaticMethods_readRomDirectly$self$$.$is_gg$ = $JSCompiler_alias_FALSE$$, $JSCompiler_StaticMethods_readRomDirectly$self$$.$vdp$.$s$ = 0, $JSCompiler_StaticMethods_readRomDirectly$self$$.$vdp$.$v$ = 32) : 2 == $mode$$9_pages$$ && ($JSCompiler_StaticMethods_readRomDirectly$self$$.$is_gg$ = $JSCompiler_alias_TRUE$$, $JSCompiler_StaticMethods_readRomDirectly$self$$.$is_sms$ = 
+  $JSCompiler_alias_FALSE$$, $JSCompiler_StaticMethods_readRomDirectly$self$$.$vdp$.$s$ = 5, $JSCompiler_StaticMethods_readRomDirectly$self$$.$vdp$.$v$ = 27);
   if(1024 >= $size$$10$$) {
     return $JSCompiler_alias_FALSE$$
   }
@@ -191,27 +191,7 @@ function $JSCompiler_StaticMethods_readRomDirectly$$($JSCompiler_StaticMethods_r
 ;var $JSSMS$Utils$Array$$ = $SUPPORT_DATAVIEW$$ ? function($length$$12$$) {
   $length$$12$$ || ($length$$12$$ = 0);
   return new DataView(new ArrayBuffer($length$$12$$))
-} : Array, $JSSMS$Utils$copyArray$$ = $SUPPORT_DATAVIEW$$ ? function($src$$3$$) {
-  if(!$src$$3$$) {
-    return $JSSMS$Utils$Array$$()
-  }
-  var $i$$3$$, $dest$$2$$;
-  $i$$3$$ = $src$$3$$.byteLength;
-  for($dest$$2$$ = new $JSSMS$Utils$Array$$($i$$3$$);$i$$3$$--;) {
-    $dest$$2$$.setInt8($i$$3$$, $src$$3$$.getInt8($i$$3$$))
-  }
-  return $dest$$2$$
-} : function($src$$4$$) {
-  if(!$src$$4$$) {
-    return $JSSMS$Utils$Array$$()
-  }
-  var $i$$4$$, $dest$$3$$;
-  $i$$4$$ = $src$$4$$.length;
-  for($dest$$3$$ = new $JSSMS$Utils$Array$$($i$$4$$);$i$$4$$--;) {
-    $src$$4$$[$i$$4$$] != $JSCompiler_alias_VOID$$ && ($dest$$3$$[$i$$4$$] = $src$$4$$[$i$$4$$])
-  }
-  return $dest$$3$$
-}, $JSSMS$Utils$writeMem$$ = $SUPPORT_DATAVIEW$$ ? function($self$$2$$, $address$$, $value$$47$$) {
+} : Array, $JSSMS$Utils$writeMem$$ = $SUPPORT_DATAVIEW$$ ? function($self$$2$$, $address$$, $value$$47$$) {
   if($address$$ >> 10 >= $self$$2$$.$memWriteMap$.length || !$self$$2$$.$memWriteMap$[$address$$ >> 10] || ($address$$ & 1023) >= $self$$2$$.$memWriteMap$[$address$$ >> 10].byteLength) {
     console.error($address$$, $address$$ >> 10, $address$$ & 1023);
     debugger
@@ -364,39 +344,39 @@ $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
 }, call:function $$JSSMS$Z80$$$$call$($condition$$3$$) {
   $condition$$3$$ ? ($JSCompiler_StaticMethods_push1$$(this, this.$d$ + 2), this.$d$ = this.$l$(this.$d$), this.$o$ -= 7) : this.$d$ += 2
 }, page:function $$JSSMS$Z80$$$$page$($address$$6$$, $value$$75$$) {
-  var $offset$$16_p$$1$$, $i$$9$$;
+  var $offset$$16_p$$1$$, $i$$7$$;
   this.$C$[$address$$6$$] = $value$$75$$;
   switch($address$$6$$) {
     case 0:
       if(0 != ($value$$75$$ & 8)) {
         $offset$$16_p$$1$$ = ($value$$75$$ & 4) << 2;
-        for($i$$9$$ = 32;48 > $i$$9$$;$i$$9$$++) {
-          this.$w$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$N$[$offset$$16_p$$1$$]), this.$memWriteMap$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$N$[$offset$$16_p$$1$$]), $offset$$16_p$$1$$++
+        for($i$$7$$ = 32;48 > $i$$7$$;$i$$7$$++) {
+          this.$w$[$i$$7$$] = this.$N$[$offset$$16_p$$1$$], this.$memWriteMap$[$i$$7$$] = this.$N$[$offset$$16_p$$1$$], $offset$$16_p$$1$$++
         }
       }else {
         $offset$$16_p$$1$$ = this.$C$[3] % this.$F$ << 4;
-        for($i$$9$$ = 32;48 > $i$$9$$;$i$$9$$++) {
-          this.$w$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$z$[$offset$$16_p$$1$$++]), this.$memWriteMap$[$i$$9$$] = $JSSMS$Utils$Array$$(1024)
+        for($i$$7$$ = 32;48 > $i$$7$$;$i$$7$$++) {
+          this.$w$[$i$$7$$] = this.$z$[$offset$$16_p$$1$$++], this.$memWriteMap$[$i$$7$$] = $JSSMS$Utils$Array$$(1024)
         }
       }
       break;
     case 1:
       $offset$$16_p$$1$$ = ($value$$75$$ % this.$F$ << 4) + 1;
-      for($i$$9$$ = 1;16 > $i$$9$$;$i$$9$$++) {
-        this.$w$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$z$[$offset$$16_p$$1$$++])
+      for($i$$7$$ = 1;16 > $i$$7$$;$i$$7$$++) {
+        this.$w$[$i$$7$$] = this.$z$[$offset$$16_p$$1$$++]
       }
       break;
     case 2:
       $offset$$16_p$$1$$ = $value$$75$$ % this.$F$ << 4;
-      for($i$$9$$ = 16;32 > $i$$9$$;$i$$9$$++) {
-        this.$w$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$z$[$offset$$16_p$$1$$++])
+      for($i$$7$$ = 16;32 > $i$$7$$;$i$$7$$++) {
+        this.$w$[$i$$7$$] = this.$z$[$offset$$16_p$$1$$++]
       }
       break;
     case 3:
       if(0 == (this.$C$[0] & 8)) {
         $offset$$16_p$$1$$ = $value$$75$$ % this.$F$ << 4;
-        for($i$$9$$ = 32;48 > $i$$9$$;$i$$9$$++) {
-          this.$w$[$i$$9$$] = $JSSMS$Utils$copyArray$$(this.$z$[$offset$$16_p$$1$$++])
+        for($i$$7$$ = 32;48 > $i$$7$$;$i$$7$$++) {
+          this.$w$[$i$$7$$] = this.$z$[$offset$$16_p$$1$$++]
         }
       }
   }
@@ -413,7 +393,7 @@ function $JSCompiler_StaticMethods_resetMemory$$($JSCompiler_StaticMethods_reset
   if($JSCompiler_StaticMethods_resetMemory$self$$.$z$.length) {
     $JSCompiler_StaticMethods_resetMemory$self$$.$F$ = $JSCompiler_StaticMethods_resetMemory$self$$.$z$.length / 16;
     for(var $i$$inline_64_romSize$$inline_67$$ = 0;48 > $i$$inline_64_romSize$$inline_67$$;$i$$inline_64_romSize$$inline_67$$++) {
-      $JSCompiler_StaticMethods_resetMemory$self$$.$w$[$i$$inline_64_romSize$$inline_67$$] = $JSSMS$Utils$copyArray$$($JSCompiler_StaticMethods_resetMemory$self$$.$z$[$i$$inline_64_romSize$$inline_67$$ & 31]), $JSCompiler_StaticMethods_resetMemory$self$$.$memWriteMap$[$i$$inline_64_romSize$$inline_67$$] = $JSSMS$Utils$Array$$(1024)
+      $JSCompiler_StaticMethods_resetMemory$self$$.$w$[$i$$inline_64_romSize$$inline_67$$] = $JSCompiler_StaticMethods_resetMemory$self$$.$z$[$i$$inline_64_romSize$$inline_67$$ & 31], $JSCompiler_StaticMethods_resetMemory$self$$.$memWriteMap$[$i$$inline_64_romSize$$inline_67$$] = $JSSMS$Utils$Array$$(1024)
     }
     for($i$$inline_64_romSize$$inline_67$$ = 48;64 > $i$$inline_64_romSize$$inline_67$$;$i$$inline_64_romSize$$inline_67$$++) {
       $JSCompiler_StaticMethods_resetMemory$self$$.$w$[$i$$inline_64_romSize$$inline_67$$] = $JSCompiler_StaticMethods_resetMemory$self$$.$X$[$i$$inline_64_romSize$$inline_67$$ & 7], $JSCompiler_StaticMethods_resetMemory$self$$.$memWriteMap$[$i$$inline_64_romSize$$inline_67$$] = $JSCompiler_StaticMethods_resetMemory$self$$.$X$[$i$$inline_64_romSize$$inline_67$$ & 7]
@@ -8168,61 +8148,55 @@ function $JSSMS$SN76489$$($sms$$2$$) {
   this.$i$ = Array(4)
 }
 $JSSMS$SN76489$$.prototype = {};
-function $JSSMS$Vdp$$($i$$inline_159_sms$$3$$) {
-  this.$main$ = $i$$inline_159_sms$$3$$;
-  var $i$$16$$ = 0;
-  this.$B$ = 0;
+function $JSSMS$Vdp$$($i$$inline_159_i$$inline_162_sms$$3$$) {
+  this.$main$ = $i$$inline_159_i$$inline_162_sms$$3$$;
+  var $i$$14_r$$inline_163$$ = 0;
+  this.$z$ = 0;
   this.$d$ = Array(16384);
   this.$a$ = Array(96);
-  for($i$$16$$ = 0;96 > $i$$16$$;$i$$16$$++) {
-    this.$a$[$i$$16$$] = 255
+  for($i$$14_r$$inline_163$$ = 0;96 > $i$$14_r$$inline_163$$;$i$$14_r$$inline_163$$++) {
+    this.$a$[$i$$14_r$$inline_163$$] = 255
   }
   this.$c$ = Array(16);
   this.$e$ = 0;
   this.$l$ = $JSCompiler_alias_FALSE$$;
-  this.$p$ = this.$i$ = this.$A$ = this.$r$ = this.$f$ = this.$k$ = 0;
+  this.$p$ = this.$i$ = this.$w$ = this.$r$ = this.$f$ = this.$k$ = 0;
   this.$o$ = Array(256);
-  this.$w$ = 0;
-  this.$b$ = $i$$inline_159_sms$$3$$.$a$.$canvasImageData$.data;
+  this.$u$ = 0;
+  this.$b$ = $i$$inline_159_i$$inline_162_sms$$3$$.$a$.$canvasImageData$.data;
   this.$G$ = Array(64);
   this.$F$ = Array(64);
   this.$D$ = Array(64);
-  this.$v$ = Array(256);
-  this.$C$ = Array(16);
-  this.$t$ = $JSCompiler_alias_FALSE$$;
-  this.$g$ = this.$z$ = this.$s$ = 0;
+  this.$C$ = Array(256);
+  this.$B$ = Array(256);
+  this.$A$ = Array(16);
+  this.$g$ = this.$v$ = this.$s$ = 0;
   this.$h$ = $JSCompiler_alias_FALSE$$;
   this.$n$ = Array(192);
-  for($i$$16$$ = 0;192 > $i$$16$$;$i$$16$$++) {
-    this.$n$[$i$$16$$] = Array(25)
+  for($i$$14_r$$inline_163$$ = 0;192 > $i$$14_r$$inline_163$$;$i$$14_r$$inline_163$$++) {
+    this.$n$[$i$$14_r$$inline_163$$] = Array(25)
   }
-  this.$u$ = Array(512);
+  this.$t$ = Array(512);
   this.$q$ = Array(512);
-  for($i$$inline_159_sms$$3$$ = this.$j$ = this.$m$ = 0;512 > $i$$inline_159_sms$$3$$;$i$$inline_159_sms$$3$$++) {
-    this.$u$[$i$$inline_159_sms$$3$$] = Array(64)
+  for($i$$inline_159_i$$inline_162_sms$$3$$ = this.$j$ = this.$m$ = 0;512 > $i$$inline_159_i$$inline_162_sms$$3$$;$i$$inline_159_i$$inline_162_sms$$3$$++) {
+    this.$t$[$i$$inline_159_i$$inline_162_sms$$3$$] = Array(64)
+  }
+  var $g$$inline_164$$, $b$$inline_165$$;
+  for($i$$inline_159_i$$inline_162_sms$$3$$ = 0;64 > $i$$inline_159_i$$inline_162_sms$$3$$;$i$$inline_159_i$$inline_162_sms$$3$$++) {
+    $i$$14_r$$inline_163$$ = $i$$inline_159_i$$inline_162_sms$$3$$ & 3, $g$$inline_164$$ = $i$$inline_159_i$$inline_162_sms$$3$$ >> 2 & 3, $b$$inline_165$$ = $i$$inline_159_i$$inline_162_sms$$3$$ >> 4 & 3, this.$G$[$i$$inline_159_i$$inline_162_sms$$3$$] = 85 * $i$$14_r$$inline_163$$ & 255, this.$F$[$i$$inline_159_i$$inline_162_sms$$3$$] = 85 * $g$$inline_164$$ & 255, this.$D$[$i$$inline_159_i$$inline_162_sms$$3$$] = 85 * $b$$inline_165$$ & 255
+  }
+  for($i$$inline_159_i$$inline_162_sms$$3$$ = 0;256 > $i$$inline_159_i$$inline_162_sms$$3$$;$i$$inline_159_i$$inline_162_sms$$3$$++) {
+    $g$$inline_164$$ = $i$$inline_159_i$$inline_162_sms$$3$$ & 15, $b$$inline_165$$ = $i$$inline_159_i$$inline_162_sms$$3$$ >> 4 & 15, this.$C$[$i$$inline_159_i$$inline_162_sms$$3$$] = ($g$$inline_164$$ << 4 | $g$$inline_164$$) & 255, this.$B$[$i$$inline_159_i$$inline_162_sms$$3$$] = ($b$$inline_165$$ << 4 | $b$$inline_165$$) & 255
+  }
+  for($i$$inline_159_i$$inline_162_sms$$3$$ = 0;16 > $i$$inline_159_i$$inline_162_sms$$3$$;$i$$inline_159_i$$inline_162_sms$$3$$++) {
+    this.$A$[$i$$inline_159_i$$inline_162_sms$$3$$] = ($i$$inline_159_i$$inline_162_sms$$3$$ << 4 | $i$$inline_159_i$$inline_162_sms$$3$$) & 255
   }
 }
 $JSSMS$Vdp$$.prototype = {reset:function $$JSSMS$Vdp$$$$reset$() {
-  var $i$$17_i$$inline_162$$;
-  this.$t$ = $JSCompiler_alias_FALSE$$;
-  var $r$$inline_163$$, $g$$inline_164$$, $b$$inline_165$$;
-  if(this.$main$.$is_sms$ && !this.$t$) {
-    for($i$$17_i$$inline_162$$ = 0;64 > $i$$17_i$$inline_162$$;$i$$17_i$$inline_162$$++) {
-      $r$$inline_163$$ = $i$$17_i$$inline_162$$ & 3, $g$$inline_164$$ = $i$$17_i$$inline_162$$ >> 2 & 3, $b$$inline_165$$ = $i$$17_i$$inline_162$$ >> 4 & 3, this.$G$[$i$$17_i$$inline_162$$] = 85 * $r$$inline_163$$ & 255, this.$F$[$i$$17_i$$inline_162$$] = 85 * $g$$inline_164$$ & 255, this.$D$[$i$$17_i$$inline_162$$] = 85 * $b$$inline_165$$ & 255
-    }
-  }else {
-    if(this.$main$.$is_gg$ && !this.$t$) {
-      for($i$$17_i$$inline_162$$ = 0;256 > $i$$17_i$$inline_162$$;$i$$17_i$$inline_162$$++) {
-        $g$$inline_164$$ = $i$$17_i$$inline_162$$ & 15, $b$$inline_165$$ = $i$$17_i$$inline_162$$ >> 4 & 15, this.$v$[$i$$17_i$$inline_162$$] = $b$$inline_165$$ << 12 | $b$$inline_165$$ << 8 | $g$$inline_164$$ << 4 | $g$$inline_164$$
-      }
-      for($i$$17_i$$inline_162$$ = 0;16 > $i$$17_i$$inline_162$$;$i$$17_i$$inline_162$$++) {
-        this.$C$[$i$$17_i$$inline_162$$] = $i$$17_i$$inline_162$$ << 20
-      }
-    }
-  }
-  this.$l$ = this.$t$ = $JSCompiler_alias_TRUE$$;
-  for($i$$17_i$$inline_162$$ = this.$r$ = this.$e$ = this.$p$ = this.$f$ = 0;16 > $i$$17_i$$inline_162$$;$i$$17_i$$inline_162$$++) {
-    this.$c$[$i$$17_i$$inline_162$$] = 0
+  var $i$$15$$;
+  this.$l$ = $JSCompiler_alias_TRUE$$;
+  for($i$$15$$ = this.$r$ = this.$e$ = this.$p$ = this.$f$ = 0;16 > $i$$15$$;$i$$15$$++) {
+    this.$c$[$i$$15$$] = 0
   }
   this.$c$[2] = 14;
   this.$c$[5] = 126;
@@ -8230,24 +8204,24 @@ $JSSMS$Vdp$$.prototype = {reset:function $$JSSMS$Vdp$$$$reset$() {
   this.$h$ = $JSCompiler_alias_TRUE$$;
   this.$m$ = 512;
   this.$j$ = -1;
-  for($i$$17_i$$inline_162$$ = 0;16384 > $i$$17_i$$inline_162$$;$i$$17_i$$inline_162$$++) {
-    this.$d$[$i$$17_i$$inline_162$$] = 0
+  for($i$$15$$ = 0;16384 > $i$$15$$;$i$$15$$++) {
+    this.$d$[$i$$15$$] = 0
   }
-  for($i$$17_i$$inline_162$$ = 0;196608 > $i$$17_i$$inline_162$$;$i$$17_i$$inline_162$$ += 4) {
-    this.$b$[$i$$17_i$$inline_162$$] = 0, this.$b$[$i$$17_i$$inline_162$$ + 1] = 0, this.$b$[$i$$17_i$$inline_162$$ + 2] = 0, this.$b$[$i$$17_i$$inline_162$$ + 3] = 255
+  for($i$$15$$ = 0;196608 > $i$$15$$;$i$$15$$ += 4) {
+    this.$b$[$i$$15$$] = 0, this.$b$[$i$$15$$ + 1] = 0, this.$b$[$i$$15$$ + 2] = 0, this.$b$[$i$$15$$ + 3] = 255
   }
 }};
 function $JSCompiler_StaticMethods_drawLine$$($JSCompiler_StaticMethods_drawLine$self$$, $lineno$$2$$) {
-  var $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = 0, $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ = 0, $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ = 0;
+  var $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = 0, $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ = 0, $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ = 0;
   if(!$JSCompiler_StaticMethods_drawLine$self$$.$main$.$is_gg$ || !(24 > $lineno$$2$$ || 168 <= $lineno$$2$$)) {
     if(0 != ($JSCompiler_StaticMethods_drawLine$self$$.$c$[1] & 64)) {
       if(-1 != $JSCompiler_StaticMethods_drawLine$self$$.$j$) {
         console.log("[" + $JSCompiler_StaticMethods_drawLine$self$$.$i$ + "] min dirty:" + $JSCompiler_StaticMethods_drawLine$self$$.$m$ + " max: " + $JSCompiler_StaticMethods_drawLine$self$$.$j$);
-        for($height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = $JSCompiler_StaticMethods_drawLine$self$$.$m$;$height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ <= $JSCompiler_StaticMethods_drawLine$self$$.$j$;$height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$++) {
-          if($JSCompiler_StaticMethods_drawLine$self$$.$q$[$height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$]) {
-            $JSCompiler_StaticMethods_drawLine$self$$.$q$[$height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$] = $JSCompiler_alias_FALSE$$;
-            console.log("tile " + $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ + " is dirty");
-            for(var $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ = $JSCompiler_StaticMethods_drawLine$self$$.$u$[$height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$], $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ = 0, $address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ = $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ << 
+        for($height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = $JSCompiler_StaticMethods_drawLine$self$$.$m$;$height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ <= $JSCompiler_StaticMethods_drawLine$self$$.$j$;$height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$++) {
+          if($JSCompiler_StaticMethods_drawLine$self$$.$q$[$height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$]) {
+            $JSCompiler_StaticMethods_drawLine$self$$.$q$[$height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$] = $JSCompiler_alias_FALSE$$;
+            console.log("tile " + $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ + " is dirty");
+            for(var $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ = $JSCompiler_StaticMethods_drawLine$self$$.$t$[$height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$], $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ = 0, $address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ = $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ << 
             5, $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$ = 0;8 > $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$;$row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$++) {
               for(var $address0$$inline_173_off$$inline_208_off$$inline_221_row_precal$$inline_192$$ = $JSCompiler_StaticMethods_drawLine$self$$.$d$[$address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$++], $address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$ = $JSCompiler_StaticMethods_drawLine$self$$.$d$[$address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$++], $address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ = 
               $JSCompiler_StaticMethods_drawLine$self$$.$d$[$address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$++], $address3$$inline_176_pal$$inline_196_pix$$inline_227_y$$inline_223$$ = $JSCompiler_StaticMethods_drawLine$self$$.$d$[$address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$++], $bit$$inline_177_colour$$inline_213_sx$$inline_197_tileRow$$inline_225$$ = 128;0 != $bit$$inline_177_colour$$inline_213_sx$$inline_197_tileRow$$inline_225$$;$bit$$inline_177_colour$$inline_213_sx$$inline_197_tileRow$$inline_225$$ >>= 
@@ -8265,18 +8239,18 @@ function $JSCompiler_StaticMethods_drawLine$$($JSCompiler_StaticMethods_drawLine
         $JSCompiler_StaticMethods_drawLine$self$$.$m$ = 512;
         $JSCompiler_StaticMethods_drawLine$self$$.$j$ = -1
       }
-      var $pixX$$inline_182_temp2$$inline_215_tile_props$$inline_194$$ = 0, $colour$$inline_183_offset$$inline_228$$ = 0, $temp$$inline_184$$ = 0, $temp2$$inline_185$$ = 0, $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = $JSCompiler_StaticMethods_drawLine$self$$.$c$[8], $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$ = $JSCompiler_StaticMethods_drawLine$self$$.$c$[9];
-      16 > $lineno$$2$$ && 0 != ($JSCompiler_StaticMethods_drawLine$self$$.$c$[0] & 64) && ($height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = 0);
+      var $pixX$$inline_182_temp2$$inline_215_tile_props$$inline_194$$ = 0, $colour$$inline_183_offset$$inline_228$$ = 0, $temp$$inline_184$$ = 0, $temp2$$inline_185$$ = 0, $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = $JSCompiler_StaticMethods_drawLine$self$$.$c$[8], $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$ = $JSCompiler_StaticMethods_drawLine$self$$.$c$[9];
+      16 > $lineno$$2$$ && 0 != ($JSCompiler_StaticMethods_drawLine$self$$.$c$[0] & 64) && ($height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = 0);
       $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ = $JSCompiler_StaticMethods_drawLine$self$$.$c$[0] & 128;
-      $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ = 32 - ($height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ >> 3) + $JSCompiler_StaticMethods_drawLine$self$$.$s$;
+      $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ = 32 - ($height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ >> 3) + $JSCompiler_StaticMethods_drawLine$self$$.$s$;
       $address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ = $lineno$$2$$ + $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$ >> 3;
       27 < $address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ && ($address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ -= 28);
       $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$ = ($lineno$$2$$ + ($row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$ & 7) & 7) << 3;
       $address0$$inline_173_off$$inline_208_off$$inline_221_row_precal$$inline_192$$ = $lineno$$2$$ << 8;
-      for($address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$ = $JSCompiler_StaticMethods_drawLine$self$$.$s$;$address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$ < $JSCompiler_StaticMethods_drawLine$self$$.$z$;$address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$++) {
-        var $pixX$$inline_182_temp2$$inline_215_tile_props$$inline_194$$ = $JSCompiler_StaticMethods_drawLine$self$$.$w$ + (($count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ & 31) << 1) + ($address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ << 6), $address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ = $JSCompiler_StaticMethods_drawLine$self$$.$d$[$pixX$$inline_182_temp2$$inline_215_tile_props$$inline_194$$ + 
-        1], $address3$$inline_176_pal$$inline_196_pix$$inline_227_y$$inline_223$$ = ($address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ & 8) << 1, $bit$$inline_177_colour$$inline_213_sx$$inline_197_tileRow$$inline_225$$ = ($address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$ << 3) + ($height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ & 7), $colour$$inline_178_pixY$$inline_198_temp$$inline_214$$ = 
-        0 == ($address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ & 4) ? $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$ : 56 - $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$, $tile$$inline_199$$ = $JSCompiler_StaticMethods_drawLine$self$$.$u$[($JSCompiler_StaticMethods_drawLine$self$$.$d$[$pixX$$inline_182_temp2$$inline_215_tile_props$$inline_194$$] & 255) + (($address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ & 
+      for($address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$ = $JSCompiler_StaticMethods_drawLine$self$$.$s$;$address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$ < $JSCompiler_StaticMethods_drawLine$self$$.$v$;$address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$++) {
+        var $pixX$$inline_182_temp2$$inline_215_tile_props$$inline_194$$ = $JSCompiler_StaticMethods_drawLine$self$$.$u$ + (($count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ & 31) << 1) + ($address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ << 6), $address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ = $JSCompiler_StaticMethods_drawLine$self$$.$d$[$pixX$$inline_182_temp2$$inline_215_tile_props$$inline_194$$ + 
+        1], $address3$$inline_176_pal$$inline_196_pix$$inline_227_y$$inline_223$$ = ($address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ & 8) << 1, $bit$$inline_177_colour$$inline_213_sx$$inline_197_tileRow$$inline_225$$ = ($address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$ << 3) + ($height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ & 7), $colour$$inline_178_pixY$$inline_198_temp$$inline_214$$ = 
+        0 == ($address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ & 4) ? $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$ : 56 - $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$, $tile$$inline_199$$ = $JSCompiler_StaticMethods_drawLine$self$$.$t$[($JSCompiler_StaticMethods_drawLine$self$$.$d$[$pixX$$inline_182_temp2$$inline_215_tile_props$$inline_194$$] & 255) + (($address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ & 
         1) << 8)];
         if(0 == ($address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ & 2)) {
           for($pixX$$inline_182_temp2$$inline_215_tile_props$$inline_194$$ = 0;8 > $pixX$$inline_182_temp2$$inline_215_tile_props$$inline_194$$ && 256 > $bit$$inline_177_colour$$inline_213_sx$$inline_197_tileRow$$inline_225$$;$pixX$$inline_182_temp2$$inline_215_tile_props$$inline_194$$++, $bit$$inline_177_colour$$inline_213_sx$$inline_197_tileRow$$inline_225$$++) {
@@ -8296,11 +8270,11 @@ function $JSCompiler_StaticMethods_drawLine$$($JSCompiler_StaticMethods_drawLine
       }
       if($JSCompiler_StaticMethods_drawLine$self$$.$h$) {
         $JSCompiler_StaticMethods_drawLine$self$$.$h$ = $JSCompiler_alias_FALSE$$;
-        for($height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = 0;$height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ < $JSCompiler_StaticMethods_drawLine$self$$.$n$.length;$height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$++) {
-          $JSCompiler_StaticMethods_drawLine$self$$.$n$[$height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$][0] = 0
+        for($height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = 0;$height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ < $JSCompiler_StaticMethods_drawLine$self$$.$n$.length;$height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$++) {
+          $JSCompiler_StaticMethods_drawLine$self$$.$n$[$height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$][0] = 0
         }
-        $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = 0 == ($JSCompiler_StaticMethods_drawLine$self$$.$c$[1] & 2) ? 8 : 16;
-        1 == ($JSCompiler_StaticMethods_drawLine$self$$.$c$[1] & 1) && ($height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ <<= 1);
+        $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = 0 == ($JSCompiler_StaticMethods_drawLine$self$$.$c$[1] & 2) ? 8 : 16;
+        1 == ($JSCompiler_StaticMethods_drawLine$self$$.$c$[1] & 1) && ($height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ <<= 1);
         for($lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ = 0;64 > $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$;$lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$++) {
           $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ = $JSCompiler_StaticMethods_drawLine$self$$.$d$[$JSCompiler_StaticMethods_drawLine$self$$.$g$ + $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$] & 255;
           if(208 == $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$) {
@@ -8309,7 +8283,7 @@ function $JSCompiler_StaticMethods_drawLine$$($JSCompiler_StaticMethods_drawLine
           $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$++;
           240 < $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ && ($count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ -= 256);
           for($address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ = 0;192 > $address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$;$address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$++) {
-            $address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ >= $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ && $address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ - $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ < $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ && 
+            $address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ >= $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ && $address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ - $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ < $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ && 
             ($row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$ = $JSCompiler_StaticMethods_drawLine$self$$.$n$[$address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$], 8 > $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$[0] && ($address0$$inline_173_off$$inline_208_off$$inline_221_row_precal$$inline_192$$ = 3 * $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$[0] + 
             1, $address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$ = $JSCompiler_StaticMethods_drawLine$self$$.$g$ + ($lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ << 1) + 128, $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$[$address0$$inline_173_off$$inline_208_off$$inline_221_row_precal$$inline_192$$++] = $JSCompiler_StaticMethods_drawLine$self$$.$d$[$address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$++] & 
             255, $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$[$address0$$inline_173_off$$inline_208_off$$inline_221_row_precal$$inline_192$$++] = $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$, $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$[$address0$$inline_173_off$$inline_208_off$$inline_221_row_precal$$inline_192$$++] = $JSCompiler_StaticMethods_drawLine$self$$.$d$[$address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$] & 
@@ -8318,15 +8292,15 @@ function $JSCompiler_StaticMethods_drawLine$$($JSCompiler_StaticMethods_drawLine
         }
       }
       if(0 != $JSCompiler_StaticMethods_drawLine$self$$.$n$[$lineno$$2$$][0]) {
-        $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = $pixX$$inline_182_temp2$$inline_215_tile_props$$inline_194$$ = $colour$$inline_178_pixY$$inline_198_temp$$inline_214$$ = $bit$$inline_177_colour$$inline_213_sx$$inline_197_tileRow$$inline_225$$ = 0;
+        $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = $pixX$$inline_182_temp2$$inline_215_tile_props$$inline_194$$ = $colour$$inline_178_pixY$$inline_198_temp$$inline_214$$ = $bit$$inline_177_colour$$inline_213_sx$$inline_197_tileRow$$inline_225$$ = 0;
         $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ = $JSCompiler_StaticMethods_drawLine$self$$.$n$[$lineno$$2$$];
         $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ = Math.min(8, $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$[0]);
         $address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ = $JSCompiler_StaticMethods_drawLine$self$$.$c$[1] & 1;
         $row_precal$$inline_220_sprites$$inline_207_tile_y$$inline_191_vscroll$$inline_187_y$$inline_172$$ = $lineno$$2$$ << 8;
-        for($address0$$inline_173_off$$inline_208_off$$inline_221_row_precal$$inline_192$$ = 3 * $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$;$height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ < $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$;$height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$++) {
+        for($address0$$inline_173_off$$inline_208_off$$inline_221_row_precal$$inline_192$$ = 3 * $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$;$height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ < $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$;$height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$++) {
           if($address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ = $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$[$address0$$inline_173_off$$inline_208_off$$inline_221_row_precal$$inline_192$$--] | ($JSCompiler_StaticMethods_drawLine$self$$.$c$[6] & 4) << 6, $address3$$inline_176_pal$$inline_196_pix$$inline_227_y$$inline_223$$ = $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$[$address0$$inline_173_off$$inline_208_off$$inline_221_row_precal$$inline_192$$--], 
           $address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$ = $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$[$address0$$inline_173_off$$inline_208_off$$inline_221_row_precal$$inline_192$$--] - ($JSCompiler_StaticMethods_drawLine$self$$.$c$[0] & 8), $bit$$inline_177_colour$$inline_213_sx$$inline_197_tileRow$$inline_225$$ = $lineno$$2$$ - $address3$$inline_176_pal$$inline_196_pix$$inline_227_y$$inline_223$$ >> $address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$, 
-          0 != ($JSCompiler_StaticMethods_drawLine$self$$.$c$[1] & 2) && ($address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ &= -2), $address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ = $JSCompiler_StaticMethods_drawLine$self$$.$u$[$address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ + (($bit$$inline_177_colour$$inline_213_sx$$inline_197_tileRow$$inline_225$$ & 8) >> 3)], $address3$$inline_176_pal$$inline_196_pix$$inline_227_y$$inline_223$$ = 
+          0 != ($JSCompiler_StaticMethods_drawLine$self$$.$c$[1] & 2) && ($address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ &= -2), $address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ = $JSCompiler_StaticMethods_drawLine$self$$.$t$[$address2$$inline_175_n$$inline_222_secondbyte$$inline_195_tile$$inline_226$$ + (($bit$$inline_177_colour$$inline_213_sx$$inline_197_tileRow$$inline_225$$ & 8) >> 3)], $address3$$inline_176_pal$$inline_196_pix$$inline_227_y$$inline_223$$ = 
           0, 0 > $address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$ && ($address3$$inline_176_pal$$inline_196_pix$$inline_227_y$$inline_223$$ = -$address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$, $address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$ = 0), $colour$$inline_183_offset$$inline_228$$ = $address3$$inline_176_pal$$inline_196_pix$$inline_227_y$$inline_223$$ + (($bit$$inline_177_colour$$inline_213_sx$$inline_197_tileRow$$inline_225$$ & 
           7) << 3), 0 == $address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$) {
             for(;8 > $address3$$inline_176_pal$$inline_196_pix$$inline_227_y$$inline_223$$ && 256 > $address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$;$address3$$inline_176_pal$$inline_196_pix$$inline_227_y$$inline_223$$++, $address$$inline_209_address1$$inline_174_tx$$inline_193_x$$inline_224$$++) {
@@ -8350,20 +8324,20 @@ function $JSCompiler_StaticMethods_drawLine$$($JSCompiler_StaticMethods_drawLine
       if($JSCompiler_StaticMethods_drawLine$self$$.$main$.$is_sms$ && 0 != ($JSCompiler_StaticMethods_drawLine$self$$.$c$[0] & 32)) {
         $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ = 4 * ($lineno$$2$$ << 8);
         $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ = 3 * (16 + ($JSCompiler_StaticMethods_drawLine$self$$.$c$[7] & 15));
-        for($height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = 0;8 > $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$;$height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$++) {
-          $JSCompiler_StaticMethods_drawLine$self$$.$b$[$lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ + $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$] = $JSCompiler_StaticMethods_drawLine$self$$.$a$[$count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$], $JSCompiler_StaticMethods_drawLine$self$$.$b$[$lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ + 
-          $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ + 1] = $JSCompiler_StaticMethods_drawLine$self$$.$a$[$count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ + 1], $JSCompiler_StaticMethods_drawLine$self$$.$b$[$lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ + $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ + 
+        for($height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = 0;8 > $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$;$height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$++) {
+          $JSCompiler_StaticMethods_drawLine$self$$.$b$[$lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ + $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$] = $JSCompiler_StaticMethods_drawLine$self$$.$a$[$count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$], $JSCompiler_StaticMethods_drawLine$self$$.$b$[$lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ + 
+          $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ + 1] = $JSCompiler_StaticMethods_drawLine$self$$.$a$[$count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ + 1], $JSCompiler_StaticMethods_drawLine$self$$.$b$[$lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ + $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ + 
           2] = $JSCompiler_StaticMethods_drawLine$self$$.$a$[$count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ + 2]
         }
       }
     }else {
-      $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = $lineno$$2$$ << 8;
+      $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$ = $lineno$$2$$ << 8;
       $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ = 0;
       $count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ = 3 * (16 + ($JSCompiler_StaticMethods_drawLine$self$$.$c$[7] & 15));
       for($address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$ = 0;1024 > $address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$;$address$$inline_171_i$$inline_235_lineno$$inline_206_tile_row$$inline_190_zoomed$$inline_219$$++) {
-        $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ = 4 * $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$, $JSCompiler_StaticMethods_drawLine$self$$.$b$[$lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$] = $JSCompiler_StaticMethods_drawLine$self$$.$a$[$count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$], 
+        $lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ = 4 * $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$, $JSCompiler_StaticMethods_drawLine$self$$.$b$[$lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$] = $JSCompiler_StaticMethods_drawLine$self$$.$a$[$count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$], 
         $JSCompiler_StaticMethods_drawLine$self$$.$b$[$lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ + 1] = $JSCompiler_StaticMethods_drawLine$self$$.$a$[$count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ + 1], $JSCompiler_StaticMethods_drawLine$self$$.$b$[$lock$$inline_188_spriteno$$inline_204_sprites$$inline_217_temp$$15_temp$$inline_233_tile$$inline_169$$ + 2] = $JSCompiler_StaticMethods_drawLine$self$$.$a$[$count$$inline_218_pixel_index$$inline_170_temp2_temp2$$inline_234_tile_column$$inline_189_y$$inline_205$$ + 
-        2], $height$$inline_203_hscroll$$inline_186_i$$19_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$++
+        2], $height$$inline_203_hscroll$$inline_186_i$$17_i$$inline_168_i$$inline_202_i$$inline_216_row_precal$$inline_232$$++
       }
     }
   }
@@ -8373,11 +8347,11 @@ function $JSCompiler_StaticMethods_interrupts$$($JSCompiler_StaticMethods_interr
   $JSCompiler_alias_TRUE$$)) : ($JSCompiler_StaticMethods_interrupts$self$$.$p$ = $JSCompiler_StaticMethods_interrupts$self$$.$c$[10], 0 != ($JSCompiler_StaticMethods_interrupts$self$$.$e$ & 128) && (0 != ($JSCompiler_StaticMethods_interrupts$self$$.$c$[1] & 32) && 224 > $lineno$$1$$) && ($JSCompiler_StaticMethods_interrupts$self$$.$main$.$cpu$.$D$ = $JSCompiler_alias_TRUE$$))
 }
 function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_forceFullRedraw$self$$) {
-  $JSCompiler_StaticMethods_forceFullRedraw$self$$.$w$ = ($JSCompiler_StaticMethods_forceFullRedraw$self$$.$c$[2] & 14) << 10;
+  $JSCompiler_StaticMethods_forceFullRedraw$self$$.$u$ = ($JSCompiler_StaticMethods_forceFullRedraw$self$$.$c$[2] & 14) << 10;
   $JSCompiler_StaticMethods_forceFullRedraw$self$$.$m$ = 0;
   $JSCompiler_StaticMethods_forceFullRedraw$self$$.$j$ = 511;
-  for(var $i$$18$$ = 0, $l$$ = $JSCompiler_StaticMethods_forceFullRedraw$self$$.$q$.length;$i$$18$$ < $l$$;$i$$18$$++) {
-    $JSCompiler_StaticMethods_forceFullRedraw$self$$.$q$[$i$$18$$] = $JSCompiler_alias_TRUE$$
+  for(var $i$$16$$ = 0, $l$$ = $JSCompiler_StaticMethods_forceFullRedraw$self$$.$q$.length;$i$$16$$ < $l$$;$i$$16$$++) {
+    $JSCompiler_StaticMethods_forceFullRedraw$self$$.$q$[$i$$16$$] = $JSCompiler_alias_TRUE$$
   }
   $JSCompiler_StaticMethods_forceFullRedraw$self$$.$g$ = ($JSCompiler_StaticMethods_forceFullRedraw$self$$.$c$[5] & -130) << 7;
   $JSCompiler_StaticMethods_forceFullRedraw$self$$.$h$ = $JSCompiler_alias_TRUE$$
@@ -8399,7 +8373,7 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
     }else {
       var $self$$4$$ = this;
       $root_sms$$5$$ = $("<div></div>");
-      var $controls$$ = $('<div class="controls"></div>'), $screenContainer$$ = $('<div class="screen"></div>'), $fullscreenSupport$$ = $JSSMS$Utils$getPrefix$$(["fullscreenEnabled", "mozFullScreenEnabled", "webkitCancelFullScreen"]), $requestAnimationFramePrefix$$ = $JSSMS$Utils$getPrefix$$(["requestAnimationFrame", "msRequestAnimationFrame", "mozRequestAnimationFrame", "webkitRequestAnimationFrame"], window), $i$$26$$;
+      var $controls$$ = $('<div class="controls"></div>'), $screenContainer$$ = $('<div class="screen"></div>'), $fullscreenSupport$$ = $JSSMS$Utils$getPrefix$$(["fullscreenEnabled", "mozFullScreenEnabled", "webkitCancelFullScreen"]), $requestAnimationFramePrefix$$ = $JSSMS$Utils$getPrefix$$(["requestAnimationFrame", "msRequestAnimationFrame", "mozRequestAnimationFrame", "webkitRequestAnimationFrame"], window), $i$$24$$;
       if($requestAnimationFramePrefix$$) {
         this.requestAnimationFrame = window[$requestAnimationFramePrefix$$].bind(window)
       }else {
@@ -8445,8 +8419,8 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
           }), $self$$4$$.$buttons$.zoom.attr("value", "Zoom in")) : ($self$$4$$.screen.animate({width:"512px", height:"384px"}), $self$$4$$.$buttons$.zoom.attr("value", "Zoom out"));
           $self$$4$$.$zoomed$ = !$self$$4$$.$zoomed$
         }));
-        for($i$$26$$ in this.$buttons$) {
-          this.$buttons$[$i$$26$$].appendTo($controls$$)
+        for($i$$24$$ in this.$buttons$) {
+          this.$buttons$[$i$$24$$].appendTo($controls$$)
         }
         this.log = $('<div id="status"></div>');
         this.screen.appendTo($screenContainer$$);
@@ -8473,15 +8447,15 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
     this.log.empty();
     this.$dissambler$.empty()
   }, $setRoms$:function $$UI$$$$$setRoms$$($roms$$1$$) {
-    var $groupName$$, $optgroup$$, $length$$18$$, $i$$27$$, $count$$7$$ = 0;
+    var $groupName$$, $optgroup$$, $length$$18$$, $i$$25$$, $count$$7$$ = 0;
     this.$romSelect$.children().remove();
     $("<option>Select a ROM...</option>").appendTo(this.$romSelect$);
     for($groupName$$ in $roms$$1$$) {
       if($roms$$1$$.hasOwnProperty($groupName$$)) {
         $optgroup$$ = $("<optgroup></optgroup>").attr("label", $groupName$$);
         $length$$18$$ = $roms$$1$$[$groupName$$].length;
-        for($i$$27$$ = 0;$i$$27$$ < $length$$18$$;$i$$27$$++) {
-          $("<option>" + $roms$$1$$[$groupName$$][$i$$27$$][0] + "</option>").attr("value", $roms$$1$$[$groupName$$][$i$$27$$][1]).appendTo($optgroup$$)
+        for($i$$25$$ = 0;$i$$25$$ < $length$$18$$;$i$$25$$++) {
+          $("<option>" + $roms$$1$$[$groupName$$][$i$$25$$][0] + "</option>").attr("value", $roms$$1$$[$groupName$$][$i$$25$$][1]).appendTo($optgroup$$)
         }
         $optgroup$$.appendTo(this.$romSelect$)
       }
@@ -8497,7 +8471,7 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
       return $self$$5$$.xhr = $xhr$$
     }, complete:function($xhr$$1$$, $status$$) {
       var $data$$32$$;
-      "error" == $status$$ ? $self$$5$$.updateStatus("The selected rom could not be loaded.") : ($data$$32$$ = $xhr$$1$$.responseText, $self$$5$$.$main$.stop(), $self$$5$$.$main$.reset(), $JSCompiler_StaticMethods_readRomDirectly$$($self$$5$$.$main$, $data$$32$$, $self$$5$$.$romSelect$.val()), $JSCompiler_StaticMethods_forceFullRedraw$$($self$$5$$.$main$.$vdp$), $self$$5$$.enable())
+      "error" == $status$$ ? $self$$5$$.updateStatus("The selected rom could not be loaded.") : ($data$$32$$ = $xhr$$1$$.responseText, $self$$5$$.$main$.stop(), $JSCompiler_StaticMethods_readRomDirectly$$($self$$5$$.$main$, $data$$32$$, $self$$5$$.$romSelect$.val()), $self$$5$$.$main$.reset(), $JSCompiler_StaticMethods_forceFullRedraw$$($self$$5$$.$main$.$vdp$), $self$$5$$.enable())
     }})
   }, enable:function $$UI$$$$enable$() {
     this.$buttons$.start.removeAttr("disabled");
@@ -8515,8 +8489,8 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
       this.$canvasContext$.putImageData(this.$canvasImageData$, 0, 0)
     }
   }(), $updateDisassembly$:function $$UI$$$$$updateDisassembly$$($currentAddress$$1$$) {
-    for(var $instructions$$ = this.$main$.$cpu$.$instructions$, $length$$19$$ = $instructions$$.length, $html$$ = "", $i$$28$$ = 8 > $currentAddress$$1$$ ? 0 : $currentAddress$$1$$ - 8, $num$$4$$ = 0;16 > $num$$4$$ && $i$$28$$ <= $length$$19$$;$i$$28$$++) {
-      $instructions$$[$i$$28$$] && ($html$$ += "<div" + ($instructions$$[$i$$28$$].$address$ == $currentAddress$$1$$ ? ' class="current"' : "") + ">" + $instructions$$[$i$$28$$].$hexAddress$ + ($instructions$$[$i$$28$$].$isJumpTarget$ ? ":" : " ") + "<code>" + $instructions$$[$i$$28$$].$inst$ + "</code></div>", $num$$4$$++)
+    for(var $instructions$$ = this.$main$.$cpu$.$instructions$, $length$$19$$ = $instructions$$.length, $html$$ = "", $i$$26$$ = 8 > $currentAddress$$1$$ ? 0 : $currentAddress$$1$$ - 8, $num$$4$$ = 0;16 > $num$$4$$ && $i$$26$$ <= $length$$19$$;$i$$26$$++) {
+      $instructions$$[$i$$26$$] && ($html$$ += "<div" + ($instructions$$[$i$$26$$].$address$ == $currentAddress$$1$$ ? ' class="current"' : "") + ">" + $instructions$$[$i$$26$$].$hexAddress$ + ($instructions$$[$i$$26$$].$isJumpTarget$ ? ":" : " ") + "<code>" + $instructions$$[$i$$26$$].$inst$ + "</code></div>", $num$$4$$++)
     }
     this.$dissambler$.html($html$$)
   }};
@@ -8556,7 +8530,7 @@ function $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_in_$self$$, $
       var $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$;
       a: {
         $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$ = $JSCompiler_StaticMethods_in_$self$$.$vdp$;
-        if(0 == $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$.$B$) {
+        if(0 == $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$.$z$) {
           if(218 < $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$.$i$) {
             $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$ = $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$.$i$ - 6;
             break a
@@ -8575,8 +8549,8 @@ function $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_in_$self$$, $
     case 128:
       $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$ = $JSCompiler_StaticMethods_in_$self$$.$vdp$;
       $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$.$l$ = $JSCompiler_alias_TRUE$$;
-      var $statuscopy$$inline_243_value$$inline_240$$ = $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$.$A$;
-      $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$.$A$ = $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$.$d$[$JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$.$f$++ & 
+      var $statuscopy$$inline_243_value$$inline_240$$ = $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$.$w$;
+      $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$.$w$ = $JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$.$d$[$JSCompiler_StaticMethods_controlRead$self$$inline_242_JSCompiler_StaticMethods_dataRead$self$$inline_239_JSCompiler_StaticMethods_getVCount$self$$inline_237_JSCompiler_inline_result$$4$$.$f$++ & 
       16383] & 255;
       return $statuscopy$$inline_243_value$$inline_240$$;
     case 129:
@@ -8628,14 +8602,14 @@ function $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_JSSMS_SN76489
             break;
           case 3:
             $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$main$.$is_sms$ ? ($address$$inline_248_old$$inline_254_port_temp$$inline_247$$ = 3 * ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$f$ & 
-            31), $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_248_old$$inline_254_port_temp$$inline_247$$] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$G$[$reg$$inline_253_value$$80$$ & 
-            63], $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_248_old$$inline_254_port_temp$$inline_247$$ + 1] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$F$[$reg$$inline_253_value$$80$$ & 
-            63], $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_248_old$$inline_254_port_temp$$inline_247$$ + 2] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$D$[$reg$$inline_253_value$$80$$ & 
-            63]) : $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$main$.$is_gg$ && ($address$$inline_248_old$$inline_254_port_temp$$inline_247$$ = 3 * (($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$f$ & 
+            31), $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_248_old$$inline_254_port_temp$$inline_247$$] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$G$[$reg$$inline_253_value$$80$$], 
+            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_248_old$$inline_254_port_temp$$inline_247$$ + 1] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$F$[$reg$$inline_253_value$$80$$], 
+            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_248_old$$inline_254_port_temp$$inline_247$$ + 2] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$D$[$reg$$inline_253_value$$80$$]) : 
+            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$main$.$is_gg$ && ($address$$inline_248_old$$inline_254_port_temp$$inline_247$$ = 3 * (($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$f$ & 
             63) >> 1), 0 == ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$f$ & 1) ? ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_248_old$$inline_254_port_temp$$inline_247$$] = 
-            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$v$[$reg$$inline_253_value$$80$$] & 255, $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_248_old$$inline_254_port_temp$$inline_247$$ + 
-            1] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$v$[$reg$$inline_253_value$$80$$] >> 8 & 255) : $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_248_old$$inline_254_port_temp$$inline_247$$ + 
-            2] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$C$[$reg$$inline_253_value$$80$$ & 15] >> 16 & 255)
+            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$C$[$reg$$inline_253_value$$80$$], $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_248_old$$inline_254_port_temp$$inline_247$$ + 
+            1] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$B$[$reg$$inline_253_value$$80$$]) : $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_248_old$$inline_254_port_temp$$inline_247$$ + 
+            2] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$A$[$reg$$inline_253_value$$80$$])
         }
         $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$f$++;
         break;
@@ -8648,7 +8622,7 @@ function $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_JSSMS_SN76489
           if($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$l$ = $JSCompiler_alias_TRUE$$, $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$r$ = $reg$$inline_253_value$$80$$ >> 
           6 & 3, $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$f$ = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$k$ | $reg$$inline_253_value$$80$$ << 8, 0 == 
           $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$r$) {
-            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$A$ = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$d$[$JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$f$++ & 
+            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$w$ = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$d$[$JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$f$++ & 
             16383] & 255
           }else {
             if(2 == $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$r$) {
@@ -8661,7 +8635,7 @@ function $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_JSSMS_SN76489
                   ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$h$ = $JSCompiler_alias_TRUE$$);
                   break;
                 case 2:
-                  $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$w$ = ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$k$ & 14) << 10;
+                  $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$u$ = ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$k$ & 14) << 10;
                   break;
                 case 5:
                   $address$$inline_248_old$$inline_254_port_temp$$inline_247$$ = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$g$, $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_256_JSCompiler_StaticMethods_controlWrite$self$$inline_251_JSCompiler_StaticMethods_dataWrite$self$$inline_245_JSCompiler_StaticMethods_out$self$$.$g$ = 

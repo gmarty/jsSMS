@@ -3186,15 +3186,15 @@ JSSMS.Z80.prototype = {
 
   setDefaultMemoryMapping: function() {
     // Map ROM
-    for (var i = 0; i < 48; i++) {
-      this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[i & 31]);
+    for (var i = 0; i < 0x30; i++) {
+      this.memReadMap[i] = this.rom[i & 0x1F];
       this.memWriteMap[i] = this.getDummyWrite();
     }
 
     // Map RAM
-    for (i = 48; i < 64; i++) {
-      this.memReadMap[i] = this.ram[i & 7];
-      this.memWriteMap[i] = this.ram[i & 7];
+    for (i = 0x30; i < 0x40; i++) {
+      this.memReadMap[i] = this.ram[i & 0x07];
+      this.memWriteMap[i] = this.ram[i & 0x07];
     }
   },
 
@@ -3241,8 +3241,8 @@ JSSMS.Z80.prototype = {
 
           // Map 16K of SRAM
           for (i = 32; i < 48; i++) {
-            this.memReadMap[i] = JSSMS.Utils.copyArray(this.sram[offset]);
-            this.memWriteMap[i] = JSSMS.Utils.copyArray(this.sram[offset]);
+            this.memReadMap[i] = this.sram[offset];
+            this.memWriteMap[i] = this.sram[offset];
             offset++;
           }
 
@@ -3253,7 +3253,7 @@ JSSMS.Z80.prototype = {
 
           // Map 16K of ROM
           for (i = 32; i < 48; i++) {
-            this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
+            this.memReadMap[i] = this.rom[p++];
             this.memWriteMap[i] = this.getDummyWrite();
           }
         }
@@ -3265,7 +3265,7 @@ JSSMS.Z80.prototype = {
         p = ((value % this.number_of_pages) << 4) + 1;
 
         for (i = 1; i < 16; i++)
-          this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
+          this.memReadMap[i] = this.rom[p++];
         break;
 
       // 0xFFFE: Page 1 ROM Bank
@@ -3273,7 +3273,7 @@ JSSMS.Z80.prototype = {
         p = (value % this.number_of_pages) << 4;
 
         for (i = 16; i < 32; i++)
-          this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
+          this.memReadMap[i] = this.rom[p++];
         break;
 
       // 0xFFFF: Page 2 ROM Bank
@@ -3283,7 +3283,7 @@ JSSMS.Z80.prototype = {
           p = (value % this.number_of_pages) << 4;
 
           for (i = 32; i < 48; i++)
-            this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
+            this.memReadMap[i] = this.rom[p++];
         }
         break;
     }

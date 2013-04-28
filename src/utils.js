@@ -95,57 +95,6 @@ JSSMS.Utils = {
 
 
   /**
-   * Returns a clone of the source array. Not safe for array of objects.
-   */
-  copyArray: function() {
-    if (SUPPORT_DATAVIEW) {
-      /**
-       * @param {DataView} src The source array.
-       * @return {DataView} A copy of source array.
-       */
-      return function(src) {
-        if (!src) {
-          return JSSMS.Utils.Array();
-        }
-
-        var i, dest;
-
-        i = src.byteLength;
-        dest = new JSSMS.Utils.Array(i);
-
-        while (i--) {
-          dest.setInt8(i, src.getInt8(i));
-        }
-
-        return dest;
-      };
-    } else {
-      /**
-       * @param {Array.<number>} src The source array.
-       * @return {Array.<number>} A copy of source array.
-       */
-      return function(src) {
-        if (!src) {
-          return JSSMS.Utils.Array();
-        }
-
-        var i, dest;
-
-        i = src.length;
-        dest = new JSSMS.Utils.Array(i);
-
-        while (i--) {
-          if (src[i] != undefined)
-            dest[i] = src[i];
-        }
-
-        return dest;
-      };
-    }
-  }(),
-
-
-  /**
    * Write to a memory location.
    */
   writeMem: function() {

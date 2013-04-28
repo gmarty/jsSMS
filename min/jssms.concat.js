@@ -297,36 +297,6 @@ JSSMS.Utils = {rndInt:function(range) {
       }
     }
   }
-}(), copyArray:function() {
-  if(SUPPORT_DATAVIEW) {
-    return function(src) {
-      if(!src) {
-        return JSSMS.Utils.Array()
-      }
-      var i, dest;
-      i = src.byteLength;
-      dest = new JSSMS.Utils.Array(i);
-      while(i--) {
-        dest.setInt8(i, src.getInt8(i))
-      }
-      return dest
-    }
-  }else {
-    return function(src) {
-      if(!src) {
-        return JSSMS.Utils.Array()
-      }
-      var i, dest;
-      i = src.length;
-      dest = new JSSMS.Utils.Array(i);
-      while(i--) {
-        if(src[i] != undefined) {
-          dest[i] = src[i]
-        }
-      }
-      return dest
-    }
-  }
 }(), writeMem:function() {
   if(SUPPORT_DATAVIEW) {
     return function(self, address, value) {
@@ -4415,7 +4385,7 @@ JSSMS.Z80.prototype = {reset:function() {
   }
 }, setDefaultMemoryMapping:function() {
   for(var i = 0;i < 48;i++) {
-    this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[i & 31]);
+    this.memReadMap[i] = this.rom[i & 31];
     this.memWriteMap[i] = this.getDummyWrite()
   }
   for(i = 48;i < 64;i++) {
@@ -4432,15 +4402,15 @@ JSSMS.Z80.prototype = {reset:function() {
       if((value & 8) != 0) {
         offset = (value & 4) << 2;
         for(i = 32;i < 48;i++) {
-          this.memReadMap[i] = JSSMS.Utils.copyArray(this.sram[offset]);
-          this.memWriteMap[i] = JSSMS.Utils.copyArray(this.sram[offset]);
+          this.memReadMap[i] = this.sram[offset];
+          this.memWriteMap[i] = this.sram[offset];
           offset++
         }
         this.useSRAM = true
       }else {
         p = this.frameReg[3] % this.number_of_pages << 4;
         for(i = 32;i < 48;i++) {
-          this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++]);
+          this.memReadMap[i] = this.rom[p++];
           this.memWriteMap[i] = this.getDummyWrite()
         }
       }
@@ -4448,20 +4418,20 @@ JSSMS.Z80.prototype = {reset:function() {
     case 1:
       p = (value % this.number_of_pages << 4) + 1;
       for(i = 1;i < 16;i++) {
-        this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++])
+        this.memReadMap[i] = this.rom[p++]
       }
       break;
     case 2:
       p = value % this.number_of_pages << 4;
       for(i = 16;i < 32;i++) {
-        this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++])
+        this.memReadMap[i] = this.rom[p++]
       }
       break;
     case 3:
       if((this.frameReg[0] & 8) == 0) {
         p = value % this.number_of_pages << 4;
         for(i = 32;i < 48;i++) {
-          this.memReadMap[i] = JSSMS.Utils.copyArray(this.rom[p++])
+          this.memReadMap[i] = this.rom[p++]
         }
       }
       break
@@ -8155,9 +8125,9 @@ JSSMS.Vdp = function(sms) {
   this.main_JAVA_R = new Array(64);
   this.main_JAVA_G = new Array(64);
   this.main_JAVA_B = new Array(64);
-  this.GG_JAVA1 = new Array(256);
-  this.GG_JAVA2 = new Array(16);
-  this.isPalConverted = false;
+  this.GG_JAVA_R = new Array(256);
+  this.GG_JAVA_G = new Array(256);
+  this.GG_JAVA_B = new Array(16);
   this.h_start = 0;
   this.h_end = 0;
   this.sat = 0;
@@ -8170,12 +8140,11 @@ JSSMS.Vdp = function(sms) {
   this.isTileDirty = new Array(TOTAL_TILES);
   this.minDirty = 0;
   this.maxDirty = 0;
-  this.createCachedImages()
+  this.createCachedImages();
+  this.generateConvertedPals()
 };
 JSSMS.Vdp.prototype = {reset:function() {
   var i;
-  this.isPalConverted = false;
-  this.generateConvertedPals();
   this.firstByte = true;
   this.location = 0;
   this.counter = 0;
@@ -8308,17 +8277,17 @@ JSSMS.Vdp.prototype = {reset:function() {
     case 3:
       if(this.main.is_sms) {
         temp = (this.location & 31) * 3;
-        this.CRAM[temp] = this.main_JAVA_R[value & 63];
-        this.CRAM[temp + 1] = this.main_JAVA_G[value & 63];
-        this.CRAM[temp + 2] = this.main_JAVA_B[value & 63]
+        this.CRAM[temp] = this.main_JAVA_R[value];
+        this.CRAM[temp + 1] = this.main_JAVA_G[value];
+        this.CRAM[temp + 2] = this.main_JAVA_B[value]
       }else {
         if(this.main.is_gg) {
           temp = ((this.location & 63) >> 1) * 3;
           if((this.location & 1) == 0) {
-            this.CRAM[temp] = this.GG_JAVA1[value] & 255;
-            this.CRAM[temp + 1] = this.GG_JAVA1[value] >> 8 & 255
+            this.CRAM[temp] = this.GG_JAVA_R[value];
+            this.CRAM[temp + 1] = this.GG_JAVA_G[value]
           }else {
-            this.CRAM[temp + 2] = this.GG_JAVA2[value & 15] >> 16 & 255
+            this.CRAM[temp + 2] = this.GG_JAVA_B[value]
           }
         }
       }
@@ -8535,35 +8504,6 @@ JSSMS.Vdp.prototype = {reset:function() {
     this.display[temp + 2] = this.CRAM[temp2 + 2];
     row_precal++
   }
-}, generateConvertedPals:function() {
-  var i;
-  var r, g, b;
-  if(this.main.is_sms && !this.isPalConverted) {
-    for(i = 0;i < 64;i++) {
-      r = i & 3;
-      g = i >> 2 & 3;
-      b = i >> 4 & 3;
-      this.main_JAVA_R[i] = r * 85 & 255;
-      this.main_JAVA_G[i] = g * 85 & 255;
-      this.main_JAVA_B[i] = b * 85 & 255
-    }
-  }else {
-    if(this.main.is_gg && !this.isPalConverted) {
-      for(i = 0;i < 256;i++) {
-        g = i & 15;
-        b = i >> 4 & 15;
-        this.GG_JAVA1[i] = b << 12 | b << 8 | g << 4 | g
-      }
-      for(i = 0;i < 16;i++) {
-        this.GG_JAVA2[i] = i << 20
-      }
-    }
-  }
-  this.isPalConverted = true
-}, createCachedImages:function() {
-  for(var i = 0;i < TOTAL_TILES;i++) {
-    this.tiles[i] = new Array(TILE_SIZE * TILE_SIZE)
-  }
 }, decodeTiles:function() {
   DEBUG && console.log("[" + this.line + "]" + " min dirty:" + this.minDirty + " max: " + this.maxDirty);
   for(var i = this.minDirty;i <= this.maxDirty;i++) {
@@ -8631,6 +8571,30 @@ JSSMS.Vdp.prototype = {reset:function() {
         }
       }
     }
+  }
+}, createCachedImages:function() {
+  for(var i = 0;i < TOTAL_TILES;i++) {
+    this.tiles[i] = new Array(TILE_SIZE * TILE_SIZE)
+  }
+}, generateConvertedPals:function() {
+  var i;
+  var r, g, b;
+  for(i = 0;i < 64;i++) {
+    r = i & 3;
+    g = i >> 2 & 3;
+    b = i >> 4 & 3;
+    this.main_JAVA_R[i] = r * 85 & 255;
+    this.main_JAVA_G[i] = g * 85 & 255;
+    this.main_JAVA_B[i] = b * 85 & 255
+  }
+  for(i = 0;i < 256;i++) {
+    g = i & 15;
+    b = i >> 4 & 15;
+    this.GG_JAVA_R[i] = (g << 4 | g) & 255;
+    this.GG_JAVA_G[i] = (b << 4 | b) & 255
+  }
+  for(i = 0;i < 16;i++) {
+    this.GG_JAVA_B[i] = (i << 4 | i) & 255
   }
 }, getState:function() {
   var state = new Array(3 + 16 + 32);
@@ -8839,8 +8803,8 @@ if(typeof $ != "undefined") {
         }
         data = xhr.responseText;
         self.main.stop();
-        self.main.reset();
         self.main.readRomDirectly(data, self.romSelect.val());
+        self.main.reset();
         self.main.vdp.forceFullRedraw();
         self.enable()
       }})
