@@ -240,15 +240,9 @@ JSSMS.Vdp = function(sms) {
   /** @type {Array.<number>} */ this.main_JAVA_B = new Array(0x40);
 
   /** GG colours converted to RGB hex. */
-  /** @type {Array.<number>} */ this.GG_JAVA_R = new Array(0x10);
+  /** @type {Array.<number>} */ this.GG_JAVA_R = new Array(0x100);
   /** @type {Array.<number>} */ this.GG_JAVA_G = new Array(0x100);
-  /** @type {Array.<number>} */ this.GG_JAVA_B = new Array(0x100);
-
-  /**
-   * Keep a reference of palette being converted.
-   * @type {boolean}
-   */
-  this.isPalConverted = false;
+  /** @type {Array.<number>} */ this.GG_JAVA_B = new Array(0x10);
 
   /**
    * Horizontal viewport start.
@@ -302,6 +296,7 @@ JSSMS.Vdp = function(sms) {
   /** @type {number} */ this.maxDirty = 0;
 
   this.createCachedImages();
+  this.generateConvertedPals();
 };
 
 JSSMS.Vdp.prototype = {
@@ -310,9 +305,6 @@ JSSMS.Vdp.prototype = {
    */
   reset: function() {
     var i;
-
-    this.isPalConverted = false;
-    this.generateConvertedPals();
 
     this.firstByte = true;
 
@@ -542,11 +534,11 @@ JSSMS.Vdp.prototype = {
           temp = ((this.location & 0x3F) >> 1) * 3;
           if ((this.location & 0x01) == 0) {
             // first byte
-            this.CRAM[temp] = this.GG_JAVA_G[value]; // GG
-            this.CRAM[temp + 1] = this.GG_JAVA_B[value]; // GG
+            this.CRAM[temp] = this.GG_JAVA_R[value]; // GG
+            this.CRAM[temp + 1] = this.GG_JAVA_G[value]; // GG
           }
           else {
-            this.CRAM[temp + 2] = this.GG_JAVA_R[value];
+            this.CRAM[temp + 2] = this.GG_JAVA_B[value];
           }
         }
         break;
@@ -914,78 +906,6 @@ JSSMS.Vdp.prototype = {
   },
 
 
-  // Generated pre-converted palettes.
-  //
-  // SMS and GG colours are converted to Java RGB for speed purposes.
-  //
-  // Java: 0xAARRGGBB (4 bytes) Java colour
-  //
-  // SMS : 00BBGGRR   (1 byte)
-  // GG  : GGGGRRRR   (1st byte)
-  //       0000BBBB   (2nd byte)
-  generateConvertedPals: function() {
-    var i;
-    var r, g, b;
-
-    if (this.isPalConverted) {
-      return;
-    }
-
-    if (this.main.is_sms) {
-      for (i = 0; i < 0x40; i++) {
-        r = i & 0x03;
-        g = (i >> 2) & 0x03;
-        b = (i >> 4) & 0x03;
-
-        this.main_JAVA_R[i] = (r * 85) & 0xFF;
-        this.main_JAVA_G[i] = (g * 85) & 0xFF;
-        this.main_JAVA_B[i] = (b * 85) & 0xFF;
-      }
-    } else if (this.main.is_gg) {
-      // Red
-      for (i = 0; i < 0x10; i++) {
-        this.GG_JAVA_R[i] = (i << 4) | i;
-      }
-
-      // Green & Blue
-      for (i = 0; i < 0x100; i++) {
-        g = i & 0x0F;
-        b = (i >> 4) & 0x0F;
-
-        // Shift and fill with the original bitpattern
-        // so %1111 becomes %11111111, %1010 becomes %10101010
-        this.GG_JAVA_G[i] = ((g << 4) | g) & 0xFF;
-        this.GG_JAVA_B[i] = ((b << 4) | b) & 0xFF;
-      }
-    }
-
-    this.isPalConverted = true;
-  },
-
-
-  // Decode all background tiles
-  //
-  // Tiles are 8x8
-  //
-  // Background table is a 32x28 matrix of words stored in VRAM
-  //
-  //  MSB          LSB
-  //  ---pcvhnnnnnnnnn
-  //
-  // p = priority
-  // c = palette
-  // v = vertical flip
-  // h = horizontal flip
-  // n = pattern index (0 - 512)
-  createCachedImages: function() {
-    //this.tiles = new Array(TOTAL_TILES);
-    for (var i = 0; i < TOTAL_TILES; i++) {
-      this.tiles[i] = new Array(TILE_SIZE * TILE_SIZE);
-    }
-    //this.isTileDirty = new Array(TOTAL_TILES);
-  },
-
-
   // Note we should try not to update the bgt/sat locations?
   decodeTiles: function() {
     DEBUG && console.log('[' + this.line + ']' + ' min dirty:' + this.minDirty + ' max: ' + this.maxDirty);
@@ -1122,6 +1042,71 @@ JSSMS.Vdp.prototype = {
           }
         }
       }
+    }
+  },
+
+
+  // Decode all background tiles
+  //
+  // Tiles are 8x8
+  //
+  // Background table is a 32x28 matrix of words stored in VRAM
+  //
+  //  MSB          LSB
+  //  ---pcvhnnnnnnnnn
+  //
+  // p = priority
+  // c = palette
+  // v = vertical flip
+  // h = horizontal flip
+  // n = pattern index (0 - 512)
+  createCachedImages: function() {
+    //this.tiles = new Array(TOTAL_TILES);
+    for (var i = 0; i < TOTAL_TILES; i++) {
+      this.tiles[i] = new Array(TILE_SIZE * TILE_SIZE);
+    }
+    //this.isTileDirty = new Array(TOTAL_TILES);
+  },
+
+
+  // Generated pre-converted palettes.
+  //
+  // SMS and GG colours are converted to Java RGB for speed purposes.
+  //
+  // Java: 0xAARRGGBB (4 bytes) Java colour
+  //
+  // SMS : 00BBGGRR   (1 byte)
+  // GG  : GGGGRRRR   (1st byte)
+  //       0000BBBB   (2nd byte)
+  generateConvertedPals: function() {
+    var i;
+    var r, g, b;
+
+    // Convert SMS palette.
+    for (i = 0; i < 0x40; i++) {
+      r = i & 0x03;
+      g = (i >> 2) & 0x03;
+      b = (i >> 4) & 0x03;
+
+      this.main_JAVA_R[i] = (r * 85) & 0xFF;
+      this.main_JAVA_G[i] = (g * 85) & 0xFF;
+      this.main_JAVA_B[i] = (b * 85) & 0xFF;
+    }
+
+    // Convert GG palette.
+    // Red & Green
+    for (i = 0; i < 0x100; i++) {
+      g = i & 0x0F;
+      b = (i >> 4) & 0x0F;
+
+      // Shift and fill with the original bitpattern
+      // so %1111 becomes %11111111, %1010 becomes %10101010
+      this.GG_JAVA_R[i] = ((g << 4) | g) & 0xFF;
+      this.GG_JAVA_G[i] = ((b << 4) | b) & 0xFF;
+    }
+    // Blue
+    for (i = 0; i < 0x10; i++) {
+      this.GG_JAVA_B[i] = ((i << 4) | i) & 0xFF;
     }
   },
 
