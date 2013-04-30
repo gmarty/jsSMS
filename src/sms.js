@@ -47,6 +47,10 @@ var CLOCK_PAL = 3546893;
  * @param {Object.<string, *>} opts
  */
 function JSSMS(opts) {
+  /**
+   * The list of options that can be overridden at instantiation.
+   * @dict
+   */
   this.opts = {
     'ui': JSSMS.DummyUI,
     'swfPath': 'lib/'
