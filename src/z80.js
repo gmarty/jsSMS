@@ -311,7 +311,7 @@ JSSMS.Z80 = function(sms) {
    * SRAM.
    * @type {Array.<Array.<number>>}
    */
-  this.sram = null;
+  this.sram = Array(32);
 
   /**
    * Cartridge uses SRAM.
@@ -3137,7 +3137,10 @@ JSSMS.Z80.prototype = {
 
     // Create 2 x 16K RAM Cartridge Pages
     if (this.sram == null) {
-      this.sram = JSSMS.Utils.Array(32);
+      this.sram = Array(32);
+      for (i = 0; i < 32; i++) {
+        this.sram[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
+      }
       this.useSRAM = false;
     }
 
