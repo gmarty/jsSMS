@@ -53,11 +53,13 @@ JSSMS.Debugger.prototype = {
    * Parse the rom instructions.
    */
   parseInstructions: function() {
+    console.time('Instructions parsing');
+
     var romSize = Setup.PAGE_SIZE * this.rom.length;
     var instruction;
     var currentAddress;
-    var addresses = []; //Array(romSize);
     var i = 0;
+    var addresses = []; //Array(romSize);
 
     addresses.push(0x00); // Add program entry point to the list of addresses to visit.
     /*addresses.push(0x08); // And below: set by RST.
@@ -68,8 +70,6 @@ JSSMS.Debugger.prototype = {
      addresses.push(0x30);*/
     addresses.push(0x38); // RST 38h and Interrupt.
     addresses.push(0x66); // Set by NMI.
-
-    console.time('Instructions parsing');
 
     while (addresses.length) {
       currentAddress = addresses.shift();

@@ -4511,15 +4511,15 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   this.parseInstructions();
   this.main.ui.updateStatus("Instructions parsed")
 }, parseInstructions:function() {
+  console.time("Instructions parsing");
   var romSize = Setup.PAGE_SIZE * this.rom.length;
   var instruction;
   var currentAddress;
-  var addresses = [];
   var i = 0;
+  var addresses = [];
   addresses.push(0);
   addresses.push(56);
   addresses.push(102);
-  console.time("Instructions parsing");
   while(addresses.length) {
     currentAddress = addresses.shift();
     if(this.instructions[currentAddress]) {

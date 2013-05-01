@@ -74,12 +74,12 @@ reset:function $$JSSMS$$$$reset$() {
   $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$ = this.$cpu$;
   $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$ = [];
   $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$main$.$a$.updateStatus("Parsing instructions...");
-  var $JSCompiler_StaticMethods_init$self$$inline_261_mode$$inline_14_romSize$$inline_266_v$$inline_17$$ = 1024 * $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$z$.length, $instruction$$inline_267_opcode$$inline_318_options$$inline_339$$, $addresses$$inline_269$$ = [], $i$$inline_270$$ = 0;
-  $addresses$$inline_269$$.push(0);
-  $addresses$$inline_269$$.push(56);
-  $addresses$$inline_269$$.push(102);
-  for(console.time("Instructions parsing");$addresses$$inline_269$$.length;) {
-    if($currentAddress$$inline_268_fractional$$inline_18$$ = $addresses$$inline_269$$.shift(), !$JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$currentAddress$$inline_268_fractional$$inline_18$$]) {
+  console.time("Instructions parsing");
+  var $JSCompiler_StaticMethods_init$self$$inline_261_mode$$inline_14_romSize$$inline_266_v$$inline_17$$ = 1024 * $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$z$.length, $instruction$$inline_267_opcode$$inline_318_options$$inline_339$$, $i$$inline_269$$ = 0, $addresses$$inline_270$$ = [];
+  $addresses$$inline_270$$.push(0);
+  $addresses$$inline_270$$.push(56);
+  for($addresses$$inline_270$$.push(102);$addresses$$inline_270$$.length;) {
+    if($currentAddress$$inline_268_fractional$$inline_18$$ = $addresses$$inline_270$$.shift(), !$JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$currentAddress$$inline_268_fractional$$inline_18$$]) {
       if($currentAddress$$inline_268_fractional$$inline_18$$ >= $JSCompiler_StaticMethods_init$self$$inline_261_mode$$inline_14_romSize$$inline_266_v$$inline_17$$ || 65 <= $currentAddress$$inline_268_fractional$$inline_18$$ >> 10) {
         console.log("Invalid address", $currentAddress$$inline_268_fractional$$inline_18$$)
       }else {
@@ -2248,14 +2248,14 @@ reset:function $$JSSMS$$$$reset$() {
         $defaultInstruction$$inline_340_opcodesArray$$inline_319$$.label = $defaultInstruction$$inline_340_opcodesArray$$inline_319$$.$hexAddress$ + " " + $hexOpcodes$$inline_342_target$$inline_322$$ + $defaultInstruction$$inline_340_opcodesArray$$inline_319$$.$inst$;
         $instruction$$inline_267_opcode$$inline_318_options$$inline_339$$ = $defaultInstruction$$inline_340_opcodesArray$$inline_319$$;
         $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$currentAddress$$inline_268_fractional$$inline_18$$] = $instruction$$inline_267_opcode$$inline_318_options$$inline_339$$;
-        $instruction$$inline_267_opcode$$inline_318_options$$inline_339$$.$nextAddress$ != $JSCompiler_alias_NULL$$ && $addresses$$inline_269$$.push($instruction$$inline_267_opcode$$inline_318_options$$inline_339$$.$nextAddress$);
-        $instruction$$inline_267_opcode$$inline_318_options$$inline_339$$.target != $JSCompiler_alias_NULL$$ && $addresses$$inline_269$$.push($instruction$$inline_267_opcode$$inline_318_options$$inline_339$$.target)
+        $instruction$$inline_267_opcode$$inline_318_options$$inline_339$$.$nextAddress$ != $JSCompiler_alias_NULL$$ && $addresses$$inline_270$$.push($instruction$$inline_267_opcode$$inline_318_options$$inline_339$$.$nextAddress$);
+        $instruction$$inline_267_opcode$$inline_318_options$$inline_339$$.target != $JSCompiler_alias_NULL$$ && $addresses$$inline_270$$.push($instruction$$inline_267_opcode$$inline_318_options$$inline_339$$.target)
       }
     }
   }
-  for(;$i$$inline_270$$ < $JSCompiler_StaticMethods_init$self$$inline_261_mode$$inline_14_romSize$$inline_266_v$$inline_17$$;$i$$inline_270$$++) {
-    $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$i$$inline_270$$] && $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$i$$inline_270$$].target != $JSCompiler_alias_NULL$$ && ($JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$i$$inline_270$$].target] ? 
-    $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$i$$inline_270$$].target].$isJumpTarget$ = $JSCompiler_alias_TRUE$$ : console.log("Invalid target address", $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$i$$inline_270$$].target))
+  for(;$i$$inline_269$$ < $JSCompiler_StaticMethods_init$self$$inline_261_mode$$inline_14_romSize$$inline_266_v$$inline_17$$;$i$$inline_269$$++) {
+    $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$i$$inline_269$$] && $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$i$$inline_269$$].target != $JSCompiler_alias_NULL$$ && ($JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$i$$inline_269$$].target] ? 
+    $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$i$$inline_269$$].target].$isJumpTarget$ = $JSCompiler_alias_TRUE$$ : console.log("Invalid target address", $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$instructions$[$i$$inline_269$$].target))
   }
   console.timeEnd("Instructions parsing");
   $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_263$$.$main$.$a$.updateStatus("Instructions parsed");
