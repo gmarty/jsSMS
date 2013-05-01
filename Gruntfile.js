@@ -93,6 +93,43 @@ module.exports = function(grunt) {
           debug: true,
           formatting: 'PRETTY_PRINT'
         }
+      },
+
+      // Generates a minified version of the script to use with node.js.
+      node: {
+        js: [
+          'src/setup.js',
+          'src/sms.js',
+          'src/utils.js',
+          'src/z80.js',
+          'src/debugger.js',
+          'src/keyboard.js',
+          'src/psg.js',
+          'src/vdp.js',
+          'src/node-ui.js',
+          'src/ports.js',
+          'src/build/node-exports.js'
+        ],
+        jsOutputFile: 'min/jssms.node.js',
+        options: {
+          externs: [
+            'src/build/externs/node.js',
+            '<%= closurePath %>/contrib/externs/webkit_console.js',
+            '<%= closurePath %>/contrib/html5.js'
+          ],
+          compilation_level: 'ADVANCED_OPTIMIZATIONS',
+          language_in: 'ECMASCRIPT5_STRICT',
+          use_types_for_optimization: null,
+          summary_detail_level: 3,
+          warning_level: 'VERBOSE',
+          output_wrapper: '(function(window){%output%})(global);',
+          define: [
+            '"DEBUG=true"',
+            '"DEBUGGER=true"'
+          ],
+          debug: true,
+          formatting: 'PRETTY_PRINT'
+        }
       }
     },
 
@@ -111,6 +148,10 @@ module.exports = function(grunt) {
       concat: {
         src: ['min/jssms.concat.js'],
         dest: 'min/jssms.concat.js'
+      },
+      node: {
+        src: ['min/jssms.node.js'],
+        dest: 'min/jssms.node.js'
       }
     }
 
@@ -124,6 +165,10 @@ module.exports = function(grunt) {
     'concat:min',
     'concat:debug',
     'concat:concat'
+  ]);
+  grunt.registerTask('node', [
+    'closure-compiler:node',
+    'concat:node'
   ]);
 
 };
