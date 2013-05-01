@@ -30,7 +30,8 @@ function $JSSMS$$($opts$$) {
   this.$b$ = new $JSSMS$SN76489$$(this);
   this.$c$ = new $JSSMS$Ports$$(this);
   this.$cpu$ = new $JSSMS$Z80$$(this);
-  this.$a$.updateStatus("Ready to load a ROM.")
+  this.$a$.updateStatus("Ready to load a ROM.");
+  this.ui = this.$a$
 }
 $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, $no_of_scanlines$:0, $frameSkip$:0, $fps$:0, $frameskip_counter$:0, $pause_button$:$JSCompiler_alias_FALSE$$, $is_sms$:$JSCompiler_alias_TRUE$$, $is_gg$:$JSCompiler_alias_FALSE$$, $soundEnabled$:$JSCompiler_alias_FALSE$$, $audioBuffer$:[], $audioBufferOffset$:0, $samplesPerFrame$:0, $samplesPerLine$:[], $fpsFrameCount$:0, $z80TimeCounter$:0, $drawTimeCounter$:0, $frameCount$:0, $romData$:"", $romFileName$:"", $lineno$:0, 
 reset:function $$JSSMS$$$$reset$() {

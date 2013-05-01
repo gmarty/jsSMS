@@ -42,7 +42,8 @@ function JSSMS(opts) {
   this.psg = new JSSMS.SN76489(this);
   this.ports = new JSSMS.Ports(this);
   this.cpu = new JSSMS.Z80(this);
-  this.ui.updateStatus("Ready to load a ROM.")
+  this.ui.updateStatus("Ready to load a ROM.");
+  this["ui"] = this.ui
 }
 JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0, throttle:true, fps:0, frameskip_counter:0, pause_button:false, is_sms:true, is_gg:false, soundEnabled:false, audioBuffer:[], audioBufferOffset:0, samplesPerFrame:0, samplesPerLine:[], emuWidth:0, emuHeight:0, fpsFrameCount:0, z80Time:0, drawTime:0, z80TimeCounter:0, drawTimeCounter:0, frameCount:0, romData:"", romFileName:"", lineno:0, reset:function() {
   this.setVideoTiming(this.vdp.videoMode);
@@ -4548,32 +4549,33 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   }
   console.timeEnd("Instructions parsing")
 }, writeGraphViz:function() {
+  console.time("DOT generation");
   var tree = this.instructions;
   var INDENT = " ";
-  console.time("DOT generation");
-  var dotFile = ["digraph G {"];
+  var content = ["digraph G {"];
   for(var i = 0, length = tree.length;i < length;i++) {
-    if(tree[i]) {
-      dotFile.push(INDENT + i + ' [label="' + tree[i].label + '"];');
-      if(tree[i].target != null) {
-        dotFile.push(INDENT + i + " -> " + tree[i].target + ";")
-      }
-      if(tree[i].nextAddress != null) {
-        dotFile.push(INDENT + i + " -> " + tree[i].nextAddress + ";")
-      }
+    if(!tree[i]) {
+      continue
+    }
+    content.push(INDENT + i + ' [label="' + tree[i].label + '"];');
+    if(tree[i].target != null) {
+      content.push(INDENT + i + " -> " + tree[i].target + ";")
+    }
+    if(tree[i].nextAddress != null) {
+      content.push(INDENT + i + " -> " + tree[i].nextAddress + ";")
     }
   }
-  dotFile.push("}");
-  dotFile = dotFile.join("\n");
-  dotFile = dotFile.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
+  content.push("}");
+  content = content.join("\n");
+  content = content.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
   console.timeEnd("DOT generation");
-  console.log(dotFile)
+  return content
 }, writeJavaScript:function() {
+  console.time("JavaScript generation");
   var tree = this.instructions;
   var toHex = JSSMS.Utils.toHex;
   var INDENT = "  ";
   var tstates = 0;
-  console.time("JavaScript generation");
   var code = ["function run(cycles, cyclesTo) {", "var location = 0;", "var opcode = 0;", "var temp = 0;", "", "this.tstates += cycles;", "", "if (cycles != 0)", "  this.totalCycles = cycles;"];
   if(!Setup.ACCURATE_INTERRUPT_EMULATION) {
     code.push("if (this.interruptLine) this.interrupt(); // Check for interrupt")
@@ -4589,21 +4591,22 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   code.push("");
   code.push("switch(this.pc) {");
   for(var i = 0, length = tree.length;i < length;i++) {
-    if(tree[i]) {
-      code.push(INDENT + "case " + toHex(tree[i].address) + ":");
-      code.push(INDENT + "// " + tree[i].label);
-      tstates = getTotalTStates(tree[i].opcodes);
-      if(tstates) {
-        code.push(INDENT + "this.tstates -= " + tstates + ";")
-      }
-      if(code != "") {
-        code.push(INDENT + tree[i].code)
-      }
-      if(tree[i].nextAddress) {
-        code.push(INDENT + "this.pc = " + toHex(tree[i].nextAddress) + ";")
-      }
-      code.push(INDENT + "break;")
+    if(!tree[i]) {
+      continue
     }
+    code.push(INDENT + "case " + toHex(tree[i].address) + ":");
+    code.push(INDENT + "// " + tree[i].label);
+    tstates = getTotalTStates(tree[i].opcodes);
+    if(tstates) {
+      code.push(INDENT + "this.tstates -= " + tstates + ";")
+    }
+    if(code != "") {
+      code.push(INDENT + tree[i].code)
+    }
+    if(tree[i].nextAddress) {
+      code.push(INDENT + "this.pc = " + toHex(tree[i].nextAddress) + ";")
+    }
+    code.push(INDENT + "break;")
   }
   code.push(INDENT + "default:");
   code.push(INDENT + 'console.log("Bad address", this.pc);');

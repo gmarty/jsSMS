@@ -28,6 +28,7 @@
  * @extends {JSSMS.Z80}
  */
 JSSMS.Debugger = function() {
+  // Nothing here -- never executed.
 };
 
 JSSMS.Debugger.prototype = {
@@ -113,32 +114,39 @@ JSSMS.Debugger.prototype = {
 
   /**
    * Write a dot file representation of parsed instructions to the console.
+   *
+   * @return {string} The content of a Dot file.
    */
   writeGraphViz: function() {
+    console.time('DOT generation');
+
     var tree = this.instructions;
     var INDENT = ' ';
 
-    console.time('DOT generation');
+    var content = ['digraph G {'];
 
-    var dotFile = ['digraph G {'];
     for (var i = 0, length = tree.length; i < length; i++) {
-      if (tree[i]) {
-        dotFile.push(INDENT + i + ' [label="' + tree[i].label + '"];');
-        if (tree[i].target != null)
-          dotFile.push(INDENT + i + ' -> ' + tree[i].target + ';');
-        if (tree[i].nextAddress != null)
-          dotFile.push(INDENT + i + ' -> ' + tree[i].nextAddress + ';');
-      }
+      if (!tree[i])
+        continue;
+
+      content.push(INDENT + i + ' [label="' + tree[i].label + '"];');
+
+      if (tree[i].target != null)
+        content.push(INDENT + i + ' -> ' + tree[i].target + ';');
+
+      if (tree[i].nextAddress != null)
+        content.push(INDENT + i + ' -> ' + tree[i].nextAddress + ';');
     }
-    dotFile.push('}');
-    dotFile = dotFile.join('\n');
+
+    content.push('}');
+    content = content.join('\n');
 
     // Inject entry point styling.
-    dotFile = dotFile.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
+    content = content.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
 
     console.timeEnd('DOT generation');
 
-    console.log(dotFile);
+    return content;
   },
 
 
@@ -146,14 +154,16 @@ JSSMS.Debugger.prototype = {
    * Return a string representing a JavaScript code for the ROM instructions.
    * The format is a big switch unrolling the value of this.pc.
    * The idea is to avoid using this.readMem() and this.readMemWord().
+   *
+   * @return {string} JavaScript code.
    */
   writeJavaScript: function() {
+    console.time('JavaScript generation');
+
     var tree = this.instructions;
     var toHex = JSSMS.Utils.toHex;
     var INDENT = '  ';
     var tstates = 0;
-
-    console.time('JavaScript generation');
 
     var code = [
       'function run(cycles, cyclesTo) {',
@@ -184,27 +194,29 @@ JSSMS.Debugger.prototype = {
     code.push('switch(this.pc) {');
 
     for (var i = 0, length = tree.length; i < length; i++) {
-      if (tree[i]) {
-        code.push(INDENT + 'case ' + toHex(tree[i].address) + ':');
+      if (!tree[i])
+        continue;
 
-        // Comment for debugging.
-        code.push(INDENT + '// ' + tree[i].label);
+      code.push(INDENT + 'case ' + toHex(tree[i].address) + ':');
 
-        // Decrement tstates.
-        tstates = getTotalTStates(tree[i].opcodes);
-        if (tstates)
-          code.push(INDENT + 'this.tstates -= ' + tstates + ';');
+      // Comment for debugging.
+      code.push(INDENT + '// ' + tree[i].label);
 
-        // Instruction.
-        if (code != '')
-          code.push(INDENT + tree[i].code);
+      // Decrement tstates.
+      tstates = getTotalTStates(tree[i].opcodes);
+      if (tstates)
+        code.push(INDENT + 'this.tstates -= ' + tstates + ';');
 
-        // Move program counter.
-        if (tree[i].nextAddress)
-          code.push(INDENT + 'this.pc = ' + toHex(tree[i].nextAddress) + ';');
-        code.push(INDENT + 'break;');
-      }
+      // Instruction.
+      if (code != '')
+        code.push(INDENT + tree[i].code);
+
+      // Move program counter.
+      if (tree[i].nextAddress)
+        code.push(INDENT + 'this.pc = ' + toHex(tree[i].nextAddress) + ';');
+      code.push(INDENT + 'break;');
     }
+
     code.push(INDENT + 'default:');
     code.push(INDENT + 'console.log("Bad address", this.pc);');
     code.push(INDENT + 'break;');

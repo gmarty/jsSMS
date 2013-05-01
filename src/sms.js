@@ -72,6 +72,9 @@ function JSSMS(opts) {
   this.cpu = new JSSMS.Z80(this);
 
   this.ui.updateStatus('Ready to load a ROM.');
+
+  // Exposing ui publicly after minification.
+  this['ui'] = this.ui;
 }
 
 JSSMS.prototype = {
