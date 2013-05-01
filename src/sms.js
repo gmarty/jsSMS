@@ -273,7 +273,6 @@ JSSMS.prototype = {
     if (DEBUGGER) {
       this.cpu.resetDebug();
     }
-    this.cpu.resetMemory();
 
     clearInterval(this.fpsInterval);
   },

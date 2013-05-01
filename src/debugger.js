@@ -41,6 +41,10 @@ JSSMS.Debugger.prototype = {
    */
   resetDebug: function() {
     this.instructions = [];
+
+    this.main.ui.updateStatus('Parsing instructions...');
+    this.parseInstructions();
+    this.main.ui.updateStatus('Instructions parsed');
   },
 
 

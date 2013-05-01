@@ -56,7 +56,6 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   if(DEBUGGER) {
     this.cpu.resetDebug()
   }
-  this.cpu.resetMemory();
   clearInterval(this.fpsInterval)
 }, start:function() {
   var self = this;
@@ -4374,12 +4373,7 @@ JSSMS.Z80.prototype = {reset:function() {
   this.frameReg[3] = 0;
   if(this.rom.length) {
     this.number_of_pages = this.rom.length / 16;
-    this.setDefaultMemoryMapping();
-    if(DEBUGGER) {
-      this.main.ui.updateStatus("Parsing instructions...");
-      this.parseInstructions();
-      this.main.ui.updateStatus("Instructions parsed")
-    }
+    this.setDefaultMemoryMapping()
   }else {
     this.number_of_pages = 0
   }
@@ -4511,7 +4505,10 @@ JSSMS.Z80.prototype = {reset:function() {
 JSSMS.Debugger = function() {
 };
 JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
-  this.instructions = []
+  this.instructions = [];
+  this.main.ui.updateStatus("Parsing instructions...");
+  this.parseInstructions();
+  this.main.ui.updateStatus("Instructions parsed")
 }, parseInstructions:function() {
   var romSize = Setup.PAGE_SIZE * this.rom.length;
   var instruction;

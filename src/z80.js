@@ -3172,12 +3172,6 @@ JSSMS.Z80.prototype = {
       // 16K Page Chunks :)
       this.number_of_pages = this.rom.length / 16;
       this.setDefaultMemoryMapping();
-
-      if (DEBUGGER) {
-        this.main.ui.updateStatus('Parsing instructions...');
-        this.parseInstructions();
-        this.main.ui.updateStatus('Instructions parsed');
-      }
     } else {
       this.number_of_pages = 0;
     }
