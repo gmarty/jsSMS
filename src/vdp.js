@@ -529,15 +529,13 @@ JSSMS.Vdp.prototype = {
           this.CRAM[temp] = this.main_JAVA_R[value];
           this.CRAM[temp + 1] = this.main_JAVA_G[value];
           this.CRAM[temp + 2] = this.main_JAVA_B[value];
-        }
-        else if (this.main.is_gg) {
+        } else {
           temp = ((this.location & 0x3F) >> 1) * 3;
           if ((this.location & 0x01) == 0) {
             // first byte
             this.CRAM[temp] = this.GG_JAVA_R[value]; // GG
             this.CRAM[temp + 1] = this.GG_JAVA_G[value]; // GG
-          }
-          else {
+          } else {
             this.CRAM[temp + 2] = this.GG_JAVA_B[value];
           }
         }
