@@ -23,7 +23,7 @@
 /**
  * Command line to generate various type of output from a rom.
  *
- * Usage: node c:\dev\emulator\jsSMS\bin\jssms.js -f [rom_file_name]
+ * Usage: node ./jsSMS/bin/jssms.js -f [rom_file_name]
  *
  * Options:
  * -f, --file    ROM file location                                   [required]
@@ -65,7 +65,9 @@ fs.readFile(argv.file, {encoding: 'binary'}, function(err, data) {
   }
 
   if (argv.d) {
-    generateOutput(sms.ui.writeJavaScript());
+    var tpl = fs.readFileSync(__dirname + '/tpl/z80.js.tpl', {encoding: 'ascii'}).toString();
+    tpl = tpl.replace(/\{\{run_method_code\}\}/, sms.ui.writeJavaScript());
+    generateOutput(tpl);
     return;
   }
 
