@@ -75,9 +75,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
   $JSCompiler_StaticMethods_resetDebug$self$$inline_16_clockSpeedHz$$inline_11_i$$inline_12_i$$inline_160$$.$aa$.$b$.updateStatus("Parsing instructions...");
   console.time("Instructions parsing");
   var $JSCompiler_StaticMethods_init$self$$inline_158_mode$$inline_10_romSize$$inline_163_v$$inline_13$$ = 1024 * $JSCompiler_StaticMethods_resetDebug$self$$inline_16_clockSpeedHz$$inline_11_i$$inline_12_i$$inline_160$$.$A$.length, $instruction$$inline_164_opcode$$inline_219_options$$inline_241$$, $i$$inline_166$$ = 0, $addresses$$inline_167$$ = [];
-  $addresses$$inline_167$$.push(0);
-  $addresses$$inline_167$$.push(56);
-  for($addresses$$inline_167$$.push(102);$addresses$$inline_167$$.length;) {
+  for($addresses$$inline_167$$.push(0);$addresses$$inline_167$$.length;) {
     if($currentAddress$$inline_165_fractional$$inline_14$$ = $addresses$$inline_167$$.shift(), !$JSCompiler_StaticMethods_resetDebug$self$$inline_16_clockSpeedHz$$inline_11_i$$inline_12_i$$inline_160$$.$w$[$currentAddress$$inline_165_fractional$$inline_14$$]) {
       if($currentAddress$$inline_165_fractional$$inline_14$$ >= $JSCompiler_StaticMethods_init$self$$inline_158_mode$$inline_10_romSize$$inline_163_v$$inline_13$$ || 65 <= $currentAddress$$inline_165_fractional$$inline_14$$ >> 10) {
         console.log("Invalid address", $currentAddress$$inline_165_fractional$$inline_14$$)
@@ -4971,16 +4969,17 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 }
                 $y$$inline_351$$++;
                 240 < $y$$inline_351$$ && ($y$$inline_351$$ -= 256);
-                for(var $lineno$$inline_352$$ = 0;192 > $lineno$$inline_352$$;$lineno$$inline_352$$++) {
-                  if($lineno$$inline_352$$ >= $y$$inline_351$$ && $lineno$$inline_352$$ - $y$$inline_351$$ < $height$$inline_349$$) {
+                for(var $lineno$$inline_352$$ = $y$$inline_351$$;192 > $lineno$$inline_352$$;$lineno$$inline_352$$++) {
+                  if($lineno$$inline_352$$ - $y$$inline_351$$ < $height$$inline_349$$) {
                     var $sprites$$inline_353$$ = $JSCompiler_StaticMethods_decodeSat$self$$inline_347$$.$n$[$lineno$$inline_352$$];
-                    if(8 > $sprites$$inline_353$$[0]) {
-                      var $off$$inline_354$$ = 3 * $sprites$$inline_353$$[0] + 1, $address$$inline_355$$ = $JSCompiler_StaticMethods_decodeSat$self$$inline_347$$.$g$ + ($spriteno$$inline_350$$ << 1) + 128;
-                      $sprites$$inline_353$$[$off$$inline_354$$++] = $JSCompiler_StaticMethods_decodeSat$self$$inline_347$$.$d$[$address$$inline_355$$++] & 255;
-                      $sprites$$inline_353$$[$off$$inline_354$$++] = $y$$inline_351$$;
-                      $sprites$$inline_353$$[$off$$inline_354$$++] = $JSCompiler_StaticMethods_decodeSat$self$$inline_347$$.$d$[$address$$inline_355$$] & 255;
-                      $sprites$$inline_353$$[0]++
+                    if(8 <= $sprites$$inline_353$$[0]) {
+                      break
                     }
+                    var $off$$inline_354$$ = 3 * $sprites$$inline_353$$[0] + 1, $address$$inline_355$$ = $JSCompiler_StaticMethods_decodeSat$self$$inline_347$$.$g$ + ($spriteno$$inline_350$$ << 1) + 128;
+                    $sprites$$inline_353$$[$off$$inline_354$$++] = $JSCompiler_StaticMethods_decodeSat$self$$inline_347$$.$d$[$address$$inline_355$$++] & 255;
+                    $sprites$$inline_353$$[$off$$inline_354$$++] = $y$$inline_351$$;
+                    $sprites$$inline_353$$[$off$$inline_354$$++] = $JSCompiler_StaticMethods_decodeSat$self$$inline_347$$.$d$[$address$$inline_355$$] & 255;
+                    $sprites$$inline_353$$[0]++
                   }
                 }
               }
@@ -7209,7 +7208,7 @@ $JSSMS$NodeUI$$.prototype = {reset:function $$JSSMS$NodeUI$$$$reset$() {
       }
       ($opcodes$$inline_209_prevPc$$inline_204_tstates$$inline_203$$ = $breakNeeded$$inline_205_tstates$$inline_210$$) && $code$$inline_206$$.push("  this.tstates -= " + $opcodes$$inline_209_prevPc$$inline_204_tstates$$inline_203$$ + ";");
       "" != $code$$inline_206$$ && $code$$inline_206$$.push("  " + $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self$$inline_201_tree$$inline_202$$[$i$$inline_207$$].code);
-      $breakNeeded$$inline_205_tstates$$inline_210$$ = "return;" == $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self$$inline_201_tree$$inline_202$$[$i$$inline_207$$].code.substr(-7) ? $JSCompiler_alias_TRUE$$ : $JSCompiler_alias_FALSE$$;
+      $breakNeeded$$inline_205_tstates$$inline_210$$ = "return;" == $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self$$inline_201_tree$$inline_202$$[$i$$inline_207$$].code.substr(-7);
       $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self$$inline_201_tree$$inline_202$$[$i$$inline_207$$].$nextAddress$ && !$breakNeeded$$inline_205_tstates$$inline_210$$ && $code$$inline_206$$.push("  this.pc = " + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self$$inline_201_tree$$inline_202$$[$i$$inline_207$$].$nextAddress$) + ";");
       $opcodes$$inline_209_prevPc$$inline_204_tstates$$inline_203$$ = $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self$$inline_201_tree$$inline_202$$[$i$$inline_207$$].$nextAddress$
     }

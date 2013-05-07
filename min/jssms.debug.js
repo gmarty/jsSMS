@@ -76,9 +76,7 @@ reset:function $$JSSMS$$$$reset$() {
   $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_264$$.$main$.$a$.updateStatus("Parsing instructions...");
   console.time("Instructions parsing");
   var $JSCompiler_StaticMethods_init$self$$inline_262_mode$$inline_14_romSize$$inline_267_v$$inline_17$$ = 1024 * $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_264$$.$z$.length, $instruction$$inline_268_opcode$$inline_319_options$$inline_341$$, $i$$inline_270$$ = 0, $addresses$$inline_271$$ = [];
-  $addresses$$inline_271$$.push(0);
-  $addresses$$inline_271$$.push(56);
-  for($addresses$$inline_271$$.push(102);$addresses$$inline_271$$.length;) {
+  for($addresses$$inline_271$$.push(0);$addresses$$inline_271$$.length;) {
     if($currentAddress$$inline_269_fractional$$inline_18$$ = $addresses$$inline_271$$.shift(), !$JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_264$$.$instructions$[$currentAddress$$inline_269_fractional$$inline_18$$]) {
       if($currentAddress$$inline_269_fractional$$inline_18$$ >= $JSCompiler_StaticMethods_init$self$$inline_262_mode$$inline_14_romSize$$inline_267_v$$inline_17$$ || 65 <= $currentAddress$$inline_269_fractional$$inline_18$$ >> 10) {
         console.log("Invalid address", $currentAddress$$inline_269_fractional$$inline_18$$)
@@ -8291,12 +8289,19 @@ function $JSCompiler_StaticMethods_drawLine$$($JSCompiler_StaticMethods_drawLine
           }
           $count$$inline_212_pixel_index$$inline_164_temp$$inline_228_temp2_tile_column$$inline_183_y$$inline_199$$++;
           240 < $count$$inline_212_pixel_index$$inline_164_temp$$inline_228_temp2_tile_column$$inline_183_y$$inline_199$$ && ($count$$inline_212_pixel_index$$inline_164_temp$$inline_228_temp2_tile_column$$inline_183_y$$inline_199$$ -= 256);
-          for($address$$inline_165_lineno$$inline_200_tile_row$$inline_184_zoomed$$inline_213$$ = 0;192 > $address$$inline_165_lineno$$inline_200_tile_row$$inline_184_zoomed$$inline_213$$;$address$$inline_165_lineno$$inline_200_tile_row$$inline_184_zoomed$$inline_213$$++) {
-            $address$$inline_165_lineno$$inline_200_tile_row$$inline_184_zoomed$$inline_213$$ >= $count$$inline_212_pixel_index$$inline_164_temp$$inline_228_temp2_tile_column$$inline_183_y$$inline_199$$ && $address$$inline_165_lineno$$inline_200_tile_row$$inline_184_zoomed$$inline_213$$ - $count$$inline_212_pixel_index$$inline_164_temp$$inline_228_temp2_tile_column$$inline_183_y$$inline_199$$ < $height$$inline_197_hscroll$$inline_180_i$$17_i$$inline_162_i$$inline_196_i$$inline_210_row_precal$$inline_226$$ && 
-            ($row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$ = $JSCompiler_StaticMethods_drawLine$self$$.$n$[$address$$inline_165_lineno$$inline_200_tile_row$$inline_184_zoomed$$inline_213$$], 8 > $row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$[0] && ($address0$$inline_167_off$$inline_202_off$$inline_215_row_precal$$inline_186$$ = 3 * $row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$[0] + 
-            1, $address$$inline_203_address1$$inline_168_tx$$inline_187_x$$inline_218$$ = $JSCompiler_StaticMethods_drawLine$self$$.$g$ + ($length$$inline_227_lock$$inline_182_spriteno$$inline_198_sprites$$inline_211_temp$$15_tile$$inline_163$$ << 1) + 128, $row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$[$address0$$inline_167_off$$inline_202_off$$inline_215_row_precal$$inline_186$$++] = $JSCompiler_StaticMethods_drawLine$self$$.$d$[$address$$inline_203_address1$$inline_168_tx$$inline_187_x$$inline_218$$++] & 
-            255, $row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$[$address0$$inline_167_off$$inline_202_off$$inline_215_row_precal$$inline_186$$++] = $count$$inline_212_pixel_index$$inline_164_temp$$inline_228_temp2_tile_column$$inline_183_y$$inline_199$$, $row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$[$address0$$inline_167_off$$inline_202_off$$inline_215_row_precal$$inline_186$$++] = $JSCompiler_StaticMethods_drawLine$self$$.$d$[$address$$inline_203_address1$$inline_168_tx$$inline_187_x$$inline_218$$] & 
-            255, $row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$[0]++))
+          for($address$$inline_165_lineno$$inline_200_tile_row$$inline_184_zoomed$$inline_213$$ = $count$$inline_212_pixel_index$$inline_164_temp$$inline_228_temp2_tile_column$$inline_183_y$$inline_199$$;192 > $address$$inline_165_lineno$$inline_200_tile_row$$inline_184_zoomed$$inline_213$$;$address$$inline_165_lineno$$inline_200_tile_row$$inline_184_zoomed$$inline_213$$++) {
+            if($address$$inline_165_lineno$$inline_200_tile_row$$inline_184_zoomed$$inline_213$$ - $count$$inline_212_pixel_index$$inline_164_temp$$inline_228_temp2_tile_column$$inline_183_y$$inline_199$$ < $height$$inline_197_hscroll$$inline_180_i$$17_i$$inline_162_i$$inline_196_i$$inline_210_row_precal$$inline_226$$) {
+              $row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$ = $JSCompiler_StaticMethods_drawLine$self$$.$n$[$address$$inline_165_lineno$$inline_200_tile_row$$inline_184_zoomed$$inline_213$$];
+              if(8 <= $row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$[0]) {
+                break
+              }
+              $address0$$inline_167_off$$inline_202_off$$inline_215_row_precal$$inline_186$$ = 3 * $row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$[0] + 1;
+              $address$$inline_203_address1$$inline_168_tx$$inline_187_x$$inline_218$$ = $JSCompiler_StaticMethods_drawLine$self$$.$g$ + ($length$$inline_227_lock$$inline_182_spriteno$$inline_198_sprites$$inline_211_temp$$15_tile$$inline_163$$ << 1) + 128;
+              $row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$[$address0$$inline_167_off$$inline_202_off$$inline_215_row_precal$$inline_186$$++] = $JSCompiler_StaticMethods_drawLine$self$$.$d$[$address$$inline_203_address1$$inline_168_tx$$inline_187_x$$inline_218$$++] & 255;
+              $row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$[$address0$$inline_167_off$$inline_202_off$$inline_215_row_precal$$inline_186$$++] = $count$$inline_212_pixel_index$$inline_164_temp$$inline_228_temp2_tile_column$$inline_183_y$$inline_199$$;
+              $row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$[$address0$$inline_167_off$$inline_202_off$$inline_215_row_precal$$inline_186$$++] = $JSCompiler_StaticMethods_drawLine$self$$.$d$[$address$$inline_203_address1$$inline_168_tx$$inline_187_x$$inline_218$$] & 255;
+              $row_precal$$inline_214_sprites$$inline_201_tile_y$$inline_185_vscroll$$inline_181_y$$inline_166$$[0]++
+            }
           }
         }
       }

@@ -4521,8 +4521,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   var i = 0;
   var addresses = [];
   addresses.push(0);
-  addresses.push(56);
-  addresses.push(102);
   while(addresses.length) {
     currentAddress = addresses.shift();
     if(this.instructions[currentAddress]) {
@@ -4613,11 +4611,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     if(code != "") {
       code.push(INDENT + tree[i].code)
     }
-    if(tree[i].code.substr(-7) == "return;") {
-      breakNeeded = true
-    }else {
-      breakNeeded = false
-    }
+    breakNeeded = tree[i].code.substr(-7) == "return;";
     if(tree[i].nextAddress && !breakNeeded) {
       code.push(INDENT + "this.pc = " + toHex(tree[i].nextAddress) + ";")
     }
@@ -8568,17 +8562,18 @@ JSSMS.Vdp.prototype = {reset:function() {
     if(y > 240) {
       y -= 256
     }
-    for(var lineno = 0;lineno < SMS_HEIGHT;lineno++) {
-      if(lineno >= y && lineno - y < height) {
+    for(var lineno = y;lineno < SMS_HEIGHT;lineno++) {
+      if(lineno - y < height) {
         var sprites = this.lineSprites[lineno];
-        if(sprites[SPRITE_COUNT] < SPRITES_PER_LINE) {
-          var off = sprites[SPRITE_COUNT] * 3 + SPRITE_X;
-          var address = this.sat + (spriteno << 1) + 128;
-          sprites[off++] = this.VRAM[address++] & 255;
-          sprites[off++] = y;
-          sprites[off++] = this.VRAM[address] & 255;
-          sprites[SPRITE_COUNT]++
+        if(sprites[SPRITE_COUNT] >= SPRITES_PER_LINE) {
+          break
         }
+        var off = sprites[SPRITE_COUNT] * 3 + SPRITE_X;
+        var address = this.sat + (spriteno << 1) + 128;
+        sprites[off++] = this.VRAM[address++] & 255;
+        sprites[off++] = y;
+        sprites[off++] = this.VRAM[address] & 255;
+        sprites[SPRITE_COUNT]++
       }
     }
   }
