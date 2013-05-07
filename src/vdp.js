@@ -1011,30 +1011,32 @@ JSSMS.Vdp.prototype = {
         y -= 256;
       }
 
-      for (var lineno = 0; lineno < SMS_HEIGHT; lineno++) {
+      for (var lineno = y; lineno < SMS_HEIGHT; lineno++) {
         // Does Sprite fall on this line?
-        if ((lineno >= y) && ((lineno - y) < height)) {
+        if ((lineno - y) < height) {
           var sprites = this.lineSprites[lineno];
 
-          if (sprites[SPRITE_COUNT] < SPRITES_PER_LINE) {
-            // Get offset into array
-            var off = (sprites[SPRITE_COUNT] * 3) + SPRITE_X;
-
-            // Address of Sprite in Sprite Attribute Table
-            var address = this.sat + (spriteno << 1) + 0x80;
-
-            // Sprite X Position
-            sprites[off++] = (this.VRAM[address++] & 0xFF);
-
-            // Sprite Y Position
-            sprites[off++] = y;
-
-            // Sprite Pattern Index
-            sprites[off++] = (this.VRAM[address] & 0xFF);
-
-            // Increment number of sprites on this scanline
-            sprites[SPRITE_COUNT]++;
+          if (sprites[SPRITE_COUNT] >= SPRITES_PER_LINE) {
+            break;
           }
+
+          // Get offset into array
+          var off = (sprites[SPRITE_COUNT] * 3) + SPRITE_X;
+
+          // Address of Sprite in Sprite Attribute Table
+          var address = this.sat + (spriteno << 1) + 0x80;
+
+          // Sprite X Position
+          sprites[off++] = (this.VRAM[address++] & 0xFF);
+
+          // Sprite Y Position
+          sprites[off++] = y;
+
+          // Sprite Pattern Index
+          sprites[off++] = (this.VRAM[address] & 0xFF);
+
+          // Increment number of sprites on this scanline
+          sprites[SPRITE_COUNT]++;
         }
       }
     }
