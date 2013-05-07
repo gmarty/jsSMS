@@ -98,6 +98,7 @@ JSSMS.Debugger.prototype = {
     }
 
     // Flag any instructions that are jump targets.
+    this.instructions[0].isJumpTarget = true; // Define entry point as a jump target.
     for (; i < romSize; i++) {
       if (this.instructions[i] && this.instructions[i].target != null) {
         if (this.instructions[this.instructions[i].target]) {
@@ -164,6 +165,8 @@ JSSMS.Debugger.prototype = {
     var toHex = JSSMS.Utils.toHex;
     var INDENT = '  ';
     var tstates = 0;
+    var prevPc = 0;
+    var breakNeeded = false;
 
     var code = [
       'function run(cycles, cyclesTo) {',
@@ -190,14 +193,19 @@ JSSMS.Debugger.prototype = {
     if (Setup.REFRESH_EMULATION)
       code.push('this.incR();');
 
-    code.push('');
     code.push('switch(this.pc) {');
+
+    code.push(INDENT + 'default:');
+    code.push(INDENT + 'console.log("Bad address", this.pc);');
 
     for (var i = 0, length = tree.length; i < length; i++) {
       if (!tree[i])
         continue;
 
-      code.push(INDENT + 'case ' + toHex(tree[i].address) + ':');
+      if (tree[i].isJumpTarget || prevPc != tree[i].address || breakNeeded) {
+        code.push(INDENT + 'break;');
+        code.push(INDENT + 'case ' + toHex(tree[i].address) + ':');
+      }
 
       // Comment for debugging.
       code.push(INDENT + '// ' + tree[i].label);
@@ -211,15 +219,19 @@ JSSMS.Debugger.prototype = {
       if (code != '')
         code.push(INDENT + tree[i].code);
 
+      if (tree[i].code.substr(-7) == 'return;') {
+        breakNeeded = true;
+      } else {
+        breakNeeded = false;
+      }
+
       // Move program counter.
-      if (tree[i].nextAddress)
+      if (tree[i].nextAddress && !breakNeeded)
         code.push(INDENT + 'this.pc = ' + toHex(tree[i].nextAddress) + ';');
-      code.push(INDENT + 'break;');
+
+      prevPc = tree[i].nextAddress;
     }
 
-    code.push(INDENT + 'default:');
-    code.push(INDENT + 'console.log("Bad address", this.pc);');
-    code.push(INDENT + 'break;');
     code.push('}'); // End of switch
     code.push('}'); // End of while
     code.push('}'); // End of function
@@ -391,7 +403,7 @@ JSSMS.Debugger.prototype = {
       case 0x18:
         target = address + this.signExtend(this.readMem(address) + 1);
         inst = 'JR (' + toHex(target) + ')';
-        code = 'this.pc = ' + target + ';';
+        code = 'this.pc = ' + target + '; return;';
         address = null;
         break;
       case 0x19:
@@ -562,6 +574,7 @@ JSSMS.Debugger.prototype = {
         code = 'if ((this.f & F_CARRY) != 0) {' +
             'this.pc = ' + toHex(target) + ';' +
             'this.tstates -= 5;' +
+            'return;' +
             '}';
         address++;
         break;
@@ -1139,7 +1152,7 @@ JSSMS.Debugger.prototype = {
       case 0xC3:
         target = this.readMemWord(address);
         inst = 'JP (' + toHex(target) + ')';
-        code = 'this.pc = ' + toHex(target) + ';';
+        code = 'this.pc = ' + toHex(target) + '; return;';
         address = null;
         break;
       case 0xC4:
@@ -1149,6 +1162,7 @@ JSSMS.Debugger.prototype = {
             'this.push1(' + toHex(address + 2) + ');' + // write value of PC to stack
             'this.pc = ' + toHex(target) + ';' +
             'this.tstates -= 7;' +
+            'return;' +
             '}';
         address += 2;
         break;
@@ -1178,7 +1192,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xC9:
         inst = 'RET';
-        code = 'this.pc = this.readMemWord(this.sp); this.sp += 2;';
+        code = 'this.pc = this.readMemWord(this.sp); this.sp += 2; return;';
         address = null;
         break;
       case 0xCA:
@@ -1205,6 +1219,7 @@ JSSMS.Debugger.prototype = {
             'this.push1(' + toHex(address + 2) + ');' + // write value of PC to stack
             'this.pc = ' + toHex(target) + ';' +
             'this.tstates -= 7;' +
+            'return;' +
             '}';
         address += 2;
         break;
@@ -1404,7 +1419,7 @@ JSSMS.Debugger.prototype = {
       case 0xE9:
         // This target can't be determined using static analysis.
         inst = 'JP (HL)';
-        code = 'this.pc = this.getHL();';
+        code = 'this.pc = this.getHL(); return;';
         address = null;
         break;
       case 0xEA:
@@ -1438,6 +1453,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xED:
         var _inst = this.getED(address);
+        target = _inst.target;
         inst = _inst.inst;
         code = _inst.code;
         opcodesArray = opcodesArray.concat(_inst.opcodes);
@@ -2386,6 +2402,7 @@ JSSMS.Debugger.prototype = {
     var opcodesArray = [opcode];
     var inst = 'Unimplemented 0xED prefixed opcode';
     var currAddr = address;
+    var target = null;
     var code = 'throw "Unimplemented 0xED prefixed opcode";';
     address++;
 
@@ -2575,6 +2592,7 @@ JSSMS.Debugger.prototype = {
             '} else {' +
             'this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;' +
             '}' +
+            '' +
             'if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;' +
             'else this.f &= ~ F_NEGATIVE;';
         break;
@@ -2591,6 +2609,7 @@ JSSMS.Debugger.prototype = {
         inst = 'OUTD';
         break;
       case 0xB0:
+        target = address - 2;
         inst = 'LDIR';
         code = 'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
             'this.incDE();' +
@@ -2600,15 +2619,15 @@ JSSMS.Debugger.prototype = {
             'if (this.getBC() != 0) {' +
             'this.f |= F_PARITY;' +
             'this.tstates -= 5;' +
-            'this.pc = ' + toHex(address - 2) + ';' +
+            'this.pc = ' + toHex(target) + ';' +
+            'return;' +
             '} else {' +
             'this.f &= ~ F_PARITY;' +
-            'this.pc = ' + toHex(address) + ';' +
+            // Following line not needed as this.pc is set by default.
+            //'this.pc = ' + toHex(address) + ';' +
             '}' +
             '' +
-            'this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;' +
-            '' +
-            'return;';
+            'this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;';
         break;
       case 0xB1:
         inst = 'CPIR';
@@ -2617,6 +2636,7 @@ JSSMS.Debugger.prototype = {
         inst = 'INIR';
         break;
       case 0xB3:
+        target = address - 2;
         inst = 'OTIR';
         code = 'temp = this.readMem(this.getHL());' +
             // (C) <- (HL)
@@ -2628,9 +2648,11 @@ JSSMS.Debugger.prototype = {
             '' +
             'if (this.b != 0) {' +
             'this.tstates -= 5;' +
-            'this.pc = ' + toHex(address - 2) + ';' +
-            '} else {' +
-            'this.pc = ' + toHex(address) + ';' +
+            'this.pc = ' + toHex(target) + ';' +
+            'return;' +
+            // Following 2 lines not needed as this.pc is set by default.
+            //'} else {' +
+            //'this.pc = ' + toHex(address) + ';' +
             '}' +
             'if ((this.l + temp) > 255) {' +
             'this.f |= F_CARRY; this.f |= F_HALFCARRY;' +
@@ -2639,9 +2661,7 @@ JSSMS.Debugger.prototype = {
             '}' +
             '' +
             'if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;' +
-            'else this.f &= ~ F_NEGATIVE;' +
-            '' +
-            'return;';
+            'else this.f &= ~ F_NEGATIVE;';
         break;
       case 0xB8:
         inst = 'LDDR';
@@ -2663,7 +2683,8 @@ JSSMS.Debugger.prototype = {
       inst: inst,
       code: code,
       address: currAddr,
-      nextAddress: address
+      nextAddress: address,
+      target: target
     };
   },
 
@@ -2705,8 +2726,7 @@ JSSMS.Debugger.prototype = {
         inst = 'LD (' + operand + '),' + index;
         code = 'location = ' + operand + ';' +
             'this.writeMem(location++, this.' + index.toLowerCase() + 'L);' +
-            'this.writeMem(location, this.' + index.toLowerCase() + 'H);' +
-            'this.pc += 2;';
+            'this.writeMem(location, this.' + index.toLowerCase() + 'H);';
         address = address + 2;
         break;
       case 0x23:
