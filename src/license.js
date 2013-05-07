@@ -1,6 +1,6 @@
 /*
 jsSMS - A Sega Master System/GameGear emulator in JavaScript
-Copyright (C) 2012 Guillaume Marty (https://github.com/gmarty)
+Copyright (C) 2012-2013 Guillaume Marty (https://github.com/gmarty)
 Based on JavaGear Copyright (c) 2002-2008 Chris White
 
 This program is free software: you can redistribute it and/or modify

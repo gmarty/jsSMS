@@ -1,41 +1,40 @@
 # jsSMS
 
-A Sega Master System & GameGear emulator in JavaScript.
+jsSMS is an emulator for Sega Master System & GameGear ROMs written in JavaScript.
 
 ## Code
 
 This is a JavaScript port of JavaGear by Chris White.
 
 Original copyright:
-    Copyright (c) 2002-2008 Chris White
+    Copyright (C) 2002-2008 Chris White
 
 ## Current state
 
-At the moment, only a few roms are emulated correctly.
+The compatibility is quite good now, even better than the original JavaGear. The CPU class is not fully ZEXXAL compliant tough.
 
-Sound and lightgun are not yet supported.
+Lightgun is not yet supported.
+
+Sound is supported on the outdated [dynamicaudio](https://github.com/gmarty/jsSMS/tree/dynamicaudio) branch.
 
 Though state save and load functions are ported, there are not used and should be more JavaScript friendly (using JSON for example, see JSNES for an example of implementation).
 
 Many parts of the script are borrowed from JSNES, a NES emulator in JavaScript by Ben Firsh.
 
-This script is shipped with a minified version of about 14 kb gzipped.
-The ant task for build uses Closure Compiler in advanced optimizations mode.
+This script is shipped with a minified version of about 14 kb gzipped. The Grunt task for build uses Closure Compiler in advanced optimizations mode.
 
 If you are looking for another SMS emulator in JavaScript, go to [Miracle](http://github.com/mattgodbolt/Miracle).
 
 ## ToDos
 
-Improve emulated roms rate.
+Improve execution speed in mobile browsers.
 
-Test and support other browsers (Opera, IE, mobile...).
-
-Declare JSSMS#is_sms and JSSMS#is_gg as {define} to allow overwrite their type at build time. Stripping dead code would allow better performance.
+Support latest IE.
 
 ## License
 
 jsSMS - A Sega Master System/GameGear emulator in JavaScript
-Copyright (C) 2012  Guillaume Marty (https://github.com/gmarty)
+Copyright (C) 2012-2013 Guillaume Marty (https://github.com/gmarty)
 Based on JavaGear Copyright (c) 2002-2008 Chris White
 
 This program is free software: you can redistribute it and/or modify
