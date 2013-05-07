@@ -86,9 +86,6 @@ JSSMS.NodeUI.prototype = {
   /**
    * Update the canvas screen. ATM, prevBuffer is not used. See JSNES for
    * an implementation of differential update.
-   *
-   * @param {Array.<number>} buffer
-   * @param {Array.<number>} prevBuffer
    */
   writeFrame: function() {
   },

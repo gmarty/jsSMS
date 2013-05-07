@@ -541,7 +541,7 @@ JSSMS.prototype = {
 
   // Screen Rendering
   doRepaint: function() {
-    this.ui.writeFrame(this.vdp.display, []);
+    this.ui.writeFrame();
   },
 
 

@@ -352,11 +352,8 @@ if (typeof $ != 'undefined') {
       /**
        * Update the canvas screen. ATM, prevBuffer is not used. See JSNES for
        * an implementation of differential update.
-       *
-       * @param {Array.<number>} buffer
-       * @param {Array.<number>} prevBuffer
        */
-      writeFrame: function(buffer, prevBuffer) {
+      writeFrame: function() {
         var self = this;
 
         /**
@@ -367,7 +364,7 @@ if (typeof $ != 'undefined') {
 
         if (hiddenPrefix) {
           // If browser supports visibility API and this page is hidden, we exit.
-          return function(buffer, prevBuffer) {
+          return function() {
             if (document[hiddenPrefix]) {
               return;
             }
@@ -375,7 +372,7 @@ if (typeof $ != 'undefined') {
             this.canvasContext.putImageData(this.canvasImageData, 0, 0);
           }
         } else {
-          return function(buffer, prevBuffer) {
+          return function() {
             this.canvasContext.putImageData(this.canvasImageData, 0, 0);
           }
         }
