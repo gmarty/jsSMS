@@ -1,45 +1,41 @@
-src\debugger.js:379: WARNING - assignment
+src\debugger.js:403: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1127: WARNING - assignment
+src\debugger.js:1152: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1166: WARNING - assignment
+src\debugger.js:1192: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1392: WARNING - assignment
+src\debugger.js:1419: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:2413: WARNING - assignment
+src\debugger.js:2442: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:3023: WARNING - assignment
+src\debugger.js:3055: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\sms.js:64: WARNING - cannot instantiate non-constructor
+src\sms.js:68: WARNING - cannot instantiate non-constructor
   this.ui = new opts['ui'](this);
             ^
 
-src\ui.js:359: WARNING - Function function: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
-      writeFrame: function(buffer, prevBuffer) {
-                  ^
-
-0 error(s), 8 warning(s), 96.3% typed
+0 error(s), 7 warning(s), 96.2% typed

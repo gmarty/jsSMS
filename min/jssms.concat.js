@@ -1,6 +1,6 @@
 /*
 jsSMS - A Sega Master System/GameGear emulator in JavaScript
-Copyright (C) 2012 Guillaume Marty (https://github.com/gmarty)
+Copyright (C) 2012-2013 Guillaume Marty (https://github.com/gmarty)
 Based on JavaGear Copyright (c) 2002-2008 Chris White
 
 This program is free software: you can redistribute it and/or modify
@@ -42,7 +42,8 @@ function JSSMS(opts) {
   this.psg = new JSSMS.SN76489(this);
   this.ports = new JSSMS.Ports(this);
   this.cpu = new JSSMS.Z80(this);
-  this.ui.updateStatus("Ready to load a ROM.")
+  this.ui.updateStatus("Ready to load a ROM.");
+  this["ui"] = this.ui
 }
 JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0, throttle:true, fps:0, frameskip_counter:0, pause_button:false, is_sms:true, is_gg:false, soundEnabled:false, audioBuffer:[], audioBufferOffset:0, samplesPerFrame:0, samplesPerLine:[], emuWidth:0, emuHeight:0, fpsFrameCount:0, z80Time:0, drawTime:0, z80TimeCounter:0, drawTimeCounter:0, frameCount:0, romData:"", romFileName:"", lineno:0, reset:function() {
   this.setVideoTiming(this.vdp.videoMode);
@@ -56,7 +57,6 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   if(DEBUGGER) {
     this.cpu.resetDebug()
   }
-  this.cpu.resetMemory();
   clearInterval(this.fpsInterval)
 }, start:function() {
   var self = this;
@@ -203,7 +203,7 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
 }, audioOutput:function(buffer) {
   this.ui.writeAudio(buffer)
 }, doRepaint:function() {
-  this.ui.writeFrame(this.vdp.display, [])
+  this.ui.writeFrame()
 }, printFps:function() {
   var now = JSSMS.Utils.getTimestamp();
   var s = "Running: " + (this.fpsFrameCount / ((now - this.lastFpsTime) / 1E3)).toFixed(2) + " FPS";
@@ -448,7 +448,7 @@ JSSMS.Z80 = function(sms) {
   this.tstates = 0;
   this.rom = [];
   this.ram = new Array(8);
-  this.sram = null;
+  this.sram = Array(32);
   this.useSRAM = false;
   this.frameReg = new Array(4);
   this.number_of_pages = 0;
@@ -4358,7 +4358,10 @@ JSSMS.Z80.prototype = {reset:function() {
     this.ram[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE)
   }
   if(this.sram == null) {
-    this.sram = JSSMS.Utils.Array(32);
+    this.sram = Array(32);
+    for(i = 0;i < 32;i++) {
+      this.sram[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE)
+    }
     this.useSRAM = false
   }
   this.memReadMap[64] = this.getDummyWrite();
@@ -4374,12 +4377,7 @@ JSSMS.Z80.prototype = {reset:function() {
   this.frameReg[3] = 0;
   if(this.rom.length) {
     this.number_of_pages = this.rom.length / 16;
-    this.setDefaultMemoryMapping();
-    if(DEBUGGER) {
-      this.main.ui.updateStatus("Parsing instructions...");
-      this.parseInstructions();
-      this.main.ui.updateStatus("Instructions parsed")
-    }
+    this.setDefaultMemoryMapping()
   }else {
     this.number_of_pages = 0
   }
@@ -4511,17 +4509,20 @@ JSSMS.Z80.prototype = {reset:function() {
 JSSMS.Debugger = function() {
 };
 JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
-  this.instructions = []
+  this.instructions = [];
+  this.main.ui.updateStatus("Parsing instructions...");
+  this.parseInstructions();
+  this.main.ui.updateStatus("Instructions parsed")
 }, parseInstructions:function() {
+  console.time("Instructions parsing");
   var romSize = Setup.PAGE_SIZE * this.rom.length;
   var instruction;
   var currentAddress;
-  var addresses = [];
   var i = 0;
+  var addresses = [];
   addresses.push(0);
   addresses.push(56);
   addresses.push(102);
-  console.time("Instructions parsing");
   while(addresses.length) {
     currentAddress = addresses.shift();
     if(this.instructions[currentAddress]) {
@@ -4540,6 +4541,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       addresses.push(instruction.target)
     }
   }
+  this.instructions[0].isJumpTarget = true;
   for(;i < romSize;i++) {
     if(this.instructions[i] && this.instructions[i].target != null) {
       if(this.instructions[this.instructions[i].target]) {
@@ -4551,32 +4553,35 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   }
   console.timeEnd("Instructions parsing")
 }, writeGraphViz:function() {
+  console.time("DOT generation");
   var tree = this.instructions;
   var INDENT = " ";
-  console.time("DOT generation");
-  var dotFile = ["digraph G {"];
+  var content = ["digraph G {"];
   for(var i = 0, length = tree.length;i < length;i++) {
-    if(tree[i]) {
-      dotFile.push(INDENT + i + ' [label="' + tree[i].label + '"];');
-      if(tree[i].target != null) {
-        dotFile.push(INDENT + i + " -> " + tree[i].target + ";")
-      }
-      if(tree[i].nextAddress != null) {
-        dotFile.push(INDENT + i + " -> " + tree[i].nextAddress + ";")
-      }
+    if(!tree[i]) {
+      continue
+    }
+    content.push(INDENT + i + ' [label="' + tree[i].label + '"];');
+    if(tree[i].target != null) {
+      content.push(INDENT + i + " -> " + tree[i].target + ";")
+    }
+    if(tree[i].nextAddress != null) {
+      content.push(INDENT + i + " -> " + tree[i].nextAddress + ";")
     }
   }
-  dotFile.push("}");
-  dotFile = dotFile.join("\n");
-  dotFile = dotFile.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
+  content.push("}");
+  content = content.join("\n");
+  content = content.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
   console.timeEnd("DOT generation");
-  console.log(dotFile)
+  return content
 }, writeJavaScript:function() {
+  console.time("JavaScript generation");
   var tree = this.instructions;
   var toHex = JSSMS.Utils.toHex;
   var INDENT = "  ";
   var tstates = 0;
-  console.time("JavaScript generation");
+  var prevPc = 0;
+  var breakNeeded = false;
   var code = ["function run(cycles, cyclesTo) {", "var location = 0;", "var opcode = 0;", "var temp = 0;", "", "this.tstates += cycles;", "", "if (cycles != 0)", "  this.totalCycles = cycles;"];
   if(!Setup.ACCURATE_INTERRUPT_EMULATION) {
     code.push("if (this.interruptLine) this.interrupt(); // Check for interrupt")
@@ -4589,28 +4594,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   if(Setup.REFRESH_EMULATION) {
     code.push("this.incR();")
   }
-  code.push("");
   code.push("switch(this.pc) {");
-  for(var i = 0, length = tree.length;i < length;i++) {
-    if(tree[i]) {
-      code.push(INDENT + "case " + toHex(tree[i].address) + ":");
-      code.push(INDENT + "// " + tree[i].label);
-      tstates = getTotalTStates(tree[i].opcodes);
-      if(tstates) {
-        code.push(INDENT + "this.tstates -= " + tstates + ";")
-      }
-      if(code != "") {
-        code.push(INDENT + tree[i].code)
-      }
-      if(tree[i].nextAddress) {
-        code.push(INDENT + "this.pc = " + toHex(tree[i].nextAddress) + ";")
-      }
-      code.push(INDENT + "break;")
-    }
-  }
   code.push(INDENT + "default:");
   code.push(INDENT + 'console.log("Bad address", this.pc);');
-  code.push(INDENT + "break;");
+  for(var i = 0, length = tree.length;i < length;i++) {
+    if(!tree[i]) {
+      continue
+    }
+    if(tree[i].isJumpTarget || prevPc != tree[i].address || breakNeeded) {
+      code.push(INDENT + "break;");
+      code.push(INDENT + "case " + toHex(tree[i].address) + ":")
+    }
+    code.push(INDENT + "// " + tree[i].label);
+    tstates = getTotalTStates(tree[i].opcodes);
+    if(tstates) {
+      code.push(INDENT + "this.tstates -= " + tstates + ";")
+    }
+    if(code != "") {
+      code.push(INDENT + tree[i].code)
+    }
+    breakNeeded = tree[i].code.substr(-7) == "return;";
+    if(tree[i].nextAddress && !breakNeeded) {
+      code.push(INDENT + "this.pc = " + toHex(tree[i].nextAddress) + ";")
+    }
+    prevPc = tree[i].nextAddress
+  }
   code.push("}");
   code.push("}");
   code.push("}");
@@ -4764,7 +4772,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 24:
       target = address + this.signExtend(this.readMem(address) + 1);
       inst = "JR (" + toHex(target) + ")";
-      code = "this.pc = " + target + ";";
+      code = "this.pc = " + target + "; return;";
       address = null;
       break;
     case 25:
@@ -4919,7 +4927,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 56:
       target = address + this.signExtend(this.readMem(address) + 1);
       inst = "JR C,(" + toHex(target) + ")";
-      code = "if ((this.f & F_CARRY) != 0) {" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 5;" + "}";
+      code = "if ((this.f & F_CARRY) != 0) {" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 5;" + "return;" + "}";
       address++;
       break;
     case 57:
@@ -5488,13 +5496,13 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 195:
       target = this.readMemWord(address);
       inst = "JP (" + toHex(target) + ")";
-      code = "this.pc = " + toHex(target) + ";";
+      code = "this.pc = " + toHex(target) + "; return;";
       address = null;
       break;
     case 196:
       target = this.readMemWord(address);
       inst = "CALL NZ (" + toHex(target) + ")";
-      code = "if ((this.f & F_ZERO) == 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "}";
+      code = "if ((this.f & F_ZERO) == 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
       address += 2;
       break;
     case 197:
@@ -5518,7 +5526,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 201:
       inst = "RET";
-      code = "this.pc = this.readMemWord(this.sp); this.sp += 2;";
+      code = "this.pc = this.readMemWord(this.sp); this.sp += 2; return;";
       address = null;
       break;
     case 202:
@@ -5537,7 +5545,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 204:
       target = this.readMemWord(address);
       inst = "CALL Z (" + toHex(target) + ")";
-      code = "if ((this.f & F_ZERO) != 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "}";
+      code = "if ((this.f & F_ZERO) != 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
       address += 2;
       break;
     case 205:
@@ -5684,7 +5692,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 233:
       inst = "JP (HL)";
-      code = "this.pc = this.getHL();";
+      code = "this.pc = this.getHL(); return;";
       address = null;
       break;
     case 234:
@@ -5705,6 +5713,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 237:
       var _inst = this.getED(address);
+      target = _inst.target;
       inst = _inst.inst;
       code = _inst.code;
       opcodesArray = opcodesArray.concat(_inst.opcodes);
@@ -6589,6 +6598,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   var opcodesArray = [opcode];
   var inst = "Unimplemented 0xED prefixed opcode";
   var currAddr = address;
+  var target = null;
   var code = 'throw "Unimplemented 0xED prefixed opcode";';
   address++;
   switch(opcode) {
@@ -6779,7 +6789,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 163:
       inst = "OUTI";
-      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.incHL();" + "this.b = this.dec8(this.b);" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.incHL();" + "this.b = this.dec8(this.b);" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 168:
       inst = "LDD";
@@ -6794,8 +6804,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "OUTD";
       break;
     case 176:
+      target = address - 2;
       inst = "LDIR";
-      code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();" + "this.incHL();" + "this.decBC();" + "" + "if (this.getBC() != 0) {" + "this.f |= F_PARITY;" + "this.tstates -= 5;" + "this.pc = " + toHex(address - 2) + ";" + "} else {" + "this.f &= ~ F_PARITY;" + "this.pc = " + toHex(address) + ";" + "}" + "" + "this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;" + "" + "return;";
+      code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();" + "this.incHL();" + "this.decBC();" + "" + "if (this.getBC() != 0) {" + "this.f |= F_PARITY;" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "} else {" + "this.f &= ~ F_PARITY;" + "}" + "" + "this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
       break;
     case 177:
       inst = "CPIR";
@@ -6804,9 +6815,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "INIR";
       break;
     case 179:
+      target = address - 2;
       inst = "OTIR";
-      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(address - 2) + ";" + "} else {" + "this.pc = " + toHex(address) + ";" + "}" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;" + 
-      "" + "return;";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 184:
       inst = "LDDR";
@@ -6821,7 +6832,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "OTDR";
       break
   }
-  return{opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address}
+  return{opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address, target:target}
 }, getIndex:function(index, address) {
   var toHex = JSSMS.Utils.toHex;
   var opcode = this.readMem(address);
@@ -6849,7 +6860,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 34:
       operand = toHex(this.readMemWord(address));
       inst = "LD (" + operand + ")," + index;
-      code = "location = " + operand + ";" + "this.writeMem(location++, this." + index.toLowerCase() + "L);" + "this.writeMem(location, this." + index.toLowerCase() + "H);" + "this.pc += 2;";
+      code = "location = " + operand + ";" + "this.writeMem(location++, this." + index.toLowerCase() + "L);" + "this.writeMem(location, this." + index.toLowerCase() + "H);";
       address = address + 2;
       break;
     case 35:
@@ -8281,14 +8292,12 @@ JSSMS.Vdp.prototype = {reset:function() {
         this.CRAM[temp + 1] = this.main_JAVA_G[value];
         this.CRAM[temp + 2] = this.main_JAVA_B[value]
       }else {
-        if(this.main.is_gg) {
-          temp = ((this.location & 63) >> 1) * 3;
-          if((this.location & 1) == 0) {
-            this.CRAM[temp] = this.GG_JAVA_R[value];
-            this.CRAM[temp + 1] = this.GG_JAVA_G[value]
-          }else {
-            this.CRAM[temp + 2] = this.GG_JAVA_B[value]
-          }
+        temp = ((this.location & 63) >> 1) * 3;
+        if((this.location & 1) == 0) {
+          this.CRAM[temp] = this.GG_JAVA_R[value];
+          this.CRAM[temp + 1] = this.GG_JAVA_G[value]
+        }else {
+          this.CRAM[temp + 2] = this.GG_JAVA_B[value]
         }
       }
       break
@@ -8822,18 +8831,18 @@ if(typeof $ != "undefined") {
     }, updateStatus:function(s) {
       this.log.text(s)
     }, writeAudio:function(buffer) {
-    }, writeFrame:function(buffer, prevBuffer) {
+    }, writeFrame:function() {
       var self = this;
       var hiddenPrefix = JSSMS.Utils.getPrefix(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
       if(hiddenPrefix) {
-        return function(buffer, prevBuffer) {
+        return function() {
           if(document[hiddenPrefix]) {
             return
           }
           this.canvasContext.putImageData(this.canvasImageData, 0, 0)
         }
       }else {
-        return function(buffer, prevBuffer) {
+        return function() {
           this.canvasContext.putImageData(this.canvasImageData, 0, 0)
         }
       }
