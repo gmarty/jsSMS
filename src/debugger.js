@@ -203,6 +203,10 @@ JSSMS.Debugger.prototype = {
         continue;
 
       if (tree[i].isJumpTarget || prevPc != tree[i].address || breakNeeded) {
+        insertTStates();
+        if (prevPc && !breakNeeded) {
+          code.push(INDENT + 'this.pc = ' + toHex(prevPc) + ';');
+        }
         code.push(INDENT + 'break;');
         code.push(INDENT + 'case ' + toHex(tree[i].address) + ':');
       }
@@ -211,19 +215,21 @@ JSSMS.Debugger.prototype = {
       code.push(INDENT + '// ' + tree[i].label);
 
       // Decrement tstates.
-      tstates = getTotalTStates(tree[i].opcodes);
-      if (tstates)
-        code.push(INDENT + 'this.tstates -= ' + tstates + ';');
+      tstates += getTotalTStates(tree[i].opcodes);
+
+      breakNeeded = tree[i].code.substr(-7) == 'return;';
+
+      if (/return;/.test(tree[i].code) || /this\.tstates/.test(tree[i].code)) {
+        insertTStates();
+      }
 
       // Instruction.
       if (code != '')
         code.push(INDENT + tree[i].code);
 
-      breakNeeded = tree[i].code.substr(-7) == 'return;';
-
       // Move program counter.
-      if (tree[i].nextAddress && !breakNeeded)
-        code.push(INDENT + 'this.pc = ' + toHex(tree[i].nextAddress) + ';');
+      /*if (tree[i].nextAddress && !breakNeeded)
+       code.push(INDENT + 'this.pc = ' + toHex(tree[i].nextAddress) + ';');*/
 
       prevPc = tree[i].nextAddress;
     }
@@ -260,6 +266,13 @@ JSSMS.Debugger.prototype = {
       }
 
       return tstates;
+    }
+
+    function insertTStates() {
+      if (tstates)
+        code.push(INDENT + 'this.tstates -= ' + tstates + ';');
+
+      tstates = 0;
     }
   },
 
