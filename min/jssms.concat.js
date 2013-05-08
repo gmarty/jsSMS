@@ -4600,20 +4600,21 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       continue
     }
     if(tree[i].isJumpTarget || prevPc != tree[i].address || breakNeeded) {
+      insertTStates();
+      if(prevPc && !breakNeeded) {
+        code.push(INDENT + "this.pc = " + toHex(prevPc) + ";")
+      }
       code.push(INDENT + "break;");
       code.push(INDENT + "case " + toHex(tree[i].address) + ":")
     }
     code.push(INDENT + "// " + tree[i].label);
-    tstates = getTotalTStates(tree[i].opcodes);
-    if(tstates) {
-      code.push(INDENT + "this.tstates -= " + tstates + ";")
+    tstates += getTotalTStates(tree[i].opcodes);
+    breakNeeded = tree[i].code.substr(-7) == "return;";
+    if(/return;/.test(tree[i].code) || /this\.tstates/.test(tree[i].code)) {
+      insertTStates()
     }
     if(code != "") {
       code.push(INDENT + tree[i].code)
-    }
-    breakNeeded = tree[i].code.substr(-7) == "return;";
-    if(tree[i].nextAddress && !breakNeeded) {
-      code.push(INDENT + "this.pc = " + toHex(tree[i].nextAddress) + ";")
     }
     prevPc = tree[i].nextAddress
   }
@@ -4646,6 +4647,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
         break
     }
     return tstates
+  }
+  function insertTStates() {
+    if(tstates) {
+      code.push(INDENT + "this.tstates -= " + tstates + ";")
+    }
+    tstates = 0
   }
 }, disassemble:function(address) {
   var toHex = JSSMS.Utils.toHex;
@@ -8638,8 +8645,8 @@ JSSMS.DummyUI = function(sms) {
   this.writeFrame = function() {
   }
 };
-if(typeof $ != "undefined") {
-  $.fn.JSSMSUI = function(roms) {
+if(window["$"]) {
+  $.fn["JSSMSUI"] = function(roms) {
     var parent = this;
     var UI = function(sms) {
       this.main = sms;

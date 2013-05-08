@@ -36,12 +36,12 @@ JSSMS.DummyUI = function(sms) {
   this.writeFrame = function() {};
 };
 
-if (typeof $ != 'undefined') {
+if (window['$']) {
   /**
    * @constructor
    * @param {Object.<string, Object.<string, string>>} roms A list of rom files.
    */
-  $.fn.JSSMSUI = function(roms) {
+  $.fn['JSSMSUI'] = function(roms) {
     var parent = /** HTMLElement **/ (this);
     var UI = function(sms) {
       this.main = sms;

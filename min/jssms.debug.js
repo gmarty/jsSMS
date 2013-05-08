@@ -8378,7 +8378,7 @@ function $JSCompiler_StaticMethods_forceFullRedraw$$($JSCompiler_StaticMethods_f
   this.$writeFrame$ = function $this$$writeFrame$$() {
   }
 }
-"undefined" != typeof $ && ($.fn.$JSSMSUI$ = function $$$fn$$JSSMSUI$$($roms$$) {
+window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
   function $UI$$($root_sms$$5$$) {
     this.$main$ = $root_sms$$5$$;
     if("[object OperaMini]" == Object.prototype.toString.call(window.operamini)) {
@@ -8686,5 +8686,4 @@ function $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_JSSMS_SN76489
   }
 }
 ;window.JSSMS = $JSSMS$$;
-jQuery.fn.JSSMSUI = jQuery.fn.$JSSMSUI$;
 
