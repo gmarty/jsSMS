@@ -113,7 +113,7 @@ module.exports = function(grunt) {
         jsOutputFile: 'min/jssms.node.js',
         options: {
           externs: [
-            'src/build/externs/node.js',
+            'node_modules/closurecompiler-externs/core.js',
             '<%= closurePath %>/contrib/externs/webkit_console.js',
             '<%= closurePath %>/contrib/html5.js'
           ],
