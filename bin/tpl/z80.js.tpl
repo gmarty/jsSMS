@@ -383,7 +383,7 @@ JSSMS.Z80 = function(sms) {
    * @param {number} address Memory address.
    * @param {number} value Value to write.
    */
-  this.writeMem = JSSMS.Utils.writeMem.bind(this, this);
+  this.writeMem = JSSMS.Utils.writeMem.bind(this);
 
 
   /**
@@ -392,7 +392,7 @@ JSSMS.Z80 = function(sms) {
    * @param {number} address Memory location.
    * @return {number} Value from memory location.
    */
-  this.readMem = JSSMS.Utils.readMem.bind(this, this.memReadMap);
+  this.readMem = JSSMS.Utils.readMem.bind(this);
 
 
   /**
@@ -401,7 +401,7 @@ JSSMS.Z80 = function(sms) {
    * @param {number} address Memory address.
    * @return {number} Value from memory location.
    */
-  this.readMemWord = JSSMS.Utils.readMemWord.bind(this, this.memReadMap);
+  this.readMemWord = JSSMS.Utils.readMemWord.bind(this);
 };
 
 JSSMS.Z80.prototype = {

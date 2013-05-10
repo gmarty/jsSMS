@@ -100,35 +100,34 @@ JSSMS.Utils = {
   writeMem: function() {
     if (SUPPORT_DATAVIEW) {
       /**
-       * @param {*} self A context.
        * @param {number} address Memory address.
        * @param {number} value Value to write.
        */
-      return function(self, address, value) {
+      return function(address, value) {
         // DEBUG
-        if (DEBUG && ((address >> 10) >= self.memWriteMap.length || !self.memWriteMap[address >> 10] || (address & 0x3FF) >= self.memWriteMap[address >> 10].byteLength)) {
+        if (DEBUG && ((address >> 10) >= this.memWriteMap.length || !this.memWriteMap[address >> 10] ||
+            (address & 0x3FF) >= this.memWriteMap[address >> 10].byteLength)) {
           console.error(address, (address >> 10), (address & 0x3FF));
           debugger;
         }
 
-        self.memWriteMap[address >> 10].setInt8(address & 0x3FF, value);
+        this.memWriteMap[address >> 10].setInt8(address & 0x3FF, value);
 
         // Paging registers
         if (address >= 0xFFFC)
-          self.page(address & 3, value);
+          this.page(address & 3, value);
       }
     } else {
       /**
-       * @param {*} self A context.
        * @param {number} address Memory address.
        * @param {number} value Value to write.
        */
-      return function(self, address, value) {
-        self.memWriteMap[address >> 10][address & 0x3FF] = value;
+      return function(address, value) {
+        this.memWriteMap[address >> 10][address & 0x3FF] = value;
 
         // Paging registers
         if (address >= 0xFFFC)
-          self.page(address & 3, value);
+          this.page(address & 3, value);
       }
     }
   }(),
@@ -140,27 +139,26 @@ JSSMS.Utils = {
   readMem: function() {
     if (SUPPORT_DATAVIEW) {
       /**
-       * @param {Array.<DataView>} array
        * @param {number} address
        * @return {number} Value from memory location.
        */
-      return function(array, address) {
+      return function(address) {
         // DEBUG
-        if (DEBUG && ((address >> 10) >= array.length || !array[address >> 10] || (address & 0x3FF) >= array[address >> 10].byteLength)) {
+        if (DEBUG && ((address >> 10) >= this.memReadMap.length || !this.memReadMap[address >> 10] ||
+            (address & 0x3FF) >= this.memReadMap[address >> 10].byteLength)) {
           console.error(address, (address >> 10), (address & 0x3FF));
           debugger;
         }
 
-        return array[address >> 10].getUint8(address & 0x3FF);
+        return this.memReadMap[address >> 10].getUint8(address & 0x3FF);
       }
     } else {
       /**
-       * @param {Array.<Array.<number>>} array
        * @param {number} address
        * @return {number} Value from memory location.
        */
-      return function(array, address) {
-        return array[address >> 10][address & 0x3FF] & 0xFF;
+      return function(address) {
+        return this.memReadMap[address >> 10][address & 0x3FF] & 0xFF;
       }
     }
   }(),
@@ -172,33 +170,32 @@ JSSMS.Utils = {
   readMemWord: function() {
     if (SUPPORT_DATAVIEW) {
       /**
-       * @param {Array.<DataView>} array
        * @param {number} address
        * @return {number} Value from memory location.
        */
-      return function(array, address) {
+      return function(address) {
         // DEBUG
-        if (DEBUG && ((address >> 10) >= array.length || !array[address >> 10] || (address & 0x3FF) >= array[address >> 10].byteLength)) {
+        if (DEBUG && ((address >> 10) >= this.memReadMap.length || !this.memReadMap[address >> 10] ||
+            (address & 0x3FF) >= this.memReadMap[address >> 10].byteLength)) {
           console.error(address, (address >> 10), (address & 0x3FF));
           debugger;
         }
 
-        if ((address & 0x3FF) < 1023) {
-          return array[address >> 10].getUint16(address & 0x3FF, LITTLE_ENDIAN);
+        if ((address & 0x3FF) < 0x3FF) {
+          return this.memReadMap[address >> 10].getUint16(address & 0x3FF, LITTLE_ENDIAN);
         } else {
-          return (array[address >> 10].getUint8(address & 0x3FF)) |
-              ((array[++address >> 10].getUint8(address & 0x3FF)) << 8);
+          return (this.memReadMap[address >> 10].getUint8(address & 0x3FF)) |
+              ((this.memReadMap[++address >> 10].getUint8(address & 0x3FF)) << 8);
         }
       }
     } else {
       /**
-       * @param {Array.<Array.<number>>} array
        * @param {number} address
        * @return {number} Value from memory location.
        */
-      return function(array, address) {
-        return (array[address >> 10][address & 0x3FF] & 0xFF) |
-            ((array[++address >> 10][address & 0x3FF] & 0xFF) << 8);
+      return function(address) {
+        return (this.memReadMap[address >> 10][address & 0x3FF] & 0xFF) |
+            ((this.memReadMap[++address >> 10][address & 0x3FF] & 0xFF) << 8);
       }
     }
   }(),
