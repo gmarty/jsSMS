@@ -2618,23 +2618,29 @@ JSSMS.Debugger.prototype = {
         inst = 'OUTD';
         break;
       case 0xB0:
-        target = address - 2;
         inst = 'LDIR';
-        code = 'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
-            'this.incDE();' +
-            'this.incHL();' +
-            'this.decBC();' +
-            '' +
-            'if (this.getBC() != 0) {' +
-            'this.f |= F_PARITY;' +
-            'this.tstates -= 5;' +
-            'this.pc = ' + toHex(target) + ';' +
-            'return;' +
-            '} else {' +
-            'this.f &= ~ F_PARITY;' +
-            // Following line not needed as this.pc is set by default.
-            //'this.pc = ' + toHex(address) + ';' +
-            '}' +
+        if (Setup.ACCURATE_INTERRUPT_EMULATION) {
+          target = address - 2;
+          code = 'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
+              'this.incDE();' +
+              'this.incHL();' +
+              'this.decBC();' +
+              '' +
+              'if (this.getBC() != 0) {' +
+              'this.f |= F_PARITY;' +
+              'this.tstates -= 5;' +
+              'this.pc = ' + toHex(target) + ';' +
+              'return;' +
+              '}';
+        } else {
+          code = 'for(;this.getBC() != 0; this.f |= F_PARITY, this.tstates -= 5) {' +
+              'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
+              'this.incDE();' +
+              'this.incHL();' +
+              'this.decBC();' +
+              '}';
+        }
+        code += 'if (!(this.getBC() != 0)) this.f &= ~ F_PARITY;' +
             '' +
             'this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;';
         break;
@@ -2645,25 +2651,34 @@ JSSMS.Debugger.prototype = {
         inst = 'INIR';
         break;
       case 0xB3:
-        target = address - 2;
         inst = 'OTIR';
-        code = 'temp = this.readMem(this.getHL());' +
-            // (C) <- (HL)
-            'this.port.out(this.c, temp);' +
-            // B <- B -1
-            'this.b = this.dec8(this.b);' +
-            // HL <- HL + 1
-            'this.incHL();' +
-            '' +
-            'if (this.b != 0) {' +
-            'this.tstates -= 5;' +
-            'this.pc = ' + toHex(target) + ';' +
-            'return;' +
-            // Following 2 lines not needed as this.pc is set by default.
-            //'} else {' +
-            //'this.pc = ' + toHex(address) + ';' +
-            '}' +
-            'if ((this.l + temp) > 255) {' +
+        if (Setup.ACCURATE_INTERRUPT_EMULATION) {
+          target = address - 2;
+          code = 'temp = this.readMem(this.getHL());' +
+              // (C) <- (HL)
+              'this.port.out(this.c, temp);' +
+              // B <- B -1
+              'this.b = this.dec8(this.b);' +
+              // HL <- HL + 1
+              'this.incHL();' +
+              '' +
+              'if (this.b != 0) {' +
+              'this.tstates -= 5;' +
+              'this.pc = ' + toHex(target) + ';' +
+              'return;' +
+              '}';
+        } else {
+          code = 'for(;this.b != 0; this.tstates -= 5) {' +
+              'temp = this.readMem(this.getHL());' +
+              // (C) <- (HL)
+              'this.port.out(this.c, temp);' +
+              // B <- B -1
+              'this.b = this.dec8(this.b);' +
+              // HL <- HL + 1
+              'this.incHL();' +
+              '}';
+        }
+        code += 'if ((this.l + temp) > 255) {' +
             'this.f |= F_CARRY; this.f |= F_HALFCARRY;' +
             '} else {' +
             'this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;' +
