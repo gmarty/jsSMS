@@ -299,54 +299,54 @@ JSSMS.Utils = {rndInt:function(range) {
   }
 }(), writeMem:function() {
   if(SUPPORT_DATAVIEW) {
-    return function(self, address, value) {
-      if(DEBUG && (address >> 10 >= self.memWriteMap.length || !self.memWriteMap[address >> 10] || (address & 1023) >= self.memWriteMap[address >> 10].byteLength)) {
+    return function(address, value) {
+      if(DEBUG && (address >> 10 >= this.memWriteMap.length || !this.memWriteMap[address >> 10] || (address & 1023) >= this.memWriteMap[address >> 10].byteLength)) {
         console.error(address, address >> 10, address & 1023);
         debugger
       }
-      self.memWriteMap[address >> 10].setInt8(address & 1023, value);
+      this.memWriteMap[address >> 10].setInt8(address & 1023, value);
       if(address >= 65532) {
-        self.page(address & 3, value)
+        this.page(address & 3, value)
       }
     }
   }else {
-    return function(self, address, value) {
-      self.memWriteMap[address >> 10][address & 1023] = value;
+    return function(address, value) {
+      this.memWriteMap[address >> 10][address & 1023] = value;
       if(address >= 65532) {
-        self.page(address & 3, value)
+        this.page(address & 3, value)
       }
     }
   }
 }(), readMem:function() {
   if(SUPPORT_DATAVIEW) {
-    return function(array, address) {
-      if(DEBUG && (address >> 10 >= array.length || !array[address >> 10] || (address & 1023) >= array[address >> 10].byteLength)) {
+    return function(address) {
+      if(DEBUG && (address >> 10 >= this.memReadMap.length || !this.memReadMap[address >> 10] || (address & 1023) >= this.memReadMap[address >> 10].byteLength)) {
         console.error(address, address >> 10, address & 1023);
         debugger
       }
-      return array[address >> 10].getUint8(address & 1023)
+      return this.memReadMap[address >> 10].getUint8(address & 1023)
     }
   }else {
-    return function(array, address) {
-      return array[address >> 10][address & 1023] & 255
+    return function(address) {
+      return this.memReadMap[address >> 10][address & 1023] & 255
     }
   }
 }(), readMemWord:function() {
   if(SUPPORT_DATAVIEW) {
-    return function(array, address) {
-      if(DEBUG && (address >> 10 >= array.length || !array[address >> 10] || (address & 1023) >= array[address >> 10].byteLength)) {
+    return function(address) {
+      if(DEBUG && (address >> 10 >= this.memReadMap.length || !this.memReadMap[address >> 10] || (address & 1023) >= this.memReadMap[address >> 10].byteLength)) {
         console.error(address, address >> 10, address & 1023);
         debugger
       }
       if((address & 1023) < 1023) {
-        return array[address >> 10].getUint16(address & 1023, LITTLE_ENDIAN)
+        return this.memReadMap[address >> 10].getUint16(address & 1023, LITTLE_ENDIAN)
       }else {
-        return array[address >> 10].getUint8(address & 1023) | array[++address >> 10].getUint8(address & 1023) << 8
+        return this.memReadMap[address >> 10].getUint8(address & 1023) | this.memReadMap[++address >> 10].getUint8(address & 1023) << 8
       }
     }
   }else {
-    return function(array, address) {
-      return array[address >> 10][address & 1023] & 255 | (array[++address >> 10][address & 1023] & 255) << 8
+    return function(address) {
+      return this.memReadMap[address >> 10][address & 1023] & 255 | (this.memReadMap[++address >> 10][address & 1023] & 255) << 8
     }
   }
 }(), getTimestamp:function() {
@@ -465,9 +465,9 @@ JSSMS.Z80 = function(sms) {
   this.generateFlagTables();
   this.generateDAATable();
   this.generateMemory();
-  this.writeMem = JSSMS.Utils.writeMem.bind(this, this);
-  this.readMem = JSSMS.Utils.readMem.bind(this, this.memReadMap);
-  this.readMemWord = JSSMS.Utils.readMemWord.bind(this, this.memReadMap);
+  this.writeMem = JSSMS.Utils.writeMem.bind(this);
+  this.readMem = JSSMS.Utils.readMem.bind(this);
+  this.readMemWord = JSSMS.Utils.readMemWord.bind(this);
   if(DEBUGGER) {
     for(var method in JSSMS.Debugger.prototype) {
       this[method] = JSSMS.Debugger.prototype[method]
@@ -4367,9 +4367,9 @@ JSSMS.Z80.prototype = {reset:function() {
   this.memReadMap[64] = this.getDummyWrite();
   this.memWriteMap[64] = this.getDummyWrite();
   this.number_of_pages = 2
-}, resetMemory:function(p) {
-  if(p) {
-    this.rom = p
+}, resetMemory:function(pages) {
+  if(pages) {
+    this.rom = pages
   }
   this.frameReg[0] = 0;
   this.frameReg[1] = 0;
@@ -4414,9 +4414,9 @@ JSSMS.Z80.prototype = {reset:function() {
       }
       break;
     case 1:
-      p = (value % this.number_of_pages << 4) + 1;
+      p = value % this.number_of_pages << 4;
       for(i = 1;i < 16;i++) {
-        this.memReadMap[i] = this.rom[p++]
+        this.memReadMap[i] = this.rom[p + i]
       }
       break;
     case 2:
@@ -4576,7 +4576,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   console.time("JavaScript generation");
   var tree = this.instructions;
   var toHex = JSSMS.Utils.toHex;
-  var INDENT = "  ";
   var tstates = 0;
   var prevPc = 0;
   var breakNeeded = false;
@@ -4585,16 +4584,21 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     code.push("if (this.interruptLine) this.interrupt(); // Check for interrupt")
   }
   code.push("while (this.tstates > cyclesTo) {");
+  code.push("if (this.interruptLine) this.interrupt(); // Check for interrupt");
   if(Setup.ACCURATE_INTERRUPT_EMULATION) {
-    code.push("if (this.interruptLine) this.interrupt(); // Check for interrupt");
     code.push("this.EI_inst = false;")
   }
   if(Setup.REFRESH_EMULATION) {
     code.push("this.incR();")
   }
-  code.push("switch(this.pc) {");
-  code.push(INDENT + "default:");
-  code.push(INDENT + 'console.log("Bad address", this.pc);');
+  code.push("this.branches[this.pc].call(this);");
+  code.push("}");
+  code.push("},");
+  code.push("");
+  code.push("");
+  code.push("branches: {");
+  code.push('"": function() {');
+  code.push('console.log("Bad address", this.pc);');
   for(var i = 0, length = tree.length;i < length;i++) {
     if(!tree[i]) {
       continue
@@ -4602,23 +4606,22 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     if(tree[i].isJumpTarget || prevPc != tree[i].address || breakNeeded) {
       insertTStates();
       if(prevPc && !breakNeeded) {
-        code.push(INDENT + "this.pc = " + toHex(prevPc) + ";")
+        code.push("this.pc = " + toHex(prevPc) + ";")
       }
-      code.push(INDENT + "break;");
-      code.push(INDENT + "case " + toHex(tree[i].address) + ":")
+      code.push("},");
+      code.push("" + toHex(tree[i].address) + ": function(temp) {")
     }
-    code.push(INDENT + "// " + tree[i].label);
+    code.push("// " + tree[i].label);
     tstates += getTotalTStates(tree[i].opcodes);
     breakNeeded = tree[i].code.substr(-7) == "return;";
     if(/return;/.test(tree[i].code) || /this\.tstates/.test(tree[i].code)) {
       insertTStates()
     }
-    if(code != "") {
-      code.push(INDENT + tree[i].code)
+    if(tree[i].code != "") {
+      code.push(tree[i].code)
     }
     prevPc = tree[i].nextAddress
   }
-  code.push("}");
   code.push("}");
   code.push("}");
   code = code.join("\n");
@@ -4650,7 +4653,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   }
   function insertTStates() {
     if(tstates) {
-      code.push(INDENT + "this.tstates -= " + tstates + ";")
+      code.push("this.tstates -= " + tstates + ";")
     }
     tstates = 0
   }
@@ -6809,9 +6812,14 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "OUTD";
       break;
     case 176:
-      target = address - 2;
       inst = "LDIR";
-      code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();" + "this.incHL();" + "this.decBC();" + "" + "if (this.getBC() != 0) {" + "this.f |= F_PARITY;" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "} else {" + "this.f &= ~ F_PARITY;" + "}" + "" + "this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
+      if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+        target = address - 2;
+        code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();" + "this.incHL();" + "this.decBC();" + "" + "if (this.getBC() != 0) {" + "this.f |= F_PARITY;" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
+      }else {
+        code = "for(;this.getBC() != 0; this.f |= F_PARITY, this.tstates -= 5) {" + "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();" + "this.incHL();" + "this.decBC();" + "}"
+      }
+      code += "if (!(this.getBC() != 0)) this.f &= ~ F_PARITY;" + "" + "this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
       break;
     case 177:
       inst = "CPIR";
@@ -6820,9 +6828,14 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "INIR";
       break;
     case 179:
-      target = address - 2;
       inst = "OTIR";
-      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+        target = address - 2;
+        code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
+      }else {
+        code = "for(;this.b != 0; this.tstates -= 5) {" + "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "}"
+      }
+      code += "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 184:
       inst = "LDDR";

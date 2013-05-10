@@ -163,7 +163,6 @@ JSSMS.Debugger.prototype = {
 
     var tree = this.instructions;
     var toHex = JSSMS.Utils.toHex;
-    var INDENT = '  ';
     var tstates = 0;
     var prevPc = 0;
     var breakNeeded = false;
@@ -185,18 +184,29 @@ JSSMS.Debugger.prototype = {
 
     code.push('while (this.tstates > cyclesTo) {');
 
+    // Warning: the generated code is not fully compatible with ACCURATE_INTERRUPT_EMULATION mode.
+    // Before it is, let's do a check in the while loop:
+    code.push('if (this.interruptLine) this.interrupt(); // Check for interrupt');
+
     if (Setup.ACCURATE_INTERRUPT_EMULATION) {
-      code.push('if (this.interruptLine) this.interrupt(); // Check for interrupt');
+      //code.push('if (this.interruptLine) this.interrupt(); // Check for interrupt');
       code.push('this.EI_inst = false;');
     }
 
     if (Setup.REFRESH_EMULATION)
       code.push('this.incR();');
 
-    code.push('switch(this.pc) {');
+    code.push('this.branches[this.pc].call(this);');
+    code.push('}'); // End of while
+    code.push('},'); // End of method `run()`
 
-    code.push(INDENT + 'default:');
-    code.push(INDENT + 'console.log("Bad address", this.pc);');
+    code.push('');
+    code.push('');
+
+    code.push('branches: {');
+
+    code.push('"": function() {');
+    code.push('console.log("Bad address", this.pc);');
 
     for (var i = 0, length = tree.length; i < length; i++) {
       if (!tree[i])
@@ -205,14 +215,15 @@ JSSMS.Debugger.prototype = {
       if (tree[i].isJumpTarget || prevPc != tree[i].address || breakNeeded) {
         insertTStates();
         if (prevPc && !breakNeeded) {
-          code.push(INDENT + 'this.pc = ' + toHex(prevPc) + ';');
+          code.push('this.pc = ' + toHex(prevPc) + ';');
         }
-        code.push(INDENT + 'break;');
-        code.push(INDENT + 'case ' + toHex(tree[i].address) + ':');
+        code.push('},');
+        // `temp` is only used for variable declaration, not actually passed parameter.
+        code.push('' + toHex(tree[i].address) + ': function(temp) {');
       }
 
       // Comment for debugging.
-      code.push(INDENT + '// ' + tree[i].label);
+      code.push('// ' + tree[i].label);
 
       // Decrement tstates.
       tstates += getTotalTStates(tree[i].opcodes);
@@ -224,19 +235,18 @@ JSSMS.Debugger.prototype = {
       }
 
       // Instruction.
-      if (code != '')
-        code.push(INDENT + tree[i].code);
+      if (tree[i].code != '')
+        code.push(tree[i].code);
 
       // Move program counter.
       /*if (tree[i].nextAddress && !breakNeeded)
-       code.push(INDENT + 'this.pc = ' + toHex(tree[i].nextAddress) + ';');*/
+       code.push('this.pc = ' + toHex(tree[i].nextAddress) + ';');*/
 
       prevPc = tree[i].nextAddress;
     }
 
-    code.push('}'); // End of switch
-    code.push('}'); // End of while
-    code.push('}'); // End of function
+    code.push('}'); // End of last branch
+    code.push('}'); // End of property `branches`
     code = code.join('\n');
 
     console.timeEnd('JavaScript generation');
@@ -270,7 +280,7 @@ JSSMS.Debugger.prototype = {
 
     function insertTStates() {
       if (tstates)
-        code.push(INDENT + 'this.tstates -= ' + tstates + ';');
+        code.push('this.tstates -= ' + tstates + ';');
 
       tstates = 0;
     }
