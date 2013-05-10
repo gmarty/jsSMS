@@ -3144,9 +3144,6 @@ JSSMS.Z80.prototype = {
       this.useSRAM = false;
     }
 
-    // Create dummy memory (for invalid writes)
-    //this.dummyWrite = new Array(Setup.PAGE_SIZE);
-
     // Ignore bad writes in Back To The Future 2
     this.memReadMap[64] = this.getDummyWrite();
     this.memWriteMap[64] = this.getDummyWrite();
@@ -3158,11 +3155,11 @@ JSSMS.Z80.prototype = {
   /**
    * Reset memory to default values.
    *
-   * @param {Array.<Array.<number>>=} p
+   * @param {Array.<Array.<number>>=} pages
    */
-  resetMemory: function(p) {
-    if (p) {
-      this.rom = p;
+  resetMemory: function(pages) {
+    if (pages) {
+      this.rom = pages;
     }
 
     this.frameReg[0] = 0;
@@ -3258,11 +3255,10 @@ JSSMS.Z80.prototype = {
 
       // 0xFFFD: Page 0 ROM Bank
       case 1:
-        // Note +1 here, because for loop starts at '1'
-        p = ((value % this.number_of_pages) << 4) + 1;
+        p = (value % this.number_of_pages) << 4;
 
         for (i = 1; i < 16; i++)
-          this.memReadMap[i] = this.rom[p++];
+          this.memReadMap[i] = this.rom[p + i];
         break;
 
       // 0xFFFE: Page 1 ROM Bank
