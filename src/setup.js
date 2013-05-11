@@ -133,8 +133,8 @@ var Setup = {
 
   // Memory Settings
   /**
-   * Size of each memory page (1K in this case).
+   * Size of each memory page.
    * @type {number}
    */
-  PAGE_SIZE: 0x400
+  PAGE_SIZE: 0x4000
 };

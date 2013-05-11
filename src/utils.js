@@ -105,13 +105,13 @@ JSSMS.Utils = {
        */
       return function(address, value) {
         // DEBUG
-        if (DEBUG && ((address >> 10) >= this.memWriteMap.length || !this.memWriteMap[address >> 10] ||
-            (address & 0x3FF) >= this.memWriteMap[address >> 10].byteLength)) {
-          console.error(address, (address >> 10), (address & 0x3FF));
+        if (DEBUG && ((address >> 14) >= this.memWriteMap.length || !this.memWriteMap[address >> 14] ||
+            (address & 0x3FFF) >= this.memWriteMap[address >> 14].byteLength)) {
+          console.error(address, (address >> 14), (address & 0x3FFF));
           debugger;
         }
 
-        this.memWriteMap[address >> 10].setInt8(address & 0x3FF, value);
+        this.memWriteMap[address >> 14].setInt8(address & 0x3FFF, value);
 
         // Paging registers
         if (address >= 0xFFFC)
@@ -123,7 +123,7 @@ JSSMS.Utils = {
        * @param {number} value Value to write.
        */
       return function(address, value) {
-        this.memWriteMap[address >> 10][address & 0x3FF] = value;
+        this.memWriteMap[address >> 14][address & 0x3FFF] = value;
 
         // Paging registers
         if (address >= 0xFFFC)
@@ -144,13 +144,13 @@ JSSMS.Utils = {
        */
       return function(address) {
         // DEBUG
-        if (DEBUG && ((address >> 10) >= this.memReadMap.length || !this.memReadMap[address >> 10] ||
-            (address & 0x3FF) >= this.memReadMap[address >> 10].byteLength)) {
-          console.error(address, (address >> 10), (address & 0x3FF));
+        if (DEBUG && ((address >> 14) >= this.memReadMap.length || !this.memReadMap[address >> 14] ||
+            (address & 0x3FFF) >= this.memReadMap[address >> 14].byteLength)) {
+          console.error(address, (address >> 14), (address & 0x3FFF));
           debugger;
         }
 
-        return this.memReadMap[address >> 10].getUint8(address & 0x3FF);
+        return this.memReadMap[address >> 14].getUint8(address & 0x3FFF);
       }
     } else {
       /**
@@ -158,7 +158,7 @@ JSSMS.Utils = {
        * @return {number} Value from memory location.
        */
       return function(address) {
-        return this.memReadMap[address >> 10][address & 0x3FF] & 0xFF;
+        return this.memReadMap[address >> 14][address & 0x3FFF] & 0xFF;
       }
     }
   }(),
@@ -175,17 +175,17 @@ JSSMS.Utils = {
        */
       return function(address) {
         // DEBUG
-        if (DEBUG && ((address >> 10) >= this.memReadMap.length || !this.memReadMap[address >> 10] ||
-            (address & 0x3FF) >= this.memReadMap[address >> 10].byteLength)) {
-          console.error(address, (address >> 10), (address & 0x3FF));
+        if (DEBUG && ((address >> 14) >= this.memReadMap.length || !this.memReadMap[address >> 14] ||
+            (address & 0x3FFF) >= this.memReadMap[address >> 14].byteLength)) {
+          console.error(address, (address >> 14), (address & 0x3FFF));
           debugger;
         }
 
-        if ((address & 0x3FF) < 0x3FF) {
-          return this.memReadMap[address >> 10].getUint16(address & 0x3FF, LITTLE_ENDIAN);
+        if ((address & 0x3FFF) < 0x3FFF) {
+          return this.memReadMap[address >> 14].getUint16(address & 0x3FFF, LITTLE_ENDIAN);
         } else {
-          return (this.memReadMap[address >> 10].getUint8(address & 0x3FF)) |
-              ((this.memReadMap[++address >> 10].getUint8(address & 0x3FF)) << 8);
+          return (this.memReadMap[address >> 14].getUint8(address & 0x3FFF)) |
+              ((this.memReadMap[++address >> 14].getUint8(address & 0x3FFF)) << 8);
         }
       }
     } else {
@@ -194,8 +194,8 @@ JSSMS.Utils = {
        * @return {number} Value from memory location.
        */
       return function(address) {
-        return (this.memReadMap[address >> 10][address & 0x3FF] & 0xFF) |
-            ((this.memReadMap[++address >> 10][address & 0x3FF] & 0xFF) << 8);
+        return (this.memReadMap[address >> 14][address & 0x3FFF] & 0xFF) |
+            ((this.memReadMap[++address >> 14][address & 0x3FFF] & 0xFF) << 8);
       }
     }
   }(),

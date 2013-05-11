@@ -305,13 +305,13 @@ JSSMS.Z80 = function(sms) {
    * RAM.
    * @type {Array.<Array.<number>>}
    */
-  this.ram = new Array(8);
+  this.ram = new Array(2);
 
   /**
    * SRAM.
    * @type {Array.<Array.<number>>}
    */
-  this.sram = new Array(32);
+  this.sram = new Array(16);
 
   /**
    * Cartridge uses SRAM.
@@ -335,12 +335,12 @@ JSSMS.Z80 = function(sms) {
    * Memory map.
    * @type {Array.<Array>}
    */
-  this.memWriteMap = new Array(65);
+  this.memWriteMap = new Array(17);
 
   /**
    * @type {Array.<Array>}
    */
-  this.memReadMap = new Array(65);
+  this.memReadMap = new Array(17);
 
   // Precalculated tables for speed purposes
   /** Pre-calculated result for DAA instruction. */
@@ -3121,32 +3121,26 @@ JSSMS.Z80.prototype = {
 
     // Note we create one extra dummy position to get around a dodgy write in
     // Back to the Future 2.
-    //this.memReadMap = new Array(65);
-    //this.memWriteMap = new Array(65);
 
-    for (var i = 0; i < 65; i++) {
+    for (var i = 0; i < 16; i++) {
       this.memReadMap[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
       this.memWriteMap[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
     }
 
     // Create 8K System RAM
-    //this.ram = new Array(8);
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 2; i++) {
       this.ram[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
     }
 
     // Create 2 x 16K RAM Cartridge Pages
-    if (this.sram == null) {
-      this.sram = new Array(32);
-      for (i = 0; i < 32; i++) {
-        this.sram[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
-      }
-      this.useSRAM = false;
+    for (i = 0; i < 16; i++) {
+      this.sram[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
     }
+    this.useSRAM = false;
 
     // Ignore bad writes in Back To The Future 2
-    this.memReadMap[64] = this.getDummyWrite();
-    this.memWriteMap[64] = this.getDummyWrite();
+    this.memReadMap[16] = this.getDummyWrite();
+    this.memWriteMap[16] = this.getDummyWrite();
 
     this.number_of_pages = 2;
   },
@@ -3170,7 +3164,7 @@ JSSMS.Z80.prototype = {
     // Default Mapping
     if (this.rom.length) {
       // 16K Page Chunks :)
-      this.number_of_pages = this.rom.length / 16;
+      this.number_of_pages = this.rom.length;
       this.setDefaultMemoryMapping();
     } else {
       this.number_of_pages = 0;
@@ -3180,16 +3174,14 @@ JSSMS.Z80.prototype = {
 
   setDefaultMemoryMapping: function() {
     // Map ROM
-    for (var i = 0; i < 0x30; i++) {
-      this.memReadMap[i] = this.rom[i & 0x1F];
+    for (var i = 0; i < 3; i++) {
+      this.memReadMap[i] = this.rom[i];
       this.memWriteMap[i] = this.getDummyWrite();
     }
 
     // Map RAM
-    for (i = 0x30; i < 0x40; i++) {
-      this.memReadMap[i] = this.ram[i & 0x07];
-      this.memWriteMap[i] = this.ram[i & 0x07];
-    }
+    this.memReadMap[3] = this.ram[0];
+    this.memWriteMap[3] = this.ram[0];
   },
 
 
@@ -3219,7 +3211,7 @@ JSSMS.Z80.prototype = {
    * @param {number} value Value to write.
    */
   page: function(address, value) {
-    var p, i, offset;
+    var p, offset;
 
     this.frameReg[address] = value;
 
@@ -3231,52 +3223,41 @@ JSSMS.Z80.prototype = {
           // SRAM banking; BA14 state when $8000-$BFFF is accessed (1= high, 0= low)
 
           // 16K offset into SRAM
-          offset = (value & 0x04) << 2;
+          offset = (value & 0x04);
 
           // Map 16K of SRAM
-          for (i = 32; i < 48; i++) {
-            this.memReadMap[i] = this.sram[offset];
-            this.memWriteMap[i] = this.sram[offset];
-            offset++;
-          }
+          this.memReadMap[2] = this.sram[offset];
+          this.memWriteMap[2] = this.sram[offset];
 
           this.useSRAM = true;
         } else {
           // 0= ROM mapped to $8000-$BFFF
-          p = (this.frameReg[3] % this.number_of_pages) << 4;
+          p = this.frameReg[3] % this.number_of_pages;
 
           // Map 16K of ROM
-          for (i = 32; i < 48; i++) {
-            this.memReadMap[i] = this.rom[p++];
-            this.memWriteMap[i] = this.getDummyWrite();
-          }
+          this.memReadMap[2] = this.rom[p];
+          this.memWriteMap[2] = this.getDummyWrite();
         }
         break;
 
       // 0xFFFD: Page 0 ROM Bank
       case 1:
-        p = (value % this.number_of_pages) << 4;
-
-        for (i = 1; i < 16; i++)
-          this.memReadMap[i] = this.rom[p + i];
+        p = value % this.number_of_pages;
+        this.memReadMap[0] = this.rom[p];
         break;
 
       // 0xFFFE: Page 1 ROM Bank
       case 2:
-        p = (value % this.number_of_pages) << 4;
-
-        for (i = 16; i < 32; i++)
-          this.memReadMap[i] = this.rom[p++];
+        p = value % this.number_of_pages;
+        this.memReadMap[1] = this.rom[p];
         break;
 
       // 0xFFFF: Page 2 ROM Bank
       case 3:
         // Map ROM
         if ((this.frameReg[0] & 0x08) == 0) {
-          p = (value % this.number_of_pages) << 4;
-
-          for (i = 32; i < 48; i++)
-            this.memReadMap[i] = this.rom[p++];
+          p = value % this.number_of_pages;
+          this.memReadMap[2] = this.rom[p];
         }
         break;
     }

@@ -74,7 +74,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
   $JSCompiler_StaticMethods_resetDebug$self$$inline_16_clockSpeedHz$$inline_11_i$$inline_12_i$$inline_155$$.$w$ = [];
   $JSCompiler_StaticMethods_resetDebug$self$$inline_16_clockSpeedHz$$inline_11_i$$inline_12_i$$inline_155$$.$Z$.$b$.updateStatus("Parsing instructions...");
   console.time("Instructions parsing");
-  var $JSCompiler_StaticMethods_init$self$$inline_153_mode$$inline_10_romSize$$inline_158_v$$inline_13$$ = 1024 * $JSCompiler_StaticMethods_resetDebug$self$$inline_16_clockSpeedHz$$inline_11_i$$inline_12_i$$inline_155$$.$z$.length, $instruction$$inline_159_opcode$$inline_203_options$$inline_224$$, $i$$inline_161$$ = 0, $addresses$$inline_162$$ = [];
+  var $JSCompiler_StaticMethods_init$self$$inline_153_mode$$inline_10_romSize$$inline_158_v$$inline_13$$ = 16384 * $JSCompiler_StaticMethods_resetDebug$self$$inline_16_clockSpeedHz$$inline_11_i$$inline_12_i$$inline_155$$.$z$.length, $instruction$$inline_159_opcode$$inline_203_options$$inline_224$$, $i$$inline_161$$ = 0, $addresses$$inline_162$$ = [];
   for($addresses$$inline_162$$.push(0);$addresses$$inline_162$$.length;) {
     if($currentAddress$$inline_160_fractional$$inline_14$$ = $addresses$$inline_162$$.shift(), !$JSCompiler_StaticMethods_resetDebug$self$$inline_16_clockSpeedHz$$inline_11_i$$inline_12_i$$inline_155$$.$w$[$currentAddress$$inline_160_fractional$$inline_14$$]) {
       if($currentAddress$$inline_160_fractional$$inline_14$$ >= $JSCompiler_StaticMethods_init$self$$inline_153_mode$$inline_10_romSize$$inline_158_v$$inline_13$$ || 65 <= $currentAddress$$inline_160_fractional$$inline_14$$ >> 10) {
@@ -2291,7 +2291,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
         var $JSCompiler_StaticMethods_interrupt$self$$inline_229$$ = $JSCompiler_StaticMethods_run$self$$inline_164$$;
         $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$A$ && ($JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$I$ && ($JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$d$++, $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$I$ = $JSCompiler_alias_FALSE$$), $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$A$ = $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$B$ = $JSCompiler_alias_FALSE$$, $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$D$ = $JSCompiler_alias_FALSE$$, 
         $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interrupt$self$$inline_229$$, $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$d$), 0 == $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$J$ ? ($JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$d$ = 0 == $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$K$ || 255 == $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$K$ ? 56 : $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$K$, $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$o$ -= 
-        13) : 1 == $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$J$ ? ($JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$d$ = 56, $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$o$ -= 13) : ($JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$d$ = $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$l$(($JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$N$ << 8) + $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$K$), $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$o$ -= 
+        13) : 1 == $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$J$ ? ($JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$d$ = 56, $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$o$ -= 13) : ($JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$d$ = $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$l$(($JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$M$ << 8) + $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$K$), $JSCompiler_StaticMethods_interrupt$self$$inline_229$$.$o$ -= 
         19))
       }
       for(;0 < $JSCompiler_StaticMethods_run$self$$inline_164$$.$o$;) {
@@ -2326,11 +2326,11 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             break;
           case 8:
             var $JSCompiler_StaticMethods_exAF$self$$inline_236$$ = $JSCompiler_StaticMethods_run$self$$inline_164$$, $temp$$inline_237$$ = $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$b$;
-            $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$b$ = $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$P$;
-            $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$P$ = $temp$$inline_237$$;
+            $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$b$ = $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$O$;
+            $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$O$ = $temp$$inline_237$$;
             $temp$$inline_237$$ = $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$c$;
-            $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$c$ = $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$U$;
-            $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$U$ = $temp$$inline_237$$;
+            $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$c$ = $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$T$;
+            $JSCompiler_StaticMethods_exAF$self$$inline_236$$.$T$ = $temp$$inline_237$$;
             break;
           case 9:
             $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_run$self$$inline_164$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_run$self$$inline_164$$, $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_run$self$$inline_164$$), $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_run$self$$inline_164$$)));
@@ -3749,23 +3749,23 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             break;
           case 217:
             var $JSCompiler_StaticMethods_exBC$self$$inline_258$$ = $JSCompiler_StaticMethods_run$self$$inline_164$$, $temp$$inline_259$$ = $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$g$;
-            $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$g$ = $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$Q$;
-            $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$Q$ = $temp$$inline_259$$;
+            $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$g$ = $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$P$;
+            $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$P$ = $temp$$inline_259$$;
             $temp$$inline_259$$ = $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$f$;
-            $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$f$ = $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$R$;
-            $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$R$ = $temp$$inline_259$$;
+            $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$f$ = $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$Q$;
+            $JSCompiler_StaticMethods_exBC$self$$inline_258$$.$Q$ = $temp$$inline_259$$;
             var $JSCompiler_StaticMethods_exDE$self$$inline_261$$ = $JSCompiler_StaticMethods_run$self$$inline_164$$, $temp$$inline_262$$ = $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$j$;
-            $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$j$ = $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$S$;
-            $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$S$ = $temp$$inline_262$$;
+            $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$j$ = $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$R$;
+            $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$R$ = $temp$$inline_262$$;
             $temp$$inline_262$$ = $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$h$;
-            $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$h$ = $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$T$;
-            $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$T$ = $temp$$inline_262$$;
+            $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$h$ = $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$S$;
+            $JSCompiler_StaticMethods_exDE$self$$inline_261$$.$S$ = $temp$$inline_262$$;
             var $JSCompiler_StaticMethods_exHL$self$$inline_264$$ = $JSCompiler_StaticMethods_run$self$$inline_164$$, $temp$$inline_265$$ = $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$k$;
-            $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$k$ = $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$V$;
-            $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$V$ = $temp$$inline_265$$;
+            $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$k$ = $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$U$;
+            $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$U$ = $temp$$inline_265$$;
             $temp$$inline_265$$ = $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$i$;
-            $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$i$ = $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$W$;
-            $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$W$ = $temp$$inline_265$$;
+            $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$i$ = $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$V$;
+            $JSCompiler_StaticMethods_exHL$self$$inline_264$$.$V$ = $temp$$inline_265$$;
             break;
           case 218:
             $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_run$self$$inline_164$$, 0 != ($JSCompiler_StaticMethods_run$self$$inline_164$$.$c$ & 1));
@@ -4209,7 +4209,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 $JSCompiler_StaticMethods_doED$self$$inline_272$$.$d$++;
                 break;
               case 71:
-                $JSCompiler_StaticMethods_doED$self$$inline_272$$.$N$ = $JSCompiler_StaticMethods_doED$self$$inline_272$$.$b$;
+                $JSCompiler_StaticMethods_doED$self$$inline_272$$.$M$ = $JSCompiler_StaticMethods_doED$self$$inline_272$$.$b$;
                 $JSCompiler_StaticMethods_doED$self$$inline_272$$.$d$++;
                 break;
               case 72:
@@ -4260,8 +4260,8 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 $JSCompiler_StaticMethods_doED$self$$inline_272$$.$d$++;
                 break;
               case 87:
-                $JSCompiler_StaticMethods_doED$self$$inline_272$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_272$$.$N$;
-                $JSCompiler_StaticMethods_doED$self$$inline_272$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_272$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_272$$.$O$[$JSCompiler_StaticMethods_doED$self$$inline_272$$.$b$] | ($JSCompiler_StaticMethods_doED$self$$inline_272$$.$B$ ? 4 : 0);
+                $JSCompiler_StaticMethods_doED$self$$inline_272$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_272$$.$M$;
+                $JSCompiler_StaticMethods_doED$self$$inline_272$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_272$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_272$$.$N$[$JSCompiler_StaticMethods_doED$self$$inline_272$$.$b$] | ($JSCompiler_StaticMethods_doED$self$$inline_272$$.$B$ ? 4 : 0);
                 $JSCompiler_StaticMethods_doED$self$$inline_272$$.$d$++;
                 break;
               case 88:
@@ -4285,7 +4285,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 95:
                 $JSCompiler_StaticMethods_doED$self$$inline_272$$.$b$ = Math.round(255 * Math.random());
-                $JSCompiler_StaticMethods_doED$self$$inline_272$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_272$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_272$$.$O$[$JSCompiler_StaticMethods_doED$self$$inline_272$$.$b$] | ($JSCompiler_StaticMethods_doED$self$$inline_272$$.$B$ ? 4 : 0);
+                $JSCompiler_StaticMethods_doED$self$$inline_272$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_272$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_272$$.$N$[$JSCompiler_StaticMethods_doED$self$$inline_272$$.$b$] | ($JSCompiler_StaticMethods_doED$self$$inline_272$$.$B$ ? 4 : 0);
                 $JSCompiler_StaticMethods_doED$self$$inline_272$$.$d$++;
                 break;
               case 96:
@@ -5053,20 +5053,20 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
 }, $readRomDirectly$:function $$JSSMS$$$$$readRomDirectly$$($data$$21$$, $fileName$$) {
   var $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$ = ".gg" == $fileName$$.substr(-3).toLowerCase() ? 2 : 1, $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$ = $data$$21$$.length;
   1 == $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$ ? (this.$is_sms$ = $JSCompiler_alias_TRUE$$, this.$is_gg$ = $JSCompiler_alias_FALSE$$, this.$c$.$s$ = 0, this.$c$.$u$ = 32) : 2 == $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$ && (this.$is_gg$ = $JSCompiler_alias_TRUE$$, this.$is_sms$ = $JSCompiler_alias_FALSE$$, this.$c$.$s$ = 5, this.$c$.$u$ = 27);
-  if(1024 >= $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$) {
+  if(16384 >= $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$) {
     return $JSCompiler_alias_FALSE$$
   }
   $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$ = $data$$21$$;
   0 != $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$ % 1024 && ($JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$ = $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.substr(512), $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$ -= 512);
-  var $i$$inline_33$$, $j$$inline_34$$, $number_of_pages$$inline_35$$ = Math.round($i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$ / 1024), $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$ = Array($number_of_pages$$inline_35$$);
+  var $i$$inline_33$$, $j$$inline_34$$, $number_of_pages$$inline_35$$ = Math.round($i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$ / 16384), $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$ = Array($number_of_pages$$inline_35$$);
   for($i$$inline_33$$ = 0;$i$$inline_33$$ < $number_of_pages$$inline_35$$;$i$$inline_33$$++) {
-    if($i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$[$i$$inline_33$$] = $JSSMS$Utils$Array$$(1024), $SUPPORT_DATAVIEW$$) {
-      for($j$$inline_34$$ = 0;1024 > $j$$inline_34$$;$j$$inline_34$$++) {
-        $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$[$i$$inline_33$$].setUint8($j$$inline_34$$, $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.charCodeAt(1024 * $i$$inline_33$$ + $j$$inline_34$$))
+    if($i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$[$i$$inline_33$$] = $JSSMS$Utils$Array$$(16384), $SUPPORT_DATAVIEW$$) {
+      for($j$$inline_34$$ = 0;16384 > $j$$inline_34$$;$j$$inline_34$$++) {
+        $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$[$i$$inline_33$$].setUint8($j$$inline_34$$, $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.charCodeAt(16384 * $i$$inline_33$$ + $j$$inline_34$$))
       }
     }else {
-      for($j$$inline_34$$ = 0;1024 > $j$$inline_34$$;$j$$inline_34$$++) {
-        $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$[$i$$inline_33$$][$j$$inline_34$$] = $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.charCodeAt(1024 * $i$$inline_33$$ + $j$$inline_34$$) & 255
+      for($j$$inline_34$$ = 0;16384 > $j$$inline_34$$;$j$$inline_34$$++) {
+        $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$[$i$$inline_33$$][$j$$inline_34$$] = $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.charCodeAt(16384 * $i$$inline_33$$ + $j$$inline_34$$) & 255
       }
     }
   }
@@ -5080,14 +5080,12 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
   $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$C$[2] = 1;
   $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$C$[3] = 0;
   if($JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$z$.length) {
-    $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$F$ = $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$z$.length / 16;
-    for($i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$ = 0;48 > $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$;$i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$++) {
-      $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$memReadMap$[$i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$] = $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$z$[$i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$ & 31], $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$memWriteMap$[$i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$] = $JSSMS$Utils$Array$$(1024)
+    $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$F$ = $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$z$.length;
+    for($i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$ = 0;3 > $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$;$i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$++) {
+      $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$memReadMap$[$i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$] = $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$z$[$i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$], $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$memWriteMap$[$i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$] = $JSSMS$Utils$Array$$(16384)
     }
-    for($i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$ = 48;64 > $i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$;$i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$++) {
-      $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$memReadMap$[$i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$] = $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$X$[$i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$ & 7], $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$memWriteMap$[$i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$] = $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$X$[$i$$inline_186_pages$$inline_36_size$$10_size$$inline_32$$ & 
-      7]
-    }
+    $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$memReadMap$[3] = $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$W$[0];
+    $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$memWriteMap$[3] = $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$W$[0]
   }else {
     $JSCompiler_StaticMethods_resetMemory$self$$inline_38_data$$inline_31_mode$$9$$.$F$ = 0
   }
@@ -5097,31 +5095,31 @@ var $JSSMS$Utils$Array$$ = $SUPPORT_DATAVIEW$$ ? function($length$$12$$) {
   $length$$12$$ || ($length$$12$$ = 0);
   return new DataView(new ArrayBuffer($length$$12$$))
 } : Array, $JSSMS$Utils$writeMem$$ = $SUPPORT_DATAVIEW$$ ? function($address$$, $value$$38$$) {
-  if($address$$ >> 10 >= this.$memWriteMap$.length || !this.$memWriteMap$[$address$$ >> 10] || ($address$$ & 1023) >= this.$memWriteMap$[$address$$ >> 10].byteLength) {
-    console.error($address$$, $address$$ >> 10, $address$$ & 1023);
+  if($address$$ >> 14 >= this.$memWriteMap$.length || !this.$memWriteMap$[$address$$ >> 14] || ($address$$ & 16383) >= this.$memWriteMap$[$address$$ >> 14].byteLength) {
+    console.error($address$$, $address$$ >> 14, $address$$ & 16383);
     debugger
   }
-  this.$memWriteMap$[$address$$ >> 10].setInt8($address$$ & 1023, $value$$38$$);
+  this.$memWriteMap$[$address$$ >> 14].setInt8($address$$ & 16383, $value$$38$$);
   65532 <= $address$$ && this.page($address$$ & 3, $value$$38$$)
 } : function($address$$1$$, $value$$39$$) {
-  this.$memWriteMap$[$address$$1$$ >> 10][$address$$1$$ & 1023] = $value$$39$$;
+  this.$memWriteMap$[$address$$1$$ >> 14][$address$$1$$ & 16383] = $value$$39$$;
   65532 <= $address$$1$$ && this.page($address$$1$$ & 3, $value$$39$$)
 }, $JSSMS$Utils$readMem$$ = $SUPPORT_DATAVIEW$$ ? function($address$$2$$) {
-  if($address$$2$$ >> 10 >= this.$memReadMap$.length || !this.$memReadMap$[$address$$2$$ >> 10] || ($address$$2$$ & 1023) >= this.$memReadMap$[$address$$2$$ >> 10].byteLength) {
-    console.error($address$$2$$, $address$$2$$ >> 10, $address$$2$$ & 1023);
+  if($address$$2$$ >> 14 >= this.$memReadMap$.length || !this.$memReadMap$[$address$$2$$ >> 14] || ($address$$2$$ & 16383) >= this.$memReadMap$[$address$$2$$ >> 14].byteLength) {
+    console.error($address$$2$$, $address$$2$$ >> 14, $address$$2$$ & 16383);
     debugger
   }
-  return this.$memReadMap$[$address$$2$$ >> 10].getUint8($address$$2$$ & 1023)
+  return this.$memReadMap$[$address$$2$$ >> 14].getUint8($address$$2$$ & 16383)
 } : function($address$$3$$) {
-  return this.$memReadMap$[$address$$3$$ >> 10][$address$$3$$ & 1023] & 255
+  return this.$memReadMap$[$address$$3$$ >> 14][$address$$3$$ & 16383] & 255
 }, $JSSMS$Utils$readMemWord$$ = $SUPPORT_DATAVIEW$$ ? function($address$$4$$) {
-  if($address$$4$$ >> 10 >= this.$memReadMap$.length || !this.$memReadMap$[$address$$4$$ >> 10] || ($address$$4$$ & 1023) >= this.$memReadMap$[$address$$4$$ >> 10].byteLength) {
-    console.error($address$$4$$, $address$$4$$ >> 10, $address$$4$$ & 1023);
+  if($address$$4$$ >> 14 >= this.$memReadMap$.length || !this.$memReadMap$[$address$$4$$ >> 14] || ($address$$4$$ & 16383) >= this.$memReadMap$[$address$$4$$ >> 14].byteLength) {
+    console.error($address$$4$$, $address$$4$$ >> 14, $address$$4$$ & 16383);
     debugger
   }
-  return 1023 > ($address$$4$$ & 1023) ? this.$memReadMap$[$address$$4$$ >> 10].getUint16($address$$4$$ & 1023, $JSCompiler_alias_TRUE$$) : this.$memReadMap$[$address$$4$$ >> 10].getUint8($address$$4$$ & 1023) | this.$memReadMap$[++$address$$4$$ >> 10].getUint8($address$$4$$ & 1023) << 8
+  return 16383 > ($address$$4$$ & 16383) ? this.$memReadMap$[$address$$4$$ >> 14].getUint16($address$$4$$ & 16383, $JSCompiler_alias_TRUE$$) : this.$memReadMap$[$address$$4$$ >> 14].getUint8($address$$4$$ & 16383) | this.$memReadMap$[++$address$$4$$ >> 14].getUint8($address$$4$$ & 16383) << 8
 } : function($address$$5$$) {
-  return this.$memReadMap$[$address$$5$$ >> 10][$address$$5$$ & 1023] & 255 | (this.$memReadMap$[++$address$$5$$ >> 10][$address$$5$$ & 1023] & 255) << 8
+  return this.$memReadMap$[$address$$5$$ >> 14][$address$$5$$ & 16383] & 255 | (this.$memReadMap$[++$address$$5$$ >> 14][$address$$5$$ & 16383] & 255) << 8
 }, $JSSMS$Utils$getTimestamp$$ = window.performance && window.performance.now ? function() {
   return window.performance.now()
 } : function() {
@@ -5146,30 +5144,30 @@ function $JSSMS$Z80$$($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sm
   this.$t$ = $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$.$f$;
   this.$J$ = this.$n$ = this.$d$ = 0;
   this.$D$ = this.$I$ = this.$B$ = this.$A$ = $JSCompiler_alias_FALSE$$;
-  this.$o$ = this.$U$ = this.$c$ = this.$N$ = this.$s$ = this.$q$ = this.$r$ = this.$p$ = this.$W$ = this.$V$ = this.$i$ = this.$k$ = this.$T$ = this.$S$ = this.$h$ = this.$j$ = this.$R$ = this.$Q$ = this.$f$ = this.$g$ = this.$P$ = this.$b$ = this.$K$ = 0;
+  this.$o$ = this.$T$ = this.$c$ = this.$M$ = this.$s$ = this.$q$ = this.$r$ = this.$p$ = this.$V$ = this.$U$ = this.$i$ = this.$k$ = this.$S$ = this.$R$ = this.$h$ = this.$j$ = this.$Q$ = this.$P$ = this.$f$ = this.$g$ = this.$O$ = this.$b$ = this.$K$ = 0;
   this.$z$ = [];
-  this.$X$ = Array(8);
-  this.$L$ = Array(32);
+  this.$W$ = Array(2);
+  this.$X$ = Array(16);
   this.$C$ = Array(4);
   this.$F$ = 0;
-  this.$memWriteMap$ = Array(65);
-  this.$memReadMap$ = Array(65);
+  this.$memWriteMap$ = Array(17);
+  this.$memReadMap$ = Array(17);
   this.$Y$ = Array(2048);
-  this.$O$ = Array(256);
+  this.$N$ = Array(256);
   this.$m$ = Array(256);
   this.$H$ = Array(256);
   this.$G$ = Array(256);
   this.$v$ = Array(131072);
   this.$u$ = Array(131072);
-  this.$M$ = Array(256);
+  this.$L$ = Array(256);
   var $c$$inline_58_padc$$inline_49_sf$$inline_43$$, $h$$inline_59_psub$$inline_50_zf$$inline_44$$, $n$$inline_60_psbc$$inline_51_yf$$inline_45$$, $JSCompiler_temp_const$$151_val$$inline_52_xf$$inline_46$$, $JSCompiler_temp_const$$150_oldval$$inline_53_pf$$inline_47$$, $flags$$inline_190_newval$$inline_54$$;
   for($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ = 0;256 > $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$;$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$++) {
     $c$$inline_58_padc$$inline_49_sf$$inline_43$$ = 0 != ($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ & 128) ? 128 : 0, $h$$inline_59_psub$$inline_50_zf$$inline_44$$ = 0 == $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ ? 64 : 0, $n$$inline_60_psbc$$inline_51_yf$$inline_45$$ = $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ & 32, $JSCompiler_temp_const$$151_val$$inline_52_xf$$inline_46$$ = $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ & 
-    8, $JSCompiler_temp_const$$150_oldval$$inline_53_pf$$inline_47$$ = $JSCompiler_StaticMethods_getParity$$($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$) ? 4 : 0, this.$O$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = $c$$inline_58_padc$$inline_49_sf$$inline_43$$ | $h$$inline_59_psub$$inline_50_zf$$inline_44$$ | $n$$inline_60_psbc$$inline_51_yf$$inline_45$$ | $JSCompiler_temp_const$$151_val$$inline_52_xf$$inline_46$$, this.$m$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = 
+    8, $JSCompiler_temp_const$$150_oldval$$inline_53_pf$$inline_47$$ = $JSCompiler_StaticMethods_getParity$$($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$) ? 4 : 0, this.$N$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = $c$$inline_58_padc$$inline_49_sf$$inline_43$$ | $h$$inline_59_psub$$inline_50_zf$$inline_44$$ | $n$$inline_60_psbc$$inline_51_yf$$inline_45$$ | $JSCompiler_temp_const$$151_val$$inline_52_xf$$inline_46$$, this.$m$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = 
     $c$$inline_58_padc$$inline_49_sf$$inline_43$$ | $h$$inline_59_psub$$inline_50_zf$$inline_44$$ | $n$$inline_60_psbc$$inline_51_yf$$inline_45$$ | $JSCompiler_temp_const$$151_val$$inline_52_xf$$inline_46$$ | $JSCompiler_temp_const$$150_oldval$$inline_53_pf$$inline_47$$, this.$H$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = $c$$inline_58_padc$$inline_49_sf$$inline_43$$ | $h$$inline_59_psub$$inline_50_zf$$inline_44$$ | $n$$inline_60_psbc$$inline_51_yf$$inline_45$$ | $JSCompiler_temp_const$$151_val$$inline_52_xf$$inline_46$$, 
     this.$H$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] |= 128 == $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ ? 4 : 0, this.$H$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] |= 0 == ($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ & 15) ? 16 : 0, this.$G$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = $c$$inline_58_padc$$inline_49_sf$$inline_43$$ | $h$$inline_59_psub$$inline_50_zf$$inline_44$$ | $n$$inline_60_psbc$$inline_51_yf$$inline_45$$ | 
-    $JSCompiler_temp_const$$151_val$$inline_52_xf$$inline_46$$ | 2, this.$G$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] |= 127 == $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ ? 4 : 0, this.$G$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] |= 15 == ($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ & 15) ? 16 : 0, this.$M$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = 0 != $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ ? 
-    $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ & 128 : 68, this.$M$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] |= $n$$inline_60_psbc$$inline_51_yf$$inline_45$$ | $JSCompiler_temp_const$$151_val$$inline_52_xf$$inline_46$$ | 16
+    $JSCompiler_temp_const$$151_val$$inline_52_xf$$inline_46$$ | 2, this.$G$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] |= 127 == $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ ? 4 : 0, this.$G$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] |= 15 == ($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ & 15) ? 16 : 0, this.$L$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = 0 != $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ ? 
+    $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ & 128 : 68, this.$L$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] |= $n$$inline_60_psbc$$inline_51_yf$$inline_45$$ | $JSCompiler_temp_const$$151_val$$inline_52_xf$$inline_46$$ | 16
   }
   $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ = 0;
   $c$$inline_58_padc$$inline_49_sf$$inline_43$$ = 65536;
@@ -5213,20 +5211,17 @@ function $JSSMS$Z80$$($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sm
       }
     }
   }
-  for($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ = this.$b$ = this.$c$ = 0;65 > $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$;$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$++) {
-    this.$memReadMap$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = $JSSMS$Utils$Array$$(1024), this.$memWriteMap$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = $JSSMS$Utils$Array$$(1024)
+  for($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ = this.$b$ = this.$c$ = 0;16 > $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$;$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$++) {
+    this.$memReadMap$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = $JSSMS$Utils$Array$$(16384), this.$memWriteMap$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = $JSSMS$Utils$Array$$(16384)
   }
-  for($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ = 0;8 > $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$;$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$++) {
-    this.$X$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = $JSSMS$Utils$Array$$(1024)
+  for($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ = 0;2 > $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$;$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$++) {
+    this.$W$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = $JSSMS$Utils$Array$$(16384)
   }
-  if(this.$L$ == $JSCompiler_alias_NULL$$) {
-    this.$L$ = Array(32);
-    for($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ = 0;32 > $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$;$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$++) {
-      this.$L$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = $JSSMS$Utils$Array$$(1024)
-    }
+  for($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$ = 0;16 > $i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$;$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$++) {
+    this.$X$[$i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sms$$] = $JSSMS$Utils$Array$$(16384)
   }
-  this.$memReadMap$[64] = $JSSMS$Utils$Array$$(1024);
-  this.$memWriteMap$[64] = $JSSMS$Utils$Array$$(1024);
+  this.$memReadMap$[16] = $JSSMS$Utils$Array$$(16384);
+  this.$memWriteMap$[16] = $JSSMS$Utils$Array$$(16384);
   this.$F$ = 2;
   this.$e$ = $JSSMS$Utils$writeMem$$.bind(this);
   this.$a$ = $JSSMS$Utils$readMem$$.bind(this);
@@ -5236,7 +5231,7 @@ function $JSSMS$Z80$$($i$$inline_42_i$$inline_57_i$$inline_63_padd$$inline_48_sm
   }
 }
 $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
-  this.$d$ = this.$U$ = this.$c$ = this.$N$ = this.$q$ = this.$s$ = this.$p$ = this.$r$ = this.$k$ = this.$i$ = this.$V$ = this.$W$ = this.$j$ = this.$h$ = this.$S$ = this.$T$ = this.$g$ = this.$f$ = this.$Q$ = this.$R$ = this.$b$ = this.$P$ = 0;
+  this.$d$ = this.$T$ = this.$c$ = this.$M$ = this.$q$ = this.$s$ = this.$p$ = this.$r$ = this.$k$ = this.$i$ = this.$U$ = this.$V$ = this.$j$ = this.$h$ = this.$R$ = this.$S$ = this.$g$ = this.$f$ = this.$P$ = this.$Q$ = this.$b$ = this.$O$ = 0;
   this.$n$ = 57328;
   this.$J$ = this.$o$ = 0;
   this.$B$ = this.$A$ = $JSCompiler_alias_FALSE$$;
@@ -5245,41 +5240,22 @@ $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
 }, call:function $$JSSMS$Z80$$$$call$($condition$$3$$) {
   $condition$$3$$ ? ($JSCompiler_StaticMethods_push1$$(this, this.$d$ + 2), this.$d$ = this.$l$(this.$d$), this.$o$ -= 7) : this.$d$ += 2
 }, page:function $$JSSMS$Z80$$$$page$($address$$6$$, $value$$66$$) {
-  var $offset$$16_p$$, $i$$7$$;
+  var $offset$$16_p$$;
   this.$C$[$address$$6$$] = $value$$66$$;
   switch($address$$6$$) {
     case 0:
-      if(0 != ($value$$66$$ & 8)) {
-        $offset$$16_p$$ = ($value$$66$$ & 4) << 2;
-        for($i$$7$$ = 32;48 > $i$$7$$;$i$$7$$++) {
-          this.$memReadMap$[$i$$7$$] = this.$L$[$offset$$16_p$$], this.$memWriteMap$[$i$$7$$] = this.$L$[$offset$$16_p$$], $offset$$16_p$$++
-        }
-      }else {
-        $offset$$16_p$$ = this.$C$[3] % this.$F$ << 4;
-        for($i$$7$$ = 32;48 > $i$$7$$;$i$$7$$++) {
-          this.$memReadMap$[$i$$7$$] = this.$z$[$offset$$16_p$$++], this.$memWriteMap$[$i$$7$$] = $JSSMS$Utils$Array$$(1024)
-        }
-      }
+      0 != ($value$$66$$ & 8) ? ($offset$$16_p$$ = $value$$66$$ & 4, this.$memReadMap$[2] = this.$X$[$offset$$16_p$$], this.$memWriteMap$[2] = this.$X$[$offset$$16_p$$]) : ($offset$$16_p$$ = this.$C$[3] % this.$F$, this.$memReadMap$[2] = this.$z$[$offset$$16_p$$], this.$memWriteMap$[2] = $JSSMS$Utils$Array$$(16384));
       break;
     case 1:
-      $offset$$16_p$$ = $value$$66$$ % this.$F$ << 4;
-      for($i$$7$$ = 1;16 > $i$$7$$;$i$$7$$++) {
-        this.$memReadMap$[$i$$7$$] = this.$z$[$offset$$16_p$$ + $i$$7$$]
-      }
+      $offset$$16_p$$ = $value$$66$$ % this.$F$;
+      this.$memReadMap$[0] = this.$z$[$offset$$16_p$$];
       break;
     case 2:
-      $offset$$16_p$$ = $value$$66$$ % this.$F$ << 4;
-      for($i$$7$$ = 16;32 > $i$$7$$;$i$$7$$++) {
-        this.$memReadMap$[$i$$7$$] = this.$z$[$offset$$16_p$$++]
-      }
+      $offset$$16_p$$ = $value$$66$$ % this.$F$;
+      this.$memReadMap$[1] = this.$z$[$offset$$16_p$$];
       break;
     case 3:
-      if(0 == (this.$C$[0] & 8)) {
-        $offset$$16_p$$ = $value$$66$$ % this.$F$ << 4;
-        for($i$$7$$ = 32;48 > $i$$7$$;$i$$7$$++) {
-          this.$memReadMap$[$i$$7$$] = this.$z$[$offset$$16_p$$++]
-        }
-      }
+      0 == (this.$C$[0] & 8) && ($offset$$16_p$$ = $value$$66$$ % this.$F$, this.$memReadMap$[2] = this.$z$[$offset$$16_p$$])
   }
 }};
 function $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_d_$self$$) {
@@ -6055,7 +6031,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
   $JSCompiler_StaticMethods_doIndexCB$self$$.$d$++
 }
 function $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_bit$self$$, $mask$$5$$) {
-  $JSCompiler_StaticMethods_bit$self$$.$c$ = $JSCompiler_StaticMethods_bit$self$$.$c$ & 1 | $JSCompiler_StaticMethods_bit$self$$.$M$[$mask$$5$$]
+  $JSCompiler_StaticMethods_bit$self$$.$c$ = $JSCompiler_StaticMethods_bit$self$$.$c$ & 1 | $JSCompiler_StaticMethods_bit$self$$.$L$[$mask$$5$$]
 }
 function $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_srl$self$$, $value$$48$$) {
   var $carry$$7$$ = $value$$48$$ & 1;
@@ -7109,17 +7085,17 @@ function $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$$($J
   $code$$2$$.push("branches: {");
   $code$$2$$.push('"": function() {');
   $code$$2$$.push('console.log("Bad address", this.pc);');
-  for(var $i$$11$$ = 0, $length$$17$$ = $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$.length;$i$$11$$ < $length$$17$$;$i$$11$$++) {
-    if($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$11$$]) {
-      if($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$11$$].$isJumpTarget$ || $prevPc$$ != $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$11$$].$address$ || $breakNeeded$$) {
-        $insertTStates$$(), $prevPc$$ && !$breakNeeded$$ && $code$$2$$.push("this.pc = " + $JSSMS$Utils$toHex$$($prevPc$$) + ";"), $code$$2$$.push("},"), $code$$2$$.push("" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$11$$].$address$) + ": function(temp) {")
+  for(var $i$$10$$ = 0, $length$$17$$ = $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$.length;$i$$10$$ < $length$$17$$;$i$$10$$++) {
+    if($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$]) {
+      if($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$isJumpTarget$ || $prevPc$$ != $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$address$ || $breakNeeded$$) {
+        $insertTStates$$(), $prevPc$$ && !$breakNeeded$$ && $code$$2$$.push("this.pc = " + $JSSMS$Utils$toHex$$($prevPc$$) + ";"), $code$$2$$.push("},"), $code$$2$$.push("" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$address$) + ": function(temp) {")
       }
-      $code$$2$$.push("// " + $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$11$$].label);
-      $tstates$$ += $getTotalTStates$$($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$11$$].$opcodes$);
-      $breakNeeded$$ = "return;" == $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$11$$].code.substr(-7);
-      (/return;/.test($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$11$$].code) || /this\.tstates/.test($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$11$$].code)) && $insertTStates$$();
-      "" != $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$11$$].code && $code$$2$$.push($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$11$$].code);
-      $prevPc$$ = $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$11$$].$nextAddress$
+      $code$$2$$.push("// " + $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].label);
+      $tstates$$ += $getTotalTStates$$($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$opcodes$);
+      $breakNeeded$$ = "return;" == $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].code.substr(-7);
+      (/return;/.test($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].code) || /this\.tstates/.test($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].code)) && $insertTStates$$();
+      "" != $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].code && $code$$2$$.push($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].code);
+      $prevPc$$ = $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$nextAddress$
     }
   }
   $code$$2$$.push("}");
@@ -7150,12 +7126,12 @@ function $JSSMS$SN76489$$() {
 $JSSMS$SN76489$$.prototype = {};
 function $JSSMS$Vdp$$($i$$inline_107_i$$inline_110_sms$$3$$) {
   this.$h$ = $i$$inline_107_i$$inline_110_sms$$3$$;
-  var $i$$14_r$$inline_111$$ = 0;
+  var $i$$13_r$$inline_111$$ = 0;
   this.$z$ = 0;
   this.$d$ = Array(16384);
   this.$a$ = Array(96);
-  for($i$$14_r$$inline_111$$ = 0;96 > $i$$14_r$$inline_111$$;$i$$14_r$$inline_111$$++) {
-    this.$a$[$i$$14_r$$inline_111$$] = 255
+  for($i$$13_r$$inline_111$$ = 0;96 > $i$$13_r$$inline_111$$;$i$$13_r$$inline_111$$++) {
+    this.$a$[$i$$13_r$$inline_111$$] = 255
   }
   this.$c$ = Array(16);
   this.$e$ = 0;
@@ -7173,8 +7149,8 @@ function $JSSMS$Vdp$$($i$$inline_107_i$$inline_110_sms$$3$$) {
   this.$g$ = this.$u$ = this.$s$ = 0;
   this.$k$ = $JSCompiler_alias_FALSE$$;
   this.$n$ = Array(192);
-  for($i$$14_r$$inline_111$$ = 0;192 > $i$$14_r$$inline_111$$;$i$$14_r$$inline_111$$++) {
-    this.$n$[$i$$14_r$$inline_111$$] = Array(25)
+  for($i$$13_r$$inline_111$$ = 0;192 > $i$$13_r$$inline_111$$;$i$$13_r$$inline_111$$++) {
+    this.$n$[$i$$13_r$$inline_111$$] = Array(25)
   }
   this.$t$ = Array(512);
   this.$v$ = Array(512);
@@ -7183,7 +7159,7 @@ function $JSSMS$Vdp$$($i$$inline_107_i$$inline_110_sms$$3$$) {
   }
   var $g$$inline_112$$, $b$$inline_113$$;
   for($i$$inline_107_i$$inline_110_sms$$3$$ = 0;64 > $i$$inline_107_i$$inline_110_sms$$3$$;$i$$inline_107_i$$inline_110_sms$$3$$++) {
-    $i$$14_r$$inline_111$$ = $i$$inline_107_i$$inline_110_sms$$3$$ & 3, $g$$inline_112$$ = $i$$inline_107_i$$inline_110_sms$$3$$ >> 2 & 3, $b$$inline_113$$ = $i$$inline_107_i$$inline_110_sms$$3$$ >> 4 & 3, this.$H$[$i$$inline_107_i$$inline_110_sms$$3$$] = 85 * $i$$14_r$$inline_111$$ & 255, this.$G$[$i$$inline_107_i$$inline_110_sms$$3$$] = 85 * $g$$inline_112$$ & 255, this.$F$[$i$$inline_107_i$$inline_110_sms$$3$$] = 85 * $b$$inline_113$$ & 255
+    $i$$13_r$$inline_111$$ = $i$$inline_107_i$$inline_110_sms$$3$$ & 3, $g$$inline_112$$ = $i$$inline_107_i$$inline_110_sms$$3$$ >> 2 & 3, $b$$inline_113$$ = $i$$inline_107_i$$inline_110_sms$$3$$ >> 4 & 3, this.$H$[$i$$inline_107_i$$inline_110_sms$$3$$] = 85 * $i$$13_r$$inline_111$$ & 255, this.$G$[$i$$inline_107_i$$inline_110_sms$$3$$] = 85 * $g$$inline_112$$ & 255, this.$F$[$i$$inline_107_i$$inline_110_sms$$3$$] = 85 * $b$$inline_113$$ & 255
   }
   for($i$$inline_107_i$$inline_110_sms$$3$$ = 0;256 > $i$$inline_107_i$$inline_110_sms$$3$$;$i$$inline_107_i$$inline_110_sms$$3$$++) {
     $g$$inline_112$$ = $i$$inline_107_i$$inline_110_sms$$3$$ & 15, $b$$inline_113$$ = $i$$inline_107_i$$inline_110_sms$$3$$ >> 4 & 15, this.$C$[$i$$inline_107_i$$inline_110_sms$$3$$] = ($g$$inline_112$$ << 4 | $g$$inline_112$$) & 255, this.$B$[$i$$inline_107_i$$inline_110_sms$$3$$] = ($b$$inline_113$$ << 4 | $b$$inline_113$$) & 255
@@ -7193,10 +7169,10 @@ function $JSSMS$Vdp$$($i$$inline_107_i$$inline_110_sms$$3$$) {
   }
 }
 $JSSMS$Vdp$$.prototype = {reset:function $$JSSMS$Vdp$$$$reset$() {
-  var $i$$15$$;
+  var $i$$14$$;
   this.$j$ = $JSCompiler_alias_TRUE$$;
-  for($i$$15$$ = this.$r$ = this.$e$ = this.$q$ = this.$f$ = 0;16 > $i$$15$$;$i$$15$$++) {
-    this.$c$[$i$$15$$] = 0
+  for($i$$14$$ = this.$r$ = this.$e$ = this.$q$ = this.$f$ = 0;16 > $i$$14$$;$i$$14$$++) {
+    this.$c$[$i$$14$$] = 0
   }
   this.$c$[2] = 14;
   this.$c$[5] = 126;
@@ -7204,11 +7180,11 @@ $JSSMS$Vdp$$.prototype = {reset:function $$JSSMS$Vdp$$$$reset$() {
   this.$k$ = $JSCompiler_alias_TRUE$$;
   this.$o$ = 512;
   this.$m$ = -1;
-  for($i$$15$$ = 0;16384 > $i$$15$$;$i$$15$$++) {
-    this.$d$[$i$$15$$] = 0
+  for($i$$14$$ = 0;16384 > $i$$14$$;$i$$14$$++) {
+    this.$d$[$i$$14$$] = 0
   }
-  for($i$$15$$ = 0;196608 > $i$$15$$;$i$$15$$ += 4) {
-    this.$b$[$i$$15$$] = 0, this.$b$[$i$$15$$ + 1] = 0, this.$b$[$i$$15$$ + 2] = 0, this.$b$[$i$$15$$ + 3] = 255
+  for($i$$14$$ = 0;196608 > $i$$14$$;$i$$14$$ += 4) {
+    this.$b$[$i$$14$$] = 0, this.$b$[$i$$14$$ + 1] = 0, this.$b$[$i$$14$$ + 2] = 0, this.$b$[$i$$14$$ + 3] = 255
   }
 }};
 function $JSSMS$DummyUI$$() {
