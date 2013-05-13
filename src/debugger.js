@@ -67,9 +67,9 @@ JSSMS.Debugger.prototype = {
      addresses.push(0x18);
      addresses.push(0x20);
      addresses.push(0x28);
-     addresses.push(0x30);
+     addresses.push(0x30);*/
      addresses.push(0x38); // RST 38h and Interrupt.
-     addresses.push(0x66);*/ // Set by NMI.
+     addresses.push(0x66); // Set by NMI.
 
     while (addresses.length) {
       currentAddress = addresses.shift();
