@@ -104,18 +104,21 @@ JSSMS.Utils = {
        * @param {number} value Value to write.
        */
       return function(address, value) {
-        // DEBUG
-        if (DEBUG && ((address >> 14) >= this.memWriteMap.length || !this.memWriteMap[address >> 14] ||
-            (address & 0x3FFF) >= this.memWriteMap[address >> 14].byteLength)) {
-          console.error(address, (address >> 14), (address & 0x3FFF));
+        if (address <= 0xffff) {
+          this.memWriteMap.setInt8(address & 0x1fff, value);
+          if (address == 0xfffc) {
+            this.frameReg[3] = value;
+          } else if (address == 0xfffd) {
+            this.frameReg[0] = value;
+          } else if (address == 0xfffe) {
+            this.frameReg[1] = value;
+          } else if (address == 0xffff) {
+            this.frameReg[2] = value;
+          }
+        } else if (DEBUG) {
+          console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1fff));
           debugger;
         }
-
-        this.memWriteMap[address >> 14].setInt8(address & 0x3FFF, value);
-
-        // Paging registers
-        if (address >= 0xFFFC)
-          this.page(address & 3, value);
       }
     } else {
       /**
@@ -123,11 +126,12 @@ JSSMS.Utils = {
        * @param {number} value Value to write.
        */
       return function(address, value) {
-        this.memWriteMap[address >> 14][address & 0x3FFF] = value;
+        // @todo
+        /*this.memWriteMap[address >> 14][address & 0x3FFF] = value;
 
         // Paging registers
         if (address >= 0xFFFC)
-          this.page(address & 3, value);
+          this.page(address & 3, value);*/
       }
     }
   }(),
@@ -143,14 +147,42 @@ JSSMS.Utils = {
        * @return {number} Value from memory location.
        */
       return function(address) {
-        // DEBUG
-        if (DEBUG && ((address >> 14) >= this.memReadMap.length || !this.memReadMap[address >> 14] ||
-            (address & 0x3FFF) >= this.memReadMap[address >> 14].byteLength)) {
-          console.error(address, (address >> 14), (address & 0x3FFF));
+        if (address < 0x0400) {
+          return this.rom[0].getUint8(address);
+        } else if (address < 0x4000) {
+          return this.rom[this.frameReg[0] & this.romPageMask].getUint8(address);
+        } else if (address < 0x8000) {
+          return this.rom[this.frameReg[1] & this.romPageMask].getUint8(address - 0x4000);
+        } else if (address < 0xc000) {
+          if ((this.frameReg[3] & 12) == 8) {
+            this.useSRAM = true;
+            return this.sram.getUint8(address - 0x8000);
+          } else if ((this.frameReg[3] & 12) == 12) {
+            this.useSRAM = true;
+            return this.sram.getUint8(address - 0x4000);
+          } else {
+            return this.rom[this.frameReg[2] & this.romPageMask].getUint8(address - 0x8000);
+          }
+        } else if (address < 0xe000) {
+          return this.memWriteMap.getUint8(address - 0xc000);
+        } else if (address < 0xfffc) {
+          return this.memWriteMap.getUint8(address - 0xe000);
+        } else if (address == 0xfffc) {
+          // 0xFFFC: RAM/ROM select register
+          return this.frameReg[3];
+        } else if (address == 0xfffd) {
+          // 0xFFFD: Page 0 ROM Bank
+          return this.frameReg[0];
+        } else if (address == 0xfffe) {
+          // 0xFFFE: Page 1 ROM Bank
+          return this.frameReg[1];
+        } else if (address == 0xffff) {
+          // 0xFFFF: Page 2 ROM Bank
+          return this.frameReg[2];
+        } else if (DEBUG) {
+          console.error(JSSMS.Utils.toHex(address));
           debugger;
         }
-
-        return this.memReadMap[address >> 14].getUint8(address & 0x3FFF);
       }
     } else {
       /**
@@ -158,7 +190,8 @@ JSSMS.Utils = {
        * @return {number} Value from memory location.
        */
       return function(address) {
-        return this.memReadMap[address >> 14][address & 0x3FFF] & 0xFF;
+        // @todo
+        //return this.memReadMap[address >> 14][address & 0x3FFF] & 0xFF;
       }
     }
   }(),
@@ -174,18 +207,41 @@ JSSMS.Utils = {
        * @return {number} Value from memory location.
        */
       return function(address) {
-        // DEBUG
-        if (DEBUG && ((address >> 14) >= this.memReadMap.length || !this.memReadMap[address >> 14] ||
-            (address & 0x3FFF) >= this.memReadMap[address >> 14].byteLength)) {
-          console.error(address, (address >> 14), (address & 0x3FFF));
+        if (address < 0x0400) {
+          return this.rom[0].getUint16(address, LITTLE_ENDIAN);
+        } else if (address < 0x4000) {
+          return this.rom[this.frameReg[0] & this.romPageMask].getUint16(address, LITTLE_ENDIAN);
+        } else if (address < 0x8000) {
+          return this.rom[this.frameReg[1] & this.romPageMask].getUint16(address - 0x4000, LITTLE_ENDIAN);
+        } else if (address < 0xc000) {
+          if ((this.frameReg[3] & 12) == 8) {
+            this.useSRAM = true;
+            return this.sram[address - 0x8000];
+          } else if ((this.frameReg[3] & 12) == 12) {
+            this.useSRAM = true;
+            return this.sram[address - 0x4000];
+          } else {
+            return this.rom[this.frameReg[2] & this.romPageMask].getUint16(address - 0x8000, LITTLE_ENDIAN);
+          }
+        } else if (address < 0xe000) {
+          return this.memWriteMap.getUint16(address - 0xc000, LITTLE_ENDIAN);
+        } else if (address < 0xfffc) {
+          return this.memWriteMap.getUint16(address - 0xe000, LITTLE_ENDIAN);
+        } else if (address == 0xfffc) {
+          // 0xFFFC: RAM/ROM select register
+          return this.frameReg[3];
+        } else if (address == 0xfffd) {
+          // 0xFFFD: Page 0 ROM Bank
+          return this.frameReg[0];
+        } else if (address == 0xfffe) {
+          // 0xFFFE: Page 1 ROM Bank
+          return this.frameReg[1];
+        } else if (address == 0xffff) {
+          // 0xFFFF: Page 2 ROM Bank
+          return this.frameReg[2];
+        } else if (DEBUG) {
+          console.error(JSSMS.Utils.toHex(address));
           debugger;
-        }
-
-        if ((address & 0x3FFF) < 0x3FFF) {
-          return this.memReadMap[address >> 14].getUint16(address & 0x3FFF, LITTLE_ENDIAN);
-        } else {
-          return (this.memReadMap[address >> 14].getUint8(address & 0x3FFF)) |
-              ((this.memReadMap[++address >> 14].getUint8(address & 0x3FFF)) << 8);
         }
       }
     } else {
@@ -194,8 +250,9 @@ JSSMS.Utils = {
        * @return {number} Value from memory location.
        */
       return function(address) {
-        return (this.memReadMap[address >> 14][address & 0x3FFF] & 0xFF) |
-            ((this.memReadMap[++address >> 14][address & 0x3FFF] & 0xFF) << 8);
+        // @todo
+        /*return (this.memReadMap[address >> 14][address & 0x3FFF] & 0xFF) |
+            ((this.memReadMap[++address >> 14][address & 0x3FFF] & 0xFF) << 8);*/
       }
     }
   }(),

@@ -302,16 +302,10 @@ JSSMS.Z80 = function(sms) {
   this.rom = [];
 
   /**
-   * RAM.
-   * @type {Array.<Array.<number>>}
-   */
-  this.ram = new Array(2);
-
-  /**
    * SRAM.
    * @type {Array.<Array.<number>>}
    */
-  this.sram = new Array(16);
+  this.sram = JSSMS.Utils.Array(0x8000);
 
   /**
    * Cartridge uses SRAM.
@@ -326,6 +320,11 @@ JSSMS.Z80 = function(sms) {
   this.frameReg = new Array(4);
 
   /**
+   * @type {number}
+   */
+  this.romPageMask = 0;
+
+  /**
    * Total number of 16K cartridge pages.
    * @type {number}
    */
@@ -335,12 +334,7 @@ JSSMS.Z80 = function(sms) {
    * Memory map.
    * @type {Array.<Array>}
    */
-  this.memWriteMap = new Array(17);
-
-  /**
-   * @type {Array.<Array>}
-   */
-  this.memReadMap = new Array(17);
+  this.memWriteMap = JSSMS.Utils.Array(0x2000);
 
   // Precalculated tables for speed purposes
   /** Pre-calculated result for DAA instruction. */
@@ -3106,43 +3100,24 @@ JSSMS.Z80.prototype = {
 
   // MEMORY ACCESS
   /**
-   * @return {Array.<number>}
-   */
-  getDummyWrite: function() {
-    return JSSMS.Utils.Array(Setup.PAGE_SIZE);
-  },
-
-
-  /**
    * Memory constructor.
    */
   generateMemory: function() {
-    // Create read/write memory map (64 positions each representing 1K)
-
-    // Note we create one extra dummy position to get around a dodgy write in
-    // Back to the Future 2.
-
-    for (var i = 0; i < 16; i++) {
-      this.memReadMap[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
-      this.memWriteMap[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
-    }
-
-    // Create 8K System RAM
-    for (i = 0; i < 2; i++) {
-      this.ram[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
+    for (var i = 0; i < 0x2000; i++) {
+      this.memWriteMap.setUint8(i, 0);
     }
 
     // Create 2 x 16K RAM Cartridge Pages
-    for (i = 0; i < 16; i++) {
-      this.sram[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
+    for (i = 0; i < 0x8000; i++) {
+      this.sram.setUint8(i, 0);
     }
     this.useSRAM = false;
 
-    // Ignore bad writes in Back To The Future 2
-    this.memReadMap[16] = this.getDummyWrite();
-    this.memWriteMap[16] = this.getDummyWrite();
-
     this.number_of_pages = 2;
+
+    for (i = 0; i < 4; i++) {
+      this.frameReg[i] = i % 3;
+    }
   },
 
 
@@ -3156,32 +3131,20 @@ JSSMS.Z80.prototype = {
       this.rom = pages;
     }
 
-    this.frameReg[0] = 0;
-    this.frameReg[1] = 0;
-    this.frameReg[2] = 1;
-    this.frameReg[3] = 0;
-
     // Default Mapping
     if (this.rom.length) {
-      // 16K Page Chunks :)
       this.number_of_pages = this.rom.length;
-      this.setDefaultMemoryMapping();
+      this.romPageMask = this.number_of_pages - 1;
+
+      // Paginated memory registers
+      for (var i = 0; i < 3; i++) {
+        this.frameReg[i] = i % this.number_of_pages;
+      }
+      this.frameReg[3] = 0;
     } else {
       this.number_of_pages = 0;
+      this.romPageMask = 0;
     }
-  },
-
-
-  setDefaultMemoryMapping: function() {
-    // Map ROM
-    for (var i = 0; i < 3; i++) {
-      this.memReadMap[i] = this.rom[i];
-      this.memWriteMap[i] = this.getDummyWrite();
-    }
-
-    // Map RAM
-    this.memReadMap[3] = this.ram[0];
-    this.memWriteMap[3] = this.ram[0];
   },
 
 
@@ -3192,75 +3155,6 @@ JSSMS.Z80.prototype = {
    */
   d_: function() {
     return this.readMem(this.pc);
-  },
-
-
-  /**
-   * Write to a paging register.
-   *
-   * $FFFC - Control register
-   *
-   * D7 : 1= /GWR disabled (write protect), 0= /GWR enabled (write enable)
-   * D4 : 1= SRAM mapped to $C000-$FFFF (*1)
-   * D3 : 1= SRAM mapped to $8000-$BFFF, 0= ROM mapped to $8000-$BFFF
-   * D2 : SRAM banking; BA14 state when $8000-$BFFF is accessed (1= high, 0= low)
-   * D1 : Bank shift, bit 1
-   * D0 : Bank shift, bit 0
-   *
-   * @param {number} address Memory location.
-   * @param {number} value Value to write.
-   */
-  page: function(address, value) {
-    var p, offset;
-
-    this.frameReg[address] = value;
-
-    switch (address) {
-      // 0xFFFC: RAM/ROM select register
-      case 0:
-        // 1= SRAM mapped to $8000-$BFFF
-        if ((value & 0x08) != 0) {
-          // SRAM banking; BA14 state when $8000-$BFFF is accessed (1= high, 0= low)
-
-          // 16K offset into SRAM
-          offset = (value & 0x04);
-
-          // Map 16K of SRAM
-          this.memReadMap[2] = this.sram[offset];
-          this.memWriteMap[2] = this.sram[offset];
-
-          this.useSRAM = true;
-        } else {
-          // 0= ROM mapped to $8000-$BFFF
-          p = this.frameReg[3] % this.number_of_pages;
-
-          // Map 16K of ROM
-          this.memReadMap[2] = this.rom[p];
-          this.memWriteMap[2] = this.getDummyWrite();
-        }
-        break;
-
-      // 0xFFFD: Page 0 ROM Bank
-      case 1:
-        p = value % this.number_of_pages;
-        this.memReadMap[0] = this.rom[p];
-        break;
-
-      // 0xFFFE: Page 1 ROM Bank
-      case 2:
-        p = value % this.number_of_pages;
-        this.memReadMap[1] = this.rom[p];
-        break;
-
-      // 0xFFFF: Page 2 ROM Bank
-      case 3:
-        // Map ROM
-        if ((this.frameReg[0] & 0x08) == 0) {
-          p = value % this.number_of_pages;
-          this.memReadMap[2] = this.rom[p];
-        }
-        break;
-    }
   },
 
 
@@ -3288,13 +3182,6 @@ JSSMS.Z80.prototype = {
    */
   setStateMem: function(state) {
     this.frameReg = state;
-
-    this.setDefaultMemoryMapping();
-
-    this.page(3, this.frameReg[3]);
-    this.page(2, this.frameReg[2]);
-    this.page(1, this.frameReg[1]);
-    this.page(0, this.frameReg[0]);
   },
 
 
