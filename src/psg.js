@@ -42,10 +42,10 @@ var SHIFT_RESET = 0x8000;
 
 
 /**
- * SMS Only: Tapped bits are bits 0 and 3 ($0009), fed back into bit 15.
+ * SMS Only: Tapped bits are bits 0 and 3 (0x0009), fed back into bit 15.
  * @const
  */
-var FEEDBACK_PATTERN = 0x9;
+var FEEDBACK_PATTERN = 0x09;
 
 
 // Amplification

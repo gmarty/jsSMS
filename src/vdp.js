@@ -344,7 +344,7 @@ JSSMS.Vdp.prototype = {
    * Force full redraw of entire cache.
    */
   forceFullRedraw: function() {
-    this.bgt = (this.vdpreg[2] & 0x0f & ~0x01) << 10;
+    this.bgt = (this.vdpreg[2] & 0x0F & ~0x01) << 10;
     this.minDirty = 0;
     this.maxDirty = TOTAL_TILES - 1;
     for (var i = 0, l = this.isTileDirty.length; i < l; i++) {
@@ -446,7 +446,7 @@ JSSMS.Vdp.prototype = {
           // BGT Written
           case 2:
             // Address of Background Table in VRAM
-            this.bgt = (this.commandByte & 0x0f & ~0x01) << 10;
+            this.bgt = (this.commandByte & 0x0F & ~0x01) << 10;
             break;
 
           // SAT Written
