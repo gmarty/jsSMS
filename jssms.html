@@ -26,10 +26,14 @@ html, body {
   border-radius: 10px 10px 0 0;
   border: 0;
 }
+#emulator > div {
+  text-align: center;
+}
 .screen {
   height: 192px;
   width: 256px;
   background: #000;
+  margin: auto;
 }
 .screen canvas {
   margin: auto;
@@ -175,12 +179,12 @@ if (!window.$) {
 var sms = new JSSMS({
   'ui': $('#emulator').JSSMSUI({
     'Homebrew Master System working': [
-      ['blockhead', 'roms/homebrew/blockhead.sms'],
+      ['Blockhead', 'roms/homebrew/blockhead.sms'],
       ['KunKun & KokoKun', 'roms/homebrew/KunKun & KokoKun.sms'],
       ['vg-fighter', 'roms/homebrew/vg-fighter.sms'],
       ['Bock\'s Birthday 2011 II', 'roms/homebrew/Bock\'s Birthday 2011 II.sms'],
       ['KunKun & KokoKun 2 - Return of the Kun', 'roms/homebrew/KunKun & KokoKun 2 - Return of the Kun [v0.99].sms'],
-      ['sokoban', 'roms/homebrew/sokoban.sms']
+      ['Sokoban', 'roms/homebrew/sokoban.sms']
     ],
     'Homebrew Master System not working': [
       ['ono', 'roms/homebrew/ono [v1.01].sms'],
