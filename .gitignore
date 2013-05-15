@@ -8,3 +8,5 @@ roms/gg
 *.report.txt
 node_modules/
 .idea/
+min/static/
+static/
