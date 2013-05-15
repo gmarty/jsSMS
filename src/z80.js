@@ -745,7 +745,7 @@ JSSMS.Z80.prototype = {
           this.l = temp;
           break;
         case 0xEC: this.call((this.f & F_PARITY) != 0); break;                        // CALL PE (nn)
-        case 0xED: this.doED(this.readMem(this.pc)); break;                                // ED Opcode
+        case 0xED: this.doED(this.d_()); break;                                // ED Opcode
         case 0xEE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.pc++)]; break;                // XOR n
         case 0xEF: this.push1(this.pc); this.pc = 0x28; break;                                // RST 28H
         case 0xF0: this.ret((this.f & F_SIGN) == 0); break;                           // RET P
