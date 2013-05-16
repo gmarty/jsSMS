@@ -57,20 +57,26 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   if(DEBUGGER) {
     this.cpu.resetDebug()
   }
-  clearInterval(this.fpsInterval)
+  if(DEBUG) {
+    clearInterval(this.fpsInterval)
+  }
 }, start:function() {
   var self = this;
   if(!this.isRunning) {
     this.isRunning = true
   }
   this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
-  this.resetFps();
-  this.fpsInterval = setInterval(function() {
-    self.printFps()
-  }, fpsInterval);
+  if(DEBUG) {
+    this.resetFps();
+    this.fpsInterval = setInterval(function() {
+      self.printFps()
+    }, fpsInterval)
+  }
   this.ui.updateStatus("Running")
 }, stop:function() {
-  clearInterval(this.fpsInterval);
+  if(DEBUG) {
+    clearInterval(this.fpsInterval)
+  }
   this.isRunning = false
 }, frame:function() {
   if(this.isRunning) {
@@ -176,11 +182,9 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
     this.no_of_scanlines = SMS_Y_PIXELS_NTSC;
     clockSpeedHz = CLOCK_NTSC
   }else {
-    if(mode == PAL) {
-      this.fps = 50;
-      this.no_of_scanlines = SMS_Y_PIXELS_PAL;
-      clockSpeedHz = CLOCK_PAL
-    }
+    this.fps = 50;
+    this.no_of_scanlines = SMS_Y_PIXELS_PAL;
+    clockSpeedHz = CLOCK_PAL
   }
   this.cyclesPerLine = Math.round(clockSpeedHz / this.fps / this.no_of_scanlines + 1);
   this.vdp.videoMode = mode;

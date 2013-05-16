@@ -41,7 +41,6 @@ var CLOCK_NTSC = 3579545;
 var CLOCK_PAL = 3546893;
 
 
-
 /**
  * @constructor
  * @param {Object.<string, *>} opts
@@ -277,7 +276,9 @@ JSSMS.prototype = {
       this.cpu.resetDebug();
     }
 
-    clearInterval(this.fpsInterval);
+    if (DEBUG) {
+      clearInterval(this.fpsInterval);
+    }
   },
 
 
@@ -290,17 +291,21 @@ JSSMS.prototype = {
 
     this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
 
-    this.resetFps();
-    this.fpsInterval = setInterval(function() {
-      self.printFps();
-    }, fpsInterval);
+    if (DEBUG) {
+      this.resetFps();
+      this.fpsInterval = setInterval(function() {
+        self.printFps();
+      }, fpsInterval);
+    }
 
     this.ui.updateStatus('Running');
   },
 
 
   stop: function() {
-    clearInterval(this.fpsInterval);
+    if (DEBUG) {
+      clearInterval(this.fpsInterval);
+    }
     this.isRunning = false;
   },
 
@@ -312,8 +317,8 @@ JSSMS.prototype = {
         if (this.emulateNextFrame())
           this.doRepaint();
         //if (minSleep != 0)
-      //Thread.sleep(minSleep);
-      // Throttling, also try a minimum sleep per tick
+        //Thread.sleep(minSleep);
+        // Throttling, also try a minimum sleep per tick
       } else {
         //var startTime = JSSMS.Utils.getTimestamp();
 
@@ -321,15 +326,15 @@ JSSMS.prototype = {
           this.doRepaint();
 
         /*if (ID == J2ME) {
-          long frameTime = JSSMS.Utils.currentTimeMillis() - startTime;
+         long frameTime = JSSMS.Utils.currentTimeMillis() - startTime;
 
-          if (frameTime < targetFrameTime - minSleep) {
-                              Thread.sleep(targetFrameTime - frameTime);
-          } else if (minSleep != 0)
-                              Thread.sleep(minSleep);
-        } else if (ID == J2SE) {
-          platformFunction(this, PLATFORM_THROTTLE);
-        }*/
+         if (frameTime < targetFrameTime - minSleep) {
+         Thread.sleep(targetFrameTime - frameTime);
+         } else if (minSleep != 0)
+         Thread.sleep(minSleep);
+         } else if (ID == J2SE) {
+         platformFunction(this, PLATFORM_THROTTLE);
+         }*/
       }
 
       this.fpsFrameCount++;
@@ -486,14 +491,15 @@ JSSMS.prototype = {
    */
   setVideoTiming: function(mode) {
     var clockSpeedHz = 0,
-        i, v;
+      i, v;
 
     // Game Gear should only work in NTSC
     if (mode == NTSC || this.is_gg) {
       this.fps = 60;
       this.no_of_scanlines = SMS_Y_PIXELS_NTSC;
       clockSpeedHz = CLOCK_NTSC;
-    } else if (mode == PAL) {
+    } else {
+      // PAL
       this.fps = 50;
       this.no_of_scanlines = SMS_Y_PIXELS_PAL;
       clockSpeedHz = CLOCK_PAL;
