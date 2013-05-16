@@ -1,41 +1,49 @@
-src\debugger.js:403: WARNING - assignment
+src\debugger.js:389: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1152: WARNING - assignment
+src\debugger.js:1137: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1192: WARNING - assignment
+src\debugger.js:1177: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1419: WARNING - assignment
+src\debugger.js:1404: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:2442: WARNING - assignment
+src\debugger.js:2482: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:3055: WARNING - assignment
+src\debugger.js:3141: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\sms.js:68: WARNING - cannot instantiate non-constructor
+src\sms.js:67: WARNING - cannot instantiate non-constructor
   this.ui = new opts['ui'](this);
             ^
 
-0 error(s), 7 warning(s), 96.2% typed
+src\z80.js:3087: WARNING - Property setUint8 never defined on JSSMS.Z80.memWriteMap
+        this.memWriteMap.setUint8(i, 0);
+        ^
+
+src\z80.js:3098: WARNING - Property setUint8 never defined on JSSMS.Z80.sram
+        this.sram.setUint8(i, 0);
+        ^
+
+0 error(s), 9 warning(s), 91.8% typed
