@@ -2645,7 +2645,6 @@ JSSMS.Debugger.prototype = {
             '} else {' +
             'this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;' +
             '}' +
-            '' +
             'if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;' +
             'else this.f &= ~ F_NEGATIVE;';
         break;
@@ -2663,70 +2662,72 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xB0:
         inst = 'LDIR';
+        code = 'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
+            'this.incDE();this.incHL();this.decBC();';
         if (Setup.ACCURATE_INTERRUPT_EMULATION) {
           target = address - 2;
-          code = 'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
-              'this.incDE();this.incHL();this.decBC();' +
-              '' +
-              'if (this.getBC() != 0) {' +
+          code += 'if (this.getBC() != 0) {' +
               'this.f |= F_PARITY;' +
               'this.tstates -= 5;' +
               'this.pc = ' + toHex(target) + ';' +
               'return;' +
               '}';
         } else {
-          code = 'for(;this.getBC() != 0; this.f |= F_PARITY, this.tstates -= 5) {' +
+          code += 'for (;this.getBC() != 0; this.f |= F_PARITY, this.tstates -= 5) {' +
               'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
               'this.incDE();this.incHL();this.decBC();' +
               '}';
         }
         code += 'if (!(this.getBC() != 0)) this.f &= ~ F_PARITY;' +
-            '' +
             'this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;';
         break;
       case 0xB1:
-        // @todo Apply peephole optimization here. See OTIR.
-        target = address - 2;
         inst = 'CPIR';
         code = 'temp = (this.f & F_CARRY) | F_NEGATIVE;' +
             'this.cp_a(this.readMem(this.getHL()));' + // sets zero flag for us
             'this.incHL();' +
             'this.decBC();' +
-
-            'temp |= (this.getBC() == 0 ? 0 : F_PARITY);' +
-
-            // Repeat instruction until a = (hl) or bc == 0
-            'if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {' +
-            'this.tstates -= 5;' +
-            'this.pc = ' + toHex(target) + ';' +
-            //'} else {' +
-            //'this.pc++;' +
-            '}' +
-
-            'this.f = (this.f & 0xF8) | temp;'; // Sign set by the cp instruction
+            'temp |= (this.getBC() == 0 ? 0 : F_PARITY);';
+        // Repeat instruction until a = (hl) or bc == 0
+        if (Setup.ACCURATE_INTERRUPT_EMULATION) {
+          target = address - 2;
+          code += 'if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {' +
+              'this.tstates -= 5;' +
+              'this.pc = ' + toHex(target) + ';' +
+              'return;' +
+              '}';
+        } else {
+          code += 'for (;(temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0; this.tstates -= 5) {' +
+              'temp = (this.f & F_CARRY) | F_NEGATIVE;' +
+              'this.cp_a(this.readMem(this.getHL()));' + // sets zero flag for us
+              'this.incHL();' +
+              'this.decBC();' +
+              'temp |= (this.getBC() == 0 ? 0 : F_PARITY);' +
+              '}';
+        }
+        code += 'this.f = (this.f & 0xF8) | temp;'; // Sign set by the cp instruction
         break;
       case 0xB2:
         inst = 'INIR';
         break;
       case 0xB3:
         inst = 'OTIR';
+        code = 'temp = this.readMem(this.getHL());' +
+            // (C) <- (HL)
+            'this.port.out(this.c, temp);' +
+            // B <- B -1
+            'this.b = this.dec8(this.b);' +
+            // HL <- HL + 1
+            'this.incHL();';
         if (Setup.ACCURATE_INTERRUPT_EMULATION) {
           target = address - 2;
-          code = 'temp = this.readMem(this.getHL());' +
-              // (C) <- (HL)
-              'this.port.out(this.c, temp);' +
-              // B <- B -1
-              'this.b = this.dec8(this.b);' +
-              // HL <- HL + 1
-              'this.incHL();' +
-              '' +
-              'if (this.b != 0) {' +
+          code += 'if (this.b != 0) {' +
               'this.tstates -= 5;' +
               'this.pc = ' + toHex(target) + ';' +
               'return;' +
               '}';
         } else {
-          code = 'for(;this.b != 0; this.tstates -= 5) {' +
+          code += 'for (;this.b != 0; this.tstates -= 5) {' +
               'temp = this.readMem(this.getHL());' +
               // (C) <- (HL)
               'this.port.out(this.c, temp);' +
@@ -2741,7 +2742,6 @@ JSSMS.Debugger.prototype = {
             '} else {' +
             'this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;' +
             '}' +
-            '' +
             'if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;' +
             'else this.f &= ~ F_NEGATIVE;';
         break;

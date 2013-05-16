@@ -7026,7 +7026,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 163:
       inst = "OUTI";
-      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.incHL();" + "this.b = this.dec8(this.b);" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.incHL();" + "this.b = this.dec8(this.b);" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 168:
       inst = "LDD";
@@ -7042,31 +7042,39 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 176:
       inst = "LDIR";
+      code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();";
       if(Setup.ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
-        code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "" + "if (this.getBC() != 0) {" + "this.f |= F_PARITY;" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
+        code += "if (this.getBC() != 0) {" + "this.f |= F_PARITY;" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
       }else {
-        code = "for(;this.getBC() != 0; this.f |= F_PARITY, this.tstates -= 5) {" + "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "}"
+        code += "for (;this.getBC() != 0; this.f |= F_PARITY, this.tstates -= 5) {" + "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "}"
       }
-      code += "if (!(this.getBC() != 0)) this.f &= ~ F_PARITY;" + "" + "this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
+      code += "if (!(this.getBC() != 0)) this.f &= ~ F_PARITY;" + "this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
       break;
     case 177:
-      target = address - 2;
       inst = "CPIR";
-      code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);" + "if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "}" + "this.f = (this.f & 0xF8) | temp;";
+      code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);";
+      if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+        target = address - 2;
+        code += "if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
+      }else {
+        code += "for (;(temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0; this.tstates -= 5) {" + "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);" + "}"
+      }
+      code += "this.f = (this.f & 0xF8) | temp;";
       break;
     case 178:
       inst = "INIR";
       break;
     case 179:
       inst = "OTIR";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();";
       if(Setup.ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
-        code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
+        code += "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
       }else {
-        code = "for(;this.b != 0; this.tstates -= 5) {" + "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "}"
+        code += "for (;this.b != 0; this.tstates -= 5) {" + "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "}"
       }
-      code += "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code += "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 184:
       inst = "LDDR";
