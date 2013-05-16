@@ -303,7 +303,7 @@ JSSMS.Z80 = function(sms) {
 
   /**
    * SRAM.
-   * @type {Array.<Array.<number>>}
+   * @type {Array.<number>}
    */
   this.sram = JSSMS.Utils.Array(0x8000);
 
@@ -332,7 +332,7 @@ JSSMS.Z80 = function(sms) {
 
   /**
    * Memory map.
-   * @type {Array.<Array>}
+   * @type {Array.<number>}
    */
   this.memWriteMap = JSSMS.Utils.Array(0x2000);
 
@@ -369,33 +369,6 @@ JSSMS.Z80 = function(sms) {
 
   // Generate memory arrays
   this.generateMemory();
-
-
-  /**
-   * Write to a memory location.
-   *
-   * @param {number} address Memory address.
-   * @param {number} value Value to write.
-   */
-  this.writeMem = JSSMS.Utils.writeMem.bind(this);
-
-
-  /**
-   * Read from a memory location.
-   *
-   * @param {number} address Memory location.
-   * @return {number} Value from memory location.
-   */
-  this.readMem = JSSMS.Utils.readMem.bind(this);
-
-
-  /**
-   * Read a word (two bytes) from a memory location.
-   *
-   * @param {number} address Memory address.
-   * @return {number} Value from memory location.
-   */
-  this.readMemWord = JSSMS.Utils.readMemWord.bind(this);
 };
 
 JSSMS.Z80.prototype = {
@@ -592,7 +565,7 @@ JSSMS.Z80.prototype = {
    */
   push1: function(value) {
     this.writeMem(--this.sp, value >> 8);   // (SP - 1) <- high
-    this.writeMem(--this.sp, value & 0xff); // (SP - 2) <- low
+    this.writeMem(--this.sp, value & 0xFF); // (SP - 2) <- low
   },
 
 
@@ -667,7 +640,7 @@ JSSMS.Z80.prototype = {
    */
   rlc: function(value) {
     var carry = (value & 0x80) >> 7;
-    value = ((value << 1) | (value >> 7)) & 0xff;
+    value = ((value << 1) | (value >> 7)) & 0xFF;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
@@ -681,7 +654,7 @@ JSSMS.Z80.prototype = {
    */
   rrc: function(value) {
     var carry = (value & 0x01);
-    value = ((value >> 1) | (value << 7)) & 0xff;
+    value = ((value >> 1) | (value << 7)) & 0xFF;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
@@ -695,7 +668,7 @@ JSSMS.Z80.prototype = {
    */
   rl: function(value) {
     var carry = (value & 0x80) >> 7;
-    value = ((value << 1) | (this.f & F_CARRY)) & 0xff;
+    value = ((value << 1) | (this.f & F_CARRY)) & 0xFF;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
@@ -709,7 +682,7 @@ JSSMS.Z80.prototype = {
    */
   rr: function(value) {
     var carry = (value & 0x01);
-    value = ((value >> 1) | (this.f << 7)) & 0xff;
+    value = ((value >> 1) | (this.f << 7)) & 0xFF;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
@@ -723,7 +696,7 @@ JSSMS.Z80.prototype = {
    */
   sla: function(value) {
     var carry = (value & 0x80) >> 7;
-    value = (value << 1) & 0xff;
+    value = (value << 1) & 0xFF;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
@@ -737,7 +710,7 @@ JSSMS.Z80.prototype = {
    */
   sll: function(value) {
     var carry = (value & 0x80) >> 7;
-    value = ((value << 1) | 1) & 0xff;
+    value = ((value << 1) | 1) & 0xFF;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
@@ -765,7 +738,7 @@ JSSMS.Z80.prototype = {
    */
   srl: function(value) {
     var carry = value & 0x01;
-    value = (value >> 1) & 0xff;
+    value = (value >> 1) & 0xFF;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
@@ -832,10 +805,10 @@ JSSMS.Z80.prototype = {
     var correction = 0;
     var carry = (flags & F_CARRY);
     var carry_copy = carry;
-    if ((flags & F_HALFCARRY) != 0 || (a_copy & 0x0f) > 0x09) {
+    if ((flags & F_HALFCARRY) != 0 || (a_copy & 0x0F) > 0x09) {
       correction |= 0x06;
     }
-    if ((carry == 1) || (a_copy > 0x9f) || ((a_copy > 0x8f) && ((a_copy & 0x0f) > 0x09))) {
+    if ((carry == 1) || (a_copy > 0x9F) || ((a_copy > 0x8F) && ((a_copy & 0x0F) > 0x09))) {
       correction |= 0x60;
       carry_copy = 1;
     }
@@ -850,12 +823,12 @@ JSSMS.Z80.prototype = {
       this.add_a(correction);
     }
 
-    flags = (this.f & 0xfe) | carry_copy;
+    flags = (this.f & 0xFE) | carry_copy;
 
     if (this.getParity(this.a)) {
-      flags = (flags & 0xfb) | F_PARITY;
+      flags = (flags & 0xFB) | F_PARITY;
     } else {
-      flags = (flags & 0xfb);
+      flags = (flags & 0xFB);
     }
 
     return this.a | (flags << 8);
@@ -869,7 +842,7 @@ JSSMS.Z80.prototype = {
    * @param {number} value Value to add.
    */
   add_a: function(value) {
-    var temp = (this.a + value) & 0xff;
+    var temp = (this.a + value) & 0xFF;
     this.f = this.SZHVC_ADD_TABLE[(this.a << 8) | temp];
     this.a = temp;
   },
@@ -882,7 +855,7 @@ JSSMS.Z80.prototype = {
    */
   adc_a: function(value) {
     var carry = this.f & F_CARRY;
-    var temp = (this.a + value + carry) & 0xff;
+    var temp = (this.a + value + carry) & 0xFF;
     this.f = this.SZHVC_ADD_TABLE[(carry << 16) | (this.a << 8) | temp];
     this.a = temp;
   },
@@ -894,7 +867,7 @@ JSSMS.Z80.prototype = {
    * @param {number} value Value to subtract.
    */
   sub_a: function(value) {
-    var temp = (this.a - value) & 0xff;
+    var temp = (this.a - value) & 0xFF;
     this.f = this.SZHVC_SUB_TABLE[(this.a << 8) | temp];
     this.a = temp;
   },
@@ -907,7 +880,7 @@ JSSMS.Z80.prototype = {
    */
   sbc_a: function(value) {
     var carry = this.f & F_CARRY;
-    var temp = (this.a - value - carry) & 0xff;
+    var temp = (this.a - value - carry) & 0xFF;
     this.f = this.SZHVC_SUB_TABLE[(carry << 16) | (this.a << 8) | temp];
     this.a = temp;
   },
@@ -920,7 +893,7 @@ JSSMS.Z80.prototype = {
    */
   cp_a: function(value) {
     // Subtract value from accumulator but discard result
-    this.f = this.SZHVC_SUB_TABLE[(this.a << 8) | ((this.a - value) & 0xff)];
+    this.f = this.SZHVC_SUB_TABLE[(this.a << 8) | ((this.a - value) & 0xFF)];
   },
 
 
@@ -940,8 +913,8 @@ JSSMS.Z80.prototype = {
    */
   rra_a: function() {
     var carry = this.a & 1; // bit 1 rotates to carry flag
-    this.a = ((this.a >> 1) | (this.f & F_CARRY) << 7) & 0xff; // Shift Right One Bit Position
-    this.f = (this.f & 0xec) | carry;
+    this.a = ((this.a >> 1) | (this.f & F_CARRY) << 7) & 0xFF; // Shift Right One Bit Position
+    this.f = (this.f & 0xEC) | carry;
   },
 
 
@@ -950,8 +923,8 @@ JSSMS.Z80.prototype = {
    */
   rla_a: function() {
     var carry = this.a >> 7; // bit 7 rotates to carry flag
-    this.a = ((this.a << 1) | (this.f & F_CARRY)) & 0xff;
-    this.f = (this.f & 0xec) | carry;
+    this.a = ((this.a << 1) | (this.f & F_CARRY)) & 0xFF;
+    this.f = (this.f & 0xEC) | carry;
   },
 
 
@@ -963,10 +936,10 @@ JSSMS.Z80.prototype = {
     var carry = this.a >> 7;
 
     // Shift register left
-    this.a = ((this.a << 1) & 0xff) | carry;
+    this.a = ((this.a << 1) & 0xFF) | carry;
 
     // Retain Sign, Zero, Bit 5, Bit 3 and Parity
-    this.f = (this.f & 0xec) | carry;
+    this.f = (this.f & 0xEC) | carry;
   },
 
 
@@ -979,7 +952,7 @@ JSSMS.Z80.prototype = {
     this.a = (this.a >> 1) | (carry << 7);
 
     // Retain Sign, Zero, Bit 5, Bit 3 and Parity
-    this.f = (this.f & 0xec) | carry;
+    this.f = (this.f & 0xEC) | carry;
   },
 
 
@@ -1029,7 +1002,7 @@ JSSMS.Z80.prototype = {
    */
   setBC: function(value) {
     this.b = (value >> 8);
-    this.c = value & 0xff;
+    this.c = value & 0xFF;
   },
 
 
@@ -1038,7 +1011,7 @@ JSSMS.Z80.prototype = {
    */
   setDE: function(value) {
     this.d = (value >> 8);
-    this.e = value & 0xff;
+    this.e = value & 0xFF;
   },
 
 
@@ -1047,7 +1020,7 @@ JSSMS.Z80.prototype = {
    */
   setHL: function(value) {
     this.h = (value >> 8);
-    this.l = value & 0xff;
+    this.l = value & 0xFF;
   },
 
 
@@ -1056,7 +1029,7 @@ JSSMS.Z80.prototype = {
    */
   setIX: function(value) {
     this.ixH = (value >> 8);
-    this.ixL = value & 0xff;
+    this.ixL = value & 0xFF;
   },
 
 
@@ -1065,67 +1038,67 @@ JSSMS.Z80.prototype = {
    */
   setIY: function(value) {
     this.iyH = (value >> 8);
-    this.iyL = value & 0xff;
+    this.iyL = value & 0xFF;
   },
 
 
   incBC: function() {
-    this.c = (this.c + 1) & 0xff;
-    if (this.c == 0) this.b = (this.b + 1) & 0xff;
+    this.c = (this.c + 1) & 0xFF;
+    if (this.c == 0) this.b = (this.b + 1) & 0xFF;
   },
 
 
   incDE: function() {
-    this.e = (this.e + 1) & 0xff;
-    if (this.e == 0) this.d = (this.d + 1) & 0xff;
+    this.e = (this.e + 1) & 0xFF;
+    if (this.e == 0) this.d = (this.d + 1) & 0xFF;
   },
 
 
   incHL: function() {
-    this.l = (this.l + 1) & 0xff;
-    if (this.l == 0) this.h = (this.h + 1) & 0xff;
+    this.l = (this.l + 1) & 0xFF;
+    if (this.l == 0) this.h = (this.h + 1) & 0xFF;
   },
 
 
   incIX: function() {
-    this.ixL = (this.ixL + 1) & 0xff;
-    if (this.ixL == 0) this.ixH = (this.ixH + 1) & 0xff;
+    this.ixL = (this.ixL + 1) & 0xFF;
+    if (this.ixL == 0) this.ixH = (this.ixH + 1) & 0xFF;
   },
 
 
   incIY: function() {
-    this.iyL = (this.iyL + 1) & 0xff;
-    if (this.iyL == 0) this.iyH = (this.iyH + 1) & 0xff;
+    this.iyL = (this.iyL + 1) & 0xFF;
+    if (this.iyL == 0) this.iyH = (this.iyH + 1) & 0xFF;
   },
 
 
   decBC: function() {
-    this.c = (this.c - 1) & 0xff;
-    if (this.c == 255) this.b = (this.b - 1) & 0xff;
+    this.c = (this.c - 1) & 0xFF;
+    if (this.c == 255) this.b = (this.b - 1) & 0xFF;
   },
 
 
   decDE: function() {
-    this.e = (this.e - 1) & 0xff;
-    if (this.e == 255) this.d = (this.d - 1) & 0xff;
+    this.e = (this.e - 1) & 0xFF;
+    if (this.e == 255) this.d = (this.d - 1) & 0xFF;
   },
 
 
   decHL: function() {
-    this.l = (this.l - 1) & 0xff;
-    if (this.l == 255) this.h = (this.h - 1) & 0xff;
+    this.l = (this.l - 1) & 0xFF;
+    if (this.l == 255) this.h = (this.h - 1) & 0xFF;
   },
 
 
   decIX: function() {
-    this.ixL = (this.ixL - 1) & 0xff;
-    if (this.ixL == 255) this.ixH = (this.ixH - 1) & 0xff;
+    this.ixL = (this.ixL - 1) & 0xFF;
+    if (this.ixL == 255) this.ixH = (this.ixH - 1) & 0xFF;
   },
 
 
   decIY: function() {
-    this.iyL = (this.iyL - 1) & 0xff;
-    if (this.iyL == 255) this.iyH = (this.iyH - 1) & 0xff;
+    this.iyL = (this.iyL - 1) & 0xFF;
+    if (this.iyL == 255) this.iyH = (this.iyH - 1) & 0xFF;
   },
 
 
@@ -1134,7 +1107,7 @@ JSSMS.Z80.prototype = {
    * @return {number}
    */
   inc8: function(value) {
-    value = (value + 1) & 0xff;
+    value = (value + 1) & 0xFF;
     this.f = (this.f & F_CARRY) | this.SZHV_INC_TABLE[value];
     return value;
   },
@@ -1145,7 +1118,7 @@ JSSMS.Z80.prototype = {
    * @return {number}
    */
   dec8: function(value) {
-    value = (value - 1) & 0xff;
+    value = (value - 1) & 0xFF;
     this.f = (this.f & F_CARRY) | this.SZHV_DEC_TABLE[value];
     return value;
   },
@@ -1183,8 +1156,8 @@ JSSMS.Z80.prototype = {
    */
   add16: function(reg, value) {
     var result = reg + value;
-    this.f = (this.f & 0xc4) | (((reg ^ result ^ value) >> 8) & 0x10) | ((result >> 16) & 1);
-    return result & 0xffff;
+    this.f = (this.f & 0xC4) | (((reg ^ result ^ value) >> 8) & 0x10) | ((result >> 16) & 1);
+    return result & 0xFFFF;
   },
 
 
@@ -1198,9 +1171,9 @@ JSSMS.Z80.prototype = {
     var hl = this.getHL();
 
     var result = hl + value + (this.f & F_CARRY);
-    this.f = (((hl ^ result ^ value) >> 8) & 0x10) | ((result >> 16) & 1) | ((result >> 8) & 0x80) | (((result & 0xffff) != 0) ? 0 : 0x40) | (((value ^ hl ^ 0x8000) & (value ^ result) & 0x8000) >> 13);
-    this.h = (result >> 8) & 0xff;
-    this.l = result & 0xff;
+    this.f = (((hl ^ result ^ value) >> 8) & 0x10) | ((result >> 16) & 1) | ((result >> 8) & 0x80) | (((result & 0xFFFF) != 0) ? 0 : 0x40) | (((value ^ hl ^ 0x8000) & (value ^ result) & 0x8000) >> 13);
+    this.h = (result >> 8) & 0xFF;
+    this.l = result & 0xFF;
   },
 
 
@@ -1214,9 +1187,9 @@ JSSMS.Z80.prototype = {
     var hl = this.getHL();
 
     var result = hl - value - (this.f & F_CARRY);
-    this.f = (((hl ^ result ^ value) >> 8) & 0x10) | 0x02 | ((result >> 16) & 1) | ((result >> 8) & 0x80) | (((result & 0xffff) != 0) ? 0 : 0x40) | (((value ^ hl) & (hl ^ result) & 0x8000) >> 13);
-    this.h = (result >> 8) & 0xff;
-    this.l = result & 0xff;
+    this.f = (((hl ^ result ^ value) >> 8) & 0x10) | 0x02 | ((result >> 16) & 1) | ((result >> 8) & 0x80) | (((result & 0xFFFF) != 0) ? 0 : 0x40) | (((value ^ hl) & (hl ^ result) & 0x8000) >> 13);
+    this.h = (result >> 8) & 0xFF;
+    this.l = result & 0xFF;
   },
 
 
@@ -1272,12 +1245,12 @@ JSSMS.Z80.prototype = {
       // Generate table for inc8 instruction
       this.SZHV_INC_TABLE[i] = (sf | zf | yf | xf);
       this.SZHV_INC_TABLE[i] |= (i == 0x80) ? F_OVERFLOW : 0;
-      this.SZHV_INC_TABLE[i] |= ((i & 0x0f) == 0x00) ? F_HALFCARRY : 0;
+      this.SZHV_INC_TABLE[i] |= ((i & 0x0F) == 0x00) ? F_HALFCARRY : 0;
 
       // Generate table for dec8 instruction
       this.SZHV_DEC_TABLE[i] = (sf | zf | yf | xf | F_NEGATIVE);
       this.SZHV_DEC_TABLE[i] |= (i == 0x7F) ? F_OVERFLOW : 0;
-      this.SZHV_DEC_TABLE[i] |= ((i & 0x0f) == 0x0F) ? F_HALFCARRY : 0;
+      this.SZHV_DEC_TABLE[i] |= ((i & 0x0F) == 0x0F) ? F_HALFCARRY : 0;
 
       // Generate table for bit instruction (set sign flag on here)
       this.SZ_BIT_TABLE[i] = ((i != 0) ? i & 0x80 : F_ZERO | F_PARITY);
@@ -1307,7 +1280,7 @@ JSSMS.Z80.prototype = {
 
         this.SZHVC_ADD_TABLE[padd] |= (newval & (F_BIT5 | F_BIT3)); /* undocumented flag bits 5+3 */
 
-        if ((newval & 0x0f) < (oldval & 0x0f)) {
+        if ((newval & 0x0F) < (oldval & 0x0F)) {
           this.SZHVC_ADD_TABLE[padd] |= F_HALFCARRY;
         }
         if (newval < oldval) {
@@ -1331,7 +1304,7 @@ JSSMS.Z80.prototype = {
         }
 
         this.SZHVC_ADD_TABLE[padc] |= (newval & (F_BIT5 | F_BIT3)); /* undocumented flag bits 5+3 */
-        if ((newval & 0x0f) <= (oldval & 0x0f)) {
+        if ((newval & 0x0F) <= (oldval & 0x0F)) {
           this.SZHVC_ADD_TABLE[padc] |= F_HALFCARRY;
         }
         if (newval <= oldval) {
@@ -1355,7 +1328,7 @@ JSSMS.Z80.prototype = {
         }
 
         this.SZHVC_SUB_TABLE[psub] |= (newval & (F_BIT5 | F_BIT3)); /* undocumented flag bits 5+3 */
-        if ((newval & 0x0f) > (oldval & 0x0f)) {
+        if ((newval & 0x0F) > (oldval & 0x0F)) {
           this.SZHVC_SUB_TABLE[psub] |= F_HALFCARRY;
         }
         if (newval > oldval) {
@@ -1379,7 +1352,7 @@ JSSMS.Z80.prototype = {
         }
 
         this.SZHVC_SUB_TABLE[psbc] |= (newval & (F_BIT5 | F_BIT3)); /* undocumented flag bits 5+3 */
-        if ((newval & 0x0f) >= (oldval & 0x0f)) {
+        if ((newval & 0x0F) >= (oldval & 0x0F)) {
           this.SZHVC_SUB_TABLE[psbc] |= F_HALFCARRY;
         }
         if (newval >= oldval) {
@@ -1418,14 +1391,24 @@ JSSMS.Z80.prototype = {
    * Memory constructor.
    */
   generateMemory: function() {
-    for (var i = 0; i < 0x2000; i++) {
-      this.memWriteMap.setUint8(i, 0);
-    }
+    if (SUPPORT_DATAVIEW)
+      for (var i = 0; i < 0x2000; i++) {
+        this.memWriteMap.setUint8(i, 0);
+      }
+    else
+      for (var i = 0; i < 0x2000; i++) {
+        this.memWriteMap[i] = 0;
+      }
 
     // Create 2 x 16K RAM Cartridge Pages
-    for (i = 0; i < 0x8000; i++) {
-      this.sram.setUint8(i, 0);
-    }
+    if (SUPPORT_DATAVIEW)
+      for (i = 0; i < 0x8000; i++) {
+        this.sram.setUint8(i, 0);
+      }
+    else
+      for (i = 0; i < 0x8000; i++) {
+        this.sram[i] = 0;
+      }
     this.useSRAM = false;
 
     this.number_of_pages = 2;
@@ -1474,6 +1457,250 @@ JSSMS.Z80.prototype = {
 
 
   /**
+   * Write to a memory location.
+   */
+  writeMem: function() {
+    if (SUPPORT_DATAVIEW) {
+      /**
+       * @param {number} address Memory address.
+       * @param {number} value Value to write.
+       */
+      return function(address, value) {
+        if (address <= 0xFFFF) {
+          this.memWriteMap.setInt8(address & 0x1FFF, value);
+          if (address == 0xFFFC) {
+            this.frameReg[3] = value;
+          } else if (address == 0xFFFD) {
+            this.frameReg[0] = value;
+          } else if (address == 0xFFFE) {
+            this.frameReg[1] = value;
+          } else if (address == 0xFFFF) {
+            this.frameReg[2] = value;
+          }
+        } else if (DEBUG) {
+          console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
+          debugger;
+        }
+      }
+    } else {
+      /**
+       * @param {number} address Memory address.
+       * @param {number} value Value to write.
+       */
+      return function(address, value) {
+        if (address <= 0xFFFF) {
+          this.memWriteMap[address & 0x1FFF] = value;
+          if (address == 0xFFFC) {
+            this.frameReg[3] = value;
+          } else if (address == 0xFFFD) {
+            this.frameReg[0] = value;
+          } else if (address == 0xFFFE) {
+            this.frameReg[1] = value;
+          } else if (address == 0xFFFF) {
+            this.frameReg[2] = value;
+          }
+        } else if (DEBUG) {
+          console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
+          debugger;
+        }
+      }
+    }
+  }(),
+
+
+  /**
+   * Read a signed value from next memory location.
+   */
+  readMem: function() {
+    if (SUPPORT_DATAVIEW) {
+      /**
+       * @param {number} address
+       * @return {number} Value from memory location.
+       */
+      return function(address) {
+        if (address < 0x0400) {
+          return this.rom[0].getUint8(address);
+        } else if (address < 0x4000) {
+          return this.rom[this.frameReg[0] & this.romPageMask].getUint8(address);
+        } else if (address < 0x8000) {
+          return this.rom[this.frameReg[1] & this.romPageMask].getUint8(address - 0x4000);
+        } else if (address < 0xC000) {
+          if ((this.frameReg[3] & 12) == 8) {
+            this.useSRAM = true;
+            return this.sram.getUint8(address - 0x8000);
+          } else if ((this.frameReg[3] & 12) == 12) {
+            this.useSRAM = true;
+            return this.sram.getUint8(address - 0x4000);
+          } else {
+            return this.rom[this.frameReg[2] & this.romPageMask].getUint8(address - 0x8000);
+          }
+        } else if (address < 0xE000) {
+          return this.memWriteMap.getUint8(address - 0xC000);
+        } else if (address < 0xFFFC) {
+          return this.memWriteMap.getUint8(address - 0xE000);
+        } else if (address == 0xFFFC) {
+          // 0xFFFC: RAM/ROM select register
+          return this.frameReg[3];
+        } else if (address == 0xFFFD) {
+          // 0xFFFD: Page 0 ROM Bank
+          return this.frameReg[0];
+        } else if (address == 0xFFFE) {
+          // 0xFFFE: Page 1 ROM Bank
+          return this.frameReg[1];
+        } else if (address == 0xFFFF) {
+          // 0xFFFF: Page 2 ROM Bank
+          return this.frameReg[2];
+        } else if (DEBUG) {
+          console.error(JSSMS.Utils.toHex(address));
+          debugger;
+        }
+        return 0x00;
+      }
+    } else {
+      /**
+       * @param {number} address
+       * @return {number} Value from memory location.
+       */
+      return function(address) {
+        if (address < 0x0400) {
+          return this.rom[0][address];
+        } else if (address < 0x4000) {
+          return this.rom[this.frameReg[0] & this.romPageMask][address];
+        } else if (address < 0x8000) {
+          return this.rom[this.frameReg[1] & this.romPageMask][address - 0x4000];
+        } else if (address < 0xc000) {
+          if ((this.frameReg[3] & 12) == 8) {
+            this.useSRAM = true;
+            return this.sram[address - 0x8000];
+          } else if ((this.frameReg[3] & 12) == 12) {
+            this.useSRAM = true;
+            return this.sram[address - 0x4000];
+          } else {
+            return this.rom[this.frameReg[2] & this.romPageMask][address - 0x8000];
+          }
+        } else if (address < 0xE000) {
+          return this.memWriteMap[address - 0xC000];
+        } else if (address < 0xFFFC) {
+          return this.memWriteMap[address - 0xE000];
+        } else if (address == 0xFFFC) {
+          // 0xFFFC: RAM/ROM select register
+          return this.frameReg[3];
+        } else if (address == 0xFFFD) {
+          // 0xFFFD: Page 0 ROM Bank
+          return this.frameReg[0];
+        } else if (address == 0xFFFE) {
+          // 0xFFFE: Page 1 ROM Bank
+          return this.frameReg[1];
+        } else if (address == 0xFFFF) {
+          // 0xFFFF: Page 2 ROM Bank
+          return this.frameReg[2];
+        } else if (DEBUG) {
+          console.error(JSSMS.Utils.toHex(address));
+          debugger;
+        }
+        return 0x00;
+      }
+    }
+  }(),
+
+
+  /**
+   * Read a word (two bytes) from a memory location.
+   */
+  readMemWord: function() {
+    if (SUPPORT_DATAVIEW) {
+      /**
+       * @param {number} address
+       * @return {number} Value from memory location.
+       */
+      return function(address) {
+        if (address < 0x0400) {
+          return this.rom[0].getUint16(address, LITTLE_ENDIAN);
+        } else if (address < 0x4000) {
+          return this.rom[this.frameReg[0] & this.romPageMask].getUint16(address, LITTLE_ENDIAN);
+        } else if (address < 0x8000) {
+          return this.rom[this.frameReg[1] & this.romPageMask].getUint16(address - 0x4000, LITTLE_ENDIAN);
+        } else if (address < 0xC000) {
+          if ((this.frameReg[3] & 12) == 8) {
+            this.useSRAM = true;
+            return this.sram[address - 0x8000];
+          } else if ((this.frameReg[3] & 12) == 12) {
+            this.useSRAM = true;
+            return this.sram[address - 0x4000];
+          } else {
+            return this.rom[this.frameReg[2] & this.romPageMask].getUint16(address - 0x8000, LITTLE_ENDIAN);
+          }
+        } else if (address < 0xE000) {
+          return this.memWriteMap.getUint16(address - 0xC000, LITTLE_ENDIAN);
+        } else if (address < 0xFFFC) {
+          return this.memWriteMap.getUint16(address - 0xE000, LITTLE_ENDIAN);
+        } else if (address == 0xFFFC) {
+          // 0xFFFC: RAM/ROM select register
+          return this.frameReg[3];
+        } else if (address == 0xFFFD) {
+          // 0xFFFD: Page 0 ROM Bank
+          return this.frameReg[0];
+        } else if (address == 0xFFFE) {
+          // 0xFFFE: Page 1 ROM Bank
+          return this.frameReg[1];
+        } else if (address == 0xFFFF) {
+          // 0xFFFF: Page 2 ROM Bank
+          return this.frameReg[2];
+        } else if (DEBUG) {
+          console.error(JSSMS.Utils.toHex(address));
+          debugger;
+        }
+        return 0x00;
+      }
+    } else {
+      /**
+       * @param {number} address
+       * @return {number} Value from memory location.
+       */
+      return function(address) {
+        if (address < 0x0400) {
+          return this.rom[0][address] | this.rom[0][++address] << 8;
+        } else if (address < 0x4000) {
+          return this.rom[this.frameReg[0] & this.romPageMask][address] | this.rom[this.frameReg[0] & this.romPageMask][++address] << 8;
+        } else if (address < 0x8000) {
+          return this.rom[this.frameReg[1] & this.romPageMask][address - 0x4000] | this.rom[this.frameReg[1] & this.romPageMask][++address - 0x4000] << 8;
+        } else if (address < 0xC000) {
+          if ((this.frameReg[3] & 12) == 8) {
+            this.useSRAM = true;
+            return this.sram[address - 0x8000] | this.sram[++address - 0x8000] << 8;
+          } else if ((this.frameReg[3] & 12) == 12) {
+            this.useSRAM = true;
+            return this.sram[address - 0x4000] | this.sram[++address - 0x4000] << 8;
+          } else {
+            return this.rom[this.frameReg[2] & this.romPageMask][address - 0x8000] | this.rom[this.frameReg[2] & this.romPageMask][++address - 0x8000] << 8;
+          }
+        } else if (address < 0xE000) {
+          return this.memWriteMap[address - 0xC000] | this.memWriteMap[++address - 0xC000] << 8;
+        } else if (address < 0xFFFC) {
+          return this.memWriteMap[address - 0xE000] | this.memWriteMap[++address - 0xE000] << 8;
+        } else if (address == 0xFFFC) {
+          // 0xFFFC: RAM/ROM select register
+          return this.frameReg[3];
+        } else if (address == 0xFFFD) {
+          // 0xFFFD: Page 0 ROM Bank
+          return this.frameReg[0];
+        } else if (address == 0xFFFE) {
+          // 0xFFFE: Page 1 ROM Bank
+          return this.frameReg[1];
+        } else if (address == 0xFFFF) {
+          // 0xFFFF: Page 2 ROM Bank
+          return this.frameReg[2];
+        } else if (DEBUG) {
+          console.error(JSSMS.Utils.toHex(address));
+          debugger;
+        }
+        return 0x00;
+      }
+    }
+  }(),
+
+
+  /**
    * @return {boolean}
    */
   hasUsedSRAM: function() {
@@ -1497,8 +1724,6 @@ JSSMS.Z80.prototype = {
    */
   setStateMem: function(state) {
     this.frameReg = state;
-
-    this.setDefaultMemoryMapping();
   },
 
 

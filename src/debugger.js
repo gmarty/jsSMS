@@ -68,8 +68,8 @@ JSSMS.Debugger.prototype = {
      addresses.push(0x20);
      addresses.push(0x28);
      addresses.push(0x30);*/
-     addresses.push(0x38); // RST 38h and Interrupt.
-     addresses.push(0x66); // Set by NMI.
+    addresses.push(0x38); // RST 38h and Interrupt.
+    addresses.push(0x66); // Set by NMI.
 
     while (addresses.length) {
       currentAddress = addresses.shift();
@@ -196,6 +196,7 @@ JSSMS.Debugger.prototype = {
     if (Setup.REFRESH_EMULATION)
       code.push('this.incR();');
 
+    code.push('console.log(JSSMS.Utils.toHex(this.pc));');
     code.push('this.branches[this.pc].call(this);');
     code.push('}'); // End of while
     code.push('},'); // End of method `run()`
@@ -206,7 +207,7 @@ JSSMS.Debugger.prototype = {
     code.push('branches: {');
 
     code.push('"": function() {');
-    code.push('console.log("Bad address", this.pc);');
+    code.push('throw "Bad address: " + JSSMS.Utils.toHex(this.pc);');
 
     for (var i = 0, length = tree.length; i < length; i++) {
       if (!tree[i])
@@ -851,8 +852,7 @@ JSSMS.Debugger.prototype = {
           code = 'this.tstates = 0;';
         else
           code = '';
-        code += 'this.halt = true; this.pc--; return;';
-        // @todo Do we need `this.pc--;`?
+        code += 'this.halt = true; this.pc = ' + toHex(address) + '; return;';
         break;
       case 0x77:
         inst = 'LD (HL),A';
@@ -1702,27 +1702,35 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x18:
         inst = 'RR B';
+        code = 'this.b = (this.rr(this.b));';
         break;
       case 0x19:
         inst = 'RR C';
+        code = 'this.c = (this.rr(this.c));';
         break;
       case 0x1A:
         inst = 'RR D';
+        code = 'this.d = (this.rr(this.d));';
         break;
       case 0x1B:
         inst = 'RR E';
+        code = 'this.e = (this.rr(this.e));';
         break;
       case 0x1C:
         inst = 'RR H';
+        code = 'this.h = (this.rr(this.h));';
         break;
       case 0x1D:
         inst = 'RR L';
+        code = 'this.l = (this.rr(this.l));';
         break;
       case 0x1E:
         inst = 'RR (HL)';
+        code = 'this.writeMem(this.getHL(), this.rr(this.readMem(this.getHL())));';
         break;
       case 0x1F:
         inst = 'RR A';
+        code = 'this.a = (this.rr(this.a));';
         break;
       case 0x20:
         inst = 'SLA B';
@@ -1819,6 +1827,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x3F:
         inst = 'SRL A';
+        code = 'this.a = this.srl(this.a);';
         break;
       case 0x40:
         inst = 'BIT 0,B';
@@ -1840,9 +1849,11 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x46:
         inst = 'BIT 0,(HL)';
+        code = 'this.bit(this.readMem(this.getHL()) & BIT_0);';
         break;
       case 0x47:
         inst = 'BIT 0,A';
+        code = 'this.bit(this.a & BIT_0);';
         break;
       case 0x48:
         inst = 'BIT 1,B';
@@ -1864,9 +1875,11 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x4E:
         inst = 'BIT 1,(HL)';
+        code = 'this.bit(this.readMem(this.getHL()) & BIT_1);';
         break;
       case 0x4F:
         inst = 'BIT 1,A';
+        code = 'this.bit(this.a & BIT_1);';
         break;
       case 0x50:
         inst = 'BIT 2,B';
@@ -1888,9 +1901,11 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x56:
         inst = 'BIT 2,(HL)';
+        code = 'this.bit(this.readMem(this.getHL()) & BIT_2);';
         break;
       case 0x57:
         inst = 'BIT 2,A';
+        code = 'this.bit(this.a & BIT_2);';
         break;
       case 0x58:
         inst = 'BIT 3,B';
@@ -1912,9 +1927,11 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x5E:
         inst = 'BIT 3,(HL)';
+        code = 'this.bit(this.readMem(this.getHL()) & BIT_3);';
         break;
       case 0x5F:
         inst = 'BIT 3,A';
+        code = 'this.bit(this.a & BIT_3);';
         break;
       case 0x60:
         inst = 'BIT 4,B';
@@ -1936,9 +1953,11 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x66:
         inst = 'BIT 4,(HL)';
+        code = 'this.bit(this.readMem(this.getHL()) & BIT_4);';
         break;
       case 0x67:
         inst = 'BIT 4,A';
+        code = 'this.bit(this.a & BIT_4);';
         break;
       case 0x68:
         inst = 'BIT 5,B';
@@ -1960,9 +1979,11 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x6E:
         inst = 'BIT 5,(HL)';
+        code = 'this.bit(this.readMem(this.getHL()) & BIT_5);';
         break;
       case 0x6F:
         inst = 'BIT 5,A';
+        code = 'this.bit(this.a & BIT_5);';
         break;
       case 0x70:
         inst = 'BIT 6,B';
@@ -1984,9 +2005,11 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x76:
         inst = 'BIT 6,(HL)';
+        code = 'this.bit(this.readMem(this.getHL()) & BIT_6);';
         break;
       case 0x77:
         inst = 'BIT 6,A';
+        code = 'this.bit(this.a & BIT_6);';
         break;
       case 0x78:
         inst = 'BIT 7,B';
@@ -2008,9 +2031,11 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x7E:
         inst = 'BIT 7,(HL)';
+        code = 'this.bit(this.readMem(this.getHL()) & BIT_7);';
         break;
       case 0x7F:
         inst = 'BIT 7,A';
+        code = 'this.bit(this.a & BIT_7);';
         break;
       case 0x80:
         inst = 'RES 0,B';
@@ -2032,6 +2057,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x86:
         inst = 'RES 0,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_0);';
         break;
       case 0x87:
         inst = 'RES 0,A';
@@ -2056,6 +2082,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x8E:
         inst = 'RES 1,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_1);';
         break;
       case 0x8F:
         inst = 'RES 1,A';
@@ -2080,6 +2107,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x96:
         inst = 'RES 2,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_2);';
         break;
       case 0x97:
         inst = 'RES 2,A';
@@ -2104,6 +2132,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x9E:
         inst = 'RES 3,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_3);';
         break;
       case 0x9F:
         inst = 'RES 3,A';
@@ -2128,6 +2157,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xA6:
         inst = 'RES 4,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_4);';
         break;
       case 0xA7:
         inst = 'RES 4,A';
@@ -2152,6 +2182,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xAE:
         inst = 'RES 5,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_5);';
         break;
       case 0xAF:
         inst = 'RES 5,A';
@@ -2176,6 +2207,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xB6:
         inst = 'RES 6,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_6);';
         break;
       case 0xB7:
         inst = 'RES 6,A';
@@ -2200,33 +2232,43 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xBE:
         inst = 'RES 7,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_7);';
         break;
       case 0xBF:
         inst = 'RES 7,A';
+        code = 'this.a &= ~BIT_7;';
         break;
       case 0xC0:
         inst = 'SET 0,B';
+        code = 'this.b |= BIT_0;';
         break;
       case 0xC1:
         inst = 'SET 0,C';
+        code = 'this.c |= BIT_0;';
         break;
       case 0xC2:
         inst = 'SET 0,D';
+        code = 'this.d |= BIT_0;';
         break;
       case 0xC3:
         inst = 'SET 0,E';
+        code = 'this.e |= BIT_0;';
         break;
       case 0xC4:
         inst = 'SET 0,H';
+        code = 'this.h |= BIT_0;';
         break;
       case 0xC5:
         inst = 'SET 0,L';
+        code = 'this.l |= BIT_0;';
         break;
       case 0xC6:
         inst = 'SET 0,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_0);';
         break;
       case 0xC7:
         inst = 'SET 0,A';
+        code = 'this.a |= BIT_0;';
         break;
       case 0xC8:
         inst = 'SET 1,B';
@@ -2248,6 +2290,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xCE:
         inst = 'SET 1,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_1);';
         break;
       case 0xCF:
         inst = 'SET 1,A';
@@ -2272,6 +2315,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xD6:
         inst = 'SET 2,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_2)';
         break;
       case 0xD7:
         inst = 'SET 2,A';
@@ -2296,6 +2340,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xDE:
         inst = 'SET 3,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_3);';
         break;
       case 0xDF:
         inst = 'SET 3,A';
@@ -2320,6 +2365,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xE6:
         inst = 'SET 4,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_4);';
         break;
       case 0xE7:
         inst = 'SET 4,A';
@@ -2344,6 +2390,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xEE:
         inst = 'SET 5,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_5);';
         break;
       case 0xEF:
         inst = 'SET 5,A';
@@ -2368,6 +2415,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xF6:
         inst = 'SET 6,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_6);';
         break;
       case 0xF7:
         inst = 'SET 6,A';
@@ -2392,9 +2440,11 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xFE:
         inst = 'SET 7,(HL)';
+        code = 'this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_7);';
         break;
       case 0xFF:
         inst = 'SET 7,A';
+        code = 'this.a |= BIT_7;';
         break;
     }
 
@@ -2423,6 +2473,7 @@ JSSMS.Debugger.prototype = {
     var currAddr = address;
     var target = null;
     var code = 'throw "Unimplemented 0xED prefixed opcode";';
+    var operand = '';
     address++;
 
     switch (opcode) {
@@ -2434,6 +2485,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x42:
         inst = 'SBC HL,BC';
+        code = 'this.sbc16(this.getBC());';
         break;
       case 0x43:
         inst = 'LD (' + toHex(this.readMemWord(address)) + '),BC';
@@ -2462,6 +2514,9 @@ JSSMS.Debugger.prototype = {
       case 0x75:
       case 0x7D:
         inst = 'RETN / RETI';
+        code = 'this.pc = this.readMemWord(this.sp);' +
+            'this.sp += 2;' +
+            'this.iff1 = this.iff2;';
         address = null;
         break;
       case 0x46:
@@ -2497,6 +2552,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x52:
         inst = 'SBC HL,DE';
+        code = 'this.sbc16(this.getDE());';
         break;
       case 0x53:
         inst = 'LD (' + toHex(this.readMemWord(address)) + '),DE';
@@ -2520,7 +2576,9 @@ JSSMS.Debugger.prototype = {
         inst = 'ADC HL,DE';
         break;
       case 0x5B:
-        inst = 'LD DE,(' + toHex(this.readMemWord(address)) + ')';
+        operand = toHex(this.readMemWord(address));
+        inst = 'LD DE,(' + operand + ')';
+        code = 'this.setDE(' + operand + ');';
         address = address + 2;
         break;
       case 0x5F:
@@ -2548,6 +2606,14 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x67:
         inst = 'RRD';
+        code = 'var location = this.getHL();' +
+            'temp = this.readMem(location);' +
+            // move high 4 of hl to low 4 of hl
+            // move low 4 of a to high 4 of hl
+            'this.writeMem(location, (temp >> 4) | ((this.a & 0x0F) << 4));' +
+            // move 4 lowest bits of hl to low 4 of a
+            'this.a = (this.a & 0xF0) | (temp & 0x0F);' +
+            'this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];';
         break;
       case 0x68:
         inst = 'IN L,(C)';
@@ -2557,6 +2623,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x6A:
         inst = 'ADC HL,HL';
+        code = 'this.adc16(this.getHL());';
         break;
       case 0x6B:
         inst = 'LD HL,(' + toHex(this.readMemWord(address)) + ')';
@@ -2580,6 +2647,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x79:
         inst = 'OUT (C),A';
+        code = 'this.port.out(this.c, this.a);';
         break;
       case 0x7A:
         inst = 'ADC HL,SP';
@@ -2590,6 +2658,10 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xA0:
         inst = 'LDI';
+        // (DE) <- (HL)
+        code = 'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
+            'this.incDE();this.incHL();this.decBC();' +
+            'this.f = (this.f & 0xC1) | (this.getBC() != 0 ? F_PARITY : 0);';
         break;
       case 0xA1:
         inst = 'CPI';
@@ -2632,9 +2704,7 @@ JSSMS.Debugger.prototype = {
         if (Setup.ACCURATE_INTERRUPT_EMULATION) {
           target = address - 2;
           code = 'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
-              'this.incDE();' +
-              'this.incHL();' +
-              'this.decBC();' +
+              'this.incDE();this.incHL();this.decBC();' +
               '' +
               'if (this.getBC() != 0) {' +
               'this.f |= F_PARITY;' +
@@ -2645,9 +2715,7 @@ JSSMS.Debugger.prototype = {
         } else {
           code = 'for(;this.getBC() != 0; this.f |= F_PARITY, this.tstates -= 5) {' +
               'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
-              'this.incDE();' +
-              'this.incHL();' +
-              'this.decBC();' +
+              'this.incDE();this.incHL();this.decBC();' +
               '}';
         }
         code += 'if (!(this.getBC() != 0)) this.f &= ~ F_PARITY;' +
@@ -2655,7 +2723,25 @@ JSSMS.Debugger.prototype = {
             'this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;';
         break;
       case 0xB1:
+        // @todo Apply peephole optimization here. See OTIR.
+        target = address - 2;
         inst = 'CPIR';
+        code = 'temp = (this.f & F_CARRY) | F_NEGATIVE;' +
+            'this.cp_a(this.readMem(this.getHL()));' + // sets zero flag for us
+            'this.incHL();' +
+            'this.decBC();' +
+
+            'temp |= (this.getBC() == 0 ? 0 : F_PARITY);' +
+
+            // Repeat instruction until a = (hl) or bc == 0
+            'if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {' +
+            'this.tstates -= 5;' +
+            'this.pc = ' + toHex(target) + ';' +
+            //'} else {' +
+            //'this.pc++;' +
+            '}' +
+
+            'this.f = (this.f & 0xF8) | temp;'; // Sign set by the cp instruction
         break;
       case 0xB2:
         inst = 'INIR';
@@ -2799,21 +2885,22 @@ JSSMS.Debugger.prototype = {
         address++;
         break;
       case 0x34:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'INC (' + index + sign + toHex(offset) + ')';
+        var offset = this.readMem(address);
+        inst = 'INC (' + index + '+' + toHex(offset) + ')';
+        code = 'this.incMem(this.get' + index + '() + ' + toHex(offset) + ');';
         address++;
         break;
       case 0x35:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'DEC (' + index + sign + toHex(offset) + ')';
+        var offset = this.readMem(address);
+        inst = 'DEC (' + index + '+' + toHex(offset) + ')';
+        code = 'this.decMem(this.get' + index + '() + ' + toHex(offset) + ');';
         address++;
         break;
       case 0x36:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD (' + index + sign + toHex(offset) + '),' + toHex(this.readMem(address));
+        var offset = this.readMem(address);
+        operand = toHex(this.readMem(address + 1));
+        inst = 'LD (' + index + '+' + toHex(offset) + '),' + operand;
+        code = 'this.writeMem(this.get' + index + '() + ' + toHex(offset) + ', ' + operand + ');';
         address++;
         break;
       case 0x39:
@@ -2826,9 +2913,9 @@ JSSMS.Debugger.prototype = {
         inst = 'LD B,' + index + 'L *';
         break;
       case 0x46:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD B,(' + index + sign + toHex(offset) + ')';
+        var offset = this.readMem(address);
+        inst = 'LD B,(' + index + '+' + toHex(offset) + ')';
+        code = 'this.b = this.readMem(this.get' + index + '() + ' + toHex(offset) + ');';
         address++;
         break;
       case 0x4C:
@@ -2838,9 +2925,9 @@ JSSMS.Debugger.prototype = {
         inst = 'LD C,' + index + 'L *';
         break;
       case 0x4E:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD C,(' + index + sign + toHex(offset) + ')';
+        var offset = this.readMem(address);
+        inst = 'LD C,(' + index + '+' + toHex(offset) + ')';
+        code = 'this.c = this.readMem(this.get' + index + '() + ' + toHex(offset) + ');';
         address++;
         break;
       case 0x54:
@@ -2850,9 +2937,9 @@ JSSMS.Debugger.prototype = {
         inst = 'LD D,' + index + 'L *';
         break;
       case 0x56:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD D,(' + index + sign + toHex(offset) + ')';
+        var offset = this.readMem(address);
+        inst = 'LD D,(' + index + '+' + toHex(offset) + ')';
+        code = 'this.d = this.readMem(this.get' + index + '() + ' + toHex(offset) + ');';
         address++;
         break;
       case 0x5C:
@@ -2862,9 +2949,9 @@ JSSMS.Debugger.prototype = {
         inst = 'LD E,' + index + 'L *';
         break;
       case 0x5E:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD E,(' + index + sign + toHex(offset) + ')';
+        var offset = this.readMem(address);
+        inst = 'LD E,(' + index + '+' + toHex(offset) + ')';
+        code = 'this.e = this.readMem(this.get' + index + '() + ' + toHex(offset) + ');';
         address++;
         break;
       case 0x60:
@@ -2886,9 +2973,9 @@ JSSMS.Debugger.prototype = {
         inst = 'LD ' + index + 'H,' + index + 'L *';
         break;
       case 0x66:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD H,(' + index + sign + toHex(offset) + ')';
+        var offset = this.readMem(address);
+        inst = 'LD H,(' + index + '+' + toHex(offset) + ')';
+        code = 'this.h = this.readMem(this.get' + index + '() + ' + toHex(offset) + ');';
         address++;
         break;
       case 0x67:
@@ -2913,54 +3000,54 @@ JSSMS.Debugger.prototype = {
         inst = 'LD ' + index + 'L,' + index + 'L *';
         break;
       case 0x6E:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD L,(' + index + sign + toHex(offset) + ')';
+        var offset = this.readMem(address);
+        inst = 'LD L,(' + index + '+' + toHex(offset) + ')';
+        code = 'this.l = this.readMem(this.get' + index + '() + ' + toHex(offset) + ');';
         address++;
         break;
       case 0x6F:
         inst = 'LD ' + index + 'L,A *';
         break;
       case 0x70:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD (' + index + sign + toHex(offset) + '),B';
+        var offset = this.readMem(address);
+        inst = 'LD (' + index + '+' + toHex(offset) + '),B';
+        code = 'this.writeMem(this.get' + index + '() + ' + toHex(offset) + ', this.b);';
         address++;
         break;
       case 0x71:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD (' + index + sign + toHex(offset) + '),C';
+        var offset = this.readMem(address);
+        inst = 'LD (' + index + '+' + toHex(offset) + '),C';
+        code = 'this.writeMem(this.get' + index + '() + ' + toHex(offset) + ', this.c);';
         address++;
         break;
       case 0x72:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD (' + index + sign + toHex(offset) + '),D';
+        var offset = this.readMem(address);
+        inst = 'LD (' + index + '+' + toHex(offset) + '),D';
+        code = 'this.writeMem(this.get' + index + '() + ' + toHex(offset) + ', this.d);';
         address++;
         break;
       case 0x73:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD (' + index + sign + toHex(offset) + '),E';
+        var offset = this.readMem(address);
+        inst = 'LD (' + index + '+' + toHex(offset) + '),E';
+        code = 'this.writeMem(this.get' + index + '() + ' + toHex(offset) + ', this.e);';
         address++;
         break;
       case 0x74:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD (' + index + sign + toHex(offset) + '),H';
+        var offset = this.readMem(address);
+        inst = 'LD (' + index + '+' + toHex(offset) + '),H';
+        code = 'this.writeMem(this.get' + index + '() + ' + toHex(offset) + ', this.h);';
         address++;
         break;
       case 0x75:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD (' + index + sign + toHex(offset) + '),L';
+        var offset = this.readMem(address);
+        inst = 'LD (' + index + '+' + toHex(offset) + '),L';
+        code = 'this.writeMem(this.get' + index + '() + ' + toHex(offset) + ', this.l);';
         address++;
         break;
       case 0x77:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD (' + index + sign + toHex(offset) + '),A';
+        var offset = this.readMem(address);
+        inst = 'LD (' + index + '+' + toHex(offset) + '),A';
+        code = 'this.writeMem(this.get' + index + '() + ' + toHex(offset) + ', this.a);';
         address++;
         break;
       case 0x7C:
@@ -2970,10 +3057,9 @@ JSSMS.Debugger.prototype = {
         inst = 'LD A,' + index + 'L *';
         break;
       case 0x7E:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'LD A,(' + index + sign + toHex(offset) + '))';
-        code = 'this.a = this.readMem(this.getIX() ' + sign + ' ' + toHex(offset) + ');';
+        var offset = this.readMem(address);
+        inst = 'LD A,(' + index + '+' + toHex(offset) + ')';
+        code = 'this.a = this.readMem(this.get' + index + '() + ' + toHex(offset) + ');';
         address++;
         break;
       case 0x84:
@@ -2983,9 +3069,9 @@ JSSMS.Debugger.prototype = {
         inst = 'ADD A,' + index + 'L *';
         break;
       case 0x86:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'ADD A,(' + index + sign + toHex(offset) + '))';
+        var offset = this.readMem(address);
+        inst = 'ADD A,(' + index + '+' + toHex(offset) + '))';
+        code = 'this.add_a(this.readMem(this.get' + index + '() + ' + toHex(offset) + '));';
         address++;
         break;
       case 0x8C:
@@ -2995,9 +3081,8 @@ JSSMS.Debugger.prototype = {
         inst = 'ADC A,' + index + 'L *';
         break;
       case 0x8E:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'ADC A,(' + index + sign + toHex(offset) + '))';
+        var offset = this.readMem(address);
+        inst = 'ADC A,(' + index + '+' + toHex(offset) + '))';
         address++;
         break;
       case 0x94:
@@ -3007,9 +3092,9 @@ JSSMS.Debugger.prototype = {
         inst = 'SUB ' + index + 'L *';
         break;
       case 0x96:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'SUB A,(' + index + sign + toHex(offset) + '))';
+        var offset = this.readMem(address);
+        inst = 'SUB A,(' + index + '+' + toHex(offset) + '))';
+        code = 'this.sub_a(this.readMem(this.get' + index + '() + ' + toHex(offset) + '));';
         address++;
         break;
       case 0x9C:
@@ -3019,9 +3104,8 @@ JSSMS.Debugger.prototype = {
         inst = 'SBC A,' + index + 'L *';
         break;
       case 0x9E:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'SBC A,(' + index + sign + toHex(offset) + '))';
+        var offset = this.readMem(address);
+        inst = 'SBC A,(' + index + '+' + toHex(offset) + '))';
         address++;
         break;
       case 0xA4:
@@ -3031,9 +3115,8 @@ JSSMS.Debugger.prototype = {
         inst = 'AND ' + index + 'L *';
         break;
       case 0xA6:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'AND A,(' + index + sign + toHex(offset) + '))';
+        var offset = this.readMem(address);
+        inst = 'AND A,(' + index + '+' + toHex(offset) + '))';
         address++;
         break;
       case 0xAC:
@@ -3043,9 +3126,9 @@ JSSMS.Debugger.prototype = {
         inst = 'XOR A ' + index + 'L*';
         break;
       case 0xAE:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'XOR A,(' + index + sign + toHex(offset) + '))';
+        var offset = this.readMem(address);
+        inst = 'XOR A,(' + index + '+' + toHex(offset) + '))';
+        code = 'this.f = this.SZP_TABLE[this.a ^= this.readMem(this.get' + index + '() + ' + toHex(offset) + ')];';
         address++;
         break;
       case 0xB4:
@@ -3055,9 +3138,9 @@ JSSMS.Debugger.prototype = {
         inst = 'OR A ' + index + 'L*';
         break;
       case 0xB6:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'OR A,(' + index + sign + toHex(offset) + '))';
+        var offset = this.readMem(address);
+        inst = 'OR A,(' + index + '+' + toHex(offset) + '))';
+        code = 'this.f = this.SZP_TABLE[this.a |= this.readMem(this.get' + index + '() + ' + toHex(offset) + ')];';
         address++;
         break;
       case 0xBC:
@@ -3067,26 +3150,29 @@ JSSMS.Debugger.prototype = {
         inst = 'CP ' + index + 'L *';
         break;
       case 0xBE:
-        var offset = this.signExtend(this.readMem(address));
-        var sign = offset > 0 ? '+' : '-';
-        inst = 'CP (' + index + sign + toHex(offset) + '))';
+        var offset = this.readMem(address);
+        inst = 'CP (' + index + '+' + toHex(offset) + '))';
+        code = 'this.cp_a(this.readMem(this.get' + index + '() + ' + toHex(offset) + '));';
         address++;
         break;
       case 0xCB:
         var _inst = this.getIndexCB(index, address);
         inst = _inst.inst;
+        code = _inst.code;
         opcodesArray = opcodesArray.concat(_inst.opcodes);
         address = _inst.nextAddress;
         // @todo
         break;
       case 0xE1:
         inst = 'POP ' + index;
+        code = 'this.set' + index + '(this.readMemWord(this.sp)); this.sp += 2;';
         break;
       case 0xE3:
         inst = 'EX SP,(' + index + ')';
         break;
       case 0xE5:
         inst = 'PUSH ' + index;
+        code = 'this.push2(this.' + index.toLowerCase() + 'H, this.' + index.toLowerCase() + 'L);';
         break;
       case 0xE9:
         inst = 'JP (' + index + ')';
@@ -3121,11 +3207,15 @@ JSSMS.Debugger.prototype = {
     var inst = 'Unimplemented 0xDDCB or 0xFDCB prefixed opcode';
     var currAddr = address;
     var code = 'throw "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";';
+    var location = 0;
     address++;
 
     switch (opcode) {
       case 0x00:
+        // @todo Test me.
         inst = 'LD B,RLC (' + index + ')';
+        code = 'var location = (this.get' + index + '() + ' + this.readMem(address) + ') & 0xFFFF;' +
+            'this.b = this.rlc(this.readMem(location)); this.writeMem(location, this.b);';
         break;
       case 0x01:
         inst = 'LD C,RLC (' + index + ')';
