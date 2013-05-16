@@ -1903,7 +1903,6 @@ JSSMS.Z80.prototype = {
   doED: function(opcode) {
     var temp = 0;
     var location = 0;
-    var hlmem = 0;
 
     this.tstates -= OP_ED_STATES[opcode];
 
@@ -2075,13 +2074,13 @@ JSSMS.Z80.prototype = {
       //  -- ED67 RRD -------------------------------
       case 0x67:
         location = this.getHL();
-        hlmem = this.readMem(location);
+        temp = this.readMem(location);
 
         // move high 4 of hl to low 4 of hl
         // move low 4 of a to high 4 of hl
-        this.writeMem(location, (hlmem >> 4) | ((this.a & 0x0F) << 4));
+        this.writeMem(location, (temp >> 4) | ((this.a & 0x0F) << 4));
         // move 4 lowest bits of hl to low 4 of a
-        this.a = (this.a & 0xF0) | (hlmem & 0x0F);
+        this.a = (this.a & 0xF0) | (temp & 0x0F);
 
         this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];
         this.pc++;
@@ -2109,14 +2108,14 @@ JSSMS.Z80.prototype = {
       //  -- ED6F RLD -------------------------------
       case 0x6F:
         location = this.getHL();
-        hlmem = this.readMem(location);
+        temp = this.readMem(location);
 
         // move low 4 of hl to high 4 of hl
         // move low 4 of a to low 4 of hl
-        this.writeMem(location, (hlmem & 0x0F) << 4 | (this.a & 0x0F));
+        this.writeMem(location, (temp & 0x0F) << 4 | (this.a & 0x0F));
 
         // move high 4 of hl to low 4 of a
-        this.a = (this.a & 0xF0) | (hlmem >> 4);
+        this.a = (this.a & 0xF0) | (temp >> 4);
 
         this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];
         this.pc++;
