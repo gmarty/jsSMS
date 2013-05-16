@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 'use strict';var DEBUG = true;
-var DEBUGGER = true;
+var DEBUGGER = false;
 var ACCURATE = false;
 var LITTLE_ENDIAN = true;
 var SUPPORT_DATAVIEW = !!(window["DataView"] && window["ArrayBuffer"]);
@@ -431,8 +431,8 @@ JSSMS.Z80.prototype = {reset:function() {
   this.f2 = 0;
   this.pc = 0;
   this.sp = 57328;
-  this.tstates = 0;
   this.totalCycles = 0;
+  this.tstates = 0;
   this.im = 0;
   this.iff1 = false;
   this.iff2 = false;
@@ -440,9 +440,6 @@ JSSMS.Z80.prototype = {reset:function() {
   this.interruptVector = 0;
   this.halt = false
 }, run:function(cycles, cyclesTo) {
-  var location = 0;
-  var opcode = 0;
-  var temp = 0;
   this.tstates += cycles;
   if(cycles != 0) {
     this.totalCycles = cycles
@@ -461,820 +458,824 @@ JSSMS.Z80.prototype = {reset:function() {
     if(DEBUGGER) {
       this.main.ui.updateDisassembly(this.pc)
     }
-    opcode = this.readMem(this.pc++);
-    if(Setup.ACCURATE_INTERRUPT_EMULATION) {
-      this.EI_inst = false
-    }
-    this.tstates -= OP_STATES[opcode];
-    if(Setup.REFRESH_EMULATION) {
-      this.incR()
-    }
-    switch(opcode) {
-      case 0:
-        break;
-      case 1:
-        this.setBC(this.readMemWord(this.pc++));
-        this.pc++;
-        break;
-      case 2:
-        this.writeMem(this.getBC(), this.a);
-        break;
-      case 3:
-        this.incBC();
-        break;
-      case 4:
-        this.b = this.inc8(this.b);
-        break;
-      case 5:
-        this.b = this.dec8(this.b);
-        break;
-      case 6:
-        this.b = this.readMem(this.pc++);
-        break;
-      case 7:
-        this.rlca_a();
-        break;
-      case 8:
-        this.exAF();
-        break;
-      case 9:
-        this.setHL(this.add16(this.getHL(), this.getBC()));
-        break;
-      case 10:
-        this.a = this.readMem(this.getBC());
-        break;
-      case 11:
-        this.decBC();
-        break;
-      case 12:
-        this.c = this.inc8(this.c);
-        break;
-      case 13:
-        this.c = this.dec8(this.c);
-        break;
-      case 14:
-        this.c = this.readMem(this.pc++);
-        break;
-      case 15:
-        this.rrca_a();
-        break;
-      case 16:
-        this.b = this.b - 1 & 255;
-        this.jr(this.b != 0);
-        break;
-      case 17:
-        this.setDE(this.readMemWord(this.pc++));
-        this.pc++;
-        break;
-      case 18:
-        this.writeMem(this.getDE(), this.a);
-        break;
-      case 19:
-        this.incDE();
-        break;
-      case 20:
-        this.d = this.inc8(this.d);
-        break;
-      case 21:
-        this.d = this.dec8(this.d);
-        break;
-      case 22:
-        this.d = this.readMem(this.pc++);
-        break;
-      case 23:
-        this.rla_a();
-        break;
-      case 24:
-        this.pc += this.signExtend(this.d_() + 1);
-        break;
-      case 25:
-        this.setHL(this.add16(this.getHL(), this.getDE()));
-        break;
-      case 26:
-        this.a = this.readMem(this.getDE());
-        break;
-      case 27:
-        this.decDE();
-        break;
-      case 28:
-        this.e = this.inc8(this.e);
-        break;
-      case 29:
-        this.e = this.dec8(this.e);
-        break;
-      case 30:
-        this.e = this.readMem(this.pc++);
-        break;
-      case 31:
-        this.rra_a();
-        break;
-      case 32:
-        this.jr(!((this.f & F_ZERO) != 0));
-        break;
-      case 33:
-        this.setHL(this.readMemWord(this.pc++));
-        this.pc++;
-        break;
-      case 34:
-        location = this.readMemWord(this.pc);
-        this.writeMem(location, this.l);
-        this.writeMem(++location, this.h);
-        this.pc += 2;
-        break;
-      case 35:
-        this.incHL();
-        break;
-      case 36:
-        this.h = this.inc8(this.h);
-        break;
-      case 37:
-        this.h = this.dec8(this.h);
-        break;
-      case 38:
-        this.h = this.readMem(this.pc++);
-        break;
-      case 39:
-        this.daa();
-        break;
-      case 40:
-        this.jr((this.f & F_ZERO) != 0);
-        break;
-      case 41:
-        this.setHL(this.add16(this.getHL(), this.getHL()));
-        break;
-      case 42:
-        this.setHL(this.readMemWord(this.readMemWord(this.pc)));
-        this.pc += 2;
-        break;
-      case 43:
-        this.decHL();
-        break;
-      case 44:
-        this.l = this.inc8(this.l);
-        break;
-      case 45:
-        this.l = this.dec8(this.l);
-        break;
-      case 46:
-        this.l = this.readMem(this.pc++);
-        break;
-      case 47:
-        this.cpl_a();
-        break;
-      case 48:
-        this.jr(!((this.f & F_CARRY) != 0));
-        break;
-      case 49:
-        this.sp = this.readMemWord(this.pc);
-        this.pc += 2;
-        break;
-      case 50:
-        this.writeMem(this.readMemWord(this.pc), this.a);
-        this.pc += 2;
-        break;
-      case 51:
-        this.sp++;
-        break;
-      case 52:
-        this.incMem(this.getHL());
-        break;
-      case 53:
-        this.decMem(this.getHL());
-        break;
-      case 54:
-        this.writeMem(this.getHL(), this.readMem(this.pc++));
-        break;
-      case 55:
-        this.f |= F_CARRY;
-        this.f &= ~F_NEGATIVE;
-        this.f &= ~F_HALFCARRY;
-        break;
-      case 56:
-        this.jr((this.f & F_CARRY) != 0);
-        break;
-      case 57:
-        this.setHL(this.add16(this.getHL(), this.sp));
-        break;
-      case 58:
-        this.a = this.readMem(this.readMemWord(this.pc));
-        this.pc += 2;
-        break;
-      case 59:
-        this.sp--;
-        break;
-      case 60:
-        this.a = this.inc8(this.a);
-        break;
-      case 61:
-        this.a = this.dec8(this.a);
-        break;
-      case 62:
-        this.a = this.readMem(this.pc++);
-        break;
-      case 63:
-        this.ccf();
-        break;
-      case 64:
-        break;
-      case 65:
-        this.b = this.c;
-        break;
-      case 66:
-        this.b = this.d;
-        break;
-      case 67:
-        this.b = this.e;
-        break;
-      case 68:
-        this.b = this.h;
-        break;
-      case 69:
-        this.b = this.l;
-        break;
-      case 70:
-        this.b = this.readMem(this.getHL());
-        break;
-      case 71:
-        this.b = this.a;
-        break;
-      case 72:
-        this.c = this.b;
-        break;
-      case 73:
-        break;
-      case 74:
-        this.c = this.d;
-        break;
-      case 75:
-        this.c = this.e;
-        break;
-      case 76:
-        this.c = this.h;
-        break;
-      case 77:
-        this.c = this.l;
-        break;
-      case 78:
-        this.c = this.readMem(this.getHL());
-        break;
-      case 79:
-        this.c = this.a;
-        break;
-      case 80:
-        this.d = this.b;
-        break;
-      case 81:
-        this.d = this.c;
-        break;
-      case 82:
-        break;
-      case 83:
-        this.d = this.e;
-        break;
-      case 84:
-        this.d = this.h;
-        break;
-      case 85:
-        this.d = this.l;
-        break;
-      case 86:
-        this.d = this.readMem(this.getHL());
-        break;
-      case 87:
-        this.d = this.a;
-        break;
-      case 88:
-        this.e = this.b;
-        break;
-      case 89:
-        this.e = this.c;
-        break;
-      case 90:
-        this.e = this.d;
-        break;
-      case 91:
-        break;
-      case 92:
-        this.e = this.h;
-        break;
-      case 93:
-        this.e = this.l;
-        break;
-      case 94:
-        this.e = this.readMem(this.getHL());
-        break;
-      case 95:
-        this.e = this.a;
-        break;
-      case 96:
-        this.h = this.b;
-        break;
-      case 97:
-        this.h = this.c;
-        break;
-      case 98:
-        this.h = this.d;
-        break;
-      case 99:
-        this.h = this.e;
-        break;
-      case 100:
-        break;
-      case 101:
-        this.h = this.l;
-        break;
-      case 102:
-        this.h = this.readMem(this.getHL());
-        break;
-      case 103:
-        this.h = this.a;
-        break;
-      case 104:
-        this.l = this.b;
-        break;
-      case 105:
-        this.l = this.c;
-        break;
-      case 106:
-        this.l = this.d;
-        break;
-      case 107:
-        this.l = this.e;
-        break;
-      case 108:
-        this.l = this.h;
-        break;
-      case 109:
-        break;
-      case 110:
-        this.l = this.readMem(this.getHL());
-        break;
-      case 111:
-        this.l = this.a;
-        break;
-      case 112:
-        this.writeMem(this.getHL(), this.b);
-        break;
-      case 113:
-        this.writeMem(this.getHL(), this.c);
-        break;
-      case 114:
-        this.writeMem(this.getHL(), this.d);
-        break;
-      case 115:
-        this.writeMem(this.getHL(), this.e);
-        break;
-      case 116:
-        this.writeMem(this.getHL(), this.h);
-        break;
-      case 117:
-        this.writeMem(this.getHL(), this.l);
-        break;
-      case 118:
-        if(HALT_SPEEDUP) {
-          this.tstates = 0
-        }
-        this.halt = true;
-        this.pc--;
-        break;
-      case 119:
-        this.writeMem(this.getHL(), this.a);
-        break;
-      case 120:
-        this.a = this.b;
-        break;
-      case 121:
-        this.a = this.c;
-        break;
-      case 122:
-        this.a = this.d;
-        break;
-      case 123:
-        this.a = this.e;
-        break;
-      case 124:
-        this.a = this.h;
-        break;
-      case 125:
-        this.a = this.l;
-        break;
-      case 126:
-        this.a = this.readMem(this.getHL());
-        break;
-      case 127:
-        break;
-      case 128:
-        this.add_a(this.b);
-        break;
-      case 129:
-        this.add_a(this.c);
-        break;
-      case 130:
-        this.add_a(this.d);
-        break;
-      case 131:
-        this.add_a(this.e);
-        break;
-      case 132:
-        this.add_a(this.h);
-        break;
-      case 133:
-        this.add_a(this.l);
-        break;
-      case 134:
-        this.add_a(this.readMem(this.getHL()));
-        break;
-      case 135:
-        this.add_a(this.a);
-        break;
-      case 136:
-        this.adc_a(this.b);
-        break;
-      case 137:
-        this.adc_a(this.c);
-        break;
-      case 138:
-        this.adc_a(this.d);
-        break;
-      case 139:
-        this.adc_a(this.e);
-        break;
-      case 140:
-        this.adc_a(this.h);
-        break;
-      case 141:
-        this.adc_a(this.l);
-        break;
-      case 142:
-        this.adc_a(this.readMem(this.getHL()));
-        break;
-      case 143:
-        this.adc_a(this.a);
-        break;
-      case 144:
-        this.sub_a(this.b);
-        break;
-      case 145:
-        this.sub_a(this.c);
-        break;
-      case 146:
-        this.sub_a(this.d);
-        break;
-      case 147:
-        this.sub_a(this.e);
-        break;
-      case 148:
-        this.sub_a(this.h);
-        break;
-      case 149:
-        this.sub_a(this.l);
-        break;
-      case 150:
-        this.sub_a(this.readMem(this.getHL()));
-        break;
-      case 151:
-        this.sub_a(this.a);
-        break;
-      case 152:
-        this.sbc_a(this.b);
-        break;
-      case 153:
-        this.sbc_a(this.c);
-        break;
-      case 154:
-        this.sbc_a(this.d);
-        break;
-      case 155:
-        this.sbc_a(this.e);
-        break;
-      case 156:
-        this.sbc_a(this.h);
-        break;
-      case 157:
-        this.sbc_a(this.l);
-        break;
-      case 158:
-        this.sbc_a(this.readMem(this.getHL()));
-        break;
-      case 159:
-        this.sbc_a(this.a);
-        break;
-      case 160:
-        this.f = this.SZP_TABLE[this.a &= this.b] | F_HALFCARRY;
-        break;
-      case 161:
-        this.f = this.SZP_TABLE[this.a &= this.c] | F_HALFCARRY;
-        break;
-      case 162:
-        this.f = this.SZP_TABLE[this.a &= this.d] | F_HALFCARRY;
-        break;
-      case 163:
-        this.f = this.SZP_TABLE[this.a &= this.e] | F_HALFCARRY;
-        break;
-      case 164:
-        this.f = this.SZP_TABLE[this.a &= this.h] | F_HALFCARRY;
-        break;
-      case 165:
-        this.f = this.SZP_TABLE[this.a &= this.l] | F_HALFCARRY;
-        break;
-      case 166:
-        this.f = this.SZP_TABLE[this.a &= this.readMem(this.getHL())] | F_HALFCARRY;
-        break;
-      case 167:
-        this.f = this.SZP_TABLE[this.a] | F_HALFCARRY;
-        break;
-      case 168:
-        this.f = this.SZP_TABLE[this.a ^= this.b];
-        break;
-      case 169:
-        this.f = this.SZP_TABLE[this.a ^= this.c];
-        break;
-      case 170:
-        this.f = this.SZP_TABLE[this.a ^= this.d];
-        break;
-      case 171:
-        this.f = this.SZP_TABLE[this.a ^= this.e];
-        break;
-      case 172:
-        this.f = this.SZP_TABLE[this.a ^= this.h];
-        break;
-      case 173:
-        this.f = this.SZP_TABLE[this.a ^= this.l];
-        break;
-      case 174:
-        this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getHL())];
-        break;
-      case 175:
-        this.f = this.SZP_TABLE[this.a = 0];
-        break;
-      case 176:
-        this.f = this.SZP_TABLE[this.a |= this.b];
-        break;
-      case 177:
-        this.f = this.SZP_TABLE[this.a |= this.c];
-        break;
-      case 178:
-        this.f = this.SZP_TABLE[this.a |= this.d];
-        break;
-      case 179:
-        this.f = this.SZP_TABLE[this.a |= this.e];
-        break;
-      case 180:
-        this.f = this.SZP_TABLE[this.a |= this.h];
-        break;
-      case 181:
-        this.f = this.SZP_TABLE[this.a |= this.l];
-        break;
-      case 182:
-        this.f = this.SZP_TABLE[this.a |= this.readMem(this.getHL())];
-        break;
-      case 183:
-        this.f = this.SZP_TABLE[this.a];
-        break;
-      case 184:
-        this.cp_a(this.b);
-        break;
-      case 185:
-        this.cp_a(this.c);
-        break;
-      case 186:
-        this.cp_a(this.d);
-        break;
-      case 187:
-        this.cp_a(this.e);
-        break;
-      case 188:
-        this.cp_a(this.h);
-        break;
-      case 189:
-        this.cp_a(this.l);
-        break;
-      case 190:
-        this.cp_a(this.readMem(this.getHL()));
-        break;
-      case 191:
-        this.cp_a(this.a);
-        break;
-      case 192:
-        this.ret((this.f & F_ZERO) == 0);
-        break;
-      case 193:
-        this.setBC(this.readMemWord(this.sp));
-        this.sp += 2;
-        break;
-      case 194:
-        this.jp((this.f & F_ZERO) == 0);
-        break;
-      case 195:
-        this.pc = this.readMemWord(this.pc);
-        break;
-      case 196:
-        this.call((this.f & F_ZERO) == 0);
-        break;
-      case 197:
-        this.push2(this.b, this.c);
-        break;
-      case 198:
-        this.add_a(this.readMem(this.pc++));
-        break;
-      case 199:
-        this.push1(this.pc);
-        this.pc = 0;
-        break;
-      case 200:
-        this.ret((this.f & F_ZERO) != 0);
-        break;
-      case 201:
-        this.pc = this.readMemWord(this.sp);
-        this.sp += 2;
-        break;
-      case 202:
-        this.jp((this.f & F_ZERO) != 0);
-        break;
-      case 203:
-        this.doCB(this.readMem(this.pc++));
-        break;
-      case 204:
-        this.call((this.f & F_ZERO) != 0);
-        break;
-      case 205:
-        this.push1(this.pc + 2);
-        this.pc = this.readMemWord(this.pc);
-        break;
-      case 206:
-        this.adc_a(this.readMem(this.pc++));
-        break;
-      case 207:
-        this.push1(this.pc);
-        this.pc = 8;
-        break;
-      case 208:
-        this.ret((this.f & F_CARRY) == 0);
-        break;
-      case 209:
-        this.setDE(this.readMemWord(this.sp));
-        this.sp += 2;
-        break;
-      case 210:
-        this.jp((this.f & F_CARRY) == 0);
-        break;
-      case 211:
-        this.port.out(this.readMem(this.pc++), this.a);
-        break;
-      case 212:
-        this.call((this.f & F_CARRY) == 0);
-        break;
-      case 213:
-        this.push2(this.d, this.e);
-        break;
-      case 214:
-        this.sub_a(this.readMem(this.pc++));
-        break;
-      case 215:
-        this.push1(this.pc);
-        this.pc = 16;
-        break;
-      case 216:
-        this.ret((this.f & F_CARRY) != 0);
-        break;
-      case 217:
-        this.exBC();
-        this.exDE();
-        this.exHL();
-        break;
-      case 218:
-        this.jp((this.f & F_CARRY) != 0);
-        break;
-      case 219:
-        this.a = this.port.in_(this.readMem(this.pc++));
-        break;
-      case 220:
-        this.call((this.f & F_CARRY) != 0);
-        break;
-      case 221:
-        this.doIndexOpIX(this.readMem(this.pc++));
-        break;
-      case 222:
-        this.sbc_a(this.readMem(this.pc++));
-        break;
-      case 223:
-        this.push1(this.pc);
-        this.pc = 24;
-        break;
-      case 224:
-        this.ret((this.f & F_PARITY) == 0);
-        break;
-      case 225:
-        this.setHL(this.readMemWord(this.sp));
-        this.sp += 2;
-        break;
-      case 226:
-        this.jp((this.f & F_PARITY) == 0);
-        break;
-      case 227:
-        temp = this.h;
-        this.h = this.readMem(this.sp + 1);
-        this.writeMem(this.sp + 1, temp);
-        temp = this.l;
-        this.l = this.readMem(this.sp);
-        this.writeMem(this.sp, temp);
-        break;
-      case 228:
-        this.call((this.f & F_PARITY) == 0);
-        break;
-      case 229:
-        this.push2(this.h, this.l);
-        break;
-      case 230:
-        this.f = this.SZP_TABLE[this.a &= this.readMem(this.pc++)] | F_HALFCARRY;
-        break;
-      case 231:
-        this.push1(this.pc);
-        this.pc = 32;
-        break;
-      case 232:
-        this.ret((this.f & F_PARITY) != 0);
-        break;
-      case 233:
-        this.pc = this.getHL();
-        break;
-      case 234:
-        this.jp((this.f & F_PARITY) != 0);
-        break;
-      case 235:
-        temp = this.d;
-        this.d = this.h;
-        this.h = temp;
-        temp = this.e;
-        this.e = this.l;
-        this.l = temp;
-        break;
-      case 236:
-        this.call((this.f & F_PARITY) != 0);
-        break;
-      case 237:
-        this.doED(this.d_());
-        break;
-      case 238:
-        this.f = this.SZP_TABLE[this.a ^= this.readMem(this.pc++)];
-        break;
-      case 239:
-        this.push1(this.pc);
-        this.pc = 40;
-        break;
-      case 240:
-        this.ret((this.f & F_SIGN) == 0);
-        break;
-      case 241:
-        this.f = this.readMem(this.sp++);
-        this.a = this.readMem(this.sp++);
-        break;
-      case 242:
-        this.jp((this.f & F_SIGN) == 0);
-        break;
-      case 243:
-        this.iff1 = this.iff2 = false;
-        this.EI_inst = true;
-        break;
-      case 244:
-        this.call((this.f & F_SIGN) == 0);
-        break;
-      case 245:
-        this.push2(this.a, this.f);
-        break;
-      case 246:
-        this.f = this.SZP_TABLE[this.a |= this.readMem(this.pc++)];
-        break;
-      case 247:
-        this.push1(this.pc);
-        this.pc = 48;
-        break;
-      case 248:
-        this.ret((this.f & F_SIGN) != 0);
-        break;
-      case 249:
-        this.sp = this.getHL();
-        break;
-      case 250:
-        this.jp((this.f & F_SIGN) != 0);
-        break;
-      case 251:
-        this.iff1 = this.iff2 = this.EI_inst = true;
-        break;
-      case 252:
-        this.call((this.f & F_SIGN) != 0);
-        break;
-      case 253:
-        this.doIndexOpIY(this.readMem(this.pc++));
-        break;
-      case 254:
-        this.cp_a(this.readMem(this.pc++));
-        break;
-      case 255:
-        this.push1(this.pc);
-        this.pc = 56;
-        break
-    }
+    this.interpret()
+  }
+}, interpret:function() {
+  var location = 0;
+  var temp = 0;
+  var opcode = this.readMem(this.pc++);
+  if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+    this.EI_inst = false
+  }
+  this.tstates -= OP_STATES[opcode];
+  if(Setup.REFRESH_EMULATION) {
+    this.incR()
+  }
+  switch(opcode) {
+    case 0:
+      break;
+    case 1:
+      this.setBC(this.readMemWord(this.pc++));
+      this.pc++;
+      break;
+    case 2:
+      this.writeMem(this.getBC(), this.a);
+      break;
+    case 3:
+      this.incBC();
+      break;
+    case 4:
+      this.b = this.inc8(this.b);
+      break;
+    case 5:
+      this.b = this.dec8(this.b);
+      break;
+    case 6:
+      this.b = this.readMem(this.pc++);
+      break;
+    case 7:
+      this.rlca_a();
+      break;
+    case 8:
+      this.exAF();
+      break;
+    case 9:
+      this.setHL(this.add16(this.getHL(), this.getBC()));
+      break;
+    case 10:
+      this.a = this.readMem(this.getBC());
+      break;
+    case 11:
+      this.decBC();
+      break;
+    case 12:
+      this.c = this.inc8(this.c);
+      break;
+    case 13:
+      this.c = this.dec8(this.c);
+      break;
+    case 14:
+      this.c = this.readMem(this.pc++);
+      break;
+    case 15:
+      this.rrca_a();
+      break;
+    case 16:
+      this.b = this.b - 1 & 255;
+      this.jr(this.b != 0);
+      break;
+    case 17:
+      this.setDE(this.readMemWord(this.pc++));
+      this.pc++;
+      break;
+    case 18:
+      this.writeMem(this.getDE(), this.a);
+      break;
+    case 19:
+      this.incDE();
+      break;
+    case 20:
+      this.d = this.inc8(this.d);
+      break;
+    case 21:
+      this.d = this.dec8(this.d);
+      break;
+    case 22:
+      this.d = this.readMem(this.pc++);
+      break;
+    case 23:
+      this.rla_a();
+      break;
+    case 24:
+      this.pc += this.signExtend(this.d_() + 1);
+      break;
+    case 25:
+      this.setHL(this.add16(this.getHL(), this.getDE()));
+      break;
+    case 26:
+      this.a = this.readMem(this.getDE());
+      break;
+    case 27:
+      this.decDE();
+      break;
+    case 28:
+      this.e = this.inc8(this.e);
+      break;
+    case 29:
+      this.e = this.dec8(this.e);
+      break;
+    case 30:
+      this.e = this.readMem(this.pc++);
+      break;
+    case 31:
+      this.rra_a();
+      break;
+    case 32:
+      this.jr(!((this.f & F_ZERO) != 0));
+      break;
+    case 33:
+      this.setHL(this.readMemWord(this.pc++));
+      this.pc++;
+      break;
+    case 34:
+      location = this.readMemWord(this.pc);
+      this.writeMem(location, this.l);
+      this.writeMem(++location, this.h);
+      this.pc += 2;
+      break;
+    case 35:
+      this.incHL();
+      break;
+    case 36:
+      this.h = this.inc8(this.h);
+      break;
+    case 37:
+      this.h = this.dec8(this.h);
+      break;
+    case 38:
+      this.h = this.readMem(this.pc++);
+      break;
+    case 39:
+      this.daa();
+      break;
+    case 40:
+      this.jr((this.f & F_ZERO) != 0);
+      break;
+    case 41:
+      this.setHL(this.add16(this.getHL(), this.getHL()));
+      break;
+    case 42:
+      this.setHL(this.readMemWord(this.readMemWord(this.pc)));
+      this.pc += 2;
+      break;
+    case 43:
+      this.decHL();
+      break;
+    case 44:
+      this.l = this.inc8(this.l);
+      break;
+    case 45:
+      this.l = this.dec8(this.l);
+      break;
+    case 46:
+      this.l = this.readMem(this.pc++);
+      break;
+    case 47:
+      this.cpl_a();
+      break;
+    case 48:
+      this.jr(!((this.f & F_CARRY) != 0));
+      break;
+    case 49:
+      this.sp = this.readMemWord(this.pc);
+      this.pc += 2;
+      break;
+    case 50:
+      this.writeMem(this.readMemWord(this.pc), this.a);
+      this.pc += 2;
+      break;
+    case 51:
+      this.sp++;
+      break;
+    case 52:
+      this.incMem(this.getHL());
+      break;
+    case 53:
+      this.decMem(this.getHL());
+      break;
+    case 54:
+      this.writeMem(this.getHL(), this.readMem(this.pc++));
+      break;
+    case 55:
+      this.f |= F_CARRY;
+      this.f &= ~F_NEGATIVE;
+      this.f &= ~F_HALFCARRY;
+      break;
+    case 56:
+      this.jr((this.f & F_CARRY) != 0);
+      break;
+    case 57:
+      this.setHL(this.add16(this.getHL(), this.sp));
+      break;
+    case 58:
+      this.a = this.readMem(this.readMemWord(this.pc));
+      this.pc += 2;
+      break;
+    case 59:
+      this.sp--;
+      break;
+    case 60:
+      this.a = this.inc8(this.a);
+      break;
+    case 61:
+      this.a = this.dec8(this.a);
+      break;
+    case 62:
+      this.a = this.readMem(this.pc++);
+      break;
+    case 63:
+      this.ccf();
+      break;
+    case 64:
+      break;
+    case 65:
+      this.b = this.c;
+      break;
+    case 66:
+      this.b = this.d;
+      break;
+    case 67:
+      this.b = this.e;
+      break;
+    case 68:
+      this.b = this.h;
+      break;
+    case 69:
+      this.b = this.l;
+      break;
+    case 70:
+      this.b = this.readMem(this.getHL());
+      break;
+    case 71:
+      this.b = this.a;
+      break;
+    case 72:
+      this.c = this.b;
+      break;
+    case 73:
+      break;
+    case 74:
+      this.c = this.d;
+      break;
+    case 75:
+      this.c = this.e;
+      break;
+    case 76:
+      this.c = this.h;
+      break;
+    case 77:
+      this.c = this.l;
+      break;
+    case 78:
+      this.c = this.readMem(this.getHL());
+      break;
+    case 79:
+      this.c = this.a;
+      break;
+    case 80:
+      this.d = this.b;
+      break;
+    case 81:
+      this.d = this.c;
+      break;
+    case 82:
+      break;
+    case 83:
+      this.d = this.e;
+      break;
+    case 84:
+      this.d = this.h;
+      break;
+    case 85:
+      this.d = this.l;
+      break;
+    case 86:
+      this.d = this.readMem(this.getHL());
+      break;
+    case 87:
+      this.d = this.a;
+      break;
+    case 88:
+      this.e = this.b;
+      break;
+    case 89:
+      this.e = this.c;
+      break;
+    case 90:
+      this.e = this.d;
+      break;
+    case 91:
+      break;
+    case 92:
+      this.e = this.h;
+      break;
+    case 93:
+      this.e = this.l;
+      break;
+    case 94:
+      this.e = this.readMem(this.getHL());
+      break;
+    case 95:
+      this.e = this.a;
+      break;
+    case 96:
+      this.h = this.b;
+      break;
+    case 97:
+      this.h = this.c;
+      break;
+    case 98:
+      this.h = this.d;
+      break;
+    case 99:
+      this.h = this.e;
+      break;
+    case 100:
+      break;
+    case 101:
+      this.h = this.l;
+      break;
+    case 102:
+      this.h = this.readMem(this.getHL());
+      break;
+    case 103:
+      this.h = this.a;
+      break;
+    case 104:
+      this.l = this.b;
+      break;
+    case 105:
+      this.l = this.c;
+      break;
+    case 106:
+      this.l = this.d;
+      break;
+    case 107:
+      this.l = this.e;
+      break;
+    case 108:
+      this.l = this.h;
+      break;
+    case 109:
+      break;
+    case 110:
+      this.l = this.readMem(this.getHL());
+      break;
+    case 111:
+      this.l = this.a;
+      break;
+    case 112:
+      this.writeMem(this.getHL(), this.b);
+      break;
+    case 113:
+      this.writeMem(this.getHL(), this.c);
+      break;
+    case 114:
+      this.writeMem(this.getHL(), this.d);
+      break;
+    case 115:
+      this.writeMem(this.getHL(), this.e);
+      break;
+    case 116:
+      this.writeMem(this.getHL(), this.h);
+      break;
+    case 117:
+      this.writeMem(this.getHL(), this.l);
+      break;
+    case 118:
+      if(HALT_SPEEDUP) {
+        this.tstates = 0
+      }
+      this.halt = true;
+      this.pc--;
+      break;
+    case 119:
+      this.writeMem(this.getHL(), this.a);
+      break;
+    case 120:
+      this.a = this.b;
+      break;
+    case 121:
+      this.a = this.c;
+      break;
+    case 122:
+      this.a = this.d;
+      break;
+    case 123:
+      this.a = this.e;
+      break;
+    case 124:
+      this.a = this.h;
+      break;
+    case 125:
+      this.a = this.l;
+      break;
+    case 126:
+      this.a = this.readMem(this.getHL());
+      break;
+    case 127:
+      break;
+    case 128:
+      this.add_a(this.b);
+      break;
+    case 129:
+      this.add_a(this.c);
+      break;
+    case 130:
+      this.add_a(this.d);
+      break;
+    case 131:
+      this.add_a(this.e);
+      break;
+    case 132:
+      this.add_a(this.h);
+      break;
+    case 133:
+      this.add_a(this.l);
+      break;
+    case 134:
+      this.add_a(this.readMem(this.getHL()));
+      break;
+    case 135:
+      this.add_a(this.a);
+      break;
+    case 136:
+      this.adc_a(this.b);
+      break;
+    case 137:
+      this.adc_a(this.c);
+      break;
+    case 138:
+      this.adc_a(this.d);
+      break;
+    case 139:
+      this.adc_a(this.e);
+      break;
+    case 140:
+      this.adc_a(this.h);
+      break;
+    case 141:
+      this.adc_a(this.l);
+      break;
+    case 142:
+      this.adc_a(this.readMem(this.getHL()));
+      break;
+    case 143:
+      this.adc_a(this.a);
+      break;
+    case 144:
+      this.sub_a(this.b);
+      break;
+    case 145:
+      this.sub_a(this.c);
+      break;
+    case 146:
+      this.sub_a(this.d);
+      break;
+    case 147:
+      this.sub_a(this.e);
+      break;
+    case 148:
+      this.sub_a(this.h);
+      break;
+    case 149:
+      this.sub_a(this.l);
+      break;
+    case 150:
+      this.sub_a(this.readMem(this.getHL()));
+      break;
+    case 151:
+      this.sub_a(this.a);
+      break;
+    case 152:
+      this.sbc_a(this.b);
+      break;
+    case 153:
+      this.sbc_a(this.c);
+      break;
+    case 154:
+      this.sbc_a(this.d);
+      break;
+    case 155:
+      this.sbc_a(this.e);
+      break;
+    case 156:
+      this.sbc_a(this.h);
+      break;
+    case 157:
+      this.sbc_a(this.l);
+      break;
+    case 158:
+      this.sbc_a(this.readMem(this.getHL()));
+      break;
+    case 159:
+      this.sbc_a(this.a);
+      break;
+    case 160:
+      this.f = this.SZP_TABLE[this.a &= this.b] | F_HALFCARRY;
+      break;
+    case 161:
+      this.f = this.SZP_TABLE[this.a &= this.c] | F_HALFCARRY;
+      break;
+    case 162:
+      this.f = this.SZP_TABLE[this.a &= this.d] | F_HALFCARRY;
+      break;
+    case 163:
+      this.f = this.SZP_TABLE[this.a &= this.e] | F_HALFCARRY;
+      break;
+    case 164:
+      this.f = this.SZP_TABLE[this.a &= this.h] | F_HALFCARRY;
+      break;
+    case 165:
+      this.f = this.SZP_TABLE[this.a &= this.l] | F_HALFCARRY;
+      break;
+    case 166:
+      this.f = this.SZP_TABLE[this.a &= this.readMem(this.getHL())] | F_HALFCARRY;
+      break;
+    case 167:
+      this.f = this.SZP_TABLE[this.a] | F_HALFCARRY;
+      break;
+    case 168:
+      this.f = this.SZP_TABLE[this.a ^= this.b];
+      break;
+    case 169:
+      this.f = this.SZP_TABLE[this.a ^= this.c];
+      break;
+    case 170:
+      this.f = this.SZP_TABLE[this.a ^= this.d];
+      break;
+    case 171:
+      this.f = this.SZP_TABLE[this.a ^= this.e];
+      break;
+    case 172:
+      this.f = this.SZP_TABLE[this.a ^= this.h];
+      break;
+    case 173:
+      this.f = this.SZP_TABLE[this.a ^= this.l];
+      break;
+    case 174:
+      this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getHL())];
+      break;
+    case 175:
+      this.f = this.SZP_TABLE[this.a = 0];
+      break;
+    case 176:
+      this.f = this.SZP_TABLE[this.a |= this.b];
+      break;
+    case 177:
+      this.f = this.SZP_TABLE[this.a |= this.c];
+      break;
+    case 178:
+      this.f = this.SZP_TABLE[this.a |= this.d];
+      break;
+    case 179:
+      this.f = this.SZP_TABLE[this.a |= this.e];
+      break;
+    case 180:
+      this.f = this.SZP_TABLE[this.a |= this.h];
+      break;
+    case 181:
+      this.f = this.SZP_TABLE[this.a |= this.l];
+      break;
+    case 182:
+      this.f = this.SZP_TABLE[this.a |= this.readMem(this.getHL())];
+      break;
+    case 183:
+      this.f = this.SZP_TABLE[this.a];
+      break;
+    case 184:
+      this.cp_a(this.b);
+      break;
+    case 185:
+      this.cp_a(this.c);
+      break;
+    case 186:
+      this.cp_a(this.d);
+      break;
+    case 187:
+      this.cp_a(this.e);
+      break;
+    case 188:
+      this.cp_a(this.h);
+      break;
+    case 189:
+      this.cp_a(this.l);
+      break;
+    case 190:
+      this.cp_a(this.readMem(this.getHL()));
+      break;
+    case 191:
+      this.cp_a(this.a);
+      break;
+    case 192:
+      this.ret((this.f & F_ZERO) == 0);
+      break;
+    case 193:
+      this.setBC(this.readMemWord(this.sp));
+      this.sp += 2;
+      break;
+    case 194:
+      this.jp((this.f & F_ZERO) == 0);
+      break;
+    case 195:
+      this.pc = this.readMemWord(this.pc);
+      break;
+    case 196:
+      this.call((this.f & F_ZERO) == 0);
+      break;
+    case 197:
+      this.push2(this.b, this.c);
+      break;
+    case 198:
+      this.add_a(this.readMem(this.pc++));
+      break;
+    case 199:
+      this.push1(this.pc);
+      this.pc = 0;
+      break;
+    case 200:
+      this.ret((this.f & F_ZERO) != 0);
+      break;
+    case 201:
+      this.pc = this.readMemWord(this.sp);
+      this.sp += 2;
+      break;
+    case 202:
+      this.jp((this.f & F_ZERO) != 0);
+      break;
+    case 203:
+      this.doCB(this.readMem(this.pc++));
+      break;
+    case 204:
+      this.call((this.f & F_ZERO) != 0);
+      break;
+    case 205:
+      this.push1(this.pc + 2);
+      this.pc = this.readMemWord(this.pc);
+      break;
+    case 206:
+      this.adc_a(this.readMem(this.pc++));
+      break;
+    case 207:
+      this.push1(this.pc);
+      this.pc = 8;
+      break;
+    case 208:
+      this.ret((this.f & F_CARRY) == 0);
+      break;
+    case 209:
+      this.setDE(this.readMemWord(this.sp));
+      this.sp += 2;
+      break;
+    case 210:
+      this.jp((this.f & F_CARRY) == 0);
+      break;
+    case 211:
+      this.port.out(this.readMem(this.pc++), this.a);
+      break;
+    case 212:
+      this.call((this.f & F_CARRY) == 0);
+      break;
+    case 213:
+      this.push2(this.d, this.e);
+      break;
+    case 214:
+      this.sub_a(this.readMem(this.pc++));
+      break;
+    case 215:
+      this.push1(this.pc);
+      this.pc = 16;
+      break;
+    case 216:
+      this.ret((this.f & F_CARRY) != 0);
+      break;
+    case 217:
+      this.exBC();
+      this.exDE();
+      this.exHL();
+      break;
+    case 218:
+      this.jp((this.f & F_CARRY) != 0);
+      break;
+    case 219:
+      this.a = this.port.in_(this.readMem(this.pc++));
+      break;
+    case 220:
+      this.call((this.f & F_CARRY) != 0);
+      break;
+    case 221:
+      this.doIndexOpIX(this.readMem(this.pc++));
+      break;
+    case 222:
+      this.sbc_a(this.readMem(this.pc++));
+      break;
+    case 223:
+      this.push1(this.pc);
+      this.pc = 24;
+      break;
+    case 224:
+      this.ret((this.f & F_PARITY) == 0);
+      break;
+    case 225:
+      this.setHL(this.readMemWord(this.sp));
+      this.sp += 2;
+      break;
+    case 226:
+      this.jp((this.f & F_PARITY) == 0);
+      break;
+    case 227:
+      temp = this.h;
+      this.h = this.readMem(this.sp + 1);
+      this.writeMem(this.sp + 1, temp);
+      temp = this.l;
+      this.l = this.readMem(this.sp);
+      this.writeMem(this.sp, temp);
+      break;
+    case 228:
+      this.call((this.f & F_PARITY) == 0);
+      break;
+    case 229:
+      this.push2(this.h, this.l);
+      break;
+    case 230:
+      this.f = this.SZP_TABLE[this.a &= this.readMem(this.pc++)] | F_HALFCARRY;
+      break;
+    case 231:
+      this.push1(this.pc);
+      this.pc = 32;
+      break;
+    case 232:
+      this.ret((this.f & F_PARITY) != 0);
+      break;
+    case 233:
+      this.pc = this.getHL();
+      break;
+    case 234:
+      this.jp((this.f & F_PARITY) != 0);
+      break;
+    case 235:
+      temp = this.d;
+      this.d = this.h;
+      this.h = temp;
+      temp = this.e;
+      this.e = this.l;
+      this.l = temp;
+      break;
+    case 236:
+      this.call((this.f & F_PARITY) != 0);
+      break;
+    case 237:
+      this.doED(this.d_());
+      break;
+    case 238:
+      this.f = this.SZP_TABLE[this.a ^= this.readMem(this.pc++)];
+      break;
+    case 239:
+      this.push1(this.pc);
+      this.pc = 40;
+      break;
+    case 240:
+      this.ret((this.f & F_SIGN) == 0);
+      break;
+    case 241:
+      this.f = this.readMem(this.sp++);
+      this.a = this.readMem(this.sp++);
+      break;
+    case 242:
+      this.jp((this.f & F_SIGN) == 0);
+      break;
+    case 243:
+      this.iff1 = this.iff2 = false;
+      this.EI_inst = true;
+      break;
+    case 244:
+      this.call((this.f & F_SIGN) == 0);
+      break;
+    case 245:
+      this.push2(this.a, this.f);
+      break;
+    case 246:
+      this.f = this.SZP_TABLE[this.a |= this.readMem(this.pc++)];
+      break;
+    case 247:
+      this.push1(this.pc);
+      this.pc = 48;
+      break;
+    case 248:
+      this.ret((this.f & F_SIGN) != 0);
+      break;
+    case 249:
+      this.sp = this.getHL();
+      break;
+    case 250:
+      this.jp((this.f & F_SIGN) != 0);
+      break;
+    case 251:
+      this.iff1 = this.iff2 = this.EI_inst = true;
+      break;
+    case 252:
+      this.call((this.f & F_SIGN) != 0);
+      break;
+    case 253:
+      this.doIndexOpIY(this.readMem(this.pc++));
+      break;
+    case 254:
+      this.cp_a(this.readMem(this.pc++));
+      break;
+    case 255:
+      this.push1(this.pc);
+      this.pc = 56;
+      break
   }
 }, nextStep:function() {
 }, getCycle:function() {
@@ -3480,7 +3481,6 @@ JSSMS.Z80.prototype = {reset:function() {
 }, doED:function(opcode) {
   var temp = 0;
   var location = 0;
-  var hlmem = 0;
   this.tstates -= OP_ED_STATES[opcode];
   if(Setup.REFRESH_EMULATION) {
     this.incR()
@@ -3652,9 +3652,9 @@ JSSMS.Z80.prototype = {reset:function() {
       break;
     case 103:
       location = this.getHL();
-      hlmem = this.readMem(location);
-      this.writeMem(location, hlmem >> 4 | (this.a & 15) << 4);
-      this.a = this.a & 240 | hlmem & 15;
+      temp = this.readMem(location);
+      this.writeMem(location, temp >> 4 | (this.a & 15) << 4);
+      this.a = this.a & 240 | temp & 15;
       this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];
       this.pc++;
       break;
@@ -3677,9 +3677,9 @@ JSSMS.Z80.prototype = {reset:function() {
       break;
     case 111:
       location = this.getHL();
-      hlmem = this.readMem(location);
-      this.writeMem(location, (hlmem & 15) << 4 | this.a & 15);
-      this.a = this.a & 240 | hlmem >> 4;
+      temp = this.readMem(location);
+      this.writeMem(location, (temp & 15) << 4 | this.a & 15);
+      this.a = this.a & 240 | temp >> 4;
       this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];
       this.pc++;
       break;
@@ -4712,7 +4712,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       continue
     }
     if(currentAddress >= romSize || currentAddress >> 10 >= 65) {
-      console.log("Invalid address", currentAddress);
+      console.log("Invalid address", JSSMS.Utils.toHex(currentAddress));
       continue
     }
     instruction = this.disassemble(currentAddress);
@@ -4764,26 +4764,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   var tstates = 0;
   var prevPc = 0;
   var breakNeeded = false;
-  var code = ["function run(cycles, cyclesTo) {", "var location = 0;", "var opcode = 0;", "var temp = 0;", "", "this.tstates += cycles;", "", "if (cycles != 0)", "  this.totalCycles = cycles;"];
-  if(!Setup.ACCURATE_INTERRUPT_EMULATION) {
-    code.push("if (this.interruptLine) this.interrupt(); // Check for interrupt")
-  }
-  code.push("while (this.tstates > cyclesTo) {");
-  code.push("if (this.interruptLine) this.interrupt(); // Check for interrupt");
-  if(Setup.ACCURATE_INTERRUPT_EMULATION) {
-    code.push("this.EI_inst = false;")
-  }
-  if(Setup.REFRESH_EMULATION) {
-    code.push("this.incR();")
-  }
-  code.push("this.branches[this.pc].call(this);");
-  code.push("}");
-  code.push("},");
-  code.push("");
-  code.push("");
-  code.push("branches: {");
-  code.push('"": function() {');
-  code.push('console.log("Bad address", this.pc);');
+  var code = ['"": function() {', 'throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'];
   for(var i = 0, length = tree.length;i < length;i++) {
     if(!tree[i]) {
       continue
@@ -4807,7 +4788,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     }
     prevPc = tree[i].nextAddress
   }
-  code.push("}");
   code.push("}");
   code = code.join("\n");
   console.timeEnd("JavaScript generation");
@@ -5378,7 +5358,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       }else {
         code = ""
       }
-      code += "this.halt = true; this.pc--; return;";
+      code += "this.halt = true; this.pc = " + toHex(address) + "; return;";
       break;
     case 119:
       inst = "LD (HL),A";
@@ -6089,27 +6069,35 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 24:
       inst = "RR B";
+      code = "this.b = (this.rr(this.b));";
       break;
     case 25:
       inst = "RR C";
+      code = "this.c = (this.rr(this.c));";
       break;
     case 26:
       inst = "RR D";
+      code = "this.d = (this.rr(this.d));";
       break;
     case 27:
       inst = "RR E";
+      code = "this.e = (this.rr(this.e));";
       break;
     case 28:
       inst = "RR H";
+      code = "this.h = (this.rr(this.h));";
       break;
     case 29:
       inst = "RR L";
+      code = "this.l = (this.rr(this.l));";
       break;
     case 30:
       inst = "RR (HL)";
+      code = "this.writeMem(this.getHL(), this.rr(this.readMem(this.getHL())));";
       break;
     case 31:
       inst = "RR A";
+      code = "this.a = (this.rr(this.a));";
       break;
     case 32:
       inst = "SLA B";
@@ -6206,6 +6194,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 63:
       inst = "SRL A";
+      code = "this.a = this.srl(this.a);";
       break;
     case 64:
       inst = "BIT 0,B";
@@ -6227,9 +6216,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 70:
       inst = "BIT 0,(HL)";
+      code = "this.bit(this.readMem(this.getHL()) & BIT_0);";
       break;
     case 71:
       inst = "BIT 0,A";
+      code = "this.bit(this.a & BIT_0);";
       break;
     case 72:
       inst = "BIT 1,B";
@@ -6251,9 +6242,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 78:
       inst = "BIT 1,(HL)";
+      code = "this.bit(this.readMem(this.getHL()) & BIT_1);";
       break;
     case 79:
       inst = "BIT 1,A";
+      code = "this.bit(this.a & BIT_1);";
       break;
     case 80:
       inst = "BIT 2,B";
@@ -6275,9 +6268,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 86:
       inst = "BIT 2,(HL)";
+      code = "this.bit(this.readMem(this.getHL()) & BIT_2);";
       break;
     case 87:
       inst = "BIT 2,A";
+      code = "this.bit(this.a & BIT_2);";
       break;
     case 88:
       inst = "BIT 3,B";
@@ -6299,9 +6294,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 94:
       inst = "BIT 3,(HL)";
+      code = "this.bit(this.readMem(this.getHL()) & BIT_3);";
       break;
     case 95:
       inst = "BIT 3,A";
+      code = "this.bit(this.a & BIT_3);";
       break;
     case 96:
       inst = "BIT 4,B";
@@ -6323,9 +6320,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 102:
       inst = "BIT 4,(HL)";
+      code = "this.bit(this.readMem(this.getHL()) & BIT_4);";
       break;
     case 103:
       inst = "BIT 4,A";
+      code = "this.bit(this.a & BIT_4);";
       break;
     case 104:
       inst = "BIT 5,B";
@@ -6347,9 +6346,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 110:
       inst = "BIT 5,(HL)";
+      code = "this.bit(this.readMem(this.getHL()) & BIT_5);";
       break;
     case 111:
       inst = "BIT 5,A";
+      code = "this.bit(this.a & BIT_5);";
       break;
     case 112:
       inst = "BIT 6,B";
@@ -6371,9 +6372,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 118:
       inst = "BIT 6,(HL)";
+      code = "this.bit(this.readMem(this.getHL()) & BIT_6);";
       break;
     case 119:
       inst = "BIT 6,A";
+      code = "this.bit(this.a & BIT_6);";
       break;
     case 120:
       inst = "BIT 7,B";
@@ -6395,9 +6398,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 126:
       inst = "BIT 7,(HL)";
+      code = "this.bit(this.readMem(this.getHL()) & BIT_7);";
       break;
     case 127:
       inst = "BIT 7,A";
+      code = "this.bit(this.a & BIT_7);";
       break;
     case 128:
       inst = "RES 0,B";
@@ -6419,6 +6424,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 134:
       inst = "RES 0,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_0);";
       break;
     case 135:
       inst = "RES 0,A";
@@ -6443,6 +6449,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 142:
       inst = "RES 1,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_1);";
       break;
     case 143:
       inst = "RES 1,A";
@@ -6467,6 +6474,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 150:
       inst = "RES 2,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_2);";
       break;
     case 151:
       inst = "RES 2,A";
@@ -6491,6 +6499,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 158:
       inst = "RES 3,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_3);";
       break;
     case 159:
       inst = "RES 3,A";
@@ -6515,6 +6524,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 166:
       inst = "RES 4,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_4);";
       break;
     case 167:
       inst = "RES 4,A";
@@ -6539,6 +6549,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 174:
       inst = "RES 5,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_5);";
       break;
     case 175:
       inst = "RES 5,A";
@@ -6563,6 +6574,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 182:
       inst = "RES 6,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_6);";
       break;
     case 183:
       inst = "RES 6,A";
@@ -6587,33 +6599,43 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 190:
       inst = "RES 7,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_7);";
       break;
     case 191:
       inst = "RES 7,A";
+      code = "this.a &= ~BIT_7;";
       break;
     case 192:
       inst = "SET 0,B";
+      code = "this.b |= BIT_0;";
       break;
     case 193:
       inst = "SET 0,C";
+      code = "this.c |= BIT_0;";
       break;
     case 194:
       inst = "SET 0,D";
+      code = "this.d |= BIT_0;";
       break;
     case 195:
       inst = "SET 0,E";
+      code = "this.e |= BIT_0;";
       break;
     case 196:
       inst = "SET 0,H";
+      code = "this.h |= BIT_0;";
       break;
     case 197:
       inst = "SET 0,L";
+      code = "this.l |= BIT_0;";
       break;
     case 198:
       inst = "SET 0,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_0);";
       break;
     case 199:
       inst = "SET 0,A";
+      code = "this.a |= BIT_0;";
       break;
     case 200:
       inst = "SET 1,B";
@@ -6635,6 +6657,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 206:
       inst = "SET 1,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_1);";
       break;
     case 207:
       inst = "SET 1,A";
@@ -6659,6 +6682,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 214:
       inst = "SET 2,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_2)";
       break;
     case 215:
       inst = "SET 2,A";
@@ -6683,6 +6707,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 222:
       inst = "SET 3,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_3);";
       break;
     case 223:
       inst = "SET 3,A";
@@ -6707,6 +6732,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 230:
       inst = "SET 4,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_4);";
       break;
     case 231:
       inst = "SET 4,A";
@@ -6731,6 +6757,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 238:
       inst = "SET 5,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_5);";
       break;
     case 239:
       inst = "SET 5,A";
@@ -6755,6 +6782,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 246:
       inst = "SET 6,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_6);";
       break;
     case 247:
       inst = "SET 6,A";
@@ -6779,9 +6807,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 254:
       inst = "SET 7,(HL)";
+      code = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_7);";
       break;
     case 255:
       inst = "SET 7,A";
+      code = "this.a |= BIT_7;";
       break
   }
   return{opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address}
@@ -6793,6 +6823,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   var currAddr = address;
   var target = null;
   var code = 'throw "Unimplemented 0xED prefixed opcode";';
+  var operand = "";
   address++;
   switch(opcode) {
     case 64:
@@ -6803,6 +6834,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 66:
       inst = "SBC HL,BC";
+      code = "this.sbc16(this.getBC());";
       break;
     case 67:
       inst = "LD (" + toHex(this.readMemWord(address)) + "),BC";
@@ -6842,6 +6874,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     ;
     case 125:
       inst = "RETN / RETI";
+      code = "this.pc = this.readMemWord(this.sp);" + "this.sp += 2;" + "this.iff1 = this.iff2;";
       address = null;
       break;
     case 70:
@@ -6880,6 +6913,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 82:
       inst = "SBC HL,DE";
+      code = "this.sbc16(this.getDE());";
       break;
     case 83:
       inst = "LD (" + toHex(this.readMemWord(address)) + "),DE";
@@ -6904,7 +6938,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "ADC HL,DE";
       break;
     case 91:
-      inst = "LD DE,(" + toHex(this.readMemWord(address)) + ")";
+      operand = toHex(this.readMemWord(address));
+      inst = "LD DE,(" + operand + ")";
+      code = "this.setDE(" + operand + ");";
       address = address + 2;
       break;
     case 95:
@@ -6931,6 +6967,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 103:
       inst = "RRD";
+      code = "var location = this.getHL();" + "temp = this.readMem(location);" + "this.writeMem(location, (temp >> 4) | ((this.a & 0x0F) << 4));" + "this.a = (this.a & 0xF0) | (temp & 0x0F);" + "this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];";
       break;
     case 104:
       inst = "IN L,(C)";
@@ -6940,6 +6977,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 106:
       inst = "ADC HL,HL";
+      code = "this.adc16(this.getHL());";
       break;
     case 107:
       inst = "LD HL,(" + toHex(this.readMemWord(address)) + ")";
@@ -6963,6 +7001,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 121:
       inst = "OUT (C),A";
+      code = "this.port.out(this.c, this.a);";
       break;
     case 122:
       inst = "ADC HL,SP";
@@ -6973,6 +7012,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 160:
       inst = "LDI";
+      code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "this.f = (this.f & 0xC1) | (this.getBC() != 0 ? F_PARITY : 0);";
       break;
     case 161:
       inst = "CPI";
@@ -7000,14 +7040,16 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LDIR";
       if(Setup.ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
-        code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();" + "this.incHL();" + "this.decBC();" + "" + "if (this.getBC() != 0) {" + "this.f |= F_PARITY;" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
+        code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "" + "if (this.getBC() != 0) {" + "this.f |= F_PARITY;" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
       }else {
-        code = "for(;this.getBC() != 0; this.f |= F_PARITY, this.tstates -= 5) {" + "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();" + "this.incHL();" + "this.decBC();" + "}"
+        code = "for(;this.getBC() != 0; this.f |= F_PARITY, this.tstates -= 5) {" + "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "}"
       }
       code += "if (!(this.getBC() != 0)) this.f &= ~ F_PARITY;" + "" + "this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
       break;
     case 177:
+      target = address - 2;
       inst = "CPIR";
+      code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);" + "if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "}" + "this.f = (this.f & 0xF8) | temp;";
       break;
     case 178:
       inst = "INIR";
@@ -7102,21 +7144,22 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       address++;
       break;
     case 52:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "INC (" + index + sign + toHex(offset) + ")";
+      var offset = this.readMem(address);
+      inst = "INC (" + index + "+" + toHex(offset) + ")";
+      code = "this.incMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 53:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "DEC (" + index + sign + toHex(offset) + ")";
+      var offset = this.readMem(address);
+      inst = "DEC (" + index + "+" + toHex(offset) + ")";
+      code = "this.decMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 54:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD (" + index + sign + toHex(offset) + ")," + toHex(this.readMem(address));
+      var offset = this.readMem(address);
+      operand = toHex(this.readMem(address + 1));
+      inst = "LD (" + index + "+" + toHex(offset) + ")," + operand;
+      code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", " + operand + ");";
       address++;
       break;
     case 57:
@@ -7129,9 +7172,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD B," + index + "L *";
       break;
     case 70:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD B,(" + index + sign + toHex(offset) + ")";
+      var offset = this.readMem(address);
+      inst = "LD B,(" + index + "+" + toHex(offset) + ")";
+      code = "this.b = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 76:
@@ -7141,9 +7184,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD C," + index + "L *";
       break;
     case 78:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD C,(" + index + sign + toHex(offset) + ")";
+      var offset = this.readMem(address);
+      inst = "LD C,(" + index + "+" + toHex(offset) + ")";
+      code = "this.c = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 84:
@@ -7153,9 +7196,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD D," + index + "L *";
       break;
     case 86:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD D,(" + index + sign + toHex(offset) + ")";
+      var offset = this.readMem(address);
+      inst = "LD D,(" + index + "+" + toHex(offset) + ")";
+      code = "this.d = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 92:
@@ -7165,9 +7208,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD E," + index + "L *";
       break;
     case 94:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD E,(" + index + sign + toHex(offset) + ")";
+      var offset = this.readMem(address);
+      inst = "LD E,(" + index + "+" + toHex(offset) + ")";
+      code = "this.e = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 96:
@@ -7189,9 +7232,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD " + index + "H," + index + "L *";
       break;
     case 102:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD H,(" + index + sign + toHex(offset) + ")";
+      var offset = this.readMem(address);
+      inst = "LD H,(" + index + "+" + toHex(offset) + ")";
+      code = "this.h = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 103:
@@ -7216,54 +7259,54 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD " + index + "L," + index + "L *";
       break;
     case 110:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD L,(" + index + sign + toHex(offset) + ")";
+      var offset = this.readMem(address);
+      inst = "LD L,(" + index + "+" + toHex(offset) + ")";
+      code = "this.l = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 111:
       inst = "LD " + index + "L,A *";
       break;
     case 112:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD (" + index + sign + toHex(offset) + "),B";
+      var offset = this.readMem(address);
+      inst = "LD (" + index + "+" + toHex(offset) + "),B";
+      code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.b);";
       address++;
       break;
     case 113:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD (" + index + sign + toHex(offset) + "),C";
+      var offset = this.readMem(address);
+      inst = "LD (" + index + "+" + toHex(offset) + "),C";
+      code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.c);";
       address++;
       break;
     case 114:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD (" + index + sign + toHex(offset) + "),D";
+      var offset = this.readMem(address);
+      inst = "LD (" + index + "+" + toHex(offset) + "),D";
+      code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.d);";
       address++;
       break;
     case 115:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD (" + index + sign + toHex(offset) + "),E";
+      var offset = this.readMem(address);
+      inst = "LD (" + index + "+" + toHex(offset) + "),E";
+      code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.e);";
       address++;
       break;
     case 116:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD (" + index + sign + toHex(offset) + "),H";
+      var offset = this.readMem(address);
+      inst = "LD (" + index + "+" + toHex(offset) + "),H";
+      code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.h);";
       address++;
       break;
     case 117:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD (" + index + sign + toHex(offset) + "),L";
+      var offset = this.readMem(address);
+      inst = "LD (" + index + "+" + toHex(offset) + "),L";
+      code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.l);";
       address++;
       break;
     case 119:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD (" + index + sign + toHex(offset) + "),A";
+      var offset = this.readMem(address);
+      inst = "LD (" + index + "+" + toHex(offset) + "),A";
+      code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.a);";
       address++;
       break;
     case 124:
@@ -7273,10 +7316,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD A," + index + "L *";
       break;
     case 126:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "LD A,(" + index + sign + toHex(offset) + "))";
-      code = "this.a = this.readMem(this.getIX() " + sign + " " + toHex(offset) + ");";
+      var offset = this.readMem(address);
+      inst = "LD A,(" + index + "+" + toHex(offset) + ")";
+      code = "this.a = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 132:
@@ -7286,9 +7328,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "ADD A," + index + "L *";
       break;
     case 134:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "ADD A,(" + index + sign + toHex(offset) + "))";
+      var offset = this.readMem(address);
+      inst = "ADD A,(" + index + "+" + toHex(offset) + "))";
+      code = "this.add_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
       break;
     case 140:
@@ -7298,9 +7340,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "ADC A," + index + "L *";
       break;
     case 142:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "ADC A,(" + index + sign + toHex(offset) + "))";
+      var offset = this.readMem(address);
+      inst = "ADC A,(" + index + "+" + toHex(offset) + "))";
       address++;
       break;
     case 148:
@@ -7310,9 +7351,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "SUB " + index + "L *";
       break;
     case 150:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "SUB A,(" + index + sign + toHex(offset) + "))";
+      var offset = this.readMem(address);
+      inst = "SUB A,(" + index + "+" + toHex(offset) + "))";
+      code = "this.sub_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
       break;
     case 156:
@@ -7322,9 +7363,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "SBC A," + index + "L *";
       break;
     case 158:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "SBC A,(" + index + sign + toHex(offset) + "))";
+      var offset = this.readMem(address);
+      inst = "SBC A,(" + index + "+" + toHex(offset) + "))";
       address++;
       break;
     case 164:
@@ -7334,9 +7374,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "AND " + index + "L *";
       break;
     case 166:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "AND A,(" + index + sign + toHex(offset) + "))";
+      var offset = this.readMem(address);
+      inst = "AND A,(" + index + "+" + toHex(offset) + "))";
       address++;
       break;
     case 172:
@@ -7346,9 +7385,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "XOR A " + index + "L*";
       break;
     case 174:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "XOR A,(" + index + sign + toHex(offset) + "))";
+      var offset = this.readMem(address);
+      inst = "XOR A,(" + index + "+" + toHex(offset) + "))";
+      code = "this.f = this.SZP_TABLE[this.a ^= this.readMem(this.get" + index + "() + " + toHex(offset) + ")];";
       address++;
       break;
     case 180:
@@ -7358,9 +7397,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "OR A " + index + "L*";
       break;
     case 182:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "OR A,(" + index + sign + toHex(offset) + "))";
+      var offset = this.readMem(address);
+      inst = "OR A,(" + index + "+" + toHex(offset) + "))";
+      code = "this.f = this.SZP_TABLE[this.a |= this.readMem(this.get" + index + "() + " + toHex(offset) + ")];";
       address++;
       break;
     case 188:
@@ -7370,25 +7409,28 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "CP " + index + "L *";
       break;
     case 190:
-      var offset = this.signExtend(this.readMem(address));
-      var sign = offset > 0 ? "+" : "-";
-      inst = "CP (" + index + sign + toHex(offset) + "))";
+      var offset = this.readMem(address);
+      inst = "CP (" + index + "+" + toHex(offset) + "))";
+      code = "this.cp_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
       break;
     case 203:
       var _inst = this.getIndexCB(index, address);
       inst = _inst.inst;
+      code = _inst.code;
       opcodesArray = opcodesArray.concat(_inst.opcodes);
       address = _inst.nextAddress;
       break;
     case 225:
       inst = "POP " + index;
+      code = "this.set" + index + "(this.readMemWord(this.sp)); this.sp += 2;";
       break;
     case 227:
       inst = "EX SP,(" + index + ")";
       break;
     case 229:
       inst = "PUSH " + index;
+      code = "this.push2(this." + index.toLowerCase() + "H, this." + index.toLowerCase() + "L);";
       break;
     case 233:
       inst = "JP (" + index + ")";
@@ -7405,10 +7447,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   var inst = "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";
   var currAddr = address;
   var code = 'throw "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";';
+  var location = 0;
   address++;
   switch(opcode) {
     case 0:
       inst = "LD B,RLC (" + index + ")";
+      code = "var location = (this.get" + index + "() + " + this.readMem(address) + ") & 0xFFFF;" + "this.b = this.rlc(this.readMem(location)); this.writeMem(location, this.b);";
       break;
     case 1:
       inst = "LD C,RLC (" + index + ")";
@@ -8770,7 +8814,7 @@ JSSMS.Vdp.prototype = {reset:function() {
     for(var lineno = y;lineno < SMS_HEIGHT;lineno++) {
       if(lineno - y < height) {
         var sprites = this.lineSprites[lineno];
-        if(sprites[SPRITE_COUNT] >= SPRITES_PER_LINE) {
+        if(!sprites || sprites[SPRITE_COUNT] >= SPRITES_PER_LINE) {
           break
         }
         var off = sprites[SPRITE_COUNT] * 3 + SPRITE_X;

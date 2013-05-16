@@ -1016,7 +1016,7 @@ JSSMS.Vdp.prototype = {
         if ((lineno - y) < height) {
           var sprites = this.lineSprites[lineno];
 
-          if (sprites[SPRITE_COUNT] >= SPRITES_PER_LINE) {
+          if (!sprites || sprites[SPRITE_COUNT] >= SPRITES_PER_LINE) {
             break;
           }
 

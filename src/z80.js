@@ -406,8 +406,9 @@ JSSMS.Z80.prototype = {
 
     this.pc = 0x0000;
     this.sp = 0xDFF0;
-    this.tstates = 0;
+
     this.totalCycles = 0;
+    this.tstates = 0;
 
     this.im = 0;
     this.iff1 = false;
@@ -425,10 +426,6 @@ JSSMS.Z80.prototype = {
    * @param {number} cyclesTo
    */
   run: function(cycles, cyclesTo) {
-    var location = 0;
-    var opcode = 0;
-    var temp = 0;
-
     this.tstates += cycles;
 
     if (cycles != 0)
@@ -449,300 +446,310 @@ JSSMS.Z80.prototype = {
         this.main.ui.updateDisassembly(this.pc);
       }
 
-      // Fetch & Interpret Opcodes
-      // Main Opcode Switch Rolled In For Speed
-      opcode = this.readMem(this.pc++);                    // Fetch & Interpret Opcode
-
-      if (Setup.ACCURATE_INTERRUPT_EMULATION)
-        this.EI_inst = false;
-
-      this.tstates -= OP_STATES[opcode];   // Decrement TStates
-
-      if (Setup.REFRESH_EMULATION)
-        this.incR();
-
-      switch (opcode) {
-        case 0x00: break;                                                   // NOP
-        case 0x01: this.setBC(this.readMemWord(this.pc++)); this.pc++; break;             // LD BC,nn
-        case 0x02: this.writeMem(this.getBC(), this.a); break;                             // LD (BC),A
-        case 0x03: this.incBC(); break;                                          // INC BC
-        case 0x04: this.b = this.inc8(this.b); break;                                      // INC B
-        case 0x05: this.b = this.dec8(this.b); break;                                      // DEC B
-        case 0x06: this.b = this.readMem(this.pc++); break;                                // LD B,n
-        case 0x07: this.rlca_a(); break;                                         // RLCA
-        case 0x08: this.exAF(); break;                                           // EX AF AF'
-        case 0x09: this.setHL(this.add16(this.getHL(), this.getBC())); break;                   // ADD HL,BC
-        case 0x0A: this.a = this.readMem(this.getBC()); break;                             // LD A,(BC)
-        case 0x0B: this.decBC(); break;                                          // DEC BC
-        case 0x0C: this.c = this.inc8(this.c); break;                                      // INC C
-        case 0x0D: this.c = this.dec8(this.c); break;                                      // DEC C
-        case 0x0E: this.c = this.readMem(this.pc++); break;                                // LD C,n
-        case 0x0F: this.rrca_a(); break;                                         // RRCA
-        case 0x10: this.b = (this.b - 1) & 0xFF; this.jr(this.b != 0); break;                                      // DJNZ (PC+e)
-        case 0x11: this.setDE(this.readMemWord(this.pc++)); this.pc++; break;             // LD DE,nn
-        case 0x12: this.writeMem(this.getDE(), this.a); break;                             // LD (DE),A
-        case 0x13: this.incDE(); break;                                          // INC DE
-        case 0x14: this.d = this.inc8(this.d); break;                                      // INC D
-        case 0x15: this.d = this.dec8(this.d); break;                                      // DEC D
-        case 0x16: this.d = (this.readMem(this.pc++)); break;                              // LD D,n
-        case 0x17: this.rla_a(); break;                                          // RLA
-        case 0x18: this.pc += this.signExtend(this.d_() + 1); break;                                      // JR (PC+e)
-        case 0x19: this.setHL(this.add16(this.getHL(), this.getDE())); break;                   // ADD HL,DE
-        case 0x1A: this.a = this.readMem(this.getDE()); break;                             // LD A,(DE)
-        case 0x1B: this.decDE(); break;                                          // DEC DE
-        case 0x1C: this.e = this.inc8(this.e); break;                                      // INC E
-        case 0x1D: this.e = this.dec8(this.e); break;                                      // DEC E
-        case 0x1E: this.e = this.readMem(this.pc++); break;                                // LD E,n
-        case 0x1F: this.rra_a(); break;                                          // RRA
-        case 0x20: this.jr(!((this.f & F_ZERO) != 0)); break;                         // JR NZ,(PC+e)
-        case 0x21: this.setHL(this.readMemWord(this.pc++)); this.pc++; break;             // LD HL,nn
-        case 0x22:                                                        // LD (nn),HL
-          location = this.readMemWord(this.pc);
-          this.writeMem(location, this.l);
-          this.writeMem(++location, this.h);
-          this.pc += 2;
-          break;
-        case 0x23: this.incHL(); break;                                          // INC HL
-        case 0x24: this.h = this.inc8(this.h); break;                                      // INC H
-        case 0x25: this.h = this.dec8(this.h); break;                                      // DEC H
-        case 0x26: this.h = this.readMem(this.pc++); break;                                // LD H,n
-        case 0x27: this.daa(); break;                                            // DAA
-        case 0x28: this.jr((this.f & F_ZERO) != 0); break;                          // JR Z,(PC+e)
-        case 0x29: this.setHL(this.add16(this.getHL(), this.getHL())); break;                   // ADD HL,HL
-        case 0x2A: this.setHL(this.readMemWord(this.readMemWord(this.pc))); this.pc += 2; break; // LD HL,(nn)
-        case 0x2B: this.decHL(); break;                                          // DEC HL
-        case 0x2C: this.l = this.inc8(this.l); break;                                      // INC L
-        case 0x2D: this.l = this.dec8(this.l); break;                                      // DEC L
-        case 0x2E: this.l = this.readMem(this.pc++); break;                                // LD L,n
-        case 0x2F: this.cpl_a(); break;                                          // CPL
-        case 0x30: this.jr(!((this.f & F_CARRY) != 0)); break;                        // JR NC,(PC+e)
-        case 0x31: this.sp = this.readMemWord(this.pc); this.pc += 2; break;                      // LD SP,nn
-        case 0x32: this.writeMem(this.readMemWord(this.pc), this.a); this.pc += 2; break;              // LD (nn),A
-        case 0x33: this.sp++; break;                                             // INC SP
-        case 0x34: this.incMem(this.getHL()); break;                                  // INC (HL)
-        case 0x35: this.decMem(this.getHL()); break;                                  // DEC (HL)
-        case 0x36: this.writeMem(this.getHL(), this.readMem(this.pc++)); break;                 // LD (HL),n
-        case 0x37: this.f |= F_CARRY; this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY; break;       // SCF
-        case 0x38: this.jr((this.f & F_CARRY) != 0); break;                           // JR C,(PC+e)
-        case 0x39: this.setHL(this.add16(this.getHL(), this.sp)); break;                        // ADD HL,SP
-        case 0x3A: this.a = this.readMem(this.readMemWord(this.pc)); this.pc += 2; break;              // LD A,(nn)
-        case 0x3B: this.sp--; break;                                             // DEC SP
-        case 0x3C: this.a = this.inc8(this.a); break;                                      // INC A
-        case 0x3D: this.a = this.dec8(this.a); break;                                      // DEC A
-        case 0x3E: this.a = this.readMem(this.pc++); break;                                // LD A,n
-        case 0x3F: this.ccf(); break;                                            // CCF
-        case 0x40: break;                                                   // LD B,B
-        case 0x41: this.b = this.c; break;                                            // LD B,C
-        case 0x42: this.b = this.d; break;                                            // LD B,D
-        case 0x43: this.b = this.e; break;                                            // LD B,E
-        case 0x44: this.b = this.h; break;                                            // LD B,H
-        case 0x45: this.b = this.l; break;                                            // LD B,L
-        case 0x46: this.b = this.readMem(this.getHL()); break;                             // LD B,(HL)
-        case 0x47: this.b = this.a; break;                                            // LD B,A
-        case 0x48: this.c = this.b; break;                                            // LD C,B
-        case 0x49: break;                                                   // LD C,C
-        case 0x4A: this.c = this.d; break;                                            // LD C,D
-        case 0x4B: this.c = this.e; break;                                            // LD C,E
-        case 0x4C: this.c = this.h; break;                                            // LD C,H
-        case 0x4D: this.c = this.l; break;                                            // LD C,L
-        case 0x4E: this.c = this.readMem(this.getHL()); break;                             // LD C,(HL)
-        case 0x4F: this.c = this.a; break;                                            // LD C,A
-        case 0x50: this.d = this.b; break;                                            // LD D,B
-        case 0x51: this.d = this.c; break;                                            // LD D,C
-        case 0x52: break;                                                   // LD D,D
-        case 0x53: this.d = this.e; break;                                            // LD D,E
-        case 0x54: this.d = this.h; break;                                            // LD D,H
-        case 0x55: this.d = this.l; break;                                            // LD D,L
-        case 0x56: this.d = this.readMem(this.getHL()); break;                             // LD D,(HL)
-        case 0x57: this.d = this.a; break;                                            // LD D,A
-        case 0x58: this.e = this.b; break;                                            // LD E,B
-        case 0x59: this.e = this.c; break;                                            // LD E,C
-        case 0x5A: this.e = this.d; break;                                            // LD E,D
-        case 0x5B: break;                                                   // LD E,E
-        case 0x5C: this.e = this.h; break;                                            // LD E,H
-        case 0x5D: this.e = this.l; break;                                            // LD E,L
-        case 0x5E: this.e = this.readMem(this.getHL()); break;                             // LD E,(HL)
-        case 0x5F: this.e = this.a; break;                                            // LD E,A
-        case 0x60: this.h = this.b; break;                                            // LD H,B
-        case 0x61: this.h = this.c; break;                                            // LD H,C
-        case 0x62: this.h = this.d; break;                                            // LD H,D
-        case 0x63: this.h = this.e; break;                                            // LD H,E
-        case 0x64: break;                                                   // LD H,H
-        case 0x65: this.h = this.l; break;                                            // LD H,L
-        case 0x66: this.h = this.readMem(this.getHL()); break;                             // LD H,(HL)
-        case 0x67: this.h = this.a; break;                                            // LD H,A
-        case 0x68: this.l = this.b; break;                                            // LD L,B
-        case 0x69: this.l = this.c; break;                                            // LD L,C
-        case 0x6A: this.l = this.d; break;                                            // LD L,D
-        case 0x6B: this.l = this.e; break;                                            // LD L,E
-        case 0x6C: this.l = this.h; break;                                            // LD L,H
-        case 0x6D: break;                                                   // LD L,L
-        case 0x6E: this.l = this.readMem(this.getHL()); break;                             // LD L,(HL)
-        case 0x6F: this.l = this.a; break;                                            // LD L,A
-        case 0x70: this.writeMem(this.getHL(), this.b); break;                             // LD (HL),B
-        case 0x71: this.writeMem(this.getHL(), this.c); break;                             // LD (HL),C
-        case 0x72: this.writeMem(this.getHL(), this.d); break;                             // LD (HL),D
-        case 0x73: this.writeMem(this.getHL(), this.e); break;                             // LD (HL),E
-        case 0x74: this.writeMem(this.getHL(), this.h); break;                             // LD (HL),H
-        case 0x75: this.writeMem(this.getHL(), this.l); break;                             // LD (HL),L
-        case 0x76: if (HALT_SPEEDUP) this.tstates = 0; this.halt = true; this.pc--; break;                               // HALT
-        case 0x77: this.writeMem(this.getHL(), this.a); break;                             // LD (HL),A
-        case 0x78: this.a = this.b; break;                                            // LD A,B
-        case 0x79: this.a = this.c; break;                                            // LD A,C
-        case 0x7A: this.a = this.d; break;                                            // LD A,D
-        case 0x7B: this.a = this.e; break;                                            // LD A,E
-        case 0x7C: this.a = this.h; break;                                            // LD A,H
-        case 0x7D: this.a = this.l; break;                                            // LD A,L
-        case 0x7E: this.a = this.readMem(this.getHL()); break;                             // LD A,(HL)
-        case 0x7F: break;                                                   // LD A,A
-        case 0x80: this.add_a(this.b); break;                                         // ADD A,B
-        case 0x81: this.add_a(this.c); break;                                         // ADD A,C
-        case 0x82: this.add_a(this.d); break;                                         // ADD A,D
-        case 0x83: this.add_a(this.e); break;                                         // ADD A,E
-        case 0x84: this.add_a(this.h); break;                                         // ADD A,H
-        case 0x85: this.add_a(this.l); break;                                         // ADD A,L
-        case 0x86: this.add_a(this.readMem(this.getHL())); break;                          // ADD A,(HL)
-        case 0x87: this.add_a(this.a); break;                                         // ADD A,A
-        case 0x88: this.adc_a(this.b); break;                                         // ADC A,B
-        case 0x89: this.adc_a(this.c); break;                                         // ADC A,C
-        case 0x8A: this.adc_a(this.d); break;                                         // ADC A,D
-        case 0x8B: this.adc_a(this.e); break;                                         // ADC A,E
-        case 0x8C: this.adc_a(this.h); break;                                         // ADC A,H
-        case 0x8D: this.adc_a(this.l); break;                                         // ADC A,L
-        case 0x8E: this.adc_a(this.readMem(this.getHL())); break;                          // ADC A,(HL)
-        case 0x8F: this.adc_a(this.a); break;                                         // ADC A,A
-        case 0x90: this.sub_a(this.b); break;                                         // SUB A,B
-        case 0x91: this.sub_a(this.c); break;                                         // SUB A,C
-        case 0x92: this.sub_a(this.d); break;                                         // SUB A,D
-        case 0x93: this.sub_a(this.e); break;                                         // SUB A,E
-        case 0x94: this.sub_a(this.h); break;                                         // SUB A,H
-        case 0x95: this.sub_a(this.l); break;                                         // SUB A,L
-        case 0x96: this.sub_a(this.readMem(this.getHL())); break;                          // SUB A,(HL)
-        case 0x97: this.sub_a(this.a); break;                                         // SUB A,A
-        case 0x98: this.sbc_a(this.b); break;                                         // SBC A,B
-        case 0x99: this.sbc_a(this.c); break;                                         // SBC A,C
-        case 0x9A: this.sbc_a(this.d); break;                                         // SBC A,D
-        case 0x9B: this.sbc_a(this.e); break;                                         // SBC A,E
-        case 0x9C: this.sbc_a(this.h); break;                                         // SBC A,H
-        case 0x9D: this.sbc_a(this.l); break;                                         // SBC A,L
-        case 0x9E: this.sbc_a(this.readMem(this.getHL())); break;                          // SBC A,(HL)
-        case 0x9F: this.sbc_a(this.a); break;                                         // SBC A,A
-        case 0xA0: this.f = this.SZP_TABLE[this.a &= this.b] | F_HALFCARRY; break;              // AND A,B
-        case 0xA1: this.f = this.SZP_TABLE[this.a &= this.c] | F_HALFCARRY; break;              // AND A,C
-        case 0xA2: this.f = this.SZP_TABLE[this.a &= this.d] | F_HALFCARRY; break;              // AND A,D
-        case 0xA3: this.f = this.SZP_TABLE[this.a &= this.e] | F_HALFCARRY; break;              // AND A,E
-        case 0xA4: this.f = this.SZP_TABLE[this.a &= this.h] | F_HALFCARRY; break;              // AND A,H
-        case 0xA5: this.f = this.SZP_TABLE[this.a &= this.l] | F_HALFCARRY; break;              // AND A,L
-        case 0xA6: this.f = this.SZP_TABLE[this.a &= this.readMem(this.getHL())] | F_HALFCARRY; break; // AND A,(HL)
-        case 0xA7: this.f = this.SZP_TABLE[this.a] | F_HALFCARRY; break;                   // AND A,A
-        case 0xA8: this.f = this.SZP_TABLE[this.a ^= this.b]; break;                            // XOR A,B
-        case 0xA9: this.f = this.SZP_TABLE[this.a ^= this.c]; break;                            // XOR A,C
-        case 0xAA: this.f = this.SZP_TABLE[this.a ^= this.d]; break;                            // XOR A,D
-        case 0xAB: this.f = this.SZP_TABLE[this.a ^= this.e]; break;                            // XOR A,E
-        case 0xAC: this.f = this.SZP_TABLE[this.a ^= this.h]; break;                            // XOR A,H
-        case 0xAD: this.f = this.SZP_TABLE[this.a ^= this.l]; break;                            // XOR A,L
-        case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getHL())]; break;             // XOR A,(HL)
-        case 0xAF: this.f = this.SZP_TABLE[this.a = 0]; break;                             // XOR A,A
-        case 0xB0: this.f = this.SZP_TABLE[this.a |= this.b]; break;                            // OR A,B
-        case 0xB1: this.f = this.SZP_TABLE[this.a |= this.c]; break;                            // OR A,C
-        case 0xB2: this.f = this.SZP_TABLE[this.a |= this.d]; break;                            // OR A,D
-        case 0xB3: this.f = this.SZP_TABLE[this.a |= this.e]; break;                            // OR A,E
-        case 0xB4: this.f = this.SZP_TABLE[this.a |= this.h]; break;                            // OR A,H
-        case 0xB5: this.f = this.SZP_TABLE[this.a |= this.l]; break;                            // OR A,L
-        case 0xB6: this.f = this.SZP_TABLE[this.a |= this.readMem(this.getHL())]; break;             // OR A,(HL)
-        case 0xB7: this.f = this.SZP_TABLE[this.a]; break;                                 // OR A,A
-        case 0xB8: this.cp_a(this.b); break;                                          // CP A,B
-        case 0xB9: this.cp_a(this.c); break;                                          // CP A,C
-        case 0xBA: this.cp_a(this.d); break;                                          // CP A,D
-        case 0xBB: this.cp_a(this.e); break;                                          // CP A,E
-        case 0xBC: this.cp_a(this.h); break;                                          // CP A,H
-        case 0xBD: this.cp_a(this.l); break;                                          // CP A,L
-        case 0xBE: this.cp_a(this.readMem(this.getHL())); break;                           // CP A,(HL)
-        case 0xBF: this.cp_a(this.a); break;                                          // CP A,A
-        case 0xC0: this.ret((this.f & F_ZERO) == 0); break;                          // RET NZ
-        case 0xC1: this.setBC(this.readMemWord(this.sp)); this.sp += 2; break;                    // POP BC
-        case 0xC2: this.jp((this.f & F_ZERO) == 0); break;                            // JP NZ,(nn)
-        case 0xC3: this.pc = this.readMemWord(this.pc); break;                             // JP (nn)
-        case 0xC4: this.call((this.f & F_ZERO) == 0); break;                          // CALL NZ (nn)
-        case 0xC5: this.push2(this.b, this.c); break;                                       // PUSH BC
-        case 0xC6: this.add_a(this.readMem(this.pc++)); break;                             // ADD A,n
-        case 0xC7: this.push1(this.pc); this.pc = 0x00; break;                                // RST 00H
-        case 0xC8: this.ret((this.f & F_ZERO) != 0); break;                           // RET Z
-        case 0xC9: this.pc = this.readMemWord(this.sp); this.sp += 2; break;                      // RET
-        case 0xCA: this.jp((this.f & F_ZERO) != 0); break;                            // JP Z,(nn)
-        case 0xCB: this.doCB(this.readMem(this.pc++)); break;                              // CB Opcode
-        case 0xCC: this.call((this.f & F_ZERO) != 0); break;                          // CALL Z (nn)
-        case 0xCD: this.push1(this.pc + 2); this.pc = this.readMemWord(this.pc); break;                 // CALL (nn)
-        case 0xCE: this.adc_a(this.readMem(this.pc++)); break;                             // ADC A,n
-        case 0xCF: this.push1(this.pc); this.pc = 0x08; break;                                // RST 08H
-        case 0xD0: this.ret((this.f & F_CARRY) == 0); break;                          // RET NC
-        case 0xD1: this.setDE(this.readMemWord(this.sp)); this.sp += 2; break;                    // POP DE
-        case 0xD2: this.jp((this.f & F_CARRY) == 0); break;                           // JP NC,(nn)
-        case 0xD3: this.port.out(this.readMem(this.pc++), this.a); break;                       // OUT (n),A
-        case 0xD4: this.call((this.f & F_CARRY) == 0); break;                         // CALL NC (nn)
-        case 0xD5: this.push2(this.d, this.e); break;                                       // PUSH DE
-        case 0xD6: this.sub_a(this.readMem(this.pc++)); break;                             // SUB n
-        case 0xD7: this.push1(this.pc); this.pc = 0x10; break;                                // RST 10H
-        case 0xD8: this.ret((this.f & F_CARRY) != 0); break;                        // RET C
-        case 0xD9: this.exBC(); this.exDE(); this.exHL(); break;                           // EXX
-        case 0xDA: this.jp((this.f & F_CARRY) != 0); break;                           // JP C,(nn)
-        case 0xDB: this.a = this.port.in_(this.readMem(this.pc++)); break;                       // IN A,(n)
-        case 0xDC: this.call((this.f & F_CARRY) != 0); break;                         // CALL C (nn)
-        case 0xDD: this.doIndexOpIX(this.readMem(this.pc++)); break;                       // DD Opcode
-        case 0xDE: this.sbc_a(this.readMem(this.pc++)); break;                             // SBC A,n
-        case 0xDF: this.push1(this.pc); this.pc = 0x18; break;                                // RST 18H
-        case 0xE0: this.ret((this.f & F_PARITY) == 0); break;                        // RET PO
-        case 0xE1: this.setHL(this.readMemWord(this.sp)); this.sp += 2; break;                    // POP HL
-        case 0xE2: this.jp((this.f & F_PARITY) == 0); break;                          // JP PO,(nn)
-        case 0xE3:                                                       // EX (SP),HL
-          temp = this.h;
-          this.h = this.readMem(this.sp + 1);
-          this.writeMem(this.sp + 1, temp);
-          temp = this.l;
-          this.l = this.readMem(this.sp);
-          this.writeMem(this.sp, temp);
-          break;
-        case 0xE4: this.call((this.f & F_PARITY) == 0); break;                        // CALL PO (nn)
-        case 0xE5: this.push2(this.h, this.l); break;                                       // PUSH HL
-        case 0xE6: this.f = this.SZP_TABLE[this.a &= this.readMem(this.pc++)] | F_HALFCARRY; break;  // AND (n)
-        case 0xE7: this.push1(this.pc); this.pc = 0x20; break;                                // RST 20H
-        case 0xE8: this.ret((this.f & F_PARITY) != 0); break;                         // RET PE
-        case 0xE9: this.pc = this.getHL(); break;                                     // JP (HL)
-        case 0xEA: this.jp((this.f & F_PARITY) != 0); break;                          // JP PE,(nn)
-        case 0xEB:                                                       // EX DE,HL
-          temp = this.d;
-          this.d = this.h;
-          this.h = temp;
-          temp = this.e;
-          this.e = this.l;
-          this.l = temp;
-          break;
-        case 0xEC: this.call((this.f & F_PARITY) != 0); break;                        // CALL PE (nn)
-        case 0xED: this.doED(this.d_()); break;                                // ED Opcode
-        case 0xEE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.pc++)]; break;                // XOR n
-        case 0xEF: this.push1(this.pc); this.pc = 0x28; break;                                // RST 28H
-        case 0xF0: this.ret((this.f & F_SIGN) == 0); break;                           // RET P
-        case 0xF1: this.f = this.readMem(this.sp++); this.a = this.readMem(this.sp++); break;             // POP AF
-        case 0xF2: this.jp((this.f & F_SIGN) == 0); break;                            // JP P,(nn)
-        case 0xF3: this.iff1 = this.iff2 = false; this.EI_inst = true; break;              // DI
-        case 0xF4: this.call((this.f & F_SIGN) == 0); break;                         // CALL P (nn)
-        case 0xF5: this.push2(this.a, this.f); break;                                       // PUSH AF
-        case 0xF6: this.f = this.SZP_TABLE[this.a |= this.readMem(this.pc++)]; break;                // OR n
-        case 0xF7: this.push1(this.pc); this.pc = 0x30; break;                                // RST 30H
-        case 0xF8: this.ret((this.f & F_SIGN) != 0); break;                           // RET M
-        case 0xF9: this.sp = this.getHL(); break;                                     // LD SP,HL
-        case 0xFA: this.jp((this.f & F_SIGN) != 0); break;                            // JP M,(nn)
-        case 0xFB: this.iff1 = this.iff2 = this.EI_inst = true; break;                     // EI
-        case 0xFC: this.call((this.f & F_SIGN) != 0); break;                          // CALL M (nn)
-        case 0xFD: this.doIndexOpIY(this.readMem(this.pc++)); break;                       // FD Opcode
-        case 0xFE: this.cp_a(this.readMem(this.pc++)); break;                              // CP n
-        case 0xFF: this.push1(this.pc); this.pc = 0x38; break;                                // RST 38H
-      } // end switch
+      this.interpret();
     }
   },
 
-  nextStep: function() {
 
+  /**
+   * Run the Z80 interpreter.
+   */
+  interpret: function() {
+    var location = 0;
+    var temp = 0;
+
+    // Main Opcode Switch Rolled In For Speed
+    var opcode = this.readMem(this.pc++);                    // Fetch & Interpret Opcode
+
+    if (Setup.ACCURATE_INTERRUPT_EMULATION)
+      this.EI_inst = false;
+
+    this.tstates -= OP_STATES[opcode];   // Decrement TStates
+
+    if (Setup.REFRESH_EMULATION)
+      this.incR();
+
+    switch (opcode) {
+      case 0x00: break;                                                   // NOP
+      case 0x01: this.setBC(this.readMemWord(this.pc++)); this.pc++; break;             // LD BC,nn
+      case 0x02: this.writeMem(this.getBC(), this.a); break;                             // LD (BC),A
+      case 0x03: this.incBC(); break;                                          // INC BC
+      case 0x04: this.b = this.inc8(this.b); break;                                      // INC B
+      case 0x05: this.b = this.dec8(this.b); break;                                      // DEC B
+      case 0x06: this.b = this.readMem(this.pc++); break;                                // LD B,n
+      case 0x07: this.rlca_a(); break;                                         // RLCA
+      case 0x08: this.exAF(); break;                                           // EX AF AF'
+      case 0x09: this.setHL(this.add16(this.getHL(), this.getBC())); break;                   // ADD HL,BC
+      case 0x0A: this.a = this.readMem(this.getBC()); break;                             // LD A,(BC)
+      case 0x0B: this.decBC(); break;                                          // DEC BC
+      case 0x0C: this.c = this.inc8(this.c); break;                                      // INC C
+      case 0x0D: this.c = this.dec8(this.c); break;                                      // DEC C
+      case 0x0E: this.c = this.readMem(this.pc++); break;                                // LD C,n
+      case 0x0F: this.rrca_a(); break;                                         // RRCA
+      case 0x10: this.b = (this.b - 1) & 0xFF; this.jr(this.b != 0); break;                                      // DJNZ (PC+e)
+      case 0x11: this.setDE(this.readMemWord(this.pc++)); this.pc++; break;             // LD DE,nn
+      case 0x12: this.writeMem(this.getDE(), this.a); break;                             // LD (DE),A
+      case 0x13: this.incDE(); break;                                          // INC DE
+      case 0x14: this.d = this.inc8(this.d); break;                                      // INC D
+      case 0x15: this.d = this.dec8(this.d); break;                                      // DEC D
+      case 0x16: this.d = (this.readMem(this.pc++)); break;                              // LD D,n
+      case 0x17: this.rla_a(); break;                                          // RLA
+      case 0x18: this.pc += this.signExtend(this.d_() + 1); break;                                      // JR (PC+e)
+      case 0x19: this.setHL(this.add16(this.getHL(), this.getDE())); break;                   // ADD HL,DE
+      case 0x1A: this.a = this.readMem(this.getDE()); break;                             // LD A,(DE)
+      case 0x1B: this.decDE(); break;                                          // DEC DE
+      case 0x1C: this.e = this.inc8(this.e); break;                                      // INC E
+      case 0x1D: this.e = this.dec8(this.e); break;                                      // DEC E
+      case 0x1E: this.e = this.readMem(this.pc++); break;                                // LD E,n
+      case 0x1F: this.rra_a(); break;                                          // RRA
+      case 0x20: this.jr(!((this.f & F_ZERO) != 0)); break;                         // JR NZ,(PC+e)
+      case 0x21: this.setHL(this.readMemWord(this.pc++)); this.pc++; break;             // LD HL,nn
+      case 0x22:                                                        // LD (nn),HL
+        location = this.readMemWord(this.pc);
+        this.writeMem(location, this.l);
+        this.writeMem(++location, this.h);
+        this.pc += 2;
+        break;
+      case 0x23: this.incHL(); break;                                          // INC HL
+      case 0x24: this.h = this.inc8(this.h); break;                                      // INC H
+      case 0x25: this.h = this.dec8(this.h); break;                                      // DEC H
+      case 0x26: this.h = this.readMem(this.pc++); break;                                // LD H,n
+      case 0x27: this.daa(); break;                                            // DAA
+      case 0x28: this.jr((this.f & F_ZERO) != 0); break;                          // JR Z,(PC+e)
+      case 0x29: this.setHL(this.add16(this.getHL(), this.getHL())); break;                   // ADD HL,HL
+      case 0x2A: this.setHL(this.readMemWord(this.readMemWord(this.pc))); this.pc += 2; break; // LD HL,(nn)
+      case 0x2B: this.decHL(); break;                                          // DEC HL
+      case 0x2C: this.l = this.inc8(this.l); break;                                      // INC L
+      case 0x2D: this.l = this.dec8(this.l); break;                                      // DEC L
+      case 0x2E: this.l = this.readMem(this.pc++); break;                                // LD L,n
+      case 0x2F: this.cpl_a(); break;                                          // CPL
+      case 0x30: this.jr(!((this.f & F_CARRY) != 0)); break;                        // JR NC,(PC+e)
+      case 0x31: this.sp = this.readMemWord(this.pc); this.pc += 2; break;                      // LD SP,nn
+      case 0x32: this.writeMem(this.readMemWord(this.pc), this.a); this.pc += 2; break;              // LD (nn),A
+      case 0x33: this.sp++; break;                                             // INC SP
+      case 0x34: this.incMem(this.getHL()); break;                                  // INC (HL)
+      case 0x35: this.decMem(this.getHL()); break;                                  // DEC (HL)
+      case 0x36: this.writeMem(this.getHL(), this.readMem(this.pc++)); break;                 // LD (HL),n
+      case 0x37: this.f |= F_CARRY; this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY; break;       // SCF
+      case 0x38: this.jr((this.f & F_CARRY) != 0); break;                           // JR C,(PC+e)
+      case 0x39: this.setHL(this.add16(this.getHL(), this.sp)); break;                        // ADD HL,SP
+      case 0x3A: this.a = this.readMem(this.readMemWord(this.pc)); this.pc += 2; break;              // LD A,(nn)
+      case 0x3B: this.sp--; break;                                             // DEC SP
+      case 0x3C: this.a = this.inc8(this.a); break;                                      // INC A
+      case 0x3D: this.a = this.dec8(this.a); break;                                      // DEC A
+      case 0x3E: this.a = this.readMem(this.pc++); break;                                // LD A,n
+      case 0x3F: this.ccf(); break;                                            // CCF
+      case 0x40: break;                                                   // LD B,B
+      case 0x41: this.b = this.c; break;                                            // LD B,C
+      case 0x42: this.b = this.d; break;                                            // LD B,D
+      case 0x43: this.b = this.e; break;                                            // LD B,E
+      case 0x44: this.b = this.h; break;                                            // LD B,H
+      case 0x45: this.b = this.l; break;                                            // LD B,L
+      case 0x46: this.b = this.readMem(this.getHL()); break;                             // LD B,(HL)
+      case 0x47: this.b = this.a; break;                                            // LD B,A
+      case 0x48: this.c = this.b; break;                                            // LD C,B
+      case 0x49: break;                                                   // LD C,C
+      case 0x4A: this.c = this.d; break;                                            // LD C,D
+      case 0x4B: this.c = this.e; break;                                            // LD C,E
+      case 0x4C: this.c = this.h; break;                                            // LD C,H
+      case 0x4D: this.c = this.l; break;                                            // LD C,L
+      case 0x4E: this.c = this.readMem(this.getHL()); break;                             // LD C,(HL)
+      case 0x4F: this.c = this.a; break;                                            // LD C,A
+      case 0x50: this.d = this.b; break;                                            // LD D,B
+      case 0x51: this.d = this.c; break;                                            // LD D,C
+      case 0x52: break;                                                   // LD D,D
+      case 0x53: this.d = this.e; break;                                            // LD D,E
+      case 0x54: this.d = this.h; break;                                            // LD D,H
+      case 0x55: this.d = this.l; break;                                            // LD D,L
+      case 0x56: this.d = this.readMem(this.getHL()); break;                             // LD D,(HL)
+      case 0x57: this.d = this.a; break;                                            // LD D,A
+      case 0x58: this.e = this.b; break;                                            // LD E,B
+      case 0x59: this.e = this.c; break;                                            // LD E,C
+      case 0x5A: this.e = this.d; break;                                            // LD E,D
+      case 0x5B: break;                                                   // LD E,E
+      case 0x5C: this.e = this.h; break;                                            // LD E,H
+      case 0x5D: this.e = this.l; break;                                            // LD E,L
+      case 0x5E: this.e = this.readMem(this.getHL()); break;                             // LD E,(HL)
+      case 0x5F: this.e = this.a; break;                                            // LD E,A
+      case 0x60: this.h = this.b; break;                                            // LD H,B
+      case 0x61: this.h = this.c; break;                                            // LD H,C
+      case 0x62: this.h = this.d; break;                                            // LD H,D
+      case 0x63: this.h = this.e; break;                                            // LD H,E
+      case 0x64: break;                                                   // LD H,H
+      case 0x65: this.h = this.l; break;                                            // LD H,L
+      case 0x66: this.h = this.readMem(this.getHL()); break;                             // LD H,(HL)
+      case 0x67: this.h = this.a; break;                                            // LD H,A
+      case 0x68: this.l = this.b; break;                                            // LD L,B
+      case 0x69: this.l = this.c; break;                                            // LD L,C
+      case 0x6A: this.l = this.d; break;                                            // LD L,D
+      case 0x6B: this.l = this.e; break;                                            // LD L,E
+      case 0x6C: this.l = this.h; break;                                            // LD L,H
+      case 0x6D: break;                                                   // LD L,L
+      case 0x6E: this.l = this.readMem(this.getHL()); break;                             // LD L,(HL)
+      case 0x6F: this.l = this.a; break;                                            // LD L,A
+      case 0x70: this.writeMem(this.getHL(), this.b); break;                             // LD (HL),B
+      case 0x71: this.writeMem(this.getHL(), this.c); break;                             // LD (HL),C
+      case 0x72: this.writeMem(this.getHL(), this.d); break;                             // LD (HL),D
+      case 0x73: this.writeMem(this.getHL(), this.e); break;                             // LD (HL),E
+      case 0x74: this.writeMem(this.getHL(), this.h); break;                             // LD (HL),H
+      case 0x75: this.writeMem(this.getHL(), this.l); break;                             // LD (HL),L
+      case 0x76: if (HALT_SPEEDUP) this.tstates = 0; this.halt = true; this.pc--; break;                               // HALT
+      case 0x77: this.writeMem(this.getHL(), this.a); break;                             // LD (HL),A
+      case 0x78: this.a = this.b; break;                                            // LD A,B
+      case 0x79: this.a = this.c; break;                                            // LD A,C
+      case 0x7A: this.a = this.d; break;                                            // LD A,D
+      case 0x7B: this.a = this.e; break;                                            // LD A,E
+      case 0x7C: this.a = this.h; break;                                            // LD A,H
+      case 0x7D: this.a = this.l; break;                                            // LD A,L
+      case 0x7E: this.a = this.readMem(this.getHL()); break;                             // LD A,(HL)
+      case 0x7F: break;                                                   // LD A,A
+      case 0x80: this.add_a(this.b); break;                                         // ADD A,B
+      case 0x81: this.add_a(this.c); break;                                         // ADD A,C
+      case 0x82: this.add_a(this.d); break;                                         // ADD A,D
+      case 0x83: this.add_a(this.e); break;                                         // ADD A,E
+      case 0x84: this.add_a(this.h); break;                                         // ADD A,H
+      case 0x85: this.add_a(this.l); break;                                         // ADD A,L
+      case 0x86: this.add_a(this.readMem(this.getHL())); break;                          // ADD A,(HL)
+      case 0x87: this.add_a(this.a); break;                                         // ADD A,A
+      case 0x88: this.adc_a(this.b); break;                                         // ADC A,B
+      case 0x89: this.adc_a(this.c); break;                                         // ADC A,C
+      case 0x8A: this.adc_a(this.d); break;                                         // ADC A,D
+      case 0x8B: this.adc_a(this.e); break;                                         // ADC A,E
+      case 0x8C: this.adc_a(this.h); break;                                         // ADC A,H
+      case 0x8D: this.adc_a(this.l); break;                                         // ADC A,L
+      case 0x8E: this.adc_a(this.readMem(this.getHL())); break;                          // ADC A,(HL)
+      case 0x8F: this.adc_a(this.a); break;                                         // ADC A,A
+      case 0x90: this.sub_a(this.b); break;                                         // SUB A,B
+      case 0x91: this.sub_a(this.c); break;                                         // SUB A,C
+      case 0x92: this.sub_a(this.d); break;                                         // SUB A,D
+      case 0x93: this.sub_a(this.e); break;                                         // SUB A,E
+      case 0x94: this.sub_a(this.h); break;                                         // SUB A,H
+      case 0x95: this.sub_a(this.l); break;                                         // SUB A,L
+      case 0x96: this.sub_a(this.readMem(this.getHL())); break;                          // SUB A,(HL)
+      case 0x97: this.sub_a(this.a); break;                                         // SUB A,A
+      case 0x98: this.sbc_a(this.b); break;                                         // SBC A,B
+      case 0x99: this.sbc_a(this.c); break;                                         // SBC A,C
+      case 0x9A: this.sbc_a(this.d); break;                                         // SBC A,D
+      case 0x9B: this.sbc_a(this.e); break;                                         // SBC A,E
+      case 0x9C: this.sbc_a(this.h); break;                                         // SBC A,H
+      case 0x9D: this.sbc_a(this.l); break;                                         // SBC A,L
+      case 0x9E: this.sbc_a(this.readMem(this.getHL())); break;                          // SBC A,(HL)
+      case 0x9F: this.sbc_a(this.a); break;                                         // SBC A,A
+      case 0xA0: this.f = this.SZP_TABLE[this.a &= this.b] | F_HALFCARRY; break;              // AND A,B
+      case 0xA1: this.f = this.SZP_TABLE[this.a &= this.c] | F_HALFCARRY; break;              // AND A,C
+      case 0xA2: this.f = this.SZP_TABLE[this.a &= this.d] | F_HALFCARRY; break;              // AND A,D
+      case 0xA3: this.f = this.SZP_TABLE[this.a &= this.e] | F_HALFCARRY; break;              // AND A,E
+      case 0xA4: this.f = this.SZP_TABLE[this.a &= this.h] | F_HALFCARRY; break;              // AND A,H
+      case 0xA5: this.f = this.SZP_TABLE[this.a &= this.l] | F_HALFCARRY; break;              // AND A,L
+      case 0xA6: this.f = this.SZP_TABLE[this.a &= this.readMem(this.getHL())] | F_HALFCARRY; break; // AND A,(HL)
+      case 0xA7: this.f = this.SZP_TABLE[this.a] | F_HALFCARRY; break;                   // AND A,A
+      case 0xA8: this.f = this.SZP_TABLE[this.a ^= this.b]; break;                            // XOR A,B
+      case 0xA9: this.f = this.SZP_TABLE[this.a ^= this.c]; break;                            // XOR A,C
+      case 0xAA: this.f = this.SZP_TABLE[this.a ^= this.d]; break;                            // XOR A,D
+      case 0xAB: this.f = this.SZP_TABLE[this.a ^= this.e]; break;                            // XOR A,E
+      case 0xAC: this.f = this.SZP_TABLE[this.a ^= this.h]; break;                            // XOR A,H
+      case 0xAD: this.f = this.SZP_TABLE[this.a ^= this.l]; break;                            // XOR A,L
+      case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getHL())]; break;             // XOR A,(HL)
+      case 0xAF: this.f = this.SZP_TABLE[this.a = 0]; break;                             // XOR A,A
+      case 0xB0: this.f = this.SZP_TABLE[this.a |= this.b]; break;                            // OR A,B
+      case 0xB1: this.f = this.SZP_TABLE[this.a |= this.c]; break;                            // OR A,C
+      case 0xB2: this.f = this.SZP_TABLE[this.a |= this.d]; break;                            // OR A,D
+      case 0xB3: this.f = this.SZP_TABLE[this.a |= this.e]; break;                            // OR A,E
+      case 0xB4: this.f = this.SZP_TABLE[this.a |= this.h]; break;                            // OR A,H
+      case 0xB5: this.f = this.SZP_TABLE[this.a |= this.l]; break;                            // OR A,L
+      case 0xB6: this.f = this.SZP_TABLE[this.a |= this.readMem(this.getHL())]; break;             // OR A,(HL)
+      case 0xB7: this.f = this.SZP_TABLE[this.a]; break;                                 // OR A,A
+      case 0xB8: this.cp_a(this.b); break;                                          // CP A,B
+      case 0xB9: this.cp_a(this.c); break;                                          // CP A,C
+      case 0xBA: this.cp_a(this.d); break;                                          // CP A,D
+      case 0xBB: this.cp_a(this.e); break;                                          // CP A,E
+      case 0xBC: this.cp_a(this.h); break;                                          // CP A,H
+      case 0xBD: this.cp_a(this.l); break;                                          // CP A,L
+      case 0xBE: this.cp_a(this.readMem(this.getHL())); break;                           // CP A,(HL)
+      case 0xBF: this.cp_a(this.a); break;                                          // CP A,A
+      case 0xC0: this.ret((this.f & F_ZERO) == 0); break;                          // RET NZ
+      case 0xC1: this.setBC(this.readMemWord(this.sp)); this.sp += 2; break;                    // POP BC
+      case 0xC2: this.jp((this.f & F_ZERO) == 0); break;                            // JP NZ,(nn)
+      case 0xC3: this.pc = this.readMemWord(this.pc); break;                             // JP (nn)
+      case 0xC4: this.call((this.f & F_ZERO) == 0); break;                          // CALL NZ (nn)
+      case 0xC5: this.push2(this.b, this.c); break;                                       // PUSH BC
+      case 0xC6: this.add_a(this.readMem(this.pc++)); break;                             // ADD A,n
+      case 0xC7: this.push1(this.pc); this.pc = 0x00; break;                                // RST 00H
+      case 0xC8: this.ret((this.f & F_ZERO) != 0); break;                           // RET Z
+      case 0xC9: this.pc = this.readMemWord(this.sp); this.sp += 2; break;                      // RET
+      case 0xCA: this.jp((this.f & F_ZERO) != 0); break;                            // JP Z,(nn)
+      case 0xCB: this.doCB(this.readMem(this.pc++)); break;                              // CB Opcode
+      case 0xCC: this.call((this.f & F_ZERO) != 0); break;                          // CALL Z (nn)
+      case 0xCD: this.push1(this.pc + 2); this.pc = this.readMemWord(this.pc); break;                 // CALL (nn)
+      case 0xCE: this.adc_a(this.readMem(this.pc++)); break;                             // ADC A,n
+      case 0xCF: this.push1(this.pc); this.pc = 0x08; break;                                // RST 08H
+      case 0xD0: this.ret((this.f & F_CARRY) == 0); break;                          // RET NC
+      case 0xD1: this.setDE(this.readMemWord(this.sp)); this.sp += 2; break;                    // POP DE
+      case 0xD2: this.jp((this.f & F_CARRY) == 0); break;                           // JP NC,(nn)
+      case 0xD3: this.port.out(this.readMem(this.pc++), this.a); break;                       // OUT (n),A
+      case 0xD4: this.call((this.f & F_CARRY) == 0); break;                         // CALL NC (nn)
+      case 0xD5: this.push2(this.d, this.e); break;                                       // PUSH DE
+      case 0xD6: this.sub_a(this.readMem(this.pc++)); break;                             // SUB n
+      case 0xD7: this.push1(this.pc); this.pc = 0x10; break;                                // RST 10H
+      case 0xD8: this.ret((this.f & F_CARRY) != 0); break;                        // RET C
+      case 0xD9: this.exBC(); this.exDE(); this.exHL(); break;                           // EXX
+      case 0xDA: this.jp((this.f & F_CARRY) != 0); break;                           // JP C,(nn)
+      case 0xDB: this.a = this.port.in_(this.readMem(this.pc++)); break;                       // IN A,(n)
+      case 0xDC: this.call((this.f & F_CARRY) != 0); break;                         // CALL C (nn)
+      case 0xDD: this.doIndexOpIX(this.readMem(this.pc++)); break;                       // DD Opcode
+      case 0xDE: this.sbc_a(this.readMem(this.pc++)); break;                             // SBC A,n
+      case 0xDF: this.push1(this.pc); this.pc = 0x18; break;                                // RST 18H
+      case 0xE0: this.ret((this.f & F_PARITY) == 0); break;                        // RET PO
+      case 0xE1: this.setHL(this.readMemWord(this.sp)); this.sp += 2; break;                    // POP HL
+      case 0xE2: this.jp((this.f & F_PARITY) == 0); break;                          // JP PO,(nn)
+      case 0xE3:                                                       // EX (SP),HL
+        temp = this.h;
+        this.h = this.readMem(this.sp + 1);
+        this.writeMem(this.sp + 1, temp);
+        temp = this.l;
+        this.l = this.readMem(this.sp);
+        this.writeMem(this.sp, temp);
+        break;
+      case 0xE4: this.call((this.f & F_PARITY) == 0); break;                        // CALL PO (nn)
+      case 0xE5: this.push2(this.h, this.l); break;                                       // PUSH HL
+      case 0xE6: this.f = this.SZP_TABLE[this.a &= this.readMem(this.pc++)] | F_HALFCARRY; break;  // AND (n)
+      case 0xE7: this.push1(this.pc); this.pc = 0x20; break;                                // RST 20H
+      case 0xE8: this.ret((this.f & F_PARITY) != 0); break;                         // RET PE
+      case 0xE9: this.pc = this.getHL(); break;                                     // JP (HL)
+      case 0xEA: this.jp((this.f & F_PARITY) != 0); break;                          // JP PE,(nn)
+      case 0xEB:                                                       // EX DE,HL
+        temp = this.d;
+        this.d = this.h;
+        this.h = temp;
+        temp = this.e;
+        this.e = this.l;
+        this.l = temp;
+        break;
+      case 0xEC: this.call((this.f & F_PARITY) != 0); break;                        // CALL PE (nn)
+      case 0xED: this.doED(this.d_()); break;                                // ED Opcode
+      case 0xEE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.pc++)]; break;                // XOR n
+      case 0xEF: this.push1(this.pc); this.pc = 0x28; break;                                // RST 28H
+      case 0xF0: this.ret((this.f & F_SIGN) == 0); break;                           // RET P
+      case 0xF1: this.f = this.readMem(this.sp++); this.a = this.readMem(this.sp++); break;             // POP AF
+      case 0xF2: this.jp((this.f & F_SIGN) == 0); break;                            // JP P,(nn)
+      case 0xF3: this.iff1 = this.iff2 = false; this.EI_inst = true; break;              // DI
+      case 0xF4: this.call((this.f & F_SIGN) == 0); break;                         // CALL P (nn)
+      case 0xF5: this.push2(this.a, this.f); break;                                       // PUSH AF
+      case 0xF6: this.f = this.SZP_TABLE[this.a |= this.readMem(this.pc++)]; break;                // OR n
+      case 0xF7: this.push1(this.pc); this.pc = 0x30; break;                                // RST 30H
+      case 0xF8: this.ret((this.f & F_SIGN) != 0); break;                           // RET M
+      case 0xF9: this.sp = this.getHL(); break;                                     // LD SP,HL
+      case 0xFA: this.jp((this.f & F_SIGN) != 0); break;                            // JP M,(nn)
+      case 0xFB: this.iff1 = this.iff2 = this.EI_inst = true; break;                     // EI
+      case 0xFC: this.call((this.f & F_SIGN) != 0); break;                          // CALL M (nn)
+      case 0xFD: this.doIndexOpIY(this.readMem(this.pc++)); break;                       // FD Opcode
+      case 0xFE: this.cp_a(this.readMem(this.pc++)); break;                              // CP n
+      case 0xFF: this.push1(this.pc); this.pc = 0x38; break;                                // RST 38H
+    } // end switch
+  },
+
+
+  nextStep: function() {
   },
 
 
@@ -3075,24 +3082,26 @@ JSSMS.Z80.prototype = {
    * Memory constructor.
    */
   generateMemory: function() {
-    if (SUPPORT_DATAVIEW)
+    if (SUPPORT_DATAVIEW) {
       for (var i = 0; i < 0x2000; i++) {
         this.memWriteMap.setUint8(i, 0);
       }
-    else
+    } else {
       for (var i = 0; i < 0x2000; i++) {
         this.memWriteMap[i] = 0;
       }
+    }
 
     // Create 2 x 16K RAM Cartridge Pages
-    if (SUPPORT_DATAVIEW)
+    if (SUPPORT_DATAVIEW) {
       for (i = 0; i < 0x8000; i++) {
         this.sram.setUint8(i, 0);
       }
-    else
+    } else {
       for (i = 0; i < 0x8000; i++) {
         this.sram[i] = 0;
       }
+    }
     this.useSRAM = false;
 
     this.number_of_pages = 2;

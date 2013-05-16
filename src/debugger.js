@@ -79,7 +79,7 @@ JSSMS.Debugger.prototype = {
       }
 
       if (currentAddress >= romSize || (currentAddress >> 10) >= 65) {
-        console.log('Invalid address', currentAddress);
+        console.log('Invalid address', JSSMS.Utils.toHex(currentAddress));
 
         continue;
       }
@@ -168,46 +168,9 @@ JSSMS.Debugger.prototype = {
     var breakNeeded = false;
 
     var code = [
-      'function run(cycles, cyclesTo) {',
-      'var location = 0;',
-      'var opcode = 0;',
-      'var temp = 0;',
-      '',
-      'this.tstates += cycles;',
-      '',
-      'if (cycles != 0)',
-      '  this.totalCycles = cycles;'
+      '"": function() {',
+      'throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'
     ];
-
-    if (!Setup.ACCURATE_INTERRUPT_EMULATION)
-      code.push('if (this.interruptLine) this.interrupt(); // Check for interrupt');
-
-    code.push('while (this.tstates > cyclesTo) {');
-
-    // Warning: the generated code is not fully compatible with ACCURATE_INTERRUPT_EMULATION mode.
-    // Before it is, let's do a check in the while loop:
-    code.push('if (this.interruptLine) this.interrupt(); // Check for interrupt');
-
-    if (Setup.ACCURATE_INTERRUPT_EMULATION) {
-      //code.push('if (this.interruptLine) this.interrupt(); // Check for interrupt');
-      code.push('this.EI_inst = false;');
-    }
-
-    if (Setup.REFRESH_EMULATION)
-      code.push('this.incR();');
-
-    code.push('console.log(JSSMS.Utils.toHex(this.pc));');
-    code.push('this.branches[this.pc].call(this);');
-    code.push('}'); // End of while
-    code.push('},'); // End of method `run()`
-
-    code.push('');
-    code.push('');
-
-    code.push('branches: {');
-
-    code.push('"": function() {');
-    code.push('throw "Bad address: " + JSSMS.Utils.toHex(this.pc);');
 
     for (var i = 0, length = tree.length; i < length; i++) {
       if (!tree[i])
@@ -247,7 +210,6 @@ JSSMS.Debugger.prototype = {
     }
 
     code.push('}'); // End of last branch
-    code.push('}'); // End of property `branches`
     code = code.join('\n');
 
     console.timeEnd('JavaScript generation');
