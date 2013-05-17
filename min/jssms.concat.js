@@ -364,6 +364,8 @@ var OP_ED_STATES = [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8];
 JSSMS.Z80 = function(sms) {
   this.main = sms;
+  this.vdp = sms.vdp;
+  this.psg = sms.psg;
   this.port = sms.ports;
   this.pc = 0;
   this.sp = 0;
@@ -5757,8 +5759,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       address += 2;
       break;
     case 211:
-      inst = "OUT (" + toHex(this.readMem(address)) + "),A";
-      code = "this.port.out(" + toHex(this.readMem(address)) + ", this.a);";
+      operand = this.readMem(address);
+      inst = "OUT (" + toHex(operand) + "),A";
+      code = this.peepholePortOut(operand);
       address++;
       break;
     case 212:
@@ -5795,9 +5798,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       address += 2;
       break;
     case 219:
-      operand = toHex(this.readMem(address));
-      inst = "IN A,(" + operand + ")";
-      code = "this.a = this.port.in_(" + operand + ");";
+      operand = this.readMem(address);
+      inst = "IN A,(" + toHex(operand) + ")";
+      code = this.peepholePortIn(operand);
       address++;
       break;
     case 220:
@@ -8118,6 +8121,75 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   return this.getIndex("IX", opcode)
 }, getIndexOpIY:function(opcode) {
   return this.getIndex("IY", opcode)
+}, peepholePortOut:function(port) {
+  if(this.main.is_gg && port < 7) {
+    return""
+  }
+  switch(port & 193) {
+    case 1:
+      if(Setup.LIGHTGUN) {
+        return"var value = this.a;" + "this.port.oldTH = (this.port.getTH(PORT_A) != 0 || this.port.getTH(PORT_B) != 0);" + "this.port.writePort(PORT_A, value);" + "this.port.writePort(PORT_B, value >> 2);" + "if (!this.port.oldTH && (this.port.getTH(PORT_A) != 0 || this.port.getTH(PORT_B) != 0)) {" + "this.port.hCounter = this.port.getHCount();" + "}"
+      }else {
+        var code = "var value = this.a;" + "this.port.ioPorts[0] = (value & 0x20) << 1;" + "this.port.ioPorts[1] = (value & 0x80);";
+        if(this.port.europe == 0) {
+          code += "this.port.ioPorts[0] = ~this.port.ioPorts[0];" + "this.port.ioPorts[1] = ~this.port.ioPorts[1];"
+        }
+        return code
+      }
+      break;
+    case 128:
+      return"this.vdp.dataWrite(this.a);";
+      break;
+    case 129:
+      return"this.vdp.controlWrite(this.a);";
+      break;
+    case 64:
+    ;
+    case 65:
+      if(this.main.soundEnabled) {
+        return"this.psg.write(this.a);"
+      }
+      break
+  }
+  return""
+}, peepholePortIn:function(port) {
+  if(this.main.is_gg && port < 7) {
+    switch(port) {
+      case 0:
+        return"this.a = (this.port.keyboard.ggstart & 0xBF) | this.port.europe;";
+      case 1:
+      ;
+      case 2:
+      ;
+      case 3:
+      ;
+      case 4:
+      ;
+      case 5:
+        return"this.a = 0x00;";
+      case 6:
+        return"this.a = 0xFF;"
+    }
+  }
+  switch(port & 193) {
+    case 64:
+      return"this.a = this.vdp.getVCount();";
+    case 65:
+      return"this.a = this.port.hCounter;";
+    case 128:
+      return"this.a = this.vdp.dataRead();";
+    case 129:
+      return"this.a = this.vdp.controlRead();";
+    case 192:
+      return"this.a = this.port.keyboard.controller1;";
+    case 193:
+      if(Setup.LIGHTGUN) {
+        return"if (this.port.keyboard.lightgunClick)" + "this.port.lightPhaserSync();" + "this.a = (this.port.keyboard.controller2 & 0x3F) | (this.port.getTH(PORT_A) != 0 ? 0x40 : 0) | (this.port.getTH(PORT_B) != 0 ? 0x80 : 0);"
+      }else {
+        return"this.a = (this.port.keyboard.controller2 & 0x3F) | this.port.ioPorts[0] | this.port.ioPorts[1];"
+      }
+  }
+  return"this.a = 0xFF;"
 }};
 function Instruction(options) {
   var toHex = JSSMS.Utils.toHex;

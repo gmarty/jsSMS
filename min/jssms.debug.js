@@ -1841,8 +1841,9 @@ reset:function $$JSSMS$$$$reset$() {
             $address$$inline_296_address$$inline_306_opcode$$inline_313$$ += 2;
             break;
           case 211:
-            $inst$$inline_299_opcodesArray$$inline_308_opcodesArray$$inline_314$$ = "OUT (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_295_hexOpcodes$$inline_323_opcode$$inline_307$$.$a$($address$$inline_296_address$$inline_306_opcode$$inline_313$$)) + "),A";
-            $code$$inline_302_inst$$inline_309_inst$$inline_315$$ = "this.port.out(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_295_hexOpcodes$$inline_323_opcode$$inline_307$$.$a$($address$$inline_296_address$$inline_306_opcode$$inline_313$$)) + ", this.a);";
+            $_inst$$inline_305_currAddr$$inline_310_currAddr$$inline_316_operand$$inline_303$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_295_hexOpcodes$$inline_323_opcode$$inline_307$$.$a$($address$$inline_296_address$$inline_306_opcode$$inline_313$$);
+            $inst$$inline_299_opcodesArray$$inline_308_opcodesArray$$inline_314$$ = "OUT (" + $JSSMS$Utils$toHex$$($_inst$$inline_305_currAddr$$inline_310_currAddr$$inline_316_operand$$inline_303$$) + "),A";
+            $code$$inline_302_inst$$inline_309_inst$$inline_315$$ = $JSCompiler_StaticMethods_peepholePortOut$$($JSCompiler_StaticMethods_disassemble$self$$inline_295_hexOpcodes$$inline_323_opcode$$inline_307$$, $_inst$$inline_305_currAddr$$inline_310_currAddr$$inline_316_operand$$inline_303$$);
             $address$$inline_296_address$$inline_306_opcode$$inline_313$$++;
             break;
           case 212:
@@ -1879,9 +1880,9 @@ reset:function $$JSSMS$$$$reset$() {
             $address$$inline_296_address$$inline_306_opcode$$inline_313$$ += 2;
             break;
           case 219:
-            $_inst$$inline_305_currAddr$$inline_310_currAddr$$inline_316_operand$$inline_303$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_295_hexOpcodes$$inline_323_opcode$$inline_307$$.$a$($address$$inline_296_address$$inline_306_opcode$$inline_313$$));
-            $inst$$inline_299_opcodesArray$$inline_308_opcodesArray$$inline_314$$ = "IN A,(" + $_inst$$inline_305_currAddr$$inline_310_currAddr$$inline_316_operand$$inline_303$$ + ")";
-            $code$$inline_302_inst$$inline_309_inst$$inline_315$$ = "this.a = this.port.in_(" + $_inst$$inline_305_currAddr$$inline_310_currAddr$$inline_316_operand$$inline_303$$ + ");";
+            $_inst$$inline_305_currAddr$$inline_310_currAddr$$inline_316_operand$$inline_303$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_295_hexOpcodes$$inline_323_opcode$$inline_307$$.$a$($address$$inline_296_address$$inline_306_opcode$$inline_313$$);
+            $inst$$inline_299_opcodesArray$$inline_308_opcodesArray$$inline_314$$ = "IN A,(" + $JSSMS$Utils$toHex$$($_inst$$inline_305_currAddr$$inline_310_currAddr$$inline_316_operand$$inline_303$$) + ")";
+            $code$$inline_302_inst$$inline_309_inst$$inline_315$$ = $JSCompiler_StaticMethods_peepholePortIn$$($JSCompiler_StaticMethods_disassemble$self$$inline_295_hexOpcodes$$inline_323_opcode$$inline_307$$, $_inst$$inline_305_currAddr$$inline_310_currAddr$$inline_316_operand$$inline_303$$);
             $address$$inline_296_address$$inline_306_opcode$$inline_313$$++;
             break;
           case 220:
@@ -2527,6 +2528,7 @@ function $JSSMS$Utils$getPrefix$$($arr$$16$$, $obj$$35$$) {
 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8];
 function $JSSMS$Z80$$($i$$inline_44_i$$inline_59_i$$inline_65_padd$$inline_50_sms$$) {
   this.$main$ = $i$$inline_44_i$$inline_59_i$$inline_65_padd$$inline_50_sms$$;
+  this.$vdp$ = $i$$inline_44_i$$inline_59_i$$inline_65_padd$$inline_50_sms$$.$vdp$;
   this.$t$ = $i$$inline_44_i$$inline_59_i$$inline_65_padd$$inline_50_sms$$.$c$;
   this.$F$ = this.$n$ = this.$d$ = 0;
   this.$A$ = this.$D$ = this.$z$ = this.$w$ = $JSCompiler_alias_FALSE$$;
@@ -7654,6 +7656,61 @@ function $JSCompiler_StaticMethods_run$$($JSCompiler_StaticMethods_run$self$$, $
 ;function $JSSMS$Debugger$$() {
 }
 $JSSMS$Debugger$$.prototype = {$instructions$:[]};
+function $JSCompiler_StaticMethods_peepholePortIn$$($JSCompiler_StaticMethods_peepholePortIn$self$$, $port$$1$$) {
+  if($JSCompiler_StaticMethods_peepholePortIn$self$$.$main$.$is_gg$ && 7 > $port$$1$$) {
+    switch($port$$1$$) {
+      case 0:
+        return"this.a = (this.port.keyboard.ggstart & 0xBF) | this.port.europe;";
+      case 1:
+      ;
+      case 2:
+      ;
+      case 3:
+      ;
+      case 4:
+      ;
+      case 5:
+        return"this.a = 0x00;";
+      case 6:
+        return"this.a = 0xFF;"
+    }
+  }
+  switch($port$$1$$ & 193) {
+    case 64:
+      return"this.a = this.vdp.getVCount();";
+    case 65:
+      return"this.a = this.port.hCounter;";
+    case 128:
+      return"this.a = this.vdp.dataRead();";
+    case 129:
+      return"this.a = this.vdp.controlRead();";
+    case 192:
+      return"this.a = this.port.keyboard.controller1;";
+    case 193:
+      return"this.a = (this.port.keyboard.controller2 & 0x3F) | this.port.ioPorts[0] | this.port.ioPorts[1];"
+  }
+  return"this.a = 0xFF;"
+}
+function $JSCompiler_StaticMethods_peepholePortOut$$($JSCompiler_StaticMethods_peepholePortOut$self$$, $port$$) {
+  if($JSCompiler_StaticMethods_peepholePortOut$self$$.$main$.$is_gg$ && 7 > $port$$) {
+    return""
+  }
+  switch($port$$ & 193) {
+    case 1:
+      return"var value = this.a;this.port.ioPorts[0] = (value & 0x20) << 1;this.port.ioPorts[1] = (value & 0x80);";
+    case 128:
+      return"this.vdp.dataWrite(this.a);";
+    case 129:
+      return"this.vdp.controlWrite(this.a);";
+    case 64:
+    ;
+    case 65:
+      if($JSCompiler_StaticMethods_peepholePortOut$self$$.$main$.$soundEnabled$) {
+        return"this.psg.write(this.a);"
+      }
+  }
+  return""
+}
 function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex$self$$, $index$$46$$, $address$$9_address$$inline_76$$) {
   var $opcode$$9$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_76$$), $opcodesArray$$3$$ = [$opcode$$9$$], $inst$$3_opcode$$inline_77$$ = "Unimplemented 0xDD or 0xFD prefixed opcode", $currAddr$$3$$ = $address$$9_address$$inline_76$$, $code$$8_code$$inline_81$$ = 'throw "Unimplemented 0xDD or 0xFD prefixed opcode";', $opcodesArray$$inline_78_operand$$2$$ = "";
   $address$$9_address$$inline_76$$++;
@@ -9100,9 +9157,9 @@ function $JSSMS$Ports$$($sms$$6$$) {
 $JSSMS$Ports$$.prototype = {reset:function $$JSSMS$Ports$$$$reset$() {
   this.$a$ = Array(2)
 }};
-function $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_in_$self$$, $port$$1$$) {
-  if($JSCompiler_StaticMethods_in_$self$$.$main$.$is_gg$ && 7 > $port$$1$$) {
-    switch($port$$1$$) {
+function $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_in_$self$$, $port$$3$$) {
+  if($JSCompiler_StaticMethods_in_$self$$.$main$.$is_gg$ && 7 > $port$$3$$) {
+    switch($port$$3$$) {
       case 0:
         return $JSCompiler_StaticMethods_in_$self$$.$keyboard$.$c$ & 191 | 64;
       case 1:
@@ -9119,7 +9176,7 @@ function $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_in_$self$$, $
         return 255
     }
   }
-  switch($port$$1$$ & 193) {
+  switch($port$$3$$ & 193) {
     case 64:
       var $JSCompiler_StaticMethods_controlRead$self$$inline_191_JSCompiler_StaticMethods_dataRead$self$$inline_188_JSCompiler_StaticMethods_getVCount$self$$inline_186_JSCompiler_inline_result$$4$$;
       a: {
@@ -9158,16 +9215,16 @@ function $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_in_$self$$, $
   }
   return 255
 }
-function $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$, $address$$inline_197_old$$inline_203_port_temp$$inline_196$$, $reg$$inline_202_value$$79$$) {
-  if(!($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$main$.$is_gg$ && 7 > $address$$inline_197_old$$inline_203_port_temp$$inline_196$$)) {
-    switch($address$$inline_197_old$$inline_203_port_temp$$inline_196$$ & 193) {
+function $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$, $address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$, $reg$$inline_202_value$$79$$) {
+  if(!($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$main$.$is_gg$ && 7 > $address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$)) {
+    switch($address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ & 193) {
       case 1:
         $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[0] = ($reg$$inline_202_value$$79$$ & 32) << 1;
         $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[1] = $reg$$inline_202_value$$79$$ & 128;
         break;
       case 128:
         $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$ = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$vdp$;
-        $address$$inline_197_old$$inline_203_port_temp$$inline_196$$ = 0;
+        $address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ = 0;
         $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$l$ = $JSCompiler_alias_TRUE$$;
         switch($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$r$) {
           case 0:
@@ -9175,34 +9232,34 @@ function $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_JSSMS_SN76489
           case 1:
           ;
           case 2:
-            $address$$inline_197_old$$inline_203_port_temp$$inline_196$$ = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$f$ & 16383;
-            if($reg$$inline_202_value$$79$$ != ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$d$[$address$$inline_197_old$$inline_203_port_temp$$inline_196$$] & 255)) {
-              if($address$$inline_197_old$$inline_203_port_temp$$inline_196$$ >= $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$ && $address$$inline_197_old$$inline_203_port_temp$$inline_196$$ < $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$ + 
+            $address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$f$ & 16383;
+            if($reg$$inline_202_value$$79$$ != ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$d$[$address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$] & 255)) {
+              if($address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ >= $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$ && $address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ < $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$ + 
               64) {
                 $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$h$ = $JSCompiler_alias_TRUE$$
               }else {
-                if($address$$inline_197_old$$inline_203_port_temp$$inline_196$$ >= $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$ + 128 && $address$$inline_197_old$$inline_203_port_temp$$inline_196$$ < $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$ + 
+                if($address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ >= $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$ + 128 && $address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ < $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$ + 
                 256) {
                   $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$h$ = $JSCompiler_alias_TRUE$$
                 }else {
-                  var $tileIndex$$inline_198$$ = $address$$inline_197_old$$inline_203_port_temp$$inline_196$$ >> 5;
+                  var $tileIndex$$inline_198$$ = $address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ >> 5;
                   $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$q$[$tileIndex$$inline_198$$] = $JSCompiler_alias_TRUE$$;
                   $tileIndex$$inline_198$$ < $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$m$ && ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$m$ = $tileIndex$$inline_198$$);
                   $tileIndex$$inline_198$$ > $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$j$ && ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$j$ = $tileIndex$$inline_198$$)
                 }
               }
-              $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$d$[$address$$inline_197_old$$inline_203_port_temp$$inline_196$$] = $reg$$inline_202_value$$79$$
+              $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$d$[$address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$] = $reg$$inline_202_value$$79$$
             }
             break;
           case 3:
-            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$main$.$is_sms$ ? ($address$$inline_197_old$$inline_203_port_temp$$inline_196$$ = 3 * ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$f$ & 
-            31), $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_197_old$$inline_203_port_temp$$inline_196$$] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$G$[$reg$$inline_202_value$$79$$], 
-            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_197_old$$inline_203_port_temp$$inline_196$$ + 1] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$F$[$reg$$inline_202_value$$79$$], 
-            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_197_old$$inline_203_port_temp$$inline_196$$ + 2] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$D$[$reg$$inline_202_value$$79$$]) : 
-            ($address$$inline_197_old$$inline_203_port_temp$$inline_196$$ = 3 * (($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$f$ & 63) >> 1), 0 == ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$f$ & 
-            1) ? ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_197_old$$inline_203_port_temp$$inline_196$$] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$C$[$reg$$inline_202_value$$79$$], 
-            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_197_old$$inline_203_port_temp$$inline_196$$ + 1] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$B$[$reg$$inline_202_value$$79$$]) : 
-            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_197_old$$inline_203_port_temp$$inline_196$$ + 2] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$A$[$reg$$inline_202_value$$79$$])
+            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$main$.$is_sms$ ? ($address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ = 3 * ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$f$ & 
+            31), $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$G$[$reg$$inline_202_value$$79$$], 
+            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ + 1] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$F$[$reg$$inline_202_value$$79$$], 
+            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ + 2] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$D$[$reg$$inline_202_value$$79$$]) : 
+            ($address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ = 3 * (($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$f$ & 63) >> 1), 0 == ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$f$ & 
+            1) ? ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$C$[$reg$$inline_202_value$$79$$], 
+            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ + 1] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$B$[$reg$$inline_202_value$$79$$]) : 
+            $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$a$[$address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ + 2] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$A$[$reg$$inline_202_value$$79$$])
         }
         $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$f$++;
         break;
@@ -9231,9 +9288,9 @@ function $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_JSSMS_SN76489
                   $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$u$ = ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$k$ & 14) << 10;
                   break;
                 case 5:
-                  $address$$inline_197_old$$inline_203_port_temp$$inline_196$$ = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$, $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$ = 
-                  ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$k$ & -130) << 7, $address$$inline_197_old$$inline_203_port_temp$$inline_196$$ != $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$ && 
-                  ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$h$ = $JSCompiler_alias_TRUE$$, console.log("New address written to SAT: " + $address$$inline_197_old$$inline_203_port_temp$$inline_196$$ + " -> " + $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$))
+                  $address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$, $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$ = 
+                  ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$k$ & -130) << 7, $address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ != $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$ && 
+                  ($JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$h$ = $JSCompiler_alias_TRUE$$, console.log("New address written to SAT: " + $address$$inline_197_old$$inline_203_port$$2_temp$$inline_196$$ + " -> " + $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$g$))
               }
               $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$c$[$reg$$inline_202_value$$79$$] = $JSCompiler_StaticMethods_JSSMS_SN76489_prototype$write$self$$inline_205_JSCompiler_StaticMethods_controlWrite$self$$inline_200_JSCompiler_StaticMethods_dataWrite$self$$inline_194_JSCompiler_StaticMethods_out$self$$.$k$
             }

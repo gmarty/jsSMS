@@ -1244,8 +1244,9 @@ JSSMS.Debugger.prototype = {
         address += 2;
         break;
       case 0xD3:
-        inst = 'OUT (' + toHex(this.readMem(address)) + '),A';
-        code = 'this.port.out(' + toHex(this.readMem(address)) + ', this.a);';
+        operand = this.readMem(address);
+        inst = 'OUT (' + toHex(operand) + '),A';
+        code = this.peepholePortOut(operand);
         address++;
         break;
       case 0xD4:
@@ -1296,9 +1297,9 @@ JSSMS.Debugger.prototype = {
         address += 2;
         break;
       case 0xDB:
-        operand = toHex(this.readMem(address));
-        inst = 'IN A,(' + operand + ')';
-        code = 'this.a = this.port.in_(' + operand + ');';
+        operand = this.readMem(address);
+        inst = 'IN A,(' + toHex(operand) + ')';
+        code = this.peepholePortIn(operand);
         address++;
         break;
       case 0xDC:
@@ -3780,6 +3781,128 @@ JSSMS.Debugger.prototype = {
    */
   getIndexOpIY: function(opcode) {
     return this.getIndex('IY', opcode);
+  },
+
+
+  /**
+   * Peephole optimization for port communication.
+   * @param {number} port Port number.
+   * @return {string}
+   */
+  peepholePortOut: function(port) {
+    if (this.main.is_gg && port < 0x07) {
+      return '';
+    }
+
+    switch (port & 0xC1) {
+      case 0x01:
+        // Accurate emulation with HCounter
+        if (Setup.LIGHTGUN) {
+          return 'var value = this.a;' +
+              'this.port.oldTH = (this.port.getTH(PORT_A) != 0 || this.port.getTH(PORT_B) != 0);' +
+              'this.port.writePort(PORT_A, value);' +
+              'this.port.writePort(PORT_B, value >> 2);' +
+              // Toggling TH latches H Counter
+              'if (!this.port.oldTH && (this.port.getTH(PORT_A) != 0 || this.port.getTH(PORT_B) != 0)) {' +
+              'this.port.hCounter = this.port.getHCount();' +
+              '}';
+        } else {
+          // Rough emulation of Nationalisation bits
+          var code = 'var value = this.a;' +
+              'this.port.ioPorts[0] = (value & 0x20) << 1;' +
+              'this.port.ioPorts[1] = (value & 0x80);';
+          if (this.port.europe == 0) {
+            // Not European system
+            code += 'this.port.ioPorts[0] = ~this.port.ioPorts[0];' +
+                'this.port.ioPorts[1] = ~this.port.ioPorts[1];';
+          }
+          return code;
+        }
+        break;
+
+      // 0xBE VDP Data port
+      case 0x80:
+        return 'this.vdp.dataWrite(this.a);';
+        break;
+
+      // 0xBD / 0xBF VDP Control port (Mirrored at two locations)
+      case 0x81:
+        return 'this.vdp.controlWrite(this.a);';
+        break;
+
+      // 0x7F: PSG
+      case 0x40:
+      case 0x41:
+        if (this.main.soundEnabled) {
+          return 'this.psg.write(this.a);';
+        }
+        break;
+    }
+
+    return '';
+  },
+
+
+  /**
+   * Peephole optimization for port communication.
+   * @param {number} port Port number.
+   * @return {string}
+   */
+  peepholePortIn: function(port) {
+    // Game Gear Serial Ports (not fully emulated)
+    if (this.main.is_gg && port < 0x07) {
+      switch (port) {
+        // GameGear (Start Button and Nationalisation)
+        case 0x00:
+          return 'this.a = (this.port.keyboard.ggstart & 0xBF) | this.port.europe;';
+
+        // GG Serial Communication Ports -
+        // Return 0 for now as "OutRun" gets stuck in a loop by returning 0xFF
+        case 0x01:
+        case 0x02:
+        case 0x03:
+        case 0x04:
+        case 0x05:
+          return 'this.a = 0x00;';
+        case 0x06:
+          return 'this.a = 0xFF;';
+      }
+    }
+
+    switch (port & 0xC1) {
+      // 0x7E - Vertical Port
+      case 0x40:
+        return 'this.a = this.vdp.getVCount();';
+
+      // 0x7F - Horizontal Port
+      case 0x41:
+        return 'this.a = this.port.hCounter;';
+
+      // VDP Data port
+      case 0x80:
+        return 'this.a = this.vdp.dataRead();';
+
+      // VDP Control port
+      case 0x81:
+        return 'this.a = this.vdp.controlRead();';
+
+      // 0xC0 / 0xDC - I/O Port A
+      case 0xC0:
+        return 'this.a = this.port.keyboard.controller1;';
+
+      // 0xC1 / 0xDD - I/O Port B and Misc
+      case 0xC1:
+        if (Setup.LIGHTGUN) {
+          return 'if (this.port.keyboard.lightgunClick)' +
+              'this.port.lightPhaserSync();' +
+              'this.a = (this.port.keyboard.controller2 & 0x3F) | (this.port.getTH(PORT_A) != 0 ? 0x40 : 0) | (this.port.getTH(PORT_B) != 0 ? 0x80 : 0);';
+        } else {
+          return 'this.a = (this.port.keyboard.controller2 & 0x3F) | this.port.ioPorts[0] | this.port.ioPorts[1];';
+        }
+    }
+
+    // Default Value is 0xFF
+    return 'this.a = 0xFF;';
   }
 };
 

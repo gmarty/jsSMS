@@ -188,6 +188,8 @@ var OP_ED_STATES = [
  */
 JSSMS.Z80 = function(sms) {
   this.main = sms;
+  this.vdp = sms.vdp;
+  this.psg = sms.psg;
   this.port = sms.ports;
 
   // Z80 Internal Stuff
