@@ -103,6 +103,7 @@ JSSMS.Debugger.prototype = {
       if (this.instructions[i] && this.instructions[i].target != null) {
         if (this.instructions[this.instructions[i].target]) {
           this.instructions[this.instructions[i].target].isJumpTarget = true;
+          this.instructions[this.instructions[i].target].jumpTargetNb++;
         } else {
           console.log('Invalid target address', this.instructions[i].target);
         }
@@ -184,6 +185,7 @@ JSSMS.Debugger.prototype = {
         code.push('},');
         // `temp` is only used for variable declaration, not actually passed parameter.
         code.push('' + toHex(tree[i].address) + ': function(temp) {');
+        code.push('// Nb of instructions jumping here: ' + tree[i].jumpTargetNb);
       }
 
       // Comment for debugging.
@@ -3924,6 +3926,7 @@ function Instruction(options) {
     nextAddress: null,
     target: null,
     isJumpTarget: false,
+    jumpTargetNb: 0, // Number of instructions targeting there.
     label: ''
     // Memory can be registry or offset, read or write mode, 8 or 16 bit.
     /*memory: null,
