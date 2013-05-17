@@ -85,14 +85,14 @@ JSSMS.Ports.prototype = {
 
     switch (port & 0xC1) {
       // 0x3F IO Port
-      // D7 : Port B TH pin output level (1=high, 0=low)
-      // D6 : Port B TR pin output level (1=high, 0=low)
-      // D5 : Port A TH pin output level (1=high, 0=low)
-      // D4 : Port A TR pin output level (1=high, 0=low)
-      // D3 : Port B TH pin direction (1=input, 0=output)
-      // D2 : Port B TR pin direction (1=input, 0=output)
-      // D1 : Port A TH pin direction (1=input, 0=output)
-      // D0 : Port A TR pin direction (1=input, 0=output)
+      // 0xD7 : Port B TH pin output level (1=high, 0=low)
+      // 0xD6 : Port B TR pin output level (1=high, 0=low)
+      // 0xD5 : Port A TH pin output level (1=high, 0=low)
+      // 0xD4 : Port A TR pin output level (1=high, 0=low)
+      // 0xD3 : Port B TH pin direction (1=input, 0=output)
+      // 0xD2 : Port B TR pin direction (1=input, 0=output)
+      // 0xD1 : Port A TH pin direction (1=input, 0=output)
+      // 0xD0 : Port A TR pin direction (1=input, 0=output)
       case 0x01:
         // Accurate emulation with HCounter
         if (Setup.LIGHTGUN) {
@@ -158,7 +158,7 @@ JSSMS.Ports.prototype = {
         case 0x03:
         case 0x04:
         case 0x05:
-          return 0;
+          return 0x00;
         case 0x06:
           return 0xFF;
       }
@@ -182,26 +182,26 @@ JSSMS.Ports.prototype = {
         return this.vdp.controlRead();
 
       // 0xC0 / 0xDC - I/O Port A
-      // D7 : Port B DOWN pin input
-      // D6 : Port B UP pin input
-      // D5 : Port A TR pin input
-      // D4 : Port A TL pin input
-      // D3 : Port A RIGHT pin input
-      // D2 : Port A LEFT pin input
-      // D1 : Port A DOWN pin input
-      // D0 : Port A UP pin input
+      // 0xD7 : Port B DOWN pin input
+      // 0xD6 : Port B UP pin input
+      // 0xD5 : Port A TR pin input
+      // 0xD4 : Port A TL pin input
+      // 0xD3 : Port A RIGHT pin input
+      // 0xD2 : Port A LEFT pin input
+      // 0xD1 : Port A DOWN pin input
+      // 0xD0 : Port A UP pin input
       case 0xC0:
         return this.keyboard.controller1;
 
       // 0xC1 / 0xDD - I/O Port B and Misc
-      // D7 : Port B TH pin input
-      // D6 : Port A TH pin input
-      // D5 : Unused
-      // D4 : RESET button (1= not pressed, 0= pressed)
-      // D3 : Port B TR pin input
-      // D2 : Port B TL pin input
-      // D1 : Port B RIGHT pin input
-      // D0 : Port B LEFT pin input
+      // 0xD7 : Port B TH pin input
+      // 0xD6 : Port A TH pin input
+      // 0xD5 : Unused
+      // 0xD4 : RESET button (1= not pressed, 0= pressed)
+      // 0xD3 : Port B TR pin input
+      // 0xD2 : Port B TL pin input
+      // 0xD1 : Port B RIGHT pin input
+      // 0xD0 : Port B LEFT pin input
       case 0xC1:
         if (Setup.LIGHTGUN) {
           if (this.keyboard.lightgunClick)
@@ -259,14 +259,14 @@ JSSMS.Ports.prototype = {
   //  with an 8-bit counter. Each scanline is divided up as follows:
   //
   //    Pixels H.Cnt   Description
-  //    256 : 00-7F : Active display
-  //     15 : 80-87 : Right border
-  //      8 : 87-8B : Right blanking
-  //     26 : 8B-ED : Horizontal sync
-  //      2 : ED-EE : Left blanking
-  //     14 : EE-F5 : Color burst
-  //      8 : F5-F9 : Left blanking
-  //     13 : F9-FF : Left border
+  //    256 : 0x00-0x7F : Active display
+  //     15 : 0x80-0x87 : Right border
+  //      8 : 0x87-0x8B : Right blanking
+  //     26 : 0x8B-0xED : Horizontal sync
+  //      2 : 0xED-0xEE : Left blanking
+  //     14 : 0xEE-0xF5 : Color burst
+  //      8 : 0xF5-0xF9 : Left blanking
+  //     13 : 0xF9-0xFF : Left border
   /**
    * @return {number}
    */

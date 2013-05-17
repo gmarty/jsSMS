@@ -1918,7 +1918,11 @@ JSSMS.Z80.prototype = {
 
     switch (opcode) {
       //  -- ED40 IN B,(C) -------------------------
-      case 0x40: this.b = this.port.in_(this.c); this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.b]; this.pc++; break;
+      case 0x40:
+        this.b = this.port.in_(this.c);
+        this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.b];
+        this.pc++;
+        break;
 
       //  -- ED41 OUT (C),B -------------------------
       case 0x41: this.port.out(this.c, this.b); this.pc++; break;
@@ -2014,8 +2018,8 @@ JSSMS.Z80.prototype = {
       //  -- ED53 LD (nn),DE ------------------------
       case 0x53:
         location = this.readMemWord(this.pc + 1);
-        this.writeMem(location++, this.e);        //SPl
-        this.writeMem(location, this.d);  //SPh
+        this.writeMem(location++, this.e); // SPl
+        this.writeMem(location, this.d);   // SPh
         this.pc += 3;
         break;
 
@@ -2073,8 +2077,8 @@ JSSMS.Z80.prototype = {
       //  -- ED63 LD (nn),HL ------------------------
       case 0x63:
         location = this.readMemWord(this.pc + 1);
-        this.writeMem(location++, this.l);        //SPl
-        this.writeMem(location, this.h);  //SPh
+        this.writeMem(location++, this.l); // SPl
+        this.writeMem(location, this.h);   // SPh
         this.pc += 3;
         break;
 
@@ -2137,8 +2141,8 @@ JSSMS.Z80.prototype = {
       //  -- ED73 LD (nn),SP ------------------------
       case 0x73:
         location = this.readMemWord(this.pc + 1);
-        this.writeMem(location++, this.sp & 0xFF);      //SPl
-        this.writeMem(location, this.sp >> 8);  //SPh
+        this.writeMem(location++, this.sp & 0xFF); // SPl
+        this.writeMem(location, this.sp >> 8);     // SPh
         this.pc += 3;
         break;
 
