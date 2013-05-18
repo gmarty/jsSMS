@@ -364,6 +364,8 @@ var OP_ED_STATES = [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8];
 JSSMS.Z80 = function(sms) {
   this.main = sms;
+  this.vdp = sms.vdp;
+  this.psg = sms.psg;
   this.port = sms.ports;
   this.pc = 0;
   this.sp = 0;
@@ -4949,7 +4951,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 24:
       target = address + this.signExtend(this.readMem(address) + 1);
       inst = "JR (" + toHex(target) + ")";
-      code = "this.pc = " + target + "; return;";
+      code = "this.pc = " + toHex(target) + "; return;";
       address = null;
       break;
     case 25:
@@ -5757,8 +5759,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       address += 2;
       break;
     case 211:
-      inst = "OUT (" + toHex(this.readMem(address)) + "),A";
-      code = "this.port.out(" + toHex(this.readMem(address)) + ", this.a);";
+      operand = this.readMem(address);
+      inst = "OUT (" + toHex(operand) + "),A";
+      code = this.peepholePortOut(operand);
       address++;
       break;
     case 212:
@@ -5795,9 +5798,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       address += 2;
       break;
     case 219:
-      operand = toHex(this.readMem(address));
-      inst = "IN A,(" + operand + ")";
-      code = "this.a = this.port.in_(" + operand + ");";
+      operand = this.readMem(address);
+      inst = "IN A,(" + toHex(operand) + ")";
+      code = this.peepholePortIn(operand);
       address++;
       break;
     case 220:
@@ -6004,24 +6007,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 1:
       inst = "RLC C";
+      code = "this.c = (this.rlc(this.c));";
       break;
     case 2:
       inst = "RLC D";
+      code = "this.d = (this.rlc(this.d));";
       break;
     case 3:
       inst = "RLC E";
+      code = "this.e = (this.rlc(this.e));";
       break;
     case 4:
       inst = "RLC H";
+      code = "this.h = (this.rlc(this.h));";
       break;
     case 5:
       inst = "RLC L";
+      code = "this.l = (this.rlc(this.l));";
       break;
     case 6:
       inst = "RLC (HL)";
+      code = "this.writeMem(this.getHL(), this.rlc(this.readMem(this.getHL())));";
       break;
     case 7:
       inst = "RLC A";
+      code = "this.a = (this.rlc(this.a));";
       break;
     case 8:
       inst = "RRC B";
@@ -6052,6 +6062,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 17:
       inst = "RL C";
+      code = "this.c = (this.rl(this.c));";
       break;
     case 18:
       inst = "RL D";
@@ -6254,6 +6265,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 80:
       inst = "BIT 2,B";
+      code = "this.bit(this.b & BIT_2);";
       break;
     case 81:
       inst = "BIT 2,C";
@@ -6280,6 +6292,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 88:
       inst = "BIT 3,B";
+      code = "this.bit(this.b & BIT_3);";
       break;
     case 89:
       inst = "BIT 3,C";
@@ -6332,6 +6345,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 104:
       inst = "BIT 5,B";
+      code = "this.bit(this.b & BIT_5);";
       break;
     case 105:
       inst = "BIT 5,C";
@@ -6832,9 +6846,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   switch(opcode) {
     case 64:
       inst = "IN B,(C)";
+      code = "this.b = this.port.in_(this.c);" + "this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.b];";
       break;
     case 65:
       inst = "OUT (C),B";
+      code = "this.port.out(this.c, this.b);";
       break;
     case 66:
       inst = "SBC HL,BC";
@@ -6842,6 +6858,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 67:
       inst = "LD (" + toHex(this.readMemWord(address)) + "),BC";
+      code = "var location = " + toHex(this.readMemWord(address)) + ";" + "this.writeMem(location++, this.c);" + "this.writeMem(location, this.b);";
       address = address + 2;
       break;
     case 68:
@@ -6889,31 +6906,40 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     ;
     case 110:
       inst = "IM 0";
+      code = "this.im = 0;";
       break;
     case 71:
       inst = "LD I,A";
+      code = "this.i = this.a;";
       break;
     case 72:
       inst = "IN C,(C)";
+      code = "this.c = this.port.in_(this.c);" + "this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.c];";
       break;
     case 73:
       inst = "OUT (C),C";
+      code = "this.port.out(this.c, this.c);";
       break;
     case 74:
       inst = "ADC HL,BC";
+      code = "this.adc16(this.getBC());";
       break;
     case 75:
       inst = "LD BC,(" + toHex(this.readMemWord(address)) + ")";
+      code = "this.setBC(this.readMemWord(" + toHex(this.readMemWord(address)) + "));";
       address = address + 2;
       break;
     case 79:
       inst = "LD R,A";
+      code = "this.r = this.a;";
       break;
     case 80:
       inst = "IN D,(C)";
+      code = "this.d = this.port.in_(this.c);" + "this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.d];";
       break;
     case 81:
       inst = "OUT (C),D";
+      code = "this.port.out(this.c, this.d);";
       break;
     case 82:
       inst = "SBC HL,DE";
@@ -6921,6 +6947,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 83:
       inst = "LD (" + toHex(this.readMemWord(address)) + "),DE";
+      code = "var location = this.readMemWord(this.pc + 1);" + "this.writeMem(location++, this.e);" + "this.writeMem(location, this.d);";
       address = address + 2;
       break;
     case 86:
@@ -6931,15 +6958,19 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 87:
       inst = "LD A,I";
+      code = "this.a = this.i;" + "this.f = (this.f & F_CARRY) | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);";
       break;
     case 88:
       inst = "IN E,(C)";
+      code = "this.e = this.port.in_(this.c);" + "this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.e];";
       break;
     case 89:
       inst = "OUT (C),E";
+      code = "this.port.out(this.c, this.e);";
       break;
     case 90:
       inst = "ADC HL,DE";
+      code = "this.adc16(this.getDE());";
       break;
     case 91:
       operand = toHex(this.readMemWord(address));
@@ -6958,15 +6989,19 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 96:
       inst = "IN H,(C)";
+      code = "this.h = this.port.in_(this.c);" + "this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.h];";
       break;
     case 97:
       inst = "OUT (C),H";
+      code = "this.port.out(this.c, this.h);";
       break;
     case 98:
       inst = "SBC HL,HL";
+      code = "this.sbc16(this.getHL());";
       break;
     case 99:
       inst = "LD (" + toHex(this.readMemWord(address)) + "),HL";
+      code = "var location = this.readMemWord(this.pc + 1);" + "this.writeMem(location++, this.l);" + "this.writeMem(location, this.h);";
       address = address + 2;
       break;
     case 103:
@@ -6975,9 +7010,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 104:
       inst = "IN L,(C)";
+      code = "this.l = this.port.in_(this.c);" + "this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.l];";
       break;
     case 105:
       inst = "OUT (C),L";
+      code = "this.port.out(this.c, this.l);";
       break;
     case 106:
       inst = "ADC HL,HL";
@@ -7002,6 +7039,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 120:
       inst = "IN A,(C)";
+      code = "this.a = this.port.in_(this.c);" + "this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];";
       break;
     case 121:
       inst = "OUT (C),A";
@@ -7023,10 +7061,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 162:
       inst = "INI";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 163:
       inst = "OUTI";
-      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.incHL();" + "this.b = this.dec8(this.b);" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.incHL();" + "this.b = this.dec8(this.b);" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 168:
       inst = "LDD";
@@ -7036,37 +7075,49 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 170:
       inst = "IND";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 171:
       inst = "OUTD";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.decHL();" + "this.b = this.dec8(this.b);" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 176:
       inst = "LDIR";
+      code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();";
       if(Setup.ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
-        code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "" + "if (this.getBC() != 0) {" + "this.f |= F_PARITY;" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
+        code += "if (this.getBC() != 0) {" + "this.f |= F_PARITY;" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
       }else {
-        code = "for(;this.getBC() != 0; this.f |= F_PARITY, this.tstates -= 5) {" + "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "}"
+        code += "for (;this.getBC() != 0; this.f |= F_PARITY, this.tstates -= 5) {" + "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "}"
       }
-      code += "if (!(this.getBC() != 0)) this.f &= ~ F_PARITY;" + "" + "this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
+      code += "if (!(this.getBC() != 0)) this.f &= ~ F_PARITY;" + "this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
       break;
     case 177:
-      target = address - 2;
       inst = "CPIR";
-      code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);" + "if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "}" + "this.f = (this.f & 0xF8) | temp;";
+      code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);";
+      if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+        target = address - 2;
+        code += "if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
+      }else {
+        code += "for (;(temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0; this.tstates -= 5) {" + "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);" + "}"
+      }
+      code += "this.f = (this.f & 0xF8) | temp;";
       break;
     case 178:
+      target = address - 2;
       inst = "INIR";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "}" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 179:
       inst = "OTIR";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();";
       if(Setup.ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
-        code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
+        code += "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
       }else {
-        code = "for(;this.b != 0; this.tstates -= 5) {" + "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "}"
+        code += "for (;this.b != 0; this.tstates -= 5) {" + "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "}"
       }
-      code += "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code += "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 184:
       inst = "LDDR";
@@ -7075,10 +7126,14 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "CPDR";
       break;
     case 186:
+      target = address - 2;
       inst = "INDR";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 187:
+      target = address - 2;
       inst = "OTDR";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "}" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break
   }
   return{opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address, target:target}
@@ -7109,7 +7164,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 34:
       operand = toHex(this.readMemWord(address));
       inst = "LD (" + operand + ")," + index;
-      code = "location = " + operand + ";" + "this.writeMem(location++, this." + index.toLowerCase() + "L);" + "this.writeMem(location, this." + index.toLowerCase() + "H);";
+      code = "var location = " + operand + ";" + "this.writeMem(location++, this." + index.toLowerCase() + "L);" + "this.writeMem(location, this." + index.toLowerCase() + "H);";
       address = address + 2;
       break;
     case 35:
@@ -7460,9 +7515,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 1:
       inst = "LD C,RLC (" + index + ")";
+      code = "var location = (this.get" + index + "() + " + this.readMem(address) + ") & 0xFFFF;" + "this.c = this.rlc(this.readMem(location)); this.writeMem(location, this.c);";
       break;
     case 2:
       inst = "LD D,RLC (" + index + ")";
+      code = "var location = (this.get" + index + "() + " + this.readMem(address) + ") & 0xFFFF;" + "this.d = this.rlc(this.readMem(location)); this.writeMem(location, this.d);";
       break;
     case 3:
       inst = "LD E,RLC (" + index + ")";
@@ -7475,9 +7532,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 6:
       inst = "RLC (" + index + ")";
+      code = "var location = (this.get" + index + "() + " + this.readMem(address) + ") & 0xFFFF;" + "this.writeMem(location, this.rlc(this.readMem(location)));";
       break;
     case 7:
       inst = "LD A,RLC (" + index + ")";
+      code = "var location = (this.get" + index + "() + " + this.readMem(address) + ") & 0xFFFF;" + "this.a = this.rlc(this.readMem(location)); this.writeMem(location, this.a);";
       break;
     case 8:
       inst = "LD B,RRC (" + index + ")";
@@ -7544,6 +7603,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 29:
       inst = "LD L,RR (" + index + ")";
+      code = "var location = (this.get" + index + "() + " + this.readMem(address) + ") & 0xFFFF;" + "this.l = this.rr(this.readMem(location)); this.writeMem(location, this.l);";
       break;
     case 30:
       inst = "RR (" + index + ")";
@@ -8061,6 +8121,75 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   return this.getIndex("IX", opcode)
 }, getIndexOpIY:function(opcode) {
   return this.getIndex("IY", opcode)
+}, peepholePortOut:function(port) {
+  if(this.main.is_gg && port < 7) {
+    return""
+  }
+  switch(port & 193) {
+    case 1:
+      if(Setup.LIGHTGUN) {
+        return"var value = this.a;" + "this.port.oldTH = (this.port.getTH(PORT_A) != 0 || this.port.getTH(PORT_B) != 0);" + "this.port.writePort(PORT_A, value);" + "this.port.writePort(PORT_B, value >> 2);" + "if (!this.port.oldTH && (this.port.getTH(PORT_A) != 0 || this.port.getTH(PORT_B) != 0)) {" + "this.port.hCounter = this.port.getHCount();" + "}"
+      }else {
+        var code = "var value = this.a;" + "this.port.ioPorts[0] = (value & 0x20) << 1;" + "this.port.ioPorts[1] = (value & 0x80);";
+        if(this.port.europe == 0) {
+          code += "this.port.ioPorts[0] = ~this.port.ioPorts[0];" + "this.port.ioPorts[1] = ~this.port.ioPorts[1];"
+        }
+        return code
+      }
+      break;
+    case 128:
+      return"this.vdp.dataWrite(this.a);";
+      break;
+    case 129:
+      return"this.vdp.controlWrite(this.a);";
+      break;
+    case 64:
+    ;
+    case 65:
+      if(this.main.soundEnabled) {
+        return"this.psg.write(this.a);"
+      }
+      break
+  }
+  return""
+}, peepholePortIn:function(port) {
+  if(this.main.is_gg && port < 7) {
+    switch(port) {
+      case 0:
+        return"this.a = (this.port.keyboard.ggstart & 0xBF) | this.port.europe;";
+      case 1:
+      ;
+      case 2:
+      ;
+      case 3:
+      ;
+      case 4:
+      ;
+      case 5:
+        return"this.a = 0x00;";
+      case 6:
+        return"this.a = 0xFF;"
+    }
+  }
+  switch(port & 193) {
+    case 64:
+      return"this.a = this.vdp.getVCount();";
+    case 65:
+      return"this.a = this.port.hCounter;";
+    case 128:
+      return"this.a = this.vdp.dataRead();";
+    case 129:
+      return"this.a = this.vdp.controlRead();";
+    case 192:
+      return"this.a = this.port.keyboard.controller1;";
+    case 193:
+      if(Setup.LIGHTGUN) {
+        return"if (this.port.keyboard.lightgunClick)" + "this.port.lightPhaserSync();" + "this.a = (this.port.keyboard.controller2 & 0x3F) | (this.port.getTH(PORT_A) != 0 ? 0x40 : 0) | (this.port.getTH(PORT_B) != 0 ? 0x80 : 0);"
+      }else {
+        return"this.a = (this.port.keyboard.controller2 & 0x3F) | this.port.ioPorts[0] | this.port.ioPorts[1];"
+      }
+  }
+  return"this.a = 0xFF;"
 }};
 function Instruction(options) {
   var toHex = JSSMS.Utils.toHex;

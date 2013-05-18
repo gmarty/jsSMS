@@ -3,12 +3,16 @@
 <head>
 <meta charset="utf-8">
 <title>jsSMS - JavaScript Sega Master System &amp; GameGear emulator</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <link rel="stylesheet" href="//twitter.github.io/bootstrap/assets/css/bootstrap.css">
 <link rel="stylesheet" href="//twitter.github.io/bootstrap/assets/css/bootstrap-responsive.css">
 <style>
 html, body {
   background: #eee;
+}
+/* IE10 is not tested though */
+a, input, button {
+  -ms-touch-action: none !important;
 }
 .container {
   margin-top: 20px;
@@ -38,11 +42,11 @@ html, body {
 .screen canvas {
   margin: auto;
   display: block;
-  image-rendering: -moz-crisp-edges;          // FF 6.0+
-  image-rendering: -webkit-optimize-contrast; // Webkit (Safari now, Chrome soon)
-  image-rendering: optimizeSpeed;             // Older versions of FF
-  image-rendering: optimize-contrast;         // Possible future browsers.
-  -ms-interpolation-mode: nearest-neighbor;   // IE
+  image-rendering: -moz-crisp-edges;          /* FF 6.0+ */
+  image-rendering: -o-crisp-edges;            /* Opera */
+  image-rendering: -webkit-optimize-contrast; /* Webkit (Safari now, Chrome soon) */
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;   /* IE */
 }
 .screen:-webkit-full-screen {
   height: 100%;
@@ -194,7 +198,8 @@ var sms = new JSSMS({
       ['Woody Pop v1.0', 'roms/gg/World/Woody Pop (JUE) (V1.0).gg'],
       ['Woody Pop v1.1', 'roms/gg/World/Woody Pop (JUE) (V1.1) [!].gg'],
       ['Wakiyanland', 'roms/gg/Wakiyarando (Wagyan Land) (J).gg'],
-      ['Kaitô Saint Tail', 'roms/gg/Kyoto Saint Tale (J).gg']
+      ['Kaitô Saint Tail', 'roms/gg/Kyoto Saint Tale (J).gg'],
+      ['Sonic the Hedgehog v1.0', 'roms/gg/World/Sonic the Hedgehog (JUE) (V1.0).gg']
     ],
     'Master System technical roms': [
       ['Checkstate v.1.0', 'roms/technical/chkstate.sms'],

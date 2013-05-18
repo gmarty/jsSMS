@@ -16,19 +16,19 @@ required: number
         address = null;
         ^
 
-src\debugger.js:1404: WARNING - assignment
+src\debugger.js:1405: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:2482: WARNING - assignment
+src\debugger.js:2500: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:3141: WARNING - assignment
+src\debugger.js:3270: WARNING - assignment
 found   : null
 required: number
         address = null;
@@ -38,11 +38,11 @@ src\sms.js:67: WARNING - cannot instantiate non-constructor
   this.ui = new opts['ui'](this);
             ^
 
-src\z80.js:3087: WARNING - Property setUint8 never defined on JSSMS.Z80.memWriteMap
+src\z80.js:3093: WARNING - Property setUint8 never defined on JSSMS.Z80.memWriteMap
         this.memWriteMap.setUint8(i, 0);
         ^
 
-src\z80.js:3098: WARNING - Property setUint8 never defined on JSSMS.Z80.sram
+src\z80.js:3104: WARNING - Property setUint8 never defined on JSSMS.Z80.sram
         this.sram.setUint8(i, 0);
         ^
 
