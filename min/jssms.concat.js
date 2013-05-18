@@ -4734,7 +4734,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   for(;i < romSize;i++) {
     if(this.instructions[i] && this.instructions[i].target != null) {
       if(this.instructions[this.instructions[i].target]) {
-        this.instructions[this.instructions[i].target].isJumpTarget = true
+        this.instructions[this.instructions[i].target].isJumpTarget = true;
+        this.instructions[this.instructions[i].target].jumpTargetNb++
       }else {
         console.log("Invalid target address", this.instructions[i].target)
       }
@@ -4781,7 +4782,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
         code.push("this.pc = " + toHex(prevPc) + ";")
       }
       code.push("},");
-      code.push("" + toHex(tree[i].address) + ": function(temp) {")
+      code.push("" + toHex(tree[i].address) + ": function(temp) {");
+      code.push("// Nb of instructions jumping here: " + tree[i].jumpTargetNb)
     }
     code.push("// " + tree[i].label);
     tstates += getTotalTStates(tree[i].opcodes);
@@ -8193,7 +8195,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
 }};
 function Instruction(options) {
   var toHex = JSSMS.Utils.toHex;
-  var defaultInstruction = {address:0, hexAddress:"", opcode:0, opcodes:[], inst:"", code:"", nextAddress:null, target:null, isJumpTarget:false, label:""};
+  var defaultInstruction = {address:0, hexAddress:"", opcode:0, opcodes:[], inst:"", code:"", nextAddress:null, target:null, isJumpTarget:false, jumpTargetNb:0, label:""};
   var prop;
   var hexOpcodes = "";
   for(prop in defaultInstruction) {
@@ -9031,8 +9033,9 @@ if(window["$"]) {
       }
       var self = this;
       var root = $("<div></div>");
-      var controls = $('<div class="controls"></div>');
-      var screenContainer = $('<div class="screen"></div>');
+      var screenContainer = $('<div id="screen"></div>');
+      var gamepadContainer = $('<div class="gamepad"><div class="direction"><div class="up"></div><div class="right"></div><div class="left"></div><div class="down"></div></div><div class="buttons"><div class="start"></div><div class="fire1"></div><div class="fire2"></div></div></div>');
+      var controls = $('<div id="controls"></div>');
       var fullscreenSupport = JSSMS.Utils.getPrefix(["fullscreenEnabled", "mozFullScreenEnabled", "webkitCancelFullScreen"]);
       var requestAnimationFramePrefix = JSSMS.Utils.getPrefix(["requestAnimationFrame", "msRequestAnimationFrame", "mozRequestAnimationFrame", "webkitRequestAnimationFrame"], window);
       var i;
@@ -9056,9 +9059,10 @@ if(window["$"]) {
         return
       }
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
-      this.romContainer = $("<div></div>");
-      this.romSelect = $("<select></select>");
-      this.romSelect.change(function() {
+      this.gamepad = {u:{e:$(".up", gamepadContainer), k:KEY_UP}, r:{e:$(".right", gamepadContainer), k:KEY_RIGHT}, d:{e:$(".down", gamepadContainer), k:KEY_DOWN}, l:{e:$(".left", gamepadContainer), k:KEY_LEFT}, 1:{e:$(".fire1", gamepadContainer), k:KEY_FIRE1}, 2:{e:$(".fire2", gamepadContainer), k:KEY_FIRE2}};
+      var startButton = $(".start", gamepadContainer);
+      this.romContainer = $('<div id="romSelector"></div>');
+      this.romSelect = $("<select></select>").change(function() {
         self.loadROM()
       });
       this.buttons = Object.create(null);
@@ -9132,6 +9136,7 @@ if(window["$"]) {
       }
       this.log = $('<div id="status"></div>');
       this.screen.appendTo(screenContainer);
+      gamepadContainer.appendTo(screenContainer);
       screenContainer.appendTo(root);
       this.romContainer.appendTo(root);
       controls.appendTo(root);
@@ -9144,6 +9149,32 @@ if(window["$"]) {
         self.main.keyboard.keydown(evt)
       }).bind("keyup", function(evt) {
         self.main.keyboard.keyup(evt)
+      });
+      for(i in this.gamepad) {
+        this.gamepad[i].e.on("mousedown touchstart", function(key) {
+          return function(evt) {
+            self.main.keyboard.controller1 &= ~key;
+            evt.preventDefault()
+          }
+        }(this.gamepad[i].k)).on("mouseup touchend", function(key) {
+          return function(evt) {
+            self.main.keyboard.controller1 |= key;
+            evt.preventDefault()
+          }
+        }(this.gamepad[i].k))
+      }
+      startButton.on("mousedown touchstart", function(evt) {
+        if(self.main.is_sms) {
+          self.main.pause_button = true
+        }else {
+          self.main.keyboard.ggstart &= ~128
+        }
+        evt.preventDefault()
+      }).on("mouseup touchend", function(evt) {
+        if(!self.main.is_sms) {
+          self.main.keyboard.ggstart |= 128
+        }
+        evt.preventDefault()
       })
     };
     UI.prototype = {reset:function() {
@@ -9213,7 +9244,6 @@ if(window["$"]) {
       this.log.text(s)
     }, writeAudio:function(buffer) {
     }, writeFrame:function() {
-      var self = this;
       var hiddenPrefix = JSSMS.Utils.getPrefix(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
       if(hiddenPrefix) {
         return function() {

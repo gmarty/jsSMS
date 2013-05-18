@@ -33,13 +33,13 @@ a, input, button {
 #emulator > div {
   text-align: center;
 }
-.screen {
+#screen {
   height: 192px;
   width: 256px;
   background: #000;
   margin: auto;
 }
-.screen canvas {
+#screen canvas {
   margin: auto;
   display: block;
   image-rendering: -moz-crisp-edges;          /* FF 6.0+ */
@@ -48,9 +48,55 @@ a, input, button {
   image-rendering: crisp-edges;
   -ms-interpolation-mode: nearest-neighbor;   /* IE */
 }
-.screen:-webkit-full-screen {
+#screen:-webkit-full-screen {
   height: 100%;
   width: 100%;
+}
+.gamepad {
+  height: 60px;
+  position: relative;
+}
+div .direction > div,
+div .buttons > div {
+  width: 40px;
+  height: 40px;
+  float: left;
+  display: inline;
+}
+div .direction {
+  background: lightgrey;
+  width: 80px;
+  height: 80px;
+  border-radius: 40px;
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+.up, .down {
+  background: darkgrey;
+}
+.up {
+  border-radius: 40px 0 0 0;
+}
+.down {
+  border-radius: 0 0 40px 0;
+}
+div .buttons {
+  position: absolute;
+  right: 0;
+  top: 20px;
+}
+div .buttons .start {
+  background: darkblue;
+  border-radius: 0 40px 40px 0;
+  width: 25px;
+}
+.fire1, .fire2 {
+  background: black;
+  margin-left: 10px;
+  border-radius: 40px;
+}
+#romSelector {
+  clear: both;
 }
 select, .btn {
   margin: 5px 5px 0 0;
@@ -64,13 +110,13 @@ footer {
   }
 }
 @media (orientation: portrait) {
-  .screen canvas {
+  #screen canvas {
     height: auto;
     width: 100%;
   }
 }
 @media (orientation: landscape) {
-  .screen canvas {
+  #screen canvas {
     height: 100%;
     width: auto;
   }

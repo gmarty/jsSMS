@@ -30,10 +30,14 @@
  */
 JSSMS.DummyUI = function(sms) {
   this.main = sms;
-  this.enable = function() {};
-  this.updateStatus = function() {};
-  this.writeAudio = function() {};
-  this.writeFrame = function() {};
+  this.enable = function() {
+  };
+  this.updateStatus = function() {
+  };
+  this.writeAudio = function() {
+  };
+  this.writeFrame = function() {
+  };
 };
 
 if (window['$']) {
@@ -56,8 +60,9 @@ if (window['$']) {
 
       // Create UI
       var root = $('<div></div>');
-      var controls = $('<div class="controls"></div>');
-      var screenContainer = $('<div class="screen"></div>');
+      var screenContainer = $('<div id="screen"></div>');
+      var gamepadContainer = $('<div class="gamepad"><div class="direction"><div class="up"></div><div class="right"></div><div class="left"></div><div class="down"></div></div><div class="buttons"><div class="start"></div><div class="fire1"></div><div class="fire2"></div></div></div>');
+      var controls = $('<div id="controls"></div>');
 
       // General settings
       /**
@@ -77,8 +82,9 @@ if (window['$']) {
         this.requestAnimationFrame = function(callback) {
           var currTime = JSSMS.Utils.getTimestamp();
           var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-          window.setTimeout(function() { callback(currTime + timeToCall); },
-              timeToCall);
+          window.setTimeout(function() {
+            callback(currTime + timeToCall);
+          }, timeToCall);
           lastTime = currTime + timeToCall;
         };
       }
@@ -94,13 +100,41 @@ if (window['$']) {
 
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
 
-      this.romContainer = $('<div></div>');
-      this.romSelect = $('<select></select>');
+      // Gamepad
+      this.gamepad = {
+        u: {
+          e: $('.up', gamepadContainer),
+          k: KEY_UP
+        },
+        r: {
+          e: $('.right', gamepadContainer),
+          k: KEY_RIGHT
+        },
+        d: {
+          e: $('.down', gamepadContainer),
+          k: KEY_DOWN
+        },
+        l: {
+          e: $('.left', gamepadContainer),
+          k: KEY_LEFT
+        },
+        1: {
+          e: $('.fire1', gamepadContainer),
+          k: KEY_FIRE1
+        },
+        2: {
+          e: $('.fire2', gamepadContainer),
+          k: KEY_FIRE2
+        }
+      };
+      var startButton = $('.start', gamepadContainer);
 
-      // ROM loading
-      this.romSelect.change(function() {
-        self.loadROM();
-      });
+      // Rom selector
+      this.romContainer = $('<div id="romSelector"></div>');
+      this.romSelect = $('<select></select>')
+        .change(function() {
+            self.loadROM();
+          });
 
       // Buttons
       this.buttons = Object.create(null);
@@ -196,6 +230,7 @@ if (window['$']) {
       this.log = $('<div id="status"></div>');
 
       this.screen.appendTo(screenContainer);
+      gamepadContainer.appendTo(screenContainer);
       screenContainer.appendTo(root);
       this.romContainer.appendTo(root);
       controls.appendTo(root);
@@ -207,14 +242,44 @@ if (window['$']) {
       }
 
       // Keyboard
-      $(document).
-          bind('keydown', function(evt) {
+      $(document)
+        .bind('keydown', function(evt) {
             self.main.keyboard.keydown(evt);
             //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
-          }).
-          bind('keyup', function(evt) {
+          })
+        .bind('keyup', function(evt) {
             self.main.keyboard.keyup(evt);
             //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
+          });
+
+      for (i in this.gamepad) {
+        this.gamepad[i].e
+          .on('mousedown touchstart', function(key) {
+              return function(evt) {
+                self.main.keyboard.controller1 &= ~key;
+                evt.preventDefault();
+              };
+            }(this.gamepad[i].k))
+          .on('mouseup touchend', function(key) {
+              return function(evt) {
+                self.main.keyboard.controller1 |= key;
+                evt.preventDefault();
+              };
+            }(this.gamepad[i].k));
+      }
+
+      startButton
+        .on('mousedown touchstart', function(evt) {
+            if (self.main.is_sms)
+              self.main.pause_button = true;       // Pause
+            else
+              self.main.keyboard.ggstart &= ~0x80; // Start
+            evt.preventDefault();
+          })
+        .on('mouseup touchend', function(evt) {
+            if (!self.main.is_sms)
+              self.main.keyboard.ggstart |= 0x80; // Start
+            evt.preventDefault();
           });
     };
 
@@ -290,9 +355,9 @@ if (window['$']) {
             }
 
             /*if (JSSMS.Utils.isIE()) {
-              var charCodes = JSNESBinaryToArray(xhr.responseBody).toArray();
-              data = String.fromCharCode.apply(undefined, charCodes);
-            } else {*/
+             var charCodes = JSNESBinaryToArray(xhr.responseBody).toArray();
+             data = String.fromCharCode.apply(undefined, charCodes);
+             } else {*/
             data = xhr.responseText;
             //}
 
@@ -311,11 +376,11 @@ if (window['$']) {
        */
       enable: function() {
         /*this.buttons.pause.removeAttr('disabled');
-        if (this.main.isRunning) {
-          this.buttons.pause.attr('value', 'pause');
-        } else {
-          this.buttons.pause.attr('value', 'resume');
-        }*/
+         if (this.main.isRunning) {
+         this.buttons.pause.attr('value', 'pause');
+         } else {
+         this.buttons.pause.attr('value', 'resume');
+         }*/
         this.buttons.start.removeAttr('disabled');
         this.buttons.start.attr('value', 'Start');
         this.buttons.reset.removeAttr('disabled');
@@ -354,8 +419,6 @@ if (window['$']) {
        * an implementation of differential update.
        */
       writeFrame: function() {
-        var self = this;
-
         /**
          * Contains the visibility API prefix or false if not supported.
          * @type {string|boolean}
