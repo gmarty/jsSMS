@@ -1,34 +1,34 @@
-src\debugger.js:389: WARNING - assignment
+src\debugger.js:391: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1137: WARNING - assignment
+src\debugger.js:1139: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1177: WARNING - assignment
+src\debugger.js:1179: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1405: WARNING - assignment
+src\debugger.js:1407: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:2500: WARNING - assignment
+src\debugger.js:2502: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:3270: WARNING - assignment
+src\debugger.js:3272: WARNING - assignment
 found   : null
 required: number
         address = null;
@@ -46,4 +46,4 @@ src\z80.js:3104: WARNING - Property setUint8 never defined on JSSMS.Z80.sram
         this.sram.setUint8(i, 0);
         ^
 
-0 error(s), 9 warning(s), 91.8% typed
+0 error(s), 9 warning(s), 91.7% typed
