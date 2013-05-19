@@ -98,9 +98,19 @@ JSSMS.Debugger.prototype = {
     }
 
     // Flag any instructions that are jump targets.
-    this.instructions[0].isJumpTarget = true; // Define entry point as a jump target.
+    this.instructions[0x00].isJumpTarget = true; // Define entry point as a jump target.
+    this.instructions[0x38].isJumpTarget = true;
+    this.instructions[0x66].isJumpTarget = true;
+
     for (; i < romSize; i++) {
-      if (this.instructions[i] && this.instructions[i].target != null) {
+      if (!this.instructions[i]) {
+        continue;
+      }
+      // Comparing with null is important here as `0` is a valid address.
+      if (this.instructions[i].nextAddress != null && this.instructions[this.instructions[i].nextAddress]) {
+        this.instructions[this.instructions[i].nextAddress].jumpTargetNb++;
+      }
+      if (this.instructions[i].target != null) {
         if (this.instructions[this.instructions[i].target]) {
           this.instructions[this.instructions[i].target].isJumpTarget = true;
           this.instructions[this.instructions[i].target].jumpTargetNb++;

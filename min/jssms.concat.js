@@ -4731,8 +4731,16 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     }
   }
   this.instructions[0].isJumpTarget = true;
+  this.instructions[56].isJumpTarget = true;
+  this.instructions[102].isJumpTarget = true;
   for(;i < romSize;i++) {
-    if(this.instructions[i] && this.instructions[i].target != null) {
+    if(!this.instructions[i]) {
+      continue
+    }
+    if(this.instructions[i].nextAddress != null && this.instructions[this.instructions[i].nextAddress]) {
+      this.instructions[this.instructions[i].nextAddress].jumpTargetNb++
+    }
+    if(this.instructions[i].target != null) {
       if(this.instructions[this.instructions[i].target]) {
         this.instructions[this.instructions[i].target].isJumpTarget = true;
         this.instructions[this.instructions[i].target].jumpTargetNb++
