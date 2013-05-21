@@ -63,14 +63,14 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
 }, start:function() {
   var self = this;
   if(!this.isRunning) {
-    this.isRunning = true
-  }
-  this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
-  if(DEBUG) {
-    this.resetFps();
-    this.fpsInterval = setInterval(function() {
-      self.printFps()
-    }, fpsInterval)
+    this.isRunning = true;
+    this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
+    if(DEBUG) {
+      this.resetFps();
+      this.fpsInterval = setInterval(function() {
+        self.printFps()
+      }, fpsInterval)
+    }
   }
   this.ui.updateStatus("Running")
 }, stop:function() {
@@ -80,87 +80,12 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   this.isRunning = false
 }, frame:function() {
   if(this.isRunning) {
-    if(!this.throttle) {
-      if(this.emulateNextFrame()) {
-        this.doRepaint()
-      }
-    }else {
-      if(this.emulateNextFrame()) {
-        this.doRepaint()
-      }
-    }
+    this.cpu.frame();
     this.fpsFrameCount++;
     this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen)
   }
 }, nextStep:function() {
-  if(Setup.ACCURATE_INTERRUPT_EMULATION && this.lineno == 193) {
-    this.cpu.run(this.cyclesPerLine, 8);
-    this.vdp.setVBlankFlag();
-    this.cpu.run(0, 0)
-  }else {
-    this.cpu.run(this.cyclesPerLine, 0)
-  }
-  this.vdp.line = this.lineno;
-  if(this.frameskip_counter == 0 && this.lineno < 192) {
-    this.vdp.drawLine(this.lineno)
-  }
-  this.vdp.interrupts(this.lineno);
-  this.lineno++;
-  if(this.lineno >= this.no_of_scanlines) {
-    this.lineno = 0;
-    this.doRepaint()
-  }
-}, emulateNextFrame:function() {
-  var startTime = 0;
-  var lineno = 0;
-  for(;lineno < this.no_of_scanlines;lineno++) {
-    if(Setup.DEBUG_TIMING) {
-      startTime = JSSMS.Utils.getTimestamp()
-    }
-    if(Setup.ACCURATE_INTERRUPT_EMULATION && lineno == 193) {
-      this.cpu.run(this.cyclesPerLine, 8);
-      this.vdp.setVBlankFlag();
-      this.cpu.run(0, 0)
-    }else {
-      this.cpu.run(this.cyclesPerLine, 0)
-    }
-    if(Setup.DEBUG_TIMING) {
-      this.z80TimeCounter += JSSMS.Utils.getTimestamp() - startTime
-    }
-    if(this.soundEnabled) {
-      this.updateSound(lineno)
-    }
-    this.vdp.line = lineno;
-    if(this.frameskip_counter == 0 && lineno < 192) {
-      if(Setup.DEBUG_TIMING) {
-        startTime = JSSMS.Utils.getTimestamp()
-      }
-      this.vdp.drawLine(lineno);
-      if(Setup.DEBUG_TIMING) {
-        this.drawTimeCounter += JSSMS.Utils.getTimestamp() - startTime
-      }
-    }
-    this.vdp.interrupts(lineno)
-  }
-  if(this.soundEnabled) {
-    this.audioOutput(this.audioBuffer)
-  }
-  if(Setup.DEBUG_TIMING && ++this.frameCount == 60) {
-    this.z80Time = this.z80TimeCounter;
-    this.drawTime = this.drawTimeCounter;
-    this.z80TimeCounter = 0;
-    this.drawTimeCounter = 0;
-    this.frameCount = 0
-  }
-  if(this.pause_button) {
-    this.cpu.nmi();
-    this.pause_button = false
-  }
-  if(this.frameskip_counter-- == 0) {
-    this.frameskip_counter = this.frameSkip;
-    return true
-  }
-  return false
+  this.cpu.frame()
 }, setSMS:function() {
   this.is_sms = true;
   this.is_gg = false;
@@ -445,27 +370,55 @@ JSSMS.Z80.prototype = {reset:function() {
   this.EI_inst = false;
   this.interruptVector = 0;
   this.halt = false
-}, run:function(cycles, cyclesTo) {
-  this.tstates += cycles;
-  if(cycles != 0) {
-    this.totalCycles = cycles
-  }
-  if(!Setup.ACCURATE_INTERRUPT_EMULATION) {
+}, frame:function() {
+  this.lineno = 0;
+  this.tstates += this.main.cyclesPerLine;
+  this.totalCycles = this.main.cyclesPerLine;
+  if(Setup.ACCURATE_INTERRUPT_EMULATION) {
     if(this.interruptLine) {
       this.interrupt()
     }
   }
-  while(this.tstates > cyclesTo) {
-    if(Setup.ACCURATE_INTERRUPT_EMULATION) {
-      if(this.interruptLine) {
-        this.interrupt()
-      }
-    }
+  while(true) {
     if(DEBUGGER) {
       this.main.ui.updateDisassembly(this.pc)
     }
-    this.interpret()
+    this.interpret();
+    if(this.tstates <= 0) {
+      if(this.eol()) {
+        return
+      }
+    }
   }
+}, eol:function() {
+  if(this.main.soundEnabled) {
+    this.main.updateSound(this.lineno)
+  }
+  this.vdp.line = this.lineno;
+  if(this.lineno < 192) {
+    this.vdp.drawLine(this.lineno)
+  }
+  this.vdp.interrupts(this.lineno);
+  if(this.interruptLine) {
+    this.interrupt()
+  }
+  this.lineno++;
+  if(this.lineno >= this.main.no_of_scanlines) {
+    this.eof();
+    return true
+  }
+  this.tstates += this.main.cyclesPerLine;
+  this.totalCycles = this.main.cyclesPerLine;
+  return false
+}, eof:function() {
+  if(this.main.soundEnabled) {
+    this.main.audioOutput(this.main.audioBuffer)
+  }
+  if(this.main.pause_button) {
+    this.nmi();
+    this.main.pause_button = false
+  }
+  this.main.doRepaint()
 }, interpret:function() {
   var location = 0;
   var temp = 0;
@@ -4793,12 +4746,13 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code.push("" + toHex(tree[i].address) + ": function(temp) {");
       code.push("// Nb of instructions jumping here: " + tree[i].jumpTargetNb)
     }
+    code.push("");
+    code.push("if (this.tstates <= 0) {this.pc = " + toHex(tree[i].address) + "; if (this.eol()) return;}");
+    code.push("");
     code.push("// " + tree[i].label);
-    tstates += getTotalTStates(tree[i].opcodes);
     breakNeeded = tree[i].code.substr(-7) == "return;";
-    if(/return;/.test(tree[i].code) || /this\.tstates/.test(tree[i].code)) {
-      insertTStates()
-    }
+    tstates += getTotalTStates(tree[i].opcodes);
+    insertTStates();
     if(tree[i].code != "") {
       code.push(tree[i].code)
     }
@@ -7116,7 +7070,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 178:
       target = address - 2;
       inst = "INIR";
-      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "}" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 179:
       inst = "OTIR";
@@ -7138,12 +7092,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 186:
       target = address - 2;
       inst = "INDR";
-      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 187:
       target = address - 2;
       inst = "OTDR";
-      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "}" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break
   }
   return{opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address, target:target}

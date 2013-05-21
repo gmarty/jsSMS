@@ -198,25 +198,22 @@ JSSMS.Debugger.prototype = {
         code.push('// Nb of instructions jumping here: ' + tree[i].jumpTargetNb);
       }
 
+      code.push('');
+      code.push('if (this.tstates <= 0) {this.pc = ' + toHex(tree[i].address) + '; if (this.eol()) return;}');
+      code.push('');
+
       // Comment for debugging.
       code.push('// ' + tree[i].label);
 
-      // Decrement tstates.
-      tstates += getTotalTStates(tree[i].opcodes);
-
       breakNeeded = tree[i].code.substr(-7) == 'return;';
 
-      if (/return;/.test(tree[i].code) || /this\.tstates/.test(tree[i].code)) {
-        insertTStates();
-      }
+      // Decrement tstates.
+      tstates += getTotalTStates(tree[i].opcodes);
+      insertTStates();
 
       // Instruction.
       if (tree[i].code != '')
         code.push(tree[i].code);
-
-      // Move program counter.
-      /*if (tree[i].nextAddress && !breakNeeded)
-       code.push('this.pc = ' + toHex(tree[i].nextAddress) + ';');*/
 
       prevPc = tree[i].nextAddress;
     }
@@ -2808,6 +2805,7 @@ JSSMS.Debugger.prototype = {
             'if (this.b != 0) {' +
             'this.tstates -= 5;' +
             'this.pc = ' + toHex(target) + ';' +
+            'return;' +
             //'} else {' +
             //'this.pc++;' +
             '}' +
@@ -2866,6 +2864,7 @@ JSSMS.Debugger.prototype = {
             'if (this.b != 0) {' +
             'this.tstates -= 5;' +
             'this.pc = ' + toHex(target) + ';' +
+            'return;' +
             //'} else {' +
             //'this.pc++;' +
             '}' +
@@ -2887,6 +2886,7 @@ JSSMS.Debugger.prototype = {
             'if (this.b != 0) {' +
             'this.tstates -= 5;' +
             'this.pc = ' + toHex(target) + ';' +
+            'return;' +
             //'} else {' +
             //'this.pc++;' +
             '}' +

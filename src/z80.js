@@ -422,34 +422,89 @@ JSSMS.Z80.prototype = {
 
 
   /**
-   * Run Z80.
-   *
-   * @param {number} cycles Machine cycles to run for in total.
-   * @param {number} cyclesTo
+   * Emulate one frame.
    */
-  run: function(cycles, cyclesTo) {
-    this.tstates += cycles;
+  frame: function() {
+    this.lineno = 0;
 
-    if (cycles != 0)
-      this.totalCycles = cycles;
+    this.tstates += this.main.cyclesPerLine;
+    this.totalCycles = this.main.cyclesPerLine;
 
-    if (!Setup.ACCURATE_INTERRUPT_EMULATION) {
+    if (Setup.ACCURATE_INTERRUPT_EMULATION) {
       if (this.interruptLine)
         this.interrupt();                    // Check for interrupt
     }
 
-    while (this.tstates > cyclesTo) {
-      if (Setup.ACCURATE_INTERRUPT_EMULATION) {
-        if (this.interruptLine)
-          this.interrupt();                  // Check for interrupt
-      }
-
+    while (true) {
       if (DEBUGGER) {
         this.main.ui.updateDisassembly(this.pc);
       }
 
       this.interpret();
+
+      // Execute eol() at end of scanlines and exit at end of frame.
+      if (this.tstates <= 0) {
+        if (this.eol())
+          return;
+      }
     }
+  },
+
+
+  /**
+   * End of scanline.
+   * @return {boolean} Whether the end of the current frame or an interrupt was reached or not.
+   */
+  eol: function() {
+    // PSG
+    if (this.main.soundEnabled)
+      this.main.updateSound(this.lineno);
+
+    // VDP
+    this.vdp.line = this.lineno;
+
+    // Draw next line.
+    if (this.lineno < 192) {
+      this.vdp.drawLine(this.lineno);
+    }
+
+    // Assert interrupt line if necessary.
+    this.vdp.interrupts(this.lineno);
+
+    if (this.interruptLine)
+      this.interrupt();                    // Check for interrupt
+
+    this.lineno++;
+
+    // Check for end of frame.
+    if (this.lineno >= this.main.no_of_scanlines) {
+      this.eof();
+
+      return true;
+    }
+
+    // If no, let's continue to next scanline.
+    this.tstates += this.main.cyclesPerLine;
+    this.totalCycles = this.main.cyclesPerLine;
+
+    return false;
+  },
+
+
+  /**
+   * End of frame.
+   */
+  eof: function() {
+    if (this.main.soundEnabled)
+      this.main.audioOutput(this.main.audioBuffer);
+
+    // Only check for pause button once per frame to increase emulation speed.
+    if (this.main.pause_button) {
+      this.nmi();
+      this.main.pause_button = false;
+    }
+
+    this.main.doRepaint();
   },
 
 

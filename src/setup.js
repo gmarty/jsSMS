@@ -89,6 +89,7 @@ var Setup = {
    */
   /**
    * Do accurate interrupt emulation? (slower!).
+   * Must be set to true when building jssms.node.min.js.
    * @type {boolean}
    */
   ACCURATE_INTERRUPT_EMULATION: ACCURATE,

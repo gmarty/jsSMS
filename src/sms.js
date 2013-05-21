@@ -41,6 +41,7 @@ var CLOCK_NTSC = 3579545;
 var CLOCK_PAL = 3546893;
 
 
+
 /**
  * @constructor
  * @param {Object.<string, *>} opts
@@ -287,15 +288,15 @@ JSSMS.prototype = {
 
     if (!this.isRunning) {
       this.isRunning = true;
-    }
 
-    this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
+      this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
 
-    if (DEBUG) {
-      this.resetFps();
-      this.fpsInterval = setInterval(function() {
-        self.printFps();
-      }, fpsInterval);
+      if (DEBUG) {
+        this.resetFps();
+        this.fpsInterval = setInterval(function() {
+          self.printFps();
+        }, fpsInterval);
+      }
     }
 
     this.ui.updateStatus('Running');
@@ -310,32 +311,12 @@ JSSMS.prototype = {
   },
 
 
+  /**
+   * Draw one frame on the screen.
+   */
   frame: function() {
     if (this.isRunning) {
-      // No throttling: faster code if phone is slow
-      if (!this.throttle) {
-        if (this.emulateNextFrame())
-          this.doRepaint();
-        //if (minSleep != 0)
-        //Thread.sleep(minSleep);
-        // Throttling, also try a minimum sleep per tick
-      } else {
-        //var startTime = JSSMS.Utils.getTimestamp();
-
-        if (this.emulateNextFrame())
-          this.doRepaint();
-
-        /*if (ID == J2ME) {
-         long frameTime = JSSMS.Utils.currentTimeMillis() - startTime;
-
-         if (frameTime < targetFrameTime - minSleep) {
-         Thread.sleep(targetFrameTime - frameTime);
-         } else if (minSleep != 0)
-         Thread.sleep(minSleep);
-         } else if (ID == J2SE) {
-         platformFunction(this, PLATFORM_THROTTLE);
-         }*/
-      }
+      this.cpu.frame();
 
       this.fpsFrameCount++;
       this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
@@ -344,112 +325,10 @@ JSSMS.prototype = {
 
 
   /**
-   * At the moment, execute one scan line worth of instructions, but should be changed to execute
-   * at each instruction.
+   * At the moment, execute one frame, but should be changed to be executed at each instruction.
    */
   nextStep: function() {
-    if (Setup.ACCURATE_INTERRUPT_EMULATION && this.lineno == 193) {
-      this.cpu.run(this.cyclesPerLine, 8);  // Run until 8 cycles remaining
-      this.vdp.setVBlankFlag();        // Then set VBlank flag
-      this.cpu.run(0, 0);              // Run for remaining 8 cycles
-    } else {
-      this.cpu.run(this.cyclesPerLine, 0);
-    }
-
-    // VDP
-    this.vdp.line = this.lineno;
-
-    // Draw Next Line
-    if (this.frameskip_counter == 0 && this.lineno < 192) {
-      this.vdp.drawLine(this.lineno);
-    }
-
-    // Assert Interrupt Line if Necessary
-    this.vdp.interrupts(this.lineno);
-
-    this.lineno++;
-
-    // Render after every frames.
-    if (this.lineno >= this.no_of_scanlines) {
-      this.lineno = 0;
-      this.doRepaint();
-    }
-  },
-
-
-  /**
-   * @return {boolean} Whether a screen update is required or not.
-   */
-  emulateNextFrame: function() {
-    var startTime = 0;
-    var lineno = 0;
-
-    // Draw one frame
-    for (; lineno < this.no_of_scanlines; lineno++) {
-      if (Setup.DEBUG_TIMING) startTime = JSSMS.Utils.getTimestamp();
-
-      // Run Z80
-      //
-      // Ensure interrupts always occur, and vblank is taken between instructions
-      // If the IRQ status flag is set *during* the execution of an instruction the
-      // CPU will be able to read it without the interrupt occurring.
-      //
-      // For example, "IN A,($BF)" is 11 T-states. If bit 7 of the status flags is reset prior
-      // the instruction being fetched and executed, but then set 2 T-states into execution,
-      // then the value read from the I/O port will have bit 7 set.
-      if (Setup.ACCURATE_INTERRUPT_EMULATION && lineno == 193) {
-        this.cpu.run(this.cyclesPerLine, 8);  // Run until 8 cycles remaining
-        this.vdp.setVBlankFlag();        // Then set VBlank flag
-        this.cpu.run(0, 0);              // Run for remaining 8 cycles
-      } else {
-        this.cpu.run(this.cyclesPerLine, 0);
-      }
-
-      if (Setup.DEBUG_TIMING) this.z80TimeCounter += JSSMS.Utils.getTimestamp() - startTime;
-
-      // PSG
-      if (this.soundEnabled)
-        this.updateSound(lineno);
-
-      // VDP
-      this.vdp.line = lineno;
-
-      // Draw Next Line
-      if (this.frameskip_counter == 0 && lineno < 192) {
-        if (Setup.DEBUG_TIMING) startTime = JSSMS.Utils.getTimestamp();
-        this.vdp.drawLine(lineno);
-        if (Setup.DEBUG_TIMING) this.drawTimeCounter += JSSMS.Utils.getTimestamp() - startTime;
-      }
-
-      // Assert Interrupt Line if Necessary
-      this.vdp.interrupts(lineno);
-    }
-
-    if (this.soundEnabled)
-      this.audioOutput(this.audioBuffer);
-
-    // Reset framecount once we've drawn 60 frames per second
-    if (Setup.DEBUG_TIMING && ++this.frameCount == 60) {
-      this.z80Time = this.z80TimeCounter;
-      this.drawTime = this.drawTimeCounter;
-
-      this.z80TimeCounter = 0;
-      this.drawTimeCounter = 0;
-
-      this.frameCount = 0;
-    }
-
-    // Only Check for Pause Button once per frame to increase emulation speed
-    if (this.pause_button) {
-      this.cpu.nmi();
-      this.pause_button = false;
-    }
-
-    if (this.frameskip_counter-- == 0) {
-      this.frameskip_counter = this.frameSkip;
-      return true;
-    }
-    return false;
+    this.cpu.frame();
   },
 
 
@@ -491,7 +370,7 @@ JSSMS.prototype = {
    */
   setVideoTiming: function(mode) {
     var clockSpeedHz = 0,
-      i, v;
+        i, v;
 
     // Game Gear should only work in NTSC
     if (mode == NTSC || this.is_gg) {
