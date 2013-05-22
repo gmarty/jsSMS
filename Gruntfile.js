@@ -128,7 +128,7 @@ module.exports = function(grunt) {
           define: [
             '"DEBUG=true"',
             '"DEBUGGER=true"',
-            '"ACCURATE_INTERRUPT_EMULATION=false"'
+            '"ACCURATE_INTERRUPT_EMULATION=true"'
           ],
           debug: true,
           formatting: 'PRETTY_PRINT'

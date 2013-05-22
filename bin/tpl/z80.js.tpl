@@ -435,7 +435,10 @@ JSSMS.Z80.prototype = {
 
       //console.log(JSSMS.Utils.toHex(this.pc));
 
-      this.interpret();
+      if (!this[this.pc])
+        this.interpret();
+      else
+        this[this.pc]();
 
       // Execute eol() at end of scanlines and exit at end of frame.
       if (this.tstates <= 0) {
@@ -469,17 +472,18 @@ JSSMS.Z80.prototype = {
     // Assert interrupt line if necessary.
     this.vdp.interrupts(this.lineno);
 
-    if (this.interruptLine)
-      this.interrupt();                    // Check for interrupt
-
-    this.lineno++;
-
     // Check for end of frame.
     if (this.lineno >= this.main.no_of_scanlines) {
       this.eof();
 
       return true;
     }
+
+    // Start a new scanline.
+    this.lineno++;
+
+    if (!ACCURATE_INTERRUPT_EMULATION && this.interruptLine)
+      this.interrupt();                    // Check for interrupt
 
     // If no, let's continue to next scanline.
     this.tstates += this.main.cyclesPerLine;
