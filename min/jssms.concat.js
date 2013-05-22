@@ -4750,9 +4750,6 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code.push("" + toHex(tree[i].address) + ": function(temp) {");
       code.push("// Nb of instructions jumping here: " + tree[i].jumpTargetNb)
     }
-    code.push("");
-    code.push("if (this.tstates <= 0) {this.pc = " + toHex(tree[i].address) + "; if (this.eol()) return;}");
-    code.push("");
     code.push("// " + tree[i].label);
     breakNeeded = tree[i].code.substr(-7) == "return;";
     tstates += getTotalTStates(tree[i].opcodes);

@@ -198,9 +198,7 @@ JSSMS.Debugger.prototype = {
         code.push('// Nb of instructions jumping here: ' + tree[i].jumpTargetNb);
       }
 
-      code.push('');
-      code.push('if (this.tstates <= 0) {this.pc = ' + toHex(tree[i].address) + '; if (this.eol()) return;}');
-      code.push('');
+      //code.push('if (this.tstates <= 0) {this.pc = ' + toHex(tree[i].address) + '; if (this.eol()) return;}');
 
       // Comment for debugging.
       code.push('// ' + tree[i].label);
