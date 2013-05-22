@@ -415,40 +415,6 @@ JSSMS.Z80.prototype = {
 
 
   /**
-   * Run Z80.
-   *
-   * @param {number} cycles Machine cycles to run for in total.
-   * @param {number} cyclesTo
-   */
-  run: function(cycles, cyclesTo) {
-    this.tstates += cycles;
-
-    if (cycles != 0)
-      this.totalCycles = cycles;
-
-    if (!ACCURATE_INTERRUPT_EMULATION) {
-      if (this.interruptLine)
-        this.interrupt();                    // Check for interrupt
-    }
-
-    while (this.tstates > cyclesTo) {
-      if (ACCURATE_INTERRUPT_EMULATION) {
-        if (this.interruptLine)
-          this.interrupt();                  // Check for interrupt
-      }
-
-      //console.log(JSSMS.Utils.toHex(this.pc));
-
-      if (!this[this.pc]) {
-        this.interpret();
-      } else {
-        this[this.pc]();
-      }
-    }
-  },
-
-
-  /**
    * Emulate one frame.
    */
   frame: function() {
@@ -469,21 +435,12 @@ JSSMS.Z80.prototype = {
 
       //console.log(JSSMS.Utils.toHex(this.pc));
 
-      if (!this[this.pc]) {
-        this.interpret();
+      this.interpret();
 
-        // Execute eol() at end of scanlines and exit at end of frame.
-        if (this.tstates <= 0) {
-          if (this.eol())
-            return;
-      }
-      } else {
-        this[this.pc]();
-
-        // Exit at end of frame.
-        if (this.lineno >= this.main.no_of_scanlines) {
+      // Execute eol() at end of scanlines and exit at end of frame.
+      if (this.tstates <= 0) {
+        if (this.eol())
           return;
-        }
       }
     }
   },
@@ -494,6 +451,8 @@ JSSMS.Z80.prototype = {
    * @return {boolean} Whether the end of the current frame or an interrupt was reached or not.
    */
   eol: function() {
+    var prevPc = this.pc;
+
     // PSG
     if (this.main.soundEnabled)
       this.main.updateSound(this.lineno);
@@ -524,6 +483,10 @@ JSSMS.Z80.prototype = {
     // If no, let's continue to next scanline.
     this.tstates += this.main.cyclesPerLine;
     this.totalCycles = this.main.cyclesPerLine;
+
+    // Has an interrupt happened?
+    if (prevPc != this.pc)
+      return true;
 
     return false;
   },
@@ -2014,7 +1977,11 @@ JSSMS.Z80.prototype = {
 
     switch (opcode) {
       //  -- ED40 IN B,(C) -------------------------
-      case 0x40: this.b = this.port.in_(this.c); this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.b]; this.pc++; break;
+      case 0x40:
+        this.b = this.port.in_(this.c);
+        this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.b];
+        this.pc++;
+        break;
 
       //  -- ED41 OUT (C),B -------------------------
       case 0x41: this.port.out(this.c, this.b); this.pc++; break;
@@ -2110,8 +2077,8 @@ JSSMS.Z80.prototype = {
       //  -- ED53 LD (nn),DE ------------------------
       case 0x53:
         location = this.readMemWord(this.pc + 1);
-        this.writeMem(location++, this.e);        //SPl
-        this.writeMem(location, this.d);  //SPh
+        this.writeMem(location++, this.e); // SPl
+        this.writeMem(location, this.d);   // SPh
         this.pc += 3;
         break;
 
@@ -2169,8 +2136,8 @@ JSSMS.Z80.prototype = {
       //  -- ED63 LD (nn),HL ------------------------
       case 0x63:
         location = this.readMemWord(this.pc + 1);
-        this.writeMem(location++, this.l);        //SPl
-        this.writeMem(location, this.h);  //SPh
+        this.writeMem(location++, this.l); // SPl
+        this.writeMem(location, this.h);   // SPh
         this.pc += 3;
         break;
 
@@ -2233,8 +2200,8 @@ JSSMS.Z80.prototype = {
       //  -- ED73 LD (nn),SP ------------------------
       case 0x73:
         location = this.readMemWord(this.pc + 1);
-        this.writeMem(location++, this.sp & 0xFF);      //SPl
-        this.writeMem(location, this.sp >> 8);  //SPh
+        this.writeMem(location++, this.sp & 0xFF); // SPl
+        this.writeMem(location, this.sp >> 8);     // SPh
         this.pc += 3;
         break;
 

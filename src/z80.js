@@ -806,10 +806,6 @@ JSSMS.Z80.prototype = {
   },
 
 
-  nextStep: function() {
-  },
-
-
   /**
    * Get current cycle number.
    *
