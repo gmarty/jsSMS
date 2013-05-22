@@ -2565,7 +2565,6 @@ $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
   this.$C$ = this.$B$ = $JSCompiler_alias_FALSE$$;
   this.$J$ = 0;
   this.$H$ = $JSCompiler_alias_FALSE$$
-}, $nextStep$:function $$JSSMS$Z80$$$$$nextStep$$() {
 }, call:function $$JSSMS$Z80$$$$call$($condition$$3$$) {
   $condition$$3$$ ? ($JSCompiler_StaticMethods_push1$$(this, this.$f$ + 2), this.$f$ = this.$m$(this.$f$), this.$p$ -= 7) : this.$f$ += 2
 }, $g$:$SUPPORT_DATAVIEW$$ ? function($address$$, $value$$73$$) {

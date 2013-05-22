@@ -451,7 +451,8 @@ JSSMS.Z80.prototype = {
    * @return {boolean} Whether the end of the current frame or an interrupt was reached or not.
    */
   eol: function() {
-    var prevPc = this.pc;
+    if (ACCURATE_INTERRUPT_EMULATION)
+      var prevPc = this.pc;
 
     // PSG
     if (this.main.soundEnabled)
@@ -485,7 +486,7 @@ JSSMS.Z80.prototype = {
     this.totalCycles = this.main.cyclesPerLine;
 
     // Has an interrupt happened?
-    if (prevPc != this.pc)
+    if (ACCURATE_INTERRUPT_EMULATION && prevPc != this.pc)
       return true;
 
     return false;

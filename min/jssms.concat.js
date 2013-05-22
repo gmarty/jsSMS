@@ -1241,7 +1241,6 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc = 56;
       break
   }
-}, nextStep:function() {
 }, getCycle:function() {
   return this.totalCycles - this.tstates
 }, nmi:function() {
