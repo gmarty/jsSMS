@@ -479,7 +479,7 @@ JSSMS.prototype = {
     if (mode == 1) this.setSMS();
     else if (mode == 2) this.setGG();
 
-    if (size <= Setup.PAGE_SIZE) {
+    if (size <= PAGE_SIZE) {
       return false;
     }
 
@@ -514,20 +514,20 @@ JSSMS.prototype = {
 
     // Calculate number of pages from file size and create array appropriately
     var i, j;
-    var number_of_pages = Math.round(size / Setup.PAGE_SIZE);
+    var number_of_pages = Math.round(size / PAGE_SIZE);
     var pages = new Array(number_of_pages);
 
     for (i = 0; i < number_of_pages; i++) {
-      pages[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
+      pages[i] = JSSMS.Utils.Array(PAGE_SIZE);
       // Read file into pages array
       // \@todo Move this part to JSSMS.Utils.
       if (SUPPORT_DATAVIEW) {
-        for (j = 0; j < Setup.PAGE_SIZE; j++) {
-          pages[i].setUint8(j, data.charCodeAt((i * Setup.PAGE_SIZE) + j));
+        for (j = 0; j < PAGE_SIZE; j++) {
+          pages[i].setUint8(j, data.charCodeAt((i * PAGE_SIZE) + j));
         }
       } else {
-        for (j = 0; j < Setup.PAGE_SIZE; j++) {
-          pages[i][j] = data.charCodeAt((i * Setup.PAGE_SIZE) + j) & 0xFF;
+        for (j = 0; j < PAGE_SIZE; j++) {
+          pages[i][j] = data.charCodeAt((i * PAGE_SIZE) + j) & 0xFF;
         }
       }
     }

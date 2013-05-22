@@ -64,78 +64,72 @@ var SAMPLE_RATE = 44100; //8000
 
 
 /**
+ * Print timing information on screen.
+ * @type {boolean}
+ */
+var DEBUG_TIMING = DEBUG;
+
+
+// CPU Settings
+/**
+ * Refresh register emulation (not required by any games?).
+ * @type {boolean}
+ */
+var REFRESH_EMULATION = false;
+
+
+/*
+ * Games requiring accurate interrupt emulation:
+ *  - Earthworm Jim (GG)
+ */
+/**
+ * Do accurate interrupt emulation? (slower!).
+ * Must be set to true when building jssms.node.min.js.
+ * @define {boolean}
+ */
+var ACCURATE_INTERRUPT_EMULATION = false;
+
+
+/*
+ * Lightgun Mode (For the following titles):
+ *  - Assault City
+ *  - Gangster Town
+ *  - Laser Ghost
+ *  - Marksman Shooting / Trap Shooting / Safari Hunt
+ *  - Missile Defense 3D
+ *  - Operation Wolf
+ *  - Rambo III
+ *  - Rescue Mission
+ *  - Shooting Gallery
+ *  - Space Gun
+ *  - Wanted
+ */
+/**
+ * @type {boolean}
+ */
+var LIGHTGUN = /*ACCURATE*/ false;
+
+
+// VDP Settings
+/*
+ * Games requiring sprite collision:
+ *  - Cheese Cat'astrophe (SMS)
+ *  - Ecco the Dolphin (SMS, GG)
+ *  - Fantastic Dizzy (SMS, GG)
+ *  - Fantazy Zone Gear (GG)
+ *  - Impossible Mission (SMS)
+ *  - Taz-Mania (SMS, GG)
+ */
+/**
+ * Emulate hardware sprite collisions (not used by many games, and slower).
+ * @type {boolean}
+ */
+var VDP_SPRITE_COLLISIONS = ACCURATE;
+
+
+// Memory Settings
+/**
+ * Size of each memory page.
  * @const
  */
-var Setup = {
-  // Debug settings
-  /**
-   * Print timing information on screen.
-   * @type {boolean}
-   */
-  DEBUG_TIMING: DEBUG,
-
-
-  // CPU Settings
-  /**
-   * Refresh register emulation (not required by any games?).
-   * @type {boolean}
-   */
-  REFRESH_EMULATION: false,
-
-
-  /*
-   * Games requiring accurate interrupt emulation:
-   *  - Earthworm Jim (GG)
-   */
-  /**
-   * Do accurate interrupt emulation? (slower!).
-   * Must be set to true when building jssms.node.min.js.
-   * @type {boolean}
-   */
-  ACCURATE_INTERRUPT_EMULATION: ACCURATE,
-
-
-  /*
-   * Lightgun Mode (For the following titles):
-   *  - Assault City
-   *  - Gangster Town
-   *  - Laser Ghost
-   *  - Marksman Shooting / Trap Shooting / Safari Hunt
-   *  - Missile Defense 3D
-   *  - Operation Wolf
-   *  - Rambo III
-   *  - Rescue Mission
-   *  - Shooting Gallery
-   *  - Space Gun
-   *  - Wanted
-   */
-  /**
-   * @type {boolean}
-   */
-  LIGHTGUN: /*ACCURATE*/ false,
-
-
-  // VDP Settings
-  /*
-   * Games requiring sprite collision:
-   *  - Cheese Cat'astrophe (SMS)
-   *  - Ecco the Dolphin (SMS, GG)
-   *  - Fantastic Dizzy (SMS, GG)
-   *  - Fantazy Zone Gear (GG)
-   *  - Impossible Mission (SMS)
-   *  - Taz-Mania (SMS, GG)
-   */
-  /**
-   * Emulate hardware sprite collisions (not used by many games, and slower).
-   * @type {boolean}
-   */
-  VDP_SPRITE_COLLISIONS: ACCURATE,
-
-
-  // Memory Settings
-  /**
-   * Size of each memory page.
-   * @type {number}
-   */
-  PAGE_SIZE: 0x4000
-};
+var PAGE_SIZE = 0x4000;

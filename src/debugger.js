@@ -55,7 +55,7 @@ JSSMS.Debugger.prototype = {
   parseInstructions: function() {
     console.time('Instructions parsing');
 
-    var romSize = Setup.PAGE_SIZE * this.rom.length;
+    var romSize = PAGE_SIZE * this.rom.length;
     var instruction;
     var currentAddress;
     var i = 0;
@@ -2592,7 +2592,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x5F:
         inst = 'LD A,R';
-        if (Setup.REFRESH_EMULATION) {
+        if (REFRESH_EMULATION) {
           code = 'this.a = this.r;';
         } else {
           // Note, to fake refresh emulation we use the random number generator
@@ -2751,7 +2751,7 @@ JSSMS.Debugger.prototype = {
         inst = 'LDIR';
         code = 'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
             'this.incDE();this.incHL();this.decBC();';
-        if (Setup.ACCURATE_INTERRUPT_EMULATION) {
+        if (ACCURATE_INTERRUPT_EMULATION) {
           target = address - 2;
           code += 'if (this.getBC() != 0) {' +
               'this.f |= F_PARITY;' +
@@ -2776,7 +2776,7 @@ JSSMS.Debugger.prototype = {
             'this.decBC();' +
             'temp |= (this.getBC() == 0 ? 0 : F_PARITY);';
         // Repeat instruction until a = (hl) or bc == 0
-        if (Setup.ACCURATE_INTERRUPT_EMULATION) {
+        if (ACCURATE_INTERRUPT_EMULATION) {
           target = address - 2;
           code += 'if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {' +
               'this.tstates -= 5;' +
@@ -2821,7 +2821,7 @@ JSSMS.Debugger.prototype = {
             'this.b = this.dec8(this.b);' +
             // HL <- HL + 1
             'this.incHL();';
-        if (Setup.ACCURATE_INTERRUPT_EMULATION) {
+        if (ACCURATE_INTERRUPT_EMULATION) {
           target = address - 2;
           code += 'if (this.b != 0) {' +
               'this.tstates -= 5;' +
@@ -3809,7 +3809,7 @@ JSSMS.Debugger.prototype = {
     switch (port & 0xC1) {
       case 0x01:
         // Accurate emulation with HCounter
-        if (Setup.LIGHTGUN) {
+        if (LIGHTGUN) {
           return 'var value = this.a;' +
               'this.port.oldTH = (this.port.getTH(PORT_A) != 0 || this.port.getTH(PORT_B) != 0);' +
               'this.port.writePort(PORT_A, value);' +
@@ -3904,7 +3904,7 @@ JSSMS.Debugger.prototype = {
 
       // 0xC1 / 0xDD - I/O Port B and Misc
       case 0xC1:
-        if (Setup.LIGHTGUN) {
+        if (LIGHTGUN) {
           return 'if (this.port.keyboard.lightgunClick)' +
               'this.port.lightPhaserSync();' +
               'this.a = (this.port.keyboard.controller2 & 0x3F) | (this.port.getTH(PORT_A) != 0 ? 0x40 : 0) | (this.port.getTH(PORT_B) != 0 ? 0x80 : 0);';

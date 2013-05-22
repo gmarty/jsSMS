@@ -61,7 +61,7 @@ JSSMS.Ports = function(sms) {
 
 JSSMS.Ports.prototype = {
   reset: function() {
-    if (Setup.LIGHTGUN) {
+    if (LIGHTGUN) {
       this.ioPorts = new Array(10);
       this.ioPorts[PORT_A + IO_TH_INPUT] = 1;
       this.ioPorts[PORT_B + IO_TH_INPUT] = 1;
@@ -95,7 +95,7 @@ JSSMS.Ports.prototype = {
       // 0xD0 : Port A TR pin direction (1=input, 0=output)
       case 0x01:
         // Accurate emulation with HCounter
-        if (Setup.LIGHTGUN) {
+        if (LIGHTGUN) {
           this.oldTH = (this.getTH(PORT_A) != 0 || this.getTH(PORT_B) != 0);
 
           this.writePort(PORT_A, value);
@@ -203,7 +203,7 @@ JSSMS.Ports.prototype = {
       // 0xD1 : Port B RIGHT pin input
       // 0xD0 : Port B LEFT pin input
       case 0xC1:
-        if (Setup.LIGHTGUN) {
+        if (LIGHTGUN) {
           if (this.keyboard.lightgunClick)
             this.lightPhaserSync();
 

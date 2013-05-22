@@ -43,7 +43,8 @@ module.exports = function(grunt) {
           output_wrapper: '(function(window){%output%})(window);',
           define: [
             '"DEBUG=false"',
-            '"DEBUGGER=false"'
+            '"DEBUGGER=false"',
+            '"ACCURATE_INTERRUPT_EMULATION=false"'
           ],
           debug: false
         }
@@ -62,7 +63,8 @@ module.exports = function(grunt) {
           warning_level: 'VERBOSE',
           define: [
             '"DEBUG=true"',
-            '"DEBUGGER=true"'
+            '"DEBUGGER=true"',
+            '"ACCURATE_INTERRUPT_EMULATION=false"'
           ],
           debug: true,
           formatting: 'PRETTY_PRINT'
@@ -125,7 +127,8 @@ module.exports = function(grunt) {
           output_wrapper: '(function(window){%output%})(global);',
           define: [
             '"DEBUG=true"',
-            '"DEBUGGER=true"'
+            '"DEBUGGER=true"',
+            '"ACCURATE_INTERRUPT_EMULATION=true"'
           ],
           debug: true,
           formatting: 'PRETTY_PRINT'

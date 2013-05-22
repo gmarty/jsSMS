@@ -430,7 +430,7 @@ JSSMS.Z80.prototype = {
     this.tstates += this.main.cyclesPerLine;
     this.totalCycles = this.main.cyclesPerLine;
 
-    if (Setup.ACCURATE_INTERRUPT_EMULATION) {
+    if (ACCURATE_INTERRUPT_EMULATION) {
       if (this.interruptLine)
         this.interrupt();                    // Check for interrupt
     }
@@ -518,12 +518,12 @@ JSSMS.Z80.prototype = {
     // Main Opcode Switch Rolled In For Speed
     var opcode = this.readMem(this.pc++);                    // Fetch & Interpret Opcode
 
-    if (Setup.ACCURATE_INTERRUPT_EMULATION)
+    if (ACCURATE_INTERRUPT_EMULATION)
       this.EI_inst = false;
 
     this.tstates -= OP_STATES[opcode];   // Decrement TStates
 
-    if (Setup.REFRESH_EMULATION)
+    if (REFRESH_EMULATION)
       this.incR();
 
     switch (opcode) {
@@ -827,7 +827,7 @@ JSSMS.Z80.prototype = {
     this.iff2 = this.iff1;
     this.iff1 = false;
 
-    if (Setup.REFRESH_EMULATION)
+    if (REFRESH_EMULATION)
       this.incR();
 
     // If we're in a halt instruction, increment the PC and get out of it
@@ -848,7 +848,7 @@ JSSMS.Z80.prototype = {
   interrupt: function() {
     // Interrupts not allowed OR
     // Interupts not allowed after EI instruction
-    if (!this.iff1 || (Setup.ACCURATE_INTERRUPT_EMULATION && this.EI_inst)) return;
+    if (!this.iff1 || (ACCURATE_INTERRUPT_EMULATION && this.EI_inst)) return;
 
     // If we're in a halt instruction, increment the PC and get out of it
     if (this.halt) {
@@ -856,7 +856,7 @@ JSSMS.Z80.prototype = {
       this.halt = false;
     }
 
-    if (Setup.REFRESH_EMULATION)
+    if (REFRESH_EMULATION)
       this.incR();
 
     this.iff1 = this.iff2 = false;
@@ -1030,7 +1030,7 @@ JSSMS.Z80.prototype = {
   doCB: function(opcode) {
     this.tstates -= OP_CB_STATES[opcode];
 
-    if (Setup.REFRESH_EMULATION)
+    if (REFRESH_EMULATION)
       this.incR();
 
     switch (opcode) {
@@ -1434,7 +1434,7 @@ JSSMS.Z80.prototype = {
 
     this.tstates -= OP_DD_STATES[opcode];
 
-    if (Setup.REFRESH_EMULATION)
+    if (REFRESH_EMULATION)
       this.incR();
 
     switch (opcode) {
@@ -1560,7 +1560,7 @@ JSSMS.Z80.prototype = {
 
     this.tstates -= OP_DD_STATES[opcode];
 
-    if (Setup.REFRESH_EMULATION)
+    if (REFRESH_EMULATION)
       this.incR();
 
     switch (opcode) {
@@ -1970,7 +1970,7 @@ JSSMS.Z80.prototype = {
 
     this.tstates -= OP_ED_STATES[opcode];
 
-    if (Setup.REFRESH_EMULATION)
+    if (REFRESH_EMULATION)
       this.incR();
 
     switch (opcode) {
@@ -2113,7 +2113,7 @@ JSSMS.Z80.prototype = {
       // -- ED5F LD A,R -----------------------------
       case 0x5F:
         // Note, to fake refresh emulation we use the random number generator
-        this.a = Setup.REFRESH_EMULATION ? this.r : JSSMS.Utils.rndInt(255);
+        this.a = REFRESH_EMULATION ? this.r : JSSMS.Utils.rndInt(255);
         this.f = (this.f & F_CARRY) | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);
         this.pc++;
         break;
@@ -3463,11 +3463,11 @@ JSSMS.Z80.prototype = {
 
 
   setSRAM: function(bytes) {
-    var length = bytes.length / Setup.PAGE_SIZE;
+    var length = bytes.length / PAGE_SIZE;
     var i;
 
     for (i = 0; i < length; i++)
-      JSSMS.Utils.copyArrayElements(bytes, i * Setup.PAGE_SIZE, this.sram[i], 0, Setup.PAGE_SIZE);
+      JSSMS.Utils.copyArrayElements(bytes, i * PAGE_SIZE, this.sram[i], 0, PAGE_SIZE);
   },
 
 

@@ -22,7 +22,12 @@ var ACCURATE = false;
 var LITTLE_ENDIAN = true;
 var SUPPORT_DATAVIEW = !!(window["DataView"] && window["ArrayBuffer"]);
 var SAMPLE_RATE = 44100;
-var Setup = {DEBUG_TIMING:DEBUG, REFRESH_EMULATION:false, ACCURATE_INTERRUPT_EMULATION:ACCURATE, LIGHTGUN:false, VDP_SPRITE_COLLISIONS:ACCURATE, PAGE_SIZE:16384};
+var DEBUG_TIMING = DEBUG;
+var REFRESH_EMULATION = false;
+var ACCURATE_INTERRUPT_EMULATION = false;
+var LIGHTGUN = false;
+var VDP_SPRITE_COLLISIONS = ACCURATE;
+var PAGE_SIZE = 16384;
 var fpsInterval = 500;
 var CLOCK_NTSC = 3579545;
 var CLOCK_PAL = 3546893;
@@ -160,7 +165,7 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
       this.setGG()
     }
   }
-  if(size <= Setup.PAGE_SIZE) {
+  if(size <= PAGE_SIZE) {
     return false
   }
   pages = this.loadROM(data, size);
@@ -177,17 +182,17 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
     size -= 512
   }
   var i, j;
-  var number_of_pages = Math.round(size / Setup.PAGE_SIZE);
+  var number_of_pages = Math.round(size / PAGE_SIZE);
   var pages = new Array(number_of_pages);
   for(i = 0;i < number_of_pages;i++) {
-    pages[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
+    pages[i] = JSSMS.Utils.Array(PAGE_SIZE);
     if(SUPPORT_DATAVIEW) {
-      for(j = 0;j < Setup.PAGE_SIZE;j++) {
-        pages[i].setUint8(j, data.charCodeAt(i * Setup.PAGE_SIZE + j))
+      for(j = 0;j < PAGE_SIZE;j++) {
+        pages[i].setUint8(j, data.charCodeAt(i * PAGE_SIZE + j))
       }
     }else {
-      for(j = 0;j < Setup.PAGE_SIZE;j++) {
-        pages[i][j] = data.charCodeAt(i * Setup.PAGE_SIZE + j) & 255
+      for(j = 0;j < PAGE_SIZE;j++) {
+        pages[i][j] = data.charCodeAt(i * PAGE_SIZE + j) & 255
       }
     }
   }
@@ -374,7 +379,7 @@ JSSMS.Z80.prototype = {reset:function() {
   this.lineno = 0;
   this.tstates += this.main.cyclesPerLine;
   this.totalCycles = this.main.cyclesPerLine;
-  if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+  if(ACCURATE_INTERRUPT_EMULATION) {
     if(this.interruptLine) {
       this.interrupt()
     }
@@ -423,11 +428,11 @@ JSSMS.Z80.prototype = {reset:function() {
   var location = 0;
   var temp = 0;
   var opcode = this.readMem(this.pc++);
-  if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+  if(ACCURATE_INTERRUPT_EMULATION) {
     this.EI_inst = false
   }
   this.tstates -= OP_STATES[opcode];
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   switch(opcode) {
@@ -1242,7 +1247,7 @@ JSSMS.Z80.prototype = {reset:function() {
 }, nmi:function() {
   this.iff2 = this.iff1;
   this.iff1 = false;
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   if(this.halt) {
@@ -1253,14 +1258,14 @@ JSSMS.Z80.prototype = {reset:function() {
   this.pc = 102;
   this.tstates -= 11
 }, interrupt:function() {
-  if(!this.iff1 || Setup.ACCURATE_INTERRUPT_EMULATION && this.EI_inst) {
+  if(!this.iff1 || ACCURATE_INTERRUPT_EMULATION && this.EI_inst) {
     return
   }
   if(this.halt) {
     this.pc++;
     this.halt = false
   }
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   this.iff1 = this.iff2 = false;
@@ -1335,7 +1340,7 @@ JSSMS.Z80.prototype = {reset:function() {
   this.f = this.f & F_NEGATIVE | temp >> 8
 }, doCB:function(opcode) {
   this.tstates -= OP_CB_STATES[opcode];
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   switch(opcode) {
@@ -2159,7 +2164,7 @@ JSSMS.Z80.prototype = {reset:function() {
   var location = 0;
   var temp = 0;
   this.tstates -= OP_DD_STATES[opcode];
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   switch(opcode) {
@@ -2466,7 +2471,7 @@ JSSMS.Z80.prototype = {reset:function() {
   var location;
   var temp;
   this.tstates -= OP_DD_STATES[opcode];
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   switch(opcode) {
@@ -3441,7 +3446,7 @@ JSSMS.Z80.prototype = {reset:function() {
   var temp = 0;
   var location = 0;
   this.tstates -= OP_ED_STATES[opcode];
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   switch(opcode) {
@@ -3586,7 +3591,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc += 3;
       break;
     case 95:
-      this.a = Setup.REFRESH_EMULATION ? this.r : JSSMS.Utils.rndInt(255);
+      this.a = REFRESH_EMULATION ? this.r : JSSMS.Utils.rndInt(255);
       this.f = this.f & F_CARRY | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);
       this.pc++;
       break;
@@ -4584,10 +4589,10 @@ JSSMS.Z80.prototype = {reset:function() {
 }(), hasUsedSRAM:function() {
   return this.useSRAM
 }, setSRAM:function(bytes) {
-  var length = bytes.length / Setup.PAGE_SIZE;
+  var length = bytes.length / PAGE_SIZE;
   var i;
   for(i = 0;i < length;i++) {
-    JSSMS.Utils.copyArrayElements(bytes, i * Setup.PAGE_SIZE, this.sram[i], 0, Setup.PAGE_SIZE)
+    JSSMS.Utils.copyArrayElements(bytes, i * PAGE_SIZE, this.sram[i], 0, PAGE_SIZE)
   }
 }, setStateMem:function(state) {
   this.frameReg = state
@@ -4657,7 +4662,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   this.main.ui.updateStatus("Instructions parsed")
 }, parseInstructions:function() {
   console.time("Instructions parsing");
-  var romSize = Setup.PAGE_SIZE * this.rom.length;
+  var romSize = PAGE_SIZE * this.rom.length;
   var instruction;
   var currentAddress;
   var i = 0;
@@ -6944,7 +6949,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 95:
       inst = "LD A,R";
-      if(Setup.REFRESH_EMULATION) {
+      if(REFRESH_EMULATION) {
         code = "this.a = this.r;"
       }else {
         code = "this.a = JSSMS.Utils.rndInt(255);"
@@ -7048,7 +7053,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 176:
       inst = "LDIR";
       code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();";
-      if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+      if(ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
         code += "if (this.getBC() != 0) {" + "this.f |= F_PARITY;" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
       }else {
@@ -7059,7 +7064,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 177:
       inst = "CPIR";
       code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);";
-      if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+      if(ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
         code += "if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
       }else {
@@ -7075,7 +7080,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 179:
       inst = "OTIR";
       code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();";
-      if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+      if(ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
         code += "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
       }else {
@@ -8091,7 +8096,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   }
   switch(port & 193) {
     case 1:
-      if(Setup.LIGHTGUN) {
+      if(LIGHTGUN) {
         return"var value = this.a;" + "this.port.oldTH = (this.port.getTH(PORT_A) != 0 || this.port.getTH(PORT_B) != 0);" + "this.port.writePort(PORT_A, value);" + "this.port.writePort(PORT_B, value >> 2);" + "if (!this.port.oldTH && (this.port.getTH(PORT_A) != 0 || this.port.getTH(PORT_B) != 0)) {" + "this.port.hCounter = this.port.getHCount();" + "}"
       }else {
         var code = "var value = this.a;" + "this.port.ioPorts[0] = (value & 0x20) << 1;" + "this.port.ioPorts[1] = (value & 0x80);";
@@ -8147,7 +8152,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 192:
       return"this.a = this.port.keyboard.controller1;";
     case 193:
-      if(Setup.LIGHTGUN) {
+      if(LIGHTGUN) {
         return"if (this.port.keyboard.lightgunClick)" + "this.port.lightPhaserSync();" + "this.a = (this.port.keyboard.controller2 & 0x3F) | (this.port.getTH(PORT_A) != 0 ? 0x40 : 0) | (this.port.getTH(PORT_B) != 0 ? 0x80 : 0);"
       }else {
         return"this.a = (this.port.keyboard.controller2 & 0x3F) | this.port.ioPorts[0] | this.port.ioPorts[1];"
@@ -8193,7 +8198,7 @@ JSSMS.Keyboard.prototype = {reset:function() {
   this.controller1 = 255;
   this.controller2 = 255;
   this.ggstart = 255;
-  if(Setup.LIGHTGUN) {
+  if(LIGHTGUN) {
     this.lightgunClick = false
   }
   this.pause_button = false
@@ -8471,7 +8476,7 @@ JSSMS.Vdp = function(sms) {
   this.line = 0;
   this.counter = 0;
   this.bgPriority = new Array(SMS_WIDTH);
-  if(Setup.VDP_SPRITE_COLLISIONS) {
+  if(VDP_SPRITE_COLLISIONS) {
     this.spriteCol = new Array(SMS_WIDTH)
   }
   this.bgt = 0;
@@ -8566,7 +8571,7 @@ JSSMS.Vdp.prototype = {reset:function() {
         var reg = value & 15;
         switch(reg) {
           case 0:
-            if(Setup.ACCURATE_INTERRUPT_EMULATION && (this.status & STATUS_HINT) != 0) {
+            if(ACCURATE_INTERRUPT_EMULATION && (this.status & STATUS_HINT) != 0) {
               this.main.cpu.interruptLine = (this.commandByte & 16) != 0
             }
             break;
@@ -8652,7 +8657,7 @@ JSSMS.Vdp.prototype = {reset:function() {
   this.location++
 }, interrupts:function(lineno) {
   if(lineno <= 192) {
-    if(!Setup.ACCURATE_INTERRUPT_EMULATION && lineno == 192) {
+    if(!ACCURATE_INTERRUPT_EMULATION && lineno == 192) {
       this.status |= STATUS_VINT
     }
     if(this.counter == 0) {
@@ -8684,7 +8689,7 @@ JSSMS.Vdp.prototype = {reset:function() {
       return
     }
   }
-  if(Setup.VDP_SPRITE_COLLISIONS) {
+  if(VDP_SPRITE_COLLISIONS) {
     for(i = 0;i < SMS_WIDTH;i++) {
       this.spriteCol[i] = false
     }
@@ -8799,7 +8804,7 @@ JSSMS.Vdp.prototype = {reset:function() {
           this.display[temp] = this.CRAM[temp2];
           this.display[temp + 1] = this.CRAM[temp2 + 1];
           this.display[temp + 2] = this.CRAM[temp2 + 2];
-          if(Setup.VDP_SPRITE_COLLISIONS) {
+          if(VDP_SPRITE_COLLISIONS) {
             if(!this.spriteCol[x]) {
               this.spriteCol[x] = true
             }else {
@@ -8817,7 +8822,7 @@ JSSMS.Vdp.prototype = {reset:function() {
           this.display[temp] = this.CRAM[temp2];
           this.display[temp + 1] = this.CRAM[temp2 + 1];
           this.display[temp + 2] = this.CRAM[temp2 + 2];
-          if(Setup.VDP_SPRITE_COLLISIONS) {
+          if(VDP_SPRITE_COLLISIONS) {
             if(!this.spriteCol[x]) {
               this.spriteCol[x] = true
             }else {
@@ -8831,7 +8836,7 @@ JSSMS.Vdp.prototype = {reset:function() {
           this.display[temp] = this.CRAM[temp2];
           this.display[temp + 1] = this.CRAM[temp2 + 1];
           this.display[temp + 2] = this.CRAM[temp2 + 2];
-          if(Setup.VDP_SPRITE_COLLISIONS) {
+          if(VDP_SPRITE_COLLISIONS) {
             if(!this.spriteCol[x + 1]) {
               this.spriteCol[x + 1] = true
             }else {
@@ -9254,7 +9259,7 @@ JSSMS.Ports = function(sms) {
   this.ioPorts = []
 };
 JSSMS.Ports.prototype = {reset:function() {
-  if(Setup.LIGHTGUN) {
+  if(LIGHTGUN) {
     this.ioPorts = new Array(10);
     this.ioPorts[PORT_A + IO_TH_INPUT] = 1;
     this.ioPorts[PORT_B + IO_TH_INPUT] = 1
@@ -9267,7 +9272,7 @@ JSSMS.Ports.prototype = {reset:function() {
   }
   switch(port & 193) {
     case 1:
-      if(Setup.LIGHTGUN) {
+      if(LIGHTGUN) {
         this.oldTH = this.getTH(PORT_A) != 0 || this.getTH(PORT_B) != 0;
         this.writePort(PORT_A, value);
         this.writePort(PORT_B, value >> 2);
@@ -9328,7 +9333,7 @@ JSSMS.Ports.prototype = {reset:function() {
     case 192:
       return this.keyboard.controller1;
     case 193:
-      if(Setup.LIGHTGUN) {
+      if(LIGHTGUN) {
         if(this.keyboard.lightgunClick) {
           this.lightPhaserSync()
         }

@@ -82,7 +82,7 @@ JSSMS.Keyboard.prototype = {
     this.ggstart = 0xFF;
 
     // Turn lightgun off
-    if (Setup.LIGHTGUN) {
+    if (LIGHTGUN) {
       this.lightgunClick = false;
     }
 

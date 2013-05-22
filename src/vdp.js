@@ -208,7 +208,7 @@ JSSMS.Vdp = function(sms) {
   this.bgPriority = new Array(SMS_WIDTH);
 
   /** Sprite collisions. */
-  if (Setup.VDP_SPRITE_COLLISIONS) {
+  if (VDP_SPRITE_COLLISIONS) {
     /**
      * @type {Array.<boolean>}
      */
@@ -428,7 +428,7 @@ JSSMS.Vdp.prototype = {
           // IRQ line if bit 4 of register $00 is set, and it will de-assert the IRQ line
           // if the same bit is cleared.
           case 0:
-            if (Setup.ACCURATE_INTERRUPT_EMULATION && (this.status & STATUS_HINT) != 0)
+            if (ACCURATE_INTERRUPT_EMULATION && (this.status & STATUS_HINT) != 0)
               this.main.cpu.interruptLine = (this.commandByte & 0x10) != 0;
             break;
 
@@ -565,7 +565,7 @@ JSSMS.Vdp.prototype = {
       //
       // e.g. Chicago Syndicate on GG
 
-      if (!Setup.ACCURATE_INTERRUPT_EMULATION && lineno == 192)
+      if (!ACCURATE_INTERRUPT_EMULATION && lineno == 192)
         this.status |= STATUS_VINT;
 
       // Counter Expired = Line Interrupt Pending
@@ -619,7 +619,7 @@ JSSMS.Vdp.prototype = {
     }
 
     // Clear sprite collision array if enabled
-    if (Setup.VDP_SPRITE_COLLISIONS) {
+    if (VDP_SPRITE_COLLISIONS) {
       for (i = 0; i < SMS_WIDTH /* this.spriteCol.length */; i++)
         this.spriteCol[i] = false;
     }
@@ -826,7 +826,7 @@ JSSMS.Vdp.prototype = {
             this.display[temp + 2] = this.CRAM[temp2 + 2];
 
             // Emulate sprite collision (when two opaque pixels overlap)
-            if (Setup.VDP_SPRITE_COLLISIONS) {
+            if (VDP_SPRITE_COLLISIONS) {
               if (!this.spriteCol[x])
                 this.spriteCol[x] = true;
               else
@@ -848,7 +848,7 @@ JSSMS.Vdp.prototype = {
             this.display[temp + 1] = this.CRAM[temp2 + 1];
             this.display[temp + 2] = this.CRAM[temp2 + 2];
 
-            if (Setup.VDP_SPRITE_COLLISIONS) {
+            if (VDP_SPRITE_COLLISIONS) {
               if (!this.spriteCol[x])
                 this.spriteCol[x] = true;
               else
@@ -865,7 +865,7 @@ JSSMS.Vdp.prototype = {
             this.display[temp + 1] = this.CRAM[temp2 + 1];
             this.display[temp + 2] = this.CRAM[temp2 + 2];
 
-            if (Setup.VDP_SPRITE_COLLISIONS) {
+            if (VDP_SPRITE_COLLISIONS) {
               if (!this.spriteCol[x + 1])
                 this.spriteCol[x + 1] = true;
               else
