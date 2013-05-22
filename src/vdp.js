@@ -1,5 +1,5 @@
 /**
- * jsSMS - A Sega Master System/GameGear emulator in JavaScript
+ * jsSMS - A Sega Master System/Game Gear emulator in JavaScript
  * Copyright (C) 2012  Guillaume Marty (https://github.com/gmarty)
  * Based on JavaGear Copyright (c) 2002-2008 Chris White
  *
@@ -137,7 +137,7 @@ JSSMS.Vdp = function(sms) {
   /**
    * Colour RAM.
    * Note, we don't directly emulate CRAM but actually store the converted Java palette
-   * in it. Therefore the length is different to on the real GameGear where it's actually
+   * in it. Therefore the length is different to on the real Game Gear where it's actually
    * 64 bytes.
    * @type {Array.<number>}
    */

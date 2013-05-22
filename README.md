@@ -1,6 +1,6 @@
 # jsSMS
 
-jsSMS is an emulator for Sega Master System & GameGear ROMs written in JavaScript.
+jsSMS is an emulator for Sega Master System & Game Gear ROMs written in JavaScript.
 
 ## Code
 
@@ -33,7 +33,7 @@ Support latest IE.
 
 ## License
 
-jsSMS - A Sega Master System/GameGear emulator in JavaScript
+jsSMS - A Sega Master System/Game Gear emulator in JavaScript
 Copyright (C) 2012-2013 Guillaume Marty (https://github.com/gmarty)
 Based on JavaGear Copyright (c) 2002-2008 Chris White
 

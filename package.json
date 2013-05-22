@@ -2,7 +2,7 @@
   "name": "jsSMS",
   "version": "0.0.1",
   "author": "G. Cedric Marty",
-  "description": "A Sega Master System/GameGear emulator in JavaScript",
+  "description": "A Sega Master System/Game Gear emulator in JavaScript",
   "bin": {
     "jssms": "./bin/jssms"
   },
@@ -24,7 +24,7 @@
     "SMS",
     "Sega Master System",
     "GG",
-    "GameGear",
+    "Game Gear",
     "emulator"
   ],
   "license": "GNU GPL"

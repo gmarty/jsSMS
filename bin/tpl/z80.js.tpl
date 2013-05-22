@@ -1,5 +1,5 @@
 /**
- * jsSMS - A Sega Master System/GameGear emulator in JavaScript
+ * jsSMS - A Sega Master System/Game Gear emulator in JavaScript
  * Copyright (C) 2012  Guillaume Marty (https://github.com/gmarty)
  * Based on JavaGear Copyright (c) 2002-2008 Chris White
  *

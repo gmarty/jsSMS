@@ -1,5 +1,5 @@
 /**
- * jsSMS - A Sega Master System/GameGear emulator in JavaScript
+ * jsSMS - A Sega Master System/Game Gear emulator in JavaScript
  * Copyright (C) 2012  Guillaume Marty (https://github.com/gmarty)
  * Based on JavaGear Copyright (c) 2002-2008 Chris White
  *
@@ -147,7 +147,7 @@ JSSMS.Ports.prototype = {
     // Game Gear Serial Ports (not fully emulated)
     if (this.main.is_gg && port < 0x07) {
       switch (port) {
-        // GameGear (Start Button and Nationalisation)
+        // Game Gear (Start Button and Nationalisation)
         case 0x00:
           return (this.keyboard.ggstart & 0xBF) | this.europe;
 
