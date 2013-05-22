@@ -80,7 +80,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
         console.log("Invalid address", $JSSMS$Utils$toHex$$($currentAddress$$inline_236_fractional$$inline_18$$))
       }else {
         var $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$ = $JSCompiler_StaticMethods_resetDebug$self$$inline_20_clockSpeedHz$$inline_15_i$$inline_16_i$$inline_231$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$ = $currentAddress$$inline_236_fractional$$inline_18$$;
-        $instruction$$inline_235_opcode$$inline_385_options$$inline_408$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+        $instruction$$inline_235_opcode$$inline_385_options$$inline_408$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
         var $defaultInstruction$$inline_409_opcodesArray$$inline_386$$ = [$instruction$$inline_235_opcode$$inline_385_options$$inline_408$$], $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "Unknown Opcode", $currAddr$$inline_388_prop$$inline_410$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$, $address$$inline_400_target$$inline_389$$ = $JSCompiler_alias_NULL$$, $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = 'throw "Unimplemented opcode ' + $JSSMS$Utils$toHex$$($instruction$$inline_235_opcode$$inline_385_options$$inline_408$$) + 
         '";', $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = "", $code$$inline_399_location$$inline_392_target$$inline_405$$ = 0;
         $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -90,7 +90,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "";
             break;
           case 1:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD BC," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.setBC(" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ");";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -112,7 +112,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.b = this.dec8(this.b);";
             break;
           case 6:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD B," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.b = " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ";";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -146,7 +146,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.c = this.dec8(this.c);";
             break;
           case 14:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD C," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.c = " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ";";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -156,13 +156,13 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.rrca_a();";
             break;
           case 16:
-            $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$) + 1);
+            $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$) + 1);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "DJNZ (" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.b = (this.b - 1) & 0xff;if (this.b != 0) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";this.tstates -= 5;return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
             break;
           case 17:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD DE," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.setDE(" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ");";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -184,7 +184,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.d = this.dec8(this.d);";
             break;
           case 22:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD D," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.d = " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ";";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -194,7 +194,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.rla_a();";
             break;
           case 24:
-            $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$) + 1);
+            $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$) + 1);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JR (" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + "; return;";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ = $JSCompiler_alias_NULL$$;
@@ -220,7 +220,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.e = this.dec8(this.e);";
             break;
           case 30:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD E," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.e = " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ";";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -230,19 +230,19 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.rra_a();";
             break;
           case 32:
-            $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$) + 1);
+            $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$) + 1);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JR NZ,(" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if (!((this.f & F_ZERO) != 0)) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";this.tstates -= 5;return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
             break;
           case 33:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD HL," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.setHL(" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ");";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
             break;
           case 34:
-            $code$$inline_399_location$$inline_392_target$$inline_405$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $code$$inline_399_location$$inline_392_target$$inline_405$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($code$$inline_399_location$$inline_392_target$$inline_405$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD (" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + "),HL";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.writeMem(" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ", this.l);this.writeMem(" + $JSSMS$Utils$toHex$$($code$$inline_399_location$$inline_392_target$$inline_405$$ + 1) + ", this.h);";
@@ -261,7 +261,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.h = this.dec8(this.h);";
             break;
           case 38:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD H," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.h = " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ";";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -271,7 +271,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.daa();";
             break;
           case 40:
-            $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$) + 1);
+            $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$) + 1);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JR Z,(" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_ZERO) != 0) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";this.tstates -= 5;return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -281,7 +281,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.setHL(this.add16(this.getHL(), this.getHL()));";
             break;
           case 42:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD HL,(" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.setHL(this.readMemWord(" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + "));";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -299,7 +299,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.l = this.dec8(this.l);";
             break;
           case 46:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD L," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.l = " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ";";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -309,19 +309,19 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.cpl_a();";
             break;
           case 48:
-            $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$) + 1);
+            $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$) + 1);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JR NC,(" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if (!((this.f & F_CARRY) != 0)) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";this.tstates -= 5;return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
             break;
           case 49:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD SP," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.sp = " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ";";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
             break;
           case 50:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD (" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + "),A";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.writeMem(" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ", this.a);";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -339,7 +339,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.decMem(this.getHL());";
             break;
           case 54:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD (HL)," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.writeMem(this.getHL(), " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ");";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -349,7 +349,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.f |= F_CARRY; this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
             break;
           case 56:
-            $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$) + 1);
+            $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$) + 1);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JR C,(" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_CARRY) != 0) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";this.tstates -= 5;return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -359,7 +359,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.setHL(this.add16(this.getHL(), this.sp));";
             break;
           case 58:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD A,(" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.a = this.readMem(" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ");";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -377,7 +377,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.a = this.dec8(this.a);";
             break;
           case 62:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "LD A," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.a = " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ";";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -833,7 +833,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             break;
           case 175:
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "XOR A,A";
-            $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.f = " + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$n$[0]) + "; this.a = " + $JSSMS$Utils$toHex$$(0) + ";";
+            $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.f = " + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$[0]) + "; this.a = " + $JSSMS$Utils$toHex$$(0) + ";";
             break;
           case 176:
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "OR A,B";
@@ -908,19 +908,19 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.setBC(this.readMemWord(this.sp)); this.sp += 2;";
             break;
           case 194:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JP NZ,(" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_ZERO) == 0) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
             break;
           case 195:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JP (" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + "; return;";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ = $JSCompiler_alias_NULL$$;
             break;
           case 196:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "CALL NZ (" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_ZERO) == 0) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_384_address$$inline_394_opcode$$inline_401$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";this.tstates -= 7;return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -930,7 +930,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.push2(this.b, this.c);";
             break;
           case 198:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "ADD A," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.add_a(" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ");";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -950,14 +950,14 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ = $JSCompiler_alias_NULL$$;
             break;
           case 202:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JP Z,(" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_ZERO) != 0) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
             break;
           case 203:
             $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSCompiler_alias_VOID$$;
-            $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = [$JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$];
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "Unimplemented 0xCB prefixed opcode";
             $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$;
@@ -1801,19 +1801,19 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ = $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$.$nextAddress$;
             break;
           case 204:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "CALL Z (" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_ZERO) != 0) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_384_address$$inline_394_opcode$$inline_401$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";this.tstates -= 7;return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
             break;
           case 205:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "CALL (" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_384_address$$inline_394_opcode$$inline_401$$ + 2) + "); this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + "; return;";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
             break;
           case 206:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "ADC ," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.adc_a(" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ");";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -1832,19 +1832,19 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.setDE(this.readMemWord(this.sp)); this.sp += 2;";
             break;
           case 210:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JP NC,(" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_CARRY) == 0) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
             break;
           case 211:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "OUT (" + $JSSMS$Utils$toHex$$($_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$) + "),A";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = $JSCompiler_StaticMethods_peepholePortOut$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$);
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
             break;
           case 212:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "CALL NC (" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_CARRY) == 0) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_384_address$$inline_394_opcode$$inline_401$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";this.tstates -= 7;return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -1854,7 +1854,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.push2(this.d, this.e);";
             break;
           case 214:
-            $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "SUB " + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "SUB " + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "";
             break;
           case 215:
@@ -1871,19 +1871,19 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.exBC(); this.exDE(); this.exHL();";
             break;
           case 218:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JP C,(" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_CARRY) != 0) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
             break;
           case 219:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "IN A,(" + $JSSMS$Utils$toHex$$($_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = $JSCompiler_StaticMethods_peepholePortIn$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$);
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
             break;
           case 220:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "CALL C (" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_CARRY) != 0) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_384_address$$inline_394_opcode$$inline_401$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";this.tstates -= 7;return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -1896,7 +1896,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ = $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$.$nextAddress$;
             break;
           case 222:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "SBC A," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.sbc_a(" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ");";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -1915,7 +1915,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.setHL(this.readMemWord(this.sp)); this.sp += 2;";
             break;
           case 226:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JP PO,(" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_PARITY) == 0) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -1925,7 +1925,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "temp = this.h;this.h = this.readMem(this.sp + 1);this.writeMem(this.sp + 1, temp);temp = this.l;this.l = this.readMem(this.sp);this.writeMem(this.sp, temp);";
             break;
           case 228:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "CALL PO (" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_PARITY) == 0) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_384_address$$inline_394_opcode$$inline_401$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";this.tstates -= 7;return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -1935,7 +1935,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.push2(this.h, this.l);";
             break;
           case 230:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "AND (" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.f = this.SZP_TABLE[this.a &= " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + "] | F_HALFCARRY;";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -1955,7 +1955,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ = $JSCompiler_alias_NULL$$;
             break;
           case 234:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JP PE,(" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_PARITY) != 0) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -1965,14 +1965,14 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "temp = this.d;this.d = this.h;this.h = temp;temp = this.e;this.e = this.l;this.l = temp;";
             break;
           case 236:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "CALL PE (" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_PARITY) != 0) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_384_address$$inline_394_opcode$$inline_401$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";this.tstates -= 7;return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
             break;
           case 237:
-            var $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_400_target$$inline_389$$), $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = [$address$$inline_384_address$$inline_394_opcode$$inline_401$$], $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = 
-            "Unimplemented 0xED prefixed opcode", $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $address$$inline_400_target$$inline_389$$, $code$$inline_399_location$$inline_392_target$$inline_405$$ = $JSCompiler_alias_NULL$$, $code$$inline_406$$ = 'throw "Unimplemented 0xED prefixed opcode";', $operand$$inline_407$$ = "";
+            var $address$$inline_400_target$$inline_389$$ = $address$$inline_384_address$$inline_394_opcode$$inline_401$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$), $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = [$address$$inline_384_address$$inline_394_opcode$$inline_401$$], 
+            $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "Unimplemented 0xED prefixed opcode", $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $address$$inline_400_target$$inline_389$$, $code$$inline_399_location$$inline_392_target$$inline_405$$ = $JSCompiler_alias_NULL$$, $code$$inline_406$$ = 'throw "Unimplemented 0xED prefixed opcode";', $operand$$inline_407$$ = "";
             $address$$inline_400_target$$inline_389$$++;
             switch($address$$inline_384_address$$inline_394_opcode$$inline_401$$) {
               case 64:
@@ -1988,8 +1988,9 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 $code$$inline_406$$ = "this.sbc16(this.getBC());";
                 break;
               case 67:
-                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_400_target$$inline_389$$)) + "),BC";
-                $code$$inline_406$$ = "var location = " + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_400_target$$inline_389$$)) + ";this.writeMem(location++, this.c);this.writeMem(location, this.b);";
+                $operand$$inline_407$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$));
+                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD (" + $operand$$inline_407$$ + "),BC";
+                $code$$inline_406$$ = "var location = " + $operand$$inline_407$$ + ";this.writeMem(location++, this.c);this.writeMem(location, this.b);";
                 $address$$inline_400_target$$inline_389$$ += 2;
                 break;
               case 68:
@@ -2056,8 +2057,8 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 $code$$inline_406$$ = "this.adc16(this.getBC());";
                 break;
               case 75:
-                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD BC,(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_400_target$$inline_389$$)) + ")";
-                $code$$inline_406$$ = "this.setBC(this.readMemWord(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_400_target$$inline_389$$)) + "));";
+                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD BC,(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$)) + ")";
+                $code$$inline_406$$ = "this.setBC(this.readMemWord(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$)) + "));";
                 $address$$inline_400_target$$inline_389$$ += 2;
                 break;
               case 79:
@@ -2077,7 +2078,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 $code$$inline_406$$ = "this.sbc16(this.getDE());";
                 break;
               case 83:
-                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_400_target$$inline_389$$)) + "),DE";
+                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$)) + "),DE";
                 $code$$inline_406$$ = "var location = this.readMemWord(this.pc + 1);this.writeMem(location++, this.e);this.writeMem(location, this.d);";
                 $address$$inline_400_target$$inline_389$$ += 2;
                 break;
@@ -2104,7 +2105,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 $code$$inline_406$$ = "this.adc16(this.getDE());";
                 break;
               case 91:
-                $operand$$inline_407$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_400_target$$inline_389$$));
+                $operand$$inline_407$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$));
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD DE,(" + $operand$$inline_407$$ + ")";
                 $code$$inline_406$$ = "this.setDE(" + $operand$$inline_407$$ + ");";
                 $address$$inline_400_target$$inline_389$$ += 2;
@@ -2127,7 +2128,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 $code$$inline_406$$ = "this.sbc16(this.getHL());";
                 break;
               case 99:
-                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_400_target$$inline_389$$)) + "),HL";
+                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$)) + "),HL";
                 $code$$inline_406$$ = "var location = this.readMemWord(this.pc + 1);this.writeMem(location++, this.l);this.writeMem(location, this.h);";
                 $address$$inline_400_target$$inline_389$$ += 2;
                 break;
@@ -2148,7 +2149,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 $code$$inline_406$$ = "this.adc16(this.getHL());";
                 break;
               case 107:
-                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD HL,(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_400_target$$inline_389$$)) + ")";
+                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD HL,(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$)) + ")";
                 $address$$inline_400_target$$inline_389$$ += 2;
                 break;
               case 111:
@@ -2161,7 +2162,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "SBC HL,SP";
                 break;
               case 115:
-                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_400_target$$inline_389$$)) + "),SP";
+                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$)) + "),SP";
                 $address$$inline_400_target$$inline_389$$ += 2;
                 break;
               case 120:
@@ -2176,7 +2177,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "ADC HL,SP";
                 break;
               case 123:
-                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD SP,(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_400_target$$inline_389$$)) + ")";
+                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD SP,(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$)) + ")";
                 $address$$inline_400_target$$inline_389$$ += 2;
                 break;
               case 160:
@@ -2253,7 +2254,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ = $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$.$nextAddress$;
             break;
           case 238:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "XOR A," + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.f = this.SZP_TABLE[this.a ^= " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + "];";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -2272,7 +2273,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.f = this.readMem(this.sp++); this.a = this.readMem(this.sp++);";
             break;
           case 242:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JP P,(" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_SIGN) == 0) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -2282,7 +2283,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.iff1 = this.iff2 = false; this.EI_inst = true;";
             break;
           case 244:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "CALL P (" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_SIGN) == 0) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_384_address$$inline_394_opcode$$inline_401$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";this.tstates -= 7;return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -2292,7 +2293,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.push2(this.a, this.f);";
             break;
           case 246:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "OR " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.f = this.SZP_TABLE[this.a |= " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + "];";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -2311,7 +2312,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.sp = this.getHL()";
             break;
           case 250:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "JP M,(" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_SIGN) != 0) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -2321,7 +2322,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.iff1 = this.iff2 = this.EI_inst = true;";
             break;
           case 252:
-            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$m$($address$$inline_384_address$$inline_394_opcode$$inline_401$$);
+            $address$$inline_400_target$$inline_389$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$);
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "CALL M (" + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ")";
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "if ((this.f & F_SIGN) != 0) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_384_address$$inline_394_opcode$$inline_401$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_400_target$$inline_389$$) + ";this.tstates -= 7;return;}";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ += 2;
@@ -2334,7 +2335,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$ = $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$.$nextAddress$;
             break;
           case 254:
-            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$.$a$($address$$inline_384_address$$inline_394_opcode$$inline_401$$));
+            $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_384_address$$inline_394_opcode$$inline_401$$));
             $inst$$inline_387_opcodesArray$$inline_396_opcodesArray$$inline_402$$ = "CP " + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$;
             $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "this.cp_a(" + $_inst$$inline_393_currAddr$$inline_398_currAddr$$inline_404_operand$$inline_391$$ + ");";
             $address$$inline_384_address$$inline_394_opcode$$inline_401$$++;
@@ -2464,9 +2465,9 @@ function $JSSMS$Z80$$($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sm
   this.$main$ = $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$;
   this.$vdp$ = $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$.$vdp$;
   this.$w$ = $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$.$c$;
-  this.$I$ = this.$o$ = this.$f$ = 0;
+  this.$I$ = this.$n$ = this.$c$ = 0;
   this.$D$ = this.$H$ = this.$C$ = this.$B$ = $JSCompiler_alias_FALSE$$;
-  this.$p$ = this.$T$ = this.$c$ = this.$M$ = this.$v$ = this.$s$ = this.$t$ = this.$q$ = this.$V$ = this.$U$ = this.$l$ = this.$j$ = this.$S$ = this.$R$ = this.$e$ = this.$d$ = this.$Q$ = this.$P$ = this.$h$ = this.$i$ = this.$O$ = this.$b$ = this.$J$ = 0;
+  this.$o$ = this.$T$ = this.$b$ = this.$M$ = this.$v$ = this.$s$ = this.$t$ = this.$q$ = this.$V$ = this.$U$ = this.$l$ = this.$j$ = this.$S$ = this.$R$ = this.$e$ = this.$d$ = this.$Q$ = this.$P$ = this.$h$ = this.$i$ = this.$O$ = this.$a$ = this.$J$ = 0;
   this.$rom$ = [];
   this.$sram$ = $JSSMS$Utils$Array$$(32768);
   this.$frameReg$ = Array(4);
@@ -2474,7 +2475,7 @@ function $JSSMS$Z80$$($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sm
   this.$memWriteMap$ = $JSSMS$Utils$Array$$(8192);
   this.$W$ = Array(2048);
   this.$N$ = Array(256);
-  this.$n$ = Array(256);
+  this.$m$ = Array(256);
   this.$G$ = Array(256);
   this.$F$ = Array(256);
   this.$A$ = Array(131072);
@@ -2483,7 +2484,7 @@ function $JSSMS$Z80$$($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sm
   var $c$$inline_65_padc$$inline_56_sf$$inline_50$$, $h$$inline_66_psub$$inline_57_zf$$inline_51$$, $n$$inline_67_psbc$$inline_58_yf$$inline_52$$, $JSCompiler_temp_const$$227_val$$inline_59_xf$$inline_53$$, $JSCompiler_temp_const$$226_oldval$$inline_60_pf$$inline_54$$, $flags$$inline_242_newval$$inline_61$$;
   for($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$ = 0;256 > $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$;$i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$++) {
     $c$$inline_65_padc$$inline_56_sf$$inline_50$$ = 0 != ($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$ & 128) ? 128 : 0, $h$$inline_66_psub$$inline_57_zf$$inline_51$$ = 0 == $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$ ? 64 : 0, $n$$inline_67_psbc$$inline_58_yf$$inline_52$$ = $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$ & 32, $JSCompiler_temp_const$$227_val$$inline_59_xf$$inline_53$$ = $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$ & 
-    8, $JSCompiler_temp_const$$226_oldval$$inline_60_pf$$inline_54$$ = $JSCompiler_StaticMethods_getParity$$($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$) ? 4 : 0, this.$N$[$i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$] = $c$$inline_65_padc$$inline_56_sf$$inline_50$$ | $h$$inline_66_psub$$inline_57_zf$$inline_51$$ | $n$$inline_67_psbc$$inline_58_yf$$inline_52$$ | $JSCompiler_temp_const$$227_val$$inline_59_xf$$inline_53$$, this.$n$[$i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$] = 
+    8, $JSCompiler_temp_const$$226_oldval$$inline_60_pf$$inline_54$$ = $JSCompiler_StaticMethods_getParity$$($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$) ? 4 : 0, this.$N$[$i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$] = $c$$inline_65_padc$$inline_56_sf$$inline_50$$ | $h$$inline_66_psub$$inline_57_zf$$inline_51$$ | $n$$inline_67_psbc$$inline_58_yf$$inline_52$$ | $JSCompiler_temp_const$$227_val$$inline_59_xf$$inline_53$$, this.$m$[$i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$] = 
     $c$$inline_65_padc$$inline_56_sf$$inline_50$$ | $h$$inline_66_psub$$inline_57_zf$$inline_51$$ | $n$$inline_67_psbc$$inline_58_yf$$inline_52$$ | $JSCompiler_temp_const$$227_val$$inline_59_xf$$inline_53$$ | $JSCompiler_temp_const$$226_oldval$$inline_60_pf$$inline_54$$, this.$G$[$i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$] = $c$$inline_65_padc$$inline_56_sf$$inline_50$$ | $h$$inline_66_psub$$inline_57_zf$$inline_51$$ | $n$$inline_67_psbc$$inline_58_yf$$inline_52$$ | $JSCompiler_temp_const$$227_val$$inline_59_xf$$inline_53$$, 
     this.$G$[$i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$] |= 128 == $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$ ? 4 : 0, this.$G$[$i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$] |= 0 == ($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$ & 15) ? 16 : 0, this.$F$[$i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$] = $c$$inline_65_padc$$inline_56_sf$$inline_50$$ | $h$$inline_66_psub$$inline_57_zf$$inline_51$$ | $n$$inline_67_psbc$$inline_58_yf$$inline_52$$ | 
     $JSCompiler_temp_const$$227_val$$inline_59_xf$$inline_53$$ | 2, this.$F$[$i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$] |= 127 == $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$ ? 4 : 0, this.$F$[$i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$] |= 15 == ($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$ & 15) ? 16 : 0, this.$L$[$i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$] = 0 != $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$ ? 
@@ -2513,9 +2514,9 @@ function $JSSMS$Z80$$($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sm
           $JSCompiler_temp_const$$227_val$$inline_59_xf$$inline_53$$ = this.$W$;
           $JSCompiler_temp_const$$226_oldval$$inline_60_pf$$inline_54$$ = $c$$inline_65_padc$$inline_56_sf$$inline_50$$ << 8 | $n$$inline_67_psbc$$inline_58_yf$$inline_52$$ << 9 | $h$$inline_66_psub$$inline_57_zf$$inline_51$$ << 10 | $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$;
           $flags$$inline_242_newval$$inline_61$$ = $c$$inline_65_padc$$inline_56_sf$$inline_50$$ | $n$$inline_67_psbc$$inline_58_yf$$inline_52$$ << 1 | $h$$inline_66_psub$$inline_57_zf$$inline_51$$ << 4;
-          this.$b$ = $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$;
-          this.$c$ = $flags$$inline_242_newval$$inline_61$$;
-          var $a_copy$$inline_243$$ = this.$b$, $correction$$inline_244$$ = 0, $carry$$inline_245$$ = $flags$$inline_242_newval$$inline_61$$ & 1, $carry_copy$$inline_246$$ = $carry$$inline_245$$;
+          this.$a$ = $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$;
+          this.$b$ = $flags$$inline_242_newval$$inline_61$$;
+          var $a_copy$$inline_243$$ = this.$a$, $correction$$inline_244$$ = 0, $carry$$inline_245$$ = $flags$$inline_242_newval$$inline_61$$ & 1, $carry_copy$$inline_246$$ = $carry$$inline_245$$;
           if(0 != ($flags$$inline_242_newval$$inline_61$$ & 16) || 9 < ($a_copy$$inline_243$$ & 15)) {
             $correction$$inline_244$$ |= 6
           }
@@ -2524,14 +2525,14 @@ function $JSSMS$Z80$$($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sm
           }
           153 < $a_copy$$inline_243$$ && ($carry_copy$$inline_246$$ = 1);
           0 != ($flags$$inline_242_newval$$inline_61$$ & 2) ? $JSCompiler_StaticMethods_sub_a$$(this, $correction$$inline_244$$) : $JSCompiler_StaticMethods_add_a$$(this, $correction$$inline_244$$);
-          $flags$$inline_242_newval$$inline_61$$ = this.$c$ & 254 | $carry_copy$$inline_246$$;
-          $flags$$inline_242_newval$$inline_61$$ = $JSCompiler_StaticMethods_getParity$$(this.$b$) ? $flags$$inline_242_newval$$inline_61$$ & 251 | 4 : $flags$$inline_242_newval$$inline_61$$ & 251;
-          $JSCompiler_temp_const$$227_val$$inline_59_xf$$inline_53$$[$JSCompiler_temp_const$$226_oldval$$inline_60_pf$$inline_54$$] = this.$b$ | $flags$$inline_242_newval$$inline_61$$ << 8
+          $flags$$inline_242_newval$$inline_61$$ = this.$b$ & 254 | $carry_copy$$inline_246$$;
+          $flags$$inline_242_newval$$inline_61$$ = $JSCompiler_StaticMethods_getParity$$(this.$a$) ? $flags$$inline_242_newval$$inline_61$$ & 251 | 4 : $flags$$inline_242_newval$$inline_61$$ & 251;
+          $JSCompiler_temp_const$$227_val$$inline_59_xf$$inline_53$$[$JSCompiler_temp_const$$226_oldval$$inline_60_pf$$inline_54$$] = this.$a$ | $flags$$inline_242_newval$$inline_61$$ << 8
         }
       }
     }
   }
-  this.$b$ = this.$c$ = 0;
+  this.$a$ = this.$b$ = 0;
   if($SUPPORT_DATAVIEW$$) {
     for($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$ = 0;8192 > $i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$;$i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$++) {
       this.$memWriteMap$.setUint8($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sms$$, 0)
@@ -2559,14 +2560,14 @@ function $JSSMS$Z80$$($i$$inline_49_i$$inline_64_i$$inline_70_padd$$inline_55_sm
   }
 }
 $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
-  this.$f$ = this.$T$ = this.$c$ = this.$M$ = this.$s$ = this.$v$ = this.$q$ = this.$t$ = this.$j$ = this.$l$ = this.$U$ = this.$V$ = this.$d$ = this.$e$ = this.$R$ = this.$S$ = this.$i$ = this.$h$ = this.$P$ = this.$Q$ = this.$b$ = this.$O$ = 0;
-  this.$o$ = 57328;
-  this.$I$ = this.$p$ = 0;
+  this.$c$ = this.$T$ = this.$b$ = this.$M$ = this.$s$ = this.$v$ = this.$q$ = this.$t$ = this.$j$ = this.$l$ = this.$U$ = this.$V$ = this.$d$ = this.$e$ = this.$R$ = this.$S$ = this.$i$ = this.$h$ = this.$P$ = this.$Q$ = this.$a$ = this.$O$ = 0;
+  this.$n$ = 57328;
+  this.$I$ = this.$o$ = 0;
   this.$C$ = this.$B$ = $JSCompiler_alias_FALSE$$;
   this.$J$ = 0;
   this.$H$ = $JSCompiler_alias_FALSE$$
 }, call:function $$JSSMS$Z80$$$$call$($condition$$3$$) {
-  $condition$$3$$ ? ($JSCompiler_StaticMethods_push1$$(this, this.$f$ + 2), this.$f$ = this.$m$(this.$f$), this.$p$ -= 7) : this.$f$ += 2
+  $condition$$3$$ ? ($JSCompiler_StaticMethods_push1$$(this, this.$c$ + 2), this.$c$ = this.$p$(this.$c$), this.$o$ -= 7) : this.$c$ += 2
 }, $g$:$SUPPORT_DATAVIEW$$ ? function($address$$, $value$$73$$) {
   if(65535 >= $address$$) {
     this.$memWriteMap$.setInt8($address$$ & 8191, $value$$73$$), 65532 == $address$$ ? this.$frameReg$[3] = $value$$73$$ : 65533 == $address$$ ? this.$frameReg$[0] = $value$$73$$ : 65534 == $address$$ ? this.$frameReg$[1] = $value$$73$$ : 65535 == $address$$ && (this.$frameReg$[2] = $value$$73$$)
@@ -2581,7 +2582,7 @@ $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
     console.error($JSSMS$Utils$toHex$$($address$$1$$), $JSSMS$Utils$toHex$$($address$$1$$ & 8191));
     debugger
   }
-}, $a$:$SUPPORT_DATAVIEW$$ ? function($address$$2$$) {
+}, $f$:$SUPPORT_DATAVIEW$$ ? function($address$$2$$) {
   if(1024 > $address$$2$$) {
     return this.$rom$[0].getUint8($address$$2$$)
   }
@@ -2649,7 +2650,7 @@ $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
   console.error($JSSMS$Utils$toHex$$($address$$3$$));
   debugger;
   return 0
-}, $m$:$SUPPORT_DATAVIEW$$ ? function($address$$4$$) {
+}, $p$:$SUPPORT_DATAVIEW$$ ? function($address$$4$$) {
   if(1024 > $address$$4$$) {
     return this.$rom$[0].getUint16($address$$4$$, $JSCompiler_alias_TRUE$$)
   }
@@ -2719,7 +2720,7 @@ $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
   return 0
 }};
 function $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_d_$self$$) {
-  return $JSCompiler_StaticMethods_d_$self$$.$a$($JSCompiler_StaticMethods_d_$self$$.$f$)
+  return $JSCompiler_StaticMethods_d_$self$$.$f$($JSCompiler_StaticMethods_d_$self$$.$c$)
 }
 function $JSCompiler_StaticMethods_getParity$$($value$$72$$) {
   var $parity$$ = $JSCompiler_alias_TRUE$$, $j$$1$$;
@@ -2729,30 +2730,30 @@ function $JSCompiler_StaticMethods_getParity$$($value$$72$$) {
   return $parity$$
 }
 function $JSCompiler_StaticMethods_sbc16$$($JSCompiler_StaticMethods_sbc16$self$$, $value$$71$$) {
-  var $hl$$1$$ = $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_sbc16$self$$), $result$$2$$ = $hl$$1$$ - $value$$71$$ - ($JSCompiler_StaticMethods_sbc16$self$$.$c$ & 1);
-  $JSCompiler_StaticMethods_sbc16$self$$.$c$ = ($hl$$1$$ ^ $result$$2$$ ^ $value$$71$$) >> 8 & 16 | 2 | $result$$2$$ >> 16 & 1 | $result$$2$$ >> 8 & 128 | (0 != ($result$$2$$ & 65535) ? 0 : 64) | (($value$$71$$ ^ $hl$$1$$) & ($hl$$1$$ ^ $result$$2$$) & 32768) >> 13;
+  var $hl$$1$$ = $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_sbc16$self$$), $result$$2$$ = $hl$$1$$ - $value$$71$$ - ($JSCompiler_StaticMethods_sbc16$self$$.$b$ & 1);
+  $JSCompiler_StaticMethods_sbc16$self$$.$b$ = ($hl$$1$$ ^ $result$$2$$ ^ $value$$71$$) >> 8 & 16 | 2 | $result$$2$$ >> 16 & 1 | $result$$2$$ >> 8 & 128 | (0 != ($result$$2$$ & 65535) ? 0 : 64) | (($value$$71$$ ^ $hl$$1$$) & ($hl$$1$$ ^ $result$$2$$) & 32768) >> 13;
   $JSCompiler_StaticMethods_sbc16$self$$.$j$ = $result$$2$$ >> 8 & 255;
   $JSCompiler_StaticMethods_sbc16$self$$.$l$ = $result$$2$$ & 255
 }
 function $JSCompiler_StaticMethods_adc16$$($JSCompiler_StaticMethods_adc16$self$$, $value$$70$$) {
-  var $hl$$ = $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_adc16$self$$), $result$$1$$ = $hl$$ + $value$$70$$ + ($JSCompiler_StaticMethods_adc16$self$$.$c$ & 1);
-  $JSCompiler_StaticMethods_adc16$self$$.$c$ = ($hl$$ ^ $result$$1$$ ^ $value$$70$$) >> 8 & 16 | $result$$1$$ >> 16 & 1 | $result$$1$$ >> 8 & 128 | (0 != ($result$$1$$ & 65535) ? 0 : 64) | (($value$$70$$ ^ $hl$$ ^ 32768) & ($value$$70$$ ^ $result$$1$$) & 32768) >> 13;
+  var $hl$$ = $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_adc16$self$$), $result$$1$$ = $hl$$ + $value$$70$$ + ($JSCompiler_StaticMethods_adc16$self$$.$b$ & 1);
+  $JSCompiler_StaticMethods_adc16$self$$.$b$ = ($hl$$ ^ $result$$1$$ ^ $value$$70$$) >> 8 & 16 | $result$$1$$ >> 16 & 1 | $result$$1$$ >> 8 & 128 | (0 != ($result$$1$$ & 65535) ? 0 : 64) | (($value$$70$$ ^ $hl$$ ^ 32768) & ($value$$70$$ ^ $result$$1$$) & 32768) >> 13;
   $JSCompiler_StaticMethods_adc16$self$$.$j$ = $result$$1$$ >> 8 & 255;
   $JSCompiler_StaticMethods_adc16$self$$.$l$ = $result$$1$$ & 255
 }
 function $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_add16$self$$, $reg$$, $value$$69$$) {
   var $result$$ = $reg$$ + $value$$69$$;
-  $JSCompiler_StaticMethods_add16$self$$.$c$ = $JSCompiler_StaticMethods_add16$self$$.$c$ & 196 | ($reg$$ ^ $result$$ ^ $value$$69$$) >> 8 & 16 | $result$$ >> 16 & 1;
+  $JSCompiler_StaticMethods_add16$self$$.$b$ = $JSCompiler_StaticMethods_add16$self$$.$b$ & 196 | ($reg$$ ^ $result$$ ^ $value$$69$$) >> 8 & 16 | $result$$ >> 16 & 1;
   return $result$$ & 65535
 }
 function $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_dec8$self$$, $value$$68$$) {
   $value$$68$$ = $value$$68$$ - 1 & 255;
-  $JSCompiler_StaticMethods_dec8$self$$.$c$ = $JSCompiler_StaticMethods_dec8$self$$.$c$ & 1 | $JSCompiler_StaticMethods_dec8$self$$.$F$[$value$$68$$];
+  $JSCompiler_StaticMethods_dec8$self$$.$b$ = $JSCompiler_StaticMethods_dec8$self$$.$b$ & 1 | $JSCompiler_StaticMethods_dec8$self$$.$F$[$value$$68$$];
   return $value$$68$$
 }
 function $JSCompiler_StaticMethods_inc8$$($JSCompiler_StaticMethods_inc8$self$$, $value$$67$$) {
   $value$$67$$ = $value$$67$$ + 1 & 255;
-  $JSCompiler_StaticMethods_inc8$self$$.$c$ = $JSCompiler_StaticMethods_inc8$self$$.$c$ & 1 | $JSCompiler_StaticMethods_inc8$self$$.$G$[$value$$67$$];
+  $JSCompiler_StaticMethods_inc8$self$$.$b$ = $JSCompiler_StaticMethods_inc8$self$$.$b$ & 1 | $JSCompiler_StaticMethods_inc8$self$$.$G$[$value$$67$$];
   return $value$$67$$
 }
 function $JSCompiler_StaticMethods_decHL$$($JSCompiler_StaticMethods_decHL$self$$) {
@@ -2803,279 +2804,279 @@ function $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_getBC$self$
   return $JSCompiler_StaticMethods_getBC$self$$.$i$ << 8 | $JSCompiler_StaticMethods_getBC$self$$.$h$
 }
 function $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_cp_a$self$$, $value$$61$$) {
-  $JSCompiler_StaticMethods_cp_a$self$$.$c$ = $JSCompiler_StaticMethods_cp_a$self$$.$z$[$JSCompiler_StaticMethods_cp_a$self$$.$b$ << 8 | $JSCompiler_StaticMethods_cp_a$self$$.$b$ - $value$$61$$ & 255]
+  $JSCompiler_StaticMethods_cp_a$self$$.$b$ = $JSCompiler_StaticMethods_cp_a$self$$.$z$[$JSCompiler_StaticMethods_cp_a$self$$.$a$ << 8 | $JSCompiler_StaticMethods_cp_a$self$$.$a$ - $value$$61$$ & 255]
 }
 function $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_sbc_a$self$$, $value$$60$$) {
-  var $carry$$10$$ = $JSCompiler_StaticMethods_sbc_a$self$$.$c$ & 1, $temp$$8$$ = $JSCompiler_StaticMethods_sbc_a$self$$.$b$ - $value$$60$$ - $carry$$10$$ & 255;
-  $JSCompiler_StaticMethods_sbc_a$self$$.$c$ = $JSCompiler_StaticMethods_sbc_a$self$$.$z$[$carry$$10$$ << 16 | $JSCompiler_StaticMethods_sbc_a$self$$.$b$ << 8 | $temp$$8$$];
-  $JSCompiler_StaticMethods_sbc_a$self$$.$b$ = $temp$$8$$
+  var $carry$$10$$ = $JSCompiler_StaticMethods_sbc_a$self$$.$b$ & 1, $temp$$8$$ = $JSCompiler_StaticMethods_sbc_a$self$$.$a$ - $value$$60$$ - $carry$$10$$ & 255;
+  $JSCompiler_StaticMethods_sbc_a$self$$.$b$ = $JSCompiler_StaticMethods_sbc_a$self$$.$z$[$carry$$10$$ << 16 | $JSCompiler_StaticMethods_sbc_a$self$$.$a$ << 8 | $temp$$8$$];
+  $JSCompiler_StaticMethods_sbc_a$self$$.$a$ = $temp$$8$$
 }
 function $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_sub_a$self$$, $value$$59$$) {
-  var $temp$$7$$ = $JSCompiler_StaticMethods_sub_a$self$$.$b$ - $value$$59$$ & 255;
-  $JSCompiler_StaticMethods_sub_a$self$$.$c$ = $JSCompiler_StaticMethods_sub_a$self$$.$z$[$JSCompiler_StaticMethods_sub_a$self$$.$b$ << 8 | $temp$$7$$];
-  $JSCompiler_StaticMethods_sub_a$self$$.$b$ = $temp$$7$$
+  var $temp$$7$$ = $JSCompiler_StaticMethods_sub_a$self$$.$a$ - $value$$59$$ & 255;
+  $JSCompiler_StaticMethods_sub_a$self$$.$b$ = $JSCompiler_StaticMethods_sub_a$self$$.$z$[$JSCompiler_StaticMethods_sub_a$self$$.$a$ << 8 | $temp$$7$$];
+  $JSCompiler_StaticMethods_sub_a$self$$.$a$ = $temp$$7$$
 }
 function $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_adc_a$self$$, $value$$58$$) {
-  var $carry$$9$$ = $JSCompiler_StaticMethods_adc_a$self$$.$c$ & 1, $temp$$6$$ = $JSCompiler_StaticMethods_adc_a$self$$.$b$ + $value$$58$$ + $carry$$9$$ & 255;
-  $JSCompiler_StaticMethods_adc_a$self$$.$c$ = $JSCompiler_StaticMethods_adc_a$self$$.$A$[$carry$$9$$ << 16 | $JSCompiler_StaticMethods_adc_a$self$$.$b$ << 8 | $temp$$6$$];
-  $JSCompiler_StaticMethods_adc_a$self$$.$b$ = $temp$$6$$
+  var $carry$$9$$ = $JSCompiler_StaticMethods_adc_a$self$$.$b$ & 1, $temp$$6$$ = $JSCompiler_StaticMethods_adc_a$self$$.$a$ + $value$$58$$ + $carry$$9$$ & 255;
+  $JSCompiler_StaticMethods_adc_a$self$$.$b$ = $JSCompiler_StaticMethods_adc_a$self$$.$A$[$carry$$9$$ << 16 | $JSCompiler_StaticMethods_adc_a$self$$.$a$ << 8 | $temp$$6$$];
+  $JSCompiler_StaticMethods_adc_a$self$$.$a$ = $temp$$6$$
 }
 function $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_add_a$self$$, $value$$57$$) {
-  var $temp$$5$$ = $JSCompiler_StaticMethods_add_a$self$$.$b$ + $value$$57$$ & 255;
-  $JSCompiler_StaticMethods_add_a$self$$.$c$ = $JSCompiler_StaticMethods_add_a$self$$.$A$[$JSCompiler_StaticMethods_add_a$self$$.$b$ << 8 | $temp$$5$$];
-  $JSCompiler_StaticMethods_add_a$self$$.$b$ = $temp$$5$$
+  var $temp$$5$$ = $JSCompiler_StaticMethods_add_a$self$$.$a$ + $value$$57$$ & 255;
+  $JSCompiler_StaticMethods_add_a$self$$.$b$ = $JSCompiler_StaticMethods_add_a$self$$.$A$[$JSCompiler_StaticMethods_add_a$self$$.$a$ << 8 | $temp$$5$$];
+  $JSCompiler_StaticMethods_add_a$self$$.$a$ = $temp$$5$$
 }
 function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndexCB$self$$, $index$$45$$) {
-  var $location$$24$$ = $index$$45$$ + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexCB$self$$) & 65535, $opcode$$4$$ = $JSCompiler_StaticMethods_doIndexCB$self$$.$a$(++$JSCompiler_StaticMethods_doIndexCB$self$$.$f$);
-  $JSCompiler_StaticMethods_doIndexCB$self$$.$p$ -= $OP_INDEX_CB_STATES$$[$opcode$$4$$];
+  var $location$$24$$ = $index$$45$$ + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexCB$self$$) & 65535, $opcode$$4$$ = $JSCompiler_StaticMethods_doIndexCB$self$$.$f$(++$JSCompiler_StaticMethods_doIndexCB$self$$.$c$);
+  $JSCompiler_StaticMethods_doIndexCB$self$$.$o$ -= $OP_INDEX_CB_STATES$$[$opcode$$4$$];
   switch($opcode$$4$$) {
     case 0:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$i$);
       break;
     case 1:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$h$);
       break;
     case 2:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$d$);
       break;
     case 3:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$e$);
       break;
     case 4:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$j$);
       break;
     case 5:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$l$);
       break;
     case 6:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$)));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$)));
       break;
     case 7:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$b$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$b$);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$a$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$);
       break;
     case 8:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$i$);
       break;
     case 9:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$h$);
       break;
     case 10:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$d$);
       break;
     case 11:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$e$);
       break;
     case 12:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$j$);
       break;
     case 13:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$l$);
       break;
     case 14:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$)));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$)));
       break;
     case 15:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$b$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$b$);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$a$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$);
       break;
     case 16:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$i$);
       break;
     case 17:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$h$);
       break;
     case 18:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$d$);
       break;
     case 19:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$e$);
       break;
     case 20:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$j$);
       break;
     case 21:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$l$);
       break;
     case 22:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$)));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$)));
       break;
     case 23:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$b$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$b$);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$a$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$);
       break;
     case 24:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$i$);
       break;
     case 25:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$h$);
       break;
     case 26:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$d$);
       break;
     case 27:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$e$);
       break;
     case 28:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$j$);
       break;
     case 29:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$l$);
       break;
     case 30:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$)));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$)));
       break;
     case 31:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$b$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$b$);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$a$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$);
       break;
     case 32:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$i$);
       break;
     case 33:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$h$);
       break;
     case 34:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$d$);
       break;
     case 35:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$e$);
       break;
     case 36:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$j$);
       break;
     case 37:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$l$);
       break;
     case 38:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$)));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$)));
       break;
     case 39:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$b$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$b$);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$a$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$);
       break;
     case 40:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$i$);
       break;
     case 41:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$h$);
       break;
     case 42:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$d$);
       break;
     case 43:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$e$);
       break;
     case 44:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$j$);
       break;
     case 45:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$l$);
       break;
     case 46:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$)));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$)));
       break;
     case 47:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$b$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$b$);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$a$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$);
       break;
     case 48:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$i$);
       break;
     case 49:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$h$);
       break;
     case 50:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$d$);
       break;
     case 51:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$e$);
       break;
     case 52:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$j$);
       break;
     case 53:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$l$);
       break;
     case 54:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$)));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$)));
       break;
     case 55:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$b$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$b$);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$a$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$);
       break;
     case 56:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$i$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$i$);
       break;
     case 57:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$h$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$h$);
       break;
     case 58:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$d$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$d$);
       break;
     case 59:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$e$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$e$);
       break;
     case 60:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$j$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$j$);
       break;
     case 61:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$l$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
       $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$l$);
       break;
     case 62:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$)));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$)));
       break;
     case 63:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$b$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$));
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$b$);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$a$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$));
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$);
       break;
     case 64:
     ;
@@ -3092,7 +3093,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 70:
     ;
     case 71:
-      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & 1);
+      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & 1);
       break;
     case 72:
     ;
@@ -3109,7 +3110,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 78:
     ;
     case 79:
-      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & 2);
+      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & 2);
       break;
     case 80:
     ;
@@ -3126,7 +3127,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 86:
     ;
     case 87:
-      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & 4);
+      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & 4);
       break;
     case 88:
     ;
@@ -3143,7 +3144,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 94:
     ;
     case 95:
-      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & 8);
+      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & 8);
       break;
     case 96:
     ;
@@ -3160,7 +3161,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 102:
     ;
     case 103:
-      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & 16);
+      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & 16);
       break;
     case 104:
     ;
@@ -3177,7 +3178,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 110:
     ;
     case 111:
-      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & 32);
+      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & 32);
       break;
     case 112:
     ;
@@ -3194,7 +3195,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 118:
     ;
     case 119:
-      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & 64);
+      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & 64);
       break;
     case 120:
     ;
@@ -3211,7 +3212,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 126:
     ;
     case 127:
-      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & 128);
+      $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doIndexCB$self$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & 128);
       break;
     case 128:
     ;
@@ -3228,7 +3229,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 134:
     ;
     case 135:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & -2);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & -2);
       break;
     case 136:
     ;
@@ -3245,7 +3246,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 142:
     ;
     case 143:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & -3);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & -3);
       break;
     case 144:
     ;
@@ -3262,7 +3263,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 150:
     ;
     case 151:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & -5);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & -5);
       break;
     case 152:
     ;
@@ -3279,7 +3280,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 158:
     ;
     case 159:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & -9);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & -9);
       break;
     case 160:
     ;
@@ -3296,7 +3297,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 166:
     ;
     case 167:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & -17);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & -17);
       break;
     case 168:
     ;
@@ -3313,7 +3314,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 174:
     ;
     case 175:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & -33);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & -33);
       break;
     case 176:
     ;
@@ -3330,7 +3331,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 182:
     ;
     case 183:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & -65);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & -65);
       break;
     case 184:
     ;
@@ -3347,7 +3348,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 190:
     ;
     case 191:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) & -129);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) & -129);
       break;
     case 192:
     ;
@@ -3364,7 +3365,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 198:
     ;
     case 199:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) | 1);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) | 1);
       break;
     case 200:
     ;
@@ -3381,7 +3382,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 206:
     ;
     case 207:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) | 2);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) | 2);
       break;
     case 208:
     ;
@@ -3398,7 +3399,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 214:
     ;
     case 215:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) | 4);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) | 4);
       break;
     case 216:
     ;
@@ -3415,7 +3416,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 222:
     ;
     case 223:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) | 8);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) | 8);
       break;
     case 224:
     ;
@@ -3432,7 +3433,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 230:
     ;
     case 231:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) | 16);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) | 16);
       break;
     case 232:
     ;
@@ -3449,7 +3450,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 238:
     ;
     case 239:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) | 32);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) | 32);
       break;
     case 240:
     ;
@@ -3466,7 +3467,7 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 246:
     ;
     case 247:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) | 64);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) | 64);
       break;
     case 248:
     ;
@@ -3483,106 +3484,106 @@ function $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndex
     case 254:
     ;
     case 255:
-      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$a$($location$$24$$) | 128);
+      $JSCompiler_StaticMethods_doIndexCB$self$$.$g$($location$$24$$, $JSCompiler_StaticMethods_doIndexCB$self$$.$f$($location$$24$$) | 128);
       break;
     default:
       console.log("Unimplemented DDCB/FDCB Opcode: " + $JSSMS$Utils$toHex$$($opcode$$4$$))
   }
-  $JSCompiler_StaticMethods_doIndexCB$self$$.$f$++
+  $JSCompiler_StaticMethods_doIndexCB$self$$.$c$++
 }
 function $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_bit$self$$, $mask$$5$$) {
-  $JSCompiler_StaticMethods_bit$self$$.$c$ = $JSCompiler_StaticMethods_bit$self$$.$c$ & 1 | $JSCompiler_StaticMethods_bit$self$$.$L$[$mask$$5$$]
+  $JSCompiler_StaticMethods_bit$self$$.$b$ = $JSCompiler_StaticMethods_bit$self$$.$b$ & 1 | $JSCompiler_StaticMethods_bit$self$$.$L$[$mask$$5$$]
 }
 function $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_srl$self$$, $value$$55$$) {
   var $carry$$7$$ = $value$$55$$ & 1;
   $value$$55$$ = $value$$55$$ >> 1 & 255;
-  $JSCompiler_StaticMethods_srl$self$$.$c$ = $carry$$7$$ | $JSCompiler_StaticMethods_srl$self$$.$n$[$value$$55$$];
+  $JSCompiler_StaticMethods_srl$self$$.$b$ = $carry$$7$$ | $JSCompiler_StaticMethods_srl$self$$.$m$[$value$$55$$];
   return $value$$55$$
 }
 function $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_sra$self$$, $value$$54$$) {
   var $carry$$6$$ = $value$$54$$ & 1;
   $value$$54$$ = $value$$54$$ >> 1 | $value$$54$$ & 128;
-  $JSCompiler_StaticMethods_sra$self$$.$c$ = $carry$$6$$ | $JSCompiler_StaticMethods_sra$self$$.$n$[$value$$54$$];
+  $JSCompiler_StaticMethods_sra$self$$.$b$ = $carry$$6$$ | $JSCompiler_StaticMethods_sra$self$$.$m$[$value$$54$$];
   return $value$$54$$
 }
 function $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_sll$self$$, $value$$53$$) {
   var $carry$$5$$ = ($value$$53$$ & 128) >> 7;
   $value$$53$$ = ($value$$53$$ << 1 | 1) & 255;
-  $JSCompiler_StaticMethods_sll$self$$.$c$ = $carry$$5$$ | $JSCompiler_StaticMethods_sll$self$$.$n$[$value$$53$$];
+  $JSCompiler_StaticMethods_sll$self$$.$b$ = $carry$$5$$ | $JSCompiler_StaticMethods_sll$self$$.$m$[$value$$53$$];
   return $value$$53$$
 }
 function $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_sla$self$$, $value$$52$$) {
   var $carry$$4$$ = ($value$$52$$ & 128) >> 7;
   $value$$52$$ = $value$$52$$ << 1 & 255;
-  $JSCompiler_StaticMethods_sla$self$$.$c$ = $carry$$4$$ | $JSCompiler_StaticMethods_sla$self$$.$n$[$value$$52$$];
+  $JSCompiler_StaticMethods_sla$self$$.$b$ = $carry$$4$$ | $JSCompiler_StaticMethods_sla$self$$.$m$[$value$$52$$];
   return $value$$52$$
 }
 function $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_rr$self$$, $value$$51$$) {
   var $carry$$3$$ = $value$$51$$ & 1;
-  $value$$51$$ = ($value$$51$$ >> 1 | $JSCompiler_StaticMethods_rr$self$$.$c$ << 7) & 255;
-  $JSCompiler_StaticMethods_rr$self$$.$c$ = $carry$$3$$ | $JSCompiler_StaticMethods_rr$self$$.$n$[$value$$51$$];
+  $value$$51$$ = ($value$$51$$ >> 1 | $JSCompiler_StaticMethods_rr$self$$.$b$ << 7) & 255;
+  $JSCompiler_StaticMethods_rr$self$$.$b$ = $carry$$3$$ | $JSCompiler_StaticMethods_rr$self$$.$m$[$value$$51$$];
   return $value$$51$$
 }
 function $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_rl$self$$, $value$$50$$) {
   var $carry$$2$$ = ($value$$50$$ & 128) >> 7;
-  $value$$50$$ = ($value$$50$$ << 1 | $JSCompiler_StaticMethods_rl$self$$.$c$ & 1) & 255;
-  $JSCompiler_StaticMethods_rl$self$$.$c$ = $carry$$2$$ | $JSCompiler_StaticMethods_rl$self$$.$n$[$value$$50$$];
+  $value$$50$$ = ($value$$50$$ << 1 | $JSCompiler_StaticMethods_rl$self$$.$b$ & 1) & 255;
+  $JSCompiler_StaticMethods_rl$self$$.$b$ = $carry$$2$$ | $JSCompiler_StaticMethods_rl$self$$.$m$[$value$$50$$];
   return $value$$50$$
 }
 function $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_rrc$self$$, $value$$49$$) {
   var $carry$$1$$ = $value$$49$$ & 1;
   $value$$49$$ = ($value$$49$$ >> 1 | $value$$49$$ << 7) & 255;
-  $JSCompiler_StaticMethods_rrc$self$$.$c$ = $carry$$1$$ | $JSCompiler_StaticMethods_rrc$self$$.$n$[$value$$49$$];
+  $JSCompiler_StaticMethods_rrc$self$$.$b$ = $carry$$1$$ | $JSCompiler_StaticMethods_rrc$self$$.$m$[$value$$49$$];
   return $value$$49$$
 }
 function $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_rlc$self$$, $value$$48$$) {
   var $carry$$ = ($value$$48$$ & 128) >> 7;
   $value$$48$$ = ($value$$48$$ << 1 | $value$$48$$ >> 7) & 255;
-  $JSCompiler_StaticMethods_rlc$self$$.$c$ = $carry$$ | $JSCompiler_StaticMethods_rlc$self$$.$n$[$value$$48$$];
+  $JSCompiler_StaticMethods_rlc$self$$.$b$ = $carry$$ | $JSCompiler_StaticMethods_rlc$self$$.$m$[$value$$48$$];
   return $value$$48$$
 }
 function $JSCompiler_StaticMethods_decMem$$($JSCompiler_StaticMethods_decMem$self$$, $offset$$15$$) {
-  $JSCompiler_StaticMethods_decMem$self$$.$g$($offset$$15$$, $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_decMem$self$$, $JSCompiler_StaticMethods_decMem$self$$.$a$($offset$$15$$)))
+  $JSCompiler_StaticMethods_decMem$self$$.$g$($offset$$15$$, $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_decMem$self$$, $JSCompiler_StaticMethods_decMem$self$$.$f$($offset$$15$$)))
 }
 function $JSCompiler_StaticMethods_incMem$$($JSCompiler_StaticMethods_incMem$self$$, $offset$$14$$) {
-  $JSCompiler_StaticMethods_incMem$self$$.$g$($offset$$14$$, $JSCompiler_StaticMethods_inc8$$($JSCompiler_StaticMethods_incMem$self$$, $JSCompiler_StaticMethods_incMem$self$$.$a$($offset$$14$$)))
+  $JSCompiler_StaticMethods_incMem$self$$.$g$($offset$$14$$, $JSCompiler_StaticMethods_inc8$$($JSCompiler_StaticMethods_incMem$self$$, $JSCompiler_StaticMethods_incMem$self$$.$f$($offset$$14$$)))
 }
 function $JSCompiler_StaticMethods_push2$$($JSCompiler_StaticMethods_push2$self$$, $hi$$, $lo$$) {
-  $JSCompiler_StaticMethods_push2$self$$.$g$(--$JSCompiler_StaticMethods_push2$self$$.$o$, $hi$$);
-  $JSCompiler_StaticMethods_push2$self$$.$g$(--$JSCompiler_StaticMethods_push2$self$$.$o$, $lo$$)
+  $JSCompiler_StaticMethods_push2$self$$.$g$(--$JSCompiler_StaticMethods_push2$self$$.$n$, $hi$$);
+  $JSCompiler_StaticMethods_push2$self$$.$g$(--$JSCompiler_StaticMethods_push2$self$$.$n$, $lo$$)
 }
 function $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_push1$self$$, $value$$47$$) {
-  $JSCompiler_StaticMethods_push1$self$$.$g$(--$JSCompiler_StaticMethods_push1$self$$.$o$, $value$$47$$ >> 8);
-  $JSCompiler_StaticMethods_push1$self$$.$g$(--$JSCompiler_StaticMethods_push1$self$$.$o$, $value$$47$$ & 255)
+  $JSCompiler_StaticMethods_push1$self$$.$g$(--$JSCompiler_StaticMethods_push1$self$$.$n$, $value$$47$$ >> 8);
+  $JSCompiler_StaticMethods_push1$self$$.$g$(--$JSCompiler_StaticMethods_push1$self$$.$n$, $value$$47$$ & 255)
 }
 function $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_ret$self$$, $condition$$4$$) {
-  $condition$$4$$ && ($JSCompiler_StaticMethods_ret$self$$.$f$ = $JSCompiler_StaticMethods_ret$self$$.$m$($JSCompiler_StaticMethods_ret$self$$.$o$), $JSCompiler_StaticMethods_ret$self$$.$o$ += 2, $JSCompiler_StaticMethods_ret$self$$.$p$ -= 6)
+  $condition$$4$$ && ($JSCompiler_StaticMethods_ret$self$$.$c$ = $JSCompiler_StaticMethods_ret$self$$.$p$($JSCompiler_StaticMethods_ret$self$$.$n$), $JSCompiler_StaticMethods_ret$self$$.$n$ += 2, $JSCompiler_StaticMethods_ret$self$$.$o$ -= 6)
 }
 function $JSCompiler_StaticMethods_signExtend$$($d$$) {
   128 <= $d$$ && ($d$$ -= 256);
   return $d$$
 }
 function $JSCompiler_StaticMethods_jr$$($JSCompiler_StaticMethods_jr$self$$, $condition$$2$$) {
-  $condition$$2$$ ? ($JSCompiler_StaticMethods_jr$self$$.$f$ += $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_jr$self$$) + 1), $JSCompiler_StaticMethods_jr$self$$.$p$ -= 5) : $JSCompiler_StaticMethods_jr$self$$.$f$++
+  $condition$$2$$ ? ($JSCompiler_StaticMethods_jr$self$$.$c$ += $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_jr$self$$) + 1), $JSCompiler_StaticMethods_jr$self$$.$o$ -= 5) : $JSCompiler_StaticMethods_jr$self$$.$c$++
 }
 function $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_jp$self$$, $condition$$1$$) {
-  $condition$$1$$ ? $JSCompiler_StaticMethods_jp$self$$.$f$ = $JSCompiler_StaticMethods_jp$self$$.$m$($JSCompiler_StaticMethods_jp$self$$.$f$) : $JSCompiler_StaticMethods_jp$self$$.$f$ += 2
+  $condition$$1$$ ? $JSCompiler_StaticMethods_jp$self$$.$c$ = $JSCompiler_StaticMethods_jp$self$$.$p$($JSCompiler_StaticMethods_jp$self$$.$c$) : $JSCompiler_StaticMethods_jp$self$$.$c$ += 2
 }
 function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$) {
   $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$.$lineno$ = 0;
-  for($JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$.$p$ += $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$.$main$.$cyclesPerLine$;;) {
-    $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$.$main$.$a$.$updateDisassembly$($JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$.$f$);
-    var $JSCompiler_StaticMethods_interpret$self$$inline_76$$ = $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$, $location$$inline_77$$ = 0, $temp$$inline_78$$ = 0, $opcode$$inline_79$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++);
-    $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$ -= $OP_STATES$$[$opcode$$inline_79$$];
+  for($JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$.$o$ += $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$.$main$.$cyclesPerLine$;;) {
+    $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$.$main$.$a$.$updateDisassembly$($JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$.$c$);
+    var $JSCompiler_StaticMethods_interpret$self$$inline_76$$ = $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$, $location$$inline_77$$ = 0, $temp$$inline_78$$ = 0, $opcode$$inline_79$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++);
+    $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$ -= $OP_STATES$$[$opcode$$inline_79$$];
     switch($opcode$$inline_79$$) {
       case 1:
-        var $JSCompiler_StaticMethods_setBC$self$$inline_413$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $value$$inline_414$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++);
+        var $JSCompiler_StaticMethods_setBC$self$$inline_413$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $value$$inline_414$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++);
         $JSCompiler_StaticMethods_setBC$self$$inline_413$$.$i$ = $value$$inline_414$$ >> 8;
         $JSCompiler_StaticMethods_setBC$self$$inline_413$$.$h$ = $value$$inline_414$$ & 255;
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++;
         break;
       case 2:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$);
         break;
       case 3:
         var $JSCompiler_StaticMethods_incBC$self$$inline_248$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$;
@@ -3596,26 +3597,26 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$);
         break;
       case 6:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++);
         break;
       case 7:
-        var $JSCompiler_StaticMethods_rlca_a$self$$inline_250$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $carry$$inline_251$$ = $JSCompiler_StaticMethods_rlca_a$self$$inline_250$$.$b$ >> 7;
-        $JSCompiler_StaticMethods_rlca_a$self$$inline_250$$.$b$ = $JSCompiler_StaticMethods_rlca_a$self$$inline_250$$.$b$ << 1 & 255 | $carry$$inline_251$$;
-        $JSCompiler_StaticMethods_rlca_a$self$$inline_250$$.$c$ = $JSCompiler_StaticMethods_rlca_a$self$$inline_250$$.$c$ & 236 | $carry$$inline_251$$;
+        var $JSCompiler_StaticMethods_rlca_a$self$$inline_250$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $carry$$inline_251$$ = $JSCompiler_StaticMethods_rlca_a$self$$inline_250$$.$a$ >> 7;
+        $JSCompiler_StaticMethods_rlca_a$self$$inline_250$$.$a$ = $JSCompiler_StaticMethods_rlca_a$self$$inline_250$$.$a$ << 1 & 255 | $carry$$inline_251$$;
+        $JSCompiler_StaticMethods_rlca_a$self$$inline_250$$.$b$ = $JSCompiler_StaticMethods_rlca_a$self$$inline_250$$.$b$ & 236 | $carry$$inline_251$$;
         break;
       case 8:
-        var $JSCompiler_StaticMethods_exAF$self$$inline_253$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $temp$$inline_254$$ = $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$b$;
-        $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$b$ = $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$O$;
+        var $JSCompiler_StaticMethods_exAF$self$$inline_253$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $temp$$inline_254$$ = $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$a$;
+        $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$a$ = $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$O$;
         $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$O$ = $temp$$inline_254$$;
-        $temp$$inline_254$$ = $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$c$;
-        $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$c$ = $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$T$;
+        $temp$$inline_254$$ = $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$b$;
+        $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$b$ = $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$T$;
         $JSCompiler_StaticMethods_exAF$self$$inline_253$$.$T$ = $temp$$inline_254$$;
         break;
       case 9:
         $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$)));
         break;
       case 10:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
         break;
       case 11:
         $JSCompiler_StaticMethods_decBC$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$);
@@ -3627,25 +3628,25 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$);
         break;
       case 14:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++);
         break;
       case 15:
-        var $JSCompiler_StaticMethods_rrca_a$self$$inline_256$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $carry$$inline_257$$ = $JSCompiler_StaticMethods_rrca_a$self$$inline_256$$.$b$ & 1;
-        $JSCompiler_StaticMethods_rrca_a$self$$inline_256$$.$b$ = $JSCompiler_StaticMethods_rrca_a$self$$inline_256$$.$b$ >> 1 | $carry$$inline_257$$ << 7;
-        $JSCompiler_StaticMethods_rrca_a$self$$inline_256$$.$c$ = $JSCompiler_StaticMethods_rrca_a$self$$inline_256$$.$c$ & 236 | $carry$$inline_257$$;
+        var $JSCompiler_StaticMethods_rrca_a$self$$inline_256$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $carry$$inline_257$$ = $JSCompiler_StaticMethods_rrca_a$self$$inline_256$$.$a$ & 1;
+        $JSCompiler_StaticMethods_rrca_a$self$$inline_256$$.$a$ = $JSCompiler_StaticMethods_rrca_a$self$$inline_256$$.$a$ >> 1 | $carry$$inline_257$$ << 7;
+        $JSCompiler_StaticMethods_rrca_a$self$$inline_256$$.$b$ = $JSCompiler_StaticMethods_rrca_a$self$$inline_256$$.$b$ & 236 | $carry$$inline_257$$;
         break;
       case 16:
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$ - 1 & 255;
         $JSCompiler_StaticMethods_jr$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$);
         break;
       case 17:
-        var $JSCompiler_StaticMethods_setDE$self$$inline_416$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $value$$inline_417$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++);
+        var $JSCompiler_StaticMethods_setDE$self$$inline_416$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $value$$inline_417$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++);
         $JSCompiler_StaticMethods_setDE$self$$inline_416$$.$d$ = $value$$inline_417$$ >> 8;
         $JSCompiler_StaticMethods_setDE$self$$inline_416$$.$e$ = $value$$inline_417$$ & 255;
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++;
         break;
       case 18:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$);
         break;
       case 19:
         $JSCompiler_StaticMethods_incDE$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$);
@@ -3657,21 +3658,21 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$);
         break;
       case 22:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++);
         break;
       case 23:
-        var $JSCompiler_StaticMethods_rla_a$self$$inline_259$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $carry$$inline_260$$ = $JSCompiler_StaticMethods_rla_a$self$$inline_259$$.$b$ >> 7;
-        $JSCompiler_StaticMethods_rla_a$self$$inline_259$$.$b$ = ($JSCompiler_StaticMethods_rla_a$self$$inline_259$$.$b$ << 1 | $JSCompiler_StaticMethods_rla_a$self$$inline_259$$.$c$ & 1) & 255;
-        $JSCompiler_StaticMethods_rla_a$self$$inline_259$$.$c$ = $JSCompiler_StaticMethods_rla_a$self$$inline_259$$.$c$ & 236 | $carry$$inline_260$$;
+        var $JSCompiler_StaticMethods_rla_a$self$$inline_259$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $carry$$inline_260$$ = $JSCompiler_StaticMethods_rla_a$self$$inline_259$$.$a$ >> 7;
+        $JSCompiler_StaticMethods_rla_a$self$$inline_259$$.$a$ = ($JSCompiler_StaticMethods_rla_a$self$$inline_259$$.$a$ << 1 | $JSCompiler_StaticMethods_rla_a$self$$inline_259$$.$b$ & 1) & 255;
+        $JSCompiler_StaticMethods_rla_a$self$$inline_259$$.$b$ = $JSCompiler_StaticMethods_rla_a$self$$inline_259$$.$b$ & 236 | $carry$$inline_260$$;
         break;
       case 24:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ += $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$) + 1);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ += $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$) + 1);
         break;
       case 25:
         $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$)));
         break;
       case 26:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
         break;
       case 27:
         $JSCompiler_StaticMethods_decDE$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$);
@@ -3683,25 +3684,25 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$);
         break;
       case 30:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++);
         break;
       case 31:
-        var $JSCompiler_StaticMethods_rra_a$self$$inline_262$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $carry$$inline_263$$ = $JSCompiler_StaticMethods_rra_a$self$$inline_262$$.$b$ & 1;
-        $JSCompiler_StaticMethods_rra_a$self$$inline_262$$.$b$ = ($JSCompiler_StaticMethods_rra_a$self$$inline_262$$.$b$ >> 1 | ($JSCompiler_StaticMethods_rra_a$self$$inline_262$$.$c$ & 1) << 7) & 255;
-        $JSCompiler_StaticMethods_rra_a$self$$inline_262$$.$c$ = $JSCompiler_StaticMethods_rra_a$self$$inline_262$$.$c$ & 236 | $carry$$inline_263$$;
+        var $JSCompiler_StaticMethods_rra_a$self$$inline_262$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $carry$$inline_263$$ = $JSCompiler_StaticMethods_rra_a$self$$inline_262$$.$a$ & 1;
+        $JSCompiler_StaticMethods_rra_a$self$$inline_262$$.$a$ = ($JSCompiler_StaticMethods_rra_a$self$$inline_262$$.$a$ >> 1 | ($JSCompiler_StaticMethods_rra_a$self$$inline_262$$.$b$ & 1) << 7) & 255;
+        $JSCompiler_StaticMethods_rra_a$self$$inline_262$$.$b$ = $JSCompiler_StaticMethods_rra_a$self$$inline_262$$.$b$ & 236 | $carry$$inline_263$$;
         break;
       case 32:
-        $JSCompiler_StaticMethods_jr$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 64));
+        $JSCompiler_StaticMethods_jr$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 64));
         break;
       case 33:
-        $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++));
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++;
+        $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++;
         break;
       case 34:
-        $location$$inline_77$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$);
+        $location$$inline_77$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$);
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($location$$inline_77$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$);
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$(++$location$$inline_77$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ += 2;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ += 2;
         break;
       case 35:
         $JSCompiler_StaticMethods_incHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$);
@@ -3713,22 +3714,22 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$);
         break;
       case 38:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++);
         break;
       case 39:
-        var $JSCompiler_StaticMethods_daa$self$$inline_265$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $temp$$inline_266$$ = $JSCompiler_StaticMethods_daa$self$$inline_265$$.$W$[$JSCompiler_StaticMethods_daa$self$$inline_265$$.$b$ | ($JSCompiler_StaticMethods_daa$self$$inline_265$$.$c$ & 1) << 8 | ($JSCompiler_StaticMethods_daa$self$$inline_265$$.$c$ & 2) << 8 | ($JSCompiler_StaticMethods_daa$self$$inline_265$$.$c$ & 16) << 6];
-        $JSCompiler_StaticMethods_daa$self$$inline_265$$.$b$ = $temp$$inline_266$$ & 255;
-        $JSCompiler_StaticMethods_daa$self$$inline_265$$.$c$ = $JSCompiler_StaticMethods_daa$self$$inline_265$$.$c$ & 2 | $temp$$inline_266$$ >> 8;
+        var $JSCompiler_StaticMethods_daa$self$$inline_265$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $temp$$inline_266$$ = $JSCompiler_StaticMethods_daa$self$$inline_265$$.$W$[$JSCompiler_StaticMethods_daa$self$$inline_265$$.$a$ | ($JSCompiler_StaticMethods_daa$self$$inline_265$$.$b$ & 1) << 8 | ($JSCompiler_StaticMethods_daa$self$$inline_265$$.$b$ & 2) << 8 | ($JSCompiler_StaticMethods_daa$self$$inline_265$$.$b$ & 16) << 6];
+        $JSCompiler_StaticMethods_daa$self$$inline_265$$.$a$ = $temp$$inline_266$$ & 255;
+        $JSCompiler_StaticMethods_daa$self$$inline_265$$.$b$ = $JSCompiler_StaticMethods_daa$self$$inline_265$$.$b$ & 2 | $temp$$inline_266$$ >> 8;
         break;
       case 40:
-        $JSCompiler_StaticMethods_jr$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 64));
+        $JSCompiler_StaticMethods_jr$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 64));
         break;
       case 41:
         $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$)));
         break;
       case 42:
-        $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$)));
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ += 2;
+        $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$)));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ += 2;
         break;
       case 43:
         $JSCompiler_StaticMethods_decHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$);
@@ -3740,26 +3741,26 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$);
         break;
       case 46:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++);
         break;
       case 47:
         var $JSCompiler_StaticMethods_cpl_a$self$$inline_268$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$;
-        $JSCompiler_StaticMethods_cpl_a$self$$inline_268$$.$b$ ^= 255;
-        $JSCompiler_StaticMethods_cpl_a$self$$inline_268$$.$c$ |= 18;
+        $JSCompiler_StaticMethods_cpl_a$self$$inline_268$$.$a$ ^= 255;
+        $JSCompiler_StaticMethods_cpl_a$self$$inline_268$$.$b$ |= 18;
         break;
       case 48:
-        $JSCompiler_StaticMethods_jr$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 1));
+        $JSCompiler_StaticMethods_jr$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 1));
         break;
       case 49:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ += 2;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ += 2;
         break;
       case 50:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ += 2;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ += 2;
         break;
       case 51:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$++;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$++;
         break;
       case 52:
         $JSCompiler_StaticMethods_incMem$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
@@ -3768,39 +3769,39 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_decMem$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
         break;
       case 54:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++));
         break;
       case 55:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ |= 1;
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ &= -3;
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ &= -17;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ |= 1;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ &= -3;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ &= -17;
         break;
       case 56:
-        $JSCompiler_StaticMethods_jr$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 1));
+        $JSCompiler_StaticMethods_jr$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 1));
         break;
       case 57:
-        $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$));
+        $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$));
         break;
       case 58:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$));
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ += 2;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ += 2;
         break;
       case 59:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$--;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$--;
         break;
       case 60:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_inc8$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_inc8$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$);
         break;
       case 61:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$);
         break;
       case 62:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++);
         break;
       case 63:
         var $JSCompiler_StaticMethods_ccf$self$$inline_270$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$;
-        0 != ($JSCompiler_StaticMethods_ccf$self$$inline_270$$.$c$ & 1) ? ($JSCompiler_StaticMethods_ccf$self$$inline_270$$.$c$ &= -2, $JSCompiler_StaticMethods_ccf$self$$inline_270$$.$c$ |= 16) : ($JSCompiler_StaticMethods_ccf$self$$inline_270$$.$c$ |= 1, $JSCompiler_StaticMethods_ccf$self$$inline_270$$.$c$ &= -17);
-        $JSCompiler_StaticMethods_ccf$self$$inline_270$$.$c$ &= -3;
+        0 != ($JSCompiler_StaticMethods_ccf$self$$inline_270$$.$b$ & 1) ? ($JSCompiler_StaticMethods_ccf$self$$inline_270$$.$b$ &= -2, $JSCompiler_StaticMethods_ccf$self$$inline_270$$.$b$ |= 16) : ($JSCompiler_StaticMethods_ccf$self$$inline_270$$.$b$ |= 1, $JSCompiler_StaticMethods_ccf$self$$inline_270$$.$b$ &= -17);
+        $JSCompiler_StaticMethods_ccf$self$$inline_270$$.$b$ &= -3;
         break;
       case 65:
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$;
@@ -3818,10 +3819,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$;
         break;
       case 70:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
         break;
       case 71:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$;
         break;
       case 72:
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$;
@@ -3839,10 +3840,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$;
         break;
       case 78:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
         break;
       case 79:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$;
         break;
       case 80:
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$;
@@ -3860,10 +3861,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$;
         break;
       case 86:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
         break;
       case 87:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$;
         break;
       case 88:
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$;
@@ -3881,10 +3882,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$;
         break;
       case 94:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
         break;
       case 95:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$;
         break;
       case 96:
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$;
@@ -3902,10 +3903,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$;
         break;
       case 102:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
         break;
       case 103:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$;
         break;
       case 104:
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$;
@@ -3923,10 +3924,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$;
         break;
       case 110:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
         break;
       case 111:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$;
         break;
       case 112:
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$);
@@ -3947,33 +3948,33 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$);
         break;
       case 118:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$ = 0;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$ = 0;
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$H$ = $JSCompiler_alias_TRUE$$;
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$--;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$--;
         break;
       case 119:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$);
         break;
       case 120:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$;
         break;
       case 121:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$;
         break;
       case 122:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$;
         break;
       case 123:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$;
         break;
       case 124:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$;
         break;
       case 125:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$;
         break;
       case 126:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$));
         break;
       case 128:
         $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$);
@@ -3994,10 +3995,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$);
         break;
       case 134:
-        $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$)));
+        $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$)));
         break;
       case 135:
-        $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$);
+        $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$);
         break;
       case 136:
         $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$);
@@ -4018,10 +4019,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$);
         break;
       case 142:
-        $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$)));
+        $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$)));
         break;
       case 143:
-        $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$);
+        $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$);
         break;
       case 144:
         $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$);
@@ -4042,10 +4043,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$);
         break;
       case 150:
-        $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$)));
+        $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$)));
         break;
       case 151:
-        $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$);
+        $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$);
         break;
       case 152:
         $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$);
@@ -4066,82 +4067,82 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$);
         break;
       case 158:
-        $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$)));
+        $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$)));
         break;
       case 159:
-        $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$);
+        $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$);
         break;
       case 160:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$] | 16;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$] | 16;
         break;
       case 161:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$] | 16;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$] | 16;
         break;
       case 162:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$] | 16;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$] | 16;
         break;
       case 163:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$] | 16;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$] | 16;
         break;
       case 164:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$] | 16;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$] | 16;
         break;
       case 165:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$] | 16;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$] | 16;
         break;
       case 166:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$))] | 16;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$))] | 16;
         break;
       case 167:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$] | 16;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$] | 16;
         break;
       case 168:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$];
         break;
       case 169:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$];
         break;
       case 170:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$];
         break;
       case 171:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$];
         break;
       case 172:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$];
         break;
       case 173:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$];
         break;
       case 174:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$))];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$))];
         break;
       case 175:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = 0];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = 0];
         break;
       case 176:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$];
         break;
       case 177:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$];
         break;
       case 178:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$];
         break;
       case 179:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$];
         break;
       case 180:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$];
         break;
       case 181:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$];
         break;
       case 182:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$))];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$))];
         break;
       case 183:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$];
         break;
       case 184:
         $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$);
@@ -4162,52 +4163,52 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$);
         break;
       case 190:
-        $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$)));
+        $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$)));
         break;
       case 191:
-        $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$);
+        $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$);
         break;
       case 192:
-        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 64));
+        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 64));
         break;
       case 193:
-        var $JSCompiler_StaticMethods_setBC$self$$inline_419$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $value$$inline_420$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$);
+        var $JSCompiler_StaticMethods_setBC$self$$inline_419$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $value$$inline_420$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$);
         $JSCompiler_StaticMethods_setBC$self$$inline_419$$.$i$ = $value$$inline_420$$ >> 8;
         $JSCompiler_StaticMethods_setBC$self$$inline_419$$.$h$ = $value$$inline_420$$ & 255;
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$ += 2;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$ += 2;
         break;
       case 194:
-        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 64));
+        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 64));
         break;
       case 195:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$);
         break;
       case 196:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 64));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 64));
         break;
       case 197:
         $JSCompiler_StaticMethods_push2$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$i$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$h$);
         break;
       case 198:
-        $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++));
+        $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++));
         break;
       case 199:
-        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ = 0;
+        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = 0;
         break;
       case 200:
-        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 64));
+        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 64));
         break;
       case 201:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$ += 2;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$ += 2;
         break;
       case 202:
-        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 64));
+        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 64));
         break;
       case 203:
-        var $JSCompiler_StaticMethods_doCB$self$$inline_272$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $opcode$$inline_273$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++);
-        $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$p$ -= $OP_CB_STATES$$[$opcode$$inline_273$$];
+        var $JSCompiler_StaticMethods_doCB$self$$inline_272$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $opcode$$inline_273$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++);
+        $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$o$ -= $OP_CB_STATES$$[$opcode$$inline_273$$];
         switch($opcode$$inline_273$$) {
           case 0:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$);
@@ -4228,10 +4229,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$);
             break;
           case 6:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
             break;
           case 7:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ = $JSCompiler_StaticMethods_rlc$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$);
             break;
           case 8:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$);
@@ -4252,10 +4253,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$);
             break;
           case 14:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
             break;
           case 15:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ = $JSCompiler_StaticMethods_rrc$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$);
             break;
           case 16:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$);
@@ -4276,10 +4277,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$);
             break;
           case 22:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
             break;
           case 23:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$);
             break;
           case 24:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$);
@@ -4300,10 +4301,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$);
             break;
           case 30:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
             break;
           case 31:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ = $JSCompiler_StaticMethods_rr$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$);
             break;
           case 32:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$);
@@ -4324,10 +4325,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$);
             break;
           case 38:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
             break;
           case 39:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ = $JSCompiler_StaticMethods_sla$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$);
             break;
           case 40:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$);
@@ -4348,10 +4349,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$);
             break;
           case 46:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
             break;
           case 47:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ = $JSCompiler_StaticMethods_sra$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$);
             break;
           case 48:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$);
@@ -4372,10 +4373,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$);
             break;
           case 54:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
             break;
           case 55:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ = $JSCompiler_StaticMethods_sll$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$);
             break;
           case 56:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$);
@@ -4396,10 +4397,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ = $JSCompiler_StaticMethods_rl$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$);
             break;
           case 62:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$))));
             break;
           case 63:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ = $JSCompiler_StaticMethods_srl$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$);
             break;
           case 64:
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ & 1);
@@ -4420,10 +4421,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ & 1);
             break;
           case 70:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 1);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 1);
             break;
           case 71:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ & 1);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ & 1);
             break;
           case 72:
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ & 2);
@@ -4444,10 +4445,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ & 2);
             break;
           case 78:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 2);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 2);
             break;
           case 79:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ & 2);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ & 2);
             break;
           case 80:
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ & 4);
@@ -4468,10 +4469,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ & 4);
             break;
           case 86:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 4);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 4);
             break;
           case 87:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ & 4);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ & 4);
             break;
           case 88:
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ & 8);
@@ -4492,10 +4493,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ & 8);
             break;
           case 94:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 8);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 8);
             break;
           case 95:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ & 8);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ & 8);
             break;
           case 96:
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ & 16);
@@ -4516,10 +4517,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ & 16);
             break;
           case 102:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 16);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 16);
             break;
           case 103:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ & 16);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ & 16);
             break;
           case 104:
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ & 32);
@@ -4540,10 +4541,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ & 32);
             break;
           case 110:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 32);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 32);
             break;
           case 111:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ & 32);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ & 32);
             break;
           case 112:
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ & 64);
@@ -4564,10 +4565,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ & 64);
             break;
           case 118:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 64);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 64);
             break;
           case 119:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ & 64);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ & 64);
             break;
           case 120:
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ & 128);
@@ -4588,10 +4589,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ & 128);
             break;
           case 126:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 128);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & 128);
             break;
           case 127:
-            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ & 128);
+            $JSCompiler_StaticMethods_bit$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$, $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ & 128);
             break;
           case 128:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ &= -2;
@@ -4612,10 +4613,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ &= -2;
             break;
           case 134:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -2);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -2);
             break;
           case 135:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ &= -2;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ &= -2;
             break;
           case 136:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ &= -3;
@@ -4636,10 +4637,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ &= -3;
             break;
           case 142:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -3);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -3);
             break;
           case 143:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ &= -3;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ &= -3;
             break;
           case 144:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ &= -5;
@@ -4660,10 +4661,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ &= -5;
             break;
           case 150:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -5);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -5);
             break;
           case 151:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ &= -5;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ &= -5;
             break;
           case 152:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ &= -9;
@@ -4684,10 +4685,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ &= -9;
             break;
           case 158:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -9);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -9);
             break;
           case 159:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ &= -9;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ &= -9;
             break;
           case 160:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ &= -17;
@@ -4708,10 +4709,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ &= -17;
             break;
           case 166:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -17);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -17);
             break;
           case 167:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ &= -17;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ &= -17;
             break;
           case 168:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ &= -33;
@@ -4732,10 +4733,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ &= -33;
             break;
           case 174:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -33);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -33);
             break;
           case 175:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ &= -33;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ &= -33;
             break;
           case 176:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ &= -65;
@@ -4756,10 +4757,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ &= -65;
             break;
           case 182:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -65);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -65);
             break;
           case 183:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ &= -65;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ &= -65;
             break;
           case 184:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ &= -129;
@@ -4780,10 +4781,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ &= -129;
             break;
           case 190:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -129);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) & -129);
             break;
           case 191:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ &= -129;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ &= -129;
             break;
           case 192:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ |= 1;
@@ -4804,10 +4805,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ |= 1;
             break;
           case 198:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 1);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 1);
             break;
           case 199:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ |= 1;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ |= 1;
             break;
           case 200:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ |= 2;
@@ -4828,10 +4829,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ |= 2;
             break;
           case 206:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 2);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 2);
             break;
           case 207:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ |= 2;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ |= 2;
             break;
           case 208:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ |= 4;
@@ -4852,10 +4853,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ |= 4;
             break;
           case 214:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 4);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 4);
             break;
           case 215:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ |= 4;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ |= 4;
             break;
           case 216:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ |= 8;
@@ -4876,10 +4877,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ |= 8;
             break;
           case 222:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 8);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 8);
             break;
           case 223:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ |= 8;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ |= 8;
             break;
           case 224:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ |= 16;
@@ -4900,10 +4901,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ |= 16;
             break;
           case 230:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 16);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 16);
             break;
           case 231:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ |= 16;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ |= 16;
             break;
           case 232:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ |= 32;
@@ -4924,10 +4925,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ |= 32;
             break;
           case 238:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 32);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 32);
             break;
           case 239:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ |= 32;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ |= 32;
             break;
           case 240:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ |= 64;
@@ -4948,10 +4949,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ |= 64;
             break;
           case 246:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 64);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 64);
             break;
           case 247:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ |= 64;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ |= 64;
             break;
           case 248:
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$i$ |= 128;
@@ -4972,59 +4973,59 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$l$ |= 128;
             break;
           case 254:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 128);
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$), $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doCB$self$$inline_272$$)) | 128);
             break;
           case 255:
-            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$b$ |= 128;
+            $JSCompiler_StaticMethods_doCB$self$$inline_272$$.$a$ |= 128;
             break;
           default:
             console.log("Unimplemented CB Opcode: " + $JSSMS$Utils$toHex$$($opcode$$inline_273$$))
         }
         break;
       case 204:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 64));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 64));
         break;
       case 205:
-        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ + 2);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$);
+        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ + 2);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$);
         break;
       case 206:
-        $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++));
+        $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++));
         break;
       case 207:
-        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ = 8;
+        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = 8;
         break;
       case 208:
-        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 1));
+        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 1));
         break;
       case 209:
-        var $JSCompiler_StaticMethods_setDE$self$$inline_422$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $value$$inline_423$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$);
+        var $JSCompiler_StaticMethods_setDE$self$$inline_422$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $value$$inline_423$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$);
         $JSCompiler_StaticMethods_setDE$self$$inline_422$$.$d$ = $value$$inline_423$$ >> 8;
         $JSCompiler_StaticMethods_setDE$self$$inline_422$$.$e$ = $value$$inline_423$$ & 255;
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$ += 2;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$ += 2;
         break;
       case 210:
-        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 1));
+        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 1));
         break;
       case 211:
-        $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$w$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$);
+        $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$w$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$);
         break;
       case 212:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 1));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 1));
         break;
       case 213:
         $JSCompiler_StaticMethods_push2$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$e$);
         break;
       case 214:
-        $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++));
+        $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++));
         break;
       case 215:
-        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ = 16;
+        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = 16;
         break;
       case 216:
-        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 1));
+        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 1));
         break;
       case 217:
         var $JSCompiler_StaticMethods_exBC$self$$inline_275$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $temp$$inline_276$$ = $JSCompiler_StaticMethods_exBC$self$$inline_275$$.$i$;
@@ -5047,17 +5048,17 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_exHL$self$$inline_281$$.$V$ = $temp$$inline_282$$;
         break;
       case 218:
-        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 1));
+        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 1));
         break;
       case 219:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$w$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$w$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++));
         break;
       case 220:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 1));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 1));
         break;
       case 221:
-        var $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $opcode$$inline_285$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++), $location$$inline_286$$ = 0, $temp$$inline_287$$ = 0;
-        $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$p$ -= $OP_DD_STATES$$[$opcode$$inline_285$$];
+        var $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $opcode$$inline_285$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++), $location$$inline_286$$ = 0, $temp$$inline_287$$ = 0;
+        $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$o$ -= $OP_DD_STATES$$[$opcode$$inline_285$$];
         switch($opcode$$inline_285$$) {
           case 9:
             $JSCompiler_StaticMethods_setIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$)));
@@ -5066,14 +5067,14 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_setIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$)));
             break;
           case 33:
-            $JSCompiler_StaticMethods_setIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$ += 2;
+            $JSCompiler_StaticMethods_setIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$p$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$ += 2;
             break;
           case 34:
-            $location$$inline_286$$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$);
+            $location$$inline_286$$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$p$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$);
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($location$$inline_286$$++, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$);
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($location$$inline_286$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$);
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$ += 2;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$ += 2;
             break;
           case 35:
             var $JSCompiler_StaticMethods_incIX$self$$inline_425$$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$;
@@ -5087,16 +5088,16 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$);
             break;
           case 38:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++);
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++);
             break;
           case 41:
             $JSCompiler_StaticMethods_setIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$)));
             break;
           case 42:
-            $location$$inline_286$$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$);
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($location$$inline_286$$);
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$(++$location$$inline_286$$);
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$ += 2;
+            $location$$inline_286$$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$p$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$);
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($location$$inline_286$$);
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$(++$location$$inline_286$$);
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$ += 2;
             break;
           case 43:
             var $JSCompiler_StaticMethods_decIX$self$$inline_427$$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$;
@@ -5110,22 +5111,22 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$);
             break;
           case 46:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++);
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++);
             break;
           case 52:
             $JSCompiler_StaticMethods_incMem$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 53:
             $JSCompiler_StaticMethods_decMem$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 54:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$(++$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$(++$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 57:
-            $JSCompiler_StaticMethods_setIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$o$));
+            $JSCompiler_StaticMethods_setIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$));
             break;
           case 68:
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$i$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$;
@@ -5134,8 +5135,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$i$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$;
             break;
           case 70:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$i$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$i$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 76:
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$h$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$;
@@ -5144,8 +5145,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$h$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$;
             break;
           case 78:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$h$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$h$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 84:
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$d$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$;
@@ -5154,8 +5155,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$d$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$;
             break;
           case 86:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$d$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$d$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 92:
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$e$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$;
@@ -5164,8 +5165,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$e$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$;
             break;
           case 94:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$e$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$e$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 96:
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$i$;
@@ -5185,11 +5186,11 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$;
             break;
           case 102:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$j$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$j$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 103:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$;
             break;
           case 104:
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$i$;
@@ -5209,49 +5210,49 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
           case 109:
             break;
           case 110:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$l$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$l$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 111:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$;
             break;
           case 112:
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$i$);
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 113:
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$h$);
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 114:
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$d$);
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 115:
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$e$);
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 116:
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$j$);
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 117:
             $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$l$);
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 119:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$);
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$);
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 124:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$;
             break;
           case 125:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$;
             break;
           case 126:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 132:
             $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$);
@@ -5260,8 +5261,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$);
             break;
           case 134:
-            $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$)));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$)));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 140:
             $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$);
@@ -5270,8 +5271,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$);
             break;
           case 142:
-            $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$)));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$)));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 148:
             $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$);
@@ -5280,8 +5281,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$);
             break;
           case 150:
-            $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$)));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$)));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 156:
             $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$);
@@ -5290,38 +5291,38 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$);
             break;
           case 158:
-            $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$)));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$)));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 164:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ &= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$] | 16;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$ &= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$] | 16;
             break;
           case 165:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ &= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$] | 16;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$ &= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$] | 16;
             break;
           case 166:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ &= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$))] | 16;
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$ &= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$))] | 16;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 172:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ ^= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$];
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$ ^= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$];
             break;
           case 173:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ ^= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$];
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$ ^= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$];
             break;
           case 174:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ ^= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$))];
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$ ^= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$))];
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 180:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ |= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$];
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$ |= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$];
             break;
           case 181:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ |= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$];
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$ |= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$];
             break;
           case 182:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ |= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$))];
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$[$JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$ |= $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$))];
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 188:
             $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$);
@@ -5330,81 +5331,81 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$);
             break;
           case 190:
-            $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$a$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$)));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$++;
+            $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$($JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$)));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$++;
             break;
           case 203:
             $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$));
             break;
           case 225:
-            $JSCompiler_StaticMethods_setIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$o$));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$o$ += 2;
+            $JSCompiler_StaticMethods_setIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$p$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$ += 2;
             break;
           case 227:
             $temp$$inline_287$$ = $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$);
-            $JSCompiler_StaticMethods_setIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$m$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$o$));
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$o$, $temp$$inline_287$$ & 255);
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$o$ + 1, $temp$$inline_287$$ >> 8);
+            $JSCompiler_StaticMethods_setIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$p$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$));
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$, $temp$$inline_287$$ & 255);
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$g$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$ + 1, $temp$$inline_287$$ >> 8);
             break;
           case 229:
             $JSCompiler_StaticMethods_push2$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$t$, $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$q$);
             break;
           case 233:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$ = $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$);
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$ = $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$);
             break;
           case 249:
-            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$o$ = $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$);
+            $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$n$ = $JSCompiler_StaticMethods_getIX$$($JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$);
             break;
           default:
-            console.log("Unimplemented DD/FD Opcode: " + $JSSMS$Utils$toHex$$($opcode$$inline_285$$)), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$f$--
+            console.log("Unimplemented DD/FD Opcode: " + $JSSMS$Utils$toHex$$($opcode$$inline_285$$)), $JSCompiler_StaticMethods_doIndexOpIX$self$$inline_284$$.$c$--
         }
         break;
       case 222:
-        $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++));
+        $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++));
         break;
       case 223:
-        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ = 24;
+        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = 24;
         break;
       case 224:
-        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 4));
+        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 4));
         break;
       case 225:
-        $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$));
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$ += 2;
+        $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$p$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$ += 2;
         break;
       case 226:
-        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 4));
+        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 4));
         break;
       case 227:
         $temp$$inline_78$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$;
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$ + 1);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$ + 1, $temp$$inline_78$$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$ + 1);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$ + 1, $temp$$inline_78$$);
         $temp$$inline_78$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$;
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$, $temp$$inline_78$$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$g$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$, $temp$$inline_78$$);
         break;
       case 228:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 4));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 4));
         break;
       case 229:
         $JSCompiler_StaticMethods_push2$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$j$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$);
         break;
       case 230:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++)] | 16;
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ &= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++)] | 16;
         break;
       case 231:
-        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ = 32;
+        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = 32;
         break;
       case 232:
-        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 4));
+        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 4));
         break;
       case 233:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ = $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$);
         break;
       case 234:
-        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 4));
+        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 4));
         break;
       case 235:
         $temp$$inline_78$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$d$;
@@ -5415,30 +5416,30 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$l$ = $temp$$inline_78$$;
         break;
       case 236:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 4));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 4));
         break;
       case 237:
         var $JSCompiler_StaticMethods_doED$self$$inline_289$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $opcode$$inline_290$$ = $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$), $temp$$inline_291$$ = 0, $location$$inline_292$$ = 0;
-        $JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$ -= $OP_ED_STATES$$[$opcode$$inline_290$$];
+        $JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$ -= $OP_ED_STATES$$[$opcode$$inline_290$$];
         switch($opcode$$inline_290$$) {
           case 64:
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$];
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$];
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 65:
             $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 66:
             $JSCompiler_StaticMethods_sbc16$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 67:
-            $location$$inline_292$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ + 1);
+            $location$$inline_292$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ + 1);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$++, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ += 3;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ += 3;
             break;
           case 68:
           ;
@@ -5455,10 +5456,10 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
           case 116:
           ;
           case 124:
-            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = 0;
+            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$ = 0;
             $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $temp$$inline_291$$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 69:
           ;
@@ -5475,8 +5476,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
           case 117:
           ;
           case 125:
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$ += 2;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$ += 2;
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$B$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$C$;
             break;
           case 70:
@@ -5487,364 +5488,364 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
           ;
           case 110:
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$I$ = 0;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 71:
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$M$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$M$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 72:
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$];
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$];
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 73:
             $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 74:
             $JSCompiler_StaticMethods_adc16$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 75:
-            var $JSCompiler_StaticMethods_setBC$self$$inline_429$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$, $value$$inline_430$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ + 1));
+            var $JSCompiler_StaticMethods_setBC$self$$inline_429$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$, $value$$inline_430$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ + 1));
             $JSCompiler_StaticMethods_setBC$self$$inline_429$$.$i$ = $value$$inline_430$$ >> 8;
             $JSCompiler_StaticMethods_setBC$self$$inline_429$$.$h$ = $value$$inline_430$$ & 255;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ += 3;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ += 3;
             break;
           case 79:
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 80:
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$d$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$d$];
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$d$];
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 81:
             $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$d$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 82:
             $JSCompiler_StaticMethods_sbc16$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 83:
-            $location$$inline_292$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ + 1);
+            $location$$inline_292$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ + 1);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$++, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$e$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$d$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ += 3;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ += 3;
             break;
           case 86:
           ;
           case 118:
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$I$ = 1;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 87:
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$M$;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$N$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$] | ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$C$ ? 4 : 0);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$M$;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$N$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$] | ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$C$ ? 4 : 0);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 88:
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$e$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$e$];
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$e$];
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 89:
             $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$e$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 90:
             $JSCompiler_StaticMethods_adc16$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 91:
-            var $JSCompiler_StaticMethods_setDE$self$$inline_432$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$, $value$$inline_433$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ + 1));
+            var $JSCompiler_StaticMethods_setDE$self$$inline_432$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$, $value$$inline_433$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ + 1));
             $JSCompiler_StaticMethods_setDE$self$$inline_432$$.$d$ = $value$$inline_433$$ >> 8;
             $JSCompiler_StaticMethods_setDE$self$$inline_432$$.$e$ = $value$$inline_433$$ & 255;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ += 3;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ += 3;
             break;
           case 95:
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = Math.round(255 * Math.random());
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$N$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$] | ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$C$ ? 4 : 0);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$ = Math.round(255 * Math.random());
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$N$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$] | ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$C$ ? 4 : 0);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 96:
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$j$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$j$];
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$j$];
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 97:
             $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$j$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 98:
             $JSCompiler_StaticMethods_sbc16$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 99:
-            $location$$inline_292$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ + 1);
+            $location$$inline_292$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ + 1);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$++, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$l$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$j$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ += 3;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ += 3;
             break;
           case 103:
             $location$$inline_292$$ = $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
-            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($location$$inline_292$$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$, $temp$$inline_291$$ >> 4 | ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 15) << 4);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 240 | $temp$$inline_291$$ & 15;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$];
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($location$$inline_292$$);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$, $temp$$inline_291$$ >> 4 | ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$ & 15) << 4);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$ & 240 | $temp$$inline_291$$ & 15;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$];
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 104:
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$l$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$l$];
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$l$];
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 105:
             $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$l$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 106:
             $JSCompiler_StaticMethods_adc16$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 107:
-            $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ + 1)));
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ += 3;
+            $JSCompiler_StaticMethods_setHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ + 1)));
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ += 3;
             break;
           case 111:
             $location$$inline_292$$ = $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
-            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($location$$inline_292$$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$, ($temp$$inline_291$$ & 15) << 4 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 15);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 240 | $temp$$inline_291$$ >> 4;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$];
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($location$$inline_292$$);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$, ($temp$$inline_291$$ & 15) << 4 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$ & 15);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$ & 240 | $temp$$inline_291$$ >> 4;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$];
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 113:
             $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$, 0);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 114:
-            $JSCompiler_StaticMethods_sbc16$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_sbc16$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 115:
-            $location$$inline_292$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ + 1);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$++, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$ & 255);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$ >> 8);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ += 3;
+            $location$$inline_292$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ + 1);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$++, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$ & 255);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($location$$inline_292$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$ >> 8);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ += 3;
             break;
           case 120:
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$];
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$[$JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$];
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 121:
-            $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 122:
-            $JSCompiler_StaticMethods_adc16$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_adc16$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 123:
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$m$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ + 1));
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$ += 3;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$n$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ + 1));
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ += 3;
             break;
           case 160:
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$), $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$), $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
             $JSCompiler_StaticMethods_incDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_incHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_decBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 193 | (0 != $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$) ? 4 : 0);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 193 | (0 != $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$) ? 4 : 0);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 161:
-            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | 2;
-            $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
+            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | 2;
+            $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
             $JSCompiler_StaticMethods_incHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_decBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $temp$$inline_291$$ |= 0 == $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$) ? 0 : 4;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 248 | $temp$$inline_291$$;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 248 | $temp$$inline_291$$;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 162:
             $temp$$inline_291$$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$), $temp$$inline_291$$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$);
             $JSCompiler_StaticMethods_incHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = 128 == ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & -3;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = 128 == ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & -3;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 163:
-            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
+            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
             $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$, $temp$$inline_291$$);
             $JSCompiler_StaticMethods_incHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$);
-            255 < $JSCompiler_StaticMethods_doED$self$$inline_289$$.$l$ + $temp$$inline_291$$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ |= 1, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ |= 16) : ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -2, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -17);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = 128 == ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & -3;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            255 < $JSCompiler_StaticMethods_doED$self$$inline_289$$.$l$ + $temp$$inline_291$$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ |= 1, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ |= 16) : ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -2, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -17);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = 128 == ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & -3;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 168:
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$), $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$), $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
             $JSCompiler_StaticMethods_decDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_decHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_decBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 193 | (0 != $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$) ? 4 : 0);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 193 | (0 != $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$) ? 4 : 0);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 169:
-            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | 2;
-            $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
+            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | 2;
+            $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
             $JSCompiler_StaticMethods_decHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_decBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $temp$$inline_291$$ |= 0 == $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$) ? 0 : 4;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 248 | $temp$$inline_291$$;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 248 | $temp$$inline_291$$;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 170:
             $temp$$inline_291$$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$), $temp$$inline_291$$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$);
             $JSCompiler_StaticMethods_decHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = 0 != ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & -3;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = 0 != ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & -3;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 171:
-            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
+            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
             $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$, $temp$$inline_291$$);
             $JSCompiler_StaticMethods_decHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$);
-            255 < $JSCompiler_StaticMethods_doED$self$$inline_289$$.$l$ + $temp$$inline_291$$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ |= 1, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ |= 16) : ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -2, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -17);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = 128 == ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & -3;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
+            255 < $JSCompiler_StaticMethods_doED$self$$inline_289$$.$l$ + $temp$$inline_291$$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ |= 1, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ |= 16) : ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -2, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -17);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = 128 == ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & -3;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
             break;
           case 176:
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$), $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$), $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
             $JSCompiler_StaticMethods_incDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_incHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_decBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
-            0 != $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$) ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ |= 4, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$--) : ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -3;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -17;
+            0 != $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$) ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ |= 4, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$--) : ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -3;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -17;
             break;
           case 177:
-            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | 2;
-            $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
+            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | 2;
+            $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
             $JSCompiler_StaticMethods_incHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_decBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $temp$$inline_291$$ |= 0 == $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$) ? 0 : 4;
-            0 != ($temp$$inline_291$$ & 4) && 0 == ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 64) ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$--) : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 248 | $temp$$inline_291$$;
+            0 != ($temp$$inline_291$$ & 4) && 0 == ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 64) ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$--) : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 248 | $temp$$inline_291$$;
             break;
           case 178:
             $temp$$inline_291$$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$), $temp$$inline_291$$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$);
             $JSCompiler_StaticMethods_incHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
-            0 != $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$--) : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = 128 == ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & -3;
+            0 != $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$--) : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = 128 == ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & -3;
             break;
           case 179:
-            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
+            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
             $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$, $temp$$inline_291$$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$);
             $JSCompiler_StaticMethods_incHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
-            0 != $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$--) : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
-            255 < $JSCompiler_StaticMethods_doED$self$$inline_289$$.$l$ + $temp$$inline_291$$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ |= 1, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ |= 16) : ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -2, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -17);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = 0 != ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & -3;
+            0 != $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$--) : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
+            255 < $JSCompiler_StaticMethods_doED$self$$inline_289$$.$l$ + $temp$$inline_291$$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ |= 1, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ |= 16) : ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -2, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -17);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = 0 != ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & -3;
             break;
           case 184:
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$), $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$), $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
             $JSCompiler_StaticMethods_decDE$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_decHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_decBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
-            0 != $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$) ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ |= 4, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$--) : ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -3;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -17;
+            0 != $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$) ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ |= 4, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$--) : ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -3;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -17;
             break;
           case 185:
-            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 1 | 2;
-            $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
+            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 1 | 2;
+            $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$)));
             $JSCompiler_StaticMethods_decHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $JSCompiler_StaticMethods_decBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
             $temp$$inline_291$$ |= 0 == $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doED$self$$inline_289$$) ? 0 : 4;
-            0 != ($temp$$inline_291$$ & 4) && 0 == ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 64) ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$--) : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & 248 | $temp$$inline_291$$;
+            0 != ($temp$$inline_291$$ & 4) && 0 == ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 64) ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$--) : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & 248 | $temp$$inline_291$$;
             break;
           case 186:
             $temp$$inline_291$$ = $JSCompiler_StaticMethods_in_$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$g$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$), $temp$$inline_291$$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$);
             $JSCompiler_StaticMethods_decHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
-            0 != $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$--) : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = 0 != ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & -3;
+            0 != $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$--) : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = 0 != ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & -3;
             break;
           case 187:
-            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$a$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
+            $temp$$inline_291$$ = $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$($JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$));
             $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_doED$self$$inline_289$$.$w$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$h$, $temp$$inline_291$$);
             $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_doED$self$$inline_289$$, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$);
             $JSCompiler_StaticMethods_decHL$$($JSCompiler_StaticMethods_doED$self$$inline_289$$);
-            0 != $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$p$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$--) : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++;
-            255 < $JSCompiler_StaticMethods_doED$self$$inline_289$$.$l$ + $temp$$inline_291$$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ |= 1, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ |= 16) : ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -2, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ &= -17);
-            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ = 0 != ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$ & -3;
+            0 != $JSCompiler_StaticMethods_doED$self$$inline_289$$.$i$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$o$ -= 5, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$--) : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++;
+            255 < $JSCompiler_StaticMethods_doED$self$$inline_289$$.$l$ + $temp$$inline_291$$ ? ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ |= 1, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ |= 16) : ($JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -2, $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ &= -17);
+            $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ = 0 != ($temp$$inline_291$$ & 128) ? $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ | 2 : $JSCompiler_StaticMethods_doED$self$$inline_289$$.$b$ & -3;
             break;
           default:
-            console.log("Unimplemented ED Opcode: " + $JSSMS$Utils$toHex$$($opcode$$inline_290$$)), $JSCompiler_StaticMethods_doED$self$$inline_289$$.$f$++
+            console.log("Unimplemented ED Opcode: " + $JSSMS$Utils$toHex$$($opcode$$inline_290$$)), $JSCompiler_StaticMethods_doED$self$$inline_289$$.$c$++
         }
         break;
       case 238:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++)];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ ^= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++)];
         break;
       case 239:
-        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ = 40;
+        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = 40;
         break;
       case 240:
-        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 128));
+        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 128));
         break;
       case 241:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$++);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$++);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$++);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$++);
         break;
       case 242:
-        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 128));
+        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 128));
         break;
       case 243:
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$B$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$C$ = $JSCompiler_alias_FALSE$$;
         break;
       case 244:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 128));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 == ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 128));
         break;
       case 245:
-        $JSCompiler_StaticMethods_push2$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$);
+        $JSCompiler_StaticMethods_push2$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$);
         break;
       case 246:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++)];
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$m$[$JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$ |= $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++)];
         break;
       case 247:
-        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$);
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ = 48;
+        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = 48;
         break;
       case 248:
-        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 128));
+        $JSCompiler_StaticMethods_ret$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 128));
         break;
       case 249:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$o$ = $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$);
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$n$ = $JSCompiler_StaticMethods_getHL$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$);
         break;
       case 250:
-        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 128));
+        $JSCompiler_StaticMethods_jp$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, 0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 128));
         break;
       case 251:
         $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$B$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$C$ = $JSCompiler_alias_TRUE$$;
         break;
       case 252:
-        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ & 128));
+        $JSCompiler_StaticMethods_interpret$self$$inline_76$$.call(0 != ($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$b$ & 128));
         break;
       case 253:
-        var $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $opcode$$inline_295$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++), $location$$inline_296$$ = $JSCompiler_alias_VOID$$, $temp$$inline_297$$ = $JSCompiler_alias_VOID$$;
-        $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$p$ -= $OP_DD_STATES$$[$opcode$$inline_295$$];
+        var $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$, $opcode$$inline_295$$ = $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++), $location$$inline_296$$ = $JSCompiler_alias_VOID$$, $temp$$inline_297$$ = $JSCompiler_alias_VOID$$;
+        $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$o$ -= $OP_DD_STATES$$[$opcode$$inline_295$$];
         switch($opcode$$inline_295$$) {
           case 9:
             $JSCompiler_StaticMethods_setIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_getBC$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$)));
@@ -5853,14 +5854,14 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_setIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_getDE$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$)));
             break;
           case 33:
-            $JSCompiler_StaticMethods_setIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$ += 2;
+            $JSCompiler_StaticMethods_setIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$p$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$ += 2;
             break;
           case 34:
-            $location$$inline_296$$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$);
+            $location$$inline_296$$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$p$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$);
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($location$$inline_296$$++, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$);
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($location$$inline_296$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$);
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$ += 2;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$ += 2;
             break;
           case 35:
             var $JSCompiler_StaticMethods_incIY$self$$inline_435$$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$;
@@ -5874,16 +5875,16 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$);
             break;
           case 38:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++);
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++);
             break;
           case 41:
             $JSCompiler_StaticMethods_setIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$)));
             break;
           case 42:
-            $location$$inline_296$$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$);
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($location$$inline_296$$);
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$(++$location$$inline_296$$);
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$ += 2;
+            $location$$inline_296$$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$p$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$);
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($location$$inline_296$$);
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$(++$location$$inline_296$$);
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$ += 2;
             break;
           case 43:
             var $JSCompiler_StaticMethods_decIY$self$$inline_437$$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$;
@@ -5897,22 +5898,22 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$ = $JSCompiler_StaticMethods_dec8$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$);
             break;
           case 46:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++);
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++);
             break;
           case 52:
             $JSCompiler_StaticMethods_incMem$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 53:
             $JSCompiler_StaticMethods_decMem$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 54:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$(++$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$(++$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 57:
-            $JSCompiler_StaticMethods_setIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$o$));
+            $JSCompiler_StaticMethods_setIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_add16$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$));
             break;
           case 68:
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$i$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$;
@@ -5921,8 +5922,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$i$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$;
             break;
           case 70:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$i$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$i$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 76:
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$h$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$;
@@ -5931,8 +5932,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$h$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$;
             break;
           case 78:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$h$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$h$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 84:
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$d$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$;
@@ -5941,8 +5942,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$d$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$;
             break;
           case 86:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$d$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$d$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 92:
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$e$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$;
@@ -5951,8 +5952,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$e$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$;
             break;
           case 94:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$e$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$e$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 96:
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$i$;
@@ -5972,11 +5973,11 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$;
             break;
           case 102:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$j$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$j$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 103:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$;
             break;
           case 104:
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$i$;
@@ -5996,49 +5997,49 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
           case 109:
             break;
           case 110:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$l$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$l$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 111:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$;
             break;
           case 112:
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$i$);
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 113:
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$h$);
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 114:
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$d$);
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 115:
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$e$);
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 116:
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$j$);
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 117:
             $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$l$);
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 119:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$);
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$);
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 124:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$;
             break;
           case 125:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$;
             break;
           case 126:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 132:
             $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$);
@@ -6047,8 +6048,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$);
             break;
           case 134:
-            $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$)));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_add_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$)));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 140:
             $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$);
@@ -6057,8 +6058,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$);
             break;
           case 142:
-            $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$)));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_adc_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$)));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 148:
             $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$);
@@ -6067,8 +6068,8 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$);
             break;
           case 150:
-            $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$)));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_sub_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$)));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 156:
             $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$);
@@ -6077,38 +6078,38 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$);
             break;
           case 158:
-            $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$)));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_sbc_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$)));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 164:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ &= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$] | 16;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$ &= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$] | 16;
             break;
           case 165:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ &= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$] | 16;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$ &= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$] | 16;
             break;
           case 166:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ &= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$))] | 16;
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$ &= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$))] | 16;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 172:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ ^= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$];
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$ ^= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$];
             break;
           case 173:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ ^= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$];
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$ ^= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$];
             break;
           case 174:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ ^= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$))];
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$ ^= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$))];
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 180:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ |= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$];
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$ |= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$];
             break;
           case 181:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ |= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$];
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$ |= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$];
             break;
           case 182:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ |= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$))];
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$b$ = $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$[$JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$ |= $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$))];
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 188:
             $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$);
@@ -6117,43 +6118,43 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
             $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$);
             break;
           case 190:
-            $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$a$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$)));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$++;
+            $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$($JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$) + $JSCompiler_StaticMethods_d_$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$)));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$++;
             break;
           case 203:
             $JSCompiler_StaticMethods_doIndexCB$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$));
             break;
           case 225:
-            $JSCompiler_StaticMethods_setIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$o$));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$o$ += 2;
+            $JSCompiler_StaticMethods_setIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$p$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$ += 2;
             break;
           case 227:
             $temp$$inline_297$$ = $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$);
-            $JSCompiler_StaticMethods_setIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$m$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$o$));
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$o$, $temp$$inline_297$$ & 255);
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$o$ + 1, $temp$$inline_297$$ >> 8);
+            $JSCompiler_StaticMethods_setIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$p$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$));
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$, $temp$$inline_297$$ & 255);
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$g$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$ + 1, $temp$$inline_297$$ >> 8);
             break;
           case 229:
             $JSCompiler_StaticMethods_push2$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$v$, $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$s$);
             break;
           case 233:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$ = $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$);
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$ = $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$);
             break;
           case 249:
-            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$o$ = $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$);
+            $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$n$ = $JSCompiler_StaticMethods_getIY$$($JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$);
             break;
           default:
-            console.log("Unimplemented DD/FD Opcode: " + $JSSMS$Utils$toHex$$($opcode$$inline_295$$)), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$f$--
+            console.log("Unimplemented DD/FD Opcode: " + $JSSMS$Utils$toHex$$($opcode$$inline_295$$)), $JSCompiler_StaticMethods_doIndexOpIY$self$$inline_294$$.$c$--
         }
         break;
       case 254:
-        $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$a$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$++));
+        $JSCompiler_StaticMethods_cp_a$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$($JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$++));
         break;
       case 255:
-        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$f$ = 56
+        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interpret$self$$inline_76$$, $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$), $JSCompiler_StaticMethods_interpret$self$$inline_76$$.$c$ = 56
     }
     var $JSCompiler_temp$$1$$;
-    if($JSCompiler_temp$$1$$ = 0 >= $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$.$p$) {
+    if($JSCompiler_temp$$1$$ = 0 >= $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$.$o$) {
       var $JSCompiler_StaticMethods_eol$self$$inline_81$$ = $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$self$$;
       if($JSCompiler_StaticMethods_eol$self$$inline_81$$.$main$.$soundEnabled$) {
         var $JSCompiler_StaticMethods_updateSound$self$$inline_299$$ = $JSCompiler_StaticMethods_eol$self$$inline_81$$.$main$, $line$$inline_300$$ = $JSCompiler_StaticMethods_eol$self$$inline_81$$.$lineno$;
@@ -6317,20 +6318,20 @@ function $JSCompiler_StaticMethods_JSSMS_Z80_prototype$frame$$($JSCompiler_Stati
       ($JSCompiler_StaticMethods_interrupts$self$$inline_376$$.$main$.$cpu$.$D$ = $JSCompiler_alias_TRUE$$));
       if($JSCompiler_StaticMethods_eol$self$$inline_81$$.$D$) {
         var $JSCompiler_StaticMethods_interrupt$self$$inline_379$$ = $JSCompiler_StaticMethods_eol$self$$inline_81$$;
-        $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$B$ && ($JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$H$ && ($JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$f$++, $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$H$ = $JSCompiler_alias_FALSE$$), $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$B$ = $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$C$ = $JSCompiler_alias_FALSE$$, $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$D$ = $JSCompiler_alias_FALSE$$, 
-        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interrupt$self$$inline_379$$, $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$f$), 0 == $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$I$ ? ($JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$f$ = 0 == $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$J$ || 255 == $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$J$ ? 56 : $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$J$, $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$p$ -= 
-        13) : 1 == $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$I$ ? ($JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$f$ = 56, $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$p$ -= 13) : ($JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$f$ = $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$m$(($JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$M$ << 8) + $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$J$), $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$p$ -= 
+        $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$B$ && ($JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$H$ && ($JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$c$++, $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$H$ = $JSCompiler_alias_FALSE$$), $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$B$ = $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$C$ = $JSCompiler_alias_FALSE$$, $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$D$ = $JSCompiler_alias_FALSE$$, 
+        $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_interrupt$self$$inline_379$$, $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$c$), 0 == $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$I$ ? ($JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$c$ = 0 == $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$J$ || 255 == $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$J$ ? 56 : $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$J$, $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$o$ -= 
+        13) : 1 == $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$I$ ? ($JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$c$ = 56, $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$o$ -= 13) : ($JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$c$ = $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$p$(($JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$M$ << 8) + $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$J$), $JSCompiler_StaticMethods_interrupt$self$$inline_379$$.$o$ -= 
         19))
       }
       $JSCompiler_StaticMethods_eol$self$$inline_81$$.$lineno$++;
       if($JSCompiler_StaticMethods_eol$self$$inline_81$$.$lineno$ >= $JSCompiler_StaticMethods_eol$self$$inline_81$$.$main$.$no_of_scanlines$) {
         var $JSCompiler_StaticMethods_eof$self$$inline_381$$ = $JSCompiler_StaticMethods_eol$self$$inline_81$$;
-        $JSCompiler_StaticMethods_eof$self$$inline_381$$.$main$.$pause_button$ && ($JSCompiler_StaticMethods_eof$self$$inline_381$$.$C$ = $JSCompiler_StaticMethods_eof$self$$inline_381$$.$B$, $JSCompiler_StaticMethods_eof$self$$inline_381$$.$B$ = $JSCompiler_alias_FALSE$$, $JSCompiler_StaticMethods_eof$self$$inline_381$$.$H$ && ($JSCompiler_StaticMethods_eof$self$$inline_381$$.$f$++, $JSCompiler_StaticMethods_eof$self$$inline_381$$.$H$ = $JSCompiler_alias_FALSE$$), $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_eof$self$$inline_381$$, 
-        $JSCompiler_StaticMethods_eof$self$$inline_381$$.$f$), $JSCompiler_StaticMethods_eof$self$$inline_381$$.$f$ = 102, $JSCompiler_StaticMethods_eof$self$$inline_381$$.$p$ -= 11, $JSCompiler_StaticMethods_eof$self$$inline_381$$.$main$.$pause_button$ = $JSCompiler_alias_FALSE$$);
+        $JSCompiler_StaticMethods_eof$self$$inline_381$$.$main$.$pause_button$ && ($JSCompiler_StaticMethods_eof$self$$inline_381$$.$C$ = $JSCompiler_StaticMethods_eof$self$$inline_381$$.$B$, $JSCompiler_StaticMethods_eof$self$$inline_381$$.$B$ = $JSCompiler_alias_FALSE$$, $JSCompiler_StaticMethods_eof$self$$inline_381$$.$H$ && ($JSCompiler_StaticMethods_eof$self$$inline_381$$.$c$++, $JSCompiler_StaticMethods_eof$self$$inline_381$$.$H$ = $JSCompiler_alias_FALSE$$), $JSCompiler_StaticMethods_push1$$($JSCompiler_StaticMethods_eof$self$$inline_381$$, 
+        $JSCompiler_StaticMethods_eof$self$$inline_381$$.$c$), $JSCompiler_StaticMethods_eof$self$$inline_381$$.$c$ = 102, $JSCompiler_StaticMethods_eof$self$$inline_381$$.$o$ -= 11, $JSCompiler_StaticMethods_eof$self$$inline_381$$.$main$.$pause_button$ = $JSCompiler_alias_FALSE$$);
         $JSCompiler_StaticMethods_eof$self$$inline_381$$.$main$.$a$.$writeFrame$();
         $JSCompiler_temp$$1$$ = $JSCompiler_alias_TRUE$$
       }else {
-        $JSCompiler_StaticMethods_eol$self$$inline_81$$.$p$ += $JSCompiler_StaticMethods_eol$self$$inline_81$$.$main$.$cyclesPerLine$, $JSCompiler_temp$$1$$ = $JSCompiler_alias_FALSE$$
+        $JSCompiler_StaticMethods_eol$self$$inline_81$$.$o$ += $JSCompiler_StaticMethods_eol$self$$inline_81$$.$main$.$cyclesPerLine$, $JSCompiler_temp$$1$$ = $JSCompiler_alias_FALSE$$
       }
     }
     if($JSCompiler_temp$$1$$) {
@@ -6396,8 +6397,15 @@ function $JSCompiler_StaticMethods_peepholePortOut$$($JSCompiler_StaticMethods_p
   }
   return""
 }
+function $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_readRom16bit$self$$, $address$$12$$) {
+  return $SUPPORT_DATAVIEW$$ ? 16383 > ($address$$12$$ & 16383) ? $JSCompiler_StaticMethods_readRom16bit$self$$.$rom$[$address$$12$$ >> 14].getUint16($address$$12$$ & 16383, $JSCompiler_alias_TRUE$$) : $JSCompiler_StaticMethods_readRom16bit$self$$.$rom$[$address$$12$$ >> 14].getUint8($address$$12$$ & 16383) | $JSCompiler_StaticMethods_readRom16bit$self$$.$rom$[++$address$$12$$ >> 14].getUint8($address$$12$$ & 16383) << 8 : $JSCompiler_StaticMethods_readRom16bit$self$$.$rom$[$address$$12$$ >> 14][$address$$12$$ & 
+  16383] & 255 | ($JSCompiler_StaticMethods_readRom16bit$self$$.$rom$[++$address$$12$$ >> 14][$address$$12$$ & 16383] & 255) << 8
+}
+function $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_readRom8bit$self$$, $address$$11$$) {
+  return $SUPPORT_DATAVIEW$$ ? $JSCompiler_StaticMethods_readRom8bit$self$$.$rom$[$address$$11$$ >> 14].getUint8($address$$11$$ & 16383) : $JSCompiler_StaticMethods_readRom8bit$self$$.$rom$[$address$$11$$ >> 14][$address$$11$$ & 16383] & 255
+}
 function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex$self$$, $index$$46$$, $address$$9_address$$inline_85$$) {
-  var $opcode$$9$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$), $opcodesArray$$3$$ = [$opcode$$9$$], $inst$$3_opcode$$inline_86$$ = "Unimplemented 0xDD or 0xFD prefixed opcode", $currAddr$$3$$ = $address$$9_address$$inline_85$$, $code$$8_code$$inline_90$$ = 'throw "Unimplemented 0xDD or 0xFD prefixed opcode";', $opcodesArray$$inline_87_operand$$2$$ = "";
+  var $opcode$$9$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$), $opcodesArray$$3$$ = [$opcode$$9$$], $inst$$3_opcode$$inline_86$$ = "Unimplemented 0xDD or 0xFD prefixed opcode", $currAddr$$3$$ = $address$$9_address$$inline_85$$, $code$$8_code$$inline_90$$ = 'throw "Unimplemented 0xDD or 0xFD prefixed opcode";', $opcodesArray$$inline_87_operand$$2$$ = "";
   $address$$9_address$$inline_85$$++;
   switch($opcode$$9$$) {
     case 9:
@@ -6409,13 +6417,13 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $code$$8_code$$inline_90$$ = "this.set" + $index$$46$$ + "(this.add16(this.get" + $index$$46$$ + "(), this.getDE()));";
       break;
     case 33:
-      $opcodesArray$$inline_87_operand$$2$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_getIndex$self$$.$m$($address$$9_address$$inline_85$$));
+      $opcodesArray$$inline_87_operand$$2$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$));
       $inst$$3_opcode$$inline_86$$ = "LD " + $index$$46$$ + "," + $opcodesArray$$inline_87_operand$$2$$;
       $code$$8_code$$inline_90$$ = "this.set" + $index$$46$$ + "(" + $opcodesArray$$inline_87_operand$$2$$ + ");";
       $address$$9_address$$inline_85$$ += 2;
       break;
     case 34:
-      $opcodesArray$$inline_87_operand$$2$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_getIndex$self$$.$m$($address$$9_address$$inline_85$$));
+      $opcodesArray$$inline_87_operand$$2$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$));
       $inst$$3_opcode$$inline_86$$ = "LD (" + $opcodesArray$$inline_87_operand$$2$$ + ")," + $index$$46$$;
       $code$$8_code$$inline_90$$ = "var location = " + $opcodesArray$$inline_87_operand$$2$$ + ";this.writeMem(location++, this." + $index$$46$$.toLowerCase() + "L);this.writeMem(location, this." + $index$$46$$.toLowerCase() + "H);";
       $address$$9_address$$inline_85$$ += 2;
@@ -6431,14 +6439,14 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "DEC " + $index$$46$$ + "H *";
       break;
     case 38:
-      $inst$$3_opcode$$inline_86$$ = "LD " + $index$$46$$ + "H," + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$)) + " *";
+      $inst$$3_opcode$$inline_86$$ = "LD " + $index$$46$$ + "H," + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$)) + " *";
       $address$$9_address$$inline_85$$++;
       break;
     case 41:
       $inst$$3_opcode$$inline_86$$ = "ADD " + $index$$46$$ + "  " + $index$$46$$;
       break;
     case 42:
-      $inst$$3_opcode$$inline_86$$ = "LD " + $index$$46$$ + " (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_getIndex$self$$.$m$($address$$9_address$$inline_85$$)) + ")";
+      $inst$$3_opcode$$inline_86$$ = "LD " + $index$$46$$ + " (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$)) + ")";
       $address$$9_address$$inline_85$$ += 2;
       break;
     case 43:
@@ -6452,22 +6460,22 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "DEC " + $index$$46$$ + "L *";
       break;
     case 46:
-      $inst$$3_opcode$$inline_86$$ = "LD " + $index$$46$$ + "L," + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$));
+      $inst$$3_opcode$$inline_86$$ = "LD " + $index$$46$$ + "L," + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$));
       $address$$9_address$$inline_85$$++;
       break;
     case 52:
-      var $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$), $inst$$3_opcode$$inline_86$$ = "INC (" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ")", $code$$8_code$$inline_90$$ = "this.incMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ");";
+      var $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$), $inst$$3_opcode$$inline_86$$ = "INC (" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ")", $code$$8_code$$inline_90$$ = "this.incMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
       break;
     case 53:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "DEC (" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ")";
       $code$$8_code$$inline_90$$ = "this.decMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
       break;
     case 54:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
-      $opcodesArray$$inline_87_operand$$2$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$ + 1));
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $opcodesArray$$inline_87_operand$$2$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$ + 1));
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ")," + $opcodesArray$$inline_87_operand$$2$$;
       $code$$8_code$$inline_90$$ = "this.writeMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ", " + $opcodesArray$$inline_87_operand$$2$$ + ");";
       $address$$9_address$$inline_85$$++;
@@ -6482,7 +6490,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD B," + $index$$46$$ + "L *";
       break;
     case 70:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD B,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ")";
       $code$$8_code$$inline_90$$ = "this.b = this.readMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6494,7 +6502,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD C," + $index$$46$$ + "L *";
       break;
     case 78:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD C,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ")";
       $code$$8_code$$inline_90$$ = "this.c = this.readMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6506,7 +6514,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD D," + $index$$46$$ + "L *";
       break;
     case 86:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD D,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ")";
       $code$$8_code$$inline_90$$ = "this.d = this.readMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6518,7 +6526,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD E," + $index$$46$$ + "L *";
       break;
     case 94:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD E,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ")";
       $code$$8_code$$inline_90$$ = "this.e = this.readMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6542,7 +6550,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD " + $index$$46$$ + "H," + $index$$46$$ + "L *";
       break;
     case 102:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD H,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ")";
       $code$$8_code$$inline_90$$ = "this.h = this.readMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6569,7 +6577,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD " + $index$$46$$ + "L," + $index$$46$$ + "L *";
       break;
     case 110:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD L,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ")";
       $code$$8_code$$inline_90$$ = "this.l = this.readMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6578,43 +6586,43 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD " + $index$$46$$ + "L,A *";
       break;
     case 112:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "),B";
       $code$$8_code$$inline_90$$ = "this.writeMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ", this.b);";
       $address$$9_address$$inline_85$$++;
       break;
     case 113:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "),C";
       $code$$8_code$$inline_90$$ = "this.writeMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ", this.c);";
       $address$$9_address$$inline_85$$++;
       break;
     case 114:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "),D";
       $code$$8_code$$inline_90$$ = "this.writeMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ", this.d);";
       $address$$9_address$$inline_85$$++;
       break;
     case 115:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "),E";
       $code$$8_code$$inline_90$$ = "this.writeMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ", this.e);";
       $address$$9_address$$inline_85$$++;
       break;
     case 116:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "),H";
       $code$$8_code$$inline_90$$ = "this.writeMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ", this.h);";
       $address$$9_address$$inline_85$$++;
       break;
     case 117:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "),L";
       $code$$8_code$$inline_90$$ = "this.writeMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ", this.l);";
       $address$$9_address$$inline_85$$++;
       break;
     case 119:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "),A";
       $code$$8_code$$inline_90$$ = "this.writeMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ", this.a);";
       $address$$9_address$$inline_85$$++;
@@ -6626,7 +6634,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD A," + $index$$46$$ + "L *";
       break;
     case 126:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD A,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ")";
       $code$$8_code$$inline_90$$ = "this.a = this.readMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6638,7 +6646,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "ADD A," + $index$$46$$ + "L *";
       break;
     case 134:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "ADD A,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "))";
       $code$$8_code$$inline_90$$ = "this.add_a(this.readMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "));";
       $address$$9_address$$inline_85$$++;
@@ -6650,7 +6658,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "ADC A," + $index$$46$$ + "L *";
       break;
     case 142:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "ADC A,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "))";
       $address$$9_address$$inline_85$$++;
       break;
@@ -6661,7 +6669,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "SUB " + $index$$46$$ + "L *";
       break;
     case 150:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "SUB A,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "))";
       $code$$8_code$$inline_90$$ = "this.sub_a(this.readMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "));";
       $address$$9_address$$inline_85$$++;
@@ -6673,7 +6681,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "SBC A," + $index$$46$$ + "L *";
       break;
     case 158:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "SBC A,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "))";
       $address$$9_address$$inline_85$$++;
       break;
@@ -6684,7 +6692,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "AND " + $index$$46$$ + "L *";
       break;
     case 166:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "AND A,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "))";
       $address$$9_address$$inline_85$$++;
       break;
@@ -6695,7 +6703,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "XOR A " + $index$$46$$ + "L*";
       break;
     case 174:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "XOR A,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "))";
       $code$$8_code$$inline_90$$ = "this.f = this.SZP_TABLE[this.a ^= this.readMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ")];";
       $address$$9_address$$inline_85$$++;
@@ -6707,7 +6715,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "OR A " + $index$$46$$ + "L*";
       break;
     case 182:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "OR A,(" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "))";
       $code$$8_code$$inline_90$$ = "this.f = this.SZP_TABLE[this.a |= this.readMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + ")];";
       $address$$9_address$$inline_85$$++;
@@ -6719,13 +6727,13 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "CP " + $index$$46$$ + "L *";
       break;
     case 190:
-      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$inline_88_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "CP (" + $index$$46$$ + "+" + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "))";
       $code$$8_code$$inline_90$$ = "this.cp_a(this.readMem(this.get" + $index$$46$$ + "() + " + $JSSMS$Utils$toHex$$($inst$$inline_88_offset$$16$$) + "));";
       $address$$9_address$$inline_85$$++;
       break;
     case 203:
-      $inst$$3_opcode$$inline_86$$ = $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$);
+      $inst$$3_opcode$$inline_86$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
       $opcodesArray$$inline_87_operand$$2$$ = [$inst$$3_opcode$$inline_86$$];
       $inst$$inline_88_offset$$16$$ = "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";
       $code$$8_code$$inline_90$$ = 'throw "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";';
@@ -6733,15 +6741,15 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       switch($inst$$3_opcode$$inline_86$$) {
         case 0:
           $inst$$inline_88_offset$$16$$ = "LD B,RLC (" + $index$$46$$ + ")";
-          $code$$8_code$$inline_90$$ = "var location = (this.get" + $index$$46$$ + "() + " + $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$) + ") & 0xFFFF;this.b = this.rlc(this.readMem(location)); this.writeMem(location, this.b);";
+          $code$$8_code$$inline_90$$ = "var location = (this.get" + $index$$46$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.b = this.rlc(this.readMem(location)); this.writeMem(location, this.b);";
           break;
         case 1:
           $inst$$inline_88_offset$$16$$ = "LD C,RLC (" + $index$$46$$ + ")";
-          $code$$8_code$$inline_90$$ = "var location = (this.get" + $index$$46$$ + "() + " + $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$) + ") & 0xFFFF;this.c = this.rlc(this.readMem(location)); this.writeMem(location, this.c);";
+          $code$$8_code$$inline_90$$ = "var location = (this.get" + $index$$46$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.c = this.rlc(this.readMem(location)); this.writeMem(location, this.c);";
           break;
         case 2:
           $inst$$inline_88_offset$$16$$ = "LD D,RLC (" + $index$$46$$ + ")";
-          $code$$8_code$$inline_90$$ = "var location = (this.get" + $index$$46$$ + "() + " + $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$) + ") & 0xFFFF;this.d = this.rlc(this.readMem(location)); this.writeMem(location, this.d);";
+          $code$$8_code$$inline_90$$ = "var location = (this.get" + $index$$46$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.d = this.rlc(this.readMem(location)); this.writeMem(location, this.d);";
           break;
         case 3:
           $inst$$inline_88_offset$$16$$ = "LD E,RLC (" + $index$$46$$ + ")";
@@ -6754,11 +6762,11 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
           break;
         case 6:
           $inst$$inline_88_offset$$16$$ = "RLC (" + $index$$46$$ + ")";
-          $code$$8_code$$inline_90$$ = "var location = (this.get" + $index$$46$$ + "() + " + $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$) + ") & 0xFFFF;this.writeMem(location, this.rlc(this.readMem(location)));";
+          $code$$8_code$$inline_90$$ = "var location = (this.get" + $index$$46$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.writeMem(location, this.rlc(this.readMem(location)));";
           break;
         case 7:
           $inst$$inline_88_offset$$16$$ = "LD A,RLC (" + $index$$46$$ + ")";
-          $code$$8_code$$inline_90$$ = "var location = (this.get" + $index$$46$$ + "() + " + $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$) + ") & 0xFFFF;this.a = this.rlc(this.readMem(location)); this.writeMem(location, this.a);";
+          $code$$8_code$$inline_90$$ = "var location = (this.get" + $index$$46$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.a = this.rlc(this.readMem(location)); this.writeMem(location, this.a);";
           break;
         case 8:
           $inst$$inline_88_offset$$16$$ = "LD B,RRC (" + $index$$46$$ + ")";
@@ -6825,7 +6833,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
           break;
         case 29:
           $inst$$inline_88_offset$$16$$ = "LD L,RR (" + $index$$46$$ + ")";
-          $code$$8_code$$inline_90$$ = "var location = (this.get" + $index$$46$$ + "() + " + $JSCompiler_StaticMethods_getIndex$self$$.$a$($address$$9_address$$inline_85$$) + ") & 0xFFFF;this.l = this.rr(this.readMem(location)); this.writeMem(location, this.l);";
+          $code$$8_code$$inline_90$$ = "var location = (this.get" + $index$$46$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.l = this.rr(this.readMem(location)); this.writeMem(location, this.l);";
           break;
         case 30:
           $inst$$inline_88_offset$$16$$ = "RR (" + $index$$46$$ + ")";
