@@ -4304,13 +4304,13 @@ JSSMS.Z80.prototype = {reset:function() {
           this.frameReg[3] = value
         }else {
           if(address == 65533) {
-            this.frameReg[0] = value
+            this.frameReg[0] = value & this.romPageMask
           }else {
             if(address == 65534) {
-              this.frameReg[1] = value
+              this.frameReg[1] = value & this.romPageMask
             }else {
               if(address == 65535) {
-                this.frameReg[2] = value
+                this.frameReg[2] = value & this.romPageMask
               }
             }
           }
@@ -4330,13 +4330,13 @@ JSSMS.Z80.prototype = {reset:function() {
           this.frameReg[3] = value
         }else {
           if(address == 65533) {
-            this.frameReg[0] = value
+            this.frameReg[0] = value & this.romPageMask
           }else {
             if(address == 65534) {
-              this.frameReg[1] = value
+              this.frameReg[1] = value & this.romPageMask
             }else {
               if(address == 65535) {
-                this.frameReg[2] = value
+                this.frameReg[2] = value & this.romPageMask
               }
             }
           }
@@ -4356,10 +4356,10 @@ JSSMS.Z80.prototype = {reset:function() {
         return this.rom[0].getUint8(address)
       }else {
         if(address < 16384) {
-          return this.rom[this.frameReg[0] & this.romPageMask].getUint8(address)
+          return this.rom[this.frameReg[0]].getUint8(address)
         }else {
           if(address < 32768) {
-            return this.rom[this.frameReg[1] & this.romPageMask].getUint8(address - 16384)
+            return this.rom[this.frameReg[1]].getUint8(address - 16384)
           }else {
             if(address < 49152) {
               if((this.frameReg[3] & 12) == 8) {
@@ -4370,7 +4370,7 @@ JSSMS.Z80.prototype = {reset:function() {
                   this.useSRAM = true;
                   return this.sram.getUint8(address - 16384)
                 }else {
-                  return this.rom[this.frameReg[2] & this.romPageMask].getUint8(address - 32768)
+                  return this.rom[this.frameReg[2]].getUint8(address - 32768)
                 }
               }
             }else {
@@ -4414,10 +4414,10 @@ JSSMS.Z80.prototype = {reset:function() {
         return this.rom[0][address]
       }else {
         if(address < 16384) {
-          return this.rom[this.frameReg[0] & this.romPageMask][address]
+          return this.rom[this.frameReg[0]][address]
         }else {
           if(address < 32768) {
-            return this.rom[this.frameReg[1] & this.romPageMask][address - 16384]
+            return this.rom[this.frameReg[1]][address - 16384]
           }else {
             if(address < 49152) {
               if((this.frameReg[3] & 12) == 8) {
@@ -4428,7 +4428,7 @@ JSSMS.Z80.prototype = {reset:function() {
                   this.useSRAM = true;
                   return this.sram[address - 16384]
                 }else {
-                  return this.rom[this.frameReg[2] & this.romPageMask][address - 32768]
+                  return this.rom[this.frameReg[2]][address - 32768]
                 }
               }
             }else {
@@ -4474,10 +4474,10 @@ JSSMS.Z80.prototype = {reset:function() {
         return this.rom[0].getUint16(address, LITTLE_ENDIAN)
       }else {
         if(address < 16384) {
-          return this.rom[this.frameReg[0] & this.romPageMask].getUint16(address, LITTLE_ENDIAN)
+          return this.rom[this.frameReg[0]].getUint16(address, LITTLE_ENDIAN)
         }else {
           if(address < 32768) {
-            return this.rom[this.frameReg[1] & this.romPageMask].getUint16(address - 16384, LITTLE_ENDIAN)
+            return this.rom[this.frameReg[1]].getUint16(address - 16384, LITTLE_ENDIAN)
           }else {
             if(address < 49152) {
               if((this.frameReg[3] & 12) == 8) {
@@ -4488,7 +4488,7 @@ JSSMS.Z80.prototype = {reset:function() {
                   this.useSRAM = true;
                   return this.sram[address - 16384]
                 }else {
-                  return this.rom[this.frameReg[2] & this.romPageMask].getUint16(address - 32768, LITTLE_ENDIAN)
+                  return this.rom[this.frameReg[2]].getUint16(address - 32768, LITTLE_ENDIAN)
                 }
               }
             }else {
@@ -4532,10 +4532,10 @@ JSSMS.Z80.prototype = {reset:function() {
         return this.rom[0][address] | this.rom[0][++address] << 8
       }else {
         if(address < 16384) {
-          return this.rom[this.frameReg[0] & this.romPageMask][address] | this.rom[this.frameReg[0] & this.romPageMask][++address] << 8
+          return this.rom[this.frameReg[0]][address] | this.rom[this.frameReg[0]][++address] << 8
         }else {
           if(address < 32768) {
-            return this.rom[this.frameReg[1] & this.romPageMask][address - 16384] | this.rom[this.frameReg[1] & this.romPageMask][++address - 16384] << 8
+            return this.rom[this.frameReg[1]][address - 16384] | this.rom[this.frameReg[1]][++address - 16384] << 8
           }else {
             if(address < 49152) {
               if((this.frameReg[3] & 12) == 8) {
@@ -4546,7 +4546,7 @@ JSSMS.Z80.prototype = {reset:function() {
                   this.useSRAM = true;
                   return this.sram[address - 16384] | this.sram[++address - 16384] << 8
                 }else {
-                  return this.rom[this.frameReg[2] & this.romPageMask][address - 32768] | this.rom[this.frameReg[2] & this.romPageMask][++address - 32768] << 8
+                  return this.rom[this.frameReg[2]][address - 32768] | this.rom[this.frameReg[2]][++address - 32768] << 8
                 }
               }
             }else {
@@ -6016,30 +6016,39 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 8:
       inst = "RRC B";
+      code = "this.b = (this.rrc(this.b));";
       break;
     case 9:
       inst = "RRC C";
+      code = "this.c = (this.rrc(this.c));";
       break;
     case 10:
       inst = "RRC D";
+      code = "this.d = (this.rrc(this.d));";
       break;
     case 11:
       inst = "RRC E";
+      code = "this.e = (this.rrc(this.e));";
       break;
     case 12:
       inst = "RRC H";
+      code = "this.h = (this.rrc(this.h));";
       break;
     case 13:
       inst = "RRC L";
+      code = "this.l = (this.rrc(this.l));";
       break;
     case 14:
       inst = "RRC (HL)";
+      code = "this.writeMem(this.getHL(), this.rrc(this.readMem(this.getHL())));";
       break;
     case 15:
       inst = "RRC A";
+      code = "this.a = (this.rrc(this.a));";
       break;
     case 16:
       inst = "RL B";
+      code = "this.b = (this.rl(this.b));";
       break;
     case 17:
       inst = "RL C";
@@ -6047,21 +6056,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 18:
       inst = "RL D";
+      code = "this.d = (this.rl(this.d));";
       break;
     case 19:
       inst = "RL E";
+      code = "this.e = (this.rl(this.e));";
       break;
     case 20:
       inst = "RL H";
+      code = "this.h = (this.rl(this.h));";
       break;
     case 21:
       inst = "RL L";
+      code = "this.l = (this.rl(this.l));";
       break;
     case 22:
       inst = "RL (HL)";
+      code = "this.writeMem(this.getHL(), this.rl(this.readMem(this.getHL())));";
       break;
     case 23:
       inst = "RL A";
+      code = "this.a = (this.rl(this.a));";
       break;
     case 24:
       inst = "RR B";
@@ -6097,27 +6112,35 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 32:
       inst = "SLA B";
+      code = "this.b = (this.sla(this.b));";
       break;
     case 33:
       inst = "SLA C";
+      code = "this.c = (this.sla(this.c));";
       break;
     case 34:
       inst = "SLA D";
+      code = "this.d = (this.sla(this.d));";
       break;
     case 35:
       inst = "SLA E";
+      code = "this.e = (this.sla(this.e));";
       break;
     case 36:
       inst = "SLA H";
+      code = "this.h = (this.sla(this.h));";
       break;
     case 37:
       inst = "SLA L";
+      code = "this.l = (this.sla(this.l));";
       break;
     case 38:
       inst = "SLA (HL)";
+      code = "this.writeMem(this.getHL(), this.sla(this.readMem(this.getHL())));";
       break;
     case 39:
       inst = "SLA A";
+      code = "this.a = (this.sla(this.a));";
       break;
     case 40:
       inst = "SRA B";
@@ -6194,21 +6217,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 64:
       inst = "BIT 0,B";
+      code = "this.bit(this.b & BIT_0);";
       break;
     case 65:
       inst = "BIT 0,C";
+      code = "this.bit(this.c & BIT_0);";
       break;
     case 66:
       inst = "BIT 0,D";
+      code = "this.bit(this.d & BIT_0);";
       break;
     case 67:
       inst = "BIT 0,E";
+      code = "this.bit(this.e & BIT_0);";
       break;
     case 68:
       inst = "BIT 0,H";
+      code = "this.bit(this.h & BIT_0);";
       break;
     case 69:
       inst = "BIT 0,L";
+      code = "this.bit(this.l & BIT_0);";
       break;
     case 70:
       inst = "BIT 0,(HL)";
@@ -6220,21 +6249,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 72:
       inst = "BIT 1,B";
+      code = "this.bit(this.b & BIT_1);";
       break;
     case 73:
       inst = "BIT 1,C";
+      code = "this.bit(this.c & BIT_1);";
       break;
     case 74:
       inst = "BIT 1,D";
+      code = "this.bit(this.d & BIT_1);";
       break;
     case 75:
       inst = "BIT 1,E";
+      code = "this.bit(this.e & BIT_1);";
       break;
     case 76:
       inst = "BIT 1,H";
+      code = "this.bit(this.h & BIT_1);";
       break;
     case 77:
       inst = "BIT 1,L";
+      code = "this.bit(this.l & BIT_1);";
       break;
     case 78:
       inst = "BIT 1,(HL)";
@@ -6250,18 +6285,23 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 81:
       inst = "BIT 2,C";
+      code = "this.bit(this.c & BIT_2);";
       break;
     case 82:
       inst = "BIT 2,D";
+      code = "this.bit(this.d & BIT_2);";
       break;
     case 83:
       inst = "BIT 2,E";
+      code = "this.bit(this.e & BIT_2);";
       break;
     case 84:
       inst = "BIT 2,H";
+      code = "this.bit(this.h & BIT_2);";
       break;
     case 85:
       inst = "BIT 2,L";
+      code = "this.bit(this.l & BIT_2);";
       break;
     case 86:
       inst = "BIT 2,(HL)";
@@ -6277,18 +6317,23 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 89:
       inst = "BIT 3,C";
+      code = "this.bit(this.c & BIT_3);";
       break;
     case 90:
       inst = "BIT 3,D";
+      code = "this.bit(this.d & BIT_3);";
       break;
     case 91:
       inst = "BIT 3,E";
+      code = "this.bit(this.e & BIT_3);";
       break;
     case 92:
       inst = "BIT 3,H";
+      code = "this.bit(this.h & BIT_3);";
       break;
     case 93:
       inst = "BIT 3,L";
+      code = "this.bit(this.l & BIT_3);";
       break;
     case 94:
       inst = "BIT 3,(HL)";
@@ -6300,21 +6345,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 96:
       inst = "BIT 4,B";
+      code = "this.bit(this.b & BIT_4);";
       break;
     case 97:
       inst = "BIT 4,C";
+      code = "this.bit(this.c & BIT_4);";
       break;
     case 98:
       inst = "BIT 4,D";
+      code = "this.bit(this.d & BIT_4);";
       break;
     case 99:
       inst = "BIT 4,E";
+      code = "this.bit(this.e & BIT_4);";
       break;
     case 100:
       inst = "BIT 4,H";
+      code = "this.bit(this.h & BIT_4);";
       break;
     case 101:
       inst = "BIT 4,L";
+      code = "this.bit(this.l & BIT_4);";
       break;
     case 102:
       inst = "BIT 4,(HL)";
@@ -6330,18 +6381,23 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 105:
       inst = "BIT 5,C";
+      code = "this.bit(this.c & BIT_5);";
       break;
     case 106:
       inst = "BIT 5,D";
+      code = "this.bit(this.d & BIT_5);";
       break;
     case 107:
       inst = "BIT 5,E";
+      code = "this.bit(this.e & BIT_5);";
       break;
     case 108:
       inst = "BIT 5,H";
+      code = "this.bit(this.h & BIT_5);";
       break;
     case 109:
       inst = "BIT 5,L";
+      code = "this.bit(this.l & BIT_5);";
       break;
     case 110:
       inst = "BIT 5,(HL)";
@@ -6353,21 +6409,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 112:
       inst = "BIT 6,B";
+      code = "this.bit(this.b & BIT_6);";
       break;
     case 113:
       inst = "BIT 6,C";
+      code = "this.bit(this.c & BIT_6);";
       break;
     case 114:
       inst = "BIT 6,D";
+      code = "this.bit(this.d & BIT_6);";
       break;
     case 115:
       inst = "BIT 6,E";
+      code = "this.bit(this.e & BIT_6);";
       break;
     case 116:
       inst = "BIT 6,H";
+      code = "this.bit(this.h & BIT_6);";
       break;
     case 117:
       inst = "BIT 6,L";
+      code = "this.bit(this.l & BIT_6);";
       break;
     case 118:
       inst = "BIT 6,(HL)";
@@ -6379,21 +6441,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 120:
       inst = "BIT 7,B";
+      code = "this.bit(this.b & BIT_7);";
       break;
     case 121:
       inst = "BIT 7,C";
+      code = "this.bit(this.c & BIT_7);";
       break;
     case 122:
       inst = "BIT 7,D";
+      code = "this.bit(this.d & BIT_7);";
       break;
     case 123:
       inst = "BIT 7,E";
+      code = "this.bit(this.e & BIT_7);";
       break;
     case 124:
       inst = "BIT 7,H";
+      code = "this.bit(this.h & BIT_7);";
       break;
     case 125:
       inst = "BIT 7,L";
+      code = "this.bit(this.l & BIT_7);";
       break;
     case 126:
       inst = "BIT 7,(HL)";
@@ -7008,15 +7076,20 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 111:
       inst = "RLD";
+      code = "var location = this.getHL();" + "temp = this.readMem(location);" + "this.writeMem(location, (temp & 0x0F) << 4 | (this.a & 0x0F));" + "this.a = (this.a & 0xF0) | (temp >> 4);" + "this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];";
       break;
     case 113:
       inst = "OUT (C),0";
+      code = "this.port.out(this.c, 0);";
       break;
     case 114:
       inst = "SBC HL,SP";
+      code = "this.sbc16(this.sp);";
       break;
     case 115:
-      inst = "LD (" + toHex(this.readRom16bit(address)) + "),SP";
+      operand = toHex(this.readRom16bit(address));
+      inst = "LD (" + operand + "),SP";
+      code = "var location = this.readMemWord(" + operand + ");" + "this.writeMem(location++, this.sp & 0xFF);" + "this.writeMem(location, this.sp >> 8);";
       address = address + 2;
       break;
     case 120:
@@ -7029,9 +7102,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 122:
       inst = "ADC HL,SP";
+      code = "this.adc16(this.sp);";
       break;
     case 123:
-      inst = "LD SP,(" + toHex(this.readRom16bit(address)) + ")";
+      operand = toHex(this.readRom16bit(address));
+      inst = "LD SP,(" + operand + ")";
+      code = "this.sp = this.readMemWord(" + operand + ");";
       address = address + 2;
       break;
     case 160:
@@ -7040,6 +7116,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 161:
       inst = "CPI";
+      code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);" + "this.f = (this.f & 0xF8) | temp;";
       break;
     case 162:
       inst = "INI";
@@ -7205,6 +7282,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 57:
       inst = "ADD " + index + " SP";
+      code = "this.set" + index + "(this.add16(this.get" + index + "(), this.sp));";
       break;
     case 68:
       inst = "LD B," + index + "H *";

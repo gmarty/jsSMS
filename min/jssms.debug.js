@@ -998,30 +998,39 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 8:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RRC B";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.b = (this.rrc(this.b));";
                 break;
               case 9:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RRC C";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.c = (this.rrc(this.c));";
                 break;
               case 10:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RRC D";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.d = (this.rrc(this.d));";
                 break;
               case 11:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RRC E";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.e = (this.rrc(this.e));";
                 break;
               case 12:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RRC H";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.h = (this.rrc(this.h));";
                 break;
               case 13:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RRC L";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.l = (this.rrc(this.l));";
                 break;
               case 14:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RRC (HL)";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.writeMem(this.getHL(), this.rrc(this.readMem(this.getHL())));";
                 break;
               case 15:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RRC A";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.a = (this.rrc(this.a));";
                 break;
               case 16:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RL B";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.b = (this.rl(this.b));";
                 break;
               case 17:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RL C";
@@ -1029,21 +1038,27 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 18:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RL D";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.d = (this.rl(this.d));";
                 break;
               case 19:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RL E";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.e = (this.rl(this.e));";
                 break;
               case 20:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RL H";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.h = (this.rl(this.h));";
                 break;
               case 21:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RL L";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.l = (this.rl(this.l));";
                 break;
               case 22:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RL (HL)";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.writeMem(this.getHL(), this.rl(this.readMem(this.getHL())));";
                 break;
               case 23:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RL A";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.a = (this.rl(this.a));";
                 break;
               case 24:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RR B";
@@ -1079,27 +1094,35 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 32:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "SLA B";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.b = (this.sla(this.b));";
                 break;
               case 33:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "SLA C";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.c = (this.sla(this.c));";
                 break;
               case 34:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "SLA D";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.d = (this.sla(this.d));";
                 break;
               case 35:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "SLA E";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.e = (this.sla(this.e));";
                 break;
               case 36:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "SLA H";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.h = (this.sla(this.h));";
                 break;
               case 37:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "SLA L";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.l = (this.sla(this.l));";
                 break;
               case 38:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "SLA (HL)";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.writeMem(this.getHL(), this.sla(this.readMem(this.getHL())));";
                 break;
               case 39:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "SLA A";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.a = (this.sla(this.a));";
                 break;
               case 40:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "SRA B";
@@ -1176,21 +1199,27 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 64:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 0,B";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.b & BIT_0);";
                 break;
               case 65:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 0,C";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.c & BIT_0);";
                 break;
               case 66:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 0,D";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.d & BIT_0);";
                 break;
               case 67:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 0,E";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.e & BIT_0);";
                 break;
               case 68:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 0,H";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.h & BIT_0);";
                 break;
               case 69:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 0,L";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.l & BIT_0);";
                 break;
               case 70:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 0,(HL)";
@@ -1202,21 +1231,27 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 72:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 1,B";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.b & BIT_1);";
                 break;
               case 73:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 1,C";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.c & BIT_1);";
                 break;
               case 74:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 1,D";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.d & BIT_1);";
                 break;
               case 75:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 1,E";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.e & BIT_1);";
                 break;
               case 76:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 1,H";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.h & BIT_1);";
                 break;
               case 77:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 1,L";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.l & BIT_1);";
                 break;
               case 78:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 1,(HL)";
@@ -1232,18 +1267,23 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 81:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 2,C";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.c & BIT_2);";
                 break;
               case 82:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 2,D";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.d & BIT_2);";
                 break;
               case 83:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 2,E";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.e & BIT_2);";
                 break;
               case 84:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 2,H";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.h & BIT_2);";
                 break;
               case 85:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 2,L";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.l & BIT_2);";
                 break;
               case 86:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 2,(HL)";
@@ -1259,18 +1299,23 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 89:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 3,C";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.c & BIT_3);";
                 break;
               case 90:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 3,D";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.d & BIT_3);";
                 break;
               case 91:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 3,E";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.e & BIT_3);";
                 break;
               case 92:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 3,H";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.h & BIT_3);";
                 break;
               case 93:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 3,L";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.l & BIT_3);";
                 break;
               case 94:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 3,(HL)";
@@ -1282,21 +1327,27 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 96:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 4,B";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.b & BIT_4);";
                 break;
               case 97:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 4,C";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.c & BIT_4);";
                 break;
               case 98:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 4,D";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.d & BIT_4);";
                 break;
               case 99:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 4,E";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.e & BIT_4);";
                 break;
               case 100:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 4,H";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.h & BIT_4);";
                 break;
               case 101:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 4,L";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.l & BIT_4);";
                 break;
               case 102:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 4,(HL)";
@@ -1312,18 +1363,23 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 105:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 5,C";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.c & BIT_5);";
                 break;
               case 106:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 5,D";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.d & BIT_5);";
                 break;
               case 107:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 5,E";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.e & BIT_5);";
                 break;
               case 108:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 5,H";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.h & BIT_5);";
                 break;
               case 109:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 5,L";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.l & BIT_5);";
                 break;
               case 110:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 5,(HL)";
@@ -1335,21 +1391,27 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 112:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 6,B";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.b & BIT_6);";
                 break;
               case 113:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 6,C";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.c & BIT_6);";
                 break;
               case 114:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 6,D";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.d & BIT_6);";
                 break;
               case 115:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 6,E";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.e & BIT_6);";
                 break;
               case 116:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 6,H";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.h & BIT_6);";
                 break;
               case 117:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 6,L";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.l & BIT_6);";
                 break;
               case 118:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 6,(HL)";
@@ -1361,21 +1423,27 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 120:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 7,B";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.b & BIT_7);";
                 break;
               case 121:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 7,C";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.c & BIT_7);";
                 break;
               case 122:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 7,D";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.d & BIT_7);";
                 break;
               case 123:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 7,E";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.e & BIT_7);";
                 break;
               case 124:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 7,H";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.h & BIT_7);";
                 break;
               case 125:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 7,L";
+                $code$$inline_399_location$$inline_392_target$$inline_405$$ = "this.bit(this.l & BIT_7);";
                 break;
               case 126:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "BIT 7,(HL)";
@@ -2154,15 +2222,20 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 111:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "RLD";
+                $code$$inline_406$$ = "var location = this.getHL();temp = this.readMem(location);this.writeMem(location, (temp & 0x0F) << 4 | (this.a & 0x0F));this.a = (this.a & 0xF0) | (temp >> 4);this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];";
                 break;
               case 113:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "OUT (C),0";
+                $code$$inline_406$$ = "this.port.out(this.c, 0);";
                 break;
               case 114:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "SBC HL,SP";
+                $code$$inline_406$$ = "this.sbc16(this.sp);";
                 break;
               case 115:
-                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$)) + "),SP";
+                $operand$$inline_407$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$));
+                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD (" + $operand$$inline_407$$ + "),SP";
+                $code$$inline_406$$ = "var location = this.readMemWord(" + $operand$$inline_407$$ + ");this.writeMem(location++, this.sp & 0xFF);this.writeMem(location, this.sp >> 8);";
                 $address$$inline_400_target$$inline_389$$ += 2;
                 break;
               case 120:
@@ -2175,9 +2248,12 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 122:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "ADC HL,SP";
+                $code$$inline_406$$ = "this.adc16(this.sp);";
                 break;
               case 123:
-                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD SP,(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$)) + ")";
+                $operand$$inline_407$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_383_hexOpcodes$$inline_411_opcode$$inline_395$$, $address$$inline_400_target$$inline_389$$));
+                $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "LD SP,(" + $operand$$inline_407$$ + ")";
+                $code$$inline_406$$ = "this.sp = this.readMemWord(" + $operand$$inline_407$$ + ");";
                 $address$$inline_400_target$$inline_389$$ += 2;
                 break;
               case 160:
@@ -2186,6 +2262,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 161:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "CPI";
+                $code$$inline_406$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.readMem(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() == 0 ? 0 : F_PARITY);this.f = (this.f & 0xF8) | temp;";
                 break;
               case 162:
                 $code$$inline_390_inst$$inline_397_inst$$inline_403$$ = "INI";
@@ -2570,14 +2647,14 @@ $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
   $condition$$3$$ ? ($JSCompiler_StaticMethods_push1$$(this, this.$c$ + 2), this.$c$ = this.$p$(this.$c$), this.$o$ -= 7) : this.$c$ += 2
 }, $g$:$SUPPORT_DATAVIEW$$ ? function($address$$, $value$$73$$) {
   if(65535 >= $address$$) {
-    this.$memWriteMap$.setInt8($address$$ & 8191, $value$$73$$), 65532 == $address$$ ? this.$frameReg$[3] = $value$$73$$ : 65533 == $address$$ ? this.$frameReg$[0] = $value$$73$$ : 65534 == $address$$ ? this.$frameReg$[1] = $value$$73$$ : 65535 == $address$$ && (this.$frameReg$[2] = $value$$73$$)
+    this.$memWriteMap$.setInt8($address$$ & 8191, $value$$73$$), 65532 == $address$$ ? this.$frameReg$[3] = $value$$73$$ : 65533 == $address$$ ? this.$frameReg$[0] = $value$$73$$ & this.$romPageMask$ : 65534 == $address$$ ? this.$frameReg$[1] = $value$$73$$ & this.$romPageMask$ : 65535 == $address$$ && (this.$frameReg$[2] = $value$$73$$ & this.$romPageMask$)
   }else {
     console.error($JSSMS$Utils$toHex$$($address$$), $JSSMS$Utils$toHex$$($address$$ & 8191));
     debugger
   }
 } : function($address$$1$$, $value$$74$$) {
   if(65535 >= $address$$1$$) {
-    this.$memWriteMap$[$address$$1$$ & 8191] = $value$$74$$, 65532 == $address$$1$$ ? this.$frameReg$[3] = $value$$74$$ : 65533 == $address$$1$$ ? this.$frameReg$[0] = $value$$74$$ : 65534 == $address$$1$$ ? this.$frameReg$[1] = $value$$74$$ : 65535 == $address$$1$$ && (this.$frameReg$[2] = $value$$74$$)
+    this.$memWriteMap$[$address$$1$$ & 8191] = $value$$74$$, 65532 == $address$$1$$ ? this.$frameReg$[3] = $value$$74$$ : 65533 == $address$$1$$ ? this.$frameReg$[0] = $value$$74$$ & this.$romPageMask$ : 65534 == $address$$1$$ ? this.$frameReg$[1] = $value$$74$$ & this.$romPageMask$ : 65535 == $address$$1$$ && (this.$frameReg$[2] = $value$$74$$ & this.$romPageMask$)
   }else {
     console.error($JSSMS$Utils$toHex$$($address$$1$$), $JSSMS$Utils$toHex$$($address$$1$$ & 8191));
     debugger
@@ -2587,13 +2664,13 @@ $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
     return this.$rom$[0].getUint8($address$$2$$)
   }
   if(16384 > $address$$2$$) {
-    return this.$rom$[this.$frameReg$[0] & this.$romPageMask$].getUint8($address$$2$$)
+    return this.$rom$[this.$frameReg$[0]].getUint8($address$$2$$)
   }
   if(32768 > $address$$2$$) {
-    return this.$rom$[this.$frameReg$[1] & this.$romPageMask$].getUint8($address$$2$$ - 16384)
+    return this.$rom$[this.$frameReg$[1]].getUint8($address$$2$$ - 16384)
   }
   if(49152 > $address$$2$$) {
-    return 8 == (this.$frameReg$[3] & 12) ? this.$sram$.getUint8($address$$2$$ - 32768) : 12 == (this.$frameReg$[3] & 12) ? this.$sram$.getUint8($address$$2$$ - 16384) : this.$rom$[this.$frameReg$[2] & this.$romPageMask$].getUint8($address$$2$$ - 32768)
+    return 8 == (this.$frameReg$[3] & 12) ? this.$sram$.getUint8($address$$2$$ - 32768) : 12 == (this.$frameReg$[3] & 12) ? this.$sram$.getUint8($address$$2$$ - 16384) : this.$rom$[this.$frameReg$[2]].getUint8($address$$2$$ - 32768)
   }
   if(57344 > $address$$2$$) {
     return this.$memWriteMap$.getUint8($address$$2$$ - 49152)
@@ -2621,13 +2698,13 @@ $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
     return this.$rom$[0][$address$$3$$]
   }
   if(16384 > $address$$3$$) {
-    return this.$rom$[this.$frameReg$[0] & this.$romPageMask$][$address$$3$$]
+    return this.$rom$[this.$frameReg$[0]][$address$$3$$]
   }
   if(32768 > $address$$3$$) {
-    return this.$rom$[this.$frameReg$[1] & this.$romPageMask$][$address$$3$$ - 16384]
+    return this.$rom$[this.$frameReg$[1]][$address$$3$$ - 16384]
   }
   if(49152 > $address$$3$$) {
-    return 8 == (this.$frameReg$[3] & 12) ? this.$sram$[$address$$3$$ - 32768] : 12 == (this.$frameReg$[3] & 12) ? this.$sram$[$address$$3$$ - 16384] : this.$rom$[this.$frameReg$[2] & this.$romPageMask$][$address$$3$$ - 32768]
+    return 8 == (this.$frameReg$[3] & 12) ? this.$sram$[$address$$3$$ - 32768] : 12 == (this.$frameReg$[3] & 12) ? this.$sram$[$address$$3$$ - 16384] : this.$rom$[this.$frameReg$[2]][$address$$3$$ - 32768]
   }
   if(57344 > $address$$3$$) {
     return this.$memWriteMap$[$address$$3$$ - 49152]
@@ -2655,13 +2732,13 @@ $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
     return this.$rom$[0].getUint16($address$$4$$, $JSCompiler_alias_TRUE$$)
   }
   if(16384 > $address$$4$$) {
-    return this.$rom$[this.$frameReg$[0] & this.$romPageMask$].getUint16($address$$4$$, $JSCompiler_alias_TRUE$$)
+    return this.$rom$[this.$frameReg$[0]].getUint16($address$$4$$, $JSCompiler_alias_TRUE$$)
   }
   if(32768 > $address$$4$$) {
-    return this.$rom$[this.$frameReg$[1] & this.$romPageMask$].getUint16($address$$4$$ - 16384, $JSCompiler_alias_TRUE$$)
+    return this.$rom$[this.$frameReg$[1]].getUint16($address$$4$$ - 16384, $JSCompiler_alias_TRUE$$)
   }
   if(49152 > $address$$4$$) {
-    return 8 == (this.$frameReg$[3] & 12) ? this.$sram$[$address$$4$$ - 32768] : 12 == (this.$frameReg$[3] & 12) ? this.$sram$[$address$$4$$ - 16384] : this.$rom$[this.$frameReg$[2] & this.$romPageMask$].getUint16($address$$4$$ - 32768, $JSCompiler_alias_TRUE$$)
+    return 8 == (this.$frameReg$[3] & 12) ? this.$sram$[$address$$4$$ - 32768] : 12 == (this.$frameReg$[3] & 12) ? this.$sram$[$address$$4$$ - 16384] : this.$rom$[this.$frameReg$[2]].getUint16($address$$4$$ - 32768, $JSCompiler_alias_TRUE$$)
   }
   if(57344 > $address$$4$$) {
     return this.$memWriteMap$.getUint16($address$$4$$ - 49152, $JSCompiler_alias_TRUE$$)
@@ -2689,13 +2766,13 @@ $JSSMS$Z80$$.prototype = {reset:function $$JSSMS$Z80$$$$reset$() {
     return this.$rom$[0][$address$$5$$] | this.$rom$[0][++$address$$5$$] << 8
   }
   if(16384 > $address$$5$$) {
-    return this.$rom$[this.$frameReg$[0] & this.$romPageMask$][$address$$5$$] | this.$rom$[this.$frameReg$[0] & this.$romPageMask$][++$address$$5$$] << 8
+    return this.$rom$[this.$frameReg$[0]][$address$$5$$] | this.$rom$[this.$frameReg$[0]][++$address$$5$$] << 8
   }
   if(32768 > $address$$5$$) {
-    return this.$rom$[this.$frameReg$[1] & this.$romPageMask$][$address$$5$$ - 16384] | this.$rom$[this.$frameReg$[1] & this.$romPageMask$][++$address$$5$$ - 16384] << 8
+    return this.$rom$[this.$frameReg$[1]][$address$$5$$ - 16384] | this.$rom$[this.$frameReg$[1]][++$address$$5$$ - 16384] << 8
   }
   if(49152 > $address$$5$$) {
-    return 8 == (this.$frameReg$[3] & 12) ? this.$sram$[$address$$5$$ - 32768] | this.$sram$[++$address$$5$$ - 32768] << 8 : 12 == (this.$frameReg$[3] & 12) ? this.$sram$[$address$$5$$ - 16384] | this.$sram$[++$address$$5$$ - 16384] << 8 : this.$rom$[this.$frameReg$[2] & this.$romPageMask$][$address$$5$$ - 32768] | this.$rom$[this.$frameReg$[2] & this.$romPageMask$][++$address$$5$$ - 32768] << 8
+    return 8 == (this.$frameReg$[3] & 12) ? this.$sram$[$address$$5$$ - 32768] | this.$sram$[++$address$$5$$ - 32768] << 8 : 12 == (this.$frameReg$[3] & 12) ? this.$sram$[$address$$5$$ - 16384] | this.$sram$[++$address$$5$$ - 16384] << 8 : this.$rom$[this.$frameReg$[2]][$address$$5$$ - 32768] | this.$rom$[this.$frameReg$[2]][++$address$$5$$ - 32768] << 8
   }
   if(57344 > $address$$5$$) {
     return this.$memWriteMap$[$address$$5$$ - 49152] | this.$memWriteMap$[++$address$$5$$ - 49152] << 8
@@ -6482,6 +6559,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 57:
       $inst$$3_opcode$$inline_86$$ = "ADD " + $index$$46$$ + " SP";
+      $code$$8_code$$inline_90$$ = "this.set" + $index$$46$$ + "(this.add16(this.get" + $index$$46$$ + "(), this.sp));";
       break;
     case 68:
       $inst$$3_opcode$$inline_86$$ = "LD B," + $index$$46$$ + "H *";

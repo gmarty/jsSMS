@@ -1656,30 +1656,39 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x08:
         inst = 'RRC B';
+        code = 'this.b = (this.rrc(this.b));';
         break;
       case 0x09:
         inst = 'RRC C';
+        code = 'this.c = (this.rrc(this.c));';
         break;
       case 0x0A:
         inst = 'RRC D';
+        code = 'this.d = (this.rrc(this.d));';
         break;
       case 0x0B:
         inst = 'RRC E';
+        code = 'this.e = (this.rrc(this.e));';
         break;
       case 0x0C:
         inst = 'RRC H';
+        code = 'this.h = (this.rrc(this.h));';
         break;
       case 0x0D:
         inst = 'RRC L';
+        code = 'this.l = (this.rrc(this.l));';
         break;
       case 0x0E:
         inst = 'RRC (HL)';
+        code = 'this.writeMem(this.getHL(), this.rrc(this.readMem(this.getHL())));';
         break;
       case 0x0F:
         inst = 'RRC A';
+        code = 'this.a = (this.rrc(this.a));';
         break;
       case 0x10:
         inst = 'RL B';
+        code = 'this.b = (this.rl(this.b));';
         break;
       case 0x11:
         inst = 'RL C';
@@ -1687,21 +1696,27 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x12:
         inst = 'RL D';
+        code = 'this.d = (this.rl(this.d));';
         break;
       case 0x13:
         inst = 'RL E';
+        code = 'this.e = (this.rl(this.e));';
         break;
       case 0x14:
         inst = 'RL H';
+        code = 'this.h = (this.rl(this.h));';
         break;
       case 0x15:
         inst = 'RL L';
+        code = 'this.l = (this.rl(this.l));';
         break;
       case 0x16:
         inst = 'RL (HL)';
+        code = 'this.writeMem(this.getHL(), this.rl(this.readMem(this.getHL())));';
         break;
       case 0x17:
         inst = 'RL A';
+        code = 'this.a = (this.rl(this.a));';
         break;
       case 0x18:
         inst = 'RR B';
@@ -1737,27 +1752,35 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x20:
         inst = 'SLA B';
+        code = 'this.b = (this.sla(this.b));';
         break;
       case 0x21:
         inst = 'SLA C';
+        code = 'this.c = (this.sla(this.c));';
         break;
       case 0x22:
         inst = 'SLA D';
+        code = 'this.d = (this.sla(this.d));';
         break;
       case 0x23:
         inst = 'SLA E';
+        code = 'this.e = (this.sla(this.e));';
         break;
       case 0x24:
         inst = 'SLA H';
+        code = 'this.h = (this.sla(this.h));';
         break;
       case 0x25:
         inst = 'SLA L';
+        code = 'this.l = (this.sla(this.l));';
         break;
       case 0x26:
         inst = 'SLA (HL)';
+        code = 'this.writeMem(this.getHL(), this.sla(this.readMem(this.getHL())));';
         break;
       case 0x27:
         inst = 'SLA A';
+        code = 'this.a = (this.sla(this.a));';
         break;
       case 0x28:
         inst = 'SRA B';
@@ -1834,21 +1857,27 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x40:
         inst = 'BIT 0,B';
+        code = 'this.bit(this.b & BIT_0);';
         break;
       case 0x41:
         inst = 'BIT 0,C';
+        code = 'this.bit(this.c & BIT_0);';
         break;
       case 0x42:
         inst = 'BIT 0,D';
+        code = 'this.bit(this.d & BIT_0);';
         break;
       case 0x43:
         inst = 'BIT 0,E';
+        code = 'this.bit(this.e & BIT_0);';
         break;
       case 0x44:
         inst = 'BIT 0,H';
+        code = 'this.bit(this.h & BIT_0);';
         break;
       case 0x45:
         inst = 'BIT 0,L';
+        code = 'this.bit(this.l & BIT_0);';
         break;
       case 0x46:
         inst = 'BIT 0,(HL)';
@@ -1860,21 +1889,27 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x48:
         inst = 'BIT 1,B';
+        code = 'this.bit(this.b & BIT_1);';
         break;
       case 0x49:
         inst = 'BIT 1,C';
+        code = 'this.bit(this.c & BIT_1);';
         break;
       case 0x4A:
         inst = 'BIT 1,D';
+        code = 'this.bit(this.d & BIT_1);';
         break;
       case 0x4B:
         inst = 'BIT 1,E';
+        code = 'this.bit(this.e & BIT_1);';
         break;
       case 0x4C:
         inst = 'BIT 1,H';
+        code = 'this.bit(this.h & BIT_1);';
         break;
       case 0x4D:
         inst = 'BIT 1,L';
+        code = 'this.bit(this.l & BIT_1);';
         break;
       case 0x4E:
         inst = 'BIT 1,(HL)';
@@ -1890,18 +1925,23 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x51:
         inst = 'BIT 2,C';
+        code = 'this.bit(this.c & BIT_2);';
         break;
       case 0x52:
         inst = 'BIT 2,D';
+        code = 'this.bit(this.d & BIT_2);';
         break;
       case 0x53:
         inst = 'BIT 2,E';
+        code = 'this.bit(this.e & BIT_2);';
         break;
       case 0x54:
         inst = 'BIT 2,H';
+        code = 'this.bit(this.h & BIT_2);';
         break;
       case 0x55:
         inst = 'BIT 2,L';
+        code = 'this.bit(this.l & BIT_2);';
         break;
       case 0x56:
         inst = 'BIT 2,(HL)';
@@ -1917,18 +1957,23 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x59:
         inst = 'BIT 3,C';
+        code = 'this.bit(this.c & BIT_3);';
         break;
       case 0x5A:
         inst = 'BIT 3,D';
+        code = 'this.bit(this.d & BIT_3);';
         break;
       case 0x5B:
         inst = 'BIT 3,E';
+        code = 'this.bit(this.e & BIT_3);';
         break;
       case 0x5C:
         inst = 'BIT 3,H';
+        code = 'this.bit(this.h & BIT_3);';
         break;
       case 0x5D:
         inst = 'BIT 3,L';
+        code = 'this.bit(this.l & BIT_3);';
         break;
       case 0x5E:
         inst = 'BIT 3,(HL)';
@@ -1940,21 +1985,27 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x60:
         inst = 'BIT 4,B';
+        code = 'this.bit(this.b & BIT_4);';
         break;
       case 0x61:
         inst = 'BIT 4,C';
+        code = 'this.bit(this.c & BIT_4);';
         break;
       case 0x62:
         inst = 'BIT 4,D';
+        code = 'this.bit(this.d & BIT_4);';
         break;
       case 0x63:
         inst = 'BIT 4,E';
+        code = 'this.bit(this.e & BIT_4);';
         break;
       case 0x64:
         inst = 'BIT 4,H';
+        code = 'this.bit(this.h & BIT_4);';
         break;
       case 0x65:
         inst = 'BIT 4,L';
+        code = 'this.bit(this.l & BIT_4);';
         break;
       case 0x66:
         inst = 'BIT 4,(HL)';
@@ -1970,18 +2021,23 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x69:
         inst = 'BIT 5,C';
+        code = 'this.bit(this.c & BIT_5);';
         break;
       case 0x6A:
         inst = 'BIT 5,D';
+        code = 'this.bit(this.d & BIT_5);';
         break;
       case 0x6B:
         inst = 'BIT 5,E';
+        code = 'this.bit(this.e & BIT_5);';
         break;
       case 0x6C:
         inst = 'BIT 5,H';
+        code = 'this.bit(this.h & BIT_5);';
         break;
       case 0x6D:
         inst = 'BIT 5,L';
+        code = 'this.bit(this.l & BIT_5);';
         break;
       case 0x6E:
         inst = 'BIT 5,(HL)';
@@ -1993,21 +2049,27 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x70:
         inst = 'BIT 6,B';
+        code = 'this.bit(this.b & BIT_6);';
         break;
       case 0x71:
         inst = 'BIT 6,C';
+        code = 'this.bit(this.c & BIT_6);';
         break;
       case 0x72:
         inst = 'BIT 6,D';
+        code = 'this.bit(this.d & BIT_6);';
         break;
       case 0x73:
         inst = 'BIT 6,E';
+        code = 'this.bit(this.e & BIT_6);';
         break;
       case 0x74:
         inst = 'BIT 6,H';
+        code = 'this.bit(this.h & BIT_6);';
         break;
       case 0x75:
         inst = 'BIT 6,L';
+        code = 'this.bit(this.l & BIT_6);';
         break;
       case 0x76:
         inst = 'BIT 6,(HL)';
@@ -2019,21 +2081,27 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x78:
         inst = 'BIT 7,B';
+        code = 'this.bit(this.b & BIT_7);';
         break;
       case 0x79:
         inst = 'BIT 7,C';
+        code = 'this.bit(this.c & BIT_7);';
         break;
       case 0x7A:
         inst = 'BIT 7,D';
+        code = 'this.bit(this.d & BIT_7);';
         break;
       case 0x7B:
         inst = 'BIT 7,E';
+        code = 'this.bit(this.e & BIT_7);';
         break;
       case 0x7C:
         inst = 'BIT 7,H';
+        code = 'this.bit(this.h & BIT_7);';
         break;
       case 0x7D:
         inst = 'BIT 7,L';
+        code = 'this.bit(this.l & BIT_7);';
         break;
       case 0x7E:
         inst = 'BIT 7,(HL)';
@@ -2674,15 +2742,29 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x6F:
         inst = 'RLD';
+        code = 'var location = this.getHL();' +
+            'temp = this.readMem(location);' +
+            // move low 4 of hl to high 4 of hl
+            // move low 4 of a to low 4 of hl
+            'this.writeMem(location, (temp & 0x0F) << 4 | (this.a & 0x0F));' +
+            // move high 4 of hl to low 4 of a
+            'this.a = (this.a & 0xF0) | (temp >> 4);' +
+            'this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];';
         break;
       case 0x71:
         inst = 'OUT (C),0';
+        code = 'this.port.out(this.c, 0);';
         break;
       case 0x72:
         inst = 'SBC HL,SP';
+        code = 'this.sbc16(this.sp);';
         break;
       case 0x73:
-        inst = 'LD (' + toHex(this.readRom16bit(address)) + '),SP';
+        operand = toHex(this.readRom16bit(address));
+        inst = 'LD (' + operand + '),SP';
+        code = 'var location = this.readMemWord(' + operand + ');' +
+            'this.writeMem(location++, this.sp & 0xFF);' + // SPl
+            'this.writeMem(location, this.sp >> 8);'; // SPh
         address = address + 2;
         break;
       case 0x78:
@@ -2696,9 +2778,12 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x7A:
         inst = 'ADC HL,SP';
+        code = 'this.adc16(this.sp);';
         break;
       case 0x7B:
-        inst = 'LD SP,(' + toHex(this.readRom16bit(address)) + ')';
+        operand = toHex(this.readRom16bit(address));
+        inst = 'LD SP,(' + operand + ')';
+        code = 'this.sp = this.readMemWord(' + operand + ');';
         address = address + 2;
         break;
       case 0xA0:
@@ -2710,6 +2795,12 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xA1:
         inst = 'CPI';
+        code = 'temp = (this.f & F_CARRY) | F_NEGATIVE;' +
+            'this.cp_a(this.readMem(this.getHL()));' + // sets some flags
+            'this.incHL();' +
+            'this.decBC();' +
+            'temp |= (this.getBC() == 0 ? 0 : F_PARITY);' +
+            'this.f = (this.f & 0xF8) | temp;';
         break;
       case 0xA2:
         inst = 'INI';
@@ -3032,6 +3123,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x39:
         inst = 'ADD ' + index + ' SP';
+        code = 'this.set' + index + '(this.add16(this.get' + index + '(), this.sp));';
         break;
       case 0x44:
         inst = 'LD B,' + index + 'H *';
