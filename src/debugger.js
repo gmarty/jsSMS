@@ -175,22 +175,45 @@ JSSMS.Debugger.prototype = {
     var tree = this.instructions;
     var toHex = JSSMS.Utils.toHex;
     var tstates = 0;
-    var prevPc = 0;
+    var prevAddress = 0;
+    var prevNextAddress = 0;
     var breakNeeded = false;
 
+    // Memory pages
+    var pageBreakPoint = 0x0400;
+    var pageNumber = 0;
+
+    var i = 0, length = 0;
+
     var code = [
+      '"": {',
       '"": function() {',
       'throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'
     ];
 
-    for (var i = 0, length = tree.length; i < length; i++) {
+    for (i = 0, length = tree.length; i < length; i++) {
       if (!tree[i])
         continue;
 
-      if (tree[i].isJumpTarget || prevPc != tree[i].address || breakNeeded) {
+      // Break branches into several pages.
+      if (prevAddress <= pageBreakPoint && tree[i].address > pageBreakPoint) {
+        code.push('}');
+        code.push('},');
+
+        code.push('' + pageNumber + ': {');
+        code.push('"": function() {');
+        code.push('throw "Bad address: " + JSSMS.Utils.toHex(this.pc);');
+        breakNeeded = true;
+
+        // Set next memory break point.
+        pageNumber++;
+        pageBreakPoint = pageNumber * PAGE_SIZE;
+      }
+
+      if (tree[i].isJumpTarget || prevNextAddress != tree[i].address || breakNeeded) {
         insertTStates();
-        if (prevPc && !breakNeeded) {
-          code.push('this.pc = ' + toHex(prevPc) + ';');
+        if (prevNextAddress && !breakNeeded) {
+          code.push('this.pc = ' + toHex(prevNextAddress) + ';');
         }
         code.push('},');
         // `temp` is only used for variable declaration, not actually passed parameter.
@@ -213,10 +236,12 @@ JSSMS.Debugger.prototype = {
       if (tree[i].code != '')
         code.push(tree[i].code);
 
-      prevPc = tree[i].nextAddress;
+      prevAddress = tree[i].address;
+      prevNextAddress = tree[i].nextAddress;
     }
 
     code.push('}'); // End of last branch
+    code.push('}'); // End of branches object (the comma is inserted in the template).
     code = code.join('\n');
 
     console.timeEnd('JavaScript generation');

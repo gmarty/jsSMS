@@ -435,16 +435,44 @@ JSSMS.Z80.prototype = {
 
       //console.log(JSSMS.Utils.toHex(this.pc));
 
-      if (!this[this.pc])
-        this.interpret();
-      else
-        this[this.pc]();
+      this.recompile();
 
       // Execute eol() at end of scanlines and exit at end of frame.
       if (this.tstates <= 0) {
         if (this.eol())
           return;
       }
+    }
+  },
+
+
+  recompile: function() {
+    if (this.pc < 0x0400) {
+      if (this[''][this.pc]) {
+        this[''][this.pc].call(this);
+      } else {
+        this.interpret();
+      }
+    } else if (this.pc < 0x4000) {
+      if (this[this.frameReg[0]][this.pc]) {
+        this[this.frameReg[0]][this.pc].call(this);
+      } else {
+        this.interpret();
+      }
+    } else if (this.pc < 0x8000) {
+      if (this[this.frameReg[1]][this.pc]) {
+        this[this.frameReg[1]][this.pc].call(this);
+      } else {
+        this.interpret();
+      }
+    } else if (this.pc < 0xC000) {
+      if (this[this.frameReg[2]][this.pc]) {
+        this[this.frameReg[2]][this.pc].call(this);
+      } else {
+        this.interpret();
+      }
+    } else {
+      this.interpret();
     }
   },
 
