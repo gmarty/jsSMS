@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-'use strict';var DEBUG = true;
+'use strict';var DEBUG = false;
 var DEBUGGER = false;
 var ACCURATE = false;
 var LITTLE_ENDIAN = true;
@@ -6144,72 +6144,95 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 40:
       inst = "SRA B";
+      code = "this.b = (this.sra(this.b));";
       break;
     case 41:
       inst = "SRA C";
+      code = "this.c = (this.sra(this.c));";
       break;
     case 42:
       inst = "SRA D";
+      code = "this.d = (this.sra(this.d));";
       break;
     case 43:
       inst = "SRA E";
+      code = "this.e = (this.sra(this.e));";
       break;
     case 44:
       inst = "SRA H";
+      code = "this.h = (this.sra(this.h));";
       break;
     case 45:
       inst = "SRA L";
+      code = "this.l = (this.sra(this.l));";
       break;
     case 46:
       inst = "SRA (HL)";
+      code = "this.writeMem(this.getHL(), this.sra(this.readMem(this.getHL())));";
       break;
     case 47:
       inst = "SRA A";
+      code = "this.a = (this.sra(this.a));";
       break;
     case 48:
       inst = "SLL B";
+      code = "this.b = (this.sll(this.b));";
       break;
     case 49:
       inst = "SLL C";
+      code = "this.c = (this.sll(this.c));";
       break;
     case 50:
       inst = "SLL D";
+      code = "this.d = (this.sll(this.d));";
       break;
     case 51:
       inst = "SLL E";
+      code = "this.e = (this.sll(this.e));";
       break;
     case 52:
       inst = "SLL H";
+      code = "this.h = (this.sll(this.h));";
       break;
     case 53:
       inst = "SLL L";
+      code = "this.l = (this.sll(this.l));";
       break;
     case 54:
       inst = "SLL (HL)";
+      code = "this.writeMem(this.getHL(), this.sll(this.readMem(this.getHL())));";
       break;
     case 55:
       inst = "SLL A";
+      code = "this.a = (this.sll(this.a));";
       break;
     case 56:
       inst = "SRL B";
+      code = "this.b = this.srl(this.b);";
       break;
     case 57:
       inst = "SRL C";
+      code = "this.c = this.srl(this.c);";
       break;
     case 58:
       inst = "SRL D";
+      code = "this.d = this.srl(this.d);";
       break;
     case 59:
       inst = "SRL E";
+      code = "this.e = this.srl(this.e);";
       break;
     case 60:
       inst = "SRL H";
+      code = "this.h = this.srl(this.h);";
       break;
     case 61:
       inst = "SRL L";
+      code = "this.l = this.srl(this.l);";
       break;
     case 62:
       inst = "SRL (HL)";
+      code = "this.writeMem(this.getHL(), this.srl(this.readMem(this.getHL())));";
       break;
     case 63:
       inst = "SRL A";
@@ -6473,21 +6496,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 128:
       inst = "RES 0,B";
+      code = "this.b &= ~BIT_0;";
       break;
     case 129:
       inst = "RES 0,C";
+      code = "this.c &= ~BIT_0;";
       break;
     case 130:
       inst = "RES 0,D";
+      code = "this.d &= ~BIT_0;";
       break;
     case 131:
       inst = "RES 0,E";
+      code = "this.e &= ~BIT_0;";
       break;
     case 132:
       inst = "RES 0,H";
+      code = "this.h &= ~BIT_0;";
       break;
     case 133:
       inst = "RES 0,L";
+      code = "this.l &= ~BIT_0;";
       break;
     case 134:
       inst = "RES 0,(HL)";
@@ -6495,6 +6524,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 135:
       inst = "RES 0,A";
+      code = "this.a &= ~BIT_0;";
       break;
     case 136:
       inst = "RES 1,B";
@@ -6645,24 +6675,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 183:
       inst = "RES 6,A";
+      code = "this.a &= ~BIT_6;";
       break;
     case 184:
       inst = "RES 7,B";
+      code = "this.b &= ~BIT_7;";
       break;
     case 185:
       inst = "RES 7,C";
+      code = "this.c &= ~BIT_7;";
       break;
     case 186:
       inst = "RES 7,D";
+      code = "this.d &= ~BIT_7;";
       break;
     case 187:
       inst = "RES 7,E";
+      code = "this.e &= ~BIT_7;";
       break;
     case 188:
       inst = "RES 7,H";
+      code = "this.h &= ~BIT_7;";
       break;
     case 189:
       inst = "RES 7,L";
+      code = "this.l &= ~BIT_7;";
       break;
     case 190:
       inst = "RES 7,(HL)";
@@ -6828,24 +6865,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 239:
       inst = "SET 5,A";
+      code = "this.a |= BIT_5;";
       break;
     case 240:
       inst = "SET 6,B";
+      code = "this.b |= BIT_6;";
       break;
     case 241:
       inst = "SET 6,C";
+      code = "this.c |= BIT_6;";
       break;
     case 242:
       inst = "SET 6,D";
+      code = "this.d |= BIT_6;";
       break;
     case 243:
       inst = "SET 6,E";
+      code = "this.e |= BIT_6;";
       break;
     case 244:
       inst = "SET 6,H";
+      code = "this.h |= BIT_6;";
       break;
     case 245:
       inst = "SET 6,L";
+      code = "this.l |= BIT_6;";
       break;
     case 246:
       inst = "SET 6,(HL)";
@@ -6853,24 +6897,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 247:
       inst = "SET 6,A";
+      code = "this.a |= BIT_6;";
       break;
     case 248:
       inst = "SET 7,B";
+      code = "this.b |= BIT_7;";
       break;
     case 249:
       inst = "SET 7,C";
+      code = "this.c |= BIT_7;";
       break;
     case 250:
       inst = "SET 7,D";
+      code = "this.d |= BIT_7;";
       break;
     case 251:
       inst = "SET 7,E";
+      code = "this.e |= BIT_7;";
       break;
     case 252:
       inst = "SET 7,H";
+      code = "this.h |= BIT_7;";
       break;
     case 253:
       inst = "SET 7,L";
+      code = "this.l |= BIT_7;";
       break;
     case 254:
       inst = "SET 7,(HL)";
@@ -7071,7 +7122,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.adc16(this.getHL());";
       break;
     case 107:
-      inst = "LD HL,(" + toHex(this.readRom16bit(address)) + ")";
+      operand = toHex(this.readRom16bit(address));
+      inst = "LD HL,(" + operand + ")";
+      code = "this.setHL(this.readMemWord(" + operand + "));";
       address = address + 2;
       break;
     case 111:
@@ -7376,6 +7429,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 109:
       inst = "LD " + index + "L," + index + "L *";
+      code = "";
       break;
     case 110:
       var offset = this.readRom8bit(address);
@@ -7385,6 +7439,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 111:
       inst = "LD " + index + "L,A *";
+      code = "this." + index.toLowerCase() + "L = this.a;";
       break;
     case 112:
       var offset = this.readRom8bit(address);
@@ -7461,6 +7516,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 142:
       var offset = this.readRom8bit(address);
       inst = "ADC A,(" + index + "+" + toHex(offset) + "))";
+      code = "this.adc_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
       break;
     case 148:
@@ -7484,24 +7540,30 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 158:
       var offset = this.readRom8bit(address);
       inst = "SBC A,(" + index + "+" + toHex(offset) + "))";
+      code = "this.sbc_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
       break;
     case 164:
       inst = "AND " + index + "H *";
+      code = "this.f = this.SZP_TABLE[this.a &= this." + index.toLowerCase() + "H];";
       break;
     case 165:
       inst = "AND " + index + "L *";
+      code = "this.f = this.SZP_TABLE[this.a &= this." + index.toLowerCase() + "L];";
       break;
     case 166:
       var offset = this.readRom8bit(address);
       inst = "AND A,(" + index + "+" + toHex(offset) + "))";
+      code = "this.f = this.SZP_TABLE[this.a &= this.readMem(this.get" + index + "() + " + toHex(offset) + ")] | F_HALFCARRY;";
       address++;
       break;
     case 172:
       inst = "XOR A " + index + "H*";
+      code = "this.f = this.SZP_TABLE[this.a |= this." + index.toLowerCase() + "H];";
       break;
     case 173:
       inst = "XOR A " + index + "L*";
+      code = "this.f = this.SZP_TABLE[this.a |= this." + index.toLowerCase() + "L];";
       break;
     case 174:
       var offset = this.readRom8bit(address);
@@ -7511,9 +7573,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 180:
       inst = "OR A " + index + "H*";
+      code = "this.f = this.SZP_TABLE[this.a |= this." + index.toLowerCase() + "H];";
       break;
     case 181:
       inst = "OR A " + index + "L*";
+      code = "this.f = this.SZP_TABLE[this.a |= this." + index.toLowerCase() + "L];";
       break;
     case 182:
       var offset = this.readRom8bit(address);
@@ -7523,9 +7587,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 188:
       inst = "CP " + index + "H *";
+      code = "this.cp_a(this." + index.toLowerCase() + "H);";
       break;
     case 189:
       inst = "CP " + index + "L *";
+      code = "this.cp_a(this." + index.toLowerCase() + "L);";
       break;
     case 190:
       var offset = this.readRom8bit(address);
@@ -7546,6 +7612,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 227:
       inst = "EX SP,(" + index + ")";
+      code = "temp = this.get" + index + "();" + "this.set" + index + "(this.readMemWord(this.sp));" + "this.writeMem(this.sp, temp & 0xFF);" + "this.writeMem(this.sp + 1, temp >> 8);";
       break;
     case 229:
       inst = "PUSH " + index;
@@ -7553,10 +7620,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 233:
       inst = "JP (" + index + ")";
+      code = "this.pc = this.get" + index + "();";
       address = null;
       break;
     case 249:
       inst = "LD SP," + index;
+      code = "this.sp = this.get" + index + "();";
       break
   }
   return{opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address}
