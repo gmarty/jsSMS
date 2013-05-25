@@ -49,10 +49,17 @@ var LITTLE_ENDIAN = true;
 
 
 /**
+ * Force ArrayBuffer and DataView use.
+ * @define {boolean}
+ */
+var FORCE_DATAVIEW = false;
+
+
+/**
  * Does browser support ArrayBuffer and DataView?
  * @const
  */
-var SUPPORT_DATAVIEW = !!(window['DataView'] && window['ArrayBuffer']);
+var SUPPORT_DATAVIEW = FORCE_DATAVIEW || (!!(window['DataView'] && window['ArrayBuffer']));
 
 
 // Sound Output
