@@ -1,0 +1,27 @@
+{
+  "version": "0.0.1",
+  "name": "Alec emulator",
+  "launch_path": "/jsSMS/alec/index.html",
+  "description": "Emulator for Sega Master System & Game Gear",
+  "icons": {
+    "16": "/jsSMS/alec/img/icon16.png",
+    "32": "/jsSMS/alec/img/icon32.png",
+    "48": "/jsSMS/alec/img/icon48.png",
+    "60": "/jsSMS/alec/img/icon60.png",
+    "64": "/jsSMS/alec/img/icon64.png",
+    "128": "/jsSMS/alec/img/icon128.png",
+    "256": "/jsSMS/alec/img/icon128.png"
+  },
+  "developer": {
+    "name": "G. Marty",
+    "url": "https://github.com/gmarty"
+  },
+  "installs_allowed_from": ["*"],
+  "default_locale": "en",
+  "permissions": {
+    "desktop-notification": {
+      "description": "To show notifications"
+    }
+  },
+  "appcache_path": "/jsSMS/alec/manifest.appcache"
+}

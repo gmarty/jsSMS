@@ -97,6 +97,65 @@ module.exports = function(grunt) {
         }
       },
 
+      // Generates a minified version of the script for the Firefox OS app.
+      'alec': {
+        js: [
+          'src/setup.js',
+          'src/sms.js',
+          'src/utils.js',
+          'src/z80.js',
+          'src/keyboard.js',
+          'src/psg.js',
+          'src/vdp.js',
+          'src/alec/ui.js',
+          'src/ports.js',
+          'src/build/exports.js'
+        ],
+        jsOutputFile: 'alec/min/alec.min.js',
+        options: {
+          externs: '<%= externs %>',
+          compilation_level: 'ADVANCED_OPTIMIZATIONS',
+          language_in: 'ECMASCRIPT5_STRICT',
+          use_types_for_optimization: null,
+          summary_detail_level: 3,
+          warning_level: 'VERBOSE',
+          output_wrapper: '(function(window){%output%})(window);',
+          define: [
+            '"DEBUG=false"',
+            '"DEBUGGER=false"',
+            '"FORCE_DATAVIEW=true"',
+            '"ACCURATE_INTERRUPT_EMULATION=false"'
+          ],
+          debug: false
+        }
+      },
+
+      // Minify the bootstrap file for the Firefox OS app.
+      'alec-bootstrap': {
+        js: [
+          'src/setup.js',
+          'src/alec/bootstrap.js'
+        ],
+        jsOutputFile: 'alec/min/bootstrap.min.js',
+        options: {
+          externs: [
+            '<%= closurePath %>/contrib/externs/webkit_console.js',
+            '<%= closurePath %>/contrib/externs/jquery-1.7.js',
+            'src/build/externs/jssms.js'
+          ],
+          compilation_level: 'ADVANCED_OPTIMIZATIONS',
+          language_in: 'ECMASCRIPT5_STRICT',
+          use_types_for_optimization: null,
+          summary_detail_level: 3,
+          warning_level: 'VERBOSE',
+          output_wrapper: '(function(window,document,navigator){%output%})(window,document,navigator);',
+          define: [
+            '"DEBUG=false"'
+          ],
+          debug: false
+        }
+      },
+
       // Generates a minified version of the script to use with node.js.
       node: {
         js: [
@@ -152,6 +211,10 @@ module.exports = function(grunt) {
         src: ['min/jssms.concat.js'],
         dest: 'min/jssms.concat.js'
       },
+      'alec': {
+        src: ['alec/min/alec.min.js'],
+        dest: 'alec/min/alec.min.js'
+      },
       node: {
         src: ['min/jssms.node.js'],
         dest: 'min/jssms.node.js'
@@ -168,6 +231,11 @@ module.exports = function(grunt) {
     'concat:min',
     'concat:debug',
     'concat:concat'
+  ]);
+  grunt.registerTask('alec', [
+    'closure-compiler:alec',
+    'closure-compiler:alec-bootstrap',
+    'concat:alec'
   ]);
   grunt.registerTask('node', [
     'closure-compiler:node',
