@@ -1,8 +1,8 @@
 {
   "version": "0.0.1",
-  "name": "Alec emulator",
+  "name": "Alec",
   "launch_path": "/jsSMS/alec/index.html",
-  "description": "Emulator for Sega Master System & Game Gear",
+  "description": "Emulator for Sega Master System &amp; Game Gear",
   "icons": {
     "16": "/jsSMS/alec/img/icon16.png",
     "32": "/jsSMS/alec/img/icon32.png",
@@ -20,7 +20,7 @@
   "default_locale": "en",
   "permissions": {
     "desktop-notification": {
-      "description": "To show notifications"
+      "description": "To show update notifications"
     }
   },
   "appcache_path": "/jsSMS/alec/manifest.appcache"
