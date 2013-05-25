@@ -197,6 +197,7 @@ JSSMS.Debugger.prototype = {
 
       // Break branches into several pages.
       if (prevAddress <= pageBreakPoint && tree[i].address > pageBreakPoint) {
+        code.push('this.pc = ' + toHex(prevAddress) + ';');
         code.push('}');
         code.push('},');
 
@@ -230,7 +231,10 @@ JSSMS.Debugger.prototype = {
 
       // Decrement tstates.
       tstates += getTotalTStates(tree[i].opcodes);
-      insertTStates();
+
+      if (/return;/.test(tree[i].code) || /this\.tstates/.test(tree[i].code)) {
+        insertTStates();
+      }
 
       // Instruction.
       if (tree[i].code != '')
@@ -2240,6 +2244,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x9F:
         inst = 'RES 3,A';
+        code = 'this.a &= ~BIT_3;';
         break;
       case 0xA0:
         inst = 'RES 4,B';
@@ -2265,6 +2270,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xA7:
         inst = 'RES 4,A';
+        code = 'this.a &= ~BIT_4;';
         break;
       case 0xA8:
         inst = 'RES 5,B';
@@ -2480,6 +2486,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xE7:
         inst = 'SET 4,A';
+        code = 'this.a |= BIT_4;';
         break;
       case 0xE8:
         inst = 'SET 5,B';
@@ -3138,7 +3145,10 @@ JSSMS.Debugger.prototype = {
         inst = 'ADD ' + index + '  ' + index;
         break;
       case 0x2A:
-        inst = 'LD ' + index + ' (' + toHex(this.readRom16bit(address)) + ')';
+        var location = this.readRom16bit(address);
+        inst = 'LD ' + index + ' (' + toHex(location) + ')';
+        code = 'this.ixL = this.readMem(' + toHex(location) + ');' +
+            'this.ixH = this.readMem(' + toHex(location + 1) + ');';
         address = address + 2;
         break;
       case 0x2B:

@@ -350,7 +350,7 @@ if (window['$']) {
             var data;
 
             if (status == 'error') {
-              self.updateStatus('The selected rom could not be loaded.');
+              self.updateStatus('The selected ROM file could not be loaded.');
               return;
             }
 
