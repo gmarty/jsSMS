@@ -39,19 +39,15 @@ JSSMS.Utils = {
   Array: function() {
     if (SUPPORT_DATAVIEW) {
       /**
-       * @param {number=} length
+       * @param {number} length
        * @return {DataView}
        */
       return function(length) {
-        if (!length) {
-          length = 0;
-        }
-
         return new DataView(new ArrayBuffer(length));
       }
     } else {
       /**
-       * @param {number=} length
+       * @param {number} length
        * @return {Array}
        */
       return Array;
