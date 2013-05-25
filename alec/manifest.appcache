@@ -1,0 +1,11 @@
+CACHE MANIFEST
+# Version 0.0.1
+
+index.html
+css/*
+fonts/*
+img/*
+min/*
+
+NETWORK:
+*
