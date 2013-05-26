@@ -30,13 +30,12 @@
  */
 JSSMS.DummyUI = function(sms) {
   this.main = sms;
-  this.enable = function() {
+  this.reset = function() {
   };
   this.updateStatus = function() {
   };
-  this.writeAudio = function() {
-  };
-  this.writeFrame = function() {
+  this.canvasImageData = {
+    data: []
   };
 };
 
