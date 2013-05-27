@@ -2,10 +2,12 @@ CACHE MANIFEST
 # Version 0.0.1
 
 index.html
-css/*
-fonts/*
+css/*.css
+fonts/moztt_light-webfont.woff
+fonts/moztt_medium-webfont.woff
+fonts/moztt_regular-webfont.woff
 img/*
-min/*
+min/alec.min.js
 
 NETWORK:
 *

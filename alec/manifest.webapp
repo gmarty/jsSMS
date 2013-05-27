@@ -10,7 +10,7 @@
     "60": "/jsSMS/alec/img/icon60.png",
     "64": "/jsSMS/alec/img/icon64.png",
     "128": "/jsSMS/alec/img/icon128.png",
-    "256": "/jsSMS/alec/img/icon128.png"
+    "256": "/jsSMS/alec/img/icon256.png"
   },
   "developer": {
     "name": "G. Marty",
@@ -23,5 +23,13 @@
       "description": "To show update notifications"
     }
   },
-  "appcache_path": "/jsSMS/alec/manifest.appcache"
+  "appcache_path": "/jsSMS/alec/manifest.appcache",
+  "locales": {
+    "fr": {
+      "description": "Émulateur de Sega Master System et Game Gear"
+    },
+    "ja": {
+      "description": "セガ マスターシステム・ゲームギアのエミュレータ"
+    }
+  }
 }
