@@ -1,5 +1,5 @@
 /*
-jsSMS - A Sega Master System/GameGear emulator in JavaScript
+jsSMS - A Sega Master System/Game Gear emulator in JavaScript
 Copyright (C) 2012-2013 Guillaume Marty (https://github.com/gmarty)
 Based on JavaGear Copyright (c) 2002-2008 Chris White
 
@@ -20,9 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 var DEBUGGER = false;
 var ACCURATE = false;
 var LITTLE_ENDIAN = true;
-var SUPPORT_DATAVIEW = !!(window["DataView"] && window["ArrayBuffer"]);
+var FORCE_DATAVIEW = false;
+var SUPPORT_DATAVIEW = FORCE_DATAVIEW || !!(window["DataView"] && window["ArrayBuffer"]);
 var SAMPLE_RATE = 44100;
-var Setup = {DEBUG_TIMING:DEBUG, REFRESH_EMULATION:false, ACCURATE_INTERRUPT_EMULATION:ACCURATE, LIGHTGUN:false, VDP_SPRITE_COLLISIONS:ACCURATE, PAGE_SIZE:16384};
+var DEBUG_TIMING = DEBUG;
+var REFRESH_EMULATION = false;
+var ACCURATE_INTERRUPT_EMULATION = false;
+var LIGHTGUN = false;
+var VDP_SPRITE_COLLISIONS = ACCURATE;
+var PAGE_SIZE = 16384;
 var fpsInterval = 500;
 var CLOCK_NTSC = 3579545;
 var CLOCK_PAL = 3546893;
@@ -63,14 +69,14 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
 }, start:function() {
   var self = this;
   if(!this.isRunning) {
-    this.isRunning = true
-  }
-  this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
-  if(DEBUG) {
-    this.resetFps();
-    this.fpsInterval = setInterval(function() {
-      self.printFps()
-    }, fpsInterval)
+    this.isRunning = true;
+    this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen);
+    if(DEBUG) {
+      this.resetFps();
+      this.fpsInterval = setInterval(function() {
+        self.printFps()
+      }, fpsInterval)
+    }
   }
   this.ui.updateStatus("Running")
 }, stop:function() {
@@ -80,87 +86,12 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   this.isRunning = false
 }, frame:function() {
   if(this.isRunning) {
-    if(!this.throttle) {
-      if(this.emulateNextFrame()) {
-        this.doRepaint()
-      }
-    }else {
-      if(this.emulateNextFrame()) {
-        this.doRepaint()
-      }
-    }
+    this.cpu.frame();
     this.fpsFrameCount++;
     this.ui.requestAnimationFrame(this.frame.bind(this), this.ui.screen)
   }
 }, nextStep:function() {
-  if(Setup.ACCURATE_INTERRUPT_EMULATION && this.lineno == 193) {
-    this.cpu.run(this.cyclesPerLine, 8);
-    this.vdp.setVBlankFlag();
-    this.cpu.run(0, 0)
-  }else {
-    this.cpu.run(this.cyclesPerLine, 0)
-  }
-  this.vdp.line = this.lineno;
-  if(this.frameskip_counter == 0 && this.lineno < 192) {
-    this.vdp.drawLine(this.lineno)
-  }
-  this.vdp.interrupts(this.lineno);
-  this.lineno++;
-  if(this.lineno >= this.no_of_scanlines) {
-    this.lineno = 0;
-    this.doRepaint()
-  }
-}, emulateNextFrame:function() {
-  var startTime = 0;
-  var lineno = 0;
-  for(;lineno < this.no_of_scanlines;lineno++) {
-    if(Setup.DEBUG_TIMING) {
-      startTime = JSSMS.Utils.getTimestamp()
-    }
-    if(Setup.ACCURATE_INTERRUPT_EMULATION && lineno == 193) {
-      this.cpu.run(this.cyclesPerLine, 8);
-      this.vdp.setVBlankFlag();
-      this.cpu.run(0, 0)
-    }else {
-      this.cpu.run(this.cyclesPerLine, 0)
-    }
-    if(Setup.DEBUG_TIMING) {
-      this.z80TimeCounter += JSSMS.Utils.getTimestamp() - startTime
-    }
-    if(this.soundEnabled) {
-      this.updateSound(lineno)
-    }
-    this.vdp.line = lineno;
-    if(this.frameskip_counter == 0 && lineno < 192) {
-      if(Setup.DEBUG_TIMING) {
-        startTime = JSSMS.Utils.getTimestamp()
-      }
-      this.vdp.drawLine(lineno);
-      if(Setup.DEBUG_TIMING) {
-        this.drawTimeCounter += JSSMS.Utils.getTimestamp() - startTime
-      }
-    }
-    this.vdp.interrupts(lineno)
-  }
-  if(this.soundEnabled) {
-    this.audioOutput(this.audioBuffer)
-  }
-  if(Setup.DEBUG_TIMING && ++this.frameCount == 60) {
-    this.z80Time = this.z80TimeCounter;
-    this.drawTime = this.drawTimeCounter;
-    this.z80TimeCounter = 0;
-    this.drawTimeCounter = 0;
-    this.frameCount = 0
-  }
-  if(this.pause_button) {
-    this.cpu.nmi();
-    this.pause_button = false
-  }
-  if(this.frameskip_counter-- == 0) {
-    this.frameskip_counter = this.frameSkip;
-    return true
-  }
-  return false
+  this.cpu.frame()
 }, setSMS:function() {
   this.is_sms = true;
   this.is_gg = false;
@@ -235,7 +166,7 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
       this.setGG()
     }
   }
-  if(size <= Setup.PAGE_SIZE) {
+  if(size <= PAGE_SIZE) {
     return false
   }
   pages = this.loadROM(data, size);
@@ -252,17 +183,17 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
     size -= 512
   }
   var i, j;
-  var number_of_pages = Math.round(size / Setup.PAGE_SIZE);
+  var number_of_pages = Math.round(size / PAGE_SIZE);
   var pages = new Array(number_of_pages);
   for(i = 0;i < number_of_pages;i++) {
-    pages[i] = JSSMS.Utils.Array(Setup.PAGE_SIZE);
+    pages[i] = JSSMS.Utils.Array(PAGE_SIZE);
     if(SUPPORT_DATAVIEW) {
-      for(j = 0;j < Setup.PAGE_SIZE;j++) {
-        pages[i].setUint8(j, data.charCodeAt(i * Setup.PAGE_SIZE + j))
+      for(j = 0;j < PAGE_SIZE;j++) {
+        pages[i].setUint8(j, data.charCodeAt(i * PAGE_SIZE + j))
       }
     }else {
-      for(j = 0;j < Setup.PAGE_SIZE;j++) {
-        pages[i][j] = data.charCodeAt(i * Setup.PAGE_SIZE + j) & 255
+      for(j = 0;j < PAGE_SIZE;j++) {
+        pages[i][j] = data.charCodeAt(i * PAGE_SIZE + j) & 255
       }
     }
   }
@@ -279,9 +210,6 @@ JSSMS.Utils = {rndInt:function(range) {
 }, Array:function() {
   if(SUPPORT_DATAVIEW) {
     return function(length) {
-      if(!length) {
-        length = 0
-      }
       return new DataView(new ArrayBuffer(length))
     }
   }else {
@@ -445,36 +373,64 @@ JSSMS.Z80.prototype = {reset:function() {
   this.EI_inst = false;
   this.interruptVector = 0;
   this.halt = false
-}, run:function(cycles, cyclesTo) {
-  this.tstates += cycles;
-  if(cycles != 0) {
-    this.totalCycles = cycles
-  }
-  if(!Setup.ACCURATE_INTERRUPT_EMULATION) {
+}, frame:function() {
+  this.lineno = 0;
+  this.tstates += this.main.cyclesPerLine;
+  this.totalCycles = this.main.cyclesPerLine;
+  if(ACCURATE_INTERRUPT_EMULATION) {
     if(this.interruptLine) {
       this.interrupt()
     }
   }
-  while(this.tstates > cyclesTo) {
-    if(Setup.ACCURATE_INTERRUPT_EMULATION) {
-      if(this.interruptLine) {
-        this.interrupt()
-      }
-    }
+  while(true) {
     if(DEBUGGER) {
       this.main.ui.updateDisassembly(this.pc)
     }
-    this.interpret()
+    this.interpret();
+    if(this.tstates <= 0) {
+      if(this.eol()) {
+        return
+      }
+    }
   }
+}, eol:function() {
+  if(this.main.soundEnabled) {
+    this.main.updateSound(this.lineno)
+  }
+  this.vdp.line = this.lineno;
+  if(this.lineno < 192) {
+    this.vdp.drawLine(this.lineno)
+  }
+  this.vdp.interrupts(this.lineno);
+  if(this.interruptLine) {
+    this.interrupt()
+  }
+  this.lineno++;
+  if(this.lineno >= this.main.no_of_scanlines) {
+    this.eof();
+    return true
+  }
+  this.tstates += this.main.cyclesPerLine;
+  this.totalCycles = this.main.cyclesPerLine;
+  return false
+}, eof:function() {
+  if(this.main.soundEnabled) {
+    this.main.audioOutput(this.main.audioBuffer)
+  }
+  if(this.main.pause_button) {
+    this.nmi();
+    this.main.pause_button = false
+  }
+  this.main.doRepaint()
 }, interpret:function() {
   var location = 0;
   var temp = 0;
   var opcode = this.readMem(this.pc++);
-  if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+  if(ACCURATE_INTERRUPT_EMULATION) {
     this.EI_inst = false
   }
   this.tstates -= OP_STATES[opcode];
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   switch(opcode) {
@@ -1283,13 +1239,12 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc = 56;
       break
   }
-}, nextStep:function() {
 }, getCycle:function() {
   return this.totalCycles - this.tstates
 }, nmi:function() {
   this.iff2 = this.iff1;
   this.iff1 = false;
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   if(this.halt) {
@@ -1300,14 +1255,14 @@ JSSMS.Z80.prototype = {reset:function() {
   this.pc = 102;
   this.tstates -= 11
 }, interrupt:function() {
-  if(!this.iff1 || Setup.ACCURATE_INTERRUPT_EMULATION && this.EI_inst) {
+  if(!this.iff1 || ACCURATE_INTERRUPT_EMULATION && this.EI_inst) {
     return
   }
   if(this.halt) {
     this.pc++;
     this.halt = false
   }
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   this.iff1 = this.iff2 = false;
@@ -1382,7 +1337,7 @@ JSSMS.Z80.prototype = {reset:function() {
   this.f = this.f & F_NEGATIVE | temp >> 8
 }, doCB:function(opcode) {
   this.tstates -= OP_CB_STATES[opcode];
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   switch(opcode) {
@@ -2206,7 +2161,7 @@ JSSMS.Z80.prototype = {reset:function() {
   var location = 0;
   var temp = 0;
   this.tstates -= OP_DD_STATES[opcode];
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   switch(opcode) {
@@ -2513,7 +2468,7 @@ JSSMS.Z80.prototype = {reset:function() {
   var location;
   var temp;
   this.tstates -= OP_DD_STATES[opcode];
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   switch(opcode) {
@@ -3488,7 +3443,7 @@ JSSMS.Z80.prototype = {reset:function() {
   var temp = 0;
   var location = 0;
   this.tstates -= OP_ED_STATES[opcode];
-  if(Setup.REFRESH_EMULATION) {
+  if(REFRESH_EMULATION) {
     this.incR()
   }
   switch(opcode) {
@@ -3633,7 +3588,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc += 3;
       break;
     case 95:
-      this.a = Setup.REFRESH_EMULATION ? this.r : JSSMS.Utils.rndInt(255);
+      this.a = REFRESH_EMULATION ? this.r : JSSMS.Utils.rndInt(255);
       this.f = this.f & F_CARRY | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);
       this.pc++;
       break;
@@ -4347,13 +4302,13 @@ JSSMS.Z80.prototype = {reset:function() {
           this.frameReg[3] = value
         }else {
           if(address == 65533) {
-            this.frameReg[0] = value
+            this.frameReg[0] = value & this.romPageMask
           }else {
             if(address == 65534) {
-              this.frameReg[1] = value
+              this.frameReg[1] = value & this.romPageMask
             }else {
               if(address == 65535) {
-                this.frameReg[2] = value
+                this.frameReg[2] = value & this.romPageMask
               }
             }
           }
@@ -4373,13 +4328,13 @@ JSSMS.Z80.prototype = {reset:function() {
           this.frameReg[3] = value
         }else {
           if(address == 65533) {
-            this.frameReg[0] = value
+            this.frameReg[0] = value & this.romPageMask
           }else {
             if(address == 65534) {
-              this.frameReg[1] = value
+              this.frameReg[1] = value & this.romPageMask
             }else {
               if(address == 65535) {
-                this.frameReg[2] = value
+                this.frameReg[2] = value & this.romPageMask
               }
             }
           }
@@ -4399,10 +4354,10 @@ JSSMS.Z80.prototype = {reset:function() {
         return this.rom[0].getUint8(address)
       }else {
         if(address < 16384) {
-          return this.rom[this.frameReg[0] & this.romPageMask].getUint8(address)
+          return this.rom[this.frameReg[0]].getUint8(address)
         }else {
           if(address < 32768) {
-            return this.rom[this.frameReg[1] & this.romPageMask].getUint8(address - 16384)
+            return this.rom[this.frameReg[1]].getUint8(address - 16384)
           }else {
             if(address < 49152) {
               if((this.frameReg[3] & 12) == 8) {
@@ -4413,7 +4368,7 @@ JSSMS.Z80.prototype = {reset:function() {
                   this.useSRAM = true;
                   return this.sram.getUint8(address - 16384)
                 }else {
-                  return this.rom[this.frameReg[2] & this.romPageMask].getUint8(address - 32768)
+                  return this.rom[this.frameReg[2]].getUint8(address - 32768)
                 }
               }
             }else {
@@ -4457,10 +4412,10 @@ JSSMS.Z80.prototype = {reset:function() {
         return this.rom[0][address]
       }else {
         if(address < 16384) {
-          return this.rom[this.frameReg[0] & this.romPageMask][address]
+          return this.rom[this.frameReg[0]][address]
         }else {
           if(address < 32768) {
-            return this.rom[this.frameReg[1] & this.romPageMask][address - 16384]
+            return this.rom[this.frameReg[1]][address - 16384]
           }else {
             if(address < 49152) {
               if((this.frameReg[3] & 12) == 8) {
@@ -4471,7 +4426,7 @@ JSSMS.Z80.prototype = {reset:function() {
                   this.useSRAM = true;
                   return this.sram[address - 16384]
                 }else {
-                  return this.rom[this.frameReg[2] & this.romPageMask][address - 32768]
+                  return this.rom[this.frameReg[2]][address - 32768]
                 }
               }
             }else {
@@ -4517,10 +4472,10 @@ JSSMS.Z80.prototype = {reset:function() {
         return this.rom[0].getUint16(address, LITTLE_ENDIAN)
       }else {
         if(address < 16384) {
-          return this.rom[this.frameReg[0] & this.romPageMask].getUint16(address, LITTLE_ENDIAN)
+          return this.rom[this.frameReg[0]].getUint16(address, LITTLE_ENDIAN)
         }else {
           if(address < 32768) {
-            return this.rom[this.frameReg[1] & this.romPageMask].getUint16(address - 16384, LITTLE_ENDIAN)
+            return this.rom[this.frameReg[1]].getUint16(address - 16384, LITTLE_ENDIAN)
           }else {
             if(address < 49152) {
               if((this.frameReg[3] & 12) == 8) {
@@ -4531,7 +4486,7 @@ JSSMS.Z80.prototype = {reset:function() {
                   this.useSRAM = true;
                   return this.sram[address - 16384]
                 }else {
-                  return this.rom[this.frameReg[2] & this.romPageMask].getUint16(address - 32768, LITTLE_ENDIAN)
+                  return this.rom[this.frameReg[2]].getUint16(address - 32768, LITTLE_ENDIAN)
                 }
               }
             }else {
@@ -4575,10 +4530,10 @@ JSSMS.Z80.prototype = {reset:function() {
         return this.rom[0][address] | this.rom[0][++address] << 8
       }else {
         if(address < 16384) {
-          return this.rom[this.frameReg[0] & this.romPageMask][address] | this.rom[this.frameReg[0] & this.romPageMask][++address] << 8
+          return this.rom[this.frameReg[0]][address] | this.rom[this.frameReg[0]][++address] << 8
         }else {
           if(address < 32768) {
-            return this.rom[this.frameReg[1] & this.romPageMask][address - 16384] | this.rom[this.frameReg[1] & this.romPageMask][++address - 16384] << 8
+            return this.rom[this.frameReg[1]][address - 16384] | this.rom[this.frameReg[1]][++address - 16384] << 8
           }else {
             if(address < 49152) {
               if((this.frameReg[3] & 12) == 8) {
@@ -4589,7 +4544,7 @@ JSSMS.Z80.prototype = {reset:function() {
                   this.useSRAM = true;
                   return this.sram[address - 16384] | this.sram[++address - 16384] << 8
                 }else {
-                  return this.rom[this.frameReg[2] & this.romPageMask][address - 32768] | this.rom[this.frameReg[2] & this.romPageMask][++address - 32768] << 8
+                  return this.rom[this.frameReg[2]][address - 32768] | this.rom[this.frameReg[2]][++address - 32768] << 8
                 }
               }
             }else {
@@ -4631,10 +4586,10 @@ JSSMS.Z80.prototype = {reset:function() {
 }(), hasUsedSRAM:function() {
   return this.useSRAM
 }, setSRAM:function(bytes) {
-  var length = bytes.length / Setup.PAGE_SIZE;
+  var length = bytes.length / PAGE_SIZE;
   var i;
   for(i = 0;i < length;i++) {
-    JSSMS.Utils.copyArrayElements(bytes, i * Setup.PAGE_SIZE, this.sram[i], 0, Setup.PAGE_SIZE)
+    JSSMS.Utils.copyArrayElements(bytes, i * PAGE_SIZE, this.sram[i], 0, PAGE_SIZE)
   }
 }, setStateMem:function(state) {
   this.frameReg = state
@@ -4704,7 +4659,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   this.main.ui.updateStatus("Instructions parsed")
 }, parseInstructions:function() {
   console.time("Instructions parsing");
-  var romSize = Setup.PAGE_SIZE * this.rom.length;
+  var romSize = PAGE_SIZE * this.rom.length;
   var instruction;
   var currentAddress;
   var i = 0;
@@ -4731,8 +4686,16 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     }
   }
   this.instructions[0].isJumpTarget = true;
+  this.instructions[56].isJumpTarget = true;
+  this.instructions[102].isJumpTarget = true;
   for(;i < romSize;i++) {
-    if(this.instructions[i] && this.instructions[i].target != null) {
+    if(!this.instructions[i]) {
+      continue
+    }
+    if(this.instructions[i].nextAddress != null && this.instructions[this.instructions[i].nextAddress]) {
+      this.instructions[this.instructions[i].nextAddress].jumpTargetNb++
+    }
+    if(this.instructions[i].target != null) {
       if(this.instructions[this.instructions[i].target]) {
         this.instructions[this.instructions[i].target].isJumpTarget = true;
         this.instructions[this.instructions[i].target].jumpTargetNb++
@@ -4769,33 +4732,50 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   var tree = this.instructions;
   var toHex = JSSMS.Utils.toHex;
   var tstates = 0;
-  var prevPc = 0;
+  var prevAddress = 0;
+  var prevNextAddress = 0;
   var breakNeeded = false;
-  var code = ['"": function() {', 'throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'];
-  for(var i = 0, length = tree.length;i < length;i++) {
+  var pageBreakPoint = 1024;
+  var pageNumber = 0;
+  var i = 0, length = 0;
+  var code = ['"": {', '"": function() {', 'throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'];
+  for(i = 0, length = tree.length;i < length;i++) {
     if(!tree[i]) {
       continue
     }
-    if(tree[i].isJumpTarget || prevPc != tree[i].address || breakNeeded) {
+    if(prevAddress <= pageBreakPoint && tree[i].address > pageBreakPoint) {
+      code.push("this.pc = " + toHex(prevAddress) + ";");
+      code.push("}");
+      code.push("},");
+      code.push("" + pageNumber + ": {");
+      code.push('"": function() {');
+      code.push('throw "Bad address: " + JSSMS.Utils.toHex(this.pc);');
+      breakNeeded = true;
+      pageNumber++;
+      pageBreakPoint = pageNumber * PAGE_SIZE
+    }
+    if(tree[i].isJumpTarget || prevNextAddress != tree[i].address || breakNeeded) {
       insertTStates();
-      if(prevPc && !breakNeeded) {
-        code.push("this.pc = " + toHex(prevPc) + ";")
+      if(prevNextAddress && !breakNeeded) {
+        code.push("this.pc = " + toHex(prevNextAddress) + ";")
       }
       code.push("},");
       code.push("" + toHex(tree[i].address) + ": function(temp) {");
       code.push("// Nb of instructions jumping here: " + tree[i].jumpTargetNb)
     }
     code.push("// " + tree[i].label);
-    tstates += getTotalTStates(tree[i].opcodes);
     breakNeeded = tree[i].code.substr(-7) == "return;";
+    tstates += getTotalTStates(tree[i].opcodes);
     if(/return;/.test(tree[i].code) || /this\.tstates/.test(tree[i].code)) {
       insertTStates()
     }
     if(tree[i].code != "") {
       code.push(tree[i].code)
     }
-    prevPc = tree[i].nextAddress
+    prevAddress = tree[i].address;
+    prevNextAddress = tree[i].nextAddress
   }
+  code.push("}");
   code.push("}");
   code = code.join("\n");
   console.timeEnd("JavaScript generation");
@@ -4832,7 +4812,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   }
 }, disassemble:function(address) {
   var toHex = JSSMS.Utils.toHex;
-  var opcode = this.readMem(address);
+  var opcode = this.readRom8bit(address);
   var opcodesArray = [opcode];
   var inst = "Unknown Opcode";
   var currAddr = address;
@@ -4847,7 +4827,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "";
       break;
     case 1:
-      operand = toHex(this.readMemWord(address));
+      operand = toHex(this.readRom16bit(address));
       inst = "LD BC," + operand;
       code = "this.setBC(" + operand + ");";
       address += 2;
@@ -4869,7 +4849,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.b = this.dec8(this.b);";
       break;
     case 6:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "LD B," + operand;
       code = "this.b = " + operand + ";";
       address++;
@@ -4903,7 +4883,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.c = this.dec8(this.c);";
       break;
     case 14:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "LD C," + operand;
       code = "this.c = " + operand + ";";
       address++;
@@ -4913,13 +4893,13 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.rrca_a();";
       break;
     case 16:
-      target = address + this.signExtend(this.readMem(address) + 1);
+      target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "DJNZ (" + toHex(target) + ")";
       code = "this.b = (this.b - 1) & 0xff;" + "if (this.b != 0) {" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 5;" + "return;" + "}";
       address++;
       break;
     case 17:
-      operand = toHex(this.readMemWord(address));
+      operand = toHex(this.readRom16bit(address));
       inst = "LD DE," + operand;
       code = "this.setDE(" + operand + ");";
       address += 2;
@@ -4941,7 +4921,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.d = this.dec8(this.d);";
       break;
     case 22:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "LD D," + operand;
       code = "this.d = " + operand + ";";
       address++;
@@ -4951,7 +4931,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.rla_a();";
       break;
     case 24:
-      target = address + this.signExtend(this.readMem(address) + 1);
+      target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "JR (" + toHex(target) + ")";
       code = "this.pc = " + toHex(target) + "; return;";
       address = null;
@@ -4977,7 +4957,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.e = this.dec8(this.e);";
       break;
     case 30:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "LD E," + operand;
       code = "this.e = " + operand + ";";
       address++;
@@ -4987,19 +4967,19 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.rra_a();";
       break;
     case 32:
-      target = address + this.signExtend(this.readMem(address) + 1);
+      target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "JR NZ,(" + toHex(target) + ")";
       code = "if (!((this.f & F_ZERO) != 0)) {" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 5;" + "return;" + "}";
       address++;
       break;
     case 33:
-      operand = toHex(this.readMemWord(address));
+      operand = toHex(this.readRom16bit(address));
       inst = "LD HL," + operand;
       code = "this.setHL(" + operand + ");";
       address += 2;
       break;
     case 34:
-      location = this.readMemWord(address);
+      location = this.readRom16bit(address);
       operand = toHex(location);
       inst = "LD (" + operand + "),HL";
       code = "this.writeMem(" + operand + ", this.l);" + "this.writeMem(" + toHex(location + 1) + ", this.h);";
@@ -5018,7 +4998,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.h = this.dec8(this.h);";
       break;
     case 38:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "LD H," + operand;
       code = "this.h = " + operand + ";";
       address++;
@@ -5028,7 +5008,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.daa();";
       break;
     case 40:
-      target = address + this.signExtend(this.readMem(address) + 1);
+      target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "JR Z,(" + toHex(target) + ")";
       code = "if ((this.f & F_ZERO) != 0) {" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 5;" + "return;" + "}";
       address++;
@@ -5038,7 +5018,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.setHL(this.add16(this.getHL(), this.getHL()));";
       break;
     case 42:
-      operand = toHex(this.readMemWord(address));
+      operand = toHex(this.readRom16bit(address));
       inst = "LD HL,(" + operand + ")";
       code = "this.setHL(this.readMemWord(" + operand + "));";
       address += 2;
@@ -5056,7 +5036,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.l = this.dec8(this.l);";
       break;
     case 46:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "LD L," + operand;
       code = "this.l = " + operand + ";";
       address++;
@@ -5066,19 +5046,19 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.cpl_a();";
       break;
     case 48:
-      target = address + this.signExtend(this.readMem(address) + 1);
+      target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "JR NC,(" + toHex(target) + ")";
       code = "if (!((this.f & F_CARRY) != 0)) {" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 5;" + "return;" + "}";
       address++;
       break;
     case 49:
-      operand = toHex(this.readMemWord(address));
+      operand = toHex(this.readRom16bit(address));
       inst = "LD SP," + operand;
       code = "this.sp = " + operand + ";";
       address += 2;
       break;
     case 50:
-      operand = toHex(this.readMemWord(address));
+      operand = toHex(this.readRom16bit(address));
       inst = "LD (" + operand + "),A";
       code = "this.writeMem(" + operand + ", this.a);";
       address += 2;
@@ -5096,7 +5076,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.decMem(this.getHL());";
       break;
     case 54:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "LD (HL)," + operand;
       code = "this.writeMem(this.getHL(), " + operand + ");";
       address++;
@@ -5106,7 +5086,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.f |= F_CARRY; this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
       break;
     case 56:
-      target = address + this.signExtend(this.readMem(address) + 1);
+      target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "JR C,(" + toHex(target) + ")";
       code = "if ((this.f & F_CARRY) != 0) {" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 5;" + "return;" + "}";
       address++;
@@ -5116,7 +5096,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.setHL(this.add16(this.getHL(), this.sp));";
       break;
     case 58:
-      operand = toHex(this.readMemWord(address));
+      operand = toHex(this.readRom16bit(address));
       inst = "LD A,(" + operand + ")";
       code = "this.a = this.readMem(" + operand + ");";
       address += 2;
@@ -5134,7 +5114,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.a = this.dec8(this.a);";
       break;
     case 62:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "LD A," + operand;
       code = "this.a = " + operand + ";";
       address++;
@@ -5669,19 +5649,19 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.setBC(this.readMemWord(this.sp)); this.sp += 2;";
       break;
     case 194:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "JP NZ,(" + toHex(target) + ")";
       code = "if ((this.f & F_ZERO) == 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 195:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "JP (" + toHex(target) + ")";
       code = "this.pc = " + toHex(target) + "; return;";
       address = null;
       break;
     case 196:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "CALL NZ (" + toHex(target) + ")";
       code = "if ((this.f & F_ZERO) == 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
       address += 2;
@@ -5691,7 +5671,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.push2(this.b, this.c);";
       break;
     case 198:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "ADD A," + operand;
       code = "this.add_a(" + operand + ");";
       address++;
@@ -5711,7 +5691,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       address = null;
       break;
     case 202:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "JP Z,(" + toHex(target) + ")";
       code = "if ((this.f & F_ZERO) != 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
@@ -5724,19 +5704,19 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       address = _inst.nextAddress;
       break;
     case 204:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "CALL Z (" + toHex(target) + ")";
       code = "if ((this.f & F_ZERO) != 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
       address += 2;
       break;
     case 205:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "CALL (" + toHex(target) + ")";
       code = "this.push1(" + toHex(address + 2) + "); this.pc = " + toHex(target) + "; return;";
       address += 2;
       break;
     case 206:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "ADC ," + operand;
       code = "this.adc_a(" + operand + ");";
       address++;
@@ -5755,19 +5735,19 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.setDE(this.readMemWord(this.sp)); this.sp += 2;";
       break;
     case 210:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "JP NC,(" + toHex(target) + ")";
       code = "if ((this.f & F_CARRY) == 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 211:
-      operand = this.readMem(address);
+      operand = this.readRom8bit(address);
       inst = "OUT (" + toHex(operand) + "),A";
       code = this.peepholePortOut(operand);
       address++;
       break;
     case 212:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "CALL NC (" + toHex(target) + ")";
       code = "if ((this.f & F_CARRY) == 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
       address += 2;
@@ -5777,8 +5757,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.push2(this.d, this.e);";
       break;
     case 214:
-      inst = "SUB " + toHex(this.readMem(address));
-      code = "";
+      operand = toHex(this.readRom8bit(address));
+      inst = "SUB " + operand;
+      code = "this.sub_a(" + operand + ");";
       break;
     case 215:
       target = 16;
@@ -5794,19 +5775,19 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.exBC(); this.exDE(); this.exHL();";
       break;
     case 218:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "JP C,(" + toHex(target) + ")";
       code = "if ((this.f & F_CARRY) != 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 219:
-      operand = this.readMem(address);
+      operand = this.readRom8bit(address);
       inst = "IN A,(" + toHex(operand) + ")";
       code = this.peepholePortIn(operand);
       address++;
       break;
     case 220:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "CALL C (" + toHex(target) + ")";
       code = "if ((this.f & F_CARRY) != 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
       address += 2;
@@ -5819,7 +5800,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       address = _inst.nextAddress;
       break;
     case 222:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "SBC A," + operand;
       code = "this.sbc_a(" + operand + ");";
       address++;
@@ -5838,7 +5819,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.setHL(this.readMemWord(this.sp)); this.sp += 2;";
       break;
     case 226:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "JP PO,(" + toHex(target) + ")";
       code = "if ((this.f & F_PARITY) == 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
@@ -5848,7 +5829,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "temp = this.h;" + "this.h = this.readMem(this.sp + 1);" + "this.writeMem(this.sp + 1, temp);" + "temp = this.l;" + "this.l = this.readMem(this.sp);" + "this.writeMem(this.sp, temp);";
       break;
     case 228:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "CALL PO (" + toHex(target) + ")";
       code = "if ((this.f & F_PARITY) == 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
       address += 2;
@@ -5858,7 +5839,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.push2(this.h, this.l);";
       break;
     case 230:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "AND (" + operand + ")";
       code = "this.f = this.SZP_TABLE[this.a &= " + operand + "] | F_HALFCARRY;";
       address++;
@@ -5878,7 +5859,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       address = null;
       break;
     case 234:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "JP PE,(" + toHex(target) + ")";
       code = "if ((this.f & F_PARITY) != 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
@@ -5888,7 +5869,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "temp = this.d;" + "this.d = this.h;" + "this.h = temp;" + "temp = this.e;" + "this.e = this.l;" + "this.l = temp;";
       break;
     case 236:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "CALL PE (" + toHex(target) + ")";
       code = "if ((this.f & F_PARITY) != 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
       address += 2;
@@ -5902,7 +5883,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       address = _inst.nextAddress;
       break;
     case 238:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "XOR A," + operand;
       code = "this.f = this.SZP_TABLE[this.a ^= " + operand + "];";
       address++;
@@ -5921,7 +5902,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.f = this.readMem(this.sp++); this.a = this.readMem(this.sp++);";
       break;
     case 242:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "JP P,(" + toHex(target) + ")";
       code = "if ((this.f & F_SIGN) == 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
@@ -5931,7 +5912,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.iff1 = this.iff2 = false; this.EI_inst = true;";
       break;
     case 244:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "CALL P (" + toHex(target) + ")";
       code = "if ((this.f & F_SIGN) == 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
       address += 2;
@@ -5941,7 +5922,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.push2(this.a, this.f);";
       break;
     case 246:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "OR " + operand;
       code = "this.f = this.SZP_TABLE[this.a |= " + operand + "];";
       address++;
@@ -5960,7 +5941,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.sp = this.getHL()";
       break;
     case 250:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "JP M,(" + toHex(target) + ")";
       code = "if ((this.f & F_SIGN) != 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
@@ -5970,7 +5951,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.iff1 = this.iff2 = this.EI_inst = true;";
       break;
     case 252:
-      target = this.readMemWord(address);
+      target = this.readRom16bit(address);
       inst = "CALL M (" + toHex(target) + ")";
       code = "if ((this.f & F_SIGN) != 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
       address += 2;
@@ -5983,7 +5964,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       address = _inst.nextAddress;
       break;
     case 254:
-      operand = toHex(this.readMem(address));
+      operand = toHex(this.readRom8bit(address));
       inst = "CP " + operand;
       code = "this.cp_a(" + operand + ");";
       address++;
@@ -5996,7 +5977,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   }
   return Instruction({opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address, target:target})
 }, getCB:function(address) {
-  var opcode = this.readMem(address);
+  var opcode = this.readRom8bit(address);
   var opcodesArray = [opcode];
   var inst = "Unimplemented 0xCB prefixed opcode";
   var currAddr = address;
@@ -6037,30 +6018,39 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 8:
       inst = "RRC B";
+      code = "this.b = (this.rrc(this.b));";
       break;
     case 9:
       inst = "RRC C";
+      code = "this.c = (this.rrc(this.c));";
       break;
     case 10:
       inst = "RRC D";
+      code = "this.d = (this.rrc(this.d));";
       break;
     case 11:
       inst = "RRC E";
+      code = "this.e = (this.rrc(this.e));";
       break;
     case 12:
       inst = "RRC H";
+      code = "this.h = (this.rrc(this.h));";
       break;
     case 13:
       inst = "RRC L";
+      code = "this.l = (this.rrc(this.l));";
       break;
     case 14:
       inst = "RRC (HL)";
+      code = "this.writeMem(this.getHL(), this.rrc(this.readMem(this.getHL())));";
       break;
     case 15:
       inst = "RRC A";
+      code = "this.a = (this.rrc(this.a));";
       break;
     case 16:
       inst = "RL B";
+      code = "this.b = (this.rl(this.b));";
       break;
     case 17:
       inst = "RL C";
@@ -6068,21 +6058,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 18:
       inst = "RL D";
+      code = "this.d = (this.rl(this.d));";
       break;
     case 19:
       inst = "RL E";
+      code = "this.e = (this.rl(this.e));";
       break;
     case 20:
       inst = "RL H";
+      code = "this.h = (this.rl(this.h));";
       break;
     case 21:
       inst = "RL L";
+      code = "this.l = (this.rl(this.l));";
       break;
     case 22:
       inst = "RL (HL)";
+      code = "this.writeMem(this.getHL(), this.rl(this.readMem(this.getHL())));";
       break;
     case 23:
       inst = "RL A";
+      code = "this.a = (this.rl(this.a));";
       break;
     case 24:
       inst = "RR B";
@@ -6118,96 +6114,127 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 32:
       inst = "SLA B";
+      code = "this.b = (this.sla(this.b));";
       break;
     case 33:
       inst = "SLA C";
+      code = "this.c = (this.sla(this.c));";
       break;
     case 34:
       inst = "SLA D";
+      code = "this.d = (this.sla(this.d));";
       break;
     case 35:
       inst = "SLA E";
+      code = "this.e = (this.sla(this.e));";
       break;
     case 36:
       inst = "SLA H";
+      code = "this.h = (this.sla(this.h));";
       break;
     case 37:
       inst = "SLA L";
+      code = "this.l = (this.sla(this.l));";
       break;
     case 38:
       inst = "SLA (HL)";
+      code = "this.writeMem(this.getHL(), this.sla(this.readMem(this.getHL())));";
       break;
     case 39:
       inst = "SLA A";
+      code = "this.a = (this.sla(this.a));";
       break;
     case 40:
       inst = "SRA B";
+      code = "this.b = (this.sra(this.b));";
       break;
     case 41:
       inst = "SRA C";
+      code = "this.c = (this.sra(this.c));";
       break;
     case 42:
       inst = "SRA D";
+      code = "this.d = (this.sra(this.d));";
       break;
     case 43:
       inst = "SRA E";
+      code = "this.e = (this.sra(this.e));";
       break;
     case 44:
       inst = "SRA H";
+      code = "this.h = (this.sra(this.h));";
       break;
     case 45:
       inst = "SRA L";
+      code = "this.l = (this.sra(this.l));";
       break;
     case 46:
       inst = "SRA (HL)";
+      code = "this.writeMem(this.getHL(), this.sra(this.readMem(this.getHL())));";
       break;
     case 47:
       inst = "SRA A";
+      code = "this.a = (this.sra(this.a));";
       break;
     case 48:
       inst = "SLL B";
+      code = "this.b = (this.sll(this.b));";
       break;
     case 49:
       inst = "SLL C";
+      code = "this.c = (this.sll(this.c));";
       break;
     case 50:
       inst = "SLL D";
+      code = "this.d = (this.sll(this.d));";
       break;
     case 51:
       inst = "SLL E";
+      code = "this.e = (this.sll(this.e));";
       break;
     case 52:
       inst = "SLL H";
+      code = "this.h = (this.sll(this.h));";
       break;
     case 53:
       inst = "SLL L";
+      code = "this.l = (this.sll(this.l));";
       break;
     case 54:
       inst = "SLL (HL)";
+      code = "this.writeMem(this.getHL(), this.sll(this.readMem(this.getHL())));";
       break;
     case 55:
       inst = "SLL A";
+      code = "this.a = (this.sll(this.a));";
       break;
     case 56:
       inst = "SRL B";
+      code = "this.b = this.srl(this.b);";
       break;
     case 57:
       inst = "SRL C";
+      code = "this.c = this.srl(this.c);";
       break;
     case 58:
       inst = "SRL D";
+      code = "this.d = this.srl(this.d);";
       break;
     case 59:
       inst = "SRL E";
+      code = "this.e = this.srl(this.e);";
       break;
     case 60:
       inst = "SRL H";
+      code = "this.h = this.srl(this.h);";
       break;
     case 61:
       inst = "SRL L";
+      code = "this.l = this.srl(this.l);";
       break;
     case 62:
       inst = "SRL (HL)";
+      code = "this.writeMem(this.getHL(), this.srl(this.readMem(this.getHL())));";
       break;
     case 63:
       inst = "SRL A";
@@ -6215,21 +6242,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 64:
       inst = "BIT 0,B";
+      code = "this.bit(this.b & BIT_0);";
       break;
     case 65:
       inst = "BIT 0,C";
+      code = "this.bit(this.c & BIT_0);";
       break;
     case 66:
       inst = "BIT 0,D";
+      code = "this.bit(this.d & BIT_0);";
       break;
     case 67:
       inst = "BIT 0,E";
+      code = "this.bit(this.e & BIT_0);";
       break;
     case 68:
       inst = "BIT 0,H";
+      code = "this.bit(this.h & BIT_0);";
       break;
     case 69:
       inst = "BIT 0,L";
+      code = "this.bit(this.l & BIT_0);";
       break;
     case 70:
       inst = "BIT 0,(HL)";
@@ -6241,21 +6274,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 72:
       inst = "BIT 1,B";
+      code = "this.bit(this.b & BIT_1);";
       break;
     case 73:
       inst = "BIT 1,C";
+      code = "this.bit(this.c & BIT_1);";
       break;
     case 74:
       inst = "BIT 1,D";
+      code = "this.bit(this.d & BIT_1);";
       break;
     case 75:
       inst = "BIT 1,E";
+      code = "this.bit(this.e & BIT_1);";
       break;
     case 76:
       inst = "BIT 1,H";
+      code = "this.bit(this.h & BIT_1);";
       break;
     case 77:
       inst = "BIT 1,L";
+      code = "this.bit(this.l & BIT_1);";
       break;
     case 78:
       inst = "BIT 1,(HL)";
@@ -6271,18 +6310,23 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 81:
       inst = "BIT 2,C";
+      code = "this.bit(this.c & BIT_2);";
       break;
     case 82:
       inst = "BIT 2,D";
+      code = "this.bit(this.d & BIT_2);";
       break;
     case 83:
       inst = "BIT 2,E";
+      code = "this.bit(this.e & BIT_2);";
       break;
     case 84:
       inst = "BIT 2,H";
+      code = "this.bit(this.h & BIT_2);";
       break;
     case 85:
       inst = "BIT 2,L";
+      code = "this.bit(this.l & BIT_2);";
       break;
     case 86:
       inst = "BIT 2,(HL)";
@@ -6298,18 +6342,23 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 89:
       inst = "BIT 3,C";
+      code = "this.bit(this.c & BIT_3);";
       break;
     case 90:
       inst = "BIT 3,D";
+      code = "this.bit(this.d & BIT_3);";
       break;
     case 91:
       inst = "BIT 3,E";
+      code = "this.bit(this.e & BIT_3);";
       break;
     case 92:
       inst = "BIT 3,H";
+      code = "this.bit(this.h & BIT_3);";
       break;
     case 93:
       inst = "BIT 3,L";
+      code = "this.bit(this.l & BIT_3);";
       break;
     case 94:
       inst = "BIT 3,(HL)";
@@ -6321,21 +6370,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 96:
       inst = "BIT 4,B";
+      code = "this.bit(this.b & BIT_4);";
       break;
     case 97:
       inst = "BIT 4,C";
+      code = "this.bit(this.c & BIT_4);";
       break;
     case 98:
       inst = "BIT 4,D";
+      code = "this.bit(this.d & BIT_4);";
       break;
     case 99:
       inst = "BIT 4,E";
+      code = "this.bit(this.e & BIT_4);";
       break;
     case 100:
       inst = "BIT 4,H";
+      code = "this.bit(this.h & BIT_4);";
       break;
     case 101:
       inst = "BIT 4,L";
+      code = "this.bit(this.l & BIT_4);";
       break;
     case 102:
       inst = "BIT 4,(HL)";
@@ -6351,18 +6406,23 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 105:
       inst = "BIT 5,C";
+      code = "this.bit(this.c & BIT_5);";
       break;
     case 106:
       inst = "BIT 5,D";
+      code = "this.bit(this.d & BIT_5);";
       break;
     case 107:
       inst = "BIT 5,E";
+      code = "this.bit(this.e & BIT_5);";
       break;
     case 108:
       inst = "BIT 5,H";
+      code = "this.bit(this.h & BIT_5);";
       break;
     case 109:
       inst = "BIT 5,L";
+      code = "this.bit(this.l & BIT_5);";
       break;
     case 110:
       inst = "BIT 5,(HL)";
@@ -6374,21 +6434,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 112:
       inst = "BIT 6,B";
+      code = "this.bit(this.b & BIT_6);";
       break;
     case 113:
       inst = "BIT 6,C";
+      code = "this.bit(this.c & BIT_6);";
       break;
     case 114:
       inst = "BIT 6,D";
+      code = "this.bit(this.d & BIT_6);";
       break;
     case 115:
       inst = "BIT 6,E";
+      code = "this.bit(this.e & BIT_6);";
       break;
     case 116:
       inst = "BIT 6,H";
+      code = "this.bit(this.h & BIT_6);";
       break;
     case 117:
       inst = "BIT 6,L";
+      code = "this.bit(this.l & BIT_6);";
       break;
     case 118:
       inst = "BIT 6,(HL)";
@@ -6400,21 +6466,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 120:
       inst = "BIT 7,B";
+      code = "this.bit(this.b & BIT_7);";
       break;
     case 121:
       inst = "BIT 7,C";
+      code = "this.bit(this.c & BIT_7);";
       break;
     case 122:
       inst = "BIT 7,D";
+      code = "this.bit(this.d & BIT_7);";
       break;
     case 123:
       inst = "BIT 7,E";
+      code = "this.bit(this.e & BIT_7);";
       break;
     case 124:
       inst = "BIT 7,H";
+      code = "this.bit(this.h & BIT_7);";
       break;
     case 125:
       inst = "BIT 7,L";
+      code = "this.bit(this.l & BIT_7);";
       break;
     case 126:
       inst = "BIT 7,(HL)";
@@ -6426,21 +6498,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 128:
       inst = "RES 0,B";
+      code = "this.b &= ~BIT_0;";
       break;
     case 129:
       inst = "RES 0,C";
+      code = "this.c &= ~BIT_0;";
       break;
     case 130:
       inst = "RES 0,D";
+      code = "this.d &= ~BIT_0;";
       break;
     case 131:
       inst = "RES 0,E";
+      code = "this.e &= ~BIT_0;";
       break;
     case 132:
       inst = "RES 0,H";
+      code = "this.h &= ~BIT_0;";
       break;
     case 133:
       inst = "RES 0,L";
+      code = "this.l &= ~BIT_0;";
       break;
     case 134:
       inst = "RES 0,(HL)";
@@ -6448,6 +6526,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 135:
       inst = "RES 0,A";
+      code = "this.a &= ~BIT_0;";
       break;
     case 136:
       inst = "RES 1,B";
@@ -6523,6 +6602,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 159:
       inst = "RES 3,A";
+      code = "this.a &= ~BIT_3;";
       break;
     case 160:
       inst = "RES 4,B";
@@ -6548,6 +6628,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 167:
       inst = "RES 4,A";
+      code = "this.a &= ~BIT_4;";
       break;
     case 168:
       inst = "RES 5,B";
@@ -6598,24 +6679,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 183:
       inst = "RES 6,A";
+      code = "this.a &= ~BIT_6;";
       break;
     case 184:
       inst = "RES 7,B";
+      code = "this.b &= ~BIT_7;";
       break;
     case 185:
       inst = "RES 7,C";
+      code = "this.c &= ~BIT_7;";
       break;
     case 186:
       inst = "RES 7,D";
+      code = "this.d &= ~BIT_7;";
       break;
     case 187:
       inst = "RES 7,E";
+      code = "this.e &= ~BIT_7;";
       break;
     case 188:
       inst = "RES 7,H";
+      code = "this.h &= ~BIT_7;";
       break;
     case 189:
       inst = "RES 7,L";
+      code = "this.l &= ~BIT_7;";
       break;
     case 190:
       inst = "RES 7,(HL)";
@@ -6756,6 +6844,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 231:
       inst = "SET 4,A";
+      code = "this.a |= BIT_4;";
       break;
     case 232:
       inst = "SET 5,B";
@@ -6781,24 +6870,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 239:
       inst = "SET 5,A";
+      code = "this.a |= BIT_5;";
       break;
     case 240:
       inst = "SET 6,B";
+      code = "this.b |= BIT_6;";
       break;
     case 241:
       inst = "SET 6,C";
+      code = "this.c |= BIT_6;";
       break;
     case 242:
       inst = "SET 6,D";
+      code = "this.d |= BIT_6;";
       break;
     case 243:
       inst = "SET 6,E";
+      code = "this.e |= BIT_6;";
       break;
     case 244:
       inst = "SET 6,H";
+      code = "this.h |= BIT_6;";
       break;
     case 245:
       inst = "SET 6,L";
+      code = "this.l |= BIT_6;";
       break;
     case 246:
       inst = "SET 6,(HL)";
@@ -6806,24 +6902,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 247:
       inst = "SET 6,A";
+      code = "this.a |= BIT_6;";
       break;
     case 248:
       inst = "SET 7,B";
+      code = "this.b |= BIT_7;";
       break;
     case 249:
       inst = "SET 7,C";
+      code = "this.c |= BIT_7;";
       break;
     case 250:
       inst = "SET 7,D";
+      code = "this.d |= BIT_7;";
       break;
     case 251:
       inst = "SET 7,E";
+      code = "this.e |= BIT_7;";
       break;
     case 252:
       inst = "SET 7,H";
+      code = "this.h |= BIT_7;";
       break;
     case 253:
       inst = "SET 7,L";
+      code = "this.l |= BIT_7;";
       break;
     case 254:
       inst = "SET 7,(HL)";
@@ -6837,7 +6940,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   return{opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address}
 }, getED:function(address) {
   var toHex = JSSMS.Utils.toHex;
-  var opcode = this.readMem(address);
+  var opcode = this.readRom8bit(address);
   var opcodesArray = [opcode];
   var inst = "Unimplemented 0xED prefixed opcode";
   var currAddr = address;
@@ -6859,8 +6962,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.sbc16(this.getBC());";
       break;
     case 67:
-      inst = "LD (" + toHex(this.readMemWord(address)) + "),BC";
-      code = "var location = " + toHex(this.readMemWord(address)) + ";" + "this.writeMem(location++, this.c);" + "this.writeMem(location, this.b);";
+      operand = toHex(this.readRom16bit(address));
+      inst = "LD (" + operand + "),BC";
+      code = "var location = " + operand + ";" + "this.writeMem(location++, this.c);" + "this.writeMem(location, this.b);";
       address = address + 2;
       break;
     case 68:
@@ -6927,8 +7031,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.adc16(this.getBC());";
       break;
     case 75:
-      inst = "LD BC,(" + toHex(this.readMemWord(address)) + ")";
-      code = "this.setBC(this.readMemWord(" + toHex(this.readMemWord(address)) + "));";
+      operand = toHex(this.readRom16bit(address));
+      inst = "LD BC,(" + operand + ")";
+      code = "this.setBC(this.readMemWord(" + operand + "));";
       address = address + 2;
       break;
     case 79:
@@ -6948,8 +7053,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.sbc16(this.getDE());";
       break;
     case 83:
-      inst = "LD (" + toHex(this.readMemWord(address)) + "),DE";
-      code = "var location = this.readMemWord(this.pc + 1);" + "this.writeMem(location++, this.e);" + "this.writeMem(location, this.d);";
+      operand = toHex(this.readRom16bit(address));
+      inst = "LD (" + operand + "),DE";
+      code = "var location = " + operand + ";" + "this.writeMem(location++, this.e);" + "this.writeMem(location, this.d);";
       address = address + 2;
       break;
     case 86:
@@ -6975,14 +7081,14 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.adc16(this.getDE());";
       break;
     case 91:
-      operand = toHex(this.readMemWord(address));
+      operand = toHex(this.readRom16bit(address));
       inst = "LD DE,(" + operand + ")";
       code = "this.setDE(" + operand + ");";
       address = address + 2;
       break;
     case 95:
       inst = "LD A,R";
-      if(Setup.REFRESH_EMULATION) {
+      if(REFRESH_EMULATION) {
         code = "this.a = this.r;"
       }else {
         code = "this.a = JSSMS.Utils.rndInt(255);"
@@ -7002,8 +7108,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.sbc16(this.getHL());";
       break;
     case 99:
-      inst = "LD (" + toHex(this.readMemWord(address)) + "),HL";
-      code = "var location = this.readMemWord(this.pc + 1);" + "this.writeMem(location++, this.l);" + "this.writeMem(location, this.h);";
+      operand = toHex(this.readRom16bit(address));
+      inst = "LD (" + operand + "),HL";
+      code = "var location = " + operand + ";" + "this.writeMem(location++, this.l);" + "this.writeMem(location, this.h);";
       address = address + 2;
       break;
     case 103:
@@ -7023,20 +7130,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.adc16(this.getHL());";
       break;
     case 107:
-      inst = "LD HL,(" + toHex(this.readMemWord(address)) + ")";
+      operand = toHex(this.readRom16bit(address));
+      inst = "LD HL,(" + operand + ")";
+      code = "this.setHL(this.readMemWord(" + operand + "));";
       address = address + 2;
       break;
     case 111:
       inst = "RLD";
+      code = "var location = this.getHL();" + "temp = this.readMem(location);" + "this.writeMem(location, (temp & 0x0F) << 4 | (this.a & 0x0F));" + "this.a = (this.a & 0xF0) | (temp >> 4);" + "this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];";
       break;
     case 113:
       inst = "OUT (C),0";
+      code = "this.port.out(this.c, 0);";
       break;
     case 114:
       inst = "SBC HL,SP";
+      code = "this.sbc16(this.sp);";
       break;
     case 115:
-      inst = "LD (" + toHex(this.readMemWord(address)) + "),SP";
+      operand = toHex(this.readRom16bit(address));
+      inst = "LD (" + operand + "),SP";
+      code = "var location = this.readMemWord(" + operand + ");" + "this.writeMem(location++, this.sp & 0xFF);" + "this.writeMem(location, this.sp >> 8);";
       address = address + 2;
       break;
     case 120:
@@ -7049,9 +7163,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 122:
       inst = "ADC HL,SP";
+      code = "this.adc16(this.sp);";
       break;
     case 123:
-      inst = "LD SP,(" + toHex(this.readMemWord(address)) + ")";
+      operand = toHex(this.readRom16bit(address));
+      inst = "LD SP,(" + operand + ")";
+      code = "this.sp = this.readMemWord(" + operand + ");";
       address = address + 2;
       break;
     case 160:
@@ -7060,6 +7177,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 161:
       inst = "CPI";
+      code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);" + "this.f = (this.f & 0xF8) | temp;";
       break;
     case 162:
       inst = "INI";
@@ -7086,7 +7204,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 176:
       inst = "LDIR";
       code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();";
-      if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+      if(ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
         code += "if (this.getBC() != 0) {" + "this.f |= F_PARITY;" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
       }else {
@@ -7097,7 +7215,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 177:
       inst = "CPIR";
       code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);";
-      if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+      if(ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
         code += "if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
       }else {
@@ -7108,12 +7226,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 178:
       target = address - 2;
       inst = "INIR";
-      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "}" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 179:
       inst = "OTIR";
       code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();";
-      if(Setup.ACCURATE_INTERRUPT_EMULATION) {
+      if(ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
         code += "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
       }else {
@@ -7130,18 +7248,18 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 186:
       target = address - 2;
       inst = "INDR";
-      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break;
     case 187:
       target = address - 2;
       inst = "OTDR";
-      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "}" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
       break
   }
   return{opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address, target:target}
 }, getIndex:function(index, address) {
   var toHex = JSSMS.Utils.toHex;
-  var opcode = this.readMem(address);
+  var opcode = this.readRom8bit(address);
   var opcodesArray = [opcode];
   var inst = "Unimplemented 0xDD or 0xFD prefixed opcode";
   var currAddr = address;
@@ -7158,13 +7276,13 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.set" + index + "(this.add16(this.get" + index + "(), this.getDE()));";
       break;
     case 33:
-      operand = toHex(this.readMemWord(address));
+      operand = toHex(this.readRom16bit(address));
       inst = "LD " + index + "," + operand;
       code = "this.set" + index + "(" + operand + ");";
       address = address + 2;
       break;
     case 34:
-      operand = toHex(this.readMemWord(address));
+      operand = toHex(this.readRom16bit(address));
       inst = "LD (" + operand + ")," + index;
       code = "var location = " + operand + ";" + "this.writeMem(location++, this." + index.toLowerCase() + "L);" + "this.writeMem(location, this." + index.toLowerCase() + "H);";
       address = address + 2;
@@ -7180,14 +7298,16 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "DEC " + index + "H *";
       break;
     case 38:
-      inst = "LD " + index + "H," + toHex(this.readMem(address)) + " *";
+      inst = "LD " + index + "H," + toHex(this.readRom8bit(address)) + " *";
       address++;
       break;
     case 41:
       inst = "ADD " + index + "  " + index;
       break;
     case 42:
-      inst = "LD " + index + " (" + toHex(this.readMemWord(address)) + ")";
+      var location = this.readRom16bit(address);
+      inst = "LD " + index + " (" + toHex(location) + ")";
+      code = "this.ixL = this.readMem(" + toHex(location) + ");" + "this.ixH = this.readMem(" + toHex(location + 1) + ");";
       address = address + 2;
       break;
     case 43:
@@ -7201,30 +7321,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "DEC " + index + "L *";
       break;
     case 46:
-      inst = "LD " + index + "L," + toHex(this.readMem(address));
+      inst = "LD " + index + "L," + toHex(this.readRom8bit(address));
       address++;
       break;
     case 52:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "INC (" + index + "+" + toHex(offset) + ")";
       code = "this.incMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 53:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "DEC (" + index + "+" + toHex(offset) + ")";
       code = "this.decMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 54:
-      var offset = this.readMem(address);
-      operand = toHex(this.readMem(address + 1));
+      var offset = this.readRom8bit(address);
+      operand = toHex(this.readRom8bit(address + 1));
       inst = "LD (" + index + "+" + toHex(offset) + ")," + operand;
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", " + operand + ");";
-      address++;
+      address = address + 2;
       break;
     case 57:
       inst = "ADD " + index + " SP";
+      code = "this.set" + index + "(this.add16(this.get" + index + "(), this.sp));";
       break;
     case 68:
       inst = "LD B," + index + "H *";
@@ -7233,7 +7354,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD B," + index + "L *";
       break;
     case 70:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD B,(" + index + "+" + toHex(offset) + ")";
       code = "this.b = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
@@ -7245,7 +7366,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD C," + index + "L *";
       break;
     case 78:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD C,(" + index + "+" + toHex(offset) + ")";
       code = "this.c = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
@@ -7257,7 +7378,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD D," + index + "L *";
       break;
     case 86:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD D,(" + index + "+" + toHex(offset) + ")";
       code = "this.d = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
@@ -7269,7 +7390,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD E," + index + "L *";
       break;
     case 94:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD E,(" + index + "+" + toHex(offset) + ")";
       code = "this.e = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
@@ -7293,7 +7414,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD " + index + "H," + index + "L *";
       break;
     case 102:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD H,(" + index + "+" + toHex(offset) + ")";
       code = "this.h = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
@@ -7318,54 +7439,56 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 109:
       inst = "LD " + index + "L," + index + "L *";
+      code = "";
       break;
     case 110:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD L,(" + index + "+" + toHex(offset) + ")";
       code = "this.l = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 111:
       inst = "LD " + index + "L,A *";
+      code = "this." + index.toLowerCase() + "L = this.a;";
       break;
     case 112:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),B";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.b);";
       address++;
       break;
     case 113:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),C";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.c);";
       address++;
       break;
     case 114:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),D";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.d);";
       address++;
       break;
     case 115:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),E";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.e);";
       address++;
       break;
     case 116:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),H";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.h);";
       address++;
       break;
     case 117:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),L";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.l);";
       address++;
       break;
     case 119:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),A";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.a);";
       address++;
@@ -7377,7 +7500,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD A," + index + "L *";
       break;
     case 126:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "LD A,(" + index + "+" + toHex(offset) + ")";
       code = "this.a = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
@@ -7389,7 +7512,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "ADD A," + index + "L *";
       break;
     case 134:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "ADD A,(" + index + "+" + toHex(offset) + "))";
       code = "this.add_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
@@ -7401,8 +7524,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "ADC A," + index + "L *";
       break;
     case 142:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "ADC A,(" + index + "+" + toHex(offset) + "))";
+      code = "this.adc_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
       break;
     case 148:
@@ -7412,7 +7536,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "SUB " + index + "L *";
       break;
     case 150:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "SUB A,(" + index + "+" + toHex(offset) + "))";
       code = "this.sub_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
@@ -7424,53 +7548,63 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "SBC A," + index + "L *";
       break;
     case 158:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "SBC A,(" + index + "+" + toHex(offset) + "))";
+      code = "this.sbc_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
       break;
     case 164:
       inst = "AND " + index + "H *";
+      code = "this.f = this.SZP_TABLE[this.a &= this." + index.toLowerCase() + "H];";
       break;
     case 165:
       inst = "AND " + index + "L *";
+      code = "this.f = this.SZP_TABLE[this.a &= this." + index.toLowerCase() + "L];";
       break;
     case 166:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "AND A,(" + index + "+" + toHex(offset) + "))";
+      code = "this.f = this.SZP_TABLE[this.a &= this.readMem(this.get" + index + "() + " + toHex(offset) + ")] | F_HALFCARRY;";
       address++;
       break;
     case 172:
       inst = "XOR A " + index + "H*";
+      code = "this.f = this.SZP_TABLE[this.a |= this." + index.toLowerCase() + "H];";
       break;
     case 173:
       inst = "XOR A " + index + "L*";
+      code = "this.f = this.SZP_TABLE[this.a |= this." + index.toLowerCase() + "L];";
       break;
     case 174:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "XOR A,(" + index + "+" + toHex(offset) + "))";
       code = "this.f = this.SZP_TABLE[this.a ^= this.readMem(this.get" + index + "() + " + toHex(offset) + ")];";
       address++;
       break;
     case 180:
       inst = "OR A " + index + "H*";
+      code = "this.f = this.SZP_TABLE[this.a |= this." + index.toLowerCase() + "H];";
       break;
     case 181:
       inst = "OR A " + index + "L*";
+      code = "this.f = this.SZP_TABLE[this.a |= this." + index.toLowerCase() + "L];";
       break;
     case 182:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "OR A,(" + index + "+" + toHex(offset) + "))";
       code = "this.f = this.SZP_TABLE[this.a |= this.readMem(this.get" + index + "() + " + toHex(offset) + ")];";
       address++;
       break;
     case 188:
       inst = "CP " + index + "H *";
+      code = "this.cp_a(this." + index.toLowerCase() + "H);";
       break;
     case 189:
       inst = "CP " + index + "L *";
+      code = "this.cp_a(this." + index.toLowerCase() + "L);";
       break;
     case 190:
-      var offset = this.readMem(address);
+      var offset = this.readRom8bit(address);
       inst = "CP (" + index + "+" + toHex(offset) + "))";
       code = "this.cp_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
@@ -7488,6 +7622,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 227:
       inst = "EX SP,(" + index + ")";
+      code = "temp = this.get" + index + "();" + "this.set" + index + "(this.readMemWord(this.sp));" + "this.writeMem(this.sp, temp & 0xFF);" + "this.writeMem(this.sp + 1, temp >> 8);";
       break;
     case 229:
       inst = "PUSH " + index;
@@ -7495,15 +7630,17 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 233:
       inst = "JP (" + index + ")";
+      code = "this.pc = this.get" + index + "();";
       address = null;
       break;
     case 249:
       inst = "LD SP," + index;
+      code = "this.sp = this.get" + index + "();";
       break
   }
   return{opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address}
 }, getIndexCB:function(index, address) {
-  var opcode = this.readMem(address);
+  var opcode = this.readRom8bit(address);
   var opcodesArray = [opcode];
   var inst = "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";
   var currAddr = address;
@@ -7513,15 +7650,15 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   switch(opcode) {
     case 0:
       inst = "LD B,RLC (" + index + ")";
-      code = "var location = (this.get" + index + "() + " + this.readMem(address) + ") & 0xFFFF;" + "this.b = this.rlc(this.readMem(location)); this.writeMem(location, this.b);";
+      code = "var location = (this.get" + index + "() + " + this.readRom8bit(address) + ") & 0xFFFF;" + "this.b = this.rlc(this.readMem(location)); this.writeMem(location, this.b);";
       break;
     case 1:
       inst = "LD C,RLC (" + index + ")";
-      code = "var location = (this.get" + index + "() + " + this.readMem(address) + ") & 0xFFFF;" + "this.c = this.rlc(this.readMem(location)); this.writeMem(location, this.c);";
+      code = "var location = (this.get" + index + "() + " + this.readRom8bit(address) + ") & 0xFFFF;" + "this.c = this.rlc(this.readMem(location)); this.writeMem(location, this.c);";
       break;
     case 2:
       inst = "LD D,RLC (" + index + ")";
-      code = "var location = (this.get" + index + "() + " + this.readMem(address) + ") & 0xFFFF;" + "this.d = this.rlc(this.readMem(location)); this.writeMem(location, this.d);";
+      code = "var location = (this.get" + index + "() + " + this.readRom8bit(address) + ") & 0xFFFF;" + "this.d = this.rlc(this.readMem(location)); this.writeMem(location, this.d);";
       break;
     case 3:
       inst = "LD E,RLC (" + index + ")";
@@ -7534,11 +7671,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 6:
       inst = "RLC (" + index + ")";
-      code = "var location = (this.get" + index + "() + " + this.readMem(address) + ") & 0xFFFF;" + "this.writeMem(location, this.rlc(this.readMem(location)));";
+      code = "var location = (this.get" + index + "() + " + this.readRom8bit(address) + ") & 0xFFFF;" + "this.writeMem(location, this.rlc(this.readMem(location)));";
       break;
     case 7:
       inst = "LD A,RLC (" + index + ")";
-      code = "var location = (this.get" + index + "() + " + this.readMem(address) + ") & 0xFFFF;" + "this.a = this.rlc(this.readMem(location)); this.writeMem(location, this.a);";
+      code = "var location = (this.get" + index + "() + " + this.readRom8bit(address) + ") & 0xFFFF;" + "this.a = this.rlc(this.readMem(location)); this.writeMem(location, this.a);";
       break;
     case 8:
       inst = "LD B,RRC (" + index + ")";
@@ -7605,7 +7742,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 29:
       inst = "LD L,RR (" + index + ")";
-      code = "var location = (this.get" + index + "() + " + this.readMem(address) + ") & 0xFFFF;" + "this.l = this.rr(this.readMem(location)); this.writeMem(location, this.l);";
+      code = "var location = (this.get" + index + "() + " + this.readRom8bit(address) + ") & 0xFFFF;" + "this.l = this.rr(this.readMem(location)); this.writeMem(location, this.l);";
       break;
     case 30:
       inst = "RR (" + index + ")";
@@ -8123,13 +8260,29 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   return this.getIndex("IX", opcode)
 }, getIndexOpIY:function(opcode) {
   return this.getIndex("IY", opcode)
+}, readRom8bit:function(address) {
+  if(SUPPORT_DATAVIEW) {
+    return this.rom[address >> 14].getUint8(address & 16383)
+  }else {
+    return this.rom[address >> 14][address & 16383] & 255
+  }
+}, readRom16bit:function(address) {
+  if(SUPPORT_DATAVIEW) {
+    if((address & 16383) < 16383) {
+      return this.rom[address >> 14].getUint16(address & 16383, LITTLE_ENDIAN)
+    }else {
+      return this.rom[address >> 14].getUint8(address & 16383) | this.rom[++address >> 14].getUint8(address & 16383) << 8
+    }
+  }else {
+    return this.rom[address >> 14][address & 16383] & 255 | (this.rom[++address >> 14][address & 16383] & 255) << 8
+  }
 }, peepholePortOut:function(port) {
   if(this.main.is_gg && port < 7) {
     return""
   }
   switch(port & 193) {
     case 1:
-      if(Setup.LIGHTGUN) {
+      if(LIGHTGUN) {
         return"var value = this.a;" + "this.port.oldTH = (this.port.getTH(PORT_A) != 0 || this.port.getTH(PORT_B) != 0);" + "this.port.writePort(PORT_A, value);" + "this.port.writePort(PORT_B, value >> 2);" + "if (!this.port.oldTH && (this.port.getTH(PORT_A) != 0 || this.port.getTH(PORT_B) != 0)) {" + "this.port.hCounter = this.port.getHCount();" + "}"
       }else {
         var code = "var value = this.a;" + "this.port.ioPorts[0] = (value & 0x20) << 1;" + "this.port.ioPorts[1] = (value & 0x80);";
@@ -8185,7 +8338,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 192:
       return"this.a = this.port.keyboard.controller1;";
     case 193:
-      if(Setup.LIGHTGUN) {
+      if(LIGHTGUN) {
         return"if (this.port.keyboard.lightgunClick)" + "this.port.lightPhaserSync();" + "this.a = (this.port.keyboard.controller2 & 0x3F) | (this.port.getTH(PORT_A) != 0 ? 0x40 : 0) | (this.port.getTH(PORT_B) != 0 ? 0x80 : 0);"
       }else {
         return"this.a = (this.port.keyboard.controller2 & 0x3F) | this.port.ioPorts[0] | this.port.ioPorts[1];"
@@ -8231,7 +8384,7 @@ JSSMS.Keyboard.prototype = {reset:function() {
   this.controller1 = 255;
   this.controller2 = 255;
   this.ggstart = 255;
-  if(Setup.LIGHTGUN) {
+  if(LIGHTGUN) {
     this.lightgunClick = false
   }
   this.pause_button = false
@@ -8509,7 +8662,7 @@ JSSMS.Vdp = function(sms) {
   this.line = 0;
   this.counter = 0;
   this.bgPriority = new Array(SMS_WIDTH);
-  if(Setup.VDP_SPRITE_COLLISIONS) {
+  if(VDP_SPRITE_COLLISIONS) {
     this.spriteCol = new Array(SMS_WIDTH)
   }
   this.bgt = 0;
@@ -8604,7 +8757,7 @@ JSSMS.Vdp.prototype = {reset:function() {
         var reg = value & 15;
         switch(reg) {
           case 0:
-            if(Setup.ACCURATE_INTERRUPT_EMULATION && (this.status & STATUS_HINT) != 0) {
+            if(ACCURATE_INTERRUPT_EMULATION && (this.status & STATUS_HINT) != 0) {
               this.main.cpu.interruptLine = (this.commandByte & 16) != 0
             }
             break;
@@ -8690,7 +8843,7 @@ JSSMS.Vdp.prototype = {reset:function() {
   this.location++
 }, interrupts:function(lineno) {
   if(lineno <= 192) {
-    if(!Setup.ACCURATE_INTERRUPT_EMULATION && lineno == 192) {
+    if(!ACCURATE_INTERRUPT_EMULATION && lineno == 192) {
       this.status |= STATUS_VINT
     }
     if(this.counter == 0) {
@@ -8722,7 +8875,7 @@ JSSMS.Vdp.prototype = {reset:function() {
       return
     }
   }
-  if(Setup.VDP_SPRITE_COLLISIONS) {
+  if(VDP_SPRITE_COLLISIONS) {
     for(i = 0;i < SMS_WIDTH;i++) {
       this.spriteCol[i] = false
     }
@@ -8837,7 +8990,7 @@ JSSMS.Vdp.prototype = {reset:function() {
           this.display[temp] = this.CRAM[temp2];
           this.display[temp + 1] = this.CRAM[temp2 + 1];
           this.display[temp + 2] = this.CRAM[temp2 + 2];
-          if(Setup.VDP_SPRITE_COLLISIONS) {
+          if(VDP_SPRITE_COLLISIONS) {
             if(!this.spriteCol[x]) {
               this.spriteCol[x] = true
             }else {
@@ -8855,7 +9008,7 @@ JSSMS.Vdp.prototype = {reset:function() {
           this.display[temp] = this.CRAM[temp2];
           this.display[temp + 1] = this.CRAM[temp2 + 1];
           this.display[temp + 2] = this.CRAM[temp2 + 2];
-          if(Setup.VDP_SPRITE_COLLISIONS) {
+          if(VDP_SPRITE_COLLISIONS) {
             if(!this.spriteCol[x]) {
               this.spriteCol[x] = true
             }else {
@@ -8869,7 +9022,7 @@ JSSMS.Vdp.prototype = {reset:function() {
           this.display[temp] = this.CRAM[temp2];
           this.display[temp + 1] = this.CRAM[temp2 + 1];
           this.display[temp + 2] = this.CRAM[temp2 + 2];
-          if(Setup.VDP_SPRITE_COLLISIONS) {
+          if(VDP_SPRITE_COLLISIONS) {
             if(!this.spriteCol[x + 1]) {
               this.spriteCol[x + 1] = true
             }else {
@@ -9013,14 +9166,11 @@ JSSMS.Vdp.prototype = {reset:function() {
 }};
 JSSMS.DummyUI = function(sms) {
   this.main = sms;
-  this.enable = function() {
+  this.reset = function() {
   };
   this.updateStatus = function() {
   };
-  this.writeAudio = function() {
-  };
-  this.writeFrame = function() {
-  }
+  this.canvasImageData = {data:[]}
 };
 if(window["$"]) {
   $.fn["JSSMSUI"] = function(roms) {
@@ -9216,7 +9366,7 @@ if(window["$"]) {
       }, complete:function(xhr, status) {
         var data;
         if(status == "error") {
-          self.updateStatus("The selected rom could not be loaded.");
+          self.updateStatus("The selected ROM file could not be loaded.");
           return
         }
         data = xhr.responseText;
@@ -9292,7 +9442,7 @@ JSSMS.Ports = function(sms) {
   this.ioPorts = []
 };
 JSSMS.Ports.prototype = {reset:function() {
-  if(Setup.LIGHTGUN) {
+  if(LIGHTGUN) {
     this.ioPorts = new Array(10);
     this.ioPorts[PORT_A + IO_TH_INPUT] = 1;
     this.ioPorts[PORT_B + IO_TH_INPUT] = 1
@@ -9305,7 +9455,7 @@ JSSMS.Ports.prototype = {reset:function() {
   }
   switch(port & 193) {
     case 1:
-      if(Setup.LIGHTGUN) {
+      if(LIGHTGUN) {
         this.oldTH = this.getTH(PORT_A) != 0 || this.getTH(PORT_B) != 0;
         this.writePort(PORT_A, value);
         this.writePort(PORT_B, value >> 2);
@@ -9366,7 +9516,7 @@ JSSMS.Ports.prototype = {reset:function() {
     case 192:
       return this.keyboard.controller1;
     case 193:
-      if(Setup.LIGHTGUN) {
+      if(LIGHTGUN) {
         if(this.keyboard.lightgunClick) {
           this.lightPhaserSync()
         }

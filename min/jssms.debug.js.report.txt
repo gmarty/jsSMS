@@ -1,49 +1,65 @@
-src\debugger.js:391: WARNING - assignment
+src\debugger.js:425: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1139: WARNING - assignment
+src\debugger.js:1173: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1179: WARNING - assignment
+src\debugger.js:1213: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1407: WARNING - assignment
+src\debugger.js:1442: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:2502: WARNING - assignment
+src\debugger.js:2660: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:3272: WARNING - assignment
+src\debugger.js:3483: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\sms.js:67: WARNING - cannot instantiate non-constructor
+src\debugger.js:4009: WARNING - Property getUint8 never defined on Array.<number>
+      return this.rom[address >> 14].getUint8(address & 0x3FFF);
+             ^
+
+src\debugger.js:4025: WARNING - Property getUint16 never defined on Array.<number>
+        return this.rom[address >> 14].getUint16(address & 0x3FFF, LITTLE_ENDIAN);
+               ^
+
+src\debugger.js:4027: WARNING - Property getUint8 never defined on Array.<number>
+        return (this.rom[address >> 14].getUint8(address & 0x3FFF)) |
+                ^
+
+src\debugger.js:4028: WARNING - Property getUint8 never defined on Array.<number>
+            ((this.rom[++address >> 14].getUint8(address & 0x3FFF)) << 8);
+              ^
+
+src\sms.js:68: WARNING - cannot instantiate non-constructor
   this.ui = new opts['ui'](this);
             ^
 
-src\z80.js:3093: WARNING - Property setUint8 never defined on JSSMS.Z80.memWriteMap
+src\z80.js:3144: WARNING - Property setUint8 never defined on JSSMS.Z80.memWriteMap
         this.memWriteMap.setUint8(i, 0);
         ^
 
-src\z80.js:3104: WARNING - Property setUint8 never defined on JSSMS.Z80.sram
+src\z80.js:3155: WARNING - Property setUint8 never defined on JSSMS.Z80.sram
         this.sram.setUint8(i, 0);
         ^
 
-0 error(s), 9 warning(s), 91.7% typed
+0 error(s), 13 warning(s), 92.9% typed
