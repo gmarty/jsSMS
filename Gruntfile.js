@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-closure-compiler');
+  grunt.loadNpmTasks('grunt-contrib-htmlmin');
   grunt.loadNpmTasks('grunt-contrib-concat');
 
   // Project configuration.
@@ -98,7 +99,7 @@ module.exports = function(grunt) {
       },
 
       // Generates a minified version of the script for the Firefox OS app.
-      'alec': {
+      alec: {
         js: [
           'src/setup.js',
           'src/sms.js',
@@ -195,6 +196,23 @@ module.exports = function(grunt) {
       }
     },
 
+    htmlmin: {
+      alec: {
+        options: {
+          removeComments: true,
+          collapseWhitespace: true,
+          collapseBooleanAttributes: true,
+          removeAttributeQuotes: true,
+          removeRedundantAttributes: true,
+          removeEmptyAttributes: true,
+          removeOptionalTags: true
+        },
+        files: {
+          'alec/index.html': 'alec/src.html'
+        }
+      }
+    },
+
     concat: {
       options: {
         banner: grunt.file.read('src/license.js')
@@ -235,6 +253,7 @@ module.exports = function(grunt) {
   grunt.registerTask('alec', [
     'closure-compiler:alec',
     'closure-compiler:alec-bootstrap',
+    'htmlmin:alec',
     'concat:alec'
   ]);
   grunt.registerTask('node', [
