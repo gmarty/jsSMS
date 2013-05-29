@@ -1,1 +1,4 @@
+*.report.txt
 .idea/
+alec/src.html
+alec/min/bootstrap.min.js
