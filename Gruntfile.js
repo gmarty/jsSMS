@@ -214,28 +214,44 @@ module.exports = function(grunt) {
     },
 
     concat: {
-      options: {
-        banner: grunt.file.read('src/license.js')
-      },
-      min: {
-        src: ['min/jssms.min.js'],
-        dest: 'min/jssms.min.js'
-      },
-      debug: {
-        src: ['min/jssms.debug.js'],
-        dest: 'min/jssms.debug.js'
-      },
-      concat: {
-        src: ['min/jssms.concat.js'],
-        dest: 'min/jssms.concat.js'
+      jssms: {
+        options: {
+          banner: grunt.file.read('src/license.js')
+        },
+        files: {
+          'min/jssms.min.js': ['min/jssms.min.js'],
+          'min/jssms.debug.js': ['min/jssms.debug.js'],
+          'min/jssms.concat.js': ['min/jssms.concat.js']
+        }
       },
       'alec': {
-        src: ['alec/min/alec.min.js'],
-        dest: 'alec/min/alec.min.js'
+        options: {
+          banner: grunt.file.read('src/license.js')
+        },
+        files: {
+          'alec/min/alec.min.js': ['alec/min/alec.min.js']
+        }
+      },
+      'alec-bootstrap': {
+        // No banner on this one.
+        options: {
+          process: function(src) {
+            // Inline JavaScript bootstrap code.
+            return src.replace(/<script src="\.\.\/src\/setup\.js">.+<\/script>/,
+                '<script>' + grunt.file.read('alec/min/bootstrap.min.js').trim() + '</script>');
+          }
+        },
+        files: {
+          'alec/index.html': ['alec/index.html']
+        }
       },
       node: {
-        src: ['min/jssms.node.js'],
-        dest: 'min/jssms.node.js'
+        options: {
+          banner: grunt.file.read('src/license.js')
+        },
+        files: {
+          'min/jssms.node.js': ['min/jssms.node.js']
+        }
       }
     }
 
@@ -246,15 +262,14 @@ module.exports = function(grunt) {
     'closure-compiler:min',
     'closure-compiler:debug',
     'closure-compiler:concat',
-    'concat:min',
-    'concat:debug',
-    'concat:concat'
+    'concat:jssms'
   ]);
   grunt.registerTask('alec', [
     'closure-compiler:alec',
     'closure-compiler:alec-bootstrap',
     'htmlmin:alec',
-    'concat:alec'
+    'concat:alec',
+    'concat:alec-bootstrap'
   ]);
   grunt.registerTask('node', [
     'closure-compiler:node',
