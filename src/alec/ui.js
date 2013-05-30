@@ -72,8 +72,12 @@ if (window['$']) {
       this.requestAnimationFrame = window[requestAnimationFramePrefix].bind(window);
 
       // Screen
-      this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + '></canvas>');
+      this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + ' moz-opaque></canvas>');
       this.canvasContext = this.screen[0].getContext('2d');
+
+      // Nearest-neighbour rendering for scaling pixel-art.
+      this.canvasContext['mozImageSmoothingEnabled'] = false;
+      this.canvasContext['imageSmoothingEnabled'] = false;
 
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
 

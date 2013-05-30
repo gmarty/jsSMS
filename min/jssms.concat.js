@@ -16,11 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-'use strict';var DEBUG = false;
+'use strict';var DEBUG = true;
 var DEBUGGER = false;
 var ACCURATE = false;
 var LITTLE_ENDIAN = true;
-var SUPPORT_DATAVIEW = !!(window["DataView"] && window["ArrayBuffer"]);
+var FORCE_DATAVIEW = false;
+var SUPPORT_DATAVIEW = FORCE_DATAVIEW || !!(window["DataView"] && window["ArrayBuffer"]);
 var SAMPLE_RATE = 44100;
 var DEBUG_TIMING = DEBUG;
 var REFRESH_EMULATION = false;
@@ -209,9 +210,6 @@ JSSMS.Utils = {rndInt:function(range) {
 }, Array:function() {
   if(SUPPORT_DATAVIEW) {
     return function(length) {
-      if(!length) {
-        length = 0
-      }
       return new DataView(new ArrayBuffer(length))
     }
   }else {
@@ -4746,6 +4744,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       continue
     }
     if(prevAddress <= pageBreakPoint && tree[i].address > pageBreakPoint) {
+      code.push("this.pc = " + toHex(prevAddress) + ";");
       code.push("}");
       code.push("},");
       code.push("" + pageNumber + ": {");
@@ -4767,7 +4766,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     code.push("// " + tree[i].label);
     breakNeeded = tree[i].code.substr(-7) == "return;";
     tstates += getTotalTStates(tree[i].opcodes);
-    insertTStates();
+    if(/return;/.test(tree[i].code) || /this\.tstates/.test(tree[i].code)) {
+      insertTStates()
+    }
     if(tree[i].code != "") {
       code.push(tree[i].code)
     }
@@ -5756,8 +5757,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.push2(this.d, this.e);";
       break;
     case 214:
-      inst = "SUB " + toHex(this.readRom8bit(address));
-      code = "";
+      operand = toHex(this.readRom8bit(address));
+      inst = "SUB " + operand;
+      code = "this.sub_a(" + operand + ");";
       break;
     case 215:
       target = 16;
@@ -6600,6 +6602,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 159:
       inst = "RES 3,A";
+      code = "this.a &= ~BIT_3;";
       break;
     case 160:
       inst = "RES 4,B";
@@ -6625,6 +6628,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 167:
       inst = "RES 4,A";
+      code = "this.a &= ~BIT_4;";
       break;
     case 168:
       inst = "RES 5,B";
@@ -6840,6 +6844,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 231:
       inst = "SET 4,A";
+      code = "this.a |= BIT_4;";
       break;
     case 232:
       inst = "SET 5,B";
@@ -7026,8 +7031,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.adc16(this.getBC());";
       break;
     case 75:
-      inst = "LD BC,(" + toHex(this.readRom16bit(address)) + ")";
-      code = "this.setBC(this.readMemWord(" + toHex(this.readRom16bit(address)) + "));";
+      operand = toHex(this.readRom16bit(address));
+      inst = "LD BC,(" + operand + ")";
+      code = "this.setBC(this.readMemWord(" + operand + "));";
       address = address + 2;
       break;
     case 79:
@@ -7047,8 +7053,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.sbc16(this.getDE());";
       break;
     case 83:
-      inst = "LD (" + toHex(this.readRom16bit(address)) + "),DE";
-      code = "var location = this.readMemWord(this.pc + 1);" + "this.writeMem(location++, this.e);" + "this.writeMem(location, this.d);";
+      operand = toHex(this.readRom16bit(address));
+      inst = "LD (" + operand + "),DE";
+      code = "var location = " + operand + ";" + "this.writeMem(location++, this.e);" + "this.writeMem(location, this.d);";
       address = address + 2;
       break;
     case 86:
@@ -7101,8 +7108,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.sbc16(this.getHL());";
       break;
     case 99:
-      inst = "LD (" + toHex(this.readRom16bit(address)) + "),HL";
-      code = "var location = this.readMemWord(this.pc + 1);" + "this.writeMem(location++, this.l);" + "this.writeMem(location, this.h);";
+      operand = toHex(this.readRom16bit(address));
+      inst = "LD (" + operand + "),HL";
+      code = "var location = " + operand + ";" + "this.writeMem(location++, this.l);" + "this.writeMem(location, this.h);";
       address = address + 2;
       break;
     case 103:
@@ -7297,7 +7305,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "ADD " + index + "  " + index;
       break;
     case 42:
-      inst = "LD " + index + " (" + toHex(this.readRom16bit(address)) + ")";
+      var location = this.readRom16bit(address);
+      inst = "LD " + index + " (" + toHex(location) + ")";
+      code = "this.ixL = this.readMem(" + toHex(location) + ");" + "this.ixH = this.readMem(" + toHex(location + 1) + ");";
       address = address + 2;
       break;
     case 43:
@@ -7331,7 +7341,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       operand = toHex(this.readRom8bit(address + 1));
       inst = "LD (" + index + "+" + toHex(offset) + ")," + operand;
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", " + operand + ");";
-      address++;
+      address = address + 2;
       break;
     case 57:
       inst = "ADD " + index + " SP";
@@ -9156,14 +9166,11 @@ JSSMS.Vdp.prototype = {reset:function() {
 }};
 JSSMS.DummyUI = function(sms) {
   this.main = sms;
-  this.enable = function() {
+  this.reset = function() {
   };
   this.updateStatus = function() {
   };
-  this.writeAudio = function() {
-  };
-  this.writeFrame = function() {
-  }
+  this.canvasImageData = {data:[]}
 };
 if(window["$"]) {
   $.fn["JSSMSUI"] = function(roms) {
@@ -9195,8 +9202,11 @@ if(window["$"]) {
           lastTime = currTime + timeToCall
         }
       }
-      this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + "></canvas>");
+      this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + " moz-opaque></canvas>");
       this.canvasContext = this.screen[0].getContext("2d");
+      this.canvasContext["webkitImageSmoothingEnabled"] = false;
+      this.canvasContext["mozImageSmoothingEnabled"] = false;
+      this.canvasContext["imageSmoothingEnabled"] = false;
       if(!this.canvasContext.getImageData) {
         $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest version of Firefox, Google Chrome, Opera or Safari!</div>');
         return
@@ -9359,7 +9369,7 @@ if(window["$"]) {
       }, complete:function(xhr, status) {
         var data;
         if(status == "error") {
-          self.updateStatus("The selected rom could not be loaded.");
+          self.updateStatus("The selected ROM file could not be loaded.");
           return
         }
         data = xhr.responseText;

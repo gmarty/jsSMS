@@ -89,8 +89,13 @@ if (window['$']) {
       }
 
       // Screen
-      this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + '></canvas>');
+      this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + ' moz-opaque></canvas>');
       this.canvasContext = this.screen[0].getContext('2d');
+
+      // Nearest-neighbour rendering for scaling pixel-art.
+      this.canvasContext['webkitImageSmoothingEnabled'] = false;
+      this.canvasContext['mozImageSmoothingEnabled'] = false;
+      this.canvasContext['imageSmoothingEnabled'] = false;
 
       if (!this.canvasContext.getImageData) {
         $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest version of Firefox, Google Chrome, Opera or Safari!</div>');

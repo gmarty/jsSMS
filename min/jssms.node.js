@@ -1582,6 +1582,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 159:
                 $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "RES 3,A";
+                $code$$inline_285_location$$inline_278_target$$inline_291$$ = "this.a &= ~BIT_3;";
                 break;
               case 160:
                 $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "RES 4,B";
@@ -1607,6 +1608,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 167:
                 $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "RES 4,A";
+                $code$$inline_285_location$$inline_278_target$$inline_291$$ = "this.a &= ~BIT_4;";
                 break;
               case 168:
                 $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "RES 5,B";
@@ -1822,6 +1824,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 break;
               case 231:
                 $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "SET 4,A";
+                $code$$inline_285_location$$inline_278_target$$inline_291$$ = "this.a |= BIT_4;";
                 break;
               case 232:
                 $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "SET 5,B";
@@ -1973,8 +1976,9 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "this.push2(this.d, this.e);";
             break;
           case 214:
-            $inst$$inline_273_opcodesArray$$inline_282_opcodesArray$$inline_288$$ = "SUB " + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_269_hexOpcodes$$inline_297_opcode$$inline_281$$, $address$$inline_270_address$$inline_280_opcode$$inline_287$$));
-            $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "";
+            $_inst$$inline_279_currAddr$$inline_284_currAddr$$inline_290_operand$$inline_277$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_269_hexOpcodes$$inline_297_opcode$$inline_281$$, $address$$inline_270_address$$inline_280_opcode$$inline_287$$));
+            $inst$$inline_273_opcodesArray$$inline_282_opcodesArray$$inline_288$$ = "SUB " + $_inst$$inline_279_currAddr$$inline_284_currAddr$$inline_290_operand$$inline_277$$;
+            $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "this.sub_a(" + $_inst$$inline_279_currAddr$$inline_284_currAddr$$inline_290_operand$$inline_277$$ + ");";
             break;
           case 215:
             $address$$inline_286_target$$inline_275$$ = 16;
@@ -2176,8 +2180,9 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 $code$$inline_292$$ = "this.adc16(this.getBC());";
                 break;
               case 75:
-                $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "LD BC,(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_269_hexOpcodes$$inline_297_opcode$$inline_281$$, $address$$inline_286_target$$inline_275$$)) + ")";
-                $code$$inline_292$$ = "this.setBC(this.readMemWord(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_269_hexOpcodes$$inline_297_opcode$$inline_281$$, $address$$inline_286_target$$inline_275$$)) + "));";
+                $operand$$inline_293$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_269_hexOpcodes$$inline_297_opcode$$inline_281$$, $address$$inline_286_target$$inline_275$$));
+                $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "LD BC,(" + $operand$$inline_293$$ + ")";
+                $code$$inline_292$$ = "this.setBC(this.readMemWord(" + $operand$$inline_293$$ + "));";
                 $address$$inline_286_target$$inline_275$$ += 2;
                 break;
               case 79:
@@ -2197,8 +2202,9 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 $code$$inline_292$$ = "this.sbc16(this.getDE());";
                 break;
               case 83:
-                $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "LD (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_269_hexOpcodes$$inline_297_opcode$$inline_281$$, $address$$inline_286_target$$inline_275$$)) + "),DE";
-                $code$$inline_292$$ = "var location = this.readMemWord(this.pc + 1);this.writeMem(location++, this.e);this.writeMem(location, this.d);";
+                $operand$$inline_293$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_269_hexOpcodes$$inline_297_opcode$$inline_281$$, $address$$inline_286_target$$inline_275$$));
+                $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "LD (" + $operand$$inline_293$$ + "),DE";
+                $code$$inline_292$$ = "var location = " + $operand$$inline_293$$ + ";this.writeMem(location++, this.e);this.writeMem(location, this.d);";
                 $address$$inline_286_target$$inline_275$$ += 2;
                 break;
               case 86:
@@ -2247,8 +2253,9 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
                 $code$$inline_292$$ = "this.sbc16(this.getHL());";
                 break;
               case 99:
-                $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "LD (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_269_hexOpcodes$$inline_297_opcode$$inline_281$$, $address$$inline_286_target$$inline_275$$)) + "),HL";
-                $code$$inline_292$$ = "var location = this.readMemWord(this.pc + 1);this.writeMem(location++, this.l);this.writeMem(location, this.h);";
+                $operand$$inline_293$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_269_hexOpcodes$$inline_297_opcode$$inline_281$$, $address$$inline_286_target$$inline_275$$));
+                $code$$inline_276_inst$$inline_283_inst$$inline_289$$ = "LD (" + $operand$$inline_293$$ + "),HL";
+                $code$$inline_292$$ = "var location = " + $operand$$inline_293$$ + ";this.writeMem(location++, this.l);this.writeMem(location, this.h);";
                 $address$$inline_286_target$$inline_275$$ += 2;
                 break;
               case 103:
@@ -5319,7 +5326,6 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
   return $JSCompiler_alias_TRUE$$
 }};
 var $JSSMS$Utils$Array$$ = $SUPPORT_DATAVIEW$$ ? function($length$$12$$) {
-  $length$$12$$ || ($length$$12$$ = 0);
   return new DataView(new ArrayBuffer($length$$12$$))
 } : Array, $JSSMS$Utils$getTimestamp$$ = window.performance && window.performance.now ? function() {
   return window.performance.now()
@@ -6518,8 +6524,8 @@ function $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_read
 function $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_readRom8bit$self$$, $address$$11$$) {
   return $SUPPORT_DATAVIEW$$ ? $JSCompiler_StaticMethods_readRom8bit$self$$.$rom$[$address$$11$$ >> 14].getUint8($address$$11$$ & 16383) : $JSCompiler_StaticMethods_readRom8bit$self$$.$rom$[$address$$11$$ >> 14][$address$$11$$ & 16383] & 255
 }
-function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex$self$$, $index$$45$$, $address$$9_address$$inline_85$$) {
-  var $opcode$$9$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$), $opcodesArray$$3$$ = [$opcode$$9$$], $inst$$3_opcode$$inline_86$$ = "Unimplemented 0xDD or 0xFD prefixed opcode", $currAddr$$3$$ = $address$$9_address$$inline_85$$, $code$$6_code$$inline_90_offset$$16$$ = 'throw "Unimplemented 0xDD or 0xFD prefixed opcode";', $opcodesArray$$inline_87_operand$$2$$ = "";
+function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $index$$45$$, $address$$9_address$$inline_85$$) {
+  var $opcode$$9$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$), $opcodesArray$$3$$ = [$opcode$$9$$], $inst$$3_opcode$$inline_86$$ = "Unimplemented 0xDD or 0xFD prefixed opcode", $currAddr$$3$$ = $address$$9_address$$inline_85$$, $code$$6_code$$inline_90_offset$$16$$ = 'throw "Unimplemented 0xDD or 0xFD prefixed opcode";', $opcodesArray$$inline_87_operand$$2$$ = "";
   $address$$9_address$$inline_85$$++;
   switch($opcode$$9$$) {
     case 9:
@@ -6531,13 +6537,13 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $code$$6_code$$inline_90_offset$$16$$ = "this.set" + $index$$45$$ + "(this.add16(this.get" + $index$$45$$ + "(), this.getDE()));";
       break;
     case 33:
-      $opcodesArray$$inline_87_operand$$2$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$));
+      $opcodesArray$$inline_87_operand$$2$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$));
       $inst$$3_opcode$$inline_86$$ = "LD " + $index$$45$$ + "," + $opcodesArray$$inline_87_operand$$2$$;
       $code$$6_code$$inline_90_offset$$16$$ = "this.set" + $index$$45$$ + "(" + $opcodesArray$$inline_87_operand$$2$$ + ");";
       $address$$9_address$$inline_85$$ += 2;
       break;
     case 34:
-      $opcodesArray$$inline_87_operand$$2$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$));
+      $opcodesArray$$inline_87_operand$$2$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$));
       $inst$$3_opcode$$inline_86$$ = "LD (" + $opcodesArray$$inline_87_operand$$2$$ + ")," + $index$$45$$;
       $code$$6_code$$inline_90_offset$$16$$ = "var location = " + $opcodesArray$$inline_87_operand$$2$$ + ";this.writeMem(location++, this." + $index$$45$$.toLowerCase() + "L);this.writeMem(location, this." + $index$$45$$.toLowerCase() + "H);";
       $address$$9_address$$inline_85$$ += 2;
@@ -6553,14 +6559,16 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "DEC " + $index$$45$$ + "H *";
       break;
     case 38:
-      $inst$$3_opcode$$inline_86$$ = "LD " + $index$$45$$ + "H," + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$)) + " *";
+      $inst$$3_opcode$$inline_86$$ = "LD " + $index$$45$$ + "H," + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$)) + " *";
       $address$$9_address$$inline_85$$++;
       break;
     case 41:
       $inst$$3_opcode$$inline_86$$ = "ADD " + $index$$45$$ + "  " + $index$$45$$;
       break;
     case 42:
-      $inst$$3_opcode$$inline_86$$ = "LD " + $index$$45$$ + " (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$)) + ")";
+      $JSCompiler_StaticMethods_getIndex$self_location$$27$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
+      $inst$$3_opcode$$inline_86$$ = "LD " + $index$$45$$ + " (" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$) + ")";
+      $code$$6_code$$inline_90_offset$$16$$ = "this.ixL = this.readMem(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$) + ");this.ixH = this.readMem(" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$ + 1) + ");";
       $address$$9_address$$inline_85$$ += 2;
       break;
     case 43:
@@ -6574,27 +6582,27 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "DEC " + $index$$45$$ + "L *";
       break;
     case 46:
-      $inst$$3_opcode$$inline_86$$ = "LD " + $index$$45$$ + "L," + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$));
+      $inst$$3_opcode$$inline_86$$ = "LD " + $index$$45$$ + "L," + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$));
       $address$$9_address$$inline_85$$++;
       break;
     case 52:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "INC (" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ")";
       $code$$6_code$$inline_90_offset$$16$$ = "this.incMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
       break;
     case 53:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "DEC (" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ")";
       $code$$6_code$$inline_90_offset$$16$$ = "this.decMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
       break;
     case 54:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
-      $opcodesArray$$inline_87_operand$$2$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$ + 1));
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
+      $opcodesArray$$inline_87_operand$$2$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$ + 1));
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ")," + $opcodesArray$$inline_87_operand$$2$$;
       $code$$6_code$$inline_90_offset$$16$$ = "this.writeMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ", " + $opcodesArray$$inline_87_operand$$2$$ + ");";
-      $address$$9_address$$inline_85$$++;
+      $address$$9_address$$inline_85$$ += 2;
       break;
     case 57:
       $inst$$3_opcode$$inline_86$$ = "ADD " + $index$$45$$ + " SP";
@@ -6607,7 +6615,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD B," + $index$$45$$ + "L *";
       break;
     case 70:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD B,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ")";
       $code$$6_code$$inline_90_offset$$16$$ = "this.b = this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6619,7 +6627,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD C," + $index$$45$$ + "L *";
       break;
     case 78:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD C,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ")";
       $code$$6_code$$inline_90_offset$$16$$ = "this.c = this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6631,7 +6639,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD D," + $index$$45$$ + "L *";
       break;
     case 86:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD D,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ")";
       $code$$6_code$$inline_90_offset$$16$$ = "this.d = this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6643,7 +6651,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD E," + $index$$45$$ + "L *";
       break;
     case 94:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD E,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ")";
       $code$$6_code$$inline_90_offset$$16$$ = "this.e = this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6667,7 +6675,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD " + $index$$45$$ + "H," + $index$$45$$ + "L *";
       break;
     case 102:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD H,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ")";
       $code$$6_code$$inline_90_offset$$16$$ = "this.h = this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6695,7 +6703,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $code$$6_code$$inline_90_offset$$16$$ = "";
       break;
     case 110:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD L,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ")";
       $code$$6_code$$inline_90_offset$$16$$ = "this.l = this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6705,43 +6713,43 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $code$$6_code$$inline_90_offset$$16$$ = "this." + $index$$45$$.toLowerCase() + "L = this.a;";
       break;
     case 112:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "),B";
       $code$$6_code$$inline_90_offset$$16$$ = "this.writeMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ", this.b);";
       $address$$9_address$$inline_85$$++;
       break;
     case 113:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "),C";
       $code$$6_code$$inline_90_offset$$16$$ = "this.writeMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ", this.c);";
       $address$$9_address$$inline_85$$++;
       break;
     case 114:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "),D";
       $code$$6_code$$inline_90_offset$$16$$ = "this.writeMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ", this.d);";
       $address$$9_address$$inline_85$$++;
       break;
     case 115:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "),E";
       $code$$6_code$$inline_90_offset$$16$$ = "this.writeMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ", this.e);";
       $address$$9_address$$inline_85$$++;
       break;
     case 116:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "),H";
       $code$$6_code$$inline_90_offset$$16$$ = "this.writeMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ", this.h);";
       $address$$9_address$$inline_85$$++;
       break;
     case 117:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "),L";
       $code$$6_code$$inline_90_offset$$16$$ = "this.writeMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ", this.l);";
       $address$$9_address$$inline_85$$++;
       break;
     case 119:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD (" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "),A";
       $code$$6_code$$inline_90_offset$$16$$ = "this.writeMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ", this.a);";
       $address$$9_address$$inline_85$$++;
@@ -6753,7 +6761,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "LD A," + $index$$45$$ + "L *";
       break;
     case 126:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "LD A,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ")";
       $code$$6_code$$inline_90_offset$$16$$ = "this.a = this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ");";
       $address$$9_address$$inline_85$$++;
@@ -6765,7 +6773,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "ADD A," + $index$$45$$ + "L *";
       break;
     case 134:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "ADD A,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "))";
       $code$$6_code$$inline_90_offset$$16$$ = "this.add_a(this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "));";
       $address$$9_address$$inline_85$$++;
@@ -6777,7 +6785,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "ADC A," + $index$$45$$ + "L *";
       break;
     case 142:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "ADC A,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "))";
       $code$$6_code$$inline_90_offset$$16$$ = "this.adc_a(this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "));";
       $address$$9_address$$inline_85$$++;
@@ -6789,7 +6797,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "SUB " + $index$$45$$ + "L *";
       break;
     case 150:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "SUB A,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "))";
       $code$$6_code$$inline_90_offset$$16$$ = "this.sub_a(this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "));";
       $address$$9_address$$inline_85$$++;
@@ -6801,7 +6809,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_opcode$$inline_86$$ = "SBC A," + $index$$45$$ + "L *";
       break;
     case 158:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "SBC A,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "))";
       $code$$6_code$$inline_90_offset$$16$$ = "this.sbc_a(this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "));";
       $address$$9_address$$inline_85$$++;
@@ -6815,7 +6823,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $code$$6_code$$inline_90_offset$$16$$ = "this.f = this.SZP_TABLE[this.a &= this." + $index$$45$$.toLowerCase() + "L];";
       break;
     case 166:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "AND A,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "))";
       $code$$6_code$$inline_90_offset$$16$$ = "this.f = this.SZP_TABLE[this.a &= this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ")] | F_HALFCARRY;";
       $address$$9_address$$inline_85$$++;
@@ -6829,7 +6837,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $code$$6_code$$inline_90_offset$$16$$ = "this.f = this.SZP_TABLE[this.a |= this." + $index$$45$$.toLowerCase() + "L];";
       break;
     case 174:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "XOR A,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "))";
       $code$$6_code$$inline_90_offset$$16$$ = "this.f = this.SZP_TABLE[this.a ^= this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ")];";
       $address$$9_address$$inline_85$$++;
@@ -6843,7 +6851,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $code$$6_code$$inline_90_offset$$16$$ = "this.f = this.SZP_TABLE[this.a |= this." + $index$$45$$.toLowerCase() + "L];";
       break;
     case 182:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "OR A,(" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "))";
       $code$$6_code$$inline_90_offset$$16$$ = "this.f = this.SZP_TABLE[this.a |= this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + ")];";
       $address$$9_address$$inline_85$$++;
@@ -6857,26 +6865,26 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $code$$6_code$$inline_90_offset$$16$$ = "this.cp_a(this." + $index$$45$$.toLowerCase() + "L);";
       break;
     case 190:
-      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$);
+      $code$$6_code$$inline_90_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$);
       $inst$$3_opcode$$inline_86$$ = "CP (" + $index$$45$$ + "+" + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "))";
       $code$$6_code$$inline_90_offset$$16$$ = "this.cp_a(this.readMem(this.get" + $index$$45$$ + "() + " + $JSSMS$Utils$toHex$$($code$$6_code$$inline_90_offset$$16$$) + "));";
       $address$$9_address$$inline_85$$++;
       break;
     case 203:
-      var $inst$$3_opcode$$inline_86$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$), $opcodesArray$$inline_87_operand$$2$$ = [$inst$$3_opcode$$inline_86$$], $inst$$inline_88$$ = "Unimplemented 0xDDCB or 0xFDCB prefixed opcode", $code$$6_code$$inline_90_offset$$16$$ = 'throw "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";';
+      var $inst$$3_opcode$$inline_86$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$), $opcodesArray$$inline_87_operand$$2$$ = [$inst$$3_opcode$$inline_86$$], $inst$$inline_88$$ = "Unimplemented 0xDDCB or 0xFDCB prefixed opcode", $code$$6_code$$inline_90_offset$$16$$ = 'throw "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";';
       $address$$9_address$$inline_85$$++;
       switch($inst$$3_opcode$$inline_86$$) {
         case 0:
           $inst$$inline_88$$ = "LD B,RLC (" + $index$$45$$ + ")";
-          $code$$6_code$$inline_90_offset$$16$$ = "var location = (this.get" + $index$$45$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.b = this.rlc(this.readMem(location)); this.writeMem(location, this.b);";
+          $code$$6_code$$inline_90_offset$$16$$ = "var location = (this.get" + $index$$45$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.b = this.rlc(this.readMem(location)); this.writeMem(location, this.b);";
           break;
         case 1:
           $inst$$inline_88$$ = "LD C,RLC (" + $index$$45$$ + ")";
-          $code$$6_code$$inline_90_offset$$16$$ = "var location = (this.get" + $index$$45$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.c = this.rlc(this.readMem(location)); this.writeMem(location, this.c);";
+          $code$$6_code$$inline_90_offset$$16$$ = "var location = (this.get" + $index$$45$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.c = this.rlc(this.readMem(location)); this.writeMem(location, this.c);";
           break;
         case 2:
           $inst$$inline_88$$ = "LD D,RLC (" + $index$$45$$ + ")";
-          $code$$6_code$$inline_90_offset$$16$$ = "var location = (this.get" + $index$$45$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.d = this.rlc(this.readMem(location)); this.writeMem(location, this.d);";
+          $code$$6_code$$inline_90_offset$$16$$ = "var location = (this.get" + $index$$45$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.d = this.rlc(this.readMem(location)); this.writeMem(location, this.d);";
           break;
         case 3:
           $inst$$inline_88$$ = "LD E,RLC (" + $index$$45$$ + ")";
@@ -6889,11 +6897,11 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
           break;
         case 6:
           $inst$$inline_88$$ = "RLC (" + $index$$45$$ + ")";
-          $code$$6_code$$inline_90_offset$$16$$ = "var location = (this.get" + $index$$45$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.writeMem(location, this.rlc(this.readMem(location)));";
+          $code$$6_code$$inline_90_offset$$16$$ = "var location = (this.get" + $index$$45$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.writeMem(location, this.rlc(this.readMem(location)));";
           break;
         case 7:
           $inst$$inline_88$$ = "LD A,RLC (" + $index$$45$$ + ")";
-          $code$$6_code$$inline_90_offset$$16$$ = "var location = (this.get" + $index$$45$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.a = this.rlc(this.readMem(location)); this.writeMem(location, this.a);";
+          $code$$6_code$$inline_90_offset$$16$$ = "var location = (this.get" + $index$$45$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.a = this.rlc(this.readMem(location)); this.writeMem(location, this.a);";
           break;
         case 8:
           $inst$$inline_88$$ = "LD B,RRC (" + $index$$45$$ + ")";
@@ -6960,7 +6968,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
           break;
         case 29:
           $inst$$inline_88$$ = "LD L,RR (" + $index$$45$$ + ")";
-          $code$$6_code$$inline_90_offset$$16$$ = "var location = (this.get" + $index$$45$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.l = this.rr(this.readMem(location)); this.writeMem(location, this.l);";
+          $code$$6_code$$inline_90_offset$$16$$ = "var location = (this.get" + $index$$45$$ + "() + " + $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_location$$27$$, $address$$9_address$$inline_85$$) + ") & 0xFFFF;this.l = this.rr(this.readMem(location)); this.writeMem(location, this.l);";
           break;
         case 30:
           $inst$$inline_88$$ = "RR (" + $index$$45$$ + ")";
@@ -7525,14 +7533,15 @@ function $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$$($J
   $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$ = $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$.$u$;
   for(var $tstates$$ = 0, $prevAddress$$ = 0, $prevNextAddress$$ = 0, $breakNeeded$$ = $JSCompiler_alias_FALSE$$, $pageBreakPoint$$ = 1024, $pageNumber$$ = 0, $i$$10$$ = 0, $length$$17$$ = 0, $code$$2$$ = ['"": {', '"": function() {', 'throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'], $i$$10$$ = 0, $length$$17$$ = $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$.length;$i$$10$$ < $length$$17$$;$i$$10$$++) {
     if($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$]) {
-      $prevAddress$$ <= $pageBreakPoint$$ && $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$address$ > $pageBreakPoint$$ && ($code$$2$$.push("}"), $code$$2$$.push("},"), $code$$2$$.push("" + $pageNumber$$ + ": {"), $code$$2$$.push('"": function() {'), $code$$2$$.push('throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'), $breakNeeded$$ = $JSCompiler_alias_TRUE$$, $pageNumber$$++, $pageBreakPoint$$ = 16384 * $pageNumber$$);
+      $prevAddress$$ <= $pageBreakPoint$$ && $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$address$ > $pageBreakPoint$$ && ($code$$2$$.push("this.pc = " + $JSSMS$Utils$toHex$$($prevAddress$$) + ";"), $code$$2$$.push("}"), $code$$2$$.push("},"), $code$$2$$.push("" + $pageNumber$$ + ": {"), $code$$2$$.push('"": function() {'), $code$$2$$.push('throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'), $breakNeeded$$ = $JSCompiler_alias_TRUE$$, $pageNumber$$++, 
+      $pageBreakPoint$$ = 16384 * $pageNumber$$);
       if($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$isJumpTarget$ || $prevNextAddress$$ != $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$address$ || $breakNeeded$$) {
         $insertTStates$$(), $prevNextAddress$$ && !$breakNeeded$$ && $code$$2$$.push("this.pc = " + $JSSMS$Utils$toHex$$($prevNextAddress$$) + ";"), $code$$2$$.push("},"), $code$$2$$.push("" + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$address$) + ": function(temp) {"), $code$$2$$.push("// Nb of instructions jumping here: " + $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$jumpTargetNb$)
       }
       $code$$2$$.push("// " + $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].label);
       $breakNeeded$$ = "return;" == $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].code.substr(-7);
       $tstates$$ += $getTotalTStates$$($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$opcodes$);
-      $insertTStates$$();
+      (/return;/.test($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].code) || /this\.tstates/.test($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].code)) && $insertTStates$$();
       "" != $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].code && $code$$2$$.push($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].code);
       $prevAddress$$ = $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$address$;
       $prevNextAddress$$ = $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$10$$].$nextAddress$
