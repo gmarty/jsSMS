@@ -7742,8 +7742,11 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
           $lastTime$$ = $currTime$$ + $timeToCall$$
         }
       }
-      this.screen = $("<canvas width=256 height=192></canvas>");
+      this.screen = $("<canvas width=256 height=192 moz-opaque></canvas>");
       this.$canvasContext$ = this.screen[0].getContext("2d");
+      this.$canvasContext$.webkitImageSmoothingEnabled = $JSCompiler_alias_FALSE$$;
+      this.$canvasContext$.mozImageSmoothingEnabled = $JSCompiler_alias_FALSE$$;
+      this.$canvasContext$.imageSmoothingEnabled = $JSCompiler_alias_FALSE$$;
       if(this.$canvasContext$.getImageData) {
         this.$canvasImageData$ = this.$canvasContext$.getImageData(0, 0, 256, 192);
         this.$gamepad$ = {$u$:{$e$:$(".up", $gamepadContainer$$), $k$:1}, $r$:{$e$:$(".right", $gamepadContainer$$), $k$:8}, $d$:{$e$:$(".down", $gamepadContainer$$), $k$:2}, $l$:{$e$:$(".left", $gamepadContainer$$), $k$:4}, 1:{$e$:$(".fire1", $gamepadContainer$$), $k$:16}, 2:{$e$:$(".fire2", $gamepadContainer$$), $k$:32}};
