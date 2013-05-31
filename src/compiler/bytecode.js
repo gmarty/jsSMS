@@ -22,27 +22,27 @@
 
 
 /**
- * A node is made of:
+ * A bytecode is made of:
  *  * at least one and at most 3 opcodes
- *  * an optional operand
- *  * an optional offset (?)
- *  * an optional next address
- *  * an optional jump target
+ *  * an operand (defaults to null)
+ *  * a next address (defaults to null)
+ *  * a jump target (defaults to null)
  *
  * @param {number} address
  * @constructor
  */
-function Node(address) {
+function Bytecode(address) {
   var toHex = JSSMS.Utils.toHex;
 
   this.address = address;
   this.hexAddress = toHex(address);
   this.opcode = [];
-  this.inst = '';
+  this.operand = null;
   this.nextAddress = null;
   this.target = null;
   this.isJumpTarget = false;
   this.jumpTargetNb = 0; // Number of instructions targeting there.
+  this.ast = null;
   // Memory can be registry or offset, read or write mode, 8 or 16 bit.
   /*this.memory = null;
 
@@ -50,7 +50,7 @@ function Node(address) {
    this.dstRegs = {};*/
 }
 
-Node.prototype = {
+Bytecode.prototype = {
   get hexOpcode() {
     var toHex = JSSMS.Utils.toHex;
 

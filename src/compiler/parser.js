@@ -26,6 +26,7 @@
  * @constructor
  * @todo Pass the rom memory non paginated to read/write faster.
  * @todo Define address types to instructionTypes (instruction or operand).
+ * @todo Keep a track of memory locations parsed.
  */
 var Parser = function(rom) {
   this.stream = new RomStream(rom);
@@ -40,7 +41,7 @@ Parser.prototype = {
    * Parse the instructions in the ROM.
    */
   parse: function(entryPoint, pageStart, pageEnd) {
-    console.time('Parsing');
+    if (DEBUG) console.time('Parsing');
 
     this.instructions = [];
     if (DEBUG) this.instructionTypes = [];
@@ -65,14 +66,16 @@ Parser.prototype = {
         continue;
       }
 
-      this.instructions[currentAddress] = this.disassemble(currentAddress);
+      var bytecode = new Bytecode(currentAddress);
+      this.instructions[currentAddress] = this.disassemble(bytecode);
     }
 
     // Flag entry point as jump target.
     this.instructions[entryPoint].isJumpTarget = true;
+    this.instructions[entryPoint].jumpTargetNb++;
 
     // Mark all jump target instructions.
-    for (var i = 0; i < this.stream.length; i++) {
+    for (var i = 0, length = this.instructions.length; i < length; i++) {
       if (!this.instructions[i]) {
         continue;
       }
@@ -90,7 +93,7 @@ Parser.prototype = {
       }
     }
 
-    console.timeEnd('Parsing');
+    if (DEBUG) console.timeEnd('Parsing');
 
     return this.instructions;
   },
@@ -102,7 +105,7 @@ Parser.prototype = {
    * @return {string} The content of a Dot file.
    */
   writeGraphViz: function() {
-    console.time('DOT generation');
+    if (DEBUG) console.time('DOT generation');
 
     var tree = this.instructions;
     var INDENT = ' ';
@@ -128,7 +131,7 @@ Parser.prototype = {
     // Inject entry point styling.
     content = content.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
 
-    console.timeEnd('DOT generation');
+    if (DEBUG) console.timeEnd('DOT generation');
 
     return content;
   },
@@ -146,18 +149,17 @@ Parser.prototype = {
   /**
    * Returns the instruction associated to an opcode.
    *
-   * @param {number} address
-   * @return {Node}
+   * @param {Bytecode} bytecode
+   * @return {Bytecode}
    */
-  disassemble: function(address) {
-    this.stream.seek(address);
-    var node = new Node(address);
+  disassemble: function(bytecode) {
+    this.stream.seek(bytecode.address);
     var opcode = this.stream.getUint8();
 
     var operand = null;
     var target = null;
 
-    node.opcode.push(opcode);
+    bytecode.opcode.push(opcode);
 
     switch (opcode) {
       case 0x00:
@@ -598,7 +600,7 @@ Parser.prototype = {
         target = this.stream.getUint16();
         break;
       case 0xCB:
-        return this.getCB(node);
+        return this.getCB(bytecode);
         break;
       case 0xCC:
         target = this.stream.getUint16();
@@ -646,7 +648,7 @@ Parser.prototype = {
         target = this.stream.getUint16();
         break;
       case 0xDD:
-        return this.getIndexOpIX(node);
+        return this.getIndexOpIX(bytecode);
         break;
       case 0xDE:
         operand = this.stream.getUint8();
@@ -689,7 +691,7 @@ Parser.prototype = {
         target = this.stream.getUint16();
         break;
       case 0xED:
-        return this.getED(node);
+        return this.getED(bytecode);
         break;
       case 0xEE:
         operand = this.stream.getUint8();
@@ -730,7 +732,7 @@ Parser.prototype = {
         target = this.stream.getUint16();
         break;
       case 0xFD:
-        return this.getIndexOpIY(node);
+        return this.getIndexOpIY(bytecode);
         break;
       case 0xFE:
         operand = this.stream.getUint8();
@@ -749,46 +751,46 @@ Parser.prototype = {
       this.addAddress(target);
     }
 
-    node.nextAddress = this.stream.position;
-    node.operand = operand;
-    node.target = target;
+    bytecode.nextAddress = this.stream.position;
+    bytecode.operand = operand;
+    bytecode.target = target;
 
-    return node;
+    return bytecode;
   },
 
 
   /**
    * Returns the instruction associated to an opcode.
    *
-   * @param {Node} node
-   * @return {Node}
+   * @param {Bytecode} bytecode
+   * @return {Bytecode}
    */
-  getCB: function(node) {
+  getCB: function(bytecode) {
     var opcode = this.stream.getUint8();
 
-    node.opcode.push(opcode);
+    bytecode.opcode.push(opcode);
 
     this.addAddress(this.stream.position);
 
-    node.nextAddress = this.stream.position;
+    bytecode.nextAddress = this.stream.position;
 
-    return node;
+    return bytecode;
   },
 
 
   /**
    * Returns the instruction associated to an opcode.
    *
-   * @param {Node} node
-   * @return {Node}
+   * @param {Bytecode} bytecode
+   * @return {Bytecode}
    */
-  getED: function(node) {
+  getED: function(bytecode) {
     var opcode = this.stream.getUint8();
 
     var operand = null;
     var target = null;
 
-    node.opcode.push(opcode);
+    bytecode.opcode.push(opcode);
 
     switch (opcode) {
       case 0x40:
@@ -958,33 +960,33 @@ Parser.prototype = {
       this.addAddress(target);
     }
 
-    node.nextAddress = this.stream.position;
-    node.operand = operand;
-    node.target = target;
+    bytecode.nextAddress = this.stream.position;
+    bytecode.operand = operand;
+    bytecode.target = target;
 
-    return node;
+    return bytecode;
   },
 
 
   /**
    * Returns the instruction associated to an opcode.
    *
-   * @param {Node} node
-   * @return {Node}
+   * @param {Bytecode} bytecode
+   * @return {Bytecode}
    */
-  getIndexOpIX: function(node) {
-    return this.getIndex('IX', node);
+  getIndexOpIX: function(bytecode) {
+    return this.getIndex('IX', bytecode);
   },
 
 
   /**
    * Returns the instruction associated to an opcode.
    *
-   * @param {Node} node
-   * @return {Node}
+   * @param {Bytecode} bytecode
+   * @return {Bytecode}
    */
-  getIndexOpIY: function(node) {
-    return this.getIndex('IY', node);
+  getIndexOpIY: function(bytecode) {
+    return this.getIndex('IY', bytecode);
   },
 
 
@@ -992,16 +994,16 @@ Parser.prototype = {
    * Returns the instruction associated to an opcode.
    *
    * @param {string} index
-   * @param {Node} node
-   * @return {Node}
+   * @param {Bytecode} bytecode
+   * @return {Bytecode}
    */
-  getIndex: function(index, node) {
+  getIndex: function(index, bytecode) {
     var opcode = this.stream.getUint8();
 
     var operand = null;
     var target = null;
 
-    node.opcode.push(opcode);
+    bytecode.opcode.push(opcode);
 
     switch (opcode) {
       case 0x09:
@@ -1196,7 +1198,7 @@ Parser.prototype = {
         operand = this.stream.getUint8();
         break;
       case 0xCB:
-        return this.getIndexCB(index, node);
+        return this.getIndexCB(index, bytecode);
         break;
       case 0xE1:
         break;
@@ -1220,11 +1222,11 @@ Parser.prototype = {
       this.addAddress(target);
     }
 
-    node.nextAddress = this.stream.position;
-    node.operand = operand;
-    node.target = target;
+    bytecode.nextAddress = this.stream.position;
+    bytecode.operand = operand;
+    bytecode.target = target;
 
-    return node;
+    return bytecode;
   },
 
 
@@ -1232,21 +1234,21 @@ Parser.prototype = {
    * Returns the instruction associated to an opcode.
    *
    * @param {string} index
-   * @param {Node} node
-   * @return {Node}
+   * @param {Bytecode} bytecode
+   * @return {Bytecode}
    */
-  getIndexCB: function(index, node) {
+  getIndexCB: function(index, bytecode) {
     var opcode = this.stream.getUint8();
     var operand = this.stream.getUint8();
 
-    node.opcode.push(opcode);
+    bytecode.opcode.push(opcode);
 
     this.addAddress(this.stream.position);
 
-    node.nextAddress = this.stream.position;
-    node.operand = operand;
+    bytecode.nextAddress = this.stream.position;
+    bytecode.operand = operand;
 
-    return node;
+    return bytecode;
   }
 };
 
@@ -1279,12 +1281,14 @@ RomStream.prototype = {
    * @return {number} Value from memory location.
    */
   getUint8: function() {
+    var value = 0;
+
     if (SUPPORT_DATAVIEW) {
-      var value = this.rom[this.pos >> 14].getUint8(this.pos & 0x3FFF);
+      value = this.rom[this.pos >> 14].getUint8(this.pos & 0x3FFF);
       this.pos++;
       return value;
     } else {
-      var value = this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF;
+      value = this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF;
       this.pos++;
       return value;
     }
@@ -1297,12 +1301,14 @@ RomStream.prototype = {
    * @return {number} Value from memory location.
    */
   getInt8: function() {
+    var value = 0;
+
     if (SUPPORT_DATAVIEW) {
-      var value = this.rom[this.pos >> 14].getInt8(this.pos & 0x3FFF);
+      value = this.rom[this.pos >> 14].getInt8(this.pos & 0x3FFF);
       this.pos++;
       return value;
     } else {
-      var value = this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF;
+      value = this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF;
       if (value >= 128) {
         value = value - 256;
       }
@@ -1318,19 +1324,21 @@ RomStream.prototype = {
    * @return {number} Value from memory location.
    */
   getUint16: function() {
+    var value = 0;
+
     if (SUPPORT_DATAVIEW) {
       if ((this.pos & 0x3FFF) < 0x3FFF) {
-        var value = this.rom[this.pos >> 14].getUint16(this.pos & 0x3FFF, LITTLE_ENDIAN);
+        value = this.rom[this.pos >> 14].getUint16(this.pos & 0x3FFF, LITTLE_ENDIAN);
         this.pos += 2;
         return value;
       } else {
-        var value = (this.rom[this.pos >> 14].getUint8(this.pos & 0x3FFF)) |
+        value = (this.rom[this.pos >> 14].getUint8(this.pos & 0x3FFF)) |
             ((this.rom[++this.pos >> 14].getUint8(this.pos & 0x3FFF)) << 8);
         this.pos += 2;
         return value;
       }
     } else {
-      var value = (this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF) |
+      value = (this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF) |
           ((this.rom[++this.pos >> 14][this.pos & 0x3FFF] & 0xFF) << 8);
       this.pos += 2;
       return value;
