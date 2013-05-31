@@ -91,6 +91,35 @@ JSSMS.Utils = {
 
 
   /**
+   * Apply a function recursively on an object and its children.
+   *
+   * @param {Object} object
+   * @param {Function} fn
+   * @return {Object} object.
+   */
+  traverse: function(object, fn) {
+    var key, child;
+
+    /*// Return false to stop the recursive process.
+     if ( === false) {
+     return;
+     }*/
+    fn.call(null, object);
+
+    for (key in object) {
+      if (object.hasOwnProperty(key)) {
+        child = object[key];
+        if (typeof child === 'object' && child !== null) {
+          object[key] = this.traverse(child, fn);
+        }
+      }
+    }
+
+    return object;
+  },
+
+
+  /**
    * Return the current timestamp in a fast way.
    *
    * @return {number} The current timestamp.
