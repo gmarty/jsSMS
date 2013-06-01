@@ -549,7 +549,7 @@ JSSMS.Z80.prototype = {
       case 0x13: this.incDE(); break;                                          // INC DE
       case 0x14: this.d = this.inc8(this.d); break;                                      // INC D
       case 0x15: this.d = this.dec8(this.d); break;                                      // DEC D
-      case 0x16: this.d = (this.readMem(this.pc++)); break;                              // LD D,n
+      case 0x16: this.d = this.readMem(this.pc++); break;                              // LD D,n
       case 0x17: this.rla_a(); break;                                          // RLA
       case 0x18: this.pc += this.signExtend(this.d_() + 1); break;                                      // JR (PC+e)
       case 0x19: this.setHL(this.add16(this.getHL(), this.getDE())); break;                   // ADD HL,DE
@@ -1030,68 +1030,68 @@ JSSMS.Z80.prototype = {
       this.incR();
 
     switch (opcode) {
-      case 0x00: this.b = (this.rlc(this.b)); break;                                 // RLC B
-      case 0x01: this.c = (this.rlc(this.c)); break;                                 // RLC C
-      case 0x02: this.d = (this.rlc(this.d)); break;                                 // RLC D
-      case 0x03: this.e = (this.rlc(this.e)); break;                                 // RLC E
-      case 0x04: this.h = (this.rlc(this.h)); break;                                 // RLC H
-      case 0x05: this.l = (this.rlc(this.l)); break;                                 // RLC L
+      case 0x00: this.b = this.rlc(this.b); break;                                 // RLC B
+      case 0x01: this.c = this.rlc(this.c); break;                                 // RLC C
+      case 0x02: this.d = this.rlc(this.d); break;                                 // RLC D
+      case 0x03: this.e = this.rlc(this.e); break;                                 // RLC E
+      case 0x04: this.h = this.rlc(this.h); break;                                 // RLC H
+      case 0x05: this.l = this.rlc(this.l); break;                                 // RLC L
       case 0x06: this.writeMem(this.getHL(), this.rlc(this.readMem(this.getHL()))); break;     // RLC (HL)
       case 0x07: this.a = this.rlc(this.a); break;                                   // RLC A
-      case 0x08: this.b = (this.rrc(this.b)); break;                                 // RRC B
-      case 0x09: this.c = (this.rrc(this.c)); break;                                 // RRC C
-      case 0x0A: this.d = (this.rrc(this.d)); break;                                 // RRC D
-      case 0x0B: this.e = (this.rrc(this.e)); break;                                 // RRC E
-      case 0x0C: this.h = (this.rrc(this.h)); break;                                 // RRC H
-      case 0x0D: this.l = (this.rrc(this.l)); break;                                 // RRC L
+      case 0x08: this.b = this.rrc(this.b); break;                                 // RRC B
+      case 0x09: this.c = this.rrc(this.c); break;                                 // RRC C
+      case 0x0A: this.d = this.rrc(this.d); break;                                 // RRC D
+      case 0x0B: this.e = this.rrc(this.e); break;                                 // RRC E
+      case 0x0C: this.h = this.rrc(this.h); break;                                 // RRC H
+      case 0x0D: this.l = this.rrc(this.l); break;                                 // RRC L
       case 0x0E: this.writeMem(this.getHL(), this.rrc(this.readMem(this.getHL()))); break;     // RRC (HL)
       case 0x0F: this.a = this.rrc(this.a); break;                                   // RRC A
-      case 0x10: this.b = (this.rl(this.b)); break;                                  // RL B
-      case 0x11: this.c = (this.rl(this.c)); break;                                  // RL C
-      case 0x12: this.d = (this.rl(this.d)); break;                                  // RL D
-      case 0x13: this.e = (this.rl(this.e)); break;                                  // RL E
-      case 0x14: this.h = (this.rl(this.h)); break;                                  // RL H
-      case 0x15: this.l = (this.rl(this.l)); break;                                  // RL L
+      case 0x10: this.b = this.rl(this.b); break;                                  // RL B
+      case 0x11: this.c = this.rl(this.c); break;                                  // RL C
+      case 0x12: this.d = this.rl(this.d); break;                                  // RL D
+      case 0x13: this.e = this.rl(this.e); break;                                  // RL E
+      case 0x14: this.h = this.rl(this.h); break;                                  // RL H
+      case 0x15: this.l = this.rl(this.l); break;                                  // RL L
       case 0x16: this.writeMem(this.getHL(), this.rl(this.readMem(this.getHL()))); break;      // RL (HL)
       case 0x17: this.a = this.rl(this.a); break;                                    // RL A
-      case 0x18: this.b = (this.rr(this.b)); break;                                  // RR B
-      case 0x19: this.c = (this.rr(this.c)); break;                                  // RR C
-      case 0x1A: this.d = (this.rr(this.d)); break;                                  // RR D
-      case 0x1B: this.e = (this.rr(this.e)); break;                                  // RR E
-      case 0x1C: this.h = (this.rr(this.h)); break;                                  // RR H
-      case 0x1D: this.l = (this.rr(this.l)); break;                                  // RR L
+      case 0x18: this.b = this.rr(this.b); break;                                  // RR B
+      case 0x19: this.c = this.rr(this.c); break;                                  // RR C
+      case 0x1A: this.d = this.rr(this.d); break;                                  // RR D
+      case 0x1B: this.e = this.rr(this.e); break;                                  // RR E
+      case 0x1C: this.h = this.rr(this.h); break;                                  // RR H
+      case 0x1D: this.l = this.rr(this.l); break;                                  // RR L
       case 0x1E: this.writeMem(this.getHL(), this.rr(this.readMem(this.getHL()))); break;      // RR (HL)
       case 0x1F: this.a = this.rr(this.a); break;                                    // RR A
-      case 0x20: this.b = (this.sla(this.b)); break;                                 // SLA B
-      case 0x21: this.c = (this.sla(this.c)); break;                                 // SLA C
-      case 0x22: this.d = (this.sla(this.d)); break;                                 // SLA D
-      case 0x23: this.e = (this.sla(this.e)); break;                                 // SLA E
-      case 0x24: this.h = (this.sla(this.h)); break;                                 // SLA H
-      case 0x25: this.l = (this.sla(this.l)); break;                                 // SLA L
+      case 0x20: this.b = this.sla(this.b); break;                                 // SLA B
+      case 0x21: this.c = this.sla(this.c); break;                                 // SLA C
+      case 0x22: this.d = this.sla(this.d); break;                                 // SLA D
+      case 0x23: this.e = this.sla(this.e); break;                                 // SLA E
+      case 0x24: this.h = this.sla(this.h); break;                                 // SLA H
+      case 0x25: this.l = this.sla(this.l); break;                                 // SLA L
       case 0x26: this.writeMem(this.getHL(), this.sla(this.readMem(this.getHL()))); break;     // SLA (HL)
       case 0x27: this.a = this.sla(this.a); break;                                   // SLA A
-      case 0x28: this.b = (this.sra(this.b)); break;                                 // SRA B
-      case 0x29: this.c = (this.sra(this.c)); break;                                 // SRA C
-      case 0x2A: this.d = (this.sra(this.d)); break;                                 // SRA D
-      case 0x2B: this.e = (this.sra(this.e)); break;                                 // SRA E
-      case 0x2C: this.h = (this.sra(this.h)); break;                                 // SRA H
-      case 0x2D: this.l = (this.sra(this.l)); break;                                 // SRA L
+      case 0x28: this.b = this.sra(this.b); break;                                 // SRA B
+      case 0x29: this.c = this.sra(this.c); break;                                 // SRA C
+      case 0x2A: this.d = this.sra(this.d); break;                                 // SRA D
+      case 0x2B: this.e = this.sra(this.e); break;                                 // SRA E
+      case 0x2C: this.h = this.sra(this.h); break;                                 // SRA H
+      case 0x2D: this.l = this.sra(this.l); break;                                 // SRA L
       case 0x2E: this.writeMem(this.getHL(), this.sra(this.readMem(this.getHL()))); break;     // SRA (HL)
       case 0x2F: this.a = this.sra(this.a); break;                                   // SRA A
-      case 0x30: this.b = (this.sll(this.b)); break;                                 // SLL B
-      case 0x31: this.c = (this.sll(this.c)); break;                                 // SLL C
-      case 0x32: this.d = (this.sll(this.d)); break;                                 // SLL D
-      case 0x33: this.e = (this.sll(this.e)); break;                                 // SLL E
-      case 0x34: this.h = (this.sll(this.h)); break;                                 // SLL H
-      case 0x35: this.l = (this.sll(this.l)); break;                                 // SLL L
+      case 0x30: this.b = this.sll(this.b); break;                                 // SLL B
+      case 0x31: this.c = this.sll(this.c); break;                                 // SLL C
+      case 0x32: this.d = this.sll(this.d); break;                                 // SLL D
+      case 0x33: this.e = this.sll(this.e); break;                                 // SLL E
+      case 0x34: this.h = this.sll(this.h); break;                                 // SLL H
+      case 0x35: this.l = this.sll(this.l); break;                                 // SLL L
       case 0x36: this.writeMem(this.getHL(), this.sll(this.readMem(this.getHL()))); break;     // SLL (HL)
-      case 0x37: this.a = (this.sll(this.a)); break;                                 // SLL A
-      case 0x38: this.b = (this.srl(this.b)); break;                                 // SRL B
-      case 0x39: this.c = (this.srl(this.c)); break;                                 // SRL C
-      case 0x3A: this.d = (this.srl(this.d)); break;                                 // SRL D
-      case 0x3B: this.e = (this.srl(this.e)); break;                                 // SRL E
-      case 0x3C: this.h = (this.srl(this.h)); break;                                 // SRL H
-      case 0x3D: this.l = (this.rl(this.l)); break;                                 // SRL L
+      case 0x37: this.a = this.sll(this.a); break;                                 // SLL A
+      case 0x38: this.b = this.srl(this.b); break;                                 // SRL B
+      case 0x39: this.c = this.srl(this.c); break;                                 // SRL C
+      case 0x3A: this.d = this.srl(this.d); break;                                 // SRL D
+      case 0x3B: this.e = this.srl(this.e); break;                                 // SRL E
+      case 0x3C: this.h = this.srl(this.h); break;                                 // SRL H
+      case 0x3D: this.l = this.srl(this.l); break;                                 // SRL L
       case 0x3E: this.writeMem(this.getHL(), this.srl(this.readMem(this.getHL()))); break;     // SRL (HL)
       case 0x3F: this.a = this.srl(this.a); break;                                   // SRL A
       case 0x40: this.bit(this.b & BIT_0); break;                               // BIT 0,B
