@@ -50,6 +50,7 @@ Compiler.prototype = {
           var toHex = JSSMS.Utils.toHex;
           var arr = [];
           var name = toHex(fn[0].address);
+          var jumpTargetNb = fn[0].jumpTargetNb;
 
           fn = fn
           .filter(function(bytecode) {
@@ -85,6 +86,16 @@ Compiler.prototype = {
 
           // @todo Remove this test when all the opcodes are implemented.
           if (fn.length) {
+
+            if (DEBUG && fn[0] && fn[0].leadingComments)
+              // Inject data about current branch into a comment.
+              fn[0].leadingComments = [
+                {
+                  type: 'Line',
+                  value: ' Nb of instructions jumping here: ' + jumpTargetNb
+                },
+                fn[0].leadingComments[0]
+              ];
 
             // Flatten the array (`ast` properties can be an object or an array of objects).
             fn.forEach(function(ast) {
