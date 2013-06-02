@@ -57,7 +57,30 @@ Compiler.prototype = {
                 return bytecode.ast;
               })
           .map(function(bytecode) {
-                return bytecode.ast;
+                var ast = bytecode.ast;
+
+                if (DEBUG) {
+                  // Inline comment about the current bytecode.
+                  attachComment(ast);
+                }
+
+                return ast;
+
+                function attachComment(ast) {
+                  if (Array.isArray(ast))
+                    doAttachComment(ast[0]);
+                  else
+                    doAttachComment(ast);
+
+                  function doAttachComment(ast) {
+                    ast.leadingComments = [
+                      {
+                        type: 'Line',
+                        value: ' ' + bytecode.label
+                      }
+                    ];
+                  }
+                }
               });
 
           // @todo Remove this test when all the opcodes are implemented.

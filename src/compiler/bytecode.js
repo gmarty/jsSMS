@@ -67,6 +67,6 @@ Bytecode.prototype = {
   get label() {
     return this.hexAddress + ' ' +
         this.hexOpcode + ' ' +
-        this.inst;
+        this.name;
   }
 };
