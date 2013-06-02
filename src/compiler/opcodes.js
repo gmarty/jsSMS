@@ -186,6 +186,13 @@ var o = {
         );
       };
   },
+  'LD_SP': function() {
+    return function(value) {
+      return n.ExpressionStatement(
+          n.AssignmentExpression('=', n.Identifier('sp'), n.Literal(value))
+      );
+    };
+  },
   'INC8': function(register) {
     return function() {
       return n.ExpressionStatement(
@@ -240,6 +247,29 @@ var o = {
           n.CallExpression('rra_a')
       );
     };
+  },
+  'ADD': function(register1, register2) {
+    if (register1 == undefined && register2 == undefined)
+      // 0 arguments.
+      return function(value) {
+        return n.ExpressionStatement(
+            n.CallExpression('add_a', n.Literal(value))
+        );
+      };
+    if (register2 == undefined)
+      // 1 argument.
+      return function() {
+        return n.ExpressionStatement(
+            n.CallExpression('add_a', n.Register(register1))
+        );
+      };
+    else
+      // 2 arguments.
+      return function() {
+        return n.ExpressionStatement(
+            n.CallExpression('add_a', o.READ_MEM8(n.CallExpression('get' + (register1 + register2).toUpperCase())))
+        );
+      };
   },
   'JR': function(test) {
     return function(value) {
@@ -457,7 +487,7 @@ var opcodeTable = [
   //0x22
   {
     name: 'LD (nn),HL',
-    ast: o.LD16('n', 'n', 'h', 'l'),
+    ast: o.LD_WRITE_MEM('n', 'n', 'h', 'l'),
     operand: UINT16
   },
   //0x23
@@ -490,7 +520,8 @@ var opcodeTable = [
   },
   //0x29
   {
-    name: 'ADD HL,HL'
+    name: 'ADD HL,HL',
+    ast: o.ADD16('h', 'l', 'h', 'l')
   },
   //0x2A
   {
@@ -528,7 +559,7 @@ var opcodeTable = [
   //0x31
   {
     name: 'LD SP,nn',
-    //ast: o.LD16('sp'), // @todo Fix me.
+    ast: o.LD_SP(),
     operand: UINT16
   },
   //0x32
@@ -597,5 +628,383 @@ var opcodeTable = [
   //0x3F
   {
     name: 'CCF'
+  },
+  //0x40
+  {
+    name: 'LD B,B',
+    ast: o.NOOP(),
+    operand: UINT8
+  },
+  //0x41
+  {
+    name: 'LD B,C',
+    ast: o.LD8('b', 'c')
+  },
+  //0x42
+  {
+    name: 'LD B,D',
+    ast: o.LD8('b', 'd')
+  },
+  //0x43
+  {
+    name: 'LD B,E',
+    ast: o.LD8('b', 'e')
+  },
+  //0x44
+  {
+    name: 'LD B,H',
+    ast: o.LD8('b', 'h')
+  },
+  //0x45
+  {
+    name: 'LD B,L',
+    ast: o.LD8('b', 'l')
+  },
+  //0x46
+  {
+    name: 'LD B,(HL)'
+  },
+  //0x47
+  {
+    name: 'LD B,A',
+    ast: o.LD8('b', 'a')
+  },
+  //0x48
+  {
+    name: 'LD C,B',
+    ast: o.LD8('c', 'b')
+  },
+  //0x49
+  {
+    name: 'LD C,C',
+    ast: o.NOOP()
+  },
+  //0x4A
+  {
+    name: 'LD C,D',
+    ast: o.LD8('c', 'd')
+  },
+  //0x4B
+  {
+    name: 'LD C,E',
+    ast: o.LD8('c', 'e')
+  },
+  //0x4C
+  {
+    name: 'LD C,H',
+    ast: o.LD8('c', 'h')
+  },
+  //0x4D
+  {
+    name: 'LD C,L',
+    ast: o.LD8('c', 'l')
+  },
+  //0x4E
+  {
+    name: 'LD C,(HL)'
+  },
+  //0x4F
+  {
+    name: 'LD C,A',
+    ast: o.LD8('c', 'a')
+  },
+  //0x50
+  {
+    name: 'LD D,B',
+    ast: o.LD8('d', 'b')
+  },
+  //0x51
+  {
+    name: 'LD D,C',
+    ast: o.LD8('d', 'c')
+  },
+  //0x52
+  {
+    name: 'LD D,D',
+    ast: o.NOOP()
+  },
+  //0x53
+  {
+    name: 'LD D,E',
+    ast: o.LD8('d', 'e')
+  },
+  //0x54
+  {
+    name: 'LD D,H',
+    ast: o.LD8('d', 'h')
+  },
+  //0x55
+  {
+    name: 'LD D,L',
+    ast: o.LD8('d', 'l')
+  },
+  //0x56
+  {
+    name: 'LD D,(HL)'
+  },
+  //0x57
+  {
+    name: 'LD D,A',
+    ast: o.LD8('d', 'a')
+  },
+  //0x58
+  {
+    name: 'LD E,B',
+    ast: o.LD8('e', 'b')
+  },
+  //0x59
+  {
+    name: 'LD E,C',
+    ast: o.LD8('e', 'c')
+  },
+  //0x5A
+  {
+    name: 'LD E,D',
+    ast: o.LD8('e', 'd')
+  },
+  //0x5B
+  {
+    name: 'LD E,E',
+    ast: o.NOOP()
+  },
+  //0x5C
+  {
+    name: 'LD E,H',
+    ast: o.LD8('e', 'h')
+  },
+  //0x5D
+  {
+    name: 'LD E,L',
+    ast: o.LD8('e', 'l')
+  },
+  //0x5E
+  {
+    name: 'LD E,(HL)'
+  },
+  //0x5F
+  {
+    name: 'LD E,A',
+    ast: o.LD8('e', 'a')
+  },
+  //0x60
+  {
+    name: 'LD H,B',
+    ast: o.LD8('h', 'b')
+  },
+  //0x61
+  {
+    name: 'LD H,C',
+    ast: o.LD8('h', 'c')
+  },
+  //0x62
+  {
+    name: 'LD H,D',
+    ast: o.LD8('h', 'd')
+  },
+  //0x63
+  {
+    name: 'LD H,E',
+    ast: o.LD8('h', 'e')
+  },
+  //0x64
+  {
+    name: 'LD H,H',
+    ast: o.NOOP()
+  },
+  //0x65
+  {
+    name: 'LD H,L',
+    ast: o.LD8('h', 'l')
+  },
+  //0x66
+  {
+    name: 'LD H,(HL)'
+  },
+  //0x67
+  {
+    name: 'LD H,A',
+    ast: o.LD8('h', 'a')
+  },
+  //0x68
+  {
+    name: 'LD L,B',
+    ast: o.LD8('l', 'b')
+  },
+  //0x69
+  {
+    name: 'LD L,C',
+    ast: o.LD8('l', 'c')
+  },
+  //0x6A
+  {
+    name: 'LD L,D',
+    ast: o.LD8('l', 'd')
+  },
+  //0x6B
+  {
+    name: 'LD L,E',
+    ast: o.LD8('l', 'e')
+  },
+  //0x6C
+  {
+    name: 'LD L,H',
+    ast: o.LD8('l', 'h')
+  },
+  //0x6D
+  {
+    name: 'LD L,L',
+    ast: o.NOOP()
+  },
+  //0x6E
+  {
+    name: 'LD L,(HL)'
+  },
+  //0x6F
+  {
+    name: 'LD L,A',
+    ast: o.LD8('l', 'a')
+  },
+  //0x70
+  {
+    name: 'LD (HL),B'
+  },
+  //0x71
+  {
+    name: 'LD (HL),C'
+  },
+  //0x72
+  {
+    name: 'LD (HL),D'
+  },
+  //0x73
+  {
+    name: 'LD (HL),E'
+  },
+  //0x74
+  {
+    name: 'LD (HL),H'
+  },
+  //0x75
+  {
+    name: 'LD (HL),L'
+  },
+  //0x76
+  {
+    name: 'HALT'
+  },
+  //0x77
+  {
+    name: 'LD (HL),A'
+  },
+  //0x78
+  {
+    name: 'LD A,B',
+    ast: o.LD8('a', 'b')
+  },
+  //0x79
+  {
+    name: 'LD A,C',
+    ast: o.LD8('a', 'c')
+  },
+  //0x7A
+  {
+    name: 'LD A,D',
+    ast: o.LD8('a', 'd')
+  },
+  //0x7B
+  {
+    name: 'LD A,E',
+    ast: o.LD8('a', 'e')
+  },
+  //0x7C
+  {
+    name: 'LD A,H',
+    ast: o.LD8('a', 'h')
+  },
+  //0x7D
+  {
+    name: 'LD A,L',
+    ast: o.LD8('a', 'l')
+  },
+  //0x7E
+  {
+    name: 'LD A,(HL)',
+    ast: o.LD8('a', 'h', 'l')
+  },
+  //0x7F
+  {
+    name: 'LD A,A',
+    ast: o.NOOP()
+  },
+  //0x80
+  {
+    name: 'ADD A,B',
+    ast: o.ADD('b')
+  },
+  //0x81
+  {
+    name: 'ADD A,C',
+    ast: o.ADD('c')
+  },
+  //0x82
+  {
+    name: 'ADD A,D',
+    ast: o.ADD('d')
+  },
+  //0x83
+  {
+    name: 'ADD A,E',
+    ast: o.ADD('e')
+  },
+  //0x84
+  {
+    name: 'ADD A,H',
+    ast: o.ADD('h')
+  },
+  //0x85
+  {
+    name: 'ADD A,L',
+    ast: o.ADD('l')
+  },
+  //0x86
+  {
+    name: 'ADD A,(HL)'
+  },
+  //0x87
+  {
+    name: 'ADD A,A',
+    ast: o.ADD('a')
+  },
+  //0x88
+  {
+    name: 'ADC A,B'
+  },
+  //0x89
+  {
+    name: 'ADC A,C'
+  },
+  //0x8A
+  {
+    name: 'ADC A,D'
+  },
+  //0x8B
+  {
+    name: 'ADC A,E'
+  },
+  //0x8C
+  {
+    name: 'ADC A,H'
+  },
+  //0x8D
+  {
+    name: 'ADC A,L'
+  },
+  //0x8E
+  {
+    name: 'ADC A,(HL)'
+  },
+  //0x8F
+  {
+    name: 'ADC A,A'
   }
 ];
