@@ -51,14 +51,13 @@ Analyzer.prototype = {
       .map(function(bytecode) {
           var opcode = opcodeTable[bytecode.opcode];
 
-          if (opcode) {
-            if (opcode.ast)
-              bytecode.ast = opcode.ast(bytecode.operand);
+          if (opcode && opcode.ast) {
+            bytecode.ast = opcode.ast(bytecode.operand, bytecode.target);
 
             if (DEBUG) {
               bytecode.name = opcode.name;
               if (opcode.opcode)
-                bytecode.opcode = opcode.opcode(bytecode.operand);
+                bytecode.opcode = opcode.opcode(bytecode.operand, bytecode.target);
             }
           }
 
