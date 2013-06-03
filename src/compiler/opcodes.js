@@ -90,6 +90,14 @@ var n = {
       'left': left,
       'right': right
     };
+  },
+  'MemberExpression': function(object, property) {
+    return {
+      'type': 'MemberExpression',
+      'computed': true, // Generate `object[property]`.
+      'object': object,
+      'property': property
+    };
   }
 };
 
@@ -234,6 +242,13 @@ var o = {
       );
     };
   },
+  'EX_AF': function() {
+    return function() {
+      return n.ExpressionStatement(
+          n.CallExpression('exAF')
+      );
+    };
+  },
   'RLA': function() {
     return function() {
       return n.ExpressionStatement(
@@ -268,6 +283,65 @@ var o = {
       return function() {
         return n.ExpressionStatement(
             n.CallExpression('add_a', o.READ_MEM8(n.CallExpression('get' + (register1 + register2).toUpperCase())))
+        );
+      };
+  },
+  'SUB': function(register) {
+    return function() {
+      return n.ExpressionStatement(
+          n.CallExpression('sub_a', n.Register(register))
+      );
+    };
+  },
+  'XOR': function(register) {
+    if (register != 'a')
+      return function() {
+        // a ^= b; f = SZP_TABLE[a];
+        return [
+          n.ExpressionStatement(
+              n.AssignmentExpression('^=', n.Register('a'), n.Register(register))
+          ),
+          n.ExpressionStatement(
+              n.AssignmentExpression('=', n.Register('f'),
+              n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a'))
+              )
+          )
+        ];
+      };
+    else
+      // this.a = 0; this.f = this.SZP_TABLE[0];
+      return function() {
+        return [
+          n.ExpressionStatement(
+              n.AssignmentExpression('=', n.Register('a'), n.Literal(0))
+          ),
+          n.ExpressionStatement(
+              // @todo Find a better way of calling `SZP_TABLE` than `sms.cpu.SZP_TABLE`.
+              n.AssignmentExpression('=', n.Register('f'), n.Literal(sms.cpu.SZP_TABLE[0]))
+          )
+        ];
+      };
+  },
+  'OR': function(register) {
+    if (register != 'a')
+      return function() {
+        // a |= b; f = SZP_TABLE[a];
+        return [
+          n.ExpressionStatement(
+              n.AssignmentExpression('|=', n.Register('a'), n.Register(register))
+          ),
+          n.ExpressionStatement(
+              n.AssignmentExpression('=', n.Register('f'),
+              n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a'))
+              )
+          )
+        ];
+      };
+    else
+      // this.f = this.SZP_TABLE[this.a];
+      return function() {
+        return n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register('f'), n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')))
         );
       };
   },
@@ -352,7 +426,8 @@ var opcodeTable = [
   },
   //0x08:
   {
-    name: 'EX AF AF\''
+    name: 'EX AF AF\'',
+    ast: o.EX_AF()
   },
   //0x09:
   {
@@ -1006,5 +1081,218 @@ var opcodeTable = [
   //0x8F
   {
     name: 'ADC A,A'
+  },
+  //0x90
+  {
+    name: 'SUB A,B',
+    ast: o.SUB('b')
+  },
+  //0x91
+  {
+    name: 'SUB A,C',
+    ast: o.SUB('c')
+  },
+  //0x92
+  {
+    name: 'SUB A,D',
+    ast: o.SUB('d')
+  },
+  //0x93
+  {
+    name: 'SUB A,E',
+    ast: o.SUB('e')
+  },
+  //0x94
+  {
+    name: 'SUB A,H',
+    ast: o.SUB('h')
+  },
+  //0x95
+  {
+    name: 'SUB A,L',
+    ast: o.SUB('l')
+  },
+  //0x96
+  {
+    name: 'SUB A,(HL)'
+  },
+  //0x97
+  {
+    name: 'SUB A,A',
+    ast: o.SUB('a')
+  },
+  //0x98
+  {
+    name: 'SBC A,B'
+  },
+  //0x99
+  {
+    name: 'SBC A,C'
+  },
+  //0x9A
+  {
+    name: 'SBC A,D'
+  },
+  //0x9B
+  {
+    name: 'SBC A,E'
+  },
+  //0x9C
+  {
+    name: 'SBC A,H'
+  },
+  //0x9D
+  {
+    name: 'SBC A,L'
+  },
+  //0x9E
+  {
+    name: 'SBC A,(HL)'
+  },
+  //0x9F
+  {
+    name: 'SBC A,A'
+  },
+  //0xA0
+  {
+    name: 'AND A,B'
+  },
+  //0xA1
+  {
+    name: 'AND A,C'
+  },
+  //0xA2
+  {
+    name: 'AND A,D'
+  },
+  //0xA3
+  {
+    name: 'AND A,E'
+  },
+  //0xA4
+  {
+    name: 'AND A,H'
+  },
+  //0xA5
+  {
+    name: 'AND A,L'
+  },
+  //0xA6
+  {
+    name: 'AND A,(HL)'
+  },
+  //0xA7
+  {
+    name: 'AND A,A'
+  },
+  //0xA8
+  {
+    name: 'XOR A,B',
+    ast: o.XOR('b')
+  },
+  //0xA9
+  {
+    name: 'XOR A,C',
+    ast: o.XOR('c')
+  },
+  //0xAA
+  {
+    name: 'XOR A,D',
+    ast: o.XOR('d')
+  },
+  //0xAB
+  {
+    name: 'XOR A,E',
+    ast: o.XOR('e')
+  },
+  //0xAC
+  {
+    name: 'XOR A,H',
+    ast: o.XOR('h')
+  },
+  //0xAD
+  {
+    name: 'XOR A,L',
+    ast: o.XOR('l')
+  },
+  //0xAE
+  {
+    name: 'XOR A,(HL)'
+  },
+  //0xAF
+  {
+    name: 'XOR A,A',
+    ast: o.XOR('a')
+  },
+  //0xB0
+  {
+    name: 'OR A,B',
+    ast: o.OR('b')
+  },
+  //0xB1
+  {
+    name: 'OR A,C',
+    ast: o.OR('c')
+  },
+  //0xB2
+  {
+    name: 'OR A,D',
+    ast: o.OR('d')
+  },
+  //0xB3
+  {
+    name: 'OR A,E',
+    ast: o.OR('e')
+  },
+  //0xB4
+  {
+    name: 'OR A,H',
+    ast: o.OR('h')
+  },
+  //0xB5
+  {
+    name: 'OR A,L',
+    ast: o.OR('l')
+  },
+  //0xB6
+  {
+    name: 'OR A,(HL)'
+  },
+  //0xB7
+  {
+    name: 'OR A,A',
+    ast: o.OR('a')
+  },
+  //0xB8
+  {
+    name: 'CP A,B'
+  },
+  //0xB9
+  {
+    name: 'CP A,C'
+  },
+  //0xBA
+  {
+    name: 'CP A,D'
+  },
+  //0xBB
+  {
+    name: 'CP A,E'
+  },
+  //0xBC
+  {
+    name: 'CP A,H'
+  },
+  //0xBD
+  {
+    name: 'CP A,L'
+  },
+  //0xBE
+  {
+    name: 'CP A,(HL)'
+  },
+  //0xBF
+  {
+    name: 'CP A,A'
   }
 ];
