@@ -24,7 +24,7 @@
 /**
  * Apply several passes to the ast.
  * A pass looks for patterns and optimize the code accordingly.
- * Each pass should must return code in a valid state.
+ * Each pass must leave the code in a valid state.
  *
  * @param {Array.<Array.<Bytecode>>} functions
  * @constructor
@@ -47,7 +47,7 @@ Optimizer.prototype = {
 
 
   /**
-   * This pass inline replace reference to defined register by their respective value. Ex:
+   * This pass replaces references to defined registers with their respective values. Ex:
    * ```
    * a = 0x03;
    * writeMem(0xFFFE, a);
@@ -59,14 +59,13 @@ Optimizer.prototype = {
    * writeMem(0xFFFE, 0x03);
    * ```
    *
-   * It's not fully working now and has many issues:
+   * It has many flaws and can be optimized:
    *  * The list of registers is not complete.
-   *  * Doesn't work if `ast` is an array of objects, not an object.
-   *  * Does not look recursively into the AST.
-   *  * Assignment to non literal can be improved (ex: `b = b - 1` forces b to be undefined).
+   *  * Does not work if registers are modified indirectly (ex: `this.setBC()`).
+   *  * Assignment to non literal can be improved (ex: `b = b - 1` forces b to be not inlinable).
    *  * Only functions calls are optimized.
    *
-   *  Anyway, it is just a dummy example to integrate integration in the workflow.
+   *  Anyway, it is just a dummy example to test the integration in the workflow.
    *
    * @param {Array.<Bytecode>} fn
    * @return {Array.<Bytecode>}
@@ -79,6 +78,7 @@ Optimizer.prototype = {
       e: false,
       h: false,
       l: false,
+      f: false,
       a: false
     };
     var definedRegValue = {
@@ -88,14 +88,13 @@ Optimizer.prototype = {
       e: {},
       h: {},
       l: {},
-      a: {}
+      a: {},
+      f: {}
     };
 
-    for (var i = 0, length = fn.length; i < length; i++) {
-      var ast = fn[i].ast;
-
+    return JSSMS.Utils.traverse(fn, function(ast) {
       if (!ast || !ast.type)
-        continue;
+        return ast;
 
       // 1st, we tag defined registers.
       if (ast.type == 'AssignmentExpression' &&
@@ -126,8 +125,8 @@ Optimizer.prototype = {
           definedReg[ast.arguments[1].name]) {
         ast.arguments[1] = definedRegValue[ast.arguments[1].name];
       }
-    }
 
-    return fn;
+      return ast;
+    });
   }
 };
