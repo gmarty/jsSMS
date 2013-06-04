@@ -639,6 +639,7 @@ Parser.prototype = {
       case 0xD5:
         break;
       case 0xD6:
+        operand = this.stream.getUint8();
         break;
       case 0xD7:
         target = 0x10;

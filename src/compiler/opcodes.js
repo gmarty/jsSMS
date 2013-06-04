@@ -237,8 +237,8 @@ var o = {
     };
   },
   'ADD16': function(register1, register2, register3, register4) {
-    //this.setHL(this.add16(this.getHL(), this.getBC()));
     return function() {
+      // setHL(add16(getHL(), getBC()));
       return n.ExpressionStatement(
           n.CallExpression('set' + (register1 + register2).toUpperCase(),
           n.CallExpression('add16',
@@ -272,36 +272,107 @@ var o = {
   },
   'ADD': function(register1, register2) {
     if (register1 == undefined && register2 == undefined)
-      // 0 arguments.
       return function(value) {
+        // 0 arguments.
         return n.ExpressionStatement(
             n.CallExpression('add_a', n.Literal(value))
         );
       };
     if (register2 == undefined)
-      // 1 argument.
       return function() {
+        // 1 argument.
         return n.ExpressionStatement(
             n.CallExpression('add_a', n.Register(register1))
         );
       };
     else
-      // 2 arguments.
       return function() {
+        // 2 arguments.
         return n.ExpressionStatement(
             n.CallExpression('add_a', o.READ_MEM8(n.CallExpression('get' + (register1 + register2).toUpperCase())))
         );
       };
   },
   'SUB': function(register) {
-    return function() {
-      return n.ExpressionStatement(
-          n.CallExpression('sub_a', n.Register(register))
-      );
-    };
+    if (register == undefined)
+      // sub_a(value);
+      return function(value, target, currentAddress) {
+        return n.ExpressionStatement(
+            n.CallExpression('sub_a', n.Literal(value))
+        );
+      };
+    else
+      return function() {
+        // sub_a(b);
+        return n.ExpressionStatement(
+            n.CallExpression('sub_a', n.Register(register))
+        );
+      };
+  },
+  'AND': function(register) {
+    if (register == undefined)
+      return function(value, target, currentAddress) {
+        // a &= value; f = SZP_TABLE[a] | F_HALFCARRY;
+        return [
+          n.ExpressionStatement(
+              n.AssignmentExpression('&=', n.Register('a'), n.Literal(value))
+          ),
+          n.ExpressionStatement(
+              n.AssignmentExpression('=', n.Register('f'),
+              n.BinaryExpression('|',
+                n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')),
+                n.Literal(F_HALFCARRY)
+              )
+              )
+          )
+        ];
+      };
+    else if (register != 'a')
+      return function() {
+        // a &= b; f = SZP_TABLE[a] | F_HALFCARRY;
+        return [
+          n.ExpressionStatement(
+              n.AssignmentExpression('&=', n.Register('a'), n.Register(register))
+          ),
+          n.ExpressionStatement(
+              n.AssignmentExpression('=', n.Register('f'),
+              n.BinaryExpression('|',
+                n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')),
+                n.Literal(F_HALFCARRY)
+              )
+              )
+          )
+        ];
+      };
+    else
+      return function() {
+        // f = SZP_TABLE[a] | F_HALFCARRY;
+        return n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register('f'),
+            n.BinaryExpression('|',
+            n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')),
+            n.Literal(F_HALFCARRY)
+            )
+            )
+        );
+      };
   },
   'XOR': function(register) {
-    if (register != 'a')
+    if (register == undefined)
+      return function(value, target, currentAddress) {
+        // a ^= value; f = SZP_TABLE[a];
+        return [
+          n.ExpressionStatement(
+              n.AssignmentExpression('^=', n.Register('a'), n.Literal(value))
+          ),
+          n.ExpressionStatement(
+              n.AssignmentExpression('=', n.Register('f'),
+              n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a'))
+              )
+          )
+        ];
+      };
+    else if (register != 'a')
       return function() {
         // a ^= b; f = SZP_TABLE[a];
         return [
@@ -316,8 +387,8 @@ var o = {
         ];
       };
     else
-      // this.a = 0; this.f = this.SZP_TABLE[0];
       return function() {
+        // a = 0; f = SZP_TABLE[0];
         return [
           n.ExpressionStatement(
               n.AssignmentExpression('=', n.Register('a'), n.Literal(0))
@@ -345,8 +416,8 @@ var o = {
         ];
       };
     else
-      // this.f = this.SZP_TABLE[this.a];
       return function() {
+        // f = SZP_TABLE[a];
         return n.ExpressionStatement(
             n.AssignmentExpression('=', n.Register('f'), n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')))
         );
@@ -354,10 +425,7 @@ var o = {
   },
   'JR': function(test) {
     return function(value, target) {
-      // if (test) {
-      //   pc = 0x00FF;
-      //   tstates -= 5;
-      // }
+      // if (test) {pc = target; tstates -= 5;}
       return n.IfStatement(
           test,
           n.BlockStatement([
@@ -369,20 +437,19 @@ var o = {
   },
   'DJNZ': function() {
     return function(value, target) {
+      // b = (b - 1) & 0xFF; if (b != 0) {pc = target; tstates -= 5;}
       return [
-        // b = (b - 1) & 0xFF;
         n.ExpressionStatement(
             n.AssignmentExpression('=', n.Register('b'), n.BinaryExpression('&', n.BinaryExpression('-', n.Register('b'), n.Literal(1)), n.Literal(0xFF)))
         ),
-        // b != 0
         o.JR(n.BinaryExpression('!=', n.Register('b'), n.Literal(0)))(undefined, target)
       ];
     };
   },
   'RET': function(operator, bitMask) {
     if (operator == undefined && bitMask == undefined)
-      // this.pc = this.readMemWord(this.sp); this.sp += 2; return;
       return function() {
+        // pc = readMemWord(sp); sp += 2; return;
         return [
           n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), o.READ_MEM16(n.Identifier('sp')))),
           n.ExpressionStatement(n.AssignmentExpression('+=', n.Identifier('sp'), n.Literal(2))),
@@ -390,8 +457,8 @@ var o = {
         ];
       };
     else
-      // this.ret((this.f & F_ZERO) == 0);
       return function() {
+        // ret((f & F_ZERO) == 0);
         return n.ExpressionStatement(
             n.CallExpression('ret', n.BinaryExpression(operator,
             n.BinaryExpression('&', n.Register('f'), n.Literal(bitMask)),
@@ -402,16 +469,16 @@ var o = {
   },
   'JP': function(operator, bitMask) {
     if (operator == undefined && bitMask == undefined)
-      // this.pc = this.readMemWord(target); return;
       return function(value, target, currentAddress) {
+        // pc = readMemWord(target); return;
         return [
           n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
           n.ReturnStatement()
         ];
       };
     else
-      // if ((this.f & F_SIGN) != 0) {pc = target; return;}
       return function(value, target) {
+        // if ((f & F_SIGN) != 0) {pc = target; return;}
         return n.IfStatement(
             n.BinaryExpression(operator,
             n.BinaryExpression('&', n.Register('f'), n.Literal(bitMask)),
@@ -426,8 +493,8 @@ var o = {
   },
   'CALL': function(operator, bitMask) {
     if (operator == undefined && bitMask == undefined)
-      // this.push1(currentAddress + 2); this.pc = target; return;
       return function(value, target, currentAddress) {
+        // push1(currentAddress + 2); pc = target; return;
         return [
           n.ExpressionStatement(n.CallExpression('push1', n.Literal(currentAddress + 2))),
           n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
@@ -435,8 +502,8 @@ var o = {
         ];
       };
     else
-      // if ((this.f & F_ZERO) == 0) {this.push1(currentAddress + 2); this.pc = target; this.tstates -= 7; return;}
       return function(value, target, currentAddress) {
+        // if ((f & F_ZERO) == 0) {push1(currentAddress + 2); pc = target; tstates -= 7; return;}
         return n.IfStatement(
             n.BinaryExpression(operator,
             n.BinaryExpression('&', n.Register('f'), n.Literal(bitMask)),
@@ -451,12 +518,12 @@ var o = {
         );
       };
   },
-  'RST': function(target) {
-    // this.push1(currentAddress); this.pc = 0x00; return;
+  'RST': function(targetAddress) {
     return function(value, target, currentAddress) {
+      // push1(currentAddress); pc = target; return;
       return [
         n.ExpressionStatement(n.CallExpression('push1', n.Literal(currentAddress))),
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(targetAddress))),
         n.ReturnStatement()
       ];
     };
@@ -1244,27 +1311,33 @@ var opcodeTable = [
   },
   //0xA0
   {
-    name: 'AND A,B'
+    name: 'AND A,B',
+    ast: o.AND('b')
   },
   //0xA1
   {
-    name: 'AND A,C'
+    name: 'AND A,C',
+    ast: o.AND('c')
   },
   //0xA2
   {
-    name: 'AND A,D'
+    name: 'AND A,D',
+    ast: o.AND('d')
   },
   //0xA3
   {
-    name: 'AND A,E'
+    name: 'AND A,E',
+    ast: o.AND('e')
   },
   //0xA4
   {
-    name: 'AND A,H'
+    name: 'AND A,H',
+    ast: o.AND('h')
   },
   //0xA5
   {
-    name: 'AND A,L'
+    name: 'AND A,L',
+    ast: o.AND('l')
   },
   //0xA6
   {
@@ -1272,7 +1345,8 @@ var opcodeTable = [
   },
   //0xA7
   {
-    name: 'AND A,A'
+    name: 'AND A,A',
+    ast: o.AND('a')
   },
   //0xA8
   {
@@ -1490,7 +1564,8 @@ var opcodeTable = [
   },
   //0xD6
   {
-    name: 'SUB n'
+    name: 'SUB n',
+    ast: o.SUB()
   },
   //0xD7
   {
@@ -1563,7 +1638,8 @@ var opcodeTable = [
   },
   //0xE6
   {
-    name: 'AND (n)'
+    name: 'AND (n)',
+    ast: o.AND()
   },
   //0xE7
   {
@@ -1600,7 +1676,8 @@ var opcodeTable = [
   },
   //0xEE
   {
-    name: 'XOR n'
+    name: 'XOR n',
+    ast: o.XOR()
   },
   //0xEF
   {
