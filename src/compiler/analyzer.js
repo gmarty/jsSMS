@@ -75,14 +75,21 @@ Analyzer.prototype = {
   restructure: function() {
     var self = this;
     var pointer = -1;
+    var endFunction = false;
 
     this.bytecodes
       .forEach(function(bytecode) {
-          if (bytecode.isJumpTarget) {
+          if (bytecode.isJumpTarget || endFunction) {
             pointer++;
             self.ast[pointer] = [];
+            endFunction = false;
           }
+
           self.ast[pointer].push(bytecode);
+
+          if (bytecode.isFunctionEnder) {
+            endFunction = true;
+          }
         });
   }
 };

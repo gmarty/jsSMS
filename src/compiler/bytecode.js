@@ -40,6 +40,7 @@ function Bytecode(address) {
   this.operand = null;
   this.nextAddress = null;
   this.target = null;
+  this.isFunctionEnder = false;
   this.isJumpTarget = false;
   this.jumpTargetNb = 0; // Number of instructions targeting there.
   this.ast = null;

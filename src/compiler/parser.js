@@ -158,6 +158,7 @@ Parser.prototype = {
 
     var operand = null;
     var target = null;
+    var isFunctionEnder = false;
 
     bytecode.opcode.push(opcode);
 
@@ -219,6 +220,7 @@ Parser.prototype = {
       case 0x18:
         target = this.stream.position + this.stream.getInt8();
         this.stream.seek(null);
+        isFunctionEnder = true;
         break;
       case 0x19:
         break;
@@ -422,6 +424,8 @@ Parser.prototype = {
       case 0x75:
         break;
       case 0x76:
+        // `HALT` ends a function unless we find a better way.
+        isFunctionEnder = true;
         break;
       case 0x77:
         break;
@@ -579,6 +583,7 @@ Parser.prototype = {
       case 0xC3:
         target = this.stream.getUint16();
         this.stream.seek(null);
+        isFunctionEnder = true;
         break;
       case 0xC4:
         target = this.stream.getUint16();
@@ -590,11 +595,13 @@ Parser.prototype = {
         break;
       case 0xC7:
         target = 0x00;
+        isFunctionEnder = true;
         break;
       case 0xC8:
         break;
       case 0xC9:
         this.stream.seek(null);
+        isFunctionEnder = true;
         break;
       case 0xCA:
         target = this.stream.getUint16();
@@ -607,12 +614,14 @@ Parser.prototype = {
         break;
       case 0xCD:
         target = this.stream.getUint16();
+        isFunctionEnder = true;
         break;
       case 0xCE:
         operand = this.stream.getUint8();
         break;
       case 0xCF:
         target = 0x08;
+        isFunctionEnder = true;
         break;
       case 0xD0:
         break;
@@ -633,6 +642,7 @@ Parser.prototype = {
         break;
       case 0xD7:
         target = 0x10;
+        isFunctionEnder = true;
         break;
       case 0xD8:
         break;
@@ -655,6 +665,7 @@ Parser.prototype = {
         break;
       case 0xDF:
         target = 0x18;
+        isFunctionEnder = true;
         break;
       case 0xE0:
         break;
@@ -675,12 +686,14 @@ Parser.prototype = {
         break;
       case 0xE7:
         target = 0x20;
+        isFunctionEnder = true;
         break;
       case 0xE8:
         break;
       case 0xE9:
         // This target can't be determined using static analysis.
         this.stream.seek(null);
+        isFunctionEnder = true;
         break;
       case 0xEA:
         target = this.stream.getUint16();
@@ -698,6 +711,7 @@ Parser.prototype = {
         break;
       case 0xEF:
         target = 0x28;
+        isFunctionEnder = true;
         break;
       case 0xF0:
         break;
@@ -718,6 +732,7 @@ Parser.prototype = {
         break;
       case 0xF7:
         target = 0x30;
+        isFunctionEnder = true;
         break;
       case 0xF8:
         break;
@@ -739,6 +754,7 @@ Parser.prototype = {
         break;
       case 0xFF:
         target = 0x38;
+        isFunctionEnder = true;
         break;
       default:
         if (DEBUG) console.error('Unexpected opcode', JSSMS.Utils.toHex(opcode));
@@ -754,6 +770,7 @@ Parser.prototype = {
     bytecode.nextAddress = this.stream.position;
     bytecode.operand = operand;
     bytecode.target = target;
+    bytecode.isFunctionEnder = isFunctionEnder;
 
     return bytecode;
   },
