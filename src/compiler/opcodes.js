@@ -362,7 +362,7 @@ var o = {
           test,
           n.BlockStatement([
             n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
-            n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('tstates'), n.Literal(5)))
+            n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5)))
           ])
       );
     };
@@ -379,24 +379,86 @@ var o = {
       ];
     };
   },
-  // @todo Refactor RET and JP to use parameters (operator, bitMask).
-  'RET': function(test) {
-    return function() {
-      return n.ExpressionStatement(
-          n.CallExpression('ret', test)
-      );
-    };
+  'RET': function(operator, bitMask) {
+    if (operator == undefined && bitMask == undefined)
+      // this.pc = this.readMemWord(this.sp); this.sp += 2; return;
+      return function() {
+        return [
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), o.READ_MEM16(n.Identifier('sp')))),
+          n.ExpressionStatement(n.AssignmentExpression('+=', n.Identifier('sp'), n.Literal(2))),
+          n.ReturnStatement()
+        ];
+      };
+    else
+      // this.ret((this.f & F_ZERO) == 0);
+      return function() {
+        return n.ExpressionStatement(
+            n.CallExpression('ret', n.BinaryExpression(operator,
+            n.BinaryExpression('&', n.Register('f'), n.Literal(bitMask)),
+            n.Literal(0)
+            ))
+        );
+      };
   },
-  'JP': function(test) {
-    // if ((this.f & F_SIGN) != 0) {pc = target; return;}
-    return function(value, target) {
-      return n.IfStatement(
-          test,
-          n.BlockStatement([
-            n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
-            n.ReturnStatement()
-          ])
-      );
+  'JP': function(operator, bitMask) {
+    if (operator == undefined && bitMask == undefined)
+      // this.pc = this.readMemWord(target); return;
+      return function(value, target, currentAddress) {
+        return [
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
+          n.ReturnStatement()
+        ];
+      };
+    else
+      // if ((this.f & F_SIGN) != 0) {pc = target; return;}
+      return function(value, target) {
+        return n.IfStatement(
+            n.BinaryExpression(operator,
+            n.BinaryExpression('&', n.Register('f'), n.Literal(bitMask)),
+            n.Literal(0)
+            ),
+            n.BlockStatement([
+              n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
+              n.ReturnStatement()
+            ])
+        );
+      };
+  },
+  'CALL': function(operator, bitMask) {
+    if (operator == undefined && bitMask == undefined)
+      // this.push1(currentAddress + 2); this.pc = target; return;
+      return function(value, target, currentAddress) {
+        return [
+          n.ExpressionStatement(n.CallExpression('push1', n.Literal(currentAddress + 2))),
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
+          n.ReturnStatement()
+        ];
+      };
+    else
+      // if ((this.f & F_ZERO) == 0) {this.push1(currentAddress + 2); this.pc = target; this.tstates -= 7; return;}
+      return function(value, target, currentAddress) {
+        return n.IfStatement(
+            n.BinaryExpression(operator,
+            n.BinaryExpression('&', n.Register('f'), n.Literal(bitMask)),
+            n.Literal(0)
+            ),
+            n.BlockStatement([
+              n.ExpressionStatement(n.CallExpression('push1', n.Literal(currentAddress + 2))),
+              n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
+              n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(7))),
+              n.ReturnStatement()
+            ])
+        );
+      };
+  },
+  'RST': function(target) {
+    // this.push1(currentAddress); this.pc = 0x00; return;
+    return function(value, target, currentAddress) {
+      return [
+        n.ExpressionStatement(n.CallExpression('push1', n.Literal(currentAddress))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
+        n.ReturnStatement()
+      ];
     };
   },
   // Below these point, properties can't be called from outside object `n`.
@@ -1325,10 +1387,7 @@ var opcodeTable = [
   //0xC0
   {
     name: 'RET NZ',
-    ast: o.RET(n.BinaryExpression('==',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_ZERO)),
-        n.Literal(0)
-        ))
+    ast: o.RET('==', F_ZERO)
   },
   //0xC1
   {
@@ -1337,18 +1396,17 @@ var opcodeTable = [
   //0xC2
   {
     name: 'JP NZ,(nn)',
-    ast: o.JP(n.BinaryExpression('==',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_ZERO)),
-        n.Literal(0)
-        ))
+    ast: o.JP('==', F_ZERO)
   },
   //0xC3
   {
-    name: 'JP (nn)'
+    name: 'JP (nn)',
+    ast: o.JP()
   },
   //0xC4
   {
-    name: 'CALL NZ (nn)'
+    name: 'CALL NZ (nn)',
+    ast: o.CALL('==', F_ZERO)
   },
   //0xC5
   {
@@ -1360,27 +1418,24 @@ var opcodeTable = [
   },
   //0xC7
   {
-    name: 'RST 00H'
+    name: 'RST 00H',
+    ast: o.RST(0x00)
   },
   //0xC8
   {
     name: 'RET Z',
-    ast: o.RET(n.BinaryExpression('!=',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_ZERO)),
-        n.Literal(0)
-        ))
+    ast: o.RET('!=', F_ZERO)
   },
   //0xC9
   {
-    name: 'RET'
+    name: 'RET',
+    ast: o.RET()
+
   },
   //0xCA
   {
     name: 'JP Z,(nn)',
-    ast: o.JP(n.BinaryExpression('!=',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_ZERO)),
-        n.Literal(0)
-        ))
+    ast: o.JP('!=', F_ZERO)
   },
   //0xCB
   {
@@ -1389,11 +1444,13 @@ var opcodeTable = [
   },
   //0xCC
   {
-    name: 'CALL Z (nn)'
+    name: 'CALL Z (nn)',
+    ast: o.CALL('!=', F_ZERO)
   },
   //0xCD
   {
-    name: 'CALL (nn)'
+    name: 'CALL (nn)',
+    ast: o.CALL()
   },
   //0xCE
   {
@@ -1401,15 +1458,13 @@ var opcodeTable = [
   },
   //0xCF
   {
-    name: 'RST 08H'
+    name: 'RST 08H',
+    ast: o.RST(0x08)
   },
   //0xD0
   {
     name: 'RET NC',
-    ast: o.RET(n.BinaryExpression('==',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_CARRY)),
-        n.Literal(0)
-        ))
+    ast: o.RET('==', F_CARRY)
   },
   //0xD1
   {
@@ -1418,10 +1473,7 @@ var opcodeTable = [
   //0xD2
   {
     name: 'JP NC,(nn)',
-    ast: o.JP(n.BinaryExpression('==',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_CARRY)),
-        n.Literal(0)
-        ))
+    ast: o.JP('==', F_CARRY)
   },
   //0xD3
   {
@@ -1429,7 +1481,8 @@ var opcodeTable = [
   },
   //0xD4
   {
-    name: 'CALL NC (nn)'
+    name: 'CALL NC (nn)',
+    ast: o.CALL('==', F_CARRY)
   },
   //0xD5
   {
@@ -1441,15 +1494,13 @@ var opcodeTable = [
   },
   //0xD7
   {
-    name: 'RST 10H'
+    name: 'RST 10H',
+    ast: o.RST(0x10)
   },
   //0xD8
   {
     name: 'RET C',
-    ast: o.RET(n.BinaryExpression('!=',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_CARRY)),
-        n.Literal(0)
-        ))
+    ast: o.RET('!=', F_CARRY)
   },
   //0xD9
   {
@@ -1458,10 +1509,7 @@ var opcodeTable = [
   //0xDA
   {
     name: 'JP C,(nn)',
-    ast: o.JP(n.BinaryExpression('!=',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_CARRY)),
-        n.Literal(0)
-        ))
+    ast: o.JP('!=', F_CARRY)
   },
   //0xDB
   {
@@ -1469,7 +1517,8 @@ var opcodeTable = [
   },
   //0xDC
   {
-    name: 'CALL C (nn)'
+    name: 'CALL C (nn)',
+    ast: o.CALL('!=', F_CARRY)
   },
   //0xDD
   {
@@ -1482,15 +1531,13 @@ var opcodeTable = [
   },
   //0xDF
   {
-    name: 'RST 18H'
+    name: 'RST 18H',
+    ast: o.RST(0x18)
   },
   //0xE0
   {
     name: 'RET PO',
-    ast: o.RET(n.BinaryExpression('==',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_PARITY)),
-        n.Literal(0)
-        ))
+    ast: o.RET('==', F_PARITY)
   },
   //0xE1
   {
@@ -1499,10 +1546,7 @@ var opcodeTable = [
   //0xE2
   {
     name: 'JP PO,(nn)',
-    ast: o.JP(n.BinaryExpression('==',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_PARITY)),
-        n.Literal(0)
-        ))
+    ast: o.JP('==', F_PARITY)
   },
   //0xE3
   {
@@ -1510,7 +1554,8 @@ var opcodeTable = [
   },
   //0xE4
   {
-    name: 'CALL PO (nn)'
+    name: 'CALL PO (nn)',
+    ast: o.CALL('==', F_PARITY)
   },
   //0xE5
   {
@@ -1522,15 +1567,13 @@ var opcodeTable = [
   },
   //0xE7
   {
-    name: 'RST 20H'
+    name: 'RST 20H',
+    ast: o.RST(0x20)
   },
   //0xE8
   {
     name: 'RET PE',
-    ast: o.RET(n.BinaryExpression('!=',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_PARITY)),
-        n.Literal(0)
-        ))
+    ast: o.RET('!=', F_PARITY)
   },
   //0xE9
   {
@@ -1539,10 +1582,7 @@ var opcodeTable = [
   //0xEA
   {
     name: 'JP PE,(nn)',
-    ast: o.JP(n.BinaryExpression('!=',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_PARITY)),
-        n.Literal(0)
-        ))
+    ast: o.JP('!=', F_PARITY)
   },
   //0xEB
   {
@@ -1550,7 +1590,8 @@ var opcodeTable = [
   },
   //0xEC
   {
-    name: 'CALL PE (nn)'
+    name: 'CALL PE (nn)',
+    ast: o.CALL('!=', F_PARITY)
   },
   //0xED
   {
@@ -1563,15 +1604,13 @@ var opcodeTable = [
   },
   //0xEF
   {
-    name: 'RST 28H'
+    name: 'RST 28H',
+    ast: o.RST(0x28)
   },
   //0xF0
   {
     name: 'RET P',
-    ast: o.RET(n.BinaryExpression('==',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_SIGN)),
-        n.Literal(0)
-        ))
+    ast: o.RET('==', F_SIGN)
   },
   //0xF1
   {
@@ -1580,10 +1619,7 @@ var opcodeTable = [
   //0xF2
   {
     name: 'JP P,(nn)',
-    ast: o.JP(n.BinaryExpression('==',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_SIGN)),
-        n.Literal(0)
-        ))
+    ast: o.JP('==', F_SIGN)
   },
   //0xF3
   {
@@ -1591,7 +1627,8 @@ var opcodeTable = [
   },
   //0xF4
   {
-    name: 'CALL P (nn)'
+    name: 'CALL P (nn)',
+    ast: o.CALL('==', F_SIGN)
   },
   //0xF5
   {
@@ -1603,15 +1640,13 @@ var opcodeTable = [
   },
   //0xF7
   {
-    name: 'RST 30H'
+    name: 'RST 30H',
+    ast: o.RST(0x30)
   },
   //0xF8
   {
     name: 'RET M',
-    ast: o.RET(n.BinaryExpression('!=',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_SIGN)),
-        n.Literal(0)
-        ))
+    ast: o.RET('!=', F_SIGN)
   },
   //0xF9
   {
@@ -1620,10 +1655,7 @@ var opcodeTable = [
   //0xFA
   {
     name: 'JP M,(nn)',
-    ast: o.JP(n.BinaryExpression('!=',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_SIGN)),
-        n.Literal(0)
-        ))
+    ast: o.JP('!=', F_SIGN)
   },
   //0xFB
   {
@@ -1631,7 +1663,8 @@ var opcodeTable = [
   },
   //0xFC
   {
-    name: 'CALL M (nn)'
+    name: 'CALL M (nn)',
+    ast: o.CALL('!=', F_SIGN)
   },
   //0xFD
   {
@@ -1644,6 +1677,7 @@ var opcodeTable = [
   },
   //0xFF
   {
-    name: 'RST 38H'
+    name: 'RST 38H',
+    ast: o.RST(0x38)
   }
 ];

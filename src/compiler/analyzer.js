@@ -40,6 +40,7 @@ var Analyzer = function(bytecodes) {
 Analyzer.prototype = {
   /**
    * Remove unused addresses and populate bytecodes with AST.
+   * @todo Can we merge operand & target? Ex: `bytecode.operand || bytecode.target`
    */
   normalizeBytecode: function() {
     this.bytecodes = this.bytecodes
@@ -52,12 +53,12 @@ Analyzer.prototype = {
           var opcode = opcodeTable[bytecode.opcode];
 
           if (opcode && opcode.ast) {
-            bytecode.ast = opcode.ast(bytecode.operand, bytecode.target);
+            bytecode.ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.address);
 
             if (DEBUG) {
               bytecode.name = opcode.name;
               if (opcode.opcode)
-                bytecode.opcode = opcode.opcode(bytecode.operand, bytecode.target);
+                bytecode.opcode = opcode.opcode(bytecode.operand, bytecode.target, bytecode.address);
             }
           }
 
