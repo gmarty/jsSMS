@@ -38,9 +38,7 @@ var Compiler = function(functions) {
 
 Compiler.prototype = {
   /**
-   * Process bytecodes and return an AST.
-   *
-   * @return {{type: string, body: Array}}
+   * Process bytecodes.
    */
   generate: function() {
     var self = this;
