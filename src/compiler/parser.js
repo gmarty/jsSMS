@@ -1019,7 +1019,6 @@ Parser.prototype = {
     var opcode = this.stream.getUint8();
 
     var operand = null;
-    var target = null;
 
     bytecode.opcode.push(opcode);
 
@@ -1236,13 +1235,9 @@ Parser.prototype = {
     if (this.stream.position != null) {
       this.addAddress(this.stream.position);
     }
-    if (target != null) {
-      this.addAddress(target);
-    }
 
     bytecode.nextAddress = this.stream.position;
     bytecode.operand = operand;
-    bytecode.target = target;
 
     return bytecode;
   },
