@@ -110,7 +110,7 @@ JSSMS.Utils = {
       if (object.hasOwnProperty(key)) {
         child = object[key];
         if (typeof child === 'object' && child !== null) {
-          object[key] = this.traverse(child, fn);
+          object[key] = JSSMS.Utils.traverse(child, fn);
         }
       }
     }
