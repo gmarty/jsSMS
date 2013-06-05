@@ -50,7 +50,19 @@ Analyzer.prototype = {
         })
         //Populate AST for each bytecode.
       .map(function(bytecode) {
-          var opcode = opcodeTable[bytecode.opcode];
+          switch (bytecode.opcode.length) {
+            case 1:
+              var opcode = opcodeTable[bytecode.opcode[0]];
+              break;
+            case 2:
+              var opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]];
+              break;
+            case 3:
+              var opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]][bytecode.opcode[2]];
+              break;
+            default:
+              throw Error('Something went wrong in parsing. Opcode: [' + bytecode.opcode.join(',') + ']');
+          }
 
           if (opcode && opcode.ast) {
             bytecode.ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.address);
