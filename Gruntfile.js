@@ -168,9 +168,9 @@ module.exports = function(grunt) {
           'src/keyboard.js',
           'src/psg.js',
           'src/vdp.js',
-          'src/node-ui.js',
+          'src/node/ui.js',
           'src/ports.js',
-          'src/build/node-exports.js'
+          'src/node/build/exports.js'
         ],
         jsOutputFile: 'min/jssms.node.js',
         options: {
