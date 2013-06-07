@@ -1,0 +1,66 @@
+/**
+ * jsSMS - A Sega Master System/Game Gear emulator in JavaScript
+ * Copyright (C) 2012  Guillaume Marty (https://github.com/gmarty)
+ * Based on JavaGear Copyright (c) 2002-2008 Chris White
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+'use strict';
+
+
+/**
+ * @constructor
+ */
+var Recompiler = function(cpu) {
+  this.cpu = cpu;
+  this.rom = [];
+  this.parser = {};
+};
+
+Recompiler.prototype = {
+  setRom: function(rom) {
+    this.rom = rom;
+
+    this.parser = new Parser(rom);
+  },
+
+
+  /**
+   * Do initial parsing when a ROM is loaded.
+   */
+  reset: function() {
+    var self = this;
+
+    // Parse initial memory page.
+    // @todo If ROM is below 48KB, we don't have to limit parse to this memory page.
+    this.parser.parse(0x00, 0x0000, 0x0400);
+    this.parser.parse(0x38, 0x0000, 0x0400);
+    this.parser.parse(0x66, 0x0000, 0x0400);
+
+    var analyzer = new Analyzer(this.parser.instructions);
+
+    var optimizer = new Optimizer(analyzer.ast);
+
+    var compiler = new Compiler(optimizer.ast);
+
+    // Attach generated code to an attach point in Z80 instance.
+    compiler.ast.forEach(function(fn) {
+      var funcName = fn.body[0].id.name;
+      var code = window.escodegen.generate(fn, {comment: true, renumber: true, hexadecimal: true});
+      var func = new Function('return ' + code)();
+      self.cpu[''][funcName] = func;
+    });
+  }
+};
