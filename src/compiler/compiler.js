@@ -44,15 +44,15 @@ Compiler.prototype = {
     var self = this;
 
     this.functions = this.functions
-      .map(function(fn, index) {
-          var toHex = JSSMS.Utils.toHex;
+      .map(function(fn) {
           var arr = [];
-          var name = toHex(fn[0].address);
+          var name = fn[0].address;
           var jumpTargetNb = fn[0].jumpTargetNb;
+          var lastPc = fn[fn.length - 1].nextAddress;
 
           fn = fn
           .filter(function(bytecode) {
-                // @todo Remove this filter when all the opcodes are implemented.
+                // @todo Decrement tstates if the instruction can jump out of the current function.
                 return bytecode.ast;
               })
           .map(function(bytecode) {
@@ -104,59 +104,57 @@ Compiler.prototype = {
             });
 
             // Apply modifications to the AST recursively.
-            fn = self.convertRegisters(fn);
+            arr = self.convertRegisters(arr);
+          }
+
+          if (lastPc != null) {
+            // Updating this.pc at the end of the function.
+            arr.push({
+              "type": "ExpressionStatement",
+              "expression": {
+                "type": "AssignmentExpression",
+                "operator": "=",
+                "left": {
+                  "type": "Identifier",
+                  "name": "this.pc"
+                },
+                "right": {
+                  "type": "Literal",
+                  "value": lastPc
+                }
+              }
+            });
           }
 
           return {
-            'type': 'Property',
-            'key': {
-              'type': 'Literal',
-              'value': 'f_' + name // Name of the function
-            },
-            'value': {
-              'type': 'FunctionExpression',
-              'id': null,
-              'params': [
-                {
+            'type': 'Program',
+            'body': [
+              {
+                'type': 'FunctionDeclaration',
+                'id': {
                   'type': 'Identifier',
-                  'name': 'temp'
-                }
-              ],
-              'defaults': [],
-              'body': {
-                'type': 'BlockStatement',
-                'body': arr
-              },
-              'rest': null,
-              'generator': false,
-              'expression': false
-            },
-            'kind': 'init'
+                  'name': '_' + name // Name of the function
+                },
+                'params': [
+                  {
+                    'type': 'Identifier',
+                    'name': 'temp'
+                  }
+                ],
+                'defaults': [],
+                'body': {
+                  'type': 'BlockStatement',
+                  'body': arr
+                },
+                'rest': null,
+                'generator': false,
+                'expression': false
+              }
+            ]
           };
         });
 
-    this.ast = {
-      'type': 'Program',
-      'body': [
-        {
-          'type': 'VariableDeclaration',
-          'declarations': [
-            {
-              'type': 'VariableDeclarator',
-              'id': {
-                'type': 'Identifier',
-                'name': 'functions'
-              },
-              'init': {
-                'type': 'ObjectExpression',
-                'properties': this.functions
-              }
-            }
-          ],
-          'kind': 'var'
-        }
-      ]
-    };
+    this.ast = this.functions;
   },
 
 

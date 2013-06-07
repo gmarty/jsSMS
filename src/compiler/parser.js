@@ -22,14 +22,16 @@
 
 
 /**
- * @param rom
- * @constructor
  * @todo Pass the rom memory non paginated to read/write faster.
  * @todo Define address types to instructionTypes (instruction or operand).
  * @todo Keep a track of memory locations parsed.
+ * @param rom
+ * @constructor
  */
 var Parser = function(rom) {
   this.stream = new RomStream(rom);
+  this.instructions = [];
+  if (DEBUG) this.instructionTypes = [];
 };
 
 Parser.prototype = {
@@ -42,9 +44,6 @@ Parser.prototype = {
    */
   parse: function(entryPoint, pageStart, pageEnd) {
     if (DEBUG) console.time('Parsing');
-
-    this.instructions = [];
-    if (DEBUG) this.instructionTypes = [];
 
     this.addresses = [];
 
@@ -94,8 +93,6 @@ Parser.prototype = {
     }
 
     if (DEBUG) console.timeEnd('Parsing');
-
-    return this.instructions;
   },
 
 
