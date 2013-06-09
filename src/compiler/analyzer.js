@@ -31,6 +31,8 @@ var Analyzer = function(bytecodes) {
   this.bytecodes = bytecodes;
   this.ast = [];
 
+  this.missingOpcodes = {};
+
   if (DEBUG) console.time('Analyzing');
   this.normalizeBytecode();
   this.restructure();
@@ -65,7 +67,7 @@ Analyzer.prototype = {
           }
 
           if (opcode && opcode.ast) {
-            var ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.address);
+            var ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.nextAddress);
 
             // Force ast property to always be an array.
             if (!Array.isArray(ast) && ast != undefined)
@@ -76,7 +78,7 @@ Analyzer.prototype = {
             if (DEBUG) {
               bytecode.name = opcode.name;
               if (opcode.opcode)
-                bytecode.opcode = opcode.opcode(bytecode.operand, bytecode.target, bytecode.address);
+                bytecode.opcode = opcode.opcode(bytecode.operand, bytecode.target, bytecode.nextAddress);
             }
           }
 

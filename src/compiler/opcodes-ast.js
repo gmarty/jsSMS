@@ -65,7 +65,8 @@ var n = {
   Literal: function(value) {
     return {
       'type': 'Literal',
-      'value': value
+      'value': value,
+      'raw': JSSMS.Utils.toHex(value)
     };
   },
   CallExpression: function(callee, args) {
@@ -300,7 +301,7 @@ var o = {
   SUB: function(register1, register2) {
     if (register1 == undefined && register2 == undefined)
       // sub_a(value);
-      return function(value, target, currentAddress) {
+      return function(value, target, nextAddress) {
         return n.ExpressionStatement(
             n.CallExpression('sub_a', n.Literal(value))
         );
@@ -322,7 +323,7 @@ var o = {
   },
   AND: function(register1, register2) {
     if (register1 == undefined && register2 == undefined)
-      return function(value, target, currentAddress) {
+      return function(value, target, nextAddress) {
         // a &= value; f = SZP_TABLE[a] | F_HALFCARRY;
         return [
           n.ExpressionStatement(
@@ -385,7 +386,7 @@ var o = {
   },
   XOR: function(register1, register2) {
     if (register1 == undefined && register2 == undefined)
-      return function(value, target, currentAddress) {
+      return function(value, target, nextAddress) {
         // a ^= value; f = SZP_TABLE[a];
         return [
           n.ExpressionStatement(
@@ -443,7 +444,7 @@ var o = {
   },
   OR: function(register1, register2) {
     if (register1 == undefined && register2 == undefined)
-      return function(value, target, currentAddress) {
+      return function(value, target, nextAddress) {
         // a |= value; f = SZP_TABLE[a];
         return [
           n.ExpressionStatement(
@@ -579,7 +580,7 @@ var o = {
   },
   JP: function(operator, bitMask) {
     if (operator == undefined && bitMask == undefined)
-      return function(value, target, currentAddress) {
+      return function(value, target, nextAddress) {
         // pc = readMemWord(target); return;
         return [
           n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
@@ -603,24 +604,24 @@ var o = {
   },
   CALL: function(operator, bitMask) {
     if (operator == undefined && bitMask == undefined)
-      return function(value, target, currentAddress) {
-        // push1(currentAddress + 2); pc = target; return;
+      return function(value, target, nextAddress) {
+        // push1(nextAddress + 2); pc = target; return;
         return [
-          n.ExpressionStatement(n.CallExpression('push1', n.Literal(currentAddress + 2))),
+          n.ExpressionStatement(n.CallExpression('push1', n.Literal(nextAddress))),
           n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
           n.ReturnStatement()
         ];
       };
     else
-      return function(value, target, currentAddress) {
-        // if ((f & F_ZERO) == 0) {push1(currentAddress + 2); pc = target; tstates -= 7; return;}
+      return function(value, target, nextAddress) {
+        // if ((f & F_ZERO) == 0) {push1(nextAddress + 2); pc = target; tstates -= 7; return;}
         return n.IfStatement(
             n.BinaryExpression(operator,
             n.BinaryExpression('&', n.Register('f'), n.Literal(bitMask)),
             n.Literal(0)
             ),
             n.BlockStatement([
-              n.ExpressionStatement(n.CallExpression('push1', n.Literal(currentAddress + 2))),
+              n.ExpressionStatement(n.CallExpression('push1', n.Literal(nextAddress))),
               n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
               n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(7))),
               n.ReturnStatement()
@@ -629,10 +630,10 @@ var o = {
       };
   },
   RST: function(targetAddress) {
-    return function(value, target, currentAddress) {
-      // push1(currentAddress); pc = target; return;
+    return function(value, target, nextAddress) {
+      // push1(nextAddress); pc = target; return;
       return [
-        n.ExpressionStatement(n.CallExpression('push1', n.Literal(currentAddress))),
+        n.ExpressionStatement(n.CallExpression('push1', n.Literal(nextAddress))),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(targetAddress))),
         n.ReturnStatement()
       ];
@@ -651,7 +652,7 @@ var o = {
   // @todo Apply peephole optimizations when port address is known.
   OUT: function(register1, register2) {
     if (register2 == undefined)
-      return function(value, target, currentAddress) {
+      return function(value, target, nextAddress) {
         // port.out(value, a);
         return n.ExpressionStatement(
             n.CallExpression('port.out', [n.Literal(value), n.Register(register1)])
@@ -660,7 +661,7 @@ var o = {
   },
   IN: function(register1, register2) {
     if (register2 == undefined)
-      return function(value, target, currentAddress) {
+      return function(value, target, nextAddress) {
         // a = this.port.in_(value);
         return n.ExpressionStatement(
             n.AssignmentExpression('=', n.Register(register1), n.CallExpression('port.in_', n.Literal(value)))

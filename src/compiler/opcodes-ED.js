@@ -24,14 +24,14 @@ var opcodeTableED = {
     name: 'NEG'
   },
   0x56: {
-    name: 'IN B,(C)',
+    name: 'IM1',
     ast: o.IM1()
   },
   0x5F: {
     name: 'LD A,R'
   },
   0x76: {
-    name: 'IN B,(C)',
+    name: 'IM1',
     ast: o.IM1()
   },
   0xA3: {
