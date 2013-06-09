@@ -42,89 +42,98 @@ Compiler.prototype = {
    */
   generate: function() {
     var self = this;
+    var toHex = JSSMS.Utils.toHex;
 
     this.functions = this.functions
       .map(function(fn) {
-          var arr = [];
+          var body = [];
           var name = fn[0].address;
           var jumpTargetNb = fn[0].jumpTargetNb;
-          var lastPc = fn[fn.length - 1].nextAddress;
 
           fn = fn
-          .filter(function(bytecode) {
-                // @todo Decrement tstates if the instruction can jump out of the current function.
-                return bytecode.ast;
-              })
           .map(function(bytecode) {
-                var ast = bytecode.ast;
+                var decreaseTStateStmt = [
+                  {
+                    'type': 'ExpressionStatement',
+                    'expression': {
+                      'type': 'AssignmentExpression',
+                      'operator': '-=',
+                      'left': {
+                        'type': 'Identifier',
+                        'name': 'tstates'
+                      },
+                      'right': {
+                        'type': 'Literal',
+                        'value': self.getTotalTStates(bytecode.opcode)
+                      }
+                    }
+                  }
+                ];
+
+                var updatePcStmt = [
+                  {
+                    'type': 'ExpressionStatement',
+                    'expression': {
+                      'type': 'AssignmentExpression',
+                      'operator': '=',
+                      'left': {
+                        'type': 'Identifier',
+                        'name': 'pc'
+                      },
+                      'right': {
+                        'type': 'Literal',
+                        'value': bytecode.nextAddress
+                      }
+                    }
+                  }
+                ];
+
+                if (DEBUG) {
+                  if (decreaseTStateStmt[0]['expression']['right']['value'])
+                    decreaseTStateStmt[0]['expression']['right']['raw'] = toHex(decreaseTStateStmt[0]['expression']['right']['value']);
+                  if (updatePcStmt[0]['expression']['right']['value'])
+                    updatePcStmt[0]['expression']['right']['raw'] = toHex(updatePcStmt[0]['expression']['right']['value']);
+                }
+
+                if (bytecode.ast == undefined)
+                  bytecode.ast = decreaseTStateStmt.concat(updatePcStmt);
+                else
+                  bytecode.ast = decreaseTStateStmt.concat(bytecode.ast, updatePcStmt);
 
                 if (DEBUG) {
                   // Inline comment about the current bytecode.
-                  attachComment(ast);
+                  bytecode.ast[0].leadingComments = [
+                    {
+                      type: 'Line',
+                      value: ' ' + bytecode.label
+                    }
+                  ];
                 }
 
-                return ast;
-
-                function attachComment(ast) {
-                  if (Array.isArray(ast))
-                    doAttachComment(ast[0]);
-                  else
-                    doAttachComment(ast);
-
-                  function doAttachComment(ast) {
-                    ast.leadingComments = [
-                      {
-                        type: 'Line',
-                        value: ' ' + bytecode.label
-                      }
-                    ];
-                  }
-                }
+                return bytecode.ast;
               });
 
-          // @todo Remove this test when all the opcodes are implemented.
-          if (fn.length) {
+          if (DEBUG)
+            // Inject data about current branch into a comment.
+            fn[0][0].leadingComments = [].concat({
+              type: 'Line',
+              value: ' Nb of instructions jumping here: ' + jumpTargetNb
+            }, fn[0][0].leadingComments);
 
-            if (DEBUG && fn[0] && fn[0].leadingComments)
-              // Inject data about current branch into a comment.
-              fn[0].leadingComments = [
-                {
-                  type: 'Line',
-                  value: ' Nb of instructions jumping here: ' + jumpTargetNb
-                },
-                fn[0].leadingComments[0]
-              ];
+          // Flatten the array.
+          fn.forEach(function(ast) {
+            body = body.concat(ast);
+          });
 
-            // Flatten the array (`ast` properties can be an object or an array of objects).
-            fn.forEach(function(ast) {
-              if (Array.isArray(ast))
-                arr = arr.concat(ast);
-              else
-                arr.push(ast);
-            });
+          // Apply modifications to the AST recursively.
+          body = self.convertRegisters(body);
 
-            // Apply modifications to the AST recursively.
-            arr = self.convertRegisters(arr);
-          }
-
-          if (lastPc != null) {
-            // Updating this.pc at the end of the function.
-            arr.push({
-              "type": "ExpressionStatement",
-              "expression": {
-                "type": "AssignmentExpression",
-                "operator": "=",
-                "left": {
-                  "type": "Identifier",
-                  "name": "this.pc"
-                },
-                "right": {
-                  "type": "Literal",
-                  "value": lastPc
-                }
-              }
-            });
-          }
+          // Append `this` to all identifiers.
+          body = JSSMS.Utils.traverse(body, function(obj) {
+            if (obj.type && obj.type == 'Identifier')
+              obj.name = 'this.' + obj.name;
+            return obj;
+          });
 
           return {
             'type': 'Program',
@@ -144,7 +153,7 @@ Compiler.prototype = {
                 'defaults': [],
                 'body': {
                   'type': 'BlockStatement',
-                  'body': arr
+                  'body': body
                 },
                 'rest': null,
                 'generator': false,
@@ -155,6 +164,32 @@ Compiler.prototype = {
         });
 
     this.ast = this.functions;
+  },
+
+
+  getTotalTStates: function(opcodes) {
+    var tstates = 0;
+
+    switch (opcodes[0]) {
+      case 0xCB:
+        tstates = OP_CB_STATES[opcodes[1]];
+        break;
+      case 0xDD:
+      case 0xFD:
+        if (opcodes.length == 2)
+          tstates = OP_DD_STATES[opcodes[1]];
+        else
+          tstates = OP_INDEX_CB_STATES[opcodes[2]];
+        break;
+      case 0xED:
+        tstates = OP_ED_STATES[opcodes[1]];
+        break;
+      default:
+        tstates = OP_STATES[opcodes[0]];
+        break;
+    }
+
+    return tstates;
   },
 
 
