@@ -98,6 +98,7 @@ Optimizer.prototype = {
 
       // 1st, we tag defined registers.
       if (ast.type == 'AssignmentExpression' &&
+          ast.operator == '=' &&
           ast.left.type == 'Register' &&
           ast.right.type == 'Literal') {
         definedReg[ast.left.name] = true;
@@ -106,10 +107,10 @@ Optimizer.prototype = {
 
       // And we make sure to tag undefined registers.
       if (ast.type == 'AssignmentExpression' &&
-          ast.left.type == 'Register' &&
-          ast.right.type != 'Literal') {
+          ast.left.type == 'Register') {
         definedReg[ast.left.name] = false;
         definedRegValue[ast.left.name] = {};
+        return ast;
       }
 
       // Then inline arguments.
