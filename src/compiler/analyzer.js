@@ -65,7 +65,13 @@ Analyzer.prototype = {
           }
 
           if (opcode && opcode.ast) {
-            bytecode.ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.address);
+            var ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.address);
+
+            // Force ast property to always be an array.
+            if (!Array.isArray(ast) && ast != undefined)
+              ast = [ast];
+
+            bytecode.ast = ast;
 
             if (DEBUG) {
               bytecode.name = opcode.name;
@@ -87,20 +93,20 @@ Analyzer.prototype = {
   restructure: function() {
     var self = this;
     var pointer = -1;
-    var endFunction = false;
+    var startNewFunction = false;
 
     this.bytecodes
       .forEach(function(bytecode) {
-          if (bytecode.isJumpTarget || endFunction) {
+          if (bytecode.isJumpTarget || startNewFunction) {
             pointer++;
             self.ast[pointer] = [];
-            endFunction = false;
+            startNewFunction = false;
           }
 
           self.ast[pointer].push(bytecode);
 
           if (bytecode.isFunctionEnder) {
-            endFunction = true;
+            startNewFunction = true;
           }
         });
   }
