@@ -521,7 +521,7 @@ var o = {
     return function() {
       // setBC(readMemWord(sp));
       return n.ExpressionStatement(
-          n.CallExpression('set' + (register1 + register2).toUpperCase(), o.READ_MEM16(n.Literal('sp')))
+          n.CallExpression('set' + (register1 + register2).toUpperCase(), o.READ_MEM16(n.Identifier('sp')))
       );
     };
   },
