@@ -25,133 +25,145 @@
  * @todo Pass the rom memory non paginated to read/write faster.
  * @todo Define address types to instructionTypes (instruction or operand).
  * @todo Keep a track of memory locations parsed.
- * @param rom
+ * @param {Array.<Array|DataView>} rom
  * @constructor
  */
-var Parser = function(rom) {
-  this.stream = new RomStream(rom);
-  this.instructions = [];
-  if (DEBUG) this.instructionTypes = [];
-};
-
-Parser.prototype = {
-  addresses: [],
-  instructions: [],
-  instructionTypes: [],
-
-  /**
-   * Parse the instructions in the ROM.
-   */
-  parse: function(entryPoint, pageStart, pageEnd) {
-    if (DEBUG) console.time('Parsing');
-
+var Parser = (function() {
+  var parser = function(rom) {
+    this.stream = new RomStream(rom);
     this.addresses = [];
+    this.instructions = [];
+    if (DEBUG) this.instructionTypes = [];
+  };
 
-    if (pageStart == undefined) pageStart = 0x0000;
-    if (!pageEnd) pageEnd = this.stream.length - 1;
+  parser.prototype = {
+    /**
+     * Parse the instructions in the ROM.
+     */
+    parse: function(entryPoint, pageStart, pageEnd) {
+      if (DEBUG) console.time('Parsing');
 
-    this.addAddress(entryPoint);
+      this.addresses = [];
 
-    while (this.addresses.length) {
-      var currentAddress = this.addresses.shift();
+      if (pageStart == undefined) pageStart = 0x0000;
+      if (!pageEnd) pageEnd = this.stream.length - 1;
 
-      // Make sure instructions are not parsed twice.
-      if (this.instructions[currentAddress]) {
-        continue;
+      if (entryPoint < pageStart || entryPoint > pageEnd) {
+        if (DEBUG) console.error('Address out of bound', JSSMS.Utils.toHex(entryPoint));
+        return;
       }
 
-      if (currentAddress < pageStart || currentAddress > pageEnd) {
-        if (DEBUG) console.error('Invalid address', JSSMS.Utils.toHex(currentAddress));
-        continue;
-      }
+      this.addAddress(entryPoint);
 
-      var bytecode = new Bytecode(currentAddress);
-      this.instructions[currentAddress] = this.disassemble(bytecode);
-    }
+      while (this.addresses.length) {
+        var currentAddress = this.addresses.shift();
 
-    // Flag entry point as jump target.
-    this.instructions[entryPoint].isJumpTarget = true;
-    this.instructions[entryPoint].jumpTargetNb++;
+        // Make sure instructions are not parsed twice.
+        if (this.instructions[currentAddress]) {
+          continue;
+        }
 
-    // Mark all jump target instructions.
-    for (var i = 0, length = this.instructions.length; i < length; i++) {
-      if (!this.instructions[i]) {
-        continue;
-      }
-      // Comparing with null is important here as `0` is a valid address (0x00).
-      if (this.instructions[i].nextAddress != null && this.instructions[this.instructions[i].nextAddress]) {
-        this.instructions[this.instructions[i].nextAddress].jumpTargetNb++;
-      }
-      if (this.instructions[i].target != null) {
-        if (this.instructions[this.instructions[i].target]) {
-          this.instructions[this.instructions[i].target].isJumpTarget = true;
-          this.instructions[this.instructions[i].target].jumpTargetNb++;
-        } else {
-          if (DEBUG) console.log('Invalid target address', this.instructions[i].target);
+        if (currentAddress < pageStart || currentAddress > pageEnd) {
+          if (DEBUG) console.error('Address out of bound', JSSMS.Utils.toHex(currentAddress));
+          continue;
+        }
+
+        var bytecode = new Bytecode(currentAddress);
+        this.instructions[currentAddress] = disassemble(bytecode, this.stream);
+
+        if (this.instructions[currentAddress].nextAddress != null) {
+          this.addAddress(this.instructions[currentAddress].nextAddress);
+        }
+        if (this.instructions[currentAddress].target != null) {
+          this.addAddress(this.instructions[currentAddress].target);
         }
       }
+
+      // Flag entry point as jump target.
+      this.instructions[entryPoint].isJumpTarget = true;
+      this.instructions[entryPoint].jumpTargetNb++;
+
+      // Mark all jump target instructions.
+      for (var i = 0, length = this.instructions.length; i < length; i++) {
+        if (!this.instructions[i]) {
+          continue;
+        }
+        // Comparing with null is important here as `0` is a valid address (0x00).
+        if (this.instructions[i].nextAddress != null && this.instructions[this.instructions[i].nextAddress]) {
+          this.instructions[this.instructions[i].nextAddress].jumpTargetNb++;
+        }
+        if (this.instructions[i].target != null) {
+          if (this.instructions[this.instructions[i].target]) {
+            this.instructions[this.instructions[i].target].isJumpTarget = true;
+            this.instructions[this.instructions[i].target].jumpTargetNb++;
+          } else {
+            if (DEBUG) console.log('Invalid target address', this.instructions[i].target);
+          }
+        }
+      }
+
+      if (DEBUG) console.timeEnd('Parsing');
+    },
+
+
+    /**
+     * Return a dot file representation of parsed instructions.
+     *
+     * @return {string} The content of a Dot file.
+     */
+    writeGraphViz: function() {
+      if (DEBUG) console.time('DOT generation');
+
+      var tree = this.instructions;
+      var INDENT = ' ';
+
+      var content = ['digraph G {'];
+
+      for (var i = 0, length = tree.length; i < length; i++) {
+        if (!tree[i])
+          continue;
+
+        content.push(INDENT + i + ' [label="' + tree[i].label + '"];');
+
+        if (tree[i].target != null)
+          content.push(INDENT + i + ' -> ' + tree[i].target + ';');
+
+        if (tree[i].nextAddress != null)
+          content.push(INDENT + i + ' -> ' + tree[i].nextAddress + ';');
+      }
+
+      content.push('}');
+      content = content.join('\n');
+
+      // Inject entry point styling.
+      content = content.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
+
+      if (DEBUG) console.timeEnd('DOT generation');
+
+      return content;
+    },
+
+
+    /**
+     * Add an address to the queue.
+     * @param {number} address
+     */
+    addAddress: function(address) {
+      this.addresses.push(address);
     }
-
-    if (DEBUG) console.timeEnd('Parsing');
-  },
-
-
-  /**
-   * Return a dot file representation of parsed instructions.
-   *
-   * @return {string} The content of a Dot file.
-   */
-  writeGraphViz: function() {
-    if (DEBUG) console.time('DOT generation');
-
-    var tree = this.instructions;
-    var INDENT = ' ';
-
-    var content = ['digraph G {'];
-
-    for (var i = 0, length = tree.length; i < length; i++) {
-      if (!tree[i])
-        continue;
-
-      content.push(INDENT + i + ' [label="' + tree[i].label + '"];');
-
-      if (tree[i].target != null)
-        content.push(INDENT + i + ' -> ' + tree[i].target + ';');
-
-      if (tree[i].nextAddress != null)
-        content.push(INDENT + i + ' -> ' + tree[i].nextAddress + ';');
-    }
-
-    content.push('}');
-    content = content.join('\n');
-
-    // Inject entry point styling.
-    content = content.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
-
-    if (DEBUG) console.timeEnd('DOT generation');
-
-    return content;
-  },
-
-
-  /**
-   * Add an address to the queue.
-   * @param {number} address
-   */
-  addAddress: function(address) {
-    this.addresses.push(address);
-  },
+  };
 
 
   /**
    * Returns the instruction associated to an opcode.
    *
    * @param {Bytecode} bytecode
+   * @param {RomStream} stream
    * @return {Bytecode}
    */
-  disassemble: function(bytecode) {
-    this.stream.seek(bytecode.address);
-    var opcode = this.stream.getUint8();
+  function disassemble(bytecode, stream) {
+    stream.seek(bytecode.address);
+    var opcode = stream.getUint8();
 
     var operand = null;
     var target = null;
@@ -163,7 +175,7 @@ Parser.prototype = {
       case 0x00:
         break;
       case 0x01:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x02:
         break;
@@ -174,7 +186,7 @@ Parser.prototype = {
       case 0x05:
         break;
       case 0x06:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x07:
         break;
@@ -191,15 +203,15 @@ Parser.prototype = {
       case 0x0D:
         break;
       case 0x0E:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x0F:
         break;
       case 0x10:
-        target = this.stream.position + this.stream.getInt8();
+        target = stream.position + stream.getInt8();
         break;
       case 0x11:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x12:
         break;
@@ -210,13 +222,13 @@ Parser.prototype = {
       case 0x15:
         break;
       case 0x16:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x17:
         break;
       case 0x18:
-        target = this.stream.position + this.stream.getInt8();
-        this.stream.seek(null);
+        target = stream.position + stream.getInt8();
+        stream.seek(null);
         isFunctionEnder = true;
         break;
       case 0x19:
@@ -230,18 +242,18 @@ Parser.prototype = {
       case 0x1D:
         break;
       case 0x1E:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x1F:
         break;
       case 0x20:
-        target = this.stream.position + this.stream.getInt8();
+        target = stream.position + stream.getInt8();
         break;
       case 0x21:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x22:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x23:
         break;
@@ -250,17 +262,17 @@ Parser.prototype = {
       case 0x25:
         break;
       case 0x26:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x27:
         break;
       case 0x28:
-        target = this.stream.position + this.stream.getInt8();
+        target = stream.position + stream.getInt8();
         break;
       case 0x29:
         break;
       case 0x2A:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x2B:
         break;
@@ -269,18 +281,18 @@ Parser.prototype = {
       case 0x2D:
         break;
       case 0x2E:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x2F:
         break;
       case 0x30:
-        target = this.stream.position + this.stream.getInt8();
+        target = stream.position + stream.getInt8();
         break;
       case 0x31:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x32:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x33:
         break;
@@ -289,17 +301,17 @@ Parser.prototype = {
       case 0x35:
         break;
       case 0x36:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x37:
         break;
       case 0x38:
-        target = this.stream.position + this.stream.getInt8();
+        target = stream.position + stream.getInt8();
         break;
       case 0x39:
         break;
       case 0x3A:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x3B:
         break;
@@ -308,7 +320,7 @@ Parser.prototype = {
       case 0x3D:
         break;
       case 0x3E:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x3F:
         break;
@@ -575,20 +587,20 @@ Parser.prototype = {
       case 0xC1:
         break;
       case 0xC2:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xC3:
-        target = this.stream.getUint16();
-        this.stream.seek(null);
+        target = stream.getUint16();
+        stream.seek(null);
         isFunctionEnder = true;
         break;
       case 0xC4:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xC5:
         break;
       case 0xC6:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xC7:
         target = 0x00;
@@ -597,24 +609,24 @@ Parser.prototype = {
       case 0xC8:
         break;
       case 0xC9:
-        this.stream.seek(null);
+        stream.seek(null);
         isFunctionEnder = true;
         break;
       case 0xCA:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xCB:
-        return this.getCB(bytecode);
+        return getCB(bytecode, stream);
         break;
       case 0xCC:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xCD:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         isFunctionEnder = true;
         break;
       case 0xCE:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xCF:
         target = 0x08;
@@ -625,18 +637,18 @@ Parser.prototype = {
       case 0xD1:
         break;
       case 0xD2:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xD3:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xD4:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xD5:
         break;
       case 0xD6:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xD7:
         target = 0x10;
@@ -647,19 +659,19 @@ Parser.prototype = {
       case 0xD9:
         break;
       case 0xDA:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xDB:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xDC:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xDD:
-        return this.getIndexOpIX(bytecode);
+        return getIndex(bytecode, stream);
         break;
       case 0xDE:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xDF:
         target = 0x18;
@@ -670,17 +682,17 @@ Parser.prototype = {
       case 0xE1:
         break;
       case 0xE2:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xE3:
         break;
       case 0xE4:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xE5:
         break;
       case 0xE6:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xE7:
         target = 0x20;
@@ -690,22 +702,22 @@ Parser.prototype = {
         break;
       case 0xE9:
         // This target can't be determined using static analysis.
-        this.stream.seek(null);
+        stream.seek(null);
         isFunctionEnder = true;
         break;
       case 0xEA:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xEB:
         break;
       case 0xEC:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xED:
-        return this.getED(bytecode);
+        return getED(bytecode, stream);
         break;
       case 0xEE:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xEF:
         target = 0x28;
@@ -716,17 +728,17 @@ Parser.prototype = {
       case 0xF1:
         break;
       case 0xF2:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xF3:
         break;
       case 0xF4:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xF5:
         break;
       case 0xF6:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xF7:
         target = 0x30;
@@ -737,18 +749,18 @@ Parser.prototype = {
       case 0xF9:
         break;
       case 0xFA:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xFB:
         break;
       case 0xFC:
-        target = this.stream.getUint16();
+        target = stream.getUint16();
         break;
       case 0xFD:
-        return this.getIndexOpIY(bytecode);
+        return getIndex(bytecode, stream);
         break;
       case 0xFE:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xFF:
         target = 0x38;
@@ -758,49 +770,41 @@ Parser.prototype = {
         if (DEBUG) console.error('Unexpected opcode', JSSMS.Utils.toHex(opcode));
     }
 
-    if (this.stream.position != null) {
-      this.addAddress(this.stream.position);
-    }
-    if (target != null) {
-      this.addAddress(target);
-    }
-
-    bytecode.nextAddress = this.stream.position;
+    bytecode.nextAddress = stream.position;
     bytecode.operand = operand;
     bytecode.target = target;
     bytecode.isFunctionEnder = isFunctionEnder;
 
     return bytecode;
-  },
+  }
 
 
   /**
    * Returns the instruction associated to an opcode.
    *
    * @param {Bytecode} bytecode
+   * @param {RomStream} stream
    * @return {Bytecode}
    */
-  getCB: function(bytecode) {
-    var opcode = this.stream.getUint8();
+  function getCB(bytecode, stream) {
+    var opcode = stream.getUint8();
 
     bytecode.opcode.push(opcode);
-
-    this.addAddress(this.stream.position);
-
-    bytecode.nextAddress = this.stream.position;
+    bytecode.nextAddress = stream.position;
 
     return bytecode;
-  },
+  }
 
 
   /**
    * Returns the instruction associated to an opcode.
    *
    * @param {Bytecode} bytecode
+   * @param {RomStream} stream
    * @return {Bytecode}
    */
-  getED: function(bytecode) {
-    var opcode = this.stream.getUint8();
+  function getED(bytecode, stream) {
+    var opcode = stream.getUint8();
 
     var operand = null;
     var target = null;
@@ -815,7 +819,7 @@ Parser.prototype = {
       case 0x42:
         break;
       case 0x43:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x44:
       case 0x4C:
@@ -834,7 +838,7 @@ Parser.prototype = {
       case 0x6D:
       case 0x75:
       case 0x7D:
-        this.stream.seek(null);
+        stream.seek(null);
         break;
       case 0x46:
       case 0x4E:
@@ -850,7 +854,7 @@ Parser.prototype = {
       case 0x4A:
         break;
       case 0x4B:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x4F:
         break;
@@ -861,7 +865,7 @@ Parser.prototype = {
       case 0x52:
         break;
       case 0x53:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x56:
       case 0x76:
@@ -875,7 +879,7 @@ Parser.prototype = {
       case 0x5A:
         break;
       case 0x5B:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x5F:
         break;
@@ -886,7 +890,7 @@ Parser.prototype = {
       case 0x62:
         break;
       case 0x63:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x67:
         break;
@@ -897,7 +901,7 @@ Parser.prototype = {
       case 0x6A:
         break;
       case 0x6B:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x6F:
         break;
@@ -906,7 +910,7 @@ Parser.prototype = {
       case 0x72:
         break;
       case 0x73:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x78:
         break;
@@ -915,7 +919,7 @@ Parser.prototype = {
       case 0x7A:
         break;
       case 0x7B:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0xA0:
         break;
@@ -937,17 +941,17 @@ Parser.prototype = {
         break;
       case 0xB1:
         if (ACCURATE_INTERRUPT_EMULATION) {
-          target = this.stream.position - 2;
+          target = stream.position - 2;
         }
         break;
       case 0xB2:
         if (ACCURATE_INTERRUPT_EMULATION) {
-          target = this.stream.position - 2;
+          target = stream.position - 2;
         }
         break;
       case 0xB3:
         if (ACCURATE_INTERRUPT_EMULATION) {
-          target = this.stream.position - 2;
+          target = stream.position - 2;
         }
         break;
       case 0xB8:
@@ -956,64 +960,35 @@ Parser.prototype = {
         break;
       case 0xBA:
         if (ACCURATE_INTERRUPT_EMULATION) {
-          target = this.stream.position - 2;
+          target = stream.position - 2;
         }
         break;
       case 0xBB:
         if (ACCURATE_INTERRUPT_EMULATION) {
-          target = this.stream.position - 2;
+          target = stream.position - 2;
         }
         break;
       default:
         if (DEBUG) console.error('Unexpected opcode', JSSMS.Utils.toHex(opcode));
     }
 
-    if (this.stream.position != null) {
-      this.addAddress(this.stream.position);
-    }
-    if (target != null) {
-      this.addAddress(target);
-    }
-
-    bytecode.nextAddress = this.stream.position;
+    bytecode.nextAddress = stream.position;
     bytecode.operand = operand;
     bytecode.target = target;
 
     return bytecode;
-  },
+  }
 
 
   /**
    * Returns the instruction associated to an opcode.
    *
    * @param {Bytecode} bytecode
+   * @param {RomStream} stream
    * @return {Bytecode}
    */
-  getIndexOpIX: function(bytecode) {
-    return this.getIndex('IX', bytecode);
-  },
-
-
-  /**
-   * Returns the instruction associated to an opcode.
-   *
-   * @param {Bytecode} bytecode
-   * @return {Bytecode}
-   */
-  getIndexOpIY: function(bytecode) {
-    return this.getIndex('IY', bytecode);
-  },
-
-
-  /**
-   * Returns the instruction associated to an opcode.
-   *
-   * @param {string} index
-   * @param {Bytecode} bytecode
-   * @return {Bytecode}
-   */
-  getIndex: function(index, bytecode) {
-    var opcode = this.stream.getUint8();
+  function getIndex(bytecode, stream) {
+    var opcode = stream.getUint8();
 
     var operand = null;
 
@@ -1025,10 +1000,10 @@ Parser.prototype = {
       case 0x19:
         break;
       case 0x21:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x22:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x23:
         break;
@@ -1037,12 +1012,12 @@ Parser.prototype = {
       case 0x25:
         break;
       case 0x26:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x29:
         break;
       case 0x2A:
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x2B:
         break;
@@ -1051,17 +1026,17 @@ Parser.prototype = {
       case 0x2D:
         break;
       case 0x2E:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x34:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x35:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x36:
         // Actually 2 bytes (offset + value).
-        operand = this.stream.getUint16();
+        operand = stream.getUint16();
         break;
       case 0x39:
         break;
@@ -1070,28 +1045,28 @@ Parser.prototype = {
       case 0x45:
         break;
       case 0x46:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x4C:
         break;
       case 0x4D:
         break;
       case 0x4E:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x54:
         break;
       case 0x55:
         break;
       case 0x56:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x5C:
         break;
       case 0x5D:
         break;
       case 0x5E:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x60:
         break;
@@ -1106,7 +1081,7 @@ Parser.prototype = {
       case 0x65:
         break;
       case 0x66:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x67:
         break;
@@ -1123,96 +1098,96 @@ Parser.prototype = {
       case 0x6D:
         break;
       case 0x6E:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x6F:
         break;
       case 0x70:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x71:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x72:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x73:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x74:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x75:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x77:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x7C:
         break;
       case 0x7D:
         break;
       case 0x7E:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x84:
         break;
       case 0x85:
         break;
       case 0x86:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x8C:
         break;
       case 0x8D:
         break;
       case 0x8E:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x94:
         break;
       case 0x95:
         break;
       case 0x96:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0x9C:
         break;
       case 0x9D:
         break;
       case 0x9E:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xA4:
         break;
       case 0xA5:
         break;
       case 0xA6:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xAC:
         break;
       case 0xAD:
         break;
       case 0xAE:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xB4:
         break;
       case 0xB5:
         break;
       case 0xB6:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xBC:
         break;
       case 0xBD:
         break;
       case 0xBE:
-        operand = this.stream.getUint8();
+        operand = stream.getUint8();
         break;
       case 0xCB:
-        return this.getIndexCB(index, bytecode);
+        return getIndexCB(bytecode, stream);
         break;
       case 0xE1:
         break;
@@ -1221,7 +1196,7 @@ Parser.prototype = {
       case 0xE5:
         break;
       case 0xE9:
-        this.stream.seek(null);
+        stream.seek(null);
         break;
       case 0xF9:
         break;
@@ -1229,129 +1204,123 @@ Parser.prototype = {
         if (DEBUG) console.error('Unexpected opcode', JSSMS.Utils.toHex(opcode));
     }
 
-    if (this.stream.position != null) {
-      this.addAddress(this.stream.position);
-    }
-
-    bytecode.nextAddress = this.stream.position;
+    bytecode.nextAddress = stream.position;
     bytecode.operand = operand;
 
     return bytecode;
-  },
+  }
 
 
   /**
    * Returns the instruction associated to an opcode.
    *
-   * @param {string} index
    * @param {Bytecode} bytecode
+   * @param {RomStream} stream
    * @return {Bytecode}
    */
-  getIndexCB: function(index, bytecode) {
-    var opcode = this.stream.getUint8();
-    var operand = this.stream.getUint8();
+  function getIndexCB(bytecode, stream) {
+    var opcode = stream.getUint8();
+    var operand = stream.getUint8();
 
     bytecode.opcode.push(opcode);
-
-    this.addAddress(this.stream.position);
-
-    bytecode.nextAddress = this.stream.position;
+    bytecode.nextAddress = stream.position;
     bytecode.operand = operand;
 
     return bytecode;
   }
-};
-
-
-
-/**
- * @param {Array.<Array|DataView>} rom
- * @constructor
- */
-function RomStream(rom) {
-  this.rom = rom;
-  this.pos = 0;
-}
-
-RomStream.prototype = {
-  get position() {
-    return this.pos;
-  },
-  get length() {
-    return this.rom * PAGE_SIZE;
-  },
-  seek: function(pos) {
-    this.pos = pos;
-  },
 
 
   /**
-   * Read an unsigned byte from ROM memory.
-   *
-   * @return {number} Value from memory location.
+   * @param {Array.<Array|DataView>} rom
+   * @constructor
    */
-  getUint8: function() {
-    var value = 0;
+  function RomStream(rom) {
+    this.rom = rom;
+    this.pos = 0;
+  }
 
-    if (SUPPORT_DATAVIEW) {
-      value = this.rom[this.pos >> 14].getUint8(this.pos & 0x3FFF);
-      this.pos++;
-      return value;
-    } else {
-      value = this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF;
-      this.pos++;
-      return value;
-    }
-  },
-
-
-  /**
-   * Read a signed byte from ROM memory.
-   *
-   * @return {number} Value from memory location.
-   */
-  getInt8: function() {
-    var value = 0;
-
-    if (SUPPORT_DATAVIEW) {
-      value = this.rom[this.pos >> 14].getInt8(this.pos & 0x3FFF);
-      this.pos++;
-      return value;
-    } else {
-      value = this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF;
-      if (value >= 128) {
-        value = value - 256;
-      }
-      this.pos++;
-      return value;
-    }
-  },
+  RomStream.prototype = {
+    get position() {
+      return this.pos;
+    },
+    get length() {
+      return this.rom * PAGE_SIZE;
+    },
+    seek: function(pos) {
+      this.pos = pos;
+    },
 
 
-  /**
-   * Read an unsigned word (two bytes) from ROM memory.
-   *
-   * @return {number} Value from memory location.
-   */
-  getUint16: function() {
-    var value = 0;
+    /**
+     * Read an unsigned byte from ROM memory.
+     *
+     * @return {number} Value from memory location.
+     */
+    getUint8: function() {
+      var value = 0;
 
-    if (SUPPORT_DATAVIEW) {
-      if ((this.pos & 0x3FFF) < 0x3FFF) {
-        value = this.rom[this.pos >> 14].getUint16(this.pos & 0x3FFF, LITTLE_ENDIAN);
-        this.pos += 2;
+      if (SUPPORT_DATAVIEW) {
+        value = this.rom[this.pos >> 14].getUint8(this.pos & 0x3FFF);
+        this.pos++;
         return value;
       } else {
-        value = (this.rom[this.pos >> 14].getUint8(this.pos & 0x3FFF)) |
-            ((this.rom[++this.pos >> 14].getUint8(this.pos & 0x3FFF)) << 8);
+        value = this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF;
+        this.pos++;
+        return value;
+      }
+    },
+
+
+    /**
+     * Read a signed byte from ROM memory.
+     *
+     * @return {number} Value from memory location.
+     */
+    getInt8: function() {
+      var value = 0;
+
+      if (SUPPORT_DATAVIEW) {
+        value = this.rom[this.pos >> 14].getInt8(this.pos & 0x3FFF);
+        this.pos++;
+        return value;
+      } else {
+        value = this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF;
+        if (value >= 128) {
+          value = value - 256;
+        }
+        this.pos++;
+        return value;
+      }
+    },
+
+
+    /**
+     * Read an unsigned word (two bytes) from ROM memory.
+     *
+     * @return {number} Value from memory location.
+     */
+    getUint16: function() {
+      var value = 0;
+
+      if (SUPPORT_DATAVIEW) {
+        if ((this.pos & 0x3FFF) < 0x3FFF) {
+          value = this.rom[this.pos >> 14].getUint16(this.pos & 0x3FFF, LITTLE_ENDIAN);
+          this.pos += 2;
+          return value;
+        } else {
+          value = (this.rom[this.pos >> 14].getUint8(this.pos & 0x3FFF)) |
+              ((this.rom[++this.pos >> 14].getUint8(this.pos & 0x3FFF)) << 8);
+          this.pos += 2;
+          return value;
+        }
+      } else {
+        value = (this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF) |
+            ((this.rom[++this.pos >> 14][this.pos & 0x3FFF] & 0xFF) << 8);
         this.pos += 2;
         return value;
       }
-    } else {
-      value = (this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF) |
-          ((this.rom[++this.pos >> 14][this.pos & 0x3FFF] & 0xFF) << 8);
-      this.pos += 2;
-      return value;
     }
-  }
-};
+  };
+
+  return parser;
+})();
