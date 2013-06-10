@@ -38,6 +38,7 @@ var n = {
   },
   BlockStatement: function(body) {
     if (body == undefined) body = [];
+    if (!Array.isArray(body)) body = [body];
     return {
       'type': 'BlockStatement',
       'body': body
@@ -47,6 +48,13 @@ var n = {
     return {
       'type': 'ExpressionStatement',
       'expression': expression
+    };
+  },
+  ReturnStatement: function(argument) {
+    if (argument == undefined) argument = null;
+    return {
+      'type': 'ReturnStatement',
+      'argument': argument
     };
   },
   // This is not a real AST block, but it's convenient for manipulating registers in optimizer.
@@ -94,6 +102,13 @@ var n = {
       'right': right
     };
   },
+  UnaryExpression: function(operator, argument) {
+    return {
+      'type': 'UnaryExpression',
+      'operator': operator,
+      'argument': argument
+    };
+  },
   MemberExpression: function(object, property) {
     return {
       'type': 'MemberExpression',
@@ -102,11 +117,12 @@ var n = {
       'property': property
     };
   },
-  ReturnStatement: function(argument) {
-    if (argument == undefined) argument = null;
+  ConditionalExpression: function(test, consequent, alternate) {
     return {
-      'type': 'ReturnStatement',
-      'argument': argument
+      'type': 'ConditionalExpression',
+      'test': test,
+      'consequent': consequent,
+      'alternate': alternate
     };
   }
 };
@@ -142,6 +158,27 @@ var o = {
         return n.ExpressionStatement(
             n.AssignmentExpression('=', n.Register(srcRegister), o.READ_MEM8(n.Literal(value)))
         );
+      };
+    if (dstRegister1 == 'r')
+      // a = REFRESH_EMULATION ? r : JSSMS.Utils.rndInt(255);
+      // f = (f & F_CARRY) | SZ_TABLE[a] | (iff2 ? F_PARITY : 0);
+      return function() {
+        return [
+          n.ExpressionStatement(n.AssignmentExpression('=',
+              n.Register(srcRegister),
+              REFRESH_EMULATION ?
+              n.Register('r') :
+              n.CallExpression('JSSMS.Utils.rndInt', n.Literal(255))
+              )),
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('f'),
+              n.BinaryExpression('|',
+              n.BinaryExpression('|',
+                n.BinaryExpression('&', n.Register('f'), n.Literal('F_CARRY')),
+                n.MemberExpression(n.Identifier('SZ_TABLE'), n.Register(srcRegister))
+              )),
+              n.ConditionalExpression(n.Identifier('iff2'), n.Identifier('F_PARITY'), n.Literal(0))
+              ))
+        ];
       };
     else
       // Register address value assignment (ex: `LD A,(BC)`).
@@ -540,8 +577,9 @@ var o = {
       return n.IfStatement(
           test,
           n.BlockStatement([
+            n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
             n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
-            n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5)))
+            n.ReturnStatement()
           ])
       );
     };
@@ -621,9 +659,9 @@ var o = {
             n.Literal(0)
             ),
             n.BlockStatement([
+              n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(7))),
               n.ExpressionStatement(n.CallExpression('push1', n.Literal(nextAddress))),
               n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
-              n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(7))),
               n.ReturnStatement()
             ])
         );
@@ -662,7 +700,7 @@ var o = {
   IN: function(register1, register2) {
     if (register2 == undefined)
       return function(value, target, nextAddress) {
-        // a = this.port.in_(value);
+        // a = port.in_(value);
         return n.ExpressionStatement(
             n.AssignmentExpression('=', n.Register(register1), n.CallExpression('port.in_', n.Literal(value)))
         );
@@ -674,6 +712,128 @@ var o = {
       return n.ExpressionStatement(
           n.AssignmentExpression('=', n.Identifier('im'), n.Literal(1))
       );
+    };
+  },
+  // ED prefixed opcodes.
+  NEG: function() {
+    return function() {
+      // temp = a;
+      // a = 0;
+      // sub_a(temp);
+      return [
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.Register('a'))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Register('a'), n.Literal(0))),
+        n.ExpressionStatement(n.CallExpression('sub_a', n.Identifier('temp')))
+      ];
+    };
+  },
+  LDIR: function() {
+    return function(value, target, nextAddress, currentAddress) {
+      // writeMem(getDE(), readMem(getHL()));
+      // incDE();
+      // incHL();
+      // decBC();
+      //
+      // if (getBC() != 0) {
+      // f |= F_PARITY;
+      // tstates -= 5;
+      // pc--;
+      // } else {
+      // f &= ~ F_PARITY;
+      // pc++;
+      // }
+      //
+      // f &= ~ F_NEGATIVE;
+      // f &= ~ F_HALFCARRY;
+
+      return [
+        n.ExpressionStatement(
+            n.CallExpression('writeMem',
+            n.CallExpression('get' + ('d' + 'e').toUpperCase(), o.READ_MEM8(n.CallExpression('get' + ('h' + 'l').toUpperCase())))
+            )
+        ),
+        n.ExpressionStatement(n.CallExpression('incDE')),
+        n.ExpressionStatement(n.CallExpression('incHL')),
+        n.ExpressionStatement(n.CallExpression('decBC')),
+        n.IfStatement(
+            n.BinaryExpression('!=', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0)),
+            n.BlockStatement([
+              n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Identifier('F_PARITY'))),
+              n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
+              n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(currentAddress))),
+              n.ReturnStatement()
+            ]),
+            n.BlockStatement([
+              n.ExpressionStatement(n.AssignmentExpression('&=', n.Register('f'), n.UnaryExpression('~', n.Identifier('F_PARITY')))),
+              n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(nextAddress)))
+            ])
+        ),
+        n.ExpressionStatement(n.AssignmentExpression('&=', n.Register('f'), n.UnaryExpression('~', n.Identifier('F_NEGATIVE')))),
+        n.ExpressionStatement(n.AssignmentExpression('&=', n.Register('f'), n.UnaryExpression('~', n.Identifier('F_HALFCARRY'))))
+      ];
+    };
+  },
+  OTIR: function() {
+    return function(value, target, nextAddress, currentAddress) {
+      // temp = readMem(getHL());
+      // port.out(c, temp);
+      // b = dec8(b);
+      // incHL();
+      // if (b != 0) {
+      // tstates -= 5;
+      // pc--;
+      // } else {
+      // pc++;
+      // }
+      // if ((l + temp) > 255) {
+      // f |= F_CARRY;
+      // f |= F_HALFCARRY;
+      // } else {
+      // f &= ~ F_CARRY;
+      // f &= ~ F_HALFCARRY;
+      // }
+      // if ((temp & 0x80) != 0)
+      // f |= F_NEGATIVE;
+      // else
+      // f &= ~ F_NEGATIVE;
+
+      return [
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), o.READ_MEM8(n.CallExpression('get' + ('h' + 'l').toUpperCase())))),
+        n.ExpressionStatement(n.CallExpression('port.out', [n.Register('c'), n.Identifier('temp')])),
+        o.DEC8('b')(),
+        n.ExpressionStatement(n.CallExpression('incHL')),
+        n.IfStatement(
+            n.BinaryExpression('!=', n.Register('b'), n.Literal(0)),
+            n.BlockStatement([
+              n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
+              n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(currentAddress))),
+              n.ReturnStatement()
+            ]),
+            n.BlockStatement(
+              n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(nextAddress)))
+            )
+        ),
+        n.IfStatement(
+            n.BinaryExpression('>', n.BinaryExpression('+', n.Register('l'), n.Identifier('temp')), n.Literal(255)),
+            n.BlockStatement([
+              n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Identifier('F_CARRY'))),
+              n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Identifier('F_HALFCARRY')))
+            ]),
+            n.BlockStatement([
+              n.ExpressionStatement(n.AssignmentExpression('&=', n.Register('f'), n.UnaryExpression('~', n.Identifier('F_CARRY')))),
+              n.ExpressionStatement(n.AssignmentExpression('&=', n.Register('f'), n.UnaryExpression('~', n.Identifier('F_HALFCARRY'))))
+            ])
+        ),
+        n.IfStatement(
+            n.BinaryExpression('!=', n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0x80)), n.Literal(0)),
+            n.BlockStatement(
+              n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Identifier('F_NEGATIVE')))
+            ),
+            n.BlockStatement(
+              n.ExpressionStatement(n.AssignmentExpression('&=', n.Register('f'), n.UnaryExpression('~', n.Identifier('F_NEGATIVE'))))
+            )
+        )
+      ];
     };
   },
   // Below these point, properties can't be called from outside object `n`.

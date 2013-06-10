@@ -21,14 +21,16 @@
 
 var opcodeTableED = {
   0x44: {
-    name: 'NEG'
+    name: 'NEG',
+    ast: o.NEG()
   },
   0x56: {
     name: 'IM1',
     ast: o.IM1()
   },
   0x5F: {
-    name: 'LD A,R'
+    name: 'LD A,R',
+    ast: o.LD8('a', 'r')
   },
   0x76: {
     name: 'IM1',
@@ -38,9 +40,11 @@ var opcodeTableED = {
     name: 'OUTI'
   },
   0xB0: {
-    name: 'LDIR'
+    name: 'LDIR',
+    ast: o.LDIR()
   },
   0xB3: {
-    name: 'OTIR'
+    name: 'OTIR',
+    ast: o.OTIR()
   }
 };

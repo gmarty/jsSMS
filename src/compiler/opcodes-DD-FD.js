@@ -26,6 +26,14 @@ function generateIndexTable(index) {
     0x09: {
       name: 'ADD ' + index + ',BC',
       ast: o.ADD16('i', register2, 'b', 'c')
+    },
+    0x19: {
+      name: 'ADD ' + index + ',DE',
+      ast: o.ADD16('i', register2, 'd', 'e')
+    },
+    0x21: {
+      name: 'LD ' + index + ',nn',
+      ast: o.LD16('i', register2)
     }
   };
 }
