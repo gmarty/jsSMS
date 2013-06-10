@@ -70,8 +70,8 @@ Compiler.prototype = {
                   }
                 ];
 
-                var updatePcStmt = [
-                  {
+                if (bytecode.nextAddress != null)
+                  var updatePcStmt = {
                     'type': 'ExpressionStatement',
                     'expression': {
                       'type': 'AssignmentExpression',
@@ -85,20 +85,22 @@ Compiler.prototype = {
                         'value': bytecode.nextAddress
                       }
                     }
-                  }
-                ];
+                  };
 
                 if (DEBUG) {
                   if (decreaseTStateStmt[0]['expression']['right']['value'])
                     decreaseTStateStmt[0]['expression']['right']['raw'] = toHex(decreaseTStateStmt[0]['expression']['right']['value']);
-                  if (updatePcStmt[0]['expression']['right']['value'])
-                    updatePcStmt[0]['expression']['right']['raw'] = toHex(updatePcStmt[0]['expression']['right']['value']);
+                  if (bytecode.nextAddress != null)
+                    updatePcStmt['expression']['right']['raw'] = toHex(updatePcStmt['expression']['right']['value']);
                 }
 
-                if (bytecode.ast == undefined)
-                  bytecode.ast = decreaseTStateStmt.concat(updatePcStmt);
+                if (bytecode.ast == null)
+                  bytecode.ast = decreaseTStateStmt;
                 else
-                  bytecode.ast = decreaseTStateStmt.concat(bytecode.ast, updatePcStmt);
+                  bytecode.ast = decreaseTStateStmt.concat(bytecode.ast);
+
+                if (bytecode.nextAddress != null)
+                  bytecode.ast.push(updatePcStmt);
 
                 if (DEBUG) {
                   // Inline comment about the current bytecode.
