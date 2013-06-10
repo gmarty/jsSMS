@@ -787,7 +787,7 @@ JSSMS.Z80.prototype = {
       case 0xEE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.pc++)]; break;                // XOR n
       case 0xEF: this.push1(this.pc); this.pc = 0x28; break;                                // RST 28H
       case 0xF0: this.ret((this.f & F_SIGN) == 0); break;                           // RET P
-      case 0xF1: this.f = this.readMem(this.sp++); this.a = this.readMem(this.sp++); break;             // POP AF
+      case 0xF1: this.setAF(this.readMemWord(this.sp)); this.sp += 2; break;             // POP AF
       case 0xF2: this.jp((this.f & F_SIGN) == 0); break;                            // JP P,(nn)
       case 0xF3: this.iff1 = this.iff2 = false; this.EI_inst = true; break;              // DI
       case 0xF4: this.call((this.f & F_SIGN) == 0); break;                         // CALL P (nn)
@@ -2782,6 +2782,15 @@ JSSMS.Z80.prototype = {
   setHL: function(value) {
     this.h = (value >> 8);
     this.l = value & 0xFF;
+  },
+
+
+  /**
+   * @param {number} value
+   */
+  setAF: function(value) {
+    this.a = (value >> 8);
+    this.f = value & 0xFF;
   },
 
 
