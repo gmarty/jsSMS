@@ -20,6 +20,17 @@
 'use strict';
 
 
+/**
+ * These properties shouldn't be preprended with `this`.
+ * @const
+ */
+var whitelist = [
+  'F_CARRY', 'F_NEGATIVE', 'F_PARITY', 'F_OVERFLOW', 'F_BIT3', 'F_HALFCARRY', 'F_BIT5', 'F_ZERO', 'F_SIGN',
+  'BIT_0', 'BIT_1', 'BIT_2', 'BIT_3', 'BIT_4', 'BIT_5', 'BIT_6', 'BIT_7',
+  'temp'
+];
+
+
 
 /**
  * The compiler cleans the data and returns a valid AST.
@@ -132,7 +143,7 @@ Compiler.prototype = {
 
           // Append `this` to all identifiers.
           body = JSSMS.Utils.traverse(body, function(obj) {
-            if (obj.type && obj.type == 'Identifier')
+            if (obj.type && obj.type == 'Identifier' && whitelist.indexOf(obj.name) == -1)
               obj.name = 'this.' + obj.name;
             return obj;
           });
