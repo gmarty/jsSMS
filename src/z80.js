@@ -1985,10 +1985,10 @@ JSSMS.Z80.prototype = {
 
       //  -- ED43 LD (nn),BC ------------------------
       case 0x43:
-        location = this.readMemWord(this.pc + 1);
+        location = this.readMemWord(++this.pc);
         this.writeMem(location++, this.c);
         this.writeMem(location, this.b);
-        this.pc += 3;
+        this.pc += 2;
         break;
 
       //  -- ED44 NEG -------------------------------
@@ -2048,8 +2048,8 @@ JSSMS.Z80.prototype = {
 
       //  -- ED4B LD BC,(nn) -----------------------
       case 0x4B:
-        this.setBC(this.readMemWord(this.readMemWord(this.pc + 1)));
-        this.pc += 3;
+        this.setBC(this.readMemWord(this.readMemWord(++this.pc)));
+        this.pc += 2;
         break;
 
       //  -- ED4F LD R,A ---------------------------
@@ -2070,10 +2070,10 @@ JSSMS.Z80.prototype = {
 
       //  -- ED53 LD (nn),DE ------------------------
       case 0x53:
-        location = this.readMemWord(this.pc + 1);
+        location = this.readMemWord(++this.pc);
         this.writeMem(location++, this.e); // SPl
         this.writeMem(location, this.d);   // SPh
-        this.pc += 3;
+        this.pc += 2;
         break;
 
       //  -- ED56 IM 1-------------------------------
@@ -2102,8 +2102,8 @@ JSSMS.Z80.prototype = {
 
       //  -- ED5B LD DE,(nn) -----------------------
       case 0x5B:
-        this.setDE(this.readMemWord(this.readMemWord(this.pc + 1)));
-        this.pc += 3;
+        this.setDE(this.readMemWord(this.readMemWord(++this.pc)));
+        this.pc += 2;
         break;
 
       // -- ED5F LD A,R -----------------------------
@@ -2129,10 +2129,10 @@ JSSMS.Z80.prototype = {
 
       //  -- ED63 LD (nn),HL ------------------------
       case 0x63:
-        location = this.readMemWord(this.pc + 1);
+        location = this.readMemWord(++this.pc);
         this.writeMem(location++, this.l); // SPl
         this.writeMem(location, this.h);   // SPh
-        this.pc += 3;
+        this.pc += 2;
         break;
 
       //  -- ED67 RRD -------------------------------
@@ -2165,8 +2165,8 @@ JSSMS.Z80.prototype = {
 
       //  -- ED6B LD HL,(nn) -----------------------
       case 0x6B:
-        this.setHL(this.readMemWord(this.readMemWord(this.pc + 1)));
-        this.pc += 3;
+        this.setHL(this.readMemWord(this.readMemWord(++this.pc)));
+        this.pc += 2;
         break;
 
       //  -- ED6F RLD -------------------------------
@@ -2193,10 +2193,10 @@ JSSMS.Z80.prototype = {
 
       //  -- ED73 LD (nn),SP ------------------------
       case 0x73:
-        location = this.readMemWord(this.pc + 1);
+        location = this.readMemWord(++this.pc);
         this.writeMem(location++, this.sp & 0xFF); // SPl
         this.writeMem(location, this.sp >> 8);     // SPh
-        this.pc += 3;
+        this.pc += 2;
         break;
 
       //  -- ED78 IN A,(C) -------------------------
@@ -2214,15 +2214,18 @@ JSSMS.Z80.prototype = {
 
       //  -- ED7B LD SP,(nn) -----------------------
       case 0x7B:
-        this.sp = this.readMemWord(this.readMemWord(this.pc + 1));
-        this.pc += 3;
+        this.sp = this.readMemWord(this.readMemWord(++this.pc));
+        this.pc += 2;
         break;
 
       //  -- EDA0 LDI ----------------------------------
       case 0xA0:
         // (DE) <- (HL)
         this.writeMem(this.getDE(), this.readMem(this.getHL()));
-        this.incDE(); this.incHL(); this.decBC();
+        this.incDE();
+        this.incHL();
+        this.decBC();
+
         this.f = (this.f & 0xC1) | (this.getBC() != 0 ? F_PARITY : 0);
         this.pc++;
         break;
@@ -2246,6 +2249,7 @@ JSSMS.Z80.prototype = {
         this.writeMem(this.getHL(), temp);
         this.b = this.dec8(this.b);
         this.incHL();
+
         if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;
         else this.f &= ~ F_NEGATIVE;
         this.pc++;
@@ -2262,6 +2266,7 @@ JSSMS.Z80.prototype = {
         this.incHL();
         // B <- B -1
         this.b = this.dec8(this.b); // Flags in OUTI adjusted in same way as dec b anyway.
+
         if ((this.l + temp) > 255) {
           this.f |= F_CARRY; this.f |= F_HALFCARRY;
         } else {
@@ -2276,7 +2281,10 @@ JSSMS.Z80.prototype = {
       case 0xA8:
         // (DE) <- (HL)
         this.writeMem(this.getDE(), this.readMem(this.getHL()));
-        this.decDE(); this.decHL(); this.decBC();
+        this.decDE();
+        this.decHL();
+        this.decBC();
+
         this.f = (this.f & 0xC1) | (this.getBC() != 0 ? F_PARITY : 0);
         this.pc++;
         break;
@@ -2300,6 +2308,7 @@ JSSMS.Z80.prototype = {
         this.writeMem(this.getHL(), temp);
         this.b = this.dec8(this.b);
         this.decHL();
+
         if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;
         else this.f &= ~ F_NEGATIVE;
         this.pc++;
@@ -2372,6 +2381,7 @@ JSSMS.Z80.prototype = {
         this.writeMem(this.getHL(), temp);
         this.b = this.dec8(this.b);
         this.incHL();
+
         if (this.b != 0) {
           this.tstates -= 5;
           this.pc--;
@@ -2413,7 +2423,9 @@ JSSMS.Z80.prototype = {
       // -- EDB8 LDDR ---------------------------------
       case 0xB8:
         this.writeMem(this.getDE(), this.readMem(this.getHL()));
-        this.decDE(); this.decHL(); this.decBC();
+        this.decDE();
+        this.decHL();
+        this.decBC();
 
         if (this.getBC() != 0) {
           this.f |= F_PARITY;
@@ -2453,6 +2465,7 @@ JSSMS.Z80.prototype = {
         this.writeMem(this.getHL(), temp);
         this.b = this.dec8(this.b);
         this.decHL();
+
         if (this.b != 0) {
           this.tstates -= 5;
           this.pc--;
@@ -2509,7 +2522,7 @@ JSSMS.Z80.prototype = {
    *
    * Bottom 8 bytes = a value
    * Byte 9  = carry flag
-   * Byte 10 = neative flag
+   * Byte 10 = negative flag
    * Byte 11 = halfcarry flag
    *
    * Returned value:
