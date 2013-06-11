@@ -380,8 +380,8 @@ JSSMS.Debugger.prototype = {
         inst = 'DJNZ (' + toHex(target) + ')';
         code = 'this.b = (this.b - 1) & 0xff;' +
             'if (this.b != 0) {' +
-            'this.pc = ' + toHex(target) + ';' +
             'this.tstates -= 5;' +
+            'this.pc = ' + toHex(target) + ';' +
             'return;' +
             '}';
         address++;
@@ -1078,7 +1078,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xAF:
         inst = 'XOR A,A'; // =0
-        code = 'this.f = ' + toHex(this.SZP_TABLE[0]) + '; this.a = ' + toHex(0) + ';';
+        code = 'this.a = ' + toHex(0) + '; this.f = ' + toHex(this.SZP_TABLE[0]) + ';';
         break;
       case 0xB0:
         inst = 'OR A,B';
