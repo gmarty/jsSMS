@@ -1304,6 +1304,7 @@ JSSMS.Debugger.prototype = {
         operand = toHex(this.readRom8bit(address));
         inst = 'SUB ' + operand;
         code = 'this.sub_a(' + operand + ');';
+        address++;
         break;
       case 0xD7:
         target = 0x10;
