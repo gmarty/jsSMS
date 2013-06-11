@@ -37,7 +37,8 @@ var opcodeTableED = {
     ast: o.IM1()
   },
   0xA3: {
-    name: 'OUTI'
+    name: 'OUTI',
+    ast: o.OUTI()
   },
   0xB0: {
     name: 'LDIR',

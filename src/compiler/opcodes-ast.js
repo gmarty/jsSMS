@@ -190,6 +190,17 @@ var o = {
         );
       };
   },
+  LD8_D: function(srcRegister, dstRegister1, dstRegister2) {
+    // a = readMem(getIX() + d_());
+    return function(value) {
+      return n.ExpressionStatement(
+          n.AssignmentExpression('=',
+          n.Register(srcRegister),
+          n.BinaryExpression('+', n.CallExpression('get' + (dstRegister1 + dstRegister2).toUpperCase()), n.Literal(value))
+          )
+      );
+    };
+  },
   LD16: function(srcRegister1, srcRegister2, dstRegister1, dstRegister2) {
     if (dstRegister1 == undefined && dstRegister2 == undefined)
       // Direct value assignment (ex: `LD HL,nn`).
@@ -726,6 +737,51 @@ var o = {
         n.ExpressionStatement(n.CallExpression('sub_a', n.Identifier('temp')))
       ];
     };
+  },
+  OUTI: function() {
+    return function(value, target, nextAddress, currentAddress) {
+      // temp = readMem(getHL());
+      // port.out(c, temp);
+      // incHL();
+      // b = dec8(b);
+      // if ((l + temp) > 255) {
+      // f |= F_CARRY;
+      // f |= F_HALFCARRY;
+      // } else {
+      // f &= ~ F_CARRY;
+      // f &= ~ F_HALFCARRY;
+      // }
+      // if ((temp & 0x80) == 0x80)
+      // f |= F_NEGATIVE;
+      // else
+      // f &= ~ F_NEGATIVE;
+
+      return [
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), o.READ_MEM8(n.CallExpression('get' + ('h' + 'l').toUpperCase())))),
+        n.ExpressionStatement(n.CallExpression('port.out', [n.Register('c'), n.Identifier('temp')])),
+        n.ExpressionStatement(n.CallExpression('incHL')),
+        n.IfStatement(
+            n.BinaryExpression('>', n.BinaryExpression('+', n.Register('l'), n.Identifier('temp')), n.Literal(255)),
+            n.BlockStatement([
+              n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Identifier('F_CARRY'))),
+              n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Identifier('F_HALFCARRY')))
+            ]),
+            n.BlockStatement([
+              n.ExpressionStatement(n.AssignmentExpression('&=', n.Register('f'), n.UnaryExpression('~', n.Identifier('F_CARRY')))),
+              n.ExpressionStatement(n.AssignmentExpression('&=', n.Register('f'), n.UnaryExpression('~', n.Identifier('F_HALFCARRY'))))
+            ])
+        ),
+        n.IfStatement(
+            n.BinaryExpression('==', n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0x80)), n.Literal(0x80)),
+            n.BlockStatement(
+            n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Identifier('F_NEGATIVE')))
+            ),
+            n.BlockStatement(
+            n.ExpressionStatement(n.AssignmentExpression('&=', n.Register('f'), n.UnaryExpression('~', n.Identifier('F_NEGATIVE'))))
+            )
+        )
+      ];
+    }
   },
   LDIR: function() {
     return function(value, target, nextAddress, currentAddress) {

@@ -34,6 +34,18 @@ function generateIndexTable(index) {
     0x21: {
       name: 'LD ' + index + ',nn',
       ast: o.LD16('i', register2)
+    },
+    0x23: {
+      name: 'INC ' + index + '',
+      ast: o.INC16('i', register2)
+    },
+    0x2B: {
+      name: 'DEC ' + index + '',
+      ast: o.DEC16('i', register2)
+    },
+    0x7E: {
+      name: 'LD A,(' + index + '+d)',
+      ast: o.LD8_D('a', 'i', register2)
     }
   };
 }
