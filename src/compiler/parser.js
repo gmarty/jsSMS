@@ -29,6 +29,8 @@
  * @constructor
  */
 var Parser = (function() {
+  /** @const */ var ACCURATE_INTERRUPT_EMULATION = true;
+
   var parser = function(rom) {
     this.stream = new RomStream(rom);
     this.addresses = [];
@@ -938,6 +940,9 @@ var Parser = (function() {
       case 0xAB:
         break;
       case 0xB0:
+        if (ACCURATE_INTERRUPT_EMULATION) {
+          target = stream.position - 2;
+        }
         break;
       case 0xB1:
         if (ACCURATE_INTERRUPT_EMULATION) {
@@ -1282,14 +1287,14 @@ var Parser = (function() {
       if (SUPPORT_DATAVIEW) {
         value = this.rom[this.pos >> 14].getInt8(this.pos & 0x3FFF);
         this.pos++;
-        return value;
+        return value + 1;
       } else {
         value = this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF;
         if (value >= 128) {
           value = value - 256;
         }
         this.pos++;
-        return value;
+        return value + 1;
       }
     },
 
