@@ -99,7 +99,7 @@ var Parser = (function() {
             this.instructions[this.instructions[i].target].isJumpTarget = true;
             this.instructions[this.instructions[i].target].jumpTargetNb++;
           } else {
-            if (DEBUG) console.log('Invalid target address', this.instructions[i].target);
+            if (DEBUG) console.log('Invalid target address', JSSMS.Utils.toHex(this.instructions[i].target));
           }
         }
       }
