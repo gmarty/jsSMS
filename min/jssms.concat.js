@@ -229,7 +229,19 @@ JSSMS.Utils = {rndInt:function(range) {
       }
     }
   }
-}(), getTimestamp:function() {
+}(), traverse:function(object, fn) {
+  var key, child;
+  fn.call(null, object);
+  for(key in object) {
+    if(object.hasOwnProperty(key)) {
+      child = object[key];
+      if(typeof child === "object" && child !== null) {
+        object[key] = JSSMS.Utils.traverse(child, fn)
+      }
+    }
+  }
+  return object
+}, getTimestamp:function() {
   if(window.performance && window.performance.now) {
     return function() {
       return window.performance.now()
@@ -1190,8 +1202,8 @@ JSSMS.Z80.prototype = {reset:function() {
       this.ret((this.f & F_SIGN) == 0);
       break;
     case 241:
-      this.f = this.readMem(this.sp++);
-      this.a = this.readMem(this.sp++);
+      this.setAF(this.readMemWord(this.sp));
+      this.sp += 2;
       break;
     case 242:
       this.jp((this.f & F_SIGN) == 0);
@@ -1525,7 +1537,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.h = this.srl(this.h);
       break;
     case 61:
-      this.l = this.rl(this.l);
+      this.l = this.srl(this.l);
       break;
     case 62:
       this.writeMem(this.getHL(), this.srl(this.readMem(this.getHL())));
@@ -3461,10 +3473,10 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 67:
-      location = this.readMemWord(this.pc + 1);
+      location = this.readMemWord(++this.pc);
       this.writeMem(location++, this.c);
       this.writeMem(location, this.b);
-      this.pc += 3;
+      this.pc += 2;
       break;
     case 68:
     ;
@@ -3533,8 +3545,8 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 75:
-      this.setBC(this.readMemWord(this.readMemWord(this.pc + 1)));
-      this.pc += 3;
+      this.setBC(this.readMemWord(this.readMemWord(++this.pc)));
+      this.pc += 2;
       break;
     case 79:
       this.r = this.a;
@@ -3554,10 +3566,10 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 83:
-      location = this.readMemWord(this.pc + 1);
+      location = this.readMemWord(++this.pc);
       this.writeMem(location++, this.e);
       this.writeMem(location, this.d);
-      this.pc += 3;
+      this.pc += 2;
       break;
     case 86:
     ;
@@ -3584,8 +3596,8 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 91:
-      this.setDE(this.readMemWord(this.readMemWord(this.pc + 1)));
-      this.pc += 3;
+      this.setDE(this.readMemWord(this.readMemWord(++this.pc)));
+      this.pc += 2;
       break;
     case 95:
       this.a = REFRESH_EMULATION ? this.r : JSSMS.Utils.rndInt(255);
@@ -3606,10 +3618,10 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 99:
-      location = this.readMemWord(this.pc + 1);
+      location = this.readMemWord(++this.pc);
       this.writeMem(location++, this.l);
       this.writeMem(location, this.h);
-      this.pc += 3;
+      this.pc += 2;
       break;
     case 103:
       location = this.getHL();
@@ -3633,8 +3645,8 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 107:
-      this.setHL(this.readMemWord(this.readMemWord(this.pc + 1)));
-      this.pc += 3;
+      this.setHL(this.readMemWord(this.readMemWord(++this.pc)));
+      this.pc += 2;
       break;
     case 111:
       location = this.getHL();
@@ -3653,10 +3665,10 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 115:
-      location = this.readMemWord(this.pc + 1);
+      location = this.readMemWord(++this.pc);
       this.writeMem(location++, this.sp & 255);
       this.writeMem(location, this.sp >> 8);
-      this.pc += 3;
+      this.pc += 2;
       break;
     case 120:
       this.a = this.port.in_(this.c);
@@ -3672,8 +3684,8 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 123:
-      this.sp = this.readMemWord(this.readMemWord(this.pc + 1));
-      this.pc += 3;
+      this.sp = this.readMemWord(this.readMemWord(++this.pc));
+      this.pc += 2;
       break;
     case 160:
       this.writeMem(this.getDE(), this.readMem(this.getHL()));
@@ -4020,6 +4032,9 @@ JSSMS.Z80.prototype = {reset:function() {
 }, setHL:function(value) {
   this.h = value >> 8;
   this.l = value & 255
+}, setAF:function(value) {
+  this.a = value >> 8;
+  this.f = value & 255
 }, setIX:function(value) {
   this.ixH = value >> 8;
   this.ixL = value & 255
@@ -4895,7 +4910,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 16:
       target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "DJNZ (" + toHex(target) + ")";
-      code = "this.b = (this.b - 1) & 0xff;" + "if (this.b != 0) {" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 5;" + "return;" + "}";
+      code = "this.b = (this.b - 1) & 0xff;" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address++;
       break;
     case 17:
@@ -5574,7 +5589,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 175:
       inst = "XOR A,A";
-      code = "this.f = " + toHex(this.SZP_TABLE[0]) + "; this.a = " + toHex(0) + ";";
+      code = "this.a = " + toHex(0) + "; this.f = " + toHex(this.SZP_TABLE[0]) + ";";
       break;
     case 176:
       inst = "OR A,B";
@@ -5760,6 +5775,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       operand = toHex(this.readRom8bit(address));
       inst = "SUB " + operand;
       code = "this.sub_a(" + operand + ");";
+      address++;
       break;
     case 215:
       target = 16;

@@ -158,7 +158,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
           case 16:
             $address$$inline_278_target$$inline_267$$ = $address$$inline_262_address$$inline_272_opcode$$inline_279$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_261_hexOpcodes$$inline_289_opcode$$inline_273$$, $address$$inline_262_address$$inline_272_opcode$$inline_279$$) + 1);
             $inst$$inline_265_opcodesArray$$inline_274_opcodesArray$$inline_280$$ = "DJNZ (" + $JSSMS$Utils$toHex$$($address$$inline_278_target$$inline_267$$) + ")";
-            $code$$inline_268_inst$$inline_275_inst$$inline_281$$ = "this.b = (this.b - 1) & 0xff;if (this.b != 0) {this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_278_target$$inline_267$$) + ";this.tstates -= 5;return;}";
+            $code$$inline_268_inst$$inline_275_inst$$inline_281$$ = "this.b = (this.b - 1) & 0xff;if (this.b != 0) {this.tstates -= 5;this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_278_target$$inline_267$$) + ";return;}";
             $address$$inline_262_address$$inline_272_opcode$$inline_279$$++;
             break;
           case 17:
@@ -833,7 +833,7 @@ $JSSMS$$.prototype = {$isRunning$:$JSCompiler_alias_FALSE$$, $cyclesPerLine$:0, 
             break;
           case 175:
             $inst$$inline_265_opcodesArray$$inline_274_opcodesArray$$inline_280$$ = "XOR A,A";
-            $code$$inline_268_inst$$inline_275_inst$$inline_281$$ = "this.f = " + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_261_hexOpcodes$$inline_289_opcode$$inline_273$$.$l$[0]) + "; this.a = " + $JSSMS$Utils$toHex$$(0) + ";";
+            $code$$inline_268_inst$$inline_275_inst$$inline_281$$ = "this.a = " + $JSSMS$Utils$toHex$$(0) + "; this.f = " + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_261_hexOpcodes$$inline_289_opcode$$inline_273$$.$l$[0]) + ";";
             break;
           case 176:
             $inst$$inline_265_opcodesArray$$inline_274_opcodesArray$$inline_280$$ = "OR A,B";
