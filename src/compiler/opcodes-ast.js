@@ -344,6 +344,29 @@ var o = {
         );
       };
   },
+  ADC: function(register1, register2) {
+    if (register1 == undefined && register2 == undefined)
+      return function(value) {
+        // adc_a(value);
+        return n.ExpressionStatement(
+            n.CallExpression('adc_a', n.Literal(value))
+        );
+      };
+    if (register2 == undefined)
+      return function() {
+        // adc_a(b);
+        return n.ExpressionStatement(
+            n.CallExpression('adc_a', n.Register(register1))
+        );
+      };
+    else
+      return function() {
+        // adc_a(readMem(getHL()));
+        return n.ExpressionStatement(
+            n.CallExpression('adc_a', o.READ_MEM8(n.CallExpression('get' + (register1 + register2).toUpperCase())))
+        );
+      };
+  },
   SUB: function(register1, register2) {
     if (register1 == undefined && register2 == undefined)
       // sub_a(value);
@@ -364,6 +387,29 @@ var o = {
         // sub_a(readMem(getHL()));
         return n.ExpressionStatement(
             n.CallExpression('sub_a', o.READ_MEM8(n.CallExpression('get' + (register1 + register2).toUpperCase())))
+        );
+      };
+  },
+  SBC: function(register1, register2) {
+    if (register1 == undefined && register2 == undefined)
+      // sbc_a(value);
+      return function(value, target, nextAddress) {
+        return n.ExpressionStatement(
+            n.CallExpression('sbc_a', n.Literal(value))
+        );
+      };
+    if (register2 == undefined)
+      return function() {
+        // sbc_a(b);
+        return n.ExpressionStatement(
+            n.CallExpression('sbc_a', n.Register(register1))
+        );
+      };
+    else
+      return function() {
+        // sbc_a(readMem(getHL()));
+        return n.ExpressionStatement(
+            n.CallExpression('sbc_a', o.READ_MEM8(n.CallExpression('get' + (register1 + register2).toUpperCase())))
         );
       };
   },
@@ -695,6 +741,16 @@ var o = {
       return [
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('iff1'), n.Literal(false))),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('iff2'), n.Literal(false))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('EI_inst'), n.Literal(true)))
+      ];
+    };
+  },
+  EI: function() {
+    return function() {
+      // iff1 = true; iff2 = true; EI_inst = true;
+      return [
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('iff1'), n.Literal(true))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('iff2'), n.Literal(true))),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('EI_inst'), n.Literal(true)))
       ];
     };

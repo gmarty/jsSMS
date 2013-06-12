@@ -690,35 +690,43 @@ var opcodeTable = [
   },
   //0x88
   {
-    name: 'ADC A,B'
+    name: 'ADC A,B',
+    ast: o.ADC('b')
   },
   //0x89
   {
-    name: 'ADC A,C'
+    name: 'ADC A,C',
+    ast: o.ADC('c')
   },
   //0x8A
   {
-    name: 'ADC A,D'
+    name: 'ADC A,D',
+    ast: o.ADC('d')
   },
   //0x8B
   {
-    name: 'ADC A,E'
+    name: 'ADC A,E',
+    ast: o.ADC('e')
   },
   //0x8C
   {
-    name: 'ADC A,H'
+    name: 'ADC A,H',
+    ast: o.ADC('h')
   },
   //0x8D
   {
-    name: 'ADC A,L'
+    name: 'ADC A,L',
+    ast: o.ADC('l')
   },
   //0x8E
   {
-    name: 'ADC A,(HL)'
+    name: 'ADC A,(HL)',
+    ast: o.ADC('h', 'l')
   },
   //0x8F
   {
-    name: 'ADC A,A'
+    name: 'ADC A,A',
+    ast: o.ADC('a')
   },
   //0x90
   {
@@ -762,35 +770,43 @@ var opcodeTable = [
   },
   //0x98
   {
-    name: 'SBC A,B'
+    name: 'SBC A,B',
+    ast: o.SBC('b')
   },
   //0x99
   {
-    name: 'SBC A,C'
+    name: 'SBC A,C',
+    ast: o.SBC('c')
   },
   //0x9A
   {
-    name: 'SBC A,D'
+    name: 'SBC A,D',
+    ast: o.SBC('d')
   },
   //0x9B
   {
-    name: 'SBC A,E'
+    name: 'SBC A,E',
+    ast: o.SBC('e')
   },
   //0x9C
   {
-    name: 'SBC A,H'
+    name: 'SBC A,H',
+    ast: o.SBC('h')
   },
   //0x9D
   {
-    name: 'SBC A,L'
+    name: 'SBC A,L',
+    ast: o.SBC('l')
   },
   //0x9E
   {
-    name: 'SBC A,(HL)'
+    name: 'SBC A,(HL)',
+    ast: o.SBC('h', 'l')
   },
   //0x9F
   {
-    name: 'SBC A,A'
+    name: 'SBC A,A',
+    ast: o.SBC('a')
   },
   //0xA0
   {
@@ -1022,7 +1038,8 @@ var opcodeTable = [
   },
   //0xCE
   {
-    name: 'ADC A,n'
+    name: 'ADC A,n',
+    ast: o.ADC()
   },
   //0xCF
   {
@@ -1098,7 +1115,8 @@ var opcodeTable = [
   generateIndexTable('IX'),
   //0xDE
   {
-    name: 'SBC A,n'
+    name: 'SBC A,n',
+    ast: o.SBC()
   },
   //0xDF
   {
@@ -1235,7 +1253,8 @@ var opcodeTable = [
   },
   //0xFB
   {
-    name: 'EI'
+    name: 'EI',
+    ast: o.EI()
   },
   //0xFC
   {
