@@ -1076,7 +1076,8 @@ var opcodeTable = [
   },
   //0xD9
   {
-    name: 'EXX'
+    name: 'EXX',
+    ast: o.EXX()
   },
   //0xDA
   {

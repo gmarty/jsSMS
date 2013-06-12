@@ -19,35 +19,12 @@
 
 'use strict';
 
-function generateIndexTable(index) {
+function generateIndexCBTable(index) {
   var register2 = index.substring(1, 2);
 
   return {
-    0x09: {
-      name: 'ADD ' + index + ',BC',
-      ast: o.ADD16('i', register2, 'b', 'c')
-    },
-    0x19: {
-      name: 'ADD ' + index + ',DE',
-      ast: o.ADD16('i', register2, 'd', 'e')
-    },
-    0x21: {
-      name: 'LD ' + index + ',nn',
-      ast: o.LD16('i', register2)
-    },
-    0x23: {
-      name: 'INC ' + index + '',
-      ast: o.INC16('i', register2)
-    },
-    0x2B: {
-      name: 'DEC ' + index + '',
-      ast: o.DEC16('i', register2)
-    },
-    0x7E: {
-      name: 'LD A,(' + index + '+d)',
-      ast: o.LD8_D('a', 'i', register2)
-    },
-    0xCB:
-        generateIndexCBTable(index)
+    0x00: {
+      name: 'LD B,RLC (' + index + ')'
+    }
   };
 }

@@ -718,6 +718,16 @@ var o = {
         );
       };
   },
+  EXX: function() {
+    return function() {
+      // this.exBC(); this.exDE(); this.exHL();
+      return [
+        n.ExpressionStatement(n.CallExpression('exBC')),
+        n.ExpressionStatement(n.CallExpression('exDE')),
+        n.ExpressionStatement(n.CallExpression('exHL'))
+      ];
+    };
+  },
   IM1: function() {
     return function() {
       // im = 1;
