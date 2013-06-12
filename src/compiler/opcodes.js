@@ -20,136 +20,137 @@
 'use strict';
 
 var opcodeTable = [
-  //0x00:
+  //0x00
   {
     name: 'NOP',
     ast: o.NOOP()
   },
-  //0x01:
+  //0x01
   {
     name: 'LD BC,nn',
     ast: o.LD16('b', 'c'),
     operand: UINT16
   },
-  //0x02:
+  //0x02
   {
     name: 'LD (BC),A',
     ast: o.LD_WRITE_MEM('b', 'c', 'a')
   },
-  //0x03:
+  //0x03
   {
     name: 'INC BC',
     ast: o.INC16('b', 'c')
   },
-  //0x04:
+  //0x04
   {
     name: 'INC B',
     ast: o.INC8('b')
   },
-  //0x05:
+  //0x05
   {
     name: 'DEC B',
     ast: o.DEC8('b')
   },
-  //0x06:
+  //0x06
   {
     name: 'LD B,n',
     ast: o.LD8('b'),
     operand: UINT8
   },
-  //0x07:
+  //0x07
   {
     name: 'RLCA'
   },
-  //0x08:
+  //0x08
   {
     name: 'EX AF AF\'',
     ast: o.EX_AF()
   },
-  //0x09:
+  //0x09
   {
     name: 'ADD HL,BC',
     ast: o.ADD16('h', 'l', 'b', 'c')
   },
-  //0x0A:
+  //0x0A
   {
     name: 'LD A,(BC)',
     ast: o.LD8('a', 'b', 'c')
   },
-  //0x0B:
+  //0x0B
   {
     name: 'DEC BC',
     ast: o.DEC16('b', 'c')
   },
-  //0x0C:
+  //0x0C
   {
     name: 'INC C',
     ast: o.INC8('c')
   },
-  //0x0D:
+  //0x0D
   {
     name: 'DEC C',
     ast: o.DEC8('c')
   },
-  //0x0E:
+  //0x0E
   {
     name: 'LD C,n',
     ast: o.LD8('c'),
     operand: UINT8
   },
-  //0x0F:
+  //0x0F
   {
     name: 'RRCA'
   },
-  //0x10:
+  //0x10
   {
     name: 'DJNZ (PC+e)',
     ast: o.DJNZ(),
     operand: INT8
   },
-  //0x11:
+  //0x11
   {
     name: 'LD DE,nn',
     ast: o.LD16('d', 'e'),
     operand: UINT16
   },
-  //0x12:
+  //0x12
   {
     name: 'LD (DE),A',
     ast: o.LD_WRITE_MEM('d', 'e', 'a')
   },
-  //0x13:
+  //0x13
   {
     name: 'INC DE',
     ast: o.INC16('d', 'e')
   },
-  //0x14:
+  //0x14
   {
     name: 'INC D',
     ast: o.INC8('d')
   },
-  //0x15:
+  //0x15
   {
     name: 'DEC D',
     ast: o.DEC8('d')
   },
-  //0x16:
+  //0x16
   {
     name: 'LD D,n',
     ast: o.LD8('d'),
     operand: UINT8
   },
-  //0x17:
+  //0x17
   {
     name: 'RLA',
     ast: o.RLA()
   },
-  //0x18:
+  //0x18
   {
     name: 'JR (PC+e)',
+    ast: o.JP(),
     operand: INT8
   },
-  //0x19:
+  //0x19
   {
     name: 'ADD HL,DE',
     ast: o.ADD16('h', 'l', 'd', 'e')
@@ -209,11 +210,13 @@ var opcodeTable = [
   },
   //0x24
   {
-    name: 'INC H'
+    name: 'INC H',
+    ast: o.INC8('h')
   },
   //0x25
   {
-    name: 'DEC H'
+    name: 'DEC H',
+    ast: o.DEC8('h')
   },
   //0x26
   {
@@ -228,6 +231,7 @@ var opcodeTable = [
   //0x28
   {
     name: 'JR Z,(PC+e)',
+    ast: o.JRZ(),
     operand: INT8
   },
   //0x29
@@ -243,15 +247,18 @@ var opcodeTable = [
   },
   //0x2B
   {
-    name: 'DEC HL'
+    name: 'DEC HL',
+    ast: o.DEC16('h', 'l')
   },
   //0x2C
   {
-    name: 'INC L'
+    name: 'INC L',
+    ast: o.INC8('l')
   },
   //0x2D
   {
-    name: 'DEC L'
+    name: 'DEC L',
+    ast: o.DEC8('l')
   },
   //0x2E
   {
@@ -309,7 +316,8 @@ var opcodeTable = [
   },
   //0x39
   {
-    name: 'ADD HL,SP'
+    name: 'ADD HL,SP',
+    ast: o.ADD16('h', 'l', 'sp')
   },
   //0x3A
   {
@@ -569,7 +577,8 @@ var opcodeTable = [
   },
   //0x6E
   {
-    name: 'LD L,(HL)'
+    name: 'LD L,(HL)',
+    ast: o.LD8('l', 'h', 'l')
   },
   //0x6F
   {
@@ -606,7 +615,8 @@ var opcodeTable = [
   },
   //0x77
   {
-    name: 'LD (HL),A'
+    name: 'LD (HL),A',
+    ast: o.LD_WRITE_MEM('h', 'l', 'a')
   },
   //0x78
   {
@@ -1169,7 +1179,8 @@ var opcodeTable = [
   },
   //0xE9
   {
-    name: 'JP (HL)'
+    name: 'JP (HL)',
+    ast: o.JP('h', 'l')
   },
   //0xEA
   {
@@ -1244,7 +1255,8 @@ var opcodeTable = [
   },
   //0xF9
   {
-    name: 'LD SP,HL'
+    name: 'LD SP,HL',
+    ast: o.LD_SP('h', 'l')
   },
   //0xFA
   {

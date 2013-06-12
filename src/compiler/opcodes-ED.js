@@ -24,6 +24,18 @@ var opcodeTableED = {
     name: 'NEG',
     ast: o.NEG()
   },
+  0x45: {
+    name: 'RETN / RETI',
+    ast: o.RETN_RETI()
+  },
+  0x4D: {
+    name: 'RETN / RETI',
+    ast: o.RETN_RETI()
+  },
+  0x55: {
+    name: 'RETN / RETI',
+    ast: o.RETN_RETI()
+  },
   0x56: {
     name: 'IM1',
     ast: o.IM1()
@@ -31,6 +43,10 @@ var opcodeTableED = {
   0x5F: {
     name: 'LD A,R',
     ast: o.LD8('a', 'r')
+  },
+  0x73: {
+    name: 'LD (nn),SP',
+    ast: o.IM1()
   },
   0x76: {
     name: 'IM1',

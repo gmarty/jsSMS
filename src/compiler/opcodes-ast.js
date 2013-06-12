@@ -109,6 +109,15 @@ var n = {
       'argument': argument
     };
   },
+  UpdateExpression: function(operator, argument, prefix) {
+    if (prefix == undefined) prefix = false;
+    return {
+      'type': 'UpdateExpression',
+      'operator': operator,
+      'argument': argument,
+      'prefix': prefix
+    };
+  },
   MemberExpression: function(object, property) {
     return {
       'type': 'MemberExpression',
@@ -252,11 +261,36 @@ var o = {
         );
       };
   },
-  LD_SP: function() {
+  LD_SP: function(register1, register2) {
+    if (register1 == undefined && register2 == undefined)
+      // sp = value;
+      return function(value) {
+        return n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Identifier('sp'), n.Literal(value))
+        );
+      };
+    else
+    // sp = getHL();
+      return function() {
+        return n.ExpressionStatement(
+          n.AssignmentExpression('=', n.Identifier('sp'), n.CallExpression('get' + (register1 + register2).toUpperCase()))
+        );
+      };
+  },
+  LD_NN_SP: function(register1, register2) {
+    // var location = readMemWord(++pc); writeMem(location++, sp & 0xFF); writeMem(location, sp >> 8);
     return function(value) {
-      return n.ExpressionStatement(
-          n.AssignmentExpression('=', n.Identifier('sp'), n.Literal(value))
-      );
+      return [
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('location'), o.READ_MEM16(value))),
+        n.ExpressionStatement(n.CallExpression('writeMem',
+          n.UpdateExpression('++', n.Identifier('location')),
+          n.BinaryExpression('&', n.Register('sp'), n.Literal(0xFF))
+        )),
+        n.ExpressionStatement(n.CallExpression('writeMem',
+          n.Identifier('location'),
+          n.BinaryExpression('>>', n.Register('sp'), n.Literal(8))
+        ))
+      ];
     };
   },
   INC8: function(register) {
@@ -288,17 +322,30 @@ var o = {
     };
   },
   ADD16: function(register1, register2, register3, register4) {
-    return function() {
-      // setHL(add16(getHL(), getBC()));
-      return n.ExpressionStatement(
+    if (register4 == undefined)
+      return function() {
+        // setHL(add16(getHL(), sp));
+        return n.ExpressionStatement(
           n.CallExpression('set' + (register1 + register2).toUpperCase(),
-          n.CallExpression('add16',
-          [n.CallExpression('get' + (register1 + register2).toUpperCase()),
-           n.CallExpression('get' + (register3 + register4).toUpperCase())]
+            n.CallExpression('add16',
+              [n.CallExpression('get' + (register1 + register2).toUpperCase()),
+                n.Register(register3)]
+            )
           )
+        );
+      };
+    else
+      return function() {
+        // setHL(add16(getHL(), getBC()));
+        return n.ExpressionStatement(
+          n.CallExpression('set' + (register1 + register2).toUpperCase(),
+            n.CallExpression('add16',
+              [n.CallExpression('get' + (register1 + register2).toUpperCase()),
+                n.CallExpression('get' + (register3 + register4).toUpperCase())]
+            )
           )
-      );
-    };
+        );
+      };
   },
   EX_AF: function() {
     return function() {
@@ -653,6 +700,14 @@ var o = {
       ];
     };
   },
+  JRZ: function() {
+    return function(value, target) {
+      // jr((f & F_ZERO) != 0);
+      return o.JR(n.BinaryExpression('!=',
+        n.BinaryExpression('&', n.Register('f'), n.Literal(F_ZERO)),
+        n.Literal(0)))(undefined, target);
+    };
+  },
   RET: function(operator, bitMask) {
     if (operator == undefined && bitMask == undefined)
       return function() {
@@ -680,6 +735,14 @@ var o = {
         // pc = readMemWord(target); return;
         return [
           n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
+          n.ReturnStatement()
+        ];
+      };
+    if (operator == 'h' && bitMask == 'l')
+      return function(value, target, nextAddress) {
+        // pc = getHL(); return;
+        return [
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.CallExpression('get' + ('h' + 'l').toUpperCase()))),
           n.ReturnStatement()
         ];
       };
@@ -784,14 +847,6 @@ var o = {
       ];
     };
   },
-  IM1: function() {
-    return function() {
-      // im = 1;
-      return n.ExpressionStatement(
-          n.AssignmentExpression('=', n.Identifier('im'), n.Literal(1))
-      );
-    };
-  },
   // ED prefixed opcodes.
   NEG: function() {
     return function() {
@@ -803,6 +858,24 @@ var o = {
         n.ExpressionStatement(n.AssignmentExpression('=', n.Register('a'), n.Literal(0))),
         n.ExpressionStatement(n.CallExpression('sub_a', n.Identifier('temp')))
       ];
+    };
+  },
+  RETN_RETI: function() {
+    return function() {
+      // pc = readMemWord(sp); sp += 2; iff1 = iff2;
+      return [
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), o.READ_MEM16(n.Identifier('sp')))),
+        n.ExpressionStatement(n.AssignmentExpression('+=', n.Identifier('sp'), n.Literal(2))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('iff1'), n.Identifier('iff2')))
+      ];
+    };
+  },
+  IM1: function() {
+    return function() {
+      // im = 1;
+      return n.ExpressionStatement(
+        n.AssignmentExpression('=', n.Identifier('im'), n.Literal(1))
+      );
     };
   },
   OUTI: function() {
