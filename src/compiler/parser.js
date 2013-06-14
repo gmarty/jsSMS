@@ -20,17 +20,18 @@
 'use strict';
 
 
-
 /**
  * @todo Pass the rom memory non paginated to read/write faster.
  * @todo Define address types to instructionTypes (instruction or operand).
  * @todo Keep a track of memory locations parsed.
- * @param {Array.<Array|DataView>} rom
- * @constructor
  */
 var Parser = (function() {
   /** @const */ var ACCURATE_INTERRUPT_EMULATION = true;
 
+  /**
+   * @param {Array.<Array|DataView>} rom
+   * @constructor
+   */
   var parser = function(rom) {
     this.stream = new RomStream(rom);
     this.addresses = [];
@@ -40,7 +41,11 @@ var Parser = (function() {
 
   parser.prototype = {
     /**
-     * Parse the instructions in the ROM.
+     * Parse the bytecodes in the ROM.
+     *
+     * @param {number} entryPoint
+     * @param {number} pageStart
+     * @param {number} pageEnd
      */
     parse: function(entryPoint, pageStart, pageEnd) {
       if (DEBUG) console.time('Parsing');
@@ -1241,16 +1246,29 @@ var Parser = (function() {
    */
   function RomStream(rom) {
     this.rom = rom;
-    this.pos = 0;
+    this.pos = null;
   }
 
   RomStream.prototype = {
+    /**
+     * @return {?number}
+     */
     get position() {
       return this.pos;
     },
+
+
+    /**
+     * @return {number}
+     */
     get length() {
       return this.rom * PAGE_SIZE;
     },
+
+
+    /**
+     * @param {?number} pos
+     */
     seek: function(pos) {
       this.pos = pos;
     },

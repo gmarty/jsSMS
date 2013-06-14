@@ -20,8 +20,10 @@
 'use strict';
 
 
+
 /**
  * @constructor
+ * @param {JSSMS.Z80} cpu
  */
 var Recompiler = function(cpu) {
   this.cpu = cpu;
@@ -30,6 +32,9 @@ var Recompiler = function(cpu) {
 };
 
 Recompiler.prototype = {
+  /**
+   * @param {Array.<Array|DataView>} rom
+   */
   setRom: function(rom) {
     this.rom = rom;
 
@@ -45,9 +50,9 @@ Recompiler.prototype = {
 
     // Parse initial memory page.
     // @todo If ROM is below 48KB, we don't have to limit parse to this memory page.
-    this.parser.parse(0x00, 0x0000, 0x0400);
-    this.parser.parse(0x38, 0x0000, 0x0400);
-    this.parser.parse(0x66, 0x0000, 0x0400);
+    this.parser.parse(0x00, 0x0000, 0x4000);
+    this.parser.parse(0x38, 0x0000, 0x4000);
+    this.parser.parse(0x66, 0x0000, 0x4000);
 
     var analyzer = new Analyzer(this.parser.instructions);
 
@@ -58,9 +63,13 @@ Recompiler.prototype = {
     // Attach generated code to an attach point in Z80 instance.
     compiler.ast.forEach(function(fn) {
       var funcName = fn.body[0].id.name;
-      var code = window.escodegen.generate(fn, {comment: true, renumber: true, hexadecimal: true});
-      var func = new Function('return ' + code)();
-      self.cpu[''][funcName] = func;
+      var code = window['escodegen']['generate'](fn, {
+        comment: true,
+        renumber: true,
+        hexadecimal: true,
+        parse: window['esprima']['parse']
+      });
+      self.cpu[''][funcName] = new Function('return ' + code)();
     });
   }
 };
