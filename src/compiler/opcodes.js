@@ -189,6 +189,7 @@ var opcodeTable = [
   //0x20
   {
     name: 'JR NZ,(PC+e)',
+    ast: o.JRNZ(),
     operand: INT8
   },
   //0x21

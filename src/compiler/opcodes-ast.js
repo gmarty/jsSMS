@@ -699,6 +699,15 @@ var o = {
       ];
     };
   },
+  JRNZ: function() {
+    return function(value, target) {
+      // jr(!((f & F_ZERO) != 0));
+      return o.JR(n.UnaryExpression('!',
+          n.BinaryExpression('!=',
+          n.BinaryExpression('&', n.Register('f'), n.Literal(F_ZERO)),
+          n.Literal(0))))(undefined, target);
+    };
+  },
   JRZ: function() {
     return function(value, target) {
       // jr((f & F_ZERO) != 0);
