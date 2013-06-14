@@ -270,26 +270,25 @@ var o = {
         );
       };
     else
-    // sp = getHL();
+      // sp = getHL();
       return function() {
         return n.ExpressionStatement(
-          n.AssignmentExpression('=', n.Identifier('sp'), n.CallExpression('get' + (register1 + register2).toUpperCase()))
+            n.AssignmentExpression('=', n.Identifier('sp'), n.CallExpression('get' + (register1 + register2).toUpperCase()))
         );
       };
   },
   LD_NN_SP: function(register1, register2) {
-    // var location = readMemWord(++pc); writeMem(location++, sp & 0xFF); writeMem(location, sp >> 8);
+    // writeMem(value, sp & 0xFF); writeMem(value + 1, sp >> 8);
     return function(value) {
       return [
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('location'), o.READ_MEM16(value))),
         n.ExpressionStatement(n.CallExpression('writeMem',
-          n.UpdateExpression('++', n.Identifier('location')),
-          n.BinaryExpression('&', n.Register('sp'), n.Literal(0xFF))
-        )),
+            n.Literal(value),
+            n.BinaryExpression('&', n.Register('sp'), n.Literal(0xFF))
+            )),
         n.ExpressionStatement(n.CallExpression('writeMem',
-          n.Identifier('location'),
-          n.BinaryExpression('>>', n.Register('sp'), n.Literal(8))
-        ))
+            n.Literal(value + 1),
+            n.BinaryExpression('>>', n.Register('sp'), n.Literal(8))
+            ))
       ];
     };
   },
@@ -326,24 +325,24 @@ var o = {
       return function() {
         // setHL(add16(getHL(), sp));
         return n.ExpressionStatement(
-          n.CallExpression('set' + (register1 + register2).toUpperCase(),
+            n.CallExpression('set' + (register1 + register2).toUpperCase(),
             n.CallExpression('add16',
-              [n.CallExpression('get' + (register1 + register2).toUpperCase()),
-                n.Register(register3)]
+            [n.CallExpression('get' + (register1 + register2).toUpperCase()),
+             n.Register(register3)]
             )
-          )
+            )
         );
       };
     else
       return function() {
         // setHL(add16(getHL(), getBC()));
         return n.ExpressionStatement(
-          n.CallExpression('set' + (register1 + register2).toUpperCase(),
+            n.CallExpression('set' + (register1 + register2).toUpperCase(),
             n.CallExpression('add16',
-              [n.CallExpression('get' + (register1 + register2).toUpperCase()),
-                n.CallExpression('get' + (register3 + register4).toUpperCase())]
+            [n.CallExpression('get' + (register1 + register2).toUpperCase()),
+             n.CallExpression('get' + (register3 + register4).toUpperCase())]
             )
-          )
+            )
         );
       };
   },
@@ -704,8 +703,8 @@ var o = {
     return function(value, target) {
       // jr((f & F_ZERO) != 0);
       return o.JR(n.BinaryExpression('!=',
-        n.BinaryExpression('&', n.Register('f'), n.Literal(F_ZERO)),
-        n.Literal(0)))(undefined, target);
+          n.BinaryExpression('&', n.Register('f'), n.Literal(F_ZERO)),
+          n.Literal(0)))(undefined, target);
     };
   },
   RET: function(operator, bitMask) {
@@ -874,7 +873,7 @@ var o = {
     return function() {
       // im = 1;
       return n.ExpressionStatement(
-        n.AssignmentExpression('=', n.Identifier('im'), n.Literal(1))
+          n.AssignmentExpression('=', n.Identifier('im'), n.Literal(1))
       );
     };
   },

@@ -46,7 +46,7 @@ var opcodeTableED = {
   },
   0x73: {
     name: 'LD (nn),SP',
-    ast: o.IM1()
+    ast: o.LD_NN_SP()
   },
   0x76: {
     name: 'IM1',
