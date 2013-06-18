@@ -299,13 +299,13 @@ JSSMS.Z80 = function(sms) {
   // MEMORY ACCESS
   /**
    * Cartridge ROM pages.
-   * @type {Array.<Array.<number>>}
+   * @type {Array.<DataView|Array.<number>>}
    */
   this.rom = [];
 
   /**
    * SRAM.
-   * @type {Array.<number>}
+   * @type {DataView|Array.<number>}
    */
   this.sram = JSSMS.Utils.Array(0x8000);
 
@@ -334,7 +334,7 @@ JSSMS.Z80 = function(sms) {
 
   /**
    * Memory map.
-   * @type {Array.<number>}
+   * @type {DataView|Array.<number>}
    */
   this.memWriteMap = JSSMS.Utils.Array(0x2000);
 
@@ -563,8 +563,8 @@ JSSMS.Z80.prototype = {
       case 0x21: this.setHL(this.readMemWord(this.pc++)); this.pc++; break;             // LD HL,nn
       case 0x22:                                                        // LD (nn),HL
         location = this.readMemWord(this.pc);
-        this.writeMem(location, this.l);
-        this.writeMem(++location, this.h);
+        this.writeMem(location++, this.l);
+        this.writeMem(location, this.h);
         this.pc += 2;
         break;
       case 0x23: this.incHL(); break;                                          // INC HL
@@ -1450,8 +1450,8 @@ JSSMS.Z80.prototype = {
       case 0x29: this.setIX(this.add16(this.getIX(), this.getIX())); break;             // ADD IX,IX
       case 0x2A:                                                  // LD IX,(nn)
         location = this.readMemWord(this.pc);
-        this.ixL = this.readMem(location);
-        this.ixH = this.readMem(++location);
+        this.ixL = this.readMem(location++);
+        this.ixH = this.readMem(location);
         this.pc += 2;
         break;
       case 0x2B: this.decIX(); break;                                    // DEC IX
@@ -1576,8 +1576,8 @@ JSSMS.Z80.prototype = {
       case 0x29: this.setIY(this.add16(this.getIY(), this.getIY())); break;             // ADD IY,IY
       case 0x2A:                                                  // LD IY,(nn)
         location = this.readMemWord(this.pc);
-        this.iyL = this.readMem(location);
-        this.iyH = this.readMem(++location);
+        this.iyL = this.readMem(location++);
+        this.iyH = this.readMem(location);
         this.pc += 2;
         break;
       case 0x2B: this.decIY(); break;                                    // DEC IY
