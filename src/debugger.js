@@ -2608,6 +2608,7 @@ JSSMS.Debugger.prototype = {
     var target = null;
     var code = 'throw "Unimplemented 0xED prefixed opcode";';
     var operand = '';
+    var location = 0;
     address++;
 
     switch (opcode) {
@@ -2625,12 +2626,12 @@ JSSMS.Debugger.prototype = {
         code = 'this.sbc16(this.getBC());';
         break;
       case 0x43:
-        operand = toHex(this.readRom16bit(address));
+        location = this.readRom16bit(address);
+        operand = toHex(location);
         inst = 'LD (' + operand + '),BC';
-        code = 'var location = ' + operand + ';' +
-            'this.writeMem(location++, this.c);' +
-            'this.writeMem(location, this.b);';
-        address = address + 2;
+        code = 'this.writeMem(' + operand + ', this.c);' +
+            'this.writeMem(' + toHex(location + 1) + ', this.b);';
+        address += 2;
         break;
       case 0x44:
       case 0x4C:
@@ -2688,7 +2689,7 @@ JSSMS.Debugger.prototype = {
         operand = toHex(this.readRom16bit(address));
         inst = 'LD BC,(' + operand + ')';
         code = 'this.setBC(this.readMemWord(' + operand + '));';
-        address = address + 2;
+        address += 2;
         break;
       case 0x4F:
         inst = 'LD R,A';
@@ -2708,12 +2709,12 @@ JSSMS.Debugger.prototype = {
         code = 'this.sbc16(this.getDE());';
         break;
       case 0x53:
-        operand = toHex(this.readRom16bit(address));
+        location = this.readRom16bit(address);
+        operand = toHex(location);
         inst = 'LD (' + operand + '),DE';
-        code = 'var location = ' + operand + ';' +
-            'this.writeMem(location++, this.e);' + // SPl
-            'this.writeMem(location, this.d);'; // SPh
-        address = address + 2;
+        code = 'this.writeMem(' + operand + ', this.e);' + // SPl
+            'this.writeMem(' + toHex(location + 1) + ', this.d);'; // SPh
+        address += 2;
         break;
       case 0x56:
       case 0x76:
@@ -2742,7 +2743,7 @@ JSSMS.Debugger.prototype = {
         operand = toHex(this.readRom16bit(address));
         inst = 'LD DE,(' + operand + ')';
         code = 'this.setDE(' + operand + ');';
-        address = address + 2;
+        address += 2;
         break;
       case 0x5F:
         inst = 'LD A,R';
@@ -2768,12 +2769,12 @@ JSSMS.Debugger.prototype = {
         code = 'this.sbc16(this.getHL());';
         break;
       case 0x63:
-        operand = toHex(this.readRom16bit(address));
+        location = this.readRom16bit(address);
+        operand = toHex(location);
         inst = 'LD (' + operand + '),HL';
-        code = 'var location = ' + operand + ';' +
-            'this.writeMem(location++, this.l);' + // SPl
-            'this.writeMem(location, this.h);'; // SPh
-        address = address + 2;
+        code = 'this.writeMem(' + operand + ', this.l);' + // SPl
+            'this.writeMem(' + toHex(location + 1) + ', this.h);'; // SPh
+        address += 2;
         break;
       case 0x67:
         inst = 'RRD';
@@ -2803,7 +2804,7 @@ JSSMS.Debugger.prototype = {
         operand = toHex(this.readRom16bit(address));
         inst = 'LD HL,(' + operand + ')';
         code = 'this.setHL(this.readMemWord(' + operand + '));';
-        address = address + 2;
+        address += 2;
         break;
       case 0x6F:
         inst = 'RLD';
@@ -2825,12 +2826,12 @@ JSSMS.Debugger.prototype = {
         code = 'this.sbc16(this.sp);';
         break;
       case 0x73:
-        operand = toHex(this.readRom16bit(address));
+        location = this.readRom16bit(address);
+        operand = toHex(location);
         inst = 'LD (' + operand + '),SP';
-        code = 'var location = this.readMemWord(' + operand + ');' +
-            'this.writeMem(location++, this.sp & 0xFF);' + // SPl
-            'this.writeMem(location, this.sp >> 8);'; // SPh
-        address = address + 2;
+        code = 'this.writeMem(' + operand + ', this.sp & 0xFF);' + // SPl
+            'this.writeMem(' + toHex(location + 1) + ', this.sp >> 8);'; // SPh
+        address += 2;
         break;
       case 0x78:
         inst = 'IN A,(C)';
@@ -2849,7 +2850,7 @@ JSSMS.Debugger.prototype = {
         operand = toHex(this.readRom16bit(address));
         inst = 'LD SP,(' + operand + ')';
         code = 'this.sp = this.readMemWord(' + operand + ');';
-        address = address + 2;
+        address += 2;
         break;
       case 0xA0:
         inst = 'LDI';
@@ -3107,6 +3108,7 @@ JSSMS.Debugger.prototype = {
     var currAddr = address;
     var code = 'throw "Unimplemented 0xDD or 0xFD prefixed opcode";';
     var operand = '';
+    var location = 0;
     address++;
 
     switch (opcode) {
@@ -3122,15 +3124,15 @@ JSSMS.Debugger.prototype = {
         operand = toHex(this.readRom16bit(address));
         inst = 'LD ' + index + ',' + operand;
         code = 'this.set' + index + '(' + operand + ');';
-        address = address + 2;
+        address += 2;
         break;
       case 0x22:
-        operand = toHex(this.readRom16bit(address));
+        location = this.readRom16bit(address);
+        operand = toHex(location);
         inst = 'LD (' + operand + '),' + index;
-        code = 'var location = ' + operand + ';' +
-            'this.writeMem(location++, this.' + index.toLowerCase() + 'L);' +
-            'this.writeMem(location, this.' + index.toLowerCase() + 'H);';
-        address = address + 2;
+        code = 'this.writeMem(' + operand + ', this.' + index.toLowerCase() + 'L);' +
+            'this.writeMem(' + toHex(location + 1) + ', this.' + index.toLowerCase() + 'H);';
+        address += 2;
         break;
       case 0x23:
         inst = 'INC ' + index;
@@ -3150,11 +3152,11 @@ JSSMS.Debugger.prototype = {
         inst = 'ADD ' + index + '  ' + index;
         break;
       case 0x2A:
-        var location = this.readRom16bit(address);
+        location = this.readRom16bit(address);
         inst = 'LD ' + index + ' (' + toHex(location) + ')';
         code = 'this.ixL = this.readMem(' + toHex(location) + ');' +
             'this.ixH = this.readMem(' + toHex(location + 1) + ');';
-        address = address + 2;
+        address += 2;
         break;
       case 0x2B:
         inst = 'DEC ' + index;
@@ -3187,7 +3189,7 @@ JSSMS.Debugger.prototype = {
         operand = toHex(this.readRom8bit(address + 1));
         inst = 'LD (' + index + '+' + toHex(offset) + '),' + operand;
         code = 'this.writeMem(this.get' + index + '() + ' + toHex(offset) + ', ' + operand + ');';
-        address = address + 2;
+        address += 2;
         break;
       case 0x39:
         inst = 'ADD ' + index + ' SP';
