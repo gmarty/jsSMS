@@ -20,6 +20,10 @@
 'use strict';
 
 var opcodeTableED = {
+  0x41: {
+    name: 'OUT (C),B',
+    ast: o.OUT('c', 'b')
+  },
   0x44: {
     name: 'NEG',
     ast: o.NEG()
@@ -28,9 +32,17 @@ var opcodeTableED = {
     name: 'RETN / RETI',
     ast: o.RETN_RETI()
   },
+  0x49: {
+    name: 'OUT (C),C',
+    ast: o.OUT('c', 'c')
+  },
   0x4D: {
     name: 'RETN / RETI',
     ast: o.RETN_RETI()
+  },
+  0x51: {
+    name: 'OUT (C),D',
+    ast: o.OUT('c', 'd')
   },
   0x55: {
     name: 'RETN / RETI',
@@ -40,9 +52,21 @@ var opcodeTableED = {
     name: 'IM1',
     ast: o.IM1()
   },
+  0x59: {
+    name: 'OUT (C),E',
+    ast: o.OUT('c', 'e')
+  },
   0x5F: {
     name: 'LD A,R',
     ast: o.LD8('a', 'r')
+  },
+  0x61: {
+    name: 'OUT (C),H',
+    ast: o.OUT('c', 'h')
+  },
+  0x69: {
+    name: 'OUT (C),L',
+    ast: o.OUT('c', 'l')
   },
   0x73: {
     name: 'LD (nn),SP',
@@ -51,6 +75,14 @@ var opcodeTableED = {
   0x76: {
     name: 'IM1',
     ast: o.IM1()
+  },
+  0x79: {
+    name: 'OUT (C),A',
+    ast: o.OUT('c', 'a')
+  },
+  0xA0: {
+    name: 'LDI',
+    ast: o.LDI()
   },
   0xA3: {
     name: 'OUTI',

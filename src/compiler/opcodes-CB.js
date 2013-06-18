@@ -19,9 +19,17 @@
 
 'use strict';
 
-var opcodeTableCB = [
-  //0x00
-  {
+// @todo Turn into an array when implementation is complete.
+var opcodeTableCB = {
+  0x00: {
     name: 'RLC B'
+  },
+  0x40: {
+    name: 'BIT 0,B',
+    ast: o.BIT(0, 'b')
+  },
+  0x7F: {
+    name: 'BIT 7,A',
+    ast: o.BIT(7, 'a')
   }
-];
+};

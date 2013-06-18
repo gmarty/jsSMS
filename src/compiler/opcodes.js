@@ -59,7 +59,8 @@ var opcodeTable = [
   },
   //0x07
   {
-    name: 'RLCA'
+    name: 'RLCA',
+    ast: o.RLCA()
   },
   //0x08
   {
@@ -99,7 +100,8 @@ var opcodeTable = [
   },
   //0x0F
   {
-    name: 'RRCA'
+    name: 'RRCA',
+    ast: o.RRCA()
   },
   //0x10
   {
@@ -227,7 +229,8 @@ var opcodeTable = [
   },
   //0x27
   {
-    name: 'DAA'
+    name: 'DAA',
+    ast: o.DAA()
   },
   //0x28
   {
@@ -269,11 +272,13 @@ var opcodeTable = [
   },
   //0x2F
   {
-    name: 'CPL'
+    name: 'CPL',
+    ast: o.CPL()
   },
   //0x30
   {
     name: 'JR NC,(PC+e)',
+    ast: o.JRNC(),
     operand: INT8
   },
   //0x31
@@ -294,11 +299,13 @@ var opcodeTable = [
   },
   //0x34
   {
-    name: 'INC (HL)'
+    name: 'INC (HL)',
+    ast: o.INC8('h', 'l')
   },
   //0x35
   {
-    name: 'DEC (HL)'
+    name: 'DEC (HL)',
+    ast: o.DEC8('h', 'l')
   },
   //0x36
   {
@@ -308,11 +315,13 @@ var opcodeTable = [
   },
   //0x37
   {
-    name: 'SCF'
+    name: 'SCF',
+    ast: o.SCF()
   },
   //0x38
   {
     name: 'JR C,(PC+e)',
+    ast: o.JRC(),
     operand: INT8
   },
   //0x39
@@ -348,7 +357,8 @@ var opcodeTable = [
   },
   //0x3F
   {
-    name: 'CCF'
+    name: 'CCF',
+    ast: o.CCF()
   },
   //0x40
   {
@@ -383,7 +393,8 @@ var opcodeTable = [
   },
   //0x46
   {
-    name: 'LD B,(HL)'
+    name: 'LD B,(HL)',
+    ast: o.LD8('b', 'h', 'l')
   },
   //0x47
   {
@@ -422,7 +433,8 @@ var opcodeTable = [
   },
   //0x4E
   {
-    name: 'LD C,(HL)'
+    name: 'LD C,(HL)',
+    ast: o.LD8('c', 'h', 'l')
   },
   //0x4F
   {
@@ -461,7 +473,8 @@ var opcodeTable = [
   },
   //0x56
   {
-    name: 'LD D,(HL)'
+    name: 'LD D,(HL)',
+    ast: o.LD8('d', 'h', 'l')
   },
   //0x57
   {
@@ -500,7 +513,8 @@ var opcodeTable = [
   },
   //0x5E
   {
-    name: 'LD E,(HL)'
+    name: 'LD E,(HL)',
+    ast: o.LD8('e', 'h', 'l')
   },
   //0x5F
   {
@@ -539,7 +553,8 @@ var opcodeTable = [
   },
   //0x66
   {
-    name: 'LD H,(HL)'
+    name: 'LD H,(HL)',
+    ast: o.LD8('h', 'h', 'l')
   },
   //0x67
   {
@@ -1151,7 +1166,8 @@ var opcodeTable = [
   },
   //0xE3
   {
-    name: 'EX (SP),HL'
+    name: 'EX (SP),HL',
+    ast: o.EX_SP_HL()
   },
   //0xE4
   {
@@ -1190,7 +1206,8 @@ var opcodeTable = [
   },
   //0xEB
   {
-    name: 'EX DE,HL'
+    name: 'EX DE,HL',
+    ast: o.EX_DE_HL()
   },
   //0xEC
   {
