@@ -60,10 +60,9 @@ Optimizer.prototype = {
    * ```
    *
    * It has many flaws and can be optimized:
-   *  * The list of registers is not complete.
-   *  * Does not work if registers are modified indirectly (ex: `this.setBC()`).
+   *  * Limited to register A (Others are tricky as they can be modified indirectly `this.setBC()`).
+   *  * Does not work if the register is modified indirectly (ex: `this.rra_a()`, `this.setAF()`).
    *  * Assignment to non literal can be improved (ex: `b = b - 1` forces b to be not inlinable).
-   *  * Only functions calls are optimized.
    *
    *  Anyway, it is just a dummy example to test the integration in the workflow.
    *
@@ -72,62 +71,72 @@ Optimizer.prototype = {
    */
   inlineRegisters: function(fn) {
     var definedReg = {
-      b: false,
-      c: false,
-      d: false,
-      e: false,
-      h: false,
-      l: false,
-      f: false,
       a: false
     };
     var definedRegValue = {
-      b: {},
-      c: {},
-      d: {},
-      e: {},
-      h: {},
-      l: {},
-      a: {},
-      f: {}
+      a: {}
     };
 
-    return JSSMS.Utils.traverse(fn, function(ast) {
-      if (!ast || !ast.type)
+    return fn.map(function(bytecodes) {
+      var ast = bytecodes.ast;
+
+      if (!ast)
+        return bytecodes;
+
+      bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+        // 1st, we tag defined registers.
+        if (ast.type == 'AssignmentExpression' &&
+            ast.operator == '=' &&
+            ast.left.type == 'Register' &&
+            ast.right.type == 'Literal' &&
+            ast.left.name == 'a') {
+          definedReg[ast.left.name] = true;
+          definedRegValue[ast.left.name] = ast.right;
+        }
+
+        // And we make sure to tag undefined registers.
+        if (ast.type == 'AssignmentExpression' &&
+            ast.left.type == 'Register' &&
+            ast.right.type != 'Literal' &&
+            ast.left.name == 'a') {
+          definedReg[ast.left.name] = false;
+          definedRegValue[ast.left.name] = {};
+          return ast;
+        }
+
+        // Then inline arguments.
+        if (ast.type == 'CallExpression' &&
+            ast.arguments[0] &&
+            ast.arguments[0].type == 'Register' &&
+            definedReg[ast.arguments[0].name] &&
+            ast.arguments[0].name == 'a') {
+          ast.arguments[0] = definedRegValue[ast.arguments[0].name];
+          //console.log(ast.callee.name);
+          return ast;
+        }
+        if (ast.type == 'CallExpression' &&
+            ast.arguments[1] &&
+            ast.arguments[1].type == 'Register' &&
+            definedReg[ast.arguments[1].name] &&
+            ast.arguments[1].name == 'a') {
+          ast.arguments[1] = definedRegValue[ast.arguments[1].name];
+          //console.log(ast.callee.name);
+          return ast;
+        }
+        // Inline object/array properties.
+        if (ast.type == 'MemberExpression' &&
+            ast.property.type == 'Register' &&
+            definedReg[ast.property.name] &&
+            ast.property.name == 'a') {
+          ast.property = definedRegValue[ast.property.name];
+          //console.log(ast.property.name);
+          return ast;
+        }
+
         return ast;
+      });
 
-      // 1st, we tag defined registers.
-      if (ast.type == 'AssignmentExpression' &&
-          ast.operator == '=' &&
-          ast.left.type == 'Register' &&
-          ast.right.type == 'Literal') {
-        definedReg[ast.left.name] = true;
-        definedRegValue[ast.left.name] = ast.right;
-      }
-
-      // And we make sure to tag undefined registers.
-      if (ast.type == 'AssignmentExpression' &&
-          ast.left.type == 'Register') {
-        definedReg[ast.left.name] = false;
-        definedRegValue[ast.left.name] = {};
-        return ast;
-      }
-
-      // Then inline arguments.
-      if (ast.type == 'CallExpression' &&
-          ast.arguments[0] &&
-          ast.arguments[0].type == 'Register' &&
-          definedReg[ast.arguments[0].name]) {
-        ast.arguments[0] = definedRegValue[ast.arguments[0].name];
-      }
-      if (ast.type == 'CallExpression' &&
-          ast.arguments[1] &&
-          ast.arguments[1].type == 'Register' &&
-          definedReg[ast.arguments[1].name]) {
-        ast.arguments[1] = definedRegValue[ast.arguments[1].name];
-      }
-
-      return ast;
+      return bytecodes;
     });
   }
 };
