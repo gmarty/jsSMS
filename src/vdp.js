@@ -458,7 +458,7 @@ JSSMS.Vdp.prototype = {
             if (old != this.sat) {
               // Should also probably update tiles here?
               this.isSatDirty = true;
-              DEBUG && console.log('New address written to SAT: ' + old + ' -> ' + this.sat);
+              JSSMS.Utils.console.log('New address written to SAT: ' + old + ' -> ' + this.sat);
             }
             break;
         }
@@ -903,7 +903,7 @@ JSSMS.Vdp.prototype = {
 
   // Note we should try not to update the bgt/sat locations?
   decodeTiles: function() {
-    DEBUG && console.log('[' + this.line + ']' + ' min dirty:' + this.minDirty + ' max: ' + this.maxDirty);
+    JSSMS.Utils.console.log('[' + this.line + ']' + ' min dirty:' + this.minDirty + ' max: ' + this.maxDirty);
 
     for (var i = this.minDirty; i <= this.maxDirty; i++) {
       // Only decode tiles that have changed since the last iteration
@@ -912,7 +912,7 @@ JSSMS.Vdp.prototype = {
       // Note that we've updated the tile
       this.isTileDirty[i] = false;
 
-      DEBUG && console.log('tile ' + i + ' is dirty');
+      JSSMS.Utils.console.log('tile ' + i + ' is dirty');
       var tile = this.tiles[i];
 
       var pixel_index = 0;

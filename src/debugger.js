@@ -53,7 +53,7 @@ JSSMS.Debugger.prototype = {
    * Parse the rom instructions.
    */
   parseInstructions: function() {
-    console.time('Instructions parsing');
+    JSSMS.Utils.console.time('Instructions parsing');
 
     var romSize = PAGE_SIZE * this.rom.length;
     var instruction;
@@ -79,7 +79,7 @@ JSSMS.Debugger.prototype = {
       }
 
       if (currentAddress >= romSize || (currentAddress >> 10) >= 65) {
-        console.log('Invalid address', JSSMS.Utils.toHex(currentAddress));
+        JSSMS.Utils.console.log('Invalid address', JSSMS.Utils.toHex(currentAddress));
 
         continue;
       }
@@ -115,12 +115,12 @@ JSSMS.Debugger.prototype = {
           this.instructions[this.instructions[i].target].isJumpTarget = true;
           this.instructions[this.instructions[i].target].jumpTargetNb++;
         } else {
-          console.log('Invalid target address', JSSMS.Utils.toHex(this.instructions[i].target));
+          JSSMS.Utils.console.log('Invalid target address', JSSMS.Utils.toHex(this.instructions[i].target));
         }
       }
     }
 
-    console.timeEnd('Instructions parsing');
+    JSSMS.Utils.console.timeEnd('Instructions parsing');
   },
 
 
@@ -130,7 +130,7 @@ JSSMS.Debugger.prototype = {
    * @return {string} The content of a Dot file.
    */
   writeGraphViz: function() {
-    console.time('DOT generation');
+    JSSMS.Utils.console.time('DOT generation');
 
     var tree = this.instructions;
     var INDENT = ' ';
@@ -156,7 +156,7 @@ JSSMS.Debugger.prototype = {
     // Inject entry point styling.
     content = content.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
 
-    console.timeEnd('DOT generation');
+    JSSMS.Utils.console.timeEnd('DOT generation');
 
     return content;
   },
@@ -170,7 +170,7 @@ JSSMS.Debugger.prototype = {
    * @return {string} JavaScript code.
    */
   writeJavaScript: function() {
-    console.time('JavaScript generation');
+    JSSMS.Utils.console.time('JavaScript generation');
 
     var tree = this.instructions;
     var toHex = JSSMS.Utils.toHex;
@@ -248,7 +248,7 @@ JSSMS.Debugger.prototype = {
     code.push('}'); // End of branches object (the comma is inserted in the template).
     code = code.join('\n');
 
-    console.timeEnd('JavaScript generation');
+    JSSMS.Utils.console.timeEnd('JavaScript generation');
 
     return code;
 

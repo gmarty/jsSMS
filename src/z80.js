@@ -1289,9 +1289,7 @@ JSSMS.Z80.prototype = {
 
       // Unimplemented CB Opcode
       default:
-        if (DEBUG) {
-          console.log('Unimplemented CB Opcode: ' + JSSMS.Utils.toHex(opcode));
-        }
+        JSSMS.Utils.console.log('Unimplemented CB Opcode: ' + JSSMS.Utils.toHex(opcode));
         break;
     }
   },
@@ -1538,9 +1536,7 @@ JSSMS.Z80.prototype = {
 
       // Unimplemented DD/FD Opcode
       default:
-        if (DEBUG) {
-          console.log('Unimplemented DD/FD Opcode: ' + JSSMS.Utils.toHex(opcode));
-        }
+        JSSMS.Utils.console.log('Unimplemented DD/FD Opcode: ' + JSSMS.Utils.toHex(opcode));
         this.pc--;
         break;
     } // end of switch
@@ -1664,9 +1660,7 @@ JSSMS.Z80.prototype = {
 
       // Unimplemented DD/FD Opcode
       default:
-        if (DEBUG) {
-          console.log('Unimplemented DD/FD Opcode: ' + JSSMS.Utils.toHex(opcode));
-        }
+        JSSMS.Utils.console.log('Unimplemented DD/FD Opcode: ' + JSSMS.Utils.toHex(opcode));
         this.pc--;
         break;
     } // end of switch
@@ -1945,9 +1939,7 @@ JSSMS.Z80.prototype = {
 
       // Unimplemented DDCB/FDCB Opcode
       default:
-        if (DEBUG) {
-          console.log('Unimplemented DDCB/FDCB Opcode: ' + JSSMS.Utils.toHex(opcode));
-        }
+        JSSMS.Utils.console.log('Unimplemented DDCB/FDCB Opcode: ' + JSSMS.Utils.toHex(opcode));
         break;
 
     } // end of switch
@@ -2506,9 +2498,7 @@ JSSMS.Z80.prototype = {
 
       // Unimplemented ED Opcode
       default:
-        if (DEBUG) {
-          console.log('Unimplemented ED Opcode: ' + JSSMS.Utils.toHex(opcode));
-        }
+        JSSMS.Utils.console.log('Unimplemented ED Opcode: ' + JSSMS.Utils.toHex(opcode));
         this.pc++;
         break;
     } // end of switch
@@ -3249,9 +3239,10 @@ JSSMS.Z80.prototype = {
           } else if (address == 0xFFFF) {
             this.frameReg[2] = value & this.romPageMask;
           }
-        } else if (DEBUG) {
-          console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
-          debugger;
+        } else {
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
+          if (DEBUGGER)
+            debugger;
         }
       }
     } else {
@@ -3271,9 +3262,10 @@ JSSMS.Z80.prototype = {
           } else if (address == 0xFFFF) {
             this.frameReg[2] = value & this.romPageMask;
           }
-        } else if (DEBUG) {
-          console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
-          debugger;
+        } else {
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
+          if (DEBUGGER)
+            debugger;
         }
       }
     }
@@ -3322,9 +3314,10 @@ JSSMS.Z80.prototype = {
         } else if (address == 0xFFFF) {
           // 0xFFFF: Page 2 ROM Bank
           return this.frameReg[2];
-        } else if (DEBUG) {
-          console.error(JSSMS.Utils.toHex(address));
-          debugger;
+        } else {
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+          if (DEBUGGER)
+            debugger;
         }
         return 0x00;
       }
@@ -3366,9 +3359,10 @@ JSSMS.Z80.prototype = {
         } else if (address == 0xFFFF) {
           // 0xFFFF: Page 2 ROM Bank
           return this.frameReg[2];
-        } else if (DEBUG) {
-          console.error(JSSMS.Utils.toHex(address));
-          debugger;
+        } else {
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+          if (DEBUGGER)
+            debugger;
         }
         return 0x00;
       }
@@ -3418,9 +3412,10 @@ JSSMS.Z80.prototype = {
         } else if (address == 0xFFFF) {
           // 0xFFFF: Page 2 ROM Bank
           return this.frameReg[2];
-        } else if (DEBUG) {
-          console.error(JSSMS.Utils.toHex(address));
-          debugger;
+        } else {
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+          if (DEBUGGER)
+            debugger;
         }
         return 0x00;
       }
@@ -3462,9 +3457,10 @@ JSSMS.Z80.prototype = {
         } else if (address == 0xFFFF) {
           // 0xFFFF: Page 2 ROM Bank
           return this.frameReg[2];
-        } else if (DEBUG) {
-          console.error(JSSMS.Utils.toHex(address));
-          debugger;
+        } else {
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+          if (DEBUGGER)
+            debugger;
         }
         return 0x00;
       }
