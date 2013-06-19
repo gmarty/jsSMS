@@ -48,11 +48,19 @@ Recompiler.prototype = {
   reset: function() {
     var self = this;
 
-    // Parse initial memory page.
-    // @todo If ROM is below 48KB, we don't have to limit parse to this memory page.
-    this.parser.parse(0x00, 0x0000, 0x4000);
-    this.parser.parse(0x38, 0x0000, 0x4000);
-    this.parser.parse(0x66, 0x0000, 0x4000);
+    if (this.rom.length <= 2) {
+      // If ROM is below 32KB, we don't have to limit parse to memory pages.
+      JSSMS.Utils.console.log('Parsing full ROM');
+      this.parser.parse(0x00);
+      this.parser.parse(0x38);
+      this.parser.parse(0x66);
+    } else {
+      // Parse initial memory page.
+      JSSMS.Utils.console.log('Parsing initial memory page of ROM');
+      this.parser.parse(0x00, 0x0000, 0x4000);
+      this.parser.parse(0x38, 0x0000, 0x4000);
+      this.parser.parse(0x66, 0x0000, 0x4000);
+    }
 
     var analyzer = new Analyzer(this.parser.instructions);
 
@@ -69,7 +77,7 @@ Recompiler.prototype = {
         hexadecimal: true,
         parse: window['esprima']['parse']
       });
-      self.cpu[''][funcName] = new Function('return ' + code)();
+      self.cpu.branches[''][funcName] = new Function('return ' + code)();
     });
   }
 };
