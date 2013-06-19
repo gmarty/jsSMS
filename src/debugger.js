@@ -115,7 +115,7 @@ JSSMS.Debugger.prototype = {
           this.instructions[this.instructions[i].target].isJumpTarget = true;
           this.instructions[this.instructions[i].target].jumpTargetNb++;
         } else {
-          console.log('Invalid target address', this.instructions[i].target);
+          console.log('Invalid target address', JSSMS.Utils.toHex(this.instructions[i].target));
         }
       }
     }
