@@ -32,9 +32,9 @@
 var Optimizer = function(functions) {
   this.ast = functions;
 
-  if (DEBUG) console.time('Optimizing');
+  JSSMS.Utils.console.time('Optimizing');
   this.localOptimization();
-  if (DEBUG) console.timeEnd('Optimizing');
+  JSSMS.Utils.console.timeEnd('Optimizing');
 };
 
 Optimizer.prototype = {
@@ -111,7 +111,7 @@ Optimizer.prototype = {
             definedReg[ast.arguments[0].name] &&
             ast.arguments[0].name == 'a') {
           ast.arguments[0] = definedRegValue[ast.arguments[0].name];
-          //console.log(ast.callee.name);
+          //JSSMS.Utils.console.log(ast.callee.name);
           return ast;
         }
         if (ast.type == 'CallExpression' &&
@@ -120,7 +120,7 @@ Optimizer.prototype = {
             definedReg[ast.arguments[1].name] &&
             ast.arguments[1].name == 'a') {
           ast.arguments[1] = definedRegValue[ast.arguments[1].name];
-          //console.log(ast.callee.name);
+          //JSSMS.Utils.console.log(ast.callee.name);
           return ast;
         }
         // Inline object/array properties.
@@ -129,7 +129,7 @@ Optimizer.prototype = {
             definedReg[ast.property.name] &&
             ast.property.name == 'a') {
           ast.property = definedRegValue[ast.property.name];
-          //console.log(ast.property.name);
+          //JSSMS.Utils.console.log(ast.property.name);
           return ast;
         }
 

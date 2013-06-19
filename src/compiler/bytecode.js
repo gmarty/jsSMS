@@ -20,54 +20,67 @@
 'use strict';
 
 
-
-/**
- * A bytecode is made of:
- *  * at least one and at most 3 opcodes
- *  * an operand (defaults to null)
- *  * a next address (defaults to null)
- *  * a jump target (defaults to null)
- *
- * @param {number} address
- * @constructor
- */
-function Bytecode(address) {
-  var toHex = JSSMS.Utils.toHex;
-
-  this.address = address;
-  this.hexAddress = toHex(address);
-  this.opcode = [];
-  this.operand = null;
-  this.nextAddress = null;
-  this.target = null;
-  this.isFunctionEnder = false;
-  this.isJumpTarget = false;
-  this.jumpTargetNb = 0; // Number of instructions targeting there.
-  this.ast = null;
-  // Memory can be registry or offset, read or write mode, 8 or 16 bit.
-  /*this.memory = null;
-
-   this.srcRegs = {};
-   this.dstRegs = {};*/
-}
-
-Bytecode.prototype = {
-  get hexOpcode() {
-    var toHex = JSSMS.Utils.toHex;
-
-    if (this.opcode.length) {
-      return this.opcode
-        .map(toHex)
-        .join(' ');
+var Bytecode = (function() {
+  /**
+   * in DEBUG mode, get a hex from a decimal. Pad with 0 if necessary.
+   *
+   * @param {number} dec A decimal integer.
+   * @return {string} A hex representation of the input.
+   */
+  var toHex = function() {
+    if (DEBUG)
+      return JSSMS.Utils.toHex;
+    return function(dec) {
+      return dec;
     }
+  }();
 
-    return '';
-  },
+  /**
+   * A bytecode is made of:
+   *  * at least one and at most 3 opcodes
+   *  * an operand (defaults to null)
+   *  * a next address (defaults to null)
+   *  * a jump target (defaults to null)
+   *
+   * @param {number} address
+   * @constructor
+   */
+  function bytecode(address) {
+    this.address = address;
+    this.hexAddress = toHex(address);
+    this.opcode = [];
+    this.operand = null;
+    this.nextAddress = null;
+    this.target = null;
+    this.isFunctionEnder = false;
+    this.isJumpTarget = false;
+    this.jumpTargetNb = 0; // Number of instructions targeting there.
+    this.ast = null;
+    // Memory can be registry or offset, read or write mode, 8 or 16 bit.
+    /*this.memory = null;
 
-
-  get label() {
-    return this.hexAddress + ' ' +
-        this.hexOpcode + ' ' +
-        this.name;
+     this.srcRegs = {};
+     this.dstRegs = {};*/
   }
-};
+
+  bytecode.prototype = {
+    get hexOpcode() {
+      if (this.opcode.length) {
+        return this.opcode
+          .map(toHex)
+          .join(' ');
+      }
+
+      return '';
+    },
+
+
+    get label() {
+      return this.hexAddress + ' ' +
+          this.hexOpcode + ' ' +
+          this.name;
+    }
+  };
+
+  return bytecode;
+})();

@@ -31,10 +31,10 @@ var Analyzer = function(bytecodes) {
   this.bytecodes = bytecodes;
   this.ast = [];
 
-  if (DEBUG) console.time('Analyzing');
+  JSSMS.Utils.console.time('Analyzing');
   this.normalizeBytecode();
   this.restructure();
-  if (DEBUG) console.timeEnd('Analyzing');
+  JSSMS.Utils.console.timeEnd('Analyzing');
 };
 
 Analyzer.prototype = {

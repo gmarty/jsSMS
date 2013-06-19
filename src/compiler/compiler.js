@@ -42,9 +42,9 @@ var Compiler = function(functions) {
   this.functions = functions;
   this.ast = [];
 
-  if (DEBUG) console.time('Generating');
+  JSSMS.Utils.console.time('Generating');
   this.generate();
-  if (DEBUG) console.timeEnd('Generating');
+  JSSMS.Utils.console.timeEnd('Generating');
 };
 
 Compiler.prototype = {

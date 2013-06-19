@@ -91,6 +91,29 @@ JSSMS.Utils = {
 
 
   /**
+   * A proxy for console that is activated in DEBUG mode only.
+   */
+  console: {
+    log: function() {
+      if (DEBUG)
+        window.console.log.apply(window.console, arguments);
+    },
+    error: function() {
+      if (DEBUG)
+        window.console.error.apply(window.console, arguments);
+    },
+    time: function(label) {
+      if (DEBUG)
+        window.console.time(label);
+    },
+    timeEnd: function(label) {
+      if (DEBUG)
+        window.console.timeEnd(label);
+    }
+  },
+
+
+  /**
    * Apply a function recursively on an object and its children.
    *
    * @param {Object} object

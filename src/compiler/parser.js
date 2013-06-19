@@ -48,7 +48,7 @@ var Parser = (function() {
      * @param {number} pageEnd
      */
     parse: function(entryPoint, pageStart, pageEnd) {
-      if (DEBUG) console.time('Parsing');
+      JSSMS.Utils.console.time('Parsing');
 
       this.addresses = [];
 
@@ -56,7 +56,7 @@ var Parser = (function() {
       if (!pageEnd) pageEnd = this.stream.length - 1;
 
       if (entryPoint < pageStart || entryPoint > pageEnd) {
-        if (DEBUG) console.error('Address out of bound', JSSMS.Utils.toHex(entryPoint));
+        JSSMS.Utils.console.error('Address out of bound', JSSMS.Utils.toHex(entryPoint));
         return;
       }
 
@@ -71,7 +71,7 @@ var Parser = (function() {
         }
 
         if (currentAddress < pageStart || currentAddress > pageEnd) {
-          if (DEBUG) console.error('Address out of bound', JSSMS.Utils.toHex(currentAddress));
+          JSSMS.Utils.console.error('Address out of bound', JSSMS.Utils.toHex(currentAddress));
           continue;
         }
 
@@ -104,12 +104,12 @@ var Parser = (function() {
             this.instructions[this.instructions[i].target].isJumpTarget = true;
             this.instructions[this.instructions[i].target].jumpTargetNb++;
           } else {
-            if (DEBUG) console.log('Invalid target address', JSSMS.Utils.toHex(this.instructions[i].target));
+            JSSMS.Utils.console.log('Invalid target address', JSSMS.Utils.toHex(this.instructions[i].target));
           }
         }
       }
 
-      if (DEBUG) console.timeEnd('Parsing');
+      JSSMS.Utils.console.timeEnd('Parsing');
     },
 
 
@@ -119,7 +119,7 @@ var Parser = (function() {
      * @return {string} The content of a Dot file.
      */
     writeGraphViz: function() {
-      if (DEBUG) console.time('DOT generation');
+      JSSMS.Utils.console.time('DOT generation');
 
       var tree = this.instructions;
       var INDENT = ' ';
@@ -145,7 +145,7 @@ var Parser = (function() {
       // Inject entry point styling.
       content = content.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
 
-      if (DEBUG) console.timeEnd('DOT generation');
+      JSSMS.Utils.console.timeEnd('DOT generation');
 
       return content;
     },
@@ -774,7 +774,7 @@ var Parser = (function() {
         isFunctionEnder = true;
         break;
       default:
-        if (DEBUG) console.error('Unexpected opcode', JSSMS.Utils.toHex(opcode));
+        JSSMS.Utils.console.error('Unexpected opcode', JSSMS.Utils.toHex(opcode));
     }
 
     bytecode.nextAddress = stream.position;
@@ -979,7 +979,7 @@ var Parser = (function() {
         }
         break;
       default:
-        if (DEBUG) console.error('Unexpected opcode', JSSMS.Utils.toHex(opcode));
+        JSSMS.Utils.console.error('Unexpected opcode', JSSMS.Utils.toHex(opcode));
     }
 
     bytecode.nextAddress = stream.position;
@@ -1211,7 +1211,7 @@ var Parser = (function() {
       case 0xF9:
         break;
       default:
-        if (DEBUG) console.error('Unexpected opcode', JSSMS.Utils.toHex(opcode));
+        JSSMS.Utils.console.error('Unexpected opcode', JSSMS.Utils.toHex(opcode));
     }
 
     bytecode.nextAddress = stream.position;
