@@ -815,6 +815,7 @@ var Parser = (function() {
 
     var operand = null;
     var target = null;
+    var isFunctionEnder = false;
 
     bytecode.opcode.push(opcode);
 
@@ -846,6 +847,7 @@ var Parser = (function() {
       case 0x75:
       case 0x7D:
         stream.seek(null);
+        isFunctionEnder = true;
         break;
       case 0x46:
       case 0x4E:
@@ -985,6 +987,7 @@ var Parser = (function() {
     bytecode.nextAddress = stream.position;
     bytecode.operand = operand;
     bytecode.target = target;
+    bytecode.isFunctionEnder = isFunctionEnder;
 
     return bytecode;
   }
@@ -1001,6 +1004,7 @@ var Parser = (function() {
     var opcode = stream.getUint8();
 
     var operand = null;
+    var isFunctionEnder = false;
 
     bytecode.opcode.push(opcode);
 
@@ -1207,6 +1211,7 @@ var Parser = (function() {
         break;
       case 0xE9:
         stream.seek(null);
+        isFunctionEnder = true;
         break;
       case 0xF9:
         break;
@@ -1216,6 +1221,7 @@ var Parser = (function() {
 
     bytecode.nextAddress = stream.position;
     bytecode.operand = operand;
+    bytecode.isFunctionEnder = isFunctionEnder;
 
     return bytecode;
   }
