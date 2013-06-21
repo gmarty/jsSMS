@@ -447,33 +447,21 @@ JSSMS.Z80.prototype = {
 
 
   recompile: function() {
-    if (this.pc < 0x0400) {
-      if (this[''][this.pc]) {
-        this[''][this.pc].call(this);
-      } else {
-        this.interpret();
-      }
-    } else if (this.pc < 0x4000) {
-      if (this[this.frameReg[0]][this.pc]) {
-        this[this.frameReg[0]][this.pc].call(this);
-      } else {
-        this.interpret();
-      }
-    } else if (this.pc < 0x8000) {
-      if (this[this.frameReg[1]][this.pc]) {
-        this[this.frameReg[1]][this.pc].call(this);
-      } else {
-        this.interpret();
-      }
-    } else if (this.pc < 0xC000) {
-      if (this[this.frameReg[2]][this.pc]) {
-        this[this.frameReg[2]][this.pc].call(this);
-      } else {
-        this.interpret();
-      }
-    } else {
-      this.interpret();
+    if (this.pc < 0x0400 && this[''][this.pc]) {
+      this[''][this.pc].call(this);
+      return;
+    } else if (this.pc < 0x4000 && this[this.frameReg[0]][this.pc]) {
+      this[this.frameReg[0]][this.pc].call(this);
+      return;
+    } else if (this.pc < 0x8000 && this[this.frameReg[1]][this.pc]) {
+      this[this.frameReg[1]][this.pc].call(this);
+      return;
+    } else if (this.pc < 0xC000 && this[this.frameReg[2]][this.pc]) {
+      this[this.frameReg[2]][this.pc].call(this);
+      return;
     }
+
+    this.interpret();
   },
 
 
