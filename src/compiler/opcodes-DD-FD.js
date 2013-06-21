@@ -21,6 +21,7 @@
 
 function generateIndexTable(index) {
   var register2 = index.substring(1, 2);
+  var register2LC = index.substring(1, 2).toLowerCase();
 
   return {
     0x09: {
@@ -48,6 +49,10 @@ function generateIndexTable(index) {
       ast: o.LD8_D('a', 'i', register2)
     },
     0xCB:
-        generateIndexCBTable(index)
+        generateIndexCBTable(index),
+    0xE5: {
+      name: 'PUSH ' + index,
+      ast: o.PUSH('i' + register2LC + 'H', 'i' + register2LC + 'L')
+    }
   };
 }

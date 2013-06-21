@@ -295,7 +295,8 @@ var opcodeTable = [
   },
   //0x33
   {
-    name: 'INC SP'
+    name: 'INC SP',
+    ast: o.INC8('s', 'p')
   },
   //0x34
   {
@@ -337,7 +338,8 @@ var opcodeTable = [
   },
   //0x3B
   {
-    name: 'DEC SP'
+    name: 'DEC SP',
+    ast: o.DEC8('s', 'p')
   },
   //0x3C
   {
@@ -603,31 +605,38 @@ var opcodeTable = [
   },
   //0x70
   {
-    name: 'LD (HL),B'
+    name: 'LD (HL),B',
+    ast: o.LD_WRITE_MEM('h', 'l', 'b')
   },
   //0x71
   {
-    name: 'LD (HL),C'
+    name: 'LD (HL),C',
+    ast: o.LD_WRITE_MEM('h', 'l', 'c')
   },
   //0x72
   {
-    name: 'LD (HL),D'
+    name: 'LD (HL),D',
+    ast: o.LD_WRITE_MEM('h', 'l', 'd')
   },
   //0x73
   {
-    name: 'LD (HL),E'
+    name: 'LD (HL),E',
+    ast: o.LD_WRITE_MEM('h', 'l', 'e')
   },
   //0x74
   {
-    name: 'LD (HL),H'
+    name: 'LD (HL),H',
+    ast: o.LD_WRITE_MEM('h', 'l', 'h')
   },
   //0x75
   {
-    name: 'LD (HL),L'
+    name: 'LD (HL),L',
+    ast: o.LD_WRITE_MEM('h', 'l', 'l')
   },
   //0x76
   {
-    name: 'HALT'
+    name: 'HALT',
+    ast: o.HALT()
   },
   //0x77
   {
@@ -1043,7 +1052,6 @@ var opcodeTable = [
   {
     name: 'RET',
     ast: o.RET()
-
   },
   //0xCA
   {

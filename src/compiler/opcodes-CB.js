@@ -19,17 +19,35 @@
 
 'use strict';
 
-// @todo Turn into an array when implementation is complete.
-var opcodeTableCB = {
-  0x00: {
-    name: 'RLC B'
-  },
-  0x40: {
-    name: 'BIT 0,B',
-    ast: o.BIT(0, 'b')
-  },
-  0x7F: {
-    name: 'BIT 7,A',
-    ast: o.BIT(7, 'a')
-  }
+var opcodeTableCB = [];
+
+var regs = {
+  'B': ['b'],
+  'C': ['c'],
+  'D': ['d'],
+  'E': ['e'],
+  'H': ['h'],
+  'L': ['l'],
+  '(HL)': ['h', 'l'],
+  'A': ['a']
 };
+
+['RLC', 'RRC', 'RL', 'RR', 'SLA', 'SRA', 'SLL', 'SRL'].forEach(function(op) {
+  for (var reg in regs) {
+    opcodeTableCB.push({
+      name: op + ' ' + reg,
+      ast: o[op].apply(null, regs[reg])
+    });
+  }
+});
+
+['BIT', 'RES', 'SET'].forEach(function(op) {
+  for (var i = 0; i < 8; i++) {
+    for (var reg in regs) {
+      opcodeTableCB.push({
+        name: op + ' ' + i + ',' + reg,
+        ast: o[op].apply(null, [i].concat(regs[reg]))
+      });
+    }
+  }
+});

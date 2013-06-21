@@ -56,6 +56,10 @@ var opcodeTableED = {
     name: 'OUT (C),E',
     ast: o.OUT('c', 'e')
   },
+  0x5B: {
+    name: 'LD DE,(nn)',
+    ast: o.LD16('d', 'e', 'n', 'n')
+  },
   0x5F: {
     name: 'LD A,R',
     ast: o.LD8('a', 'r')
@@ -87,6 +91,10 @@ var opcodeTableED = {
   0xA3: {
     name: 'OUTI',
     ast: o.OUTI()
+  },
+  0xAB: {
+    name: 'OUTD',
+    ast: o.OUTD()
   },
   0xB0: {
     name: 'LDIR',
