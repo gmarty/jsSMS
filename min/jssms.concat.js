@@ -229,7 +229,23 @@ JSSMS.Utils = {rndInt:function(range) {
       }
     }
   }
-}(), traverse:function(object, fn) {
+}(), console:{log:function() {
+  if(DEBUG) {
+    window.console.log.apply(window.console, arguments)
+  }
+}, error:function() {
+  if(DEBUG) {
+    window.console.error.apply(window.console, arguments)
+  }
+}, time:function(label) {
+  if(DEBUG) {
+    window.console.time(label)
+  }
+}, timeEnd:function(label) {
+  if(DEBUG) {
+    window.console.timeEnd(label)
+  }
+}}, traverse:function(object, fn) {
   var key, child;
   fn.call(null, object);
   for(key in object) {
@@ -2122,9 +2138,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.a |= BIT_7;
       break;
     default:
-      if(DEBUG) {
-        console.log("Unimplemented CB Opcode: " + JSSMS.Utils.toHex(opcode))
-      }
+      JSSMS.Utils.console.log("Unimplemented CB Opcode: " + JSSMS.Utils.toHex(opcode));
       break
   }
 }, rlc:function(value) {
@@ -2470,9 +2484,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.sp = this.getIX();
       break;
     default:
-      if(DEBUG) {
-        console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex(opcode))
-      }
+      JSSMS.Utils.console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex(opcode));
       this.pc--;
       break
   }
@@ -2777,9 +2789,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.sp = this.getIY();
       break;
     default:
-      if(DEBUG) {
-        console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex(opcode))
-      }
+      JSSMS.Utils.console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex(opcode));
       this.pc--;
       break
   }
@@ -3445,9 +3455,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.writeMem(location, this.readMem(location) | BIT_7);
       break;
     default:
-      if(DEBUG) {
-        console.log("Unimplemented DDCB/FDCB Opcode: " + JSSMS.Utils.toHex(opcode))
-      }
+      JSSMS.Utils.console.log("Unimplemented DDCB/FDCB Opcode: " + JSSMS.Utils.toHex(opcode));
       break
   }
   this.pc++
@@ -3926,9 +3934,7 @@ JSSMS.Z80.prototype = {reset:function() {
       }
       break;
     default:
-      if(DEBUG) {
-        console.log("Unimplemented ED Opcode: " + JSSMS.Utils.toHex(opcode))
-      }
+      JSSMS.Utils.console.log("Unimplemented ED Opcode: " + JSSMS.Utils.toHex(opcode));
       this.pc++;
       break
   }
@@ -4329,8 +4335,8 @@ JSSMS.Z80.prototype = {reset:function() {
           }
         }
       }else {
-        if(DEBUG) {
-          console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 8191));
+        JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 8191));
+        if(DEBUGGER) {
           debugger
         }
       }
@@ -4355,8 +4361,8 @@ JSSMS.Z80.prototype = {reset:function() {
           }
         }
       }else {
-        if(DEBUG) {
-          console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 8191));
+        JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 8191));
+        if(DEBUGGER) {
           debugger
         }
       }
@@ -4405,8 +4411,8 @@ JSSMS.Z80.prototype = {reset:function() {
                         if(address == 65535) {
                           return this.frameReg[2]
                         }else {
-                          if(DEBUG) {
-                            console.error(JSSMS.Utils.toHex(address));
+                          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+                          if(DEBUGGER) {
                             debugger
                           }
                         }
@@ -4463,8 +4469,8 @@ JSSMS.Z80.prototype = {reset:function() {
                         if(address == 65535) {
                           return this.frameReg[2]
                         }else {
-                          if(DEBUG) {
-                            console.error(JSSMS.Utils.toHex(address));
+                          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+                          if(DEBUGGER) {
                             debugger
                           }
                         }
@@ -4523,8 +4529,8 @@ JSSMS.Z80.prototype = {reset:function() {
                         if(address == 65535) {
                           return this.frameReg[2]
                         }else {
-                          if(DEBUG) {
-                            console.error(JSSMS.Utils.toHex(address));
+                          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+                          if(DEBUGGER) {
                             debugger
                           }
                         }
@@ -4581,8 +4587,8 @@ JSSMS.Z80.prototype = {reset:function() {
                         if(address == 65535) {
                           return this.frameReg[2]
                         }else {
-                          if(DEBUG) {
-                            console.error(JSSMS.Utils.toHex(address));
+                          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+                          if(DEBUGGER) {
                             debugger
                           }
                         }
@@ -4673,7 +4679,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   this.parseInstructions();
   this.main.ui.updateStatus("Instructions parsed")
 }, parseInstructions:function() {
-  console.time("Instructions parsing");
+  JSSMS.Utils.console.time("Instructions parsing");
   var romSize = PAGE_SIZE * this.rom.length;
   var instruction;
   var currentAddress;
@@ -4688,7 +4694,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       continue
     }
     if(currentAddress >= romSize || currentAddress >> 10 >= 65) {
-      console.log("Invalid address", JSSMS.Utils.toHex(currentAddress));
+      JSSMS.Utils.console.log("Invalid address", JSSMS.Utils.toHex(currentAddress));
       continue
     }
     instruction = this.disassemble(currentAddress);
@@ -4715,13 +4721,13 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
         this.instructions[this.instructions[i].target].isJumpTarget = true;
         this.instructions[this.instructions[i].target].jumpTargetNb++
       }else {
-        console.log("Invalid target address", this.instructions[i].target)
+        JSSMS.Utils.console.log("Invalid target address", JSSMS.Utils.toHex(this.instructions[i].target))
       }
     }
   }
-  console.timeEnd("Instructions parsing")
+  JSSMS.Utils.console.timeEnd("Instructions parsing")
 }, writeGraphViz:function() {
-  console.time("DOT generation");
+  JSSMS.Utils.console.time("DOT generation");
   var tree = this.instructions;
   var INDENT = " ";
   var content = ["digraph G {"];
@@ -4740,10 +4746,10 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   content.push("}");
   content = content.join("\n");
   content = content.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
-  console.timeEnd("DOT generation");
+  JSSMS.Utils.console.timeEnd("DOT generation");
   return content
 }, writeJavaScript:function() {
-  console.time("JavaScript generation");
+  JSSMS.Utils.console.time("JavaScript generation");
   var tree = this.instructions;
   var toHex = JSSMS.Utils.toHex;
   var tstates = 0;
@@ -4793,7 +4799,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   code.push("}");
   code.push("}");
   code = code.join("\n");
-  console.timeEnd("JavaScript generation");
+  JSSMS.Utils.console.timeEnd("JavaScript generation");
   return code;
   function getTotalTStates(opcodes) {
     var tstates = 0;
@@ -8800,7 +8806,7 @@ JSSMS.Vdp.prototype = {reset:function() {
             this.sat = (this.commandByte & ~1 & ~128) << 7;
             if(old != this.sat) {
               this.isSatDirty = true;
-              DEBUG && console.log("New address written to SAT: " + old + " -> " + this.sat)
+              JSSMS.Utils.console.log("New address written to SAT: " + old + " -> " + this.sat)
             }
             break
         }
@@ -9069,13 +9075,13 @@ JSSMS.Vdp.prototype = {reset:function() {
     this.display[row_precal + 2] = this.CRAM[temp + 2]
   }
 }, decodeTiles:function() {
-  DEBUG && console.log("[" + this.line + "]" + " min dirty:" + this.minDirty + " max: " + this.maxDirty);
+  JSSMS.Utils.console.log("[" + this.line + "]" + " min dirty:" + this.minDirty + " max: " + this.maxDirty);
   for(var i = this.minDirty;i <= this.maxDirty;i++) {
     if(!this.isTileDirty[i]) {
       continue
     }
     this.isTileDirty[i] = false;
-    DEBUG && console.log("tile " + i + " is dirty");
+    JSSMS.Utils.console.log("tile " + i + " is dirty");
     var tile = this.tiles[i];
     var pixel_index = 0;
     var address = i << 5;
