@@ -833,7 +833,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
             break;
           case 175:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "XOR A,A";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "this.a = " + $JSSMS$Utils$toHex$$(0) + "; this.f = " + $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_disassemble$self$$inline_264_hexOpcodes$$inline_293_opcode$$inline_276$$.$l$[0]) + ";";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "this.a = " + $JSSMS$Utils$toHex$$(0) + "; this.f = this.SZP_TABLE[0x00];";
             break;
           case 176:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "OR A,B";
@@ -901,7 +901,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
             break;
           case 192:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "RET NZ";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_ZERO) == 0x00) {this.pc = this.readMemWord(this.sp);this.sp += 0x02;this.tstates -= 0x06;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_ZERO) == 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
             break;
           case 193:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "POP BC";
@@ -922,7 +922,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
           case 196:
             $address$$inline_281_target$$inline_270$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_264_hexOpcodes$$inline_293_opcode$$inline_276$$, $address$$inline_265_address$$inline_275_opcode$$inline_282$$);
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "CALL NZ (" + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ")";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_ZERO) == 0x00) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";this.tstates -= 0x07;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_ZERO) == 0x00) {this.tstates -= 0x07;this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";return;}";
             $address$$inline_265_address$$inline_275_opcode$$inline_282$$ += 2;
             break;
           case 197:
@@ -942,7 +942,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
             break;
           case 200:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "RET Z";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_ZERO) != 0x00) {this.pc = this.readMemWord(this.sp);this.sp += 0x02;this.tstates -= 0x06;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_ZERO) != 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
             break;
           case 201:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "RET";
@@ -1925,7 +1925,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
           case 204:
             $address$$inline_281_target$$inline_270$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_264_hexOpcodes$$inline_293_opcode$$inline_276$$, $address$$inline_265_address$$inline_275_opcode$$inline_282$$);
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "CALL Z (" + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ")";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_ZERO) != 0x00) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";this.tstates -= 0x07;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_ZERO) != 0x00) {this.tstates -= 0x07;this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";return;}";
             $address$$inline_265_address$$inline_275_opcode$$inline_282$$ += 2;
             break;
           case 205:
@@ -1947,7 +1947,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
             break;
           case 208:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "RET NC";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_CARRY) == 0x00) {this.pc = this.readMemWord(this.sp);this.sp += 0x02;this.tstates -= 0x06;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_CARRY) == 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
             break;
           case 209:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "POP DE";
@@ -1968,7 +1968,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
           case 212:
             $address$$inline_281_target$$inline_270$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_264_hexOpcodes$$inline_293_opcode$$inline_276$$, $address$$inline_265_address$$inline_275_opcode$$inline_282$$);
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "CALL NC (" + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ")";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_CARRY) == 0x00) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";this.tstates -= 0x07;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_CARRY) == 0x00) {this.tstates -= 0x07;this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";return;}";
             $address$$inline_265_address$$inline_275_opcode$$inline_282$$ += 2;
             break;
           case 213:
@@ -1988,7 +1988,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
             break;
           case 216:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "RET C";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_CARRY) != 0x00) {this.pc = this.readMemWord(this.sp);this.sp += 0x02;this.tstates -= 0x06;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_CARRY) != 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
             break;
           case 217:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "EXX";
@@ -2009,7 +2009,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
           case 220:
             $address$$inline_281_target$$inline_270$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_264_hexOpcodes$$inline_293_opcode$$inline_276$$, $address$$inline_265_address$$inline_275_opcode$$inline_282$$);
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "CALL C (" + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ")";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_CARRY) != 0x00) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";this.tstates -= 0x07;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_CARRY) != 0x00) {this.tstates -= 0x07;this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";return;}";
             $address$$inline_265_address$$inline_275_opcode$$inline_282$$ += 2;
             break;
           case 221:
@@ -2032,7 +2032,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
             break;
           case 224:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "RET PO";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_PARITY) == 0x00) {this.pc = this.readMemWord(this.sp);this.sp += 0x02;this.tstates -= 0x06;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_PARITY) == 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
             break;
           case 225:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "POP HL";
@@ -2051,7 +2051,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
           case 228:
             $address$$inline_281_target$$inline_270$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_264_hexOpcodes$$inline_293_opcode$$inline_276$$, $address$$inline_265_address$$inline_275_opcode$$inline_282$$);
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "CALL PO (" + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ")";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_PARITY) == 0x00) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";this.tstates -= 0x07;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_PARITY) == 0x00) {this.tstates -= 0x07;this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";return;}";
             $address$$inline_265_address$$inline_275_opcode$$inline_282$$ += 2;
             break;
           case 229:
@@ -2071,7 +2071,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
             break;
           case 232:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "RET PE";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_PARITY) != 0x00) {this.pc = this.readMemWord(this.sp);this.sp += 0x02;this.tstates -= 0x06;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_PARITY) != 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
             break;
           case 233:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "JP (HL)";
@@ -2091,7 +2091,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
           case 236:
             $address$$inline_281_target$$inline_270$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_264_hexOpcodes$$inline_293_opcode$$inline_276$$, $address$$inline_265_address$$inline_275_opcode$$inline_282$$);
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "CALL PE (" + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ")";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_PARITY) != 0x00) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";this.tstates -= 0x07;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_PARITY) != 0x00) {this.tstates -= 0x07;this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";return;}";
             $address$$inline_265_address$$inline_275_opcode$$inline_282$$ += 2;
             break;
           case 237:
@@ -2235,12 +2235,12 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
               case 91:
                 $operand$$inline_288$$ = $JSSMS$Utils$toHex$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_264_hexOpcodes$$inline_293_opcode$$inline_276$$, $address$$inline_281_target$$inline_270$$));
                 $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "LD DE,(" + $operand$$inline_288$$ + ")";
-                $code$$inline_287$$ = "this.setDE(" + $operand$$inline_288$$ + ");";
+                $code$$inline_287$$ = "this.setDE(this.readMemWord(" + $operand$$inline_288$$ + "));";
                 $address$$inline_281_target$$inline_270$$ += 2;
                 break;
               case 95:
                 $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "LD A,R";
-                $code$$inline_287$$ = "this.a = JSSMS.Utils.rndInt(255);";
+                $code$$inline_287$$ = "this.a = JSSMS.Utils.rndInt(0xFF);";
                 $code$$inline_287$$ += "this.f = (this.f & F_CARRY) | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);";
                 break;
               case 96:
@@ -2335,7 +2335,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
                 break;
               case 163:
                 $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "OUTI";
-                $code$$inline_287$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.incHL();this.b = this.dec8(this.b);if ((this.l + temp) > 255) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) == 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+                $code$$inline_287$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.incHL();this.b = this.dec8(this.b);if ((this.l + temp) > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) == 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
                 break;
               case 168:
                 $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "LDD";
@@ -2349,14 +2349,14 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
                 break;
               case 171:
                 $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "OUTD";
-                $code$$inline_287$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.decHL();this.b = this.dec8(this.b);if ((this.l + temp) > 255) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) == 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+                $code$$inline_287$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.decHL();this.b = this.dec8(this.b);if ((this.l + temp) > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) == 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
                 break;
               case 176:
                 $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "LDIR";
                 $code$$inline_287$$ = "this.writeMem(this.getDE(), this.readMem(this.getHL()));this.incDE();this.incHL();this.decBC();";
                 $code$$inline_280_location$$inline_273_target$$inline_286$$ = $address$$inline_281_target$$inline_270$$ - 2;
-                $code$$inline_287$$ += "if (this.getBC() != 0x00) {this.f |= F_PARITY;this.tstates -= 0x05;this.pc = " + $JSSMS$Utils$toHex$$($code$$inline_280_location$$inline_273_target$$inline_286$$) + ";return;}";
-                $code$$inline_287$$ += "if (!(this.getBC() != 0x00)) this.f &= ~ F_PARITY;this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
+                $code$$inline_287$$ += "if (this.getBC() != 0x00) {this.tstates -= 0x05;this.f |= F_PARITY;this.pc = " + $JSSMS$Utils$toHex$$($code$$inline_280_location$$inline_273_target$$inline_286$$) + ";return;} else {";
+                $code$$inline_287$$ += "this.f &= ~ F_PARITY;}this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
                 break;
               case 177:
                 $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "CPIR";
@@ -2375,7 +2375,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
                 $code$$inline_287$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();";
                 $code$$inline_280_location$$inline_273_target$$inline_286$$ = $address$$inline_281_target$$inline_270$$ - 2;
                 $code$$inline_287$$ += "if (this.b != 0x00) {this.tstates -= 0x05;this.pc = " + $JSSMS$Utils$toHex$$($code$$inline_280_location$$inline_273_target$$inline_286$$) + ";return;}";
-                $code$$inline_287$$ += "if ((this.l + temp) > 255) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) != 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+                $code$$inline_287$$ += "if ((this.l + temp) > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) != 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
                 break;
               case 184:
                 $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "LDDR";
@@ -2389,7 +2389,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
                 $code$$inline_287$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if (this.b != 0x00) {this.tstates -= 0x05;this.pc = " + $JSSMS$Utils$toHex$$($code$$inline_280_location$$inline_273_target$$inline_286$$) + ";return;}if ((temp & 0x80) != 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
                 break;
               case 187:
-                $code$$inline_280_location$$inline_273_target$$inline_286$$ = $address$$inline_281_target$$inline_270$$ - 2, $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "OTDR", $code$$inline_287$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.decHL();if (this.b != 0x00) {this.tstates -= 0x05;this.pc = " + $JSSMS$Utils$toHex$$($code$$inline_280_location$$inline_273_target$$inline_286$$) + ";return;}if ((this.l + temp) > 255) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) != 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}"
+                $code$$inline_280_location$$inline_273_target$$inline_286$$ = $address$$inline_281_target$$inline_270$$ - 2, $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "OTDR", $code$$inline_287$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.decHL();if (this.b != 0x00) {this.tstates -= 0x05;this.pc = " + $JSSMS$Utils$toHex$$($code$$inline_280_location$$inline_273_target$$inline_286$$) + ";return;}if ((this.l + temp) > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) != 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}"
             }
             $_inst$$inline_274_currAddr$$inline_279_currAddr$$inline_285_operand$$inline_272$$ = {$opcode$:$address$$inline_265_address$$inline_275_opcode$$inline_282$$, $opcodes$:$inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$, $inst$:$code$$inline_271_inst$$inline_278_inst$$inline_284$$, code:$code$$inline_287$$, $address$:$_inst$$inline_274_currAddr$$inline_279_currAddr$$inline_285_operand$$inline_272$$, $nextAddress$:$address$$inline_281_target$$inline_270$$, target:$code$$inline_280_location$$inline_273_target$$inline_286$$};
             $address$$inline_281_target$$inline_270$$ = $_inst$$inline_274_currAddr$$inline_279_currAddr$$inline_285_operand$$inline_272$$.target;
@@ -2411,7 +2411,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
             break;
           case 240:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "RET P";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_SIGN) == 0x00) {this.pc = this.readMemWord(this.sp);this.sp += 0x02;this.tstates -= 0x06;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_SIGN) == 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
             break;
           case 241:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "POP AF";
@@ -2430,7 +2430,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
           case 244:
             $address$$inline_281_target$$inline_270$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_264_hexOpcodes$$inline_293_opcode$$inline_276$$, $address$$inline_265_address$$inline_275_opcode$$inline_282$$);
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "CALL P (" + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ")";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_SIGN) == 0x00) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";this.tstates -= 0x07;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_SIGN) == 0x00) {this.tstates -= 0x07;this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";return;}";
             $address$$inline_265_address$$inline_275_opcode$$inline_282$$ += 2;
             break;
           case 245:
@@ -2450,7 +2450,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
             break;
           case 248:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "RET M";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_SIGN) != 0x00) {this.pc = this.readMemWord(this.sp);this.sp += 0x02;this.tstates -= 0x06;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_SIGN) != 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
             break;
           case 249:
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "LD SP,HL";
@@ -2469,7 +2469,7 @@ $JSSMS$$.prototype = {$isRunning$:!1, $cyclesPerLine$:0, $no_of_scanlines$:0, $f
           case 252:
             $address$$inline_281_target$$inline_270$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$inline_264_hexOpcodes$$inline_293_opcode$$inline_276$$, $address$$inline_265_address$$inline_275_opcode$$inline_282$$);
             $inst$$inline_268_opcodesArray$$inline_277_opcodesArray$$inline_283$$ = "CALL M (" + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ")";
-            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_SIGN) != 0x00) {this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";this.tstates -= 0x07;return;}";
+            $code$$inline_271_inst$$inline_278_inst$$inline_284$$ = "if ((this.f & F_SIGN) != 0x00) {this.tstates -= 0x07;this.push1(" + $JSSMS$Utils$toHex$$($address$$inline_265_address$$inline_275_opcode$$inline_282$$ + 2) + ");this.pc = " + $JSSMS$Utils$toHex$$($address$$inline_281_target$$inline_270$$) + ";return;}";
             $address$$inline_265_address$$inline_275_opcode$$inline_282$$ += 2;
             break;
           case 253:
