@@ -204,7 +204,8 @@ var o = {
       return n.ExpressionStatement(
           n.AssignmentExpression('=',
           n.Register(srcRegister),
-          o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (dstRegister1 + dstRegister2).toUpperCase()), n.Literal(value)))
+          o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (dstRegister1 + dstRegister2).toUpperCase()),
+          n.Literal(value)))
           )
       );
     };
@@ -540,8 +541,7 @@ var o = {
           ),
           n.ExpressionStatement(
               n.AssignmentExpression('=', n.Register('f'),
-              n.BinaryExpression('|',
-                n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')),
+              n.BinaryExpression('|', n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')),
                 n.Identifier('F_HALFCARRY')
               )
               )
@@ -557,8 +557,7 @@ var o = {
           ),
           n.ExpressionStatement(
               n.AssignmentExpression('=', n.Register('f'),
-              n.BinaryExpression('|',
-                n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')),
+              n.BinaryExpression('|', n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')),
                 n.Identifier('F_HALFCARRY')
               )
               )
@@ -570,8 +569,7 @@ var o = {
         // f = SZP_TABLE[a] | F_HALFCARRY;
         return n.ExpressionStatement(
             n.AssignmentExpression('=', n.Register('f'),
-            n.BinaryExpression('|',
-            n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')),
+            n.BinaryExpression('|', n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')),
             n.Identifier('F_HALFCARRY')
             )
             )
@@ -585,8 +583,7 @@ var o = {
         ),
         n.ExpressionStatement(
             n.AssignmentExpression('=', n.Register('f'),
-            n.BinaryExpression('|',
-              n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')),
+            n.BinaryExpression('|', n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')),
               n.Identifier('F_HALFCARRY')
             )
             )
@@ -748,7 +745,7 @@ var o = {
   },
   JR: function(test) {
     return function(value, target) {
-      // if (test) {pc = target; tstates -= 5;}
+      // if (test) {tstates -= 5; pc = target;}
       return n.IfStatement(
           test,
           n.BlockStatement([
@@ -761,7 +758,7 @@ var o = {
   },
   DJNZ: function() {
     return function(value, target) {
-      // b = (b - 1) & 0xFF; if (b != 0) {pc = target; tstates -= 5;}
+      // b = (b - 1) & 0xFF; if (b != 0) {tstates -= 5; pc = target;}
       return [
         n.ExpressionStatement(
             n.AssignmentExpression('=', n.Register('b'), n.BinaryExpression('&', n.BinaryExpression('-', n.Register('b'), n.Literal(1)), n.Literal(0xFF)))
@@ -877,7 +874,7 @@ var o = {
       };
     else
       return function(value, target, nextAddress) {
-        // if ((f & F_ZERO) == 0) {push1(nextAddress + 2); pc = target; tstates -= 7; return;}
+        // if ((f & F_ZERO) == 0) {push1(nextAddress + 2); tstates -= 7; pc = target; return;}
         return n.IfStatement(
             n.BinaryExpression(operator,
             n.BinaryExpression('&', n.Register('f'), n.Identifier(bitMask)),
@@ -975,7 +972,7 @@ var o = {
       // writeMem(sp, temp);
       return [
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.Register('h'))),
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Register('d'), o.READ_MEM8(n.BinaryExpression('+', n.Identifier('sp'), n.Literal(1))))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Register('h'), o.READ_MEM8(n.BinaryExpression('+', n.Identifier('sp'), n.Literal(1))))),
         n.ExpressionStatement(n.CallExpression('writeMem',
             [n.BinaryExpression('+', n.Identifier('sp'), n.Literal(1)),
              n.Identifier('temp')]
@@ -1075,9 +1072,10 @@ var o = {
       return function() {
         // writeMem(getHL(), readMem(getHL()) | BIT_0);
         return n.ExpressionStatement(
-            n.CallExpression('writeMem', n.CallExpression('get' + (register1 + register2).toUpperCase()),
-                o.READ_MEM8(n.BinaryExpression('|', n.CallExpression('get' + (register1 + register2).toUpperCase()), n.Identifier('BIT_' + bit)))
-            )
+            n.CallExpression('writeMem', [
+              n.CallExpression('get' + (register1 + register2).toUpperCase()),
+              n.BinaryExpression('|', o.READ_MEM8(n.CallExpression('get' + (register1 + register2).toUpperCase())), n.Identifier('BIT_' + bit))
+            ])
         );
       };
   },
@@ -1212,7 +1210,6 @@ var o = {
       // decBC();
       //
       // f = (f & 0xC1) | (getBC() != 0 ? F_PARITY : 0);
-
       return [
         n.ExpressionStatement(
             n.CallExpression('writeMem', [
@@ -1223,8 +1220,7 @@ var o = {
         n.ExpressionStatement(n.CallExpression('incHL')),
         n.ExpressionStatement(n.CallExpression('decBC')),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Register('f'), n.BinaryExpression('|',
-            n.BinaryExpression('|',
-            n.Register('f'),
+            n.BinaryExpression('&', n.Register('f'),
             n.Literal(0xC1)
             ),
             n.ConditionalExpression(
@@ -1245,8 +1241,8 @@ var o = {
       // decBC();
       //
       // if (getBC() != 0) {
-      // f |= F_PARITY;
       // tstates -= 5;
+      // f |= F_PARITY;
       // pc--;
       // } else {
       // f &= ~ F_PARITY;
@@ -1268,8 +1264,8 @@ var o = {
         n.IfStatement(
             n.BinaryExpression('!=', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0)),
             n.BlockStatement([
-              n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Identifier('F_PARITY'))),
               n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
+              n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Identifier('F_PARITY'))),
               n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(currentAddress))),
               n.ReturnStatement()
             ]),
