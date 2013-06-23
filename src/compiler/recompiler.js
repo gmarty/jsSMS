@@ -48,18 +48,18 @@ Recompiler.prototype = {
   reset: function() {
     var self = this;
 
+    this.parser.addEntryPoint(0x00, 0x00);
+    this.parser.addEntryPoint(0x38, 0x00);
+    this.parser.addEntryPoint(0x66, 0x00);
+
     if (this.rom.length <= 2) {
       // If ROM is below 32KB, we don't have to limit parse to memory pages.
       JSSMS.Utils.console.log('Parsing full ROM');
-      this.parser.parse(0x00);
-      this.parser.parse(0x38);
-      this.parser.parse(0x66);
+      this.parser.parse();
     } else {
-      // Parse initial memory page.
+      // Parse initial memory page only.
       JSSMS.Utils.console.log('Parsing initial memory page of ROM');
-      this.parser.parse(0x00, 0x0000, 0x4000);
-      this.parser.parse(0x38, 0x0000, 0x4000);
-      this.parser.parse(0x66, 0x0000, 0x4000);
+      this.parser.parse(0x00);
     }
 
     var analyzer = new Analyzer(this.parser.instructions);
@@ -69,15 +69,18 @@ Recompiler.prototype = {
     var compiler = new Compiler(optimizer.ast);
 
     // Attach generated code to an attach point in Z80 instance.
-    compiler.ast.forEach(function(fn) {
-      var funcName = fn.body[0].id.name;
-      var code = window['escodegen']['generate'](fn, {
-        comment: true,
-        renumber: true,
-        hexadecimal: true,
-        parse: window['esprima']['parse']
+    for (var page = 0; page < this.rom.length; page++) {
+      compiler.ast[page].forEach(function(fn) {
+        var funcName = fn.body[0].id.name;
+        fn.body[0].id.name = '_' + funcName;
+        var code = window['escodegen']['generate'](fn, {
+          comment: true,
+          renumber: true,
+          hexadecimal: true,
+          parse: window['esprima']['parse']
+        });
+        self.cpu.branches[page]['_' + (funcName - (page * 0x4000))] = new Function('return ' + code)();
       });
-      self.cpu.branches[''][funcName] = new Function('return ' + code)();
-    });
+    }
   }
 };

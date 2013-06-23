@@ -34,77 +34,107 @@ var Parser = (function() {
    */
   var parser = function(rom) {
     this.stream = new RomStream(rom);
+
     this.addresses = [];
+    this.entryPoints = [];
     this.instructions = [];
+
+    for (var i = 0; i < rom.length; i++) {
+      this.addresses[i] = [];
+      this.entryPoints[i] = [];
+      this.instructions[i] = [];
+    }
+
     if (DEBUG) this.instructionTypes = [];
   };
 
   parser.prototype = {
     /**
+     * Add an address to the queue.
+     * @param {number} entryPoint
+     * @param {number} page
+     */
+    addEntryPoint: function(entryPoint, page) {
+      this.addresses[page].push(entryPoint);
+    },
+
+
+    /**
      * Parse the bytecodes in the ROM.
      *
-     * @param {number} entryPoint
-     * @param {number} pageStart
-     * @param {number} pageEnd
+     * @param {number} page
      */
-    parse: function(entryPoint, pageStart, pageEnd) {
+    parse: function(page) {
       JSSMS.Utils.console.time('Parsing');
 
-      this.addresses = [];
+      var currentPage;
+      var pageStart;
+      var pageEnd;
 
-      if (pageStart == undefined) pageStart = 0x0000;
-      if (!pageEnd) pageEnd = this.stream.length - 1;
-
-      if (entryPoint < pageStart || entryPoint > pageEnd) {
-        JSSMS.Utils.console.error('Address out of bound', JSSMS.Utils.toHex(entryPoint));
-        return;
+      if (page == undefined) {
+        pageStart = 0x0000;
+        pageEnd = this.stream.length - 1;
+      } else {
+        pageStart = 0x0000;
+        pageEnd = 0x4000 - 1;
       }
 
-      this.addAddress(entryPoint);
+      for (currentPage = 0; currentPage < this.addresses.length; currentPage++) {
+        while (this.addresses[currentPage].length) {
+          var currentAddress = this.addresses[currentPage].shift();
 
-      while (this.addresses.length) {
-        var currentAddress = this.addresses.shift();
+          if (currentAddress < pageStart || currentAddress > pageEnd) {
+            JSSMS.Utils.console.error('Address out of bound', JSSMS.Utils.toHex(currentAddress));
+            continue;
+          }
 
-        // Make sure instructions are not parsed twice.
-        if (this.instructions[currentAddress]) {
-          continue;
-        }
+          // Make sure instructions are not parsed twice.
+          if (this.instructions[currentPage][currentAddress]) {
+            continue;
+          }
 
-        if (currentAddress < pageStart || currentAddress > pageEnd) {
-          JSSMS.Utils.console.error('Address out of bound', JSSMS.Utils.toHex(currentAddress));
-          continue;
-        }
+          var bytecode = new Bytecode(currentAddress);
+          this.instructions[currentPage][currentAddress] = disassemble(bytecode, this.stream);
 
-        var bytecode = new Bytecode(currentAddress);
-        this.instructions[currentAddress] = disassemble(bytecode, this.stream);
-
-        if (this.instructions[currentAddress].nextAddress != null) {
-          this.addAddress(this.instructions[currentAddress].nextAddress);
-        }
-        if (this.instructions[currentAddress].target != null) {
-          this.addAddress(this.instructions[currentAddress].target);
+          if (this.instructions[currentPage][currentAddress].nextAddress != null &&
+              this.instructions[currentPage][currentAddress].nextAddress >= pageStart &&
+              this.instructions[currentPage][currentAddress].nextAddress <= pageEnd) {
+            this.addAddress(this.instructions[currentPage][currentAddress].nextAddress);
+          }
+          if (this.instructions[currentPage][currentAddress].target != null &&
+              this.instructions[currentPage][currentAddress].target >= pageStart &&
+              this.instructions[currentPage][currentAddress].target <= pageEnd) {
+            this.addAddress(this.instructions[currentPage][currentAddress].target);
+          }
         }
       }
 
-      // Flag entry point as jump target.
-      this.instructions[entryPoint].isJumpTarget = true;
-      this.instructions[entryPoint].jumpTargetNb++;
+      for (currentPage = 0; currentPage < this.addresses.length; currentPage++) {
+        // Flag entry points as jump target.
+        for (var i = 0; i < this.entryPoints[currentPage].length; i++) {
+          var entryPoint = this.entryPoints[currentPage][i];
+          this.instructions[currentPage][entryPoint].isJumpTarget = true;
+          this.instructions[currentPage][entryPoint].jumpTargetNb++;
+        }
 
-      // Mark all jump target instructions.
-      for (var i = 0, length = this.instructions.length; i < length; i++) {
-        if (!this.instructions[i]) {
-          continue;
-        }
-        // Comparing with null is important here as `0` is a valid address (0x00).
-        if (this.instructions[i].nextAddress != null && this.instructions[this.instructions[i].nextAddress]) {
-          this.instructions[this.instructions[i].nextAddress].jumpTargetNb++;
-        }
-        if (this.instructions[i].target != null) {
-          if (this.instructions[this.instructions[i].target]) {
-            this.instructions[this.instructions[i].target].isJumpTarget = true;
-            this.instructions[this.instructions[i].target].jumpTargetNb++;
-          } else {
-            JSSMS.Utils.console.log('Invalid target address', JSSMS.Utils.toHex(this.instructions[i].target));
+        // Mark all jump target instructions.
+        for (var i = 0, length = this.instructions[currentPage].length; i < length; i++) {
+          if (!this.instructions[currentPage][i]) {
+            continue;
+          }
+          // Comparing with null is important here as `0` is a valid address (0x00).
+          if (this.instructions[currentPage][i].nextAddress != null &&
+              this.instructions[currentPage][this.instructions[currentPage][i].nextAddress]) {
+            this.instructions[currentPage][this.instructions[currentPage][i].nextAddress].jumpTargetNb++;
+          }
+          if (this.instructions[currentPage][i].target != null) {
+            var targetPage = Math.floor(this.instructions[currentPage][i].target / 0x4000);
+            if (this.instructions[targetPage][this.instructions[currentPage][i].target]) {
+              this.instructions[targetPage][this.instructions[currentPage][i].target].isJumpTarget = true;
+              this.instructions[targetPage][this.instructions[currentPage][i].target].jumpTargetNb++;
+            } else {
+              JSSMS.Utils.console.log('Invalid target address', JSSMS.Utils.toHex(this.instructions[currentPage][i].target));
+            }
           }
         }
       }
@@ -156,7 +186,7 @@ var Parser = (function() {
      * @param {number} address
      */
     addAddress: function(address) {
-      this.addresses.push(address);
+      this.addresses[Math.floor(address / 0x4000)].push(address);
     }
   };
 
@@ -1268,7 +1298,7 @@ var Parser = (function() {
      * @return {number}
      */
     get length() {
-      return this.rom * PAGE_SIZE;
+      return this.rom.length * PAGE_SIZE;
     },
 
 

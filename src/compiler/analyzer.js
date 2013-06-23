@@ -29,11 +29,13 @@
  */
 var Analyzer = function(bytecodes) {
   this.bytecodes = bytecodes;
-  this.ast = [];
+  this.ast = Array(this.bytecodes.length);
 
   JSSMS.Utils.console.time('Analyzing');
-  this.normalizeBytecode();
-  this.restructure();
+  for (var i = 0; i < this.bytecodes.length; i++) {
+    this.normalizeBytecode(i);
+    this.restructure(i);
+  }
   JSSMS.Utils.console.timeEnd('Analyzing');
 };
 
@@ -42,8 +44,10 @@ Analyzer.prototype = {
    * Remove unused addresses and populate bytecodes with AST.
    * @todo Can we merge operand & target? Ex: `bytecode.operand || bytecode.target`
    */
-  normalizeBytecode: function() {
-    this.bytecodes = this.bytecodes
+  normalizeBytecode: function(page) {
+    var self = this;
+
+    this.bytecodes[page] = this.bytecodes[page]
       .filter(function(bytecode) {
           // Turn parsed bytecodes array into a dense array.
           return bytecode;
@@ -90,20 +94,21 @@ Analyzer.prototype = {
    * along jump targets.
    * Each array in `ast` will be converted in a function.
    */
-  restructure: function() {
+  restructure: function(page) {
+    this.ast[page] = [];
     var self = this;
     var pointer = -1;
-    var startNewFunction = false;
+    var startNewFunction = true;
 
-    this.bytecodes
+    this.bytecodes[page]
       .forEach(function(bytecode) {
           if (bytecode.isJumpTarget || startNewFunction) {
             pointer++;
-            self.ast[pointer] = [];
+            self.ast[page][pointer] = [];
             startNewFunction = false;
           }
 
-          self.ast[pointer].push(bytecode);
+          self.ast[page][pointer].push(bytecode);
 
           if (bytecode.isFunctionEnder) {
             startNewFunction = true;

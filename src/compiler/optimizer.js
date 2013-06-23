@@ -33,7 +33,9 @@ var Optimizer = function(functions) {
   this.ast = functions;
 
   JSSMS.Utils.console.time('Optimizing');
-  this.localOptimization();
+  for (var i = 0; i < this.ast.length; i++) {
+    this.localOptimization(i);
+  }
   JSSMS.Utils.console.timeEnd('Optimizing');
 };
 
@@ -41,8 +43,8 @@ Optimizer.prototype = {
   /**
    * Perform various optimizations limited to a function scope.
    */
-  localOptimization: function() {
-    this.ast = this.ast.map(this.inlineRegisters);
+  localOptimization: function(page) {
+    this.ast[page] = this.ast[page].map(this.inlineRegisters);
   },
 
 

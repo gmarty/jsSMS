@@ -40,10 +40,12 @@ var whitelist = [
  */
 var Compiler = function(functions) {
   this.functions = functions;
-  this.ast = [];
+  this.ast = Array(this.functions.length);
 
   JSSMS.Utils.console.time('Generating');
-  this.generate();
+  for (var i = 0; i < this.functions.length; i++) {
+    this.generate(i);
+  }
   JSSMS.Utils.console.timeEnd('Generating');
 };
 
@@ -51,11 +53,11 @@ Compiler.prototype = {
   /**
    * Process bytecodes.
    */
-  generate: function() {
+  generate: function(page) {
     var self = this;
     var toHex = JSSMS.Utils.toHex;
 
-    this.functions = this.functions
+    this.functions[page] = this.functions[page]
       .map(function(fn) {
           var body = [];
           var name = fn[0].address;
@@ -155,7 +157,7 @@ Compiler.prototype = {
                 'type': 'FunctionDeclaration',
                 'id': {
                   'type': 'Identifier',
-                  'name': '_' + name // Name of the function
+                  'name': name // Name of the function
                 },
                 'params': [
                   {
@@ -176,7 +178,7 @@ Compiler.prototype = {
           };
         });
 
-    this.ast = this.functions;
+    this.ast[page] = this.functions[page];
   },
 
 
