@@ -27,19 +27,49 @@
  * @param {Array.<Bytecode>} bytecodes
  * @constructor
  */
-var Analyzer = function(bytecodes) {
-  this.bytecodes = bytecodes;
-  this.ast = Array(this.bytecodes.length);
+var Analyzer = function() {
+  this.bytecodes = {};
+  this.ast = [];
 
-  JSSMS.Utils.console.time('Analyzing');
-  for (var i = 0; i < this.bytecodes.length; i++) {
-    this.normalizeBytecode(i);
-    this.restructure(i);
-  }
-  JSSMS.Utils.console.timeEnd('Analyzing');
+  this.missingOpcodes = {};
 };
 
 Analyzer.prototype = {
+  analyze: function(bytecodes) {
+    this.bytecodes = bytecodes;
+    this.ast = Array(this.bytecodes.length);
+
+    JSSMS.Utils.console.time('Analyzing');
+    for (var i = 0; i < this.bytecodes.length; i++) {
+      this.normalizeBytecode(i);
+      this.restructure(i);
+    }
+    JSSMS.Utils.console.timeEnd('Analyzing');
+
+    for (var i in this.missingOpcodes) {
+      console.log(i, this.missingOpcodes[i]);
+    }
+  },
+
+
+  analyzeFromAddress: function(bytecodes) {
+    this.bytecodes = [bytecodes];
+    this.ast = [];
+
+    this.missingOpcodes = {};
+
+    JSSMS.Utils.console.time('Analyzing');
+    this.normalizeBytecode(0);
+    JSSMS.Utils.console.timeEnd('Analyzing');
+
+    this.ast = [this.bytecodes];
+
+    for (var i in this.missingOpcodes) {
+      console.log(i, this.missingOpcodes[i]);
+    }
+  },
+
+
   /**
    * Remove unused addresses and populate bytecodes with AST.
    * @todo Can we merge operand & target? Ex: `bytecode.operand || bytecode.target`
@@ -82,6 +112,10 @@ Analyzer.prototype = {
               if (opcode.opcode)
                 bytecode.opcode = opcode.opcode(bytecode.operand, bytecode.target, bytecode.nextAddress, bytecode.address);
             }
+          } else {
+            var i = bytecode.hexOpcode;
+            self.missingOpcodes[i] = self.missingOpcodes[i] != undefined ?
+                self.missingOpcodes[i] + 1 : 1;
           }
 
           return bytecode;

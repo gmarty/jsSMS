@@ -29,17 +29,22 @@
  * @param {Array.<Array.<Bytecode>>} functions
  * @constructor
  */
-var Optimizer = function(functions) {
-  this.ast = functions;
-
-  JSSMS.Utils.console.time('Optimizing');
-  for (var i = 0; i < this.ast.length; i++) {
-    this.localOptimization(i);
-  }
-  JSSMS.Utils.console.timeEnd('Optimizing');
+var Optimizer = function() {
+  this.ast = [];
 };
 
 Optimizer.prototype = {
+  optimize: function(functions) {
+    this.ast = functions;
+
+    JSSMS.Utils.console.time('Optimizing');
+    for (var i = 0; i < this.ast.length; i++) {
+      this.localOptimization(i);
+    }
+    JSSMS.Utils.console.timeEnd('Optimizing');
+  },
+
+
   /**
    * Perform various optimizations limited to a function scope.
    */

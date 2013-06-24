@@ -39,146 +39,143 @@ var whitelist = [
  * @constructor
  */
 var Compiler = function(functions) {
-  this.functions = functions;
-  this.ast = Array(this.functions.length);
-
-  JSSMS.Utils.console.time('Generating');
-  for (var i = 0; i < this.functions.length; i++) {
-    this.generate(i);
-  }
-  JSSMS.Utils.console.timeEnd('Generating');
+  this.ast = [];
 };
 
 Compiler.prototype = {
   /**
    * Process bytecodes.
    */
-  generate: function(page) {
+  generate: function(functions) {
     var self = this;
     var toHex = JSSMS.Utils.toHex;
 
-    this.functions[page] = this.functions[page]
-      .map(function(fn) {
-          var body = [];
-          var name = fn[0].address;
-          var jumpTargetNb = fn[0].jumpTargetNb;
+    JSSMS.Utils.console.time('Generating');
+    for (var page = 0; page < functions.length; page++) {
+      functions[page] = functions[page]
+        .map(function(fn) {
+            var body = [];
+            var name = fn[0].address;
+            var jumpTargetNb = fn[0].jumpTargetNb;
 
-          fn = fn
-          .map(function(bytecode) {
-                var decreaseTStateStmt = [
-                  {
-                    'type': 'ExpressionStatement',
-                    'expression': {
-                      'type': 'AssignmentExpression',
-                      'operator': '-=',
-                      'left': {
-                        'type': 'Identifier',
-                        'name': 'tstates'
-                      },
-                      'right': {
-                        'type': 'Literal',
-                        'value': self.getTotalTStates(bytecode.opcode)
-                      }
-                    }
-                  }
-                ];
-
-                if (bytecode.nextAddress != null)
-                  var updatePcStmt = {
-                    'type': 'ExpressionStatement',
-                    'expression': {
-                      'type': 'AssignmentExpression',
-                      'operator': '=',
-                      'left': {
-                        'type': 'Identifier',
-                        'name': 'pc'
-                      },
-                      'right': {
-                        'type': 'Literal',
-                        'value': bytecode.nextAddress
-                      }
-                    }
-                  };
-
-                if (DEBUG) {
-                  if (decreaseTStateStmt[0]['expression']['right']['value'])
-                    decreaseTStateStmt[0]['expression']['right']['raw'] = toHex(decreaseTStateStmt[0]['expression']['right']['value']);
-                  if (bytecode.nextAddress != null)
-                    updatePcStmt['expression']['right']['raw'] = toHex(updatePcStmt['expression']['right']['value']);
-                }
-
-                if (bytecode.ast == null)
-                  bytecode.ast = decreaseTStateStmt;
-                else
-                  bytecode.ast = decreaseTStateStmt.concat(bytecode.ast);
-
-                if (bytecode.nextAddress != null)
-                  bytecode.ast.push(updatePcStmt);
-
-                if (DEBUG) {
-                  // Inline comment about the current bytecode.
-                  bytecode.ast[0].leadingComments = [
+            fn = fn
+            .map(function(bytecode) {
+                  var decreaseTStateStmt = [
                     {
-                      type: 'Line',
-                      value: ' ' + bytecode.label
+                      'type': 'ExpressionStatement',
+                      'expression': {
+                        'type': 'AssignmentExpression',
+                        'operator': '-=',
+                        'left': {
+                          'type': 'Identifier',
+                          'name': 'tstates'
+                        },
+                        'right': {
+                          'type': 'Literal',
+                          'value': self.getTotalTStates(bytecode.opcode)
+                        }
+                      }
                     }
                   ];
-                }
 
-                return bytecode.ast;
-              });
+                  if (bytecode.nextAddress != null)
+                    var updatePcStmt = {
+                      'type': 'ExpressionStatement',
+                      'expression': {
+                        'type': 'AssignmentExpression',
+                        'operator': '=',
+                        'left': {
+                          'type': 'Identifier',
+                          'name': 'pc'
+                        },
+                        'right': {
+                          'type': 'Literal',
+                          'value': bytecode.nextAddress
+                        }
+                      }
+                    };
 
-          if (DEBUG)
-            // Inject data about current branch into a comment.
-            fn[0][0].leadingComments = [].concat({
-              type: 'Line',
-              value: ' Nb of instructions jumping here: ' + jumpTargetNb
-            }, fn[0][0].leadingComments);
-
-          // Flatten the array.
-          fn.forEach(function(ast) {
-            body = body.concat(ast);
-          });
-
-          // Apply modifications to the AST recursively.
-          body = self.convertRegisters(body);
-
-          // Append `this` to all identifiers.
-          body = JSSMS.Utils.traverse(body, function(obj) {
-            if (obj.type && obj.type == 'Identifier' && whitelist.indexOf(obj.name) == -1)
-              obj.name = 'this.' + obj.name;
-            return obj;
-          });
-
-          return {
-            'type': 'Program',
-            'body': [
-              {
-                'type': 'FunctionDeclaration',
-                'id': {
-                  'type': 'Identifier',
-                  'name': name // Name of the function
-                },
-                'params': [
-                  {
-                    'type': 'Identifier',
-                    'name': 'temp'
+                  if (DEBUG) {
+                    if (decreaseTStateStmt[0]['expression']['right']['value'])
+                      decreaseTStateStmt[0]['expression']['right']['raw'] = toHex(decreaseTStateStmt[0]['expression']['right']['value']);
+                    if (bytecode.nextAddress != null)
+                      updatePcStmt['expression']['right']['raw'] = toHex(updatePcStmt['expression']['right']['value']);
                   }
-                ],
-                'defaults': [],
-                'body': {
-                  'type': 'BlockStatement',
-                  'body': body
-                },
-                'rest': null,
-                'generator': false,
-                'expression': false
-              }
-            ]
-          };
-        });
 
-    this.ast[page] = this.functions[page];
+                  if (bytecode.ast == null)
+                    bytecode.ast = decreaseTStateStmt;
+                  else
+                    bytecode.ast = decreaseTStateStmt.concat(bytecode.ast);
+
+                  if (bytecode.nextAddress != null)
+                    bytecode.ast.push(updatePcStmt);
+
+                  if (DEBUG) {
+                    // Inline comment about the current bytecode.
+                    bytecode.ast[0].leadingComments = [
+                      {
+                        type: 'Line',
+                        value: ' ' + bytecode.label
+                      }
+                    ];
+                  }
+
+                  return bytecode.ast;
+                });
+
+            if (DEBUG)
+              // Inject data about current branch into a comment.
+              fn[0][0].leadingComments = [].concat({
+                type: 'Line',
+                value: ' Nb of instructions jumping here: ' + jumpTargetNb
+              }, fn[0][0].leadingComments);
+
+            // Flatten the array.
+            fn.forEach(function(ast) {
+              body = body.concat(ast);
+            });
+
+            // Apply modifications to the AST recursively.
+            body = self.convertRegisters(body);
+
+            // Append `this` to all identifiers.
+            body = JSSMS.Utils.traverse(body, function(obj) {
+              if (obj.type && obj.type == 'Identifier' && whitelist.indexOf(obj.name) == -1)
+                obj.name = 'this.' + obj.name;
+              return obj;
+            });
+
+            return {
+              'type': 'Program',
+              'body': [
+                {
+                  'type': 'FunctionDeclaration',
+                  'id': {
+                    'type': 'Identifier',
+                    'name': name // Name of the function
+                  },
+                  'params': [
+                    {
+                      'type': 'Identifier',
+                      'name': 'temp'
+                    }
+                  ],
+                  'defaults': [],
+                  'body': {
+                    'type': 'BlockStatement',
+                    'body': body
+                  },
+                  'rest': null,
+                  'generator': false,
+                  'expression': false
+                }
+              ]
+            };
+          });
+    }
+    JSSMS.Utils.console.timeEnd('Generating');
+
+    this.ast = functions;
   },
 
 

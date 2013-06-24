@@ -35,27 +35,27 @@ var Parser = (function() {
   var parser = function(rom) {
     this.stream = new RomStream(rom);
 
-    this.addresses = [];
-    this.entryPoints = [];
-    this.instructions = [];
+    this.addresses = Array(rom.length);
+    this.entryPoints = Array(rom.length);
+    this.instructions = Array(rom.length);
+    if (DEBUG) this.instructionTypes = [];
 
     for (var i = 0; i < rom.length; i++) {
       this.addresses[i] = [];
       this.entryPoints[i] = [];
       this.instructions[i] = [];
+      if (DEBUG) this.instructionTypes[i] = [];
     }
-
-    if (DEBUG) this.instructionTypes = [];
   };
 
   parser.prototype = {
     /**
      * Add an address to the queue.
      * @param {number} entryPoint
-     * @param {number} page
      */
-    addEntryPoint: function(entryPoint, page) {
-      this.addresses[page].push(entryPoint);
+    addEntryPoint: function(entryPoint) {
+      this.entryPoints[Math.floor(entryPoint / 0x4000)].push(entryPoint);
+      this.addresses[Math.floor(entryPoint / 0x4000)].push(entryPoint);
     },
 
 
@@ -140,6 +140,32 @@ var Parser = (function() {
       }
 
       JSSMS.Utils.console.timeEnd('Parsing');
+    },
+
+
+    /**
+     * This method only parsed a single function. The result of the parsing is added to the parsed
+     * instructions array, but returns only the bytecodes newly parsed.
+     *
+     * @param {number} currentAddress
+     * @param {number} currentPage
+     * @return {Array}
+     */
+    parseFromAddress: function(currentAddress, currentPage) {
+      var pageStart = currentPage * 0x4000;
+      var pageEnd = ((currentPage + 1) * 0x4000) - 1;
+      var branch = [];
+      var bytecode;
+
+      // @todo Check if not already parsed.
+      do {
+        bytecode = new Bytecode(currentAddress);
+        this.instructions[currentPage][currentAddress] = disassemble(bytecode, this.stream);
+        branch.push(bytecode);
+        currentAddress = bytecode.nextAddress;
+      } while ((currentAddress != null || !bytecode.isFunctionEnder) && currentAddress >= pageStart && currentAddress <= pageEnd);
+
+      return branch;
     },
 
 
