@@ -94,18 +94,30 @@ JSSMS.Utils = {
    * A proxy for console that is activated in DEBUG mode only.
    */
   console: {
-    log: function() {
+    /**
+     * @param {...string} var_args
+     */
+    log: function(var_args) {
       if (DEBUG)
         window.console.log.apply(window.console, arguments);
     },
-    error: function() {
+    /**
+     * @param {...string} var_args
+     */
+    error: function(var_args) {
       if (DEBUG)
         window.console.error.apply(window.console, arguments);
     },
+    /**
+     * @param {string} label
+     */
     time: function(label) {
       if (DEBUG)
         window.console.time(label);
     },
+    /**
+     * @param {string} label
+     */
     timeEnd: function(label) {
       if (DEBUG)
         window.console.timeEnd(label);
