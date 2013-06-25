@@ -44,12 +44,72 @@ function generateIndexTable(index) {
       name: 'DEC ' + index + '',
       ast: o.DEC16('i', register2)
     },
+    0x46: {
+      name: 'LD B,(' + index + '+d)',
+      ast: o.LD8_D('b', 'i', register2)
+    },
+    0x4E: {
+      name: 'LD C,(' + index + '+d)',
+      ast: o.LD8_D('c', 'i', register2)
+    },
+    0x56: {
+      name: 'LD D,(' + index + '+d)',
+      ast: o.LD8_D('d', 'i', register2)
+    },
+    0x5E: {
+      name: 'LD E,(' + index + '+d)',
+      ast: o.LD8_D('e', 'i', register2)
+    },
+    0x66: {
+      name: 'LD H,(' + index + '+d)',
+      ast: o.LD8_D('h', 'i', register2)
+    },
+    0x6E: {
+      name: 'LD L,(' + index + '+d)',
+      ast: o.LD8_D('l', 'i', register2)
+    },
+    0x70: {
+      name: 'LD (' + index + '+d),B',
+      ast: o.LD_X('b', 'i', register2)
+    },
+    0x71: {
+      name: 'LD (' + index + '+d),C',
+      ast: o.LD_X('c', 'i', register2)
+    },
+    0x72: {
+      name: 'LD (' + index + '+d),D',
+      ast: o.LD_X('d', 'i', register2)
+    },
+    0x73: {
+      name: 'LD (' + index + '+d),E',
+      ast: o.LD_X('e', 'i', register2)
+    },
+    0x74: {
+      name: 'LD (' + index + '+d),H',
+      ast: o.LD_X('h', 'i', register2)
+    },
+    0x75: {
+      name: 'LD (' + index + '+d),L',
+      ast: o.LD_X('l', 'i', register2)
+    },
+    0x76: {
+      name: 'LD (' + index + '+d),B',
+      ast: o.LD_X('b', 'i', register2)
+    },
+    0x77: {
+      name: 'LD (' + index + '+d),A',
+      ast: o.LD_X('a', 'i', register2)
+    },
     0x7E: {
       name: 'LD A,(' + index + '+d)',
       ast: o.LD8_D('a', 'i', register2)
     },
     0xCB:
-        generateIndexCBTable(index),
+        index == 'IX' ? opcodeTableDDCB : opcodeTableFDCB,
+    0xE1: {
+      name: 'POP ' + index,
+      ast: o.POP('i', register2)
+    },
     0xE5: {
       name: 'PUSH ' + index,
       ast: o.PUSH('i' + register2LC + 'H', 'i' + register2LC + 'L')

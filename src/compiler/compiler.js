@@ -158,6 +158,10 @@ Compiler.prototype = {
                     {
                       'type': 'Identifier',
                       'name': 'temp'
+                    },
+                    {
+                      'type': 'Identifier',
+                      'name': 'location'
                     }
                   ],
                   'defaults': [],

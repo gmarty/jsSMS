@@ -20,6 +20,8 @@
 'use strict';
 
 var opcodeTableCB = [];
+var opcodeTableDDCB = [];
+var opcodeTableFDCB = [];
 
 var regs = {
   'B': ['b'],
@@ -38,6 +40,26 @@ var regs = {
       name: op + ' ' + reg,
       ast: o[op].apply(null, regs[reg])
     });
+    // @todo Refactor and clean this section.
+    if (reg != '(HL)') {
+      opcodeTableDDCB.push({
+        name: 'LD ' + reg + ',' + op + ' (IX)',
+        ast: o['LD_' + op].apply(null, ['i', 'x'].concat(regs[reg]))
+      });
+      opcodeTableFDCB.push({
+        name: 'LD ' + reg + ',' + op + ' (IY)',
+        ast: o['LD_' + op].apply(null, ['i', 'y'].concat(regs[reg]))
+      });
+    } else {
+      opcodeTableDDCB.push({
+        name: reg + ' (IX)',
+        ast: o['LD_' + op]('i', 'x')
+      });
+      opcodeTableFDCB.push({
+        name: reg + ' (IY)',
+        ast: o['LD_' + op]('i', 'y')
+      });
+    }
   }
 });
 
@@ -47,6 +69,16 @@ var regs = {
       opcodeTableCB.push({
         name: op + ' ' + i + ',' + reg,
         ast: o[op].apply(null, [i].concat(regs[reg]))
+      });
+    }
+    for (var j = 0; j < 8; j++) {
+      opcodeTableDDCB.push({
+        name: op + ' ' + i + ' (IX)',
+        ast: o[op].apply(null, [i].concat(['i', 'x']))
+      });
+      opcodeTableFDCB.push({
+        name: op + ' ' + i + ' (IY)',
+        ast: o[op].apply(null, [i].concat(['i', 'y']))
       });
     }
   }
