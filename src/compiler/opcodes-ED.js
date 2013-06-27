@@ -20,6 +20,10 @@
 'use strict';
 
 var opcodeTableED = {
+  0x42: {
+    name: 'SBC HL,BC',
+    ast: o.SBC16('b', 'c')
+  },
   0x41: {
     name: 'OUT (C),B',
     ast: o.OUT('c', 'b')
@@ -44,6 +48,10 @@ var opcodeTableED = {
     name: 'OUT (C),D',
     ast: o.OUT('c', 'd')
   },
+  0x52: {
+    name: 'SBC HL,DE',
+    ast: o.SBC16('d', 'e')
+  },
   0x55: {
     name: 'RETN / RETI',
     ast: o.RETN_RETI()
@@ -67,6 +75,10 @@ var opcodeTableED = {
   0x61: {
     name: 'OUT (C),H',
     ast: o.OUT('c', 'h')
+  },
+  0x62: {
+    name: 'SBC HL,HL',
+    ast: o.SBC16('h', 'l')
   },
   0x69: {
     name: 'OUT (C),L',

@@ -44,6 +44,14 @@ function generateIndexTable(index) {
       name: 'DEC ' + index + '',
       ast: o.DEC16('i', register2)
     },
+    0x34: {
+      name: 'INC (' + index + '+d)',
+      ast: o.INC_X('i', register2)
+    },
+    0x35: {
+      name: 'DEC (' + index + '+d)',
+      ast: o.DEC_X('i', register2)
+    },
     0x46: {
       name: 'LD B,(' + index + '+d)',
       ast: o.LD8_D('b', 'i', register2)
@@ -104,6 +112,10 @@ function generateIndexTable(index) {
       name: 'LD A,(' + index + '+d)',
       ast: o.LD8_D('a', 'i', register2)
     },
+    0x86: {
+      name: 'ADD A,(' + index + '+d)',
+      ast: o.ADD_X('i', register2)
+    },
     0xCB:
         index == 'IX' ? opcodeTableDDCB : opcodeTableFDCB,
     0xE1: {
@@ -113,6 +125,10 @@ function generateIndexTable(index) {
     0xE5: {
       name: 'PUSH ' + index,
       ast: o.PUSH('i' + register2LC + 'H', 'i' + register2LC + 'L')
+    },
+    0xE9: {
+      name: 'JP (' + index + ')',
+      ast: o.PUSH('i', register2)
     }
   };
 }

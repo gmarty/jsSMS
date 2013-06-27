@@ -1146,7 +1146,55 @@ var o = {
       ];
     };
   },
+  INC_X: function(register1, register2) {
+    return function(value, target, nextAddress, currentAddress) {
+      // incMem(getIX() + d_());
+      return [
+        n.ExpressionStatement(n.CallExpression('incMem',
+            o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
+            n.Literal(value)))
+            ))
+      ];
+    };
+  },
+  DEC_X: function(register1, register2) {
+    return function(value, target, nextAddress, currentAddress) {
+      // decMem(getIX() + d_());
+      return [
+        n.ExpressionStatement(n.CallExpression('decMem',
+            o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
+            n.Literal(value)))
+            ))
+      ];
+    };
+  },
+  ADD_X: function(register1, register2) {
+    return function(value, target, nextAddress, currentAddress) {
+      // add_a(readMem(getIX() + d_()));
+      return n.ExpressionStatement(
+          n.CallExpression('add_a', o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
+          n.Literal(value))))
+      );
+    };
+  },
+  JP_X: function(register1, register2) {
+    return function(value, target, nextAddress, currentAddress) {
+      // pc = getIX();
+      return [
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.CallExpression('get' + (register1 + register2).toUpperCase()))),
+        n.ReturnStatement()
+      ];
+    };
+  },
   // ED prefixed opcodes.
+  SBC16: function(register1, register2) {
+    return function(value, target, nextAddress) {
+      // sbc16(getBC());
+      return n.ExpressionStatement(
+          n.CallExpression('sbc16', n.CallExpression('get' + (register1 + register2).toUpperCase()))
+      );
+    };
+  },
   NEG: function() {
     return function() {
       // temp = a;

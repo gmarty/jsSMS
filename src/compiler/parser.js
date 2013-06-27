@@ -1266,6 +1266,7 @@ var Parser = (function() {
       case 0xE5:
         break;
       case 0xE9:
+        // This target can't be determined using static analysis.
         stream.seek(null);
         isFunctionEnder = true;
         break;
