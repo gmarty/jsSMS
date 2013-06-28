@@ -1512,13 +1512,13 @@ JSSMS.Z80.prototype = {
       case 0x9E: this.sbc_a(this.readMem(this.getIX() + this.d_())); this.pc++; break;          // SBC A,(IX+d)
       case 0xA4: this.f = this.SZP_TABLE[this.a &= this.ixH] | F_HALFCARRY; break;      // AND IXH *
       case 0xA5: this.f = this.SZP_TABLE[this.a &= this.ixL] | F_HALFCARRY; break;      // AND IXL *
-      case 0xA6: this.f = this.SZP_TABLE[this.a &= this.readMem(this.getIX() + this.d_())] | F_HALFCARRY; this.pc++; break;      // AND A,(IX+d)
+      case 0xA6: this.f = this.SZP_TABLE[this.a &= this.readMem(this.getIX() + this.d_())] | F_HALFCARRY; this.pc++; break; // AND A,(IX+d)
       case 0xAC: this.f = this.SZP_TABLE[this.a ^= this.ixH]; break;                    // XOR A IXH*
       case 0xAD: this.f = this.SZP_TABLE[this.a ^= this.ixL]; break;                    // XOR A IXL*
-      case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIX() + this.d_())];this.pc++; break;// XOR A,(IX+d)
+      case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIX() + this.d_())]; this.pc++; break; // XOR A,(IX+d)
       case 0xB4: this.f = this.SZP_TABLE[this.a |= this.ixH]; break;                    // OR A IXH*
       case 0xB5: this.f = this.SZP_TABLE[this.a |= this.ixL]; break;                    // OR A IXL*
-      case 0xB6: this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIX() + this.d_())];this.pc++; break;// OR A,(IX+d)
+      case 0xB6: this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIX() + this.d_())]; this.pc++; break; // OR A,(IX+d)
       case 0xBC: this.cp_a(this.ixH); break;                                    // CP IXH *
       case 0xBD: this.cp_a(this.ixL); break;                                    // CP IXL *
       case 0xBE: this.cp_a(this.readMem(this.getIX() + this.d_())); this.pc++; break; // CP (IX+d)
@@ -1639,15 +1639,15 @@ JSSMS.Z80.prototype = {
       case 0xA6: this.f = this.SZP_TABLE[this.a &= this.readMem(this.getIY() + this.d_())] | F_HALFCARRY; this.pc++; break; // AND A,(IY+d)
       case 0xAC: this.f = this.SZP_TABLE[this.a ^= this.iyH]; break;                    // XOR A IYH*
       case 0xAD: this.f = this.SZP_TABLE[this.a ^= this.iyL]; break;                    // XOR A IYL*
-      case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIY() + this.d_())];this.pc++; break;// XOR A,(IY+d)
+      case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIY() + this.d_())]; this.pc++; break; // XOR A,(IY+d)
       case 0xB4: this.f = this.SZP_TABLE[this.a |= this.iyH]; break;                    // OR A IYH*
       case 0xB5: this.f = this.SZP_TABLE[this.a |= this.iyL]; break;                    // OR A IYL*
-      case 0xB6: this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIY() + this.d_())];this.pc++; break;// OR A,(IY+d)
-      case 0xBC: this.cp_a(this.iyH); break;                                  // CP IYH *
-      case 0xBD: this.cp_a(this.iyL); break;                                  // CP IYL *
-      case 0xBE: this.cp_a(this.readMem(this.getIY() + this.d_())); this.pc++; break;           // CP (IY+d)
-      case 0xCB: this.doIndexCB(this.getIY()); break;                         // CB Opcode
-      case 0xE1: this.setIY(this.readMemWord(this.sp)); this.sp += 2; break;              // POP IY
+      case 0xB6: this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIY() + this.d_())]; this.pc++; break; // OR A,(IY+d)
+      case 0xBC: this.cp_a(this.iyH); break;                                    // CP IYH *
+      case 0xBD: this.cp_a(this.iyL); break;                                    // CP IYL *
+      case 0xBE: this.cp_a(this.readMem(this.getIY() + this.d_())); this.pc++; break; // CP (IY+d)
+      case 0xCB: this.doIndexCB(this.getIY()); break;                           // CB Opcode
+      case 0xE1: this.setIY(this.readMemWord(this.sp)); this.sp += 2; break;    // POP IY
       case 0xE3:                                                                // EX SP,(IY)
         temp = this.getIY();
         this.setIY(this.readMemWord(this.sp));
