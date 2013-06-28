@@ -1134,17 +1134,30 @@ var o = {
   },
   // DD/FD prefixed opcodes.
   LD_X: function(register1, register2, register3) {
-    return function(value, target, nextAddress, currentAddress) {
-      // writeMem(getIX() + value, this.b);
-      return [
-        n.ExpressionStatement(n.CallExpression('sub_a', [
-          n.BinaryExpression('+',
-              n.CallExpression('get' + (register2 + register3).toUpperCase()),
-              n.Literal(register1)),
-          n.Register()
-        ]))
-      ];
-    };
+    if (register3 == undefined)
+      return function(value, target, nextAddress, currentAddress) {
+        // writeMem(getIX() + (value >> 8), value & 0xFF);
+        return [
+          n.ExpressionStatement(n.CallExpression('writeMem', [
+            n.BinaryExpression('+',
+                n.CallExpression('get' + (register1 + register2).toUpperCase()),
+                n.Literal(value >> 8)),
+            n.Literal(value & 0xFF)
+          ]))
+        ];
+      };
+    else
+      return function(value, target, nextAddress, currentAddress) {
+        // writeMem(getIX() + value, this.b);
+        return [
+          n.ExpressionStatement(n.CallExpression('writeMem', [
+            n.BinaryExpression('+',
+                n.CallExpression('get' + (register2 + register3).toUpperCase()),
+                n.Literal(value)),
+            n.Register(register1)
+          ]))
+        ];
+      };
   },
   INC_X: function(register1, register2) {
     return function(value, target, nextAddress, currentAddress) {
@@ -1162,9 +1175,9 @@ var o = {
       // decMem(getIX() + d_());
       return [
         n.ExpressionStatement(n.CallExpression('decMem',
-            o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
+            n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
             n.Literal(value)))
-            ))
+        )
       ];
     };
   },
@@ -1175,6 +1188,43 @@ var o = {
           n.CallExpression('add_a', o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
           n.Literal(value))))
       );
+    };
+  },
+  OR_X: function(register1, register2) {
+    return function(value, target, nextAddress, currentAddress) {
+      // a |= readMem(getIX() + d_()); f = SZP_TABLE[a];
+      return [
+        n.ExpressionStatement(
+            n.AssignmentExpression('|=', n.Register('a'), o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
+            n.Literal(value))))),
+        n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register('f'),
+            n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a'))
+            )
+        )
+      ];
+    };
+  },
+  EX_SP_X: function(register1, register2) {
+    return function() {
+      // temp = getIY();
+      // setIY(readMemWord(sp));
+      // writeMem(sp, temp & 0xFF);
+      // writeMem(sp + 1, temp >> 8);
+      return [
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.CallExpression('get' + (register1 + register2).toUpperCase()))),
+        n.ExpressionStatement(n.CallExpression('set' + (register1 + register2).toUpperCase(),
+            o.READ_MEM16(n.Identifier('sp'))
+            )),
+        n.ExpressionStatement(n.CallExpression('writeMem',
+            [n.Identifier('sp'),
+             n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0xFF))]
+            )),
+        n.ExpressionStatement(n.CallExpression('writeMem',
+            [n.BinaryExpression('+', n.Identifier('sp'), n.Literal(1)),
+             n.BinaryExpression('>>', n.Identifier('sp'), n.Literal(8))]
+            ))
+      ];
     };
   },
   JP_X: function(register1, register2) {
@@ -1217,11 +1267,11 @@ var o = {
       ];
     };
   },
-  IM1: function() {
+  IM: function(value) {
     return function() {
-      // im = 1;
+      // im = value;
       return n.ExpressionStatement(
-          n.AssignmentExpression('=', n.Identifier('im'), n.Literal(1))
+          n.AssignmentExpression('=', n.Identifier('im'), n.Literal(value))
       );
     };
   },

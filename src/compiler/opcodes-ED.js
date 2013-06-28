@@ -36,6 +36,10 @@ var opcodeTableED = {
     name: 'RETN / RETI',
     ast: o.RETN_RETI()
   },
+  0x46: {
+    name: 'IM 0',
+    ast: o.IM(0)
+  },
   0x49: {
     name: 'OUT (C),C',
     ast: o.OUT('c', 'c')
@@ -43,6 +47,10 @@ var opcodeTableED = {
   0x4D: {
     name: 'RETN / RETI',
     ast: o.RETN_RETI()
+  },
+  0x4E: {
+    name: 'IM 0',
+    ast: o.IM(0)
   },
   0x51: {
     name: 'OUT (C),D',
@@ -57,8 +65,8 @@ var opcodeTableED = {
     ast: o.RETN_RETI()
   },
   0x56: {
-    name: 'IM1',
-    ast: o.IM1()
+    name: 'IM 1',
+    ast: o.IM(1)
   },
   0x59: {
     name: 'OUT (C),E',
@@ -80,17 +88,25 @@ var opcodeTableED = {
     name: 'SBC HL,HL',
     ast: o.SBC16('h', 'l')
   },
+  0x66: {
+    name: 'IM 0',
+    ast: o.IM(0)
+  },
   0x69: {
     name: 'OUT (C),L',
     ast: o.OUT('c', 'l')
+  },
+  0x6E: {
+    name: 'IM 0',
+    ast: o.IM(0)
   },
   0x73: {
     name: 'LD (nn),SP',
     ast: o.LD_NN_SP()
   },
   0x76: {
-    name: 'IM1',
-    ast: o.IM1()
+    name: 'IM 1',
+    ast: o.IM(1)
   },
   0x79: {
     name: 'OUT (C),A',
