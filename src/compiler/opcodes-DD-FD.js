@@ -36,12 +36,21 @@ function generateIndexTable(index) {
       name: 'LD ' + index + ',nn',
       ast: o.LD16('i', register2)
     },
+    0x22: {
+      name: 'LD (nn),' + index,
+      ast: o.LD_NN('i' + register2LC + 'H', 'i' + register2LC + 'L')
+    },
     0x23: {
-      name: 'INC ' + index + '',
+      name: 'INC ' + index,
       ast: o.INC16('i', register2)
     },
+    0x2A: {
+      name: 'LD ' + index + ',(nn)',
+      ast: o.LD16('i' + register2LC + 'H', 'i' + register2LC + 'L', 'n', 'n'),
+      operand: UINT16
+    },
     0x2B: {
-      name: 'DEC ' + index + '',
+      name: 'DEC ' + index,
       ast: o.DEC16('i', register2)
     },
     0x34: {
@@ -126,6 +135,10 @@ function generateIndexTable(index) {
       name: 'OR A,(' + index + '+d)',
       ast: o.OR_X('i', register2)
     },
+    0xBE: {
+      name: 'CP (' + index + '+d)',
+      ast: o.CP_X('i', register2)
+    },
     0xE1: {
       name: 'POP ' + index,
       ast: o.POP('i', register2)
@@ -143,7 +156,7 @@ function generateIndexTable(index) {
       ast: o.JP_X('i', register2)
     },
     0xF9: {
-      name: 'LD SP,' + index + '',
+      name: 'LD SP,' + index,
       ast: o.LD_SP('i', register2)
     }
   };

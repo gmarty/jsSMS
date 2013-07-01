@@ -28,6 +28,10 @@ var opcodeTableED = {
     name: 'OUT (C),B',
     ast: o.OUT('c', 'b')
   },
+  0x43: {
+    name: 'LD (nn),BC',
+    ast: o.LD_NN('b', 'c')
+  },
   0x44: {
     name: 'NEG',
     ast: o.NEG()
@@ -43,6 +47,19 @@ var opcodeTableED = {
   0x49: {
     name: 'OUT (C),C',
     ast: o.OUT('c', 'c')
+  },
+  0x4A: {
+    name: 'ADC HL,BC',
+    ast: o.ADC16('b', 'c')
+  },
+  0x4B: {
+    name: 'LD BC,(nn)',
+    ast: o.LD16('b', 'c', 'n', 'n'),
+    operand: UINT16
+  },
+  0x4C: {
+    name: 'NEG',
+    ast: o.NEG()
   },
   0x4D: {
     name: 'RETN / RETI',
@@ -60,6 +77,14 @@ var opcodeTableED = {
     name: 'SBC HL,DE',
     ast: o.SBC16('d', 'e')
   },
+  0x53: {
+    name: 'LD (nn),DE',
+    ast: o.LD_NN('d', 'e')
+  },
+  0x54: {
+    name: 'NEG',
+    ast: o.NEG()
+  },
   0x55: {
     name: 'RETN / RETI',
     ast: o.RETN_RETI()
@@ -72,9 +97,18 @@ var opcodeTableED = {
     name: 'OUT (C),E',
     ast: o.OUT('c', 'e')
   },
+  0x5A: {
+    name: 'ADC HL,DE',
+    ast: o.ADC16('d', 'e')
+  },
   0x5B: {
     name: 'LD DE,(nn)',
-    ast: o.LD16('d', 'e', 'n', 'n')
+    ast: o.LD16('d', 'e', 'n', 'n'),
+    operand: UINT16
+  },
+  0x5C: {
+    name: 'NEG',
+    ast: o.NEG()
   },
   0x5F: {
     name: 'LD A,R',
@@ -88,6 +122,14 @@ var opcodeTableED = {
     name: 'SBC HL,HL',
     ast: o.SBC16('h', 'l')
   },
+  0x63: {
+    name: 'LD (nn),HL',
+    ast: o.LD_NN('h', 'l')
+  },
+  0x64: {
+    name: 'NEG',
+    ast: o.NEG()
+  },
   0x66: {
     name: 'IM 0',
     ast: o.IM(0)
@@ -96,13 +138,30 @@ var opcodeTableED = {
     name: 'OUT (C),L',
     ast: o.OUT('c', 'l')
   },
+  0x6A: {
+    name: 'ADC HL,HL',
+    ast: o.ADC16('h', 'l')
+  },
+  0x6B: {
+    name: 'LD HL,(nn)',
+    ast: o.LD16('h', 'l', 'n', 'n'),
+    operand: UINT16
+  },
+  0x6C: {
+    name: 'NEG',
+    ast: o.NEG()
+  },
   0x6E: {
     name: 'IM 0',
     ast: o.IM(0)
   },
   0x73: {
     name: 'LD (nn),SP',
-    ast: o.LD_NN_SP()
+    ast: o.LD_NN('sp')
+  },
+  0x74: {
+    name: 'NEG',
+    ast: o.NEG()
   },
   0x76: {
     name: 'IM 1',
@@ -111,6 +170,14 @@ var opcodeTableED = {
   0x79: {
     name: 'OUT (C),A',
     ast: o.OUT('c', 'a')
+  },
+  0x7A: {
+    name: 'ADC HL,SP',
+    ast: o.ADC16('sp')
+  },
+  0x7C: {
+    name: 'NEG',
+    ast: o.NEG()
   },
   0xA0: {
     name: 'LDI',

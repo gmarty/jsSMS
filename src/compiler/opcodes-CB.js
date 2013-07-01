@@ -52,11 +52,11 @@ var regs = {
       });
     } else {
       opcodeTableDDCB.push({
-        name: reg + ' (IX)',
+        name: op + ' (IX)',
         ast: o['LD_' + op]('i', 'x')
       });
       opcodeTableFDCB.push({
-        name: reg + ' (IY)',
+        name: op + ' (IY)',
         ast: o['LD_' + op]('i', 'y')
       });
     }

@@ -203,7 +203,7 @@ var opcodeTable = [
   //0x22
   {
     name: 'LD (nn),HL',
-    ast: o.LD_WRITE_MEM('n', 'n', 'h', 'l'),
+    ast: o.LD_NN('h', 'l'),
     operand: UINT16
   },
   //0x23
@@ -1040,7 +1040,7 @@ var opcodeTable = [
   },
   //0xC7
   {
-    name: 'RST 00H',
+    name: 'RST 0x00',
     ast: o.RST(0x00)
   },
   //0xC8
@@ -1077,7 +1077,7 @@ var opcodeTable = [
   },
   //0xCF
   {
-    name: 'RST 08H',
+    name: 'RST 0x08',
     ast: o.RST(0x08)
   },
   //0xD0
@@ -1117,7 +1117,7 @@ var opcodeTable = [
   },
   //0xD7
   {
-    name: 'RST 10H',
+    name: 'RST 0x10',
     ast: o.RST(0x10)
   },
   //0xD8
@@ -1154,7 +1154,7 @@ var opcodeTable = [
   },
   //0xDF
   {
-    name: 'RST 18H',
+    name: 'RST 0x18',
     ast: o.RST(0x18)
   },
   //0xE0
@@ -1194,7 +1194,7 @@ var opcodeTable = [
   },
   //0xE7
   {
-    name: 'RST 20H',
+    name: 'RST 0x20',
     ast: o.RST(0x20)
   },
   //0xE8
@@ -1231,7 +1231,7 @@ var opcodeTable = [
   },
   //0xEF
   {
-    name: 'RST 28H',
+    name: 'RST 0x28',
     ast: o.RST(0x28)
   },
   //0xF0
@@ -1271,7 +1271,7 @@ var opcodeTable = [
   },
   //0xF7
   {
-    name: 'RST 30H',
+    name: 'RST 0x30',
     ast: o.RST(0x30)
   },
   //0xF8
@@ -1308,7 +1308,7 @@ var opcodeTable = [
   },
   //0xFF
   {
-    name: 'RST 38H',
+    name: 'RST 0x38',
     ast: o.RST(0x38)
   }
 ];
