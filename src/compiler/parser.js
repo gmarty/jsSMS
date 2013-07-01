@@ -129,7 +129,7 @@ var Parser = (function() {
           }
           if (this.instructions[currentPage][i].target != null) {
             var targetPage = Math.floor(this.instructions[currentPage][i].target / 0x4000);
-            if (this.instructions[targetPage][this.instructions[currentPage][i].target]) {
+            if (this.instructions[targetPage] && this.instructions[targetPage][this.instructions[currentPage][i].target]) {
               this.instructions[targetPage][this.instructions[currentPage][i].target].isJumpTarget = true;
               this.instructions[targetPage][this.instructions[currentPage][i].target].jumpTargetNb++;
             } else {
@@ -231,6 +231,7 @@ var Parser = (function() {
     var operand = null;
     var target = null;
     var isFunctionEnder = false;
+    var canEnd = false;
 
     bytecode.opcode.push(opcode);
 
@@ -272,6 +273,7 @@ var Parser = (function() {
         break;
       case 0x10:
         target = stream.position + stream.getInt8();
+        canEnd = true;
         break;
       case 0x11:
         operand = stream.getUint16();
@@ -311,6 +313,7 @@ var Parser = (function() {
         break;
       case 0x20:
         target = stream.position + stream.getInt8();
+        canEnd = true;
         break;
       case 0x21:
         operand = stream.getUint16();
@@ -331,6 +334,7 @@ var Parser = (function() {
         break;
       case 0x28:
         target = stream.position + stream.getInt8();
+        canEnd = true;
         break;
       case 0x29:
         break;
@@ -350,6 +354,7 @@ var Parser = (function() {
         break;
       case 0x30:
         target = stream.position + stream.getInt8();
+        canEnd = true;
         break;
       case 0x31:
         operand = stream.getUint16();
@@ -370,6 +375,7 @@ var Parser = (function() {
         break;
       case 0x38:
         target = stream.position + stream.getInt8();
+        canEnd = true;
         break;
       case 0x39:
         break;
@@ -646,11 +652,13 @@ var Parser = (function() {
       case 0xBF:
         break;
       case 0xC0:
+        canEnd = true;
         break;
       case 0xC1:
         break;
       case 0xC2:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xC3:
         target = stream.getUint16();
@@ -659,6 +667,7 @@ var Parser = (function() {
         break;
       case 0xC4:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xC5:
         break;
@@ -670,6 +679,7 @@ var Parser = (function() {
         isFunctionEnder = true;
         break;
       case 0xC8:
+        canEnd = true;
         break;
       case 0xC9:
         stream.seek(null);
@@ -677,12 +687,14 @@ var Parser = (function() {
         break;
       case 0xCA:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xCB:
         return getCB(bytecode, stream);
         break;
       case 0xCC:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xCD:
         target = stream.getUint16();
@@ -696,17 +708,20 @@ var Parser = (function() {
         isFunctionEnder = true;
         break;
       case 0xD0:
+        canEnd = true;
         break;
       case 0xD1:
         break;
       case 0xD2:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xD3:
         operand = stream.getUint8();
         break;
       case 0xD4:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xD5:
         break;
@@ -718,17 +733,20 @@ var Parser = (function() {
         isFunctionEnder = true;
         break;
       case 0xD8:
+        canEnd = true;
         break;
       case 0xD9:
         break;
       case 0xDA:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xDB:
         operand = stream.getUint8();
         break;
       case 0xDC:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xDD:
         return getIndex(bytecode, stream);
@@ -741,16 +759,19 @@ var Parser = (function() {
         isFunctionEnder = true;
         break;
       case 0xE0:
+        canEnd = true;
         break;
       case 0xE1:
         break;
       case 0xE2:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xE3:
         break;
       case 0xE4:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xE5:
         break;
@@ -762,6 +783,7 @@ var Parser = (function() {
         isFunctionEnder = true;
         break;
       case 0xE8:
+        canEnd = true;
         break;
       case 0xE9:
         // This target can't be determined using static analysis.
@@ -770,11 +792,13 @@ var Parser = (function() {
         break;
       case 0xEA:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xEB:
         break;
       case 0xEC:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xED:
         return getED(bytecode, stream);
@@ -787,16 +811,19 @@ var Parser = (function() {
         isFunctionEnder = true;
         break;
       case 0xF0:
+        canEnd = true;
         break;
       case 0xF1:
         break;
       case 0xF2:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xF3:
         break;
       case 0xF4:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xF5:
         break;
@@ -808,16 +835,19 @@ var Parser = (function() {
         isFunctionEnder = true;
         break;
       case 0xF8:
+        canEnd = true;
         break;
       case 0xF9:
         break;
       case 0xFA:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xFB:
         break;
       case 0xFC:
         target = stream.getUint16();
+        canEnd = true;
         break;
       case 0xFD:
         return getIndex(bytecode, stream);
@@ -837,6 +867,7 @@ var Parser = (function() {
     bytecode.operand = operand;
     bytecode.target = target;
     bytecode.isFunctionEnder = isFunctionEnder;
+    bytecode.canEnd = canEnd;
 
     return bytecode;
   }
@@ -872,6 +903,7 @@ var Parser = (function() {
     var operand = null;
     var target = null;
     var isFunctionEnder = false;
+    var canEnd = false;
 
     bytecode.opcode.push(opcode);
 
@@ -1005,21 +1037,25 @@ var Parser = (function() {
       case 0xB0:
         if (ACCURATE_INTERRUPT_EMULATION) {
           target = stream.position - 2;
+          canEnd = true;
         }
         break;
       case 0xB1:
         if (ACCURATE_INTERRUPT_EMULATION) {
           target = stream.position - 2;
+          canEnd = true;
         }
         break;
       case 0xB2:
         if (ACCURATE_INTERRUPT_EMULATION) {
           target = stream.position - 2;
+          canEnd = true;
         }
         break;
       case 0xB3:
         if (ACCURATE_INTERRUPT_EMULATION) {
           target = stream.position - 2;
+          canEnd = true;
         }
         break;
       case 0xB8:
@@ -1029,11 +1065,13 @@ var Parser = (function() {
       case 0xBA:
         if (ACCURATE_INTERRUPT_EMULATION) {
           target = stream.position - 2;
+          canEnd = true;
         }
         break;
       case 0xBB:
         if (ACCURATE_INTERRUPT_EMULATION) {
           target = stream.position - 2;
+          canEnd = true;
         }
         break;
       default:
@@ -1044,6 +1082,7 @@ var Parser = (function() {
     bytecode.operand = operand;
     bytecode.target = target;
     bytecode.isFunctionEnder = isFunctionEnder;
+    bytecode.canEnd = canEnd;
 
     return bytecode;
   }

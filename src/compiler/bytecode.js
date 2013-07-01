@@ -20,6 +20,11 @@
 'use strict';
 
 
+
+/**
+ * @param {number} address
+ * @constructor
+ */
 var Bytecode = (function() {
   /**
    * in DEBUG mode, get a hex from a decimal. Pad with 0 if necessary.
@@ -41,11 +46,8 @@ var Bytecode = (function() {
    *  * an operand (defaults to null)
    *  * a next address (defaults to null)
    *  * a jump target (defaults to null)
-   *
-   * @param {number} address
-   * @constructor
    */
-  function bytecode(address) {
+  function Bytecode(address) {
     this.address = address;
     this.hexAddress = toHex(address);
     this.opcode = [];
@@ -53,6 +55,7 @@ var Bytecode = (function() {
     this.nextAddress = null;
     this.target = null;
     this.isFunctionEnder = false;
+    this.canEnd = false;
     this.isJumpTarget = false;
     this.jumpTargetNb = 0; // Number of instructions targeting there.
     this.ast = null;
@@ -63,7 +66,7 @@ var Bytecode = (function() {
      this.dstRegs = {};*/
   }
 
-  bytecode.prototype = {
+  Bytecode.prototype = {
     get hexOpcode() {
       if (this.opcode.length) {
         return this.opcode
@@ -76,11 +79,13 @@ var Bytecode = (function() {
 
 
     get label() {
+      // @todo Generate a function for each opcode instead of this.
+      var name = this.name ? this.name.replace(/(nn|n|PC\+e|d)/, toHex(this.target || this.operand || 0)) : '';
       return this.hexAddress + ' ' +
           this.hexOpcode + ' ' +
-          this.name;
+          name;
     }
   };
 
-  return bytecode;
+  return Bytecode;
 })();
