@@ -26,7 +26,6 @@
  * A pass looks for patterns and optimize the code accordingly.
  * Each pass must leave the code in a valid state.
  *
- * @param {Array.<Array.<Bytecode>>} functions
  * @constructor
  */
 var Optimizer = function() {
@@ -34,6 +33,9 @@ var Optimizer = function() {
 };
 
 Optimizer.prototype = {
+  /**
+   * @param {Array.<Array.<Array.<Bytecode>>>} functions
+   */
   optimize: function(functions) {
     this.ast = functions;
 
@@ -47,6 +49,8 @@ Optimizer.prototype = {
 
   /**
    * Perform various optimizations limited to a function scope.
+   *
+   * @param {number} page
    */
   localOptimization: function(page) {
     this.ast[page] = this.ast[page].map(this.inlineRegisters);
