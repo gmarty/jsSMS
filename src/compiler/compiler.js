@@ -35,10 +35,9 @@ var whitelist = [
 /**
  * The compiler cleans the data and returns a valid AST.
  *
- * @param {Array.<Array.<Bytecode>>} functions
  * @constructor
  */
-var Compiler = function(functions) {
+var Compiler = function() {
   this.ast = [];
 };
 
@@ -57,28 +56,46 @@ Compiler.prototype = {
             var body = [];
             var name = fn[0].address;
             var jumpTargetNb = fn[0].jumpTargetNb;
+            var tstates = 0;
 
             fn = fn
             .map(function(bytecode) {
-                  var decreaseTStateStmt = [
-                    {
-                      'type': 'ExpressionStatement',
-                      'expression': {
-                        'type': 'AssignmentExpression',
-                        'operator': '-=',
-                        'left': {
-                          'type': 'Identifier',
-                          'name': 'tstates'
-                        },
-                        'right': {
-                          'type': 'Literal',
-                          'value': self.getTotalTStates(bytecode.opcode)
+                  if (bytecode.ast == null)
+                    bytecode.ast = [];
+
+                  // Decrement tstates.
+                  tstates += self.getTotalTStates(bytecode.opcode);
+
+                  if (bytecode.isFunctionEnder || bytecode.canEnd || bytecode.target != null) {
+                    var decreaseTStateStmt = [
+                      {
+                        'type': 'ExpressionStatement',
+                        'expression': {
+                          'type': 'AssignmentExpression',
+                          'operator': '-=',
+                          'left': {
+                            'type': 'Identifier',
+                            'name': 'tstates'
+                          },
+                          'right': {
+                            'type': 'Literal',
+                            'value': tstates
+                          }
                         }
                       }
-                    }
-                  ];
+                    ];
 
-                  if (bytecode.nextAddress != null)
+                    if (DEBUG) {
+                      if (decreaseTStateStmt[0]['expression']['right']['value'])
+                        decreaseTStateStmt[0]['expression']['right']['raw'] = toHex(decreaseTStateStmt[0]['expression']['right']['value']);
+                    }
+
+                    bytecode.ast = decreaseTStateStmt.concat(bytecode.ast);
+                    tstates = 0;
+                  }
+
+                  // Update `this.pc` statement.
+                  if (bytecode.isFunctionEnder && bytecode.nextAddress != null) {
                     var updatePcStmt = {
                       'type': 'ExpressionStatement',
                       'expression': {
@@ -95,35 +112,28 @@ Compiler.prototype = {
                       }
                     };
 
-                  if (DEBUG) {
-                    if (decreaseTStateStmt[0]['expression']['right']['value'])
-                      decreaseTStateStmt[0]['expression']['right']['raw'] = toHex(decreaseTStateStmt[0]['expression']['right']['value']);
-                    if (bytecode.nextAddress != null)
+                    if (DEBUG) {
                       updatePcStmt['expression']['right']['raw'] = toHex(updatePcStmt['expression']['right']['value']);
-                  }
+                    }
 
-                  if (bytecode.ast == null)
-                    bytecode.ast = decreaseTStateStmt;
-                  else
-                    bytecode.ast = decreaseTStateStmt.concat(bytecode.ast);
-
-                  if (bytecode.nextAddress != null)
                     bytecode.ast.push(updatePcStmt);
+                  }
 
                   if (DEBUG) {
                     // Inline comment about the current bytecode.
-                    bytecode.ast[0].leadingComments = [
-                      {
-                        type: 'Line',
-                        value: ' ' + bytecode.label
-                      }
-                    ];
+                    if (bytecode.ast[0] && bytecode.ast[0].leadingComments)
+                      bytecode.ast[0].leadingComments = [
+                        {
+                          type: 'Line',
+                          value: ' ' + bytecode.label
+                        }
+                      ];
                   }
 
                   return bytecode.ast;
                 });
 
-            if (DEBUG)
+            if (DEBUG && fn[0][0] && fn[0][0].leadingComments)
               // Inject data about current branch into a comment.
               fn[0][0].leadingComments = [].concat({
                 type: 'Line',

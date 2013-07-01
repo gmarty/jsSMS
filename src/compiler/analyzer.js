@@ -24,7 +24,6 @@
 /**
  * The analyzer rearranges instructions to use JavaScript control flow constructs.
  *
- * @param {Array.<Bytecode>} bytecodes
  * @constructor
  */
 var Analyzer = function() {
@@ -133,6 +132,7 @@ Analyzer.prototype = {
     var self = this;
     var pointer = -1;
     var startNewFunction = true;
+    var prevBytecode = this.bytecodes[page][0];
 
     this.bytecodes[page]
       .forEach(function(bytecode) {
@@ -140,6 +140,7 @@ Analyzer.prototype = {
             pointer++;
             self.ast[page][pointer] = [];
             startNewFunction = false;
+            prevBytecode.isFunctionEnder = true; // Update previous bytecode object.
           }
 
           self.ast[page][pointer].push(bytecode);
@@ -147,6 +148,8 @@ Analyzer.prototype = {
           if (bytecode.isFunctionEnder) {
             startNewFunction = true;
           }
+
+          prevBytecode = bytecode;
         });
   }
 };
