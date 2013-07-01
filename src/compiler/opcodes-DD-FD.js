@@ -46,7 +46,7 @@ function generateIndexTable(index) {
     },
     0x2A: {
       name: 'LD ' + index + ',(nn)',
-      ast: o.LD16('i' + register2LC + 'H', 'i' + register2LC + 'L', 'n', 'n'),
+      ast: o.LD16('i', register2, 'n', 'n'),
       operand: UINT16
     },
     0x2B: {

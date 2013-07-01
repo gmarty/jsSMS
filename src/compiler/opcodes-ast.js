@@ -299,11 +299,11 @@ var o = {
       return function(value) {
         return [
           n.ExpressionStatement(n.CallExpression('writeMem',
-              n.Literal(value), n.Register(register1))
+              [n.Literal(value), n.Register(register2)])
           ),
           n.ExpressionStatement(n.CallExpression('writeMem',
-              n.Literal(value + 1),
-              n.Register(register1)
+              [n.Literal(value + 1),
+               n.Register(register1)]
               ))
         ];
       };
@@ -608,19 +608,21 @@ var o = {
         );
       };
     else
-      return [
-        // a &= readMem(getHL()); f = SZP_TABLE[a] | F_HALFCARRY;
-        n.ExpressionStatement(
-            n.AssignmentExpression('&=', n.Register('a'), o.READ_MEM8(n.CallExpression('get' + (register1 + register2).toUpperCase())))
-        ),
-        n.ExpressionStatement(
-            n.AssignmentExpression('=', n.Register('f'),
-            n.BinaryExpression('|', n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')),
-              n.Identifier('F_HALFCARRY')
-            )
-            )
-        )
-      ];
+      return function() {
+        return [
+          // a &= readMem(getHL()); f = SZP_TABLE[a] | F_HALFCARRY;
+          n.ExpressionStatement(
+              n.AssignmentExpression('&=', n.Register('a'), o.READ_MEM8(n.CallExpression('get' + (register1 + register2).toUpperCase())))
+          ),
+          n.ExpressionStatement(
+              n.AssignmentExpression('=', n.Register('f'),
+              n.BinaryExpression('|', n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')),
+                n.Identifier('F_HALFCARRY')
+              )
+              )
+          )
+        ];
+      }
   },
   XOR: function(register1, register2) {
     if (register1 == undefined && register2 == undefined)
@@ -1109,7 +1111,7 @@ var o = {
     else if (register1 == 'i')
       return function(value, target, nextAddress, currentAddress) {
         // location = (getIY() + value) & 0xFFFF;
-        // writeMem(location, this.readMem(location) & ~BIT_0);
+        // writeMem(location, readMem(location) & ~BIT_0);
         return [
           n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('location'),
               n.BinaryExpression('&', n.BinaryExpression('+',
@@ -1180,7 +1182,7 @@ var o = {
       };
     else
       return function(value, target, nextAddress, currentAddress) {
-        // writeMem(getIX() + value, this.b);
+        // writeMem(getIX() + value, b);
         return [
           n.ExpressionStatement(n.CallExpression('writeMem', [
             n.BinaryExpression('+',
@@ -1424,6 +1426,37 @@ var o = {
         ),
         n.ExpressionStatement(n.CallExpression('incDE')),
         n.ExpressionStatement(n.CallExpression('incHL')),
+        n.ExpressionStatement(n.CallExpression('decBC')),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Register('f'), n.BinaryExpression('|',
+            n.BinaryExpression('&', n.Register('f'),
+            n.Literal(0xC1)
+            ),
+            n.ConditionalExpression(
+            n.BinaryExpression('!=', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0x00)),
+            n.Identifier('F_PARITY'),
+            n.Literal(0x00)
+            )
+            )
+            ))
+      ];
+    };
+  },
+  LDD: function() {
+    return function(value, target, nextAddress, currentAddress) {
+      // writeMem(getDE(), readMem(getHL()));
+      // decDE();
+      // decHL();
+      // decBC();
+      //
+      // f = (f & 0xC1) | (getBC() != 0 ? F_PARITY : 0);
+      return [
+        n.ExpressionStatement(
+            n.CallExpression('writeMem', [
+              n.CallExpression('get' + ('d' + 'e').toUpperCase()),
+              o.READ_MEM8(n.CallExpression('get' + ('h' + 'l').toUpperCase()))])
+        ),
+        n.ExpressionStatement(n.CallExpression('decDE')),
+        n.ExpressionStatement(n.CallExpression('decHL')),
         n.ExpressionStatement(n.CallExpression('decBC')),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Register('f'), n.BinaryExpression('|',
             n.BinaryExpression('&', n.Register('f'),

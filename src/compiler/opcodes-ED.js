@@ -187,6 +187,10 @@ var opcodeTableED = {
     name: 'OUTI',
     ast: o.OUTI()
   },
+  0xA8: {
+    name: 'LDD',
+    ast: o.LDD()
+  },
   0xAB: {
     name: 'OUTD',
     ast: o.OUTD()
