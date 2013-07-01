@@ -61,15 +61,15 @@ JSSMS.Debugger.prototype = {
     var i = 0;
     var addresses = []; //Array(romSize);
 
-    addresses.push(0x00); // Add program entry point to the list of addresses to visit.
-    /*addresses.push(0x08); // And below: set by RST.
-     addresses.push(0x10);
-     addresses.push(0x18);
-     addresses.push(0x20);
-     addresses.push(0x28);
-     addresses.push(0x30);*/
-    addresses.push(0x38); // RST 38h and Interrupt.
-    addresses.push(0x66); // Set by NMI.
+    var entryPoints = [
+      0x00, // Add program entry point to the list of addresses to visit.
+      0x38, // RST 38h and Interrupt.
+      0x66 // Set by NMI.
+    ];
+
+    entryPoints.forEach(function(entryPoint) {
+      addresses.push(entryPoint);
+    });
 
     while (addresses.length) {
       currentAddress = addresses.shift();
@@ -98,9 +98,9 @@ JSSMS.Debugger.prototype = {
     }
 
     // Flag any instructions that are jump targets.
-    this.instructions[0x00].isJumpTarget = true; // Define entry point as a jump target.
-    this.instructions[0x38].isJumpTarget = true;
-    this.instructions[0x66].isJumpTarget = true;
+    entryPoints.forEach(function(entryPoint) {
+      this.instructions[entryPoint].isJumpTarget = true;
+    }, this);
 
     for (; i < romSize; i++) {
       if (!this.instructions[i]) {
@@ -1398,8 +1398,8 @@ JSSMS.Debugger.prototype = {
       case 0xE3:
         inst = 'EX (SP),HL';
         code = 'temp = this.h;' +
-            'this.h = this.readMem(this.sp + 1);' +
-            'this.writeMem(this.sp + 1, temp);' +
+            'this.h = this.readMem(this.sp + 0x01);' +
+            'this.writeMem(this.sp + 0x01, temp);' +
             'temp = this.l;' +
             'this.l = this.readMem(this.sp);' +
             'this.writeMem(this.sp, temp);';
@@ -1518,7 +1518,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xF3:
         inst = 'DI';
-        code = 'this.iff1 = this.iff2 = false; this.EI_inst = true;';
+        code = 'this.iff1 = false; this.iff2 = false; this.EI_inst = true;';
         break;
       case 0xF4:
         target = this.readRom16bit(address);
@@ -1570,7 +1570,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xFB:
         inst = 'EI';
-        code = 'this.iff1 = this.iff2 = this.EI_inst = true;';
+        code = 'this.iff1 = true; this.iff2 = true; this.EI_inst = true;';
         break;
       case 0xFC:
         target = this.readRom16bit(address);
@@ -2647,7 +2647,7 @@ JSSMS.Debugger.prototype = {
         inst = 'NEG';
         // A <- 0-A
         code = 'temp = this.a;' +
-            'this.a = 0;' +
+            'this.a = 0x00;' +
             'this.sub_a(temp);';
         break;
       case 0x45:
@@ -2861,7 +2861,7 @@ JSSMS.Debugger.prototype = {
         // (DE) <- (HL)
         code = 'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
             'this.incDE();this.incHL();this.decBC();' +
-            'this.f = (this.f & 0xC1) | (this.getBC() != 0x00 ? F_PARITY : 0x00);';
+            'this.f = this.f & 0xC1 | (this.getBC() != 0x00 ? F_PARITY : 0x00);';
         break;
       case 0xA1:
         inst = 'CPI';
@@ -3394,7 +3394,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x86:
         offset = this.readRom8bit(address);
-        inst = 'ADD A,(' + index + '+' + toHex(offset) + '))';
+        inst = 'ADD A,(' + index + '+' + toHex(offset) + ')';
         code = 'this.add_a(this.readMem(this.get' + index + '() + ' + toHex(offset) + '));';
         address++;
         break;
@@ -3406,7 +3406,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x8E:
         offset = this.readRom8bit(address);
-        inst = 'ADC A,(' + index + '+' + toHex(offset) + '))';
+        inst = 'ADC A,(' + index + '+' + toHex(offset) + ')';
         code = 'this.adc_a(this.readMem(this.get' + index + '() + ' + toHex(offset) + '));';
         address++;
         break;
@@ -3418,7 +3418,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x96:
         offset = this.readRom8bit(address);
-        inst = 'SUB A,(' + index + '+' + toHex(offset) + '))';
+        inst = 'SUB A,(' + index + '+' + toHex(offset) + ')';
         code = 'this.sub_a(this.readMem(this.get' + index + '() + ' + toHex(offset) + '));';
         address++;
         break;
@@ -3430,7 +3430,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x9E:
         offset = this.readRom8bit(address);
-        inst = 'SBC A,(' + index + '+' + toHex(offset) + '))';
+        inst = 'SBC A,(' + index + '+' + toHex(offset) + ')';
         code = 'this.sbc_a(this.readMem(this.get' + index + '() + ' + toHex(offset) + '));';
         address++;
         break;
@@ -3444,7 +3444,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xA6:
         offset = this.readRom8bit(address);
-        inst = 'AND A,(' + index + '+' + toHex(offset) + '))';
+        inst = 'AND A,(' + index + '+' + toHex(offset) + ')';
         code = 'this.f = this.SZP_TABLE[this.a &= this.readMem(this.get' + index + '() + ' + toHex(offset) + ')] | F_HALFCARRY;';
         address++;
         break;
@@ -3458,7 +3458,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xAE:
         offset = this.readRom8bit(address);
-        inst = 'XOR A,(' + index + '+' + toHex(offset) + '))';
+        inst = 'XOR A,(' + index + '+' + toHex(offset) + ')';
         code = 'this.f = this.SZP_TABLE[this.a ^= this.readMem(this.get' + index + '() + ' + toHex(offset) + ')];';
         address++;
         break;
@@ -3472,7 +3472,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xB6:
         offset = this.readRom8bit(address);
-        inst = 'OR A,(' + index + '+' + toHex(offset) + '))';
+        inst = 'OR A,(' + index + '+' + toHex(offset) + ')';
         code = 'this.f = this.SZP_TABLE[this.a |= this.readMem(this.get' + index + '() + ' + toHex(offset) + ')];';
         address++;
         break;
@@ -3486,7 +3486,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xBE:
         offset = this.readRom8bit(address);
-        inst = 'CP (' + index + '+' + toHex(offset) + '))';
+        inst = 'CP (' + index + '+' + toHex(offset) + ')';
         code = 'this.cp_a(this.readMem(this.get' + index + '() + ' + toHex(offset) + '));';
         address++;
         break;
