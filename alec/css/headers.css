@@ -87,6 +87,7 @@ section[role="region"] > header:first-child menu[type="toolbar"] {
 }
 
 section[role="region"] > header:first-child menu[type="toolbar"] a,
+section[role="region"] > header:first-child menu[type="toolbar"] span.button,
 section[role="region"] > header:first-child menu[type="toolbar"] button {
   height: 5rem;
   min-width: 5rem;
