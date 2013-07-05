@@ -339,6 +339,7 @@ if (window['$']) {
         this.enable();
 
         $('#play').removeClass('disabled');
+        $('#fullscreen').removeClass('disabled');
       },
 
 
