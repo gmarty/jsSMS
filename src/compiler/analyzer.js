@@ -61,6 +61,7 @@ Analyzer.prototype = {
     this.normalizeBytecode(0);
     JSSMS.Utils.console.timeEnd('Analyzing');
 
+    this.bytecodes[0][this.bytecodes[0].length - 1].isFunctionEnder = true;
     this.ast = [this.bytecodes];
 
     for (var i in this.missingOpcodes) {
@@ -98,7 +99,7 @@ Analyzer.prototype = {
           }
 
           if (opcode && opcode.ast) {
-            var ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.nextAddress, bytecode.address);
+            var ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.nextAddress);
 
             // Force ast property to always be an array.
             if (!Array.isArray(ast) && ast != undefined)
@@ -109,7 +110,7 @@ Analyzer.prototype = {
             if (DEBUG) {
               bytecode.name = opcode.name;
               if (opcode.opcode)
-                bytecode.opcode = opcode.opcode(bytecode.operand, bytecode.target, bytecode.nextAddress, bytecode.address);
+                bytecode.opcode = opcode.opcode(bytecode.operand, bytecode.target, bytecode.nextAddress);
             }
           } else {
             var i = bytecode.hexOpcode;
@@ -132,7 +133,7 @@ Analyzer.prototype = {
     var self = this;
     var pointer = -1;
     var startNewFunction = true;
-    var prevBytecode = this.bytecodes[page][0];
+    var prevBytecode = {};
 
     this.bytecodes[page]
       .forEach(function(bytecode) {

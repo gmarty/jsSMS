@@ -121,7 +121,7 @@ Compiler.prototype = {
 
                   if (DEBUG) {
                     // Inline comment about the current bytecode.
-                    if (bytecode.ast[0] && bytecode.ast[0].leadingComments)
+                    if (bytecode.ast[0])
                       bytecode.ast[0].leadingComments = [
                         {
                           type: 'Line',
@@ -133,7 +133,7 @@ Compiler.prototype = {
                   return bytecode.ast;
                 });
 
-            if (DEBUG && fn[0][0] && fn[0][0].leadingComments)
+            if (DEBUG && fn[0][0])
               // Inject data about current branch into a comment.
               fn[0][0].leadingComments = [].concat({
                 type: 'Line',

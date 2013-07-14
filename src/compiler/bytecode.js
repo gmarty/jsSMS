@@ -23,6 +23,7 @@
 
 /**
  * @param {number} address
+ * @param {number} page
  * @constructor
  */
 var Bytecode = (function() {
@@ -43,13 +44,14 @@ var Bytecode = (function() {
   /**
    * A bytecode is made of:
    *  * at least one and at most 3 opcodes
-   *  * an operand (defaults to null)
+   *  * an operand (defaults to null, can be 8 or 16 bits)
    *  * a next address (defaults to null)
    *  * a jump target (defaults to null)
    */
-  function Bytecode(address) {
+  function Bytecode(address, page) {
     this.address = address;
-    this.hexAddress = toHex(address);
+    //this.hexAddress = toHex(address);
+    this.page = page;
     this.opcode = [];
     this.operand = null;
     this.nextAddress = null;
@@ -59,11 +61,6 @@ var Bytecode = (function() {
     this.isJumpTarget = false;
     this.jumpTargetNb = 0; // Number of instructions targeting there.
     this.ast = null;
-    // Memory can be registry or offset, read or write mode, 8 or 16 bit.
-    /*this.memory = null;
-
-     this.srcRegs = {};
-     this.dstRegs = {};*/
   }
 
   Bytecode.prototype = {
@@ -81,7 +78,7 @@ var Bytecode = (function() {
     get label() {
       // @todo Generate a function for each opcode instead of this.
       var name = this.name ? this.name.replace(/(nn|n|PC\+e|d)/, toHex(this.target || this.operand || 0)) : '';
-      return this.hexAddress + ' ' +
+      return toHex(this.address + (this.page * PAGE_SIZE)) + ' ' +
           this.hexOpcode + ' ' +
           name;
     }

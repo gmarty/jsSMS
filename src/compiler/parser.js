@@ -21,7 +21,6 @@
 
 
 /**
- * @todo Pass the rom memory non paginated to read/write faster.
  * @todo Define address types to instructionTypes (instruction or operand).
  * @todo Keep a track of memory locations parsed.
  */
@@ -30,19 +29,20 @@ var Parser = (function() {
 
   /**
    * @param {Array.<Array|DataView>} rom
+   * @param {Array.<number>} frameReg
    * @constructor
    */
-  var parser = function(rom) {
+  var parser = function(rom, frameReg) {
     this.stream = new RomStream(rom);
+    this.frameReg = frameReg;
 
     this.addresses = Array(rom.length);
-    this.entryPoints = Array(rom.length);
+    this.entryPoints = [];
     this.instructions = Array(rom.length);
     if (DEBUG) this.instructionTypes = [];
 
     for (var i = 0; i < rom.length; i++) {
       this.addresses[i] = [];
-      this.entryPoints[i] = [];
       this.instructions[i] = [];
       if (DEBUG) this.instructionTypes[i] = [];
     }
@@ -51,11 +51,11 @@ var Parser = (function() {
   parser.prototype = {
     /**
      * Add an address to the queue.
-     * @param {number} entryPoint
+     * @param {Object} obj
      */
-    addEntryPoint: function(entryPoint) {
-      this.entryPoints[Math.floor(entryPoint / 0x4000)].push(entryPoint);
-      this.addresses[Math.floor(entryPoint / 0x4000)].push(entryPoint);
+    addEntryPoint: function(obj) {
+      this.entryPoints.push(obj);
+      this.addAddress(obj.address);
     },
 
 
@@ -81,7 +81,8 @@ var Parser = (function() {
 
       for (currentPage = 0; currentPage < this.addresses.length; currentPage++) {
         while (this.addresses[currentPage].length) {
-          var currentAddress = this.addresses[currentPage].shift();
+          var currentObj = this.addresses[currentPage].shift();
+          var currentAddress = currentObj.address % 0x4000;
 
           if (currentAddress < pageStart || currentAddress > pageEnd) {
             JSSMS.Utils.console.error('Address out of bound', JSSMS.Utils.toHex(currentAddress));
@@ -93,7 +94,7 @@ var Parser = (function() {
             continue;
           }
 
-          var bytecode = new Bytecode(currentAddress);
+          var bytecode = new Bytecode(currentAddress, currentPage);
           this.instructions[currentPage][currentAddress] = disassemble(bytecode, this.stream);
 
           if (this.instructions[currentPage][currentAddress].nextAddress != null &&
@@ -109,15 +110,24 @@ var Parser = (function() {
         }
       }
 
-      for (currentPage = 0; currentPage < this.addresses.length; currentPage++) {
-        // Flag entry points as jump target.
-        for (var i = 0; i < this.entryPoints[currentPage].length; i++) {
-          var entryPoint = this.entryPoints[currentPage][i];
-          this.instructions[currentPage][entryPoint].isJumpTarget = true;
-          this.instructions[currentPage][entryPoint].jumpTargetNb++;
-        }
+      // We consider the first 0x0400 bytes as an independent memory page.
+      if (this.instructions[0][0x03FF]) {
+        this.instructions[0][0x03FF].isFunctionEnder = true;
+      } else if (this.instructions[0][0x03FE]) {
+        this.instructions[0][0x03FE].isFunctionEnder = true;
+      }
 
-        // Mark all jump target instructions.
+      // Flag entry points as jump target.
+      for (var i = 0, length = this.entryPoints.length; i < length; i++) {
+        var entryPoint = this.entryPoints[i].address;
+        var romPage = this.entryPoints[i].romPage;
+
+        this.instructions[romPage][entryPoint].isJumpTarget = true;
+        this.instructions[romPage][entryPoint].jumpTargetNb++;
+      }
+
+      // Mark all jump target instructions.
+      for (currentPage = 0; currentPage < this.instructions.length; currentPage++) {
         for (var i = 0, length = this.instructions[currentPage].length; i < length; i++) {
           if (!this.instructions[currentPage][i]) {
             continue;
@@ -129,9 +139,10 @@ var Parser = (function() {
           }
           if (this.instructions[currentPage][i].target != null) {
             var targetPage = Math.floor(this.instructions[currentPage][i].target / 0x4000);
-            if (this.instructions[targetPage] && this.instructions[targetPage][this.instructions[currentPage][i].target]) {
-              this.instructions[targetPage][this.instructions[currentPage][i].target].isJumpTarget = true;
-              this.instructions[targetPage][this.instructions[currentPage][i].target].jumpTargetNb++;
+            var targetAddress = this.instructions[currentPage][i].target % 0x4000;
+            if (this.instructions[targetPage] && this.instructions[targetPage][targetAddress]) {
+              this.instructions[targetPage][targetAddress].isJumpTarget = true;
+              this.instructions[targetPage][targetAddress].jumpTargetNb++;
             } else {
               JSSMS.Utils.console.log('Invalid target address', JSSMS.Utils.toHex(this.instructions[currentPage][i].target));
             }
@@ -147,23 +158,39 @@ var Parser = (function() {
      * This method only parsed a single function. The result of the parsing is added to the parsed
      * instructions array, but returns only the bytecodes newly parsed.
      *
-     * @param {number} currentAddress
-     * @param {number} currentPage
+     * @param {Object} obj
      * @return {Array}
      */
-    parseFromAddress: function(currentAddress, currentPage) {
-      var pageStart = currentPage * 0x4000;
-      var pageEnd = ((currentPage + 1) * 0x4000) - 1;
+    parseFromAddress: function(obj) {
+      var address = obj.address % 0x4000;
+      var romPage = obj.romPage;
+
+      var pageStart = romPage * 0x4000;
+      var pageEnd = (romPage + 1) * 0x4000;
       var branch = [];
       var bytecode;
 
-      // @todo Check if not already parsed.
+      var firstInstruction = true;
+
+      // We consider the first 0x0400 bytes as an independent memory page.
+      if (address < 0x0400) {
+        pageStart = 0;
+        pageEnd = 0x0400;
+      }
+
       do {
-        bytecode = new Bytecode(currentAddress);
-        this.instructions[currentPage][currentAddress] = disassemble(bytecode, this.stream);
+        bytecode = new Bytecode(address, romPage);
+        this.instructions[romPage][address] = disassemble(bytecode, this.stream);
+        if (bytecode.canEnd && !firstInstruction) {
+          // Because canEnd tagged instructions are jump targets. This method doesn't tag jump
+          // targets as opposed to a full parse().
+          break;
+        }
+
+        address = bytecode.nextAddress % 0x4000;
         branch.push(bytecode);
-        currentAddress = bytecode.nextAddress;
-      } while ((currentAddress != null || !bytecode.isFunctionEnder) && currentAddress >= pageStart && currentAddress <= pageEnd);
+        firstInstruction = false;
+      } while (address != null && address >= pageStart && address < pageEnd && !bytecode.isFunctionEnder);
 
       return branch;
     },
@@ -209,10 +236,18 @@ var Parser = (function() {
 
     /**
      * Add an address to the queue.
-     * @param {number} address
+     * @param {Number} address
      */
     addAddress: function(address) {
-      this.addresses[Math.floor(address / 0x4000)].push(address);
+      var memPage = Math.floor(address / 0x4000);
+      var romPage = this.frameReg[memPage];
+      address = address % 0x4000;
+
+      this.addresses[romPage].push({
+        address: address,
+        romPage: romPage,
+        memPage: memPage
+      });
     }
   };
 
@@ -225,7 +260,8 @@ var Parser = (function() {
    * @return {Bytecode}
    */
   function disassemble(bytecode, stream) {
-    stream.seek(bytecode.address);
+    stream.page = bytecode.page;
+    stream.seek(bytecode.address + (stream.page * 0x4000));
     var opcode = stream.getUint8();
 
     var operand = null;
@@ -1075,7 +1111,7 @@ var Parser = (function() {
         }
         break;
       default:
-        JSSMS.Utils.console.error('Unexpected opcode', JSSMS.Utils.toHex(opcode));
+        JSSMS.Utils.console.error('Unexpected opcode', '0xED ' + JSSMS.Utils.toHex(opcode));
     }
 
     bytecode.nextAddress = stream.position;
@@ -1312,7 +1348,7 @@ var Parser = (function() {
       case 0xF9:
         break;
       default:
-        JSSMS.Utils.console.error('Unexpected opcode', JSSMS.Utils.toHex(opcode));
+        JSSMS.Utils.console.error('Unexpected opcode', '0xDD/0xFD ' + JSSMS.Utils.toHex(opcode));
     }
 
     bytecode.nextAddress = stream.position;
@@ -1349,6 +1385,7 @@ var Parser = (function() {
   function RomStream(rom) {
     this.rom = rom;
     this.pos = null;
+    this.page = 0;
   }
 
   RomStream.prototype = {
@@ -1383,13 +1420,15 @@ var Parser = (function() {
      */
     getUint8: function() {
       var value = 0;
+      var page = this.page;
+      var address = (this.pos) & 0x3FFF;
 
       if (SUPPORT_DATAVIEW) {
-        value = this.rom[this.pos >> 14].getUint8(this.pos & 0x3FFF);
+        value = this.rom[page].getUint8(address);
         this.pos++;
         return value;
       } else {
-        value = this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF;
+        value = this.rom[page][address] & 0xFF;
         this.pos++;
         return value;
       }
@@ -1403,13 +1442,15 @@ var Parser = (function() {
      */
     getInt8: function() {
       var value = 0;
+      var page = this.page;
+      var address = (this.pos) & 0x3FFF;
 
       if (SUPPORT_DATAVIEW) {
-        value = this.rom[this.pos >> 14].getInt8(this.pos & 0x3FFF);
+        value = this.rom[page].getInt8(address);
         this.pos++;
         return value + 1;
       } else {
-        value = this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF;
+        value = this.rom[page][address] & 0xFF;
         if (value >= 128) {
           value = value - 256;
         }
@@ -1426,21 +1467,23 @@ var Parser = (function() {
      */
     getUint16: function() {
       var value = 0;
+      var page = this.page;
+      var address = (this.pos) & 0x3FFF;
 
       if (SUPPORT_DATAVIEW) {
-        if ((this.pos & 0x3FFF) < 0x3FFF) {
-          value = this.rom[this.pos >> 14].getUint16(this.pos & 0x3FFF, LITTLE_ENDIAN);
+        if ((address & 0x3FFF) < 0x3FFF) {
+          value = this.rom[page].getUint16(address, LITTLE_ENDIAN);
           this.pos += 2;
           return value;
         } else {
-          value = (this.rom[this.pos >> 14].getUint8(this.pos & 0x3FFF)) |
-              ((this.rom[++this.pos >> 14].getUint8(this.pos & 0x3FFF)) << 8);
+          value = (this.rom[page].getUint8(address)) |
+              ((this.rom[++page].getUint8(address)) << 8);
           this.pos += 2;
           return value;
         }
       } else {
-        value = (this.rom[this.pos >> 14][this.pos & 0x3FFF] & 0xFF) |
-            ((this.rom[++this.pos >> 14][this.pos & 0x3FFF] & 0xFF) << 8);
+        value = (this.rom[page][address] & 0xFF) |
+            ((this.rom[++page][address] & 0xFF) << 8);
         this.pos += 2;
         return value;
       }

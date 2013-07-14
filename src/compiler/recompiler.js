@@ -44,7 +44,7 @@ Recompiler.prototype = {
    */
   setRom: function(rom) {
     this.rom = rom;
-    this.parser = new Parser(rom);
+    this.parser = new Parser(rom, this.cpu.frameReg);
   },
 
 
@@ -55,9 +55,9 @@ Recompiler.prototype = {
     var self = this;
 
     this.options.entryPoints = [
-      0x00,
-      0x38,
-      0x66
+      {address: 0x00, romPage: 0, memPage: 0},
+      {address: 0x38, romPage: 0, memPage: 0},
+      {address: 0x66, romPage: 0, memPage: 0}
     ];
 
     if (this.rom.length <= 2) {
@@ -82,31 +82,9 @@ Recompiler.prototype = {
         fn.body[0].id.name = '_' + funcName;
         var code = self.generateCodeFromAst(fn);
 
-        self.cpu.branches[page]['_' + (funcName - (page * 0x4000))] = new Function('return ' + code)();
+        self.cpu.branches[page]['_' + funcName] = new Function('return ' + code)();
       });
     }
-  },
-
-
-  recompileFromAddress: function(address, page) {
-    var self = this;
-
-    var fns = this
-      .parseFromAddress(address, page)
-      .analyzeFromAddress()
-      .optimize()
-      .generate();
-
-    // Attach generated code to an attach point in Z80 instance.
-    fns[0].forEach(function(fn) {
-      var funcName = fn.body[0].id.name;
-      fn.body[0].id.name = '_' + funcName;
-      var code = self.generateCodeFromAst(fn);
-
-      //console.log(funcName, code);
-
-      self.cpu.branches[page]['_' + (funcName - (page * 0x4000))] = new Function('return ' + code)();
-    });
   },
 
 
@@ -143,9 +121,30 @@ Recompiler.prototype = {
   },
 
 
-  parseFromAddress: function(address, page) {
-    //self.parser.addEntryPoint(address);
-    this.bytecodes = this.parser.parseFromAddress(address, page);
+  recompileFromAddress: function(address, romPage, memPage) {
+    var self = this;
+
+    var fns = this
+      .parseFromAddress(address, romPage, memPage)
+      .analyzeFromAddress()
+      .optimize()
+      .generate();
+
+    // Attach generated code to an attach point in Z80 instance.
+    fns[0].forEach(function(fn) {
+      var funcName = fn.body[0].id.name;
+      fn.body[0].id.name = '_' + funcName;
+      var code = self.generateCodeFromAst(fn);
+
+      self.cpu.branches[romPage]['_' + address % 0x4000] = new Function('return ' + code)();
+    });
+  },
+
+
+  parseFromAddress: function(address, romPage, memPage) {
+    var obj = {address: address, romPage: romPage, memPage: memPage};
+    this.parser.entryPoints.push(obj);
+    this.bytecodes = this.parser.parseFromAddress(obj);
 
     return this;
   },

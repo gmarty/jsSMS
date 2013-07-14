@@ -1035,7 +1035,7 @@ var o = {
     };
   },
   HALT: function() {
-    return function(value, target, nextAddress, currentAddress) {
+    return function(value, target, nextAddress) {
       // if (HALT_SPEEDUP) tstates = 0;
       // halt = true;
       // pc--;
@@ -1045,7 +1045,7 @@ var o = {
 
       return ret.concat([
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('halt'), n.Literal(true))),
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(currentAddress)))
+        n.ReturnStatement()
       ]);
     };
   },
@@ -1074,7 +1074,7 @@ var o = {
         );
       };
     else if (register1 == 'i')
-      return function(value, target, nextAddress, currentAddress) {
+      return function(value, target, nextAddress) {
         // location = (getIY() + value) & 0xFFFF;
         // bit(readMem(location) & BIT_0);
         return [
@@ -1109,7 +1109,7 @@ var o = {
         );
       };
     else if (register1 == 'i')
-      return function(value, target, nextAddress, currentAddress) {
+      return function(value, target, nextAddress) {
         // location = (getIY() + value) & 0xFFFF;
         // writeMem(location, readMem(location) & ~BIT_0);
         return [
@@ -1147,7 +1147,7 @@ var o = {
         );
       };
     else if (register1 == 'i')
-      return function(value, target, nextAddress, currentAddress) {
+      return function(value, target, nextAddress) {
         // location = (getIY() + value) & 0xFFFF;
         // writeMem(location, readMem(location) | BIT_0);
         return [
@@ -1169,7 +1169,7 @@ var o = {
   // DD/FD prefixed opcodes.
   LD_X: function(register1, register2, register3) {
     if (register3 == undefined)
-      return function(value, target, nextAddress, currentAddress) {
+      return function(value, target, nextAddress) {
         // writeMem(getIX() + (value >> 8), value & 0xFF);
         return [
           n.ExpressionStatement(n.CallExpression('writeMem', [
@@ -1181,7 +1181,7 @@ var o = {
         ];
       };
     else
-      return function(value, target, nextAddress, currentAddress) {
+      return function(value, target, nextAddress) {
         // writeMem(getIX() + value, b);
         return [
           n.ExpressionStatement(n.CallExpression('writeMem', [
@@ -1194,7 +1194,7 @@ var o = {
       };
   },
   INC_X: function(register1, register2) {
-    return function(value, target, nextAddress, currentAddress) {
+    return function(value, target, nextAddress) {
       // incMem(getIX() + value);
       return [
         n.ExpressionStatement(n.CallExpression('incMem',
@@ -1205,7 +1205,7 @@ var o = {
     };
   },
   DEC_X: function(register1, register2) {
-    return function(value, target, nextAddress, currentAddress) {
+    return function(value, target, nextAddress) {
       // decMem(getIX() + value);
       return [
         n.ExpressionStatement(n.CallExpression('decMem',
@@ -1216,7 +1216,7 @@ var o = {
     };
   },
   ADD_X: function(register1, register2) {
-    return function(value, target, nextAddress, currentAddress) {
+    return function(value, target, nextAddress) {
       // add_a(readMem(getIX() + value));
       return n.ExpressionStatement(
           n.CallExpression('add_a', o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
@@ -1225,7 +1225,7 @@ var o = {
     };
   },
   OR_X: function(register1, register2) {
-    return function(value, target, nextAddress, currentAddress) {
+    return function(value, target, nextAddress) {
       // a |= readMem(getIX() + value); f = SZP_TABLE[a];
       return [
         n.ExpressionStatement(
@@ -1271,7 +1271,7 @@ var o = {
     };
   },
   JP_X: function(register1, register2) {
-    return function(value, target, nextAddress, currentAddress) {
+    return function(value, target, nextAddress) {
       // pc = getIX();
       return [
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.CallExpression('get' + (register1 + register2).toUpperCase()))),
@@ -1319,7 +1319,7 @@ var o = {
     };
   },
   OUTI: function() {
-    return function(value, target, nextAddress, currentAddress) {
+    return function(value, target, nextAddress) {
       // temp = readMem(getHL());
       // port.out(c, temp);
       // incHL();
@@ -1365,7 +1365,7 @@ var o = {
     }
   },
   OUTD: function() {
-    return function(value, target, nextAddress, currentAddress) {
+    return function(value, target, nextAddress) {
       // temp = readMem(getHL());
       // port.out(c, temp);
       // decHL();
@@ -1411,7 +1411,7 @@ var o = {
     }
   },
   LDI: function() {
-    return function(value, target, nextAddress, currentAddress) {
+    return function(value, target, nextAddress) {
       // writeMem(getDE(), readMem(getHL()));
       // incDE();
       // incHL();
@@ -1442,7 +1442,7 @@ var o = {
     };
   },
   LDD: function() {
-    return function(value, target, nextAddress, currentAddress) {
+    return function(value, target, nextAddress) {
       // writeMem(getDE(), readMem(getHL()));
       // decDE();
       // decHL();
@@ -1473,7 +1473,7 @@ var o = {
     };
   },
   LDIR: function() {
-    return function(value, target, nextAddress, currentAddress) {
+    return function(value, target, nextAddress) {
       // writeMem(getDE(), readMem(getHL()));
       // incDE();
       // incHL();
@@ -1505,7 +1505,6 @@ var o = {
             n.BlockStatement([
               n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
               n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Identifier('F_PARITY'))),
-              n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(currentAddress))),
               n.ReturnStatement()
             ]),
             n.BlockStatement([
@@ -1518,16 +1517,13 @@ var o = {
     };
   },
   OTIR: function() {
-    return function(value, target, nextAddress, currentAddress) {
+    return function(value, target, nextAddress) {
       // temp = readMem(getHL());
       // port.out(c, temp);
       // b = dec8(b);
       // incHL();
       // if (b != 0) {
       // tstates -= 5;
-      // pc--;
-      // } else {
-      // pc++;
       // }
       // if ((l + temp) > 255) {
       // f |= F_CARRY;
@@ -1550,7 +1546,6 @@ var o = {
             n.BinaryExpression('!=', n.Register('b'), n.Literal(0)),
             n.BlockStatement([
               n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
-              n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(currentAddress))),
               n.ReturnStatement()
             ])
         ),
@@ -1620,7 +1615,7 @@ function generateCBFunctions(fn) {
 function generateIndexCBFunctions(fn) {
   return function(register1, register2, register3) {
     if (register3 == undefined)
-      return function(value, target, nextAddress, currentAddress) {
+      return function(value, target, nextAddress) {
         // location = (getIY() + value) & 0xFFFF;
         // writeMem(location, rlc(readMem(location)));
         return [
@@ -1633,7 +1628,7 @@ function generateIndexCBFunctions(fn) {
         ];
       };
     else
-      return function(value, target, nextAddress, currentAddress) {
+      return function(value, target, nextAddress) {
         // location = (getIY() + value) & 0xFFFF;
         // b = rlc(readMem(location));
         // writeMem(location, b);
