@@ -196,8 +196,8 @@ JSSMS.Debugger.prototype = {
         continue;
 
       // Break branches into several pages.
-      if (prevAddress <= pageBreakPoint && tree[i].address > pageBreakPoint) {
-        code.push('this.pc = ' + toHex(prevAddress) + ';');
+      if (prevAddress <= pageBreakPoint && tree[i].address >= pageBreakPoint) {
+        code.push('this.pc = ' + toHex(tree[i].address) + ';');
         code.push('}');
         code.push('},');
 
@@ -3662,6 +3662,8 @@ JSSMS.Debugger.prototype = {
         break;
       case 0x1F:
         inst = 'LD A,RR (' + index + ')';
+        code = location +
+            'this.a = this.rr(this.readMem(location)); this.writeMem(location, this.a);';
         break;
       case 0x20:
         inst = 'LD B,SLA (' + index + ')';
