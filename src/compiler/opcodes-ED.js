@@ -20,6 +20,10 @@
 'use strict';
 
 var opcodeTableED = {
+  0x40: {
+    name: 'IN B,(C)',
+    ast: o.IN('b', 'c')
+  },
   0x42: {
     name: 'SBC HL,BC',
     ast: o.SBC16('b', 'c')
@@ -43,6 +47,10 @@ var opcodeTableED = {
   0x46: {
     name: 'IM 0',
     ast: o.IM(0)
+  },
+  0x48: {
+    name: 'IN C,(C)',
+    ast: o.IN('c', 'c')
   },
   0x49: {
     name: 'OUT (C),C',
@@ -69,6 +77,10 @@ var opcodeTableED = {
     name: 'IM 0',
     ast: o.IM(0)
   },
+  0x50: {
+    name: 'IN D,(C)',
+    ast: o.IN('d', 'c')
+  },
   0x51: {
     name: 'OUT (C),D',
     ast: o.OUT('c', 'd')
@@ -93,6 +105,14 @@ var opcodeTableED = {
     name: 'IM 1',
     ast: o.IM(1)
   },
+  0x57: {
+    name: 'LD A,I',
+    ast: o.LD8('a', 'i')
+  },
+  0x58: {
+    name: 'IN E,(C)',
+    ast: o.IN('e', 'c')
+  },
   0x59: {
     name: 'OUT (C),E',
     ast: o.OUT('c', 'e')
@@ -114,6 +134,10 @@ var opcodeTableED = {
     name: 'LD A,R',
     ast: o.LD8('a', 'r')
   },
+  0x60: {
+    name: 'IN H,(C)',
+    ast: o.IN('h', 'c')
+  },
   0x61: {
     name: 'OUT (C),H',
     ast: o.OUT('c', 'h')
@@ -133,6 +157,10 @@ var opcodeTableED = {
   0x66: {
     name: 'IM 0',
     ast: o.IM(0)
+  },
+  0x68: {
+    name: 'IN L,(C)',
+    ast: o.IN('l', 'c')
   },
   0x69: {
     name: 'OUT (C),L',
@@ -167,6 +195,10 @@ var opcodeTableED = {
     name: 'IM 1',
     ast: o.IM(1)
   },
+  0x78: {
+    name: 'IN A,(C)',
+    ast: o.IN('a', 'c')
+  },
   0x79: {
     name: 'OUT (C),A',
     ast: o.OUT('c', 'a')
@@ -182,6 +214,14 @@ var opcodeTableED = {
   0xA0: {
     name: 'LDI',
     ast: o.LDI()
+  },
+  0xA1: {
+    name: 'CPI',
+    ast: o.CPI()
+  },
+  0xA2: {
+    name: 'INI',
+    ast: o.INI()
   },
   0xA3: {
     name: 'OUTI',
