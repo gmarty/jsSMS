@@ -78,11 +78,7 @@ Analyzer.prototype = {
     var self = this;
 
     this.bytecodes[page] = this.bytecodes[page]
-      .filter(function(bytecode) {
-          // Turn parsed bytecodes array into a dense array.
-          return bytecode;
-        })
-        //Populate AST for each bytecode.
+        // Populate AST for each bytecode.
       .map(function(bytecode) {
           switch (bytecode.opcode.length) {
             case 1:

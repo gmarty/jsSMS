@@ -173,14 +173,19 @@ var Parser = (function() {
       var firstInstruction = true;
 
       // We consider the first 0x0400 bytes as an independent memory page.
-      if (address < 0x0400) {
+      if (address < 0x0400 && romPage == 0) {
         pageStart = 0;
         pageEnd = 0x0400;
       }
 
       do {
-        bytecode = new Bytecode(address, romPage);
-        this.instructions[romPage][address] = disassemble(bytecode, this.stream);
+        if (this.instructions[romPage][address]) {
+          bytecode = this.instructions[romPage][address];
+        } else {
+          bytecode = new Bytecode(address, romPage);
+          this.instructions[romPage][address] = disassemble(bytecode, this.stream);
+        }
+
         if (bytecode.canEnd && !firstInstruction) {
           // Because canEnd tagged instructions are jump targets. This method doesn't tag jump
           // targets as opposed to a full parse().
@@ -236,7 +241,7 @@ var Parser = (function() {
 
     /**
      * Add an address to the queue.
-     * @param {Number} address
+     * @param {number} address
      */
     addAddress: function(address) {
       var memPage = Math.floor(address / 0x4000);
