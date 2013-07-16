@@ -1485,7 +1485,7 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xEE:
         operand = toHex(this.readRom8bit(address));
-        inst = 'XOR A,' + operand;
+        inst = 'XOR ' + operand;
         code = 'this.f = this.SZP_TABLE[this.a ^= ' + operand + '];';
         address++;
         break;
@@ -2757,7 +2757,7 @@ JSSMS.Debugger.prototype = {
           // Note, to fake refresh emulation we use the random number generator
           code = 'this.a = JSSMS.Utils.rndInt(0xFF);';
         }
-        code += 'this.f = (this.f & F_CARRY) | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);';
+        code += 'this.f = this.f & F_CARRY | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0x00);';
         break;
       case 0x60:
         inst = 'IN H,(C)';
