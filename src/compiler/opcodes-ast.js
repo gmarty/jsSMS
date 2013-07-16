@@ -990,7 +990,14 @@ var o = {
       };
   },
   IN: function(register1, register2) {
-    if (register1 == 'a')
+    if (register2 == undefined)
+      return function(value, target, nextAddress) {
+        // a = port.in_(value);
+        return n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register(register1), n.CallExpression('port.in_', n.Literal(value)))
+        );
+      };
+    else
       return function(value, target, nextAddress) {
         // a = port.in_(c);
         // f = (f & F_CARRY) | SZP_TABLE[a];
@@ -1000,17 +1007,10 @@ var o = {
           n.ExpressionStatement(n.AssignmentExpression('=', n.Register('f'),
               n.BinaryExpression('|',
               n.BinaryExpression('&', n.Register('f'), n.Identifier('F_CARRY')),
-              n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a'))
+              n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register(register1))
               )
               ))
         ];
-      };
-    if (register2 == undefined)
-      return function(value, target, nextAddress) {
-        // a = port.in_(value);
-        return n.ExpressionStatement(
-            n.AssignmentExpression('=', n.Register(register1), n.CallExpression('port.in_', n.Literal(value)))
-        );
       };
   },
   EX_AF: function() {
