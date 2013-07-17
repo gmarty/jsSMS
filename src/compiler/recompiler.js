@@ -82,7 +82,7 @@ Recompiler.prototype = {
         fn.body[0].id.name = '_' + funcName;
         var code = self.generateCodeFromAst(fn);
 
-        self.cpu.branches[page]['_' + funcName] = new Function('return ' + code)();
+        self.cpu.branches[page][funcName] = new Function('return ' + code)();
       });
     }
   },
@@ -136,7 +136,7 @@ Recompiler.prototype = {
       fn.body[0].id.name = '_' + funcName;
       var code = self.generateCodeFromAst(fn);
 
-      self.cpu.branches[romPage]['_' + address % 0x4000] = new Function('return ' + code)();
+      self.cpu.branches[romPage][address % 0x4000] = new Function('return ' + code)();
     });
   },
 
@@ -164,5 +164,22 @@ Recompiler.prototype = {
       hexadecimal: true,
       parse: window['esprima']['parse']
     });
+  },
+
+  /**
+   * Generate a string representation of the branches generated.
+   */
+  dump: function() {
+    var output = [];
+
+    for (var i in sms.cpu.branches) {
+      output.push('// Page ' + i);
+      for (var j in sms.cpu.branches[i]) {
+        output.push(sms.cpu.branches[i][j]);
+      }
+    }
+
+    output = output.join('\n');
+    console.log(output);
   }
 };
