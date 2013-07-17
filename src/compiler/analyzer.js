@@ -46,7 +46,7 @@ Analyzer.prototype = {
     JSSMS.Utils.console.timeEnd('Analyzing');
 
     for (var i in this.missingOpcodes) {
-      console.log(i, this.missingOpcodes[i]);
+      console.error('Missing opcode', i, this.missingOpcodes[i]);
     }
   },
 
@@ -65,7 +65,7 @@ Analyzer.prototype = {
     this.ast = [this.bytecodes];
 
     for (var i in this.missingOpcodes) {
-      console.log(i, this.missingOpcodes[i]);
+      console.error('Missing opcode', i, this.missingOpcodes[i]);
     }
   },
 
