@@ -90,7 +90,7 @@ Compiler.prototype = {
                         decreaseTStateStmt[0]['expression']['right']['raw'] = toHex(decreaseTStateStmt[0]['expression']['right']['value']);
                     }
 
-                    bytecode.ast = decreaseTStateStmt.concat(bytecode.ast);
+                    bytecode.ast = [].concat(decreaseTStateStmt, bytecode.ast);
                     tstates = 0;
                   }
 
@@ -133,12 +133,12 @@ Compiler.prototype = {
                   return bytecode.ast;
                 });
 
-            if (DEBUG && fn[0][0])
+            /*if (DEBUG && fn[0][0])
               // Inject data about current branch into a comment.
               fn[0][0].leadingComments = [].concat({
                 type: 'Line',
                 value: ' Nb of instructions jumping here: ' + jumpTargetNb
-              }, fn[0][0].leadingComments);
+              }, fn[0][0].leadingComments);*/
 
             // Flatten the array.
             fn.forEach(function(ast) {

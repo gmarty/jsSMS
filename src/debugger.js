@@ -219,7 +219,7 @@ JSSMS.Debugger.prototype = {
         code.push('},');
         // `temp` is only used for variable declaration, not actually passed parameter.
         code.push('' + toHex(tree[i].address) + ': function(temp, location) {');
-        code.push('// Nb of instructions jumping here: ' + tree[i].jumpTargetNb);
+        //code.push('// Nb of instructions jumping here: ' + tree[i].jumpTargetNb);
       }
 
       //code.push('if (this.tstates <= 0) {this.pc = ' + toHex(tree[i].address) + '; if (this.eol()) return;}');
