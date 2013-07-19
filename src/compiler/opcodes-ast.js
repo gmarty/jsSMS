@@ -1072,13 +1072,15 @@ var o = {
     return function(value, target, nextAddress) {
       // if (HALT_SPEEDUP) tstates = 0;
       // halt = true;
-      // pc--;
+      // pc = nextAddress - 1;
+      // return;
       var ret = [];
       if (HALT_SPEEDUP)
         ret.push(n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('tstates'), n.Literal(0))));
 
       return ret.concat([
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('halt'), n.Literal(true))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(nextAddress - 1))),
         n.ReturnStatement()
       ]);
     };

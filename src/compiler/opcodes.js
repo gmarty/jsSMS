@@ -164,7 +164,7 @@ var opcodeTable = [
   },
   //0x1B
   {
-    ame: 'DEC DE',
+    name: 'DEC DE',
     ast: o.DEC16('d', 'e')
   },
   //0x1C
