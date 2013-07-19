@@ -849,10 +849,10 @@ JSSMS.Debugger.prototype = {
       case 0x76:
         inst = 'HALT';
         if (HALT_SPEEDUP)
-          code = 'this.tstates = 0;';
+          code = 'this.tstates = 0x00;';
         else
           code = '';
-        code += 'this.halt = true; this.pc = ' + toHex(address) + '; return;';
+        code += 'this.halt = true; this.pc = ' + toHex(address - 1) + '; return;';
         break;
       case 0x77:
         inst = 'LD (HL),A';
