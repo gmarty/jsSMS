@@ -99,6 +99,9 @@ JSSMS.Debugger.prototype = {
 
     // Flag any instructions that are jump targets.
     entryPoints.forEach(function(entryPoint) {
+      if (!this.instructions[entryPoint]) {
+        return;
+      }
       this.instructions[entryPoint].isJumpTarget = true;
     }, this);
 
@@ -2789,7 +2792,7 @@ JSSMS.Debugger.prototype = {
             'this.writeMem(location, (temp >> 4) | ((this.a & 0x0F) << 4));' +
             // move 4 lowest bits of hl to low 4 of a
             'this.a = (this.a & 0xF0) | (temp & 0x0F);' +
-            'this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];';
+            'this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];';
         break;
       case 0x68:
         inst = 'IN L,(C)';
@@ -2819,7 +2822,7 @@ JSSMS.Debugger.prototype = {
             'this.writeMem(location, (temp & 0x0F) << 4 | (this.a & 0x0F));' +
             // move high 4 of hl to low 4 of a
             'this.a = (this.a & 0xF0) | (temp >> 4);' +
-            'this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];';
+            'this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];';
         break;
       case 0x71:
         inst = 'OUT (C),0';
@@ -2840,7 +2843,7 @@ JSSMS.Debugger.prototype = {
       case 0x78:
         inst = 'IN A,(C)';
         code = 'this.a = this.port.in_(this.c);' +
-            'this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];';
+            'this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];';
         break;
       case 0x79:
         inst = 'OUT (C),A';
@@ -2953,7 +2956,7 @@ JSSMS.Debugger.prototype = {
           code += 'if (this.getBC() != 0x00) {' +
               'this.tstates -= 0x05;' +
               'this.f |= F_PARITY;' +
-              'this.pc = ' + toHex(target) + ';' +
+              //'this.pc = ' + toHex(target) + ';' +
               'return;' +
               '} else {';
         } else {
@@ -3003,7 +3006,7 @@ JSSMS.Debugger.prototype = {
             'this.incHL();' +
             'if (this.b != 0x00) {' +
             'this.tstates -= 0x05;' +
-            'this.pc = ' + toHex(target) + ';' +
+            //'this.pc = ' + toHex(target) + ';' +
             'return;' +
             //'} else {' +
             //'this.pc++;' +
@@ -3027,7 +3030,7 @@ JSSMS.Debugger.prototype = {
           target = address - 2;
           code += 'if (this.b != 0x00) {' +
               'this.tstates -= 0x05;' +
-              'this.pc = ' + toHex(target) + ';' +
+              //'this.pc = ' + toHex(target) + ';' +
               'return;' +
               '}';
         } else {
@@ -3068,7 +3071,7 @@ JSSMS.Debugger.prototype = {
             'this.decHL();' +
             'if (this.b != 0x00) {' +
             'this.tstates -= 0x05;' +
-            'this.pc = ' + toHex(target) + ';' +
+            //'this.pc = ' + toHex(target) + ';' +
             'return;' +
             //'} else {' +
             //'this.pc++;' +
@@ -3093,7 +3096,7 @@ JSSMS.Debugger.prototype = {
             'this.decHL();' +
             'if (this.b != 0x00) {' +
             'this.tstates -= 0x05;' +
-            'this.pc = ' + toHex(target) + ';' +
+            //'this.pc = ' + toHex(target) + ';' +
             'return;' +
             //'} else {' +
             //'this.pc++;' +
