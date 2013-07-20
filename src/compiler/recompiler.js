@@ -79,7 +79,7 @@ Recompiler.prototype = {
     for (var page = 0; page < this.rom.length; page++) {
       fns[page].forEach(function(fn) {
         var funcName = fn.body[0].id.name;
-        fn.body[0].id.name = '_' + funcName;
+        fn.body[0].id.name = '_' + JSSMS.Utils.toHex(funcName);
         var code = self.generateCodeFromAst(fn);
 
         self.cpu.branches[page][funcName] = new Function('return ' + code)();
@@ -133,7 +133,7 @@ Recompiler.prototype = {
     // Attach generated code to an attach point in Z80 instance.
     fns[0].forEach(function(fn) {
       var funcName = fn.body[0].id.name;
-      fn.body[0].id.name = '_' + funcName;
+      fn.body[0].id.name = '_' + JSSMS.Utils.toHex(funcName);
       var code = self.generateCodeFromAst(fn);
 
       self.cpu.branches[romPage][address % 0x4000] = new Function('return ' + code)();
@@ -172,10 +172,10 @@ Recompiler.prototype = {
   dump: function() {
     var output = [];
 
-    for (var i in sms.cpu.branches) {
+    for (var i in this.cpu.branches) {
       output.push('// Page ' + i);
-      for (var j in sms.cpu.branches[i]) {
-        output.push(sms.cpu.branches[i][j]);
+      for (var j in this.cpu.branches[i]) {
+        output.push(this.cpu.branches[i][j]);
       }
     }
 
