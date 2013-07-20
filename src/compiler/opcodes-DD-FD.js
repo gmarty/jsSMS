@@ -73,21 +73,85 @@ function generateIndexTable(index) {
       name: 'LD C,(' + index + '+d)',
       ast: o.LD8_D('c', 'i', register2)
     },
+    0x54: {
+      name: ' LD D,' + index + 'H *',
+      ast: o.LD8('d', 'i' + register2LC + 'H')
+    },
     0x56: {
       name: 'LD D,(' + index + '+d)',
       ast: o.LD8_D('d', 'i', register2)
+    },
+    0x5D: {
+      name: 'LD E,' + index + 'L *',
+      ast: o.LD8('e', 'i' + register2LC + 'L')
     },
     0x5E: {
       name: 'LD E,(' + index + '+d)',
       ast: o.LD8_D('e', 'i', register2)
     },
+    0x60: {
+      name: 'LD ' + index + 'H,B',
+      ast: o.LD8('i' + register2LC + 'H', 'b')
+    },
+    0x61: {
+      name: 'LD ' + index + 'H,C',
+      ast: o.LD8('i' + register2LC + 'H', 'c')
+    },
+    0x62: {
+      name: 'LD ' + index + 'H,D',
+      ast: o.LD8('i' + register2LC + 'H', 'd')
+    },
+    0x63: {
+      name: 'LD ' + index + 'H,E',
+      ast: o.LD8('i' + register2LC + 'H', 'e')
+    },
+    0x64: {
+      name: 'LD ' + index + 'H,' + index + 'H',
+      ast: o.NOOP()
+    },
+    0x65: {
+      name: 'LD ' + index + 'H,' + index + 'L *',
+      ast: o.LD8_D('i' + register2LC + 'H', 'i' + register2LC + 'L')
+    },
     0x66: {
       name: 'LD H,(' + index + '+d)',
       ast: o.LD8_D('h', 'i', register2)
     },
+    0x67: {
+      name: 'LD ' + index + 'H,A',
+      ast: o.LD8('i' + register2LC + 'H', 'a')
+    },
+    0x68: {
+      name: 'LD ' + index + 'L,B',
+      ast: o.LD8('i' + register2LC + 'L', 'b')
+    },
+    0x69: {
+      name: 'LD ' + index + 'L,C',
+      ast: o.LD8('i' + register2LC + 'L', 'c')
+    },
+    0x6A: {
+      name: 'LD ' + index + 'L,D',
+      ast: o.LD8('i' + register2LC + 'L', 'd')
+    },
+    0x6B: {
+      name: 'LD ' + index + 'L,E',
+      ast: o.LD8('i' + register2LC + 'L', 'e')
+    },
+    0x6C: {
+      name: 'LD ' + index + 'L,' + index + 'H',
+      ast: o.LD8_D('i' + register2LC + 'L', 'i' + register2LC + 'H')
+    },
+    0x6D: {
+      name: 'LD ' + index + 'L,' + index + 'L *',
+      ast: o.NOOP()
+    },
     0x6E: {
       name: 'LD L,(' + index + '+d)',
       ast: o.LD8_D('l', 'i', register2)
+    },
+    0x6F: {
+      name: 'LD ' + index + 'L,A *',
+      ast: o.LD8('i' + register2LC + 'L', 'a')
     },
     0x70: {
       name: 'LD (' + index + '+d),B',
@@ -125,9 +189,29 @@ function generateIndexTable(index) {
       name: 'LD A,(' + index + '+d)',
       ast: o.LD8_D('a', 'i', register2)
     },
+    0x7C: {
+      name: 'LD A,' + index + 'H',
+      ast: o.LD8('a', 'i' + register2LC + 'H')
+    },
+    0x7D: {
+      name: 'LD A,' + index + 'L',
+      ast: o.LD8('a', 'i' + register2LC + 'L')
+    },
     0x86: {
       name: 'ADD A,(' + index + '+d)',
       ast: o.ADD_X('i', register2)
+    },
+    0x8E: {
+      name: 'ADC A,(' + index + '+d)',
+      ast: o.ADC_X('i', register2)
+    },
+    0x96: {
+      name: 'SUB A,(' + index + '+d)',
+      ast: o.SUB_X('i', register2)
+    },
+    0x9E: {
+      name: 'SBC A,(' + index + '+d)',
+      ast: o.SBC_X('i', register2)
     },
     0xCB:
         index == 'IX' ? opcodeTableDDCB : opcodeTableFDCB,

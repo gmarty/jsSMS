@@ -1260,6 +1260,33 @@ var o = {
       );
     };
   },
+  ADC_X: function(register1, register2) {
+    return function(value, target, nextAddress) {
+      // adc_a(readMem(getIX() + value));
+      return n.ExpressionStatement(
+          n.CallExpression('adc_a', o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
+          n.Literal(value))))
+      );
+    };
+  },
+  SUB_X: function(register1, register2) {
+    return function(value, target, nextAddress) {
+      // sub_a(readMem(getIX() + value));
+      return n.ExpressionStatement(
+          n.CallExpression('sub_a', o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
+          n.Literal(value))))
+      );
+    };
+  },
+  SBC_X: function(register1, register2) {
+    return function(value, target, nextAddress) {
+      // sbc_a(readMem(this.getIX() + value));
+      return n.ExpressionStatement(
+          n.CallExpression('sbc_a', o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
+          n.Literal(value))))
+      );
+    };
+  },
   OR_X: function(register1, register2) {
     return function(value, target, nextAddress) {
       // a |= readMem(getIX() + value); f = SZP_TABLE[a];
