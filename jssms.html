@@ -229,45 +229,53 @@ if (!window.$) {
 
 var sms = new JSSMS({
   'ui': $('#emulator').JSSMSUI({
-    'Homebrew Master System working': [
-      ['Blockhead', 'roms/homebrew/blockhead.sms'],
-      ['KunKun & KokoKun', 'roms/homebrew/KunKun & KokoKun.sms'],
-      ['vg-fighter', 'roms/homebrew/vg-fighter.sms'],
-      ['Bock\'s Birthday 2011 II', 'roms/homebrew/Bock\'s Birthday 2011 II.sms'],
-      ['KunKun & KokoKun 2 - Return of the Kun', 'roms/homebrew/KunKun & KokoKun 2 - Return of the Kun [v0.99].sms'],
-      ['Sokoban', 'roms/homebrew/sokoban.sms'],
-      ['ono', 'roms/homebrew/ono [v1.01].sms']
+    'Homebrew Master System': [
+      ['Blockhead', 'rom/homebrew/blockhead.sms'],
+      ['KunKun & KokoKun', 'rom/homebrew/KunKun & KokoKun.sms'],
+      ['vg-fighter', 'rom/homebrew/vg-fighter.sms'],
+      ['Bock\'s Birthday 2011 II', 'rom/homebrew/Bock\'s Birthday 2011 II.sms'],
+      ['KunKun & KokoKun 2 - Return of the Kun', 'rom/homebrew/KunKun & KokoKun 2 - Return of the Kun [v0.99].sms'],
+      ['Sokoban', 'rom/homebrew/sokoban.sms'],
+      ['ono', 'rom/homebrew/ono [v1.01].sms']
     ],
     'Homebrew Master System not working': [
-      ['vpoker', 'roms/homebrew/vpoker.sms']
+      ['vpoker', 'rom/homebrew/vpoker.sms']
+    ],
+    'Homebrew Game Gear': [
+      ['Fire Track', 'rom/gg/homebrew/ftrack.gg'],
+      ['GG Nibbles v.4', 'rom/gg/homebrew/nibbles.gg'],
+      ['Zoop \'Em Up', 'rom/gg/homebrew/zoopemup.gg']
     ],
     'Master System': [
-      ['Alex Kidd in Miracle World', 'roms/sms/Alex Kidd in Miracle World (J) [!].sms'],
-      ['Alex Kidd in High Tech World', 'roms/sms/Alex Kidd in High Tech World (UE) [!].sms'],
-      ['Sonic the Hedgehog', 'roms/sms/Sonic the Hedgehog.sms']
+      ['Alex Kidd in Miracle World', 'rom/sms/Alex Kidd in Miracle World (J) [!].sms'],
+      ['Alex Kidd in High Tech World', 'rom/sms/Alex Kidd in High Tech World (UE) [!].sms'],
+      ['Sonic the Hedgehog', 'rom/sms/Sonic The Hedgehog (UE) [!].sms']
     ],
     'Game Gear': [
-      ['Columns (J)', 'roms/gg/Japan/Columns (J).gg'],
-      ['Columns (UE)', 'roms/gg/USA-Europe/Columns (UE) [!].gg'],
-      ['Pengo (J)', 'roms/gg/Japan/Pengo (J).gg'],
-      ['Pengo (UE)', 'roms/gg/USA-Europe/Pengo (UE) [!].gg'],
-      ['Woody Pop v1.0', 'roms/gg/World/Woody Pop (JUE) (V1.0).gg'],
-      ['Woody Pop v1.1', 'roms/gg/World/Woody Pop (JUE) (V1.1) [!].gg'],
-      ['Wakiyanland', 'roms/gg/Wakiyarando (Wagyan Land) (J).gg'],
-      ['Kaitô Saint Tail', 'roms/gg/Kyoto Saint Tale (J).gg'],
-      ['Sonic the Hedgehog v1.0', 'roms/gg/World/Sonic the Hedgehog (JUE) (V1.0).gg']
+      ['Columns (J)', 'rom/gg/Japan/Columns (J).gg'],
+      ['Columns (UE)', 'rom/gg/USA-Europe/Columns (UE) [!].gg'],
+      ['Pengo (J)', 'rom/gg/Japan/Pengo (J).gg'],
+      ['Pengo (UE)', 'rom/gg/USA-Europe/Pengo (UE) [!].gg'],
+      ['Woody Pop v1.0', 'rom/gg/World/Woody Pop (JUE) (V1.0).gg'],
+      ['Woody Pop v1.1', 'rom/gg/World/Woody Pop (JUE) (V1.1) [!].gg'],
+      ['Wakiyanland', 'rom/gg/Wakiyarando (Wagyan Land) (J).gg'],
+      ['Kaitô Saint Tail', 'rom/gg/Kyoto Saint Tale (J).gg'],
+      ['Sonic the Hedgehog v1.0', 'rom/gg/World/Sonic the Hedgehog (JUE) (V1.0).gg']
     ],
-    'Master System technical roms': [
-      ['Chkstate v.1.0', 'roms/technical/Chkstate Demo by Dave (PD).sms'],
-      ['Color Check v.1.0', 'roms/technical/ColorCheck.sms'],
-      ['Fullscreen Palette Test v.1.0', 'roms/technical/FullscreenPaletteTestProgram.sms'],
-      ['Palette v.1.0', 'roms/technical/smspal.sms'],
-      ['Pause Test v1.00', 'roms/technical/PauseTest.sms'],
-      ['PFR Detect v.2.00', 'roms/technical/PFR Detect V2.00 by Eric R. Quinn (PD).sms'],
-      ['Sound Test v.1.1', 'roms/technical/SMSSoundTest1.1.sms'],
-      ['V Counter Test v.1.0', 'roms/technical/V Counter Test by Charles MacDonald (PD).sms'],
-      ['VDP Test v.1.31', 'roms/technical/VDPTEST.sms'],
-      ['ZEXALL v.0.15', 'roms/technical/zexall.sms']
+    'Master System technical ROMs': [
+      ['Chkstate v.1.0', 'rom/technical/Chkstate Demo by Dave (PD).sms'],
+      ['Color Check v.1.0', 'rom/technical/ColorCheck.sms'],
+      ['Fullscreen Palette Test v.1.0', 'rom/technical/FullscreenPaletteTestProgram.sms'],
+      ['Palette v.1.0', 'rom/technical/smspal.sms'],
+      ['Pause Test v1.00', 'rom/technical/PauseTest.sms'],
+      ['PFR Detect v.2.00', 'rom/technical/PFR Detect V2.00 by Eric R. Quinn (PD).sms'],
+      ['Sound Test v.1.1', 'rom/technical/SMSSoundTest1.1.sms'],
+      ['V Counter Test v.1.0', 'rom/technical/V Counter Test by Charles MacDonald (PD).sms'],
+      ['VDP Test v.1.31', 'rom/technical/VDPTEST.sms'],
+      ['ZEXALL v.0.15', 'rom/technical/zexall.sms']
+    ],
+    'Game Gear technical ROMs': [
+      ['FadeTest', 'rom/gg/technical/FadeTest.gg']
     ]
   })
 });
