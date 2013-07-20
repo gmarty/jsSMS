@@ -33,7 +33,7 @@ var Recompiler = function(cpu) {
   this.parser = {};
   this.analyzer = new Analyzer();
   this.optimizer = new Optimizer();
-  this.generator = new Compiler();
+  this.generator = new Generator();
 
   this.bytecodes = {};
 };

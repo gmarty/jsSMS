@@ -33,15 +33,15 @@ var whitelist = [
 
 
 /**
- * The compiler cleans the data and returns a valid AST.
+ * The generator cleans the data and returns a valid AST.
  *
  * @constructor
  */
-var Compiler = function() {
+var Generator = function() {
   this.ast = [];
 };
 
-Compiler.prototype = {
+Generator.prototype = {
   /**
    * Process bytecodes.
    */
