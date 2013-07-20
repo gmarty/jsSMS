@@ -171,6 +171,7 @@ var Parser = (function() {
       var bytecode;
 
       var firstInstruction = true;
+      var absoluteAddress = 0;
 
       // We consider the first 0x0400 bytes as an independent memory page.
       if (address < 0x0400 && romPage == 0) {
@@ -195,7 +196,8 @@ var Parser = (function() {
         address = bytecode.nextAddress % 0x4000;
         branch.push(bytecode);
         firstInstruction = false;
-      } while (address != null && address >= pageStart && address < pageEnd && !bytecode.isFunctionEnder);
+        absoluteAddress = address + (romPage * 0x4000);
+      } while (address != null && absoluteAddress >= pageStart && absoluteAddress < pageEnd && !bytecode.isFunctionEnder);
 
       return branch;
     },
