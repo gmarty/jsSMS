@@ -372,7 +372,7 @@ JSSMS.Z80 = function(sms) {
   // Generate memory arrays
   this.generateMemory();
 
-  if (DEBUGGER) {
+  if (ENABLE_DEBUGGER) {
     // Augment JSSMS.Z80 with methods from JSSMS.Disassembler.
     for (var method in JSSMS.Debugger.prototype) {
       this[method] = JSSMS.Debugger.prototype[method];
@@ -444,7 +444,7 @@ JSSMS.Z80.prototype = {
     }
 
     while (true) {
-      if (DEBUGGER) {
+      if (ENABLE_DEBUGGER) {
         this.main.ui.updateDisassembly(this.pc);
       }
 
@@ -3324,7 +3324,7 @@ JSSMS.Z80.prototype = {
           }
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
-          if (DEBUGGER)
+          if (DEBUG)
             debugger;
         }
       }
@@ -3347,7 +3347,7 @@ JSSMS.Z80.prototype = {
           }
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
-          if (DEBUGGER)
+          if (DEBUG)
             debugger;
         }
       }
@@ -3399,7 +3399,7 @@ JSSMS.Z80.prototype = {
           return this.frameReg[2];
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-          if (DEBUGGER)
+          if (DEBUG)
             debugger;
         }
         return 0x00;
@@ -3444,7 +3444,7 @@ JSSMS.Z80.prototype = {
           return this.frameReg[2];
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-          if (DEBUGGER)
+          if (DEBUG)
             debugger;
         }
         return 0x00;
@@ -3497,7 +3497,7 @@ JSSMS.Z80.prototype = {
           return this.frameReg[2];
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-          if (DEBUGGER)
+          if (DEBUG)
             debugger;
         }
         return 0x00;
@@ -3542,7 +3542,7 @@ JSSMS.Z80.prototype = {
           return this.frameReg[2];
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-          if (DEBUGGER)
+          if (DEBUG)
             debugger;
         }
         return 0x00;

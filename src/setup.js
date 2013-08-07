@@ -32,7 +32,7 @@ var DEBUG = true;
  * Whether to activate debugger.
  * @define {boolean}
  */
-var DEBUGGER = false;
+var ENABLE_DEBUGGER = false;
 
 
 /**

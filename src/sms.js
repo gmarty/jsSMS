@@ -273,7 +273,7 @@ JSSMS.prototype = {
     this.vdp.reset();
     this.ports.reset();
     this.cpu.reset();
-    if (DEBUGGER) {
+    if (ENABLE_DEBUGGER) {
       this.cpu.resetDebug();
     }
 

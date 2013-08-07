@@ -55,7 +55,7 @@ module.exports = function(grunt) {
           output_wrapper: '(function(window){%output%})(window);',
           define: [
             '"DEBUG=false"',
-            '"DEBUGGER=false"',
+            '"ENABLE_DEBUGGER=false"',
             '"ENABLE_COMPILER=true"',
             '"ACCURATE_INTERRUPT_EMULATION=false"'
           ],
@@ -76,7 +76,7 @@ module.exports = function(grunt) {
           warning_level: 'VERBOSE',
           define: [
             '"DEBUG=true"',
-            '"DEBUGGER=true"',
+            '"ENABLE_DEBUGGER=true"',
             '"ENABLE_COMPILER=true"',
             '"ACCURATE_INTERRUPT_EMULATION=false"'
           ],
@@ -147,7 +147,7 @@ module.exports = function(grunt) {
           output_wrapper: '(function(window){%output%})(window);',
           define: [
             '"DEBUG=false"',
-            '"DEBUGGER=false"',
+            '"ENABLE_DEBUGGER=false"',
             '"ENABLE_COMPILER=true"',
             '"FORCE_DATAVIEW=true"',
             '"ACCURATE_INTERRUPT_EMULATION=false"'
@@ -212,7 +212,7 @@ module.exports = function(grunt) {
           output_wrapper: '(function(window){%output%})(global);',
           define: [
             '"DEBUG=true"',
-            '"DEBUGGER=true"',
+            '"ENABLE_DEBUGGER=true"',
             '"ENABLE_COMPILER=false"',
             '"ACCURATE_INTERRUPT_EMULATION=true"'
           ],
