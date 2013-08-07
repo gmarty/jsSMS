@@ -13,6 +13,7 @@ img/headers/icons/play.png
 img/buttons/ui/shadow.png
 img/toolbars/icons/update.png
 img/headers/icons/fullscreen.png
+lib/escodegen.browser.js
 min/alec.min.js
 
 NETWORK:
