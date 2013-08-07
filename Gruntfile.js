@@ -47,12 +47,12 @@ module.exports = function(grunt) {
         jsOutputFile: 'min/jssms.min.js',
         options: {
           externs: '<%= externs %>',
-          compilation_level: 'ADVANCED_OPTIMIZATIONS',
+          compilation_level: 'SIMPLE_OPTIMIZATIONS',
           language_in: 'ECMASCRIPT5_STRICT',
           use_types_for_optimization: null,
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
-          output_wrapper: '(function(window){%output%})(window);',
+          //output_wrapper: '(function(window){%output%})(window);',
           define: [
             '"DEBUG=false"',
             '"ENABLE_DEBUGGER=false"',
@@ -69,7 +69,7 @@ module.exports = function(grunt) {
         jsOutputFile: 'min/jssms.debug.js',
         options: {
           externs: '<%= externs %>',
-          compilation_level: 'ADVANCED_OPTIMIZATIONS',
+          compilation_level: 'SIMPLE_OPTIMIZATIONS',
           language_in: 'ECMASCRIPT5_STRICT',
           use_types_for_optimization: null,
           summary_detail_level: 3,
