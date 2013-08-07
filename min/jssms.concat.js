@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 'use strict';var DEBUG = true;
-var DEBUGGER = false;
+var ENABLE_DEBUGGER = false;
 var ENABLE_COMPILER = true;
 var ACCURATE = false;
 var LITTLE_ENDIAN = true;
@@ -61,7 +61,7 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   this.vdp.reset();
   this.ports.reset();
   this.cpu.reset();
-  if(DEBUGGER) {
+  if(ENABLE_DEBUGGER) {
     this.cpu.resetDebug()
   }
   if(DEBUG) {
@@ -375,7 +375,7 @@ JSSMS.Z80 = function(sms) {
   this.generateFlagTables();
   this.generateDAATable();
   this.generateMemory();
-  if(DEBUGGER) {
+  if(ENABLE_DEBUGGER) {
     for(var method in JSSMS.Debugger.prototype) {
       this[method] = JSSMS.Debugger.prototype[method]
     }
@@ -418,7 +418,7 @@ JSSMS.Z80.prototype = {reset:function() {
     }
   }
   while(true) {
-    if(DEBUGGER) {
+    if(ENABLE_DEBUGGER) {
       this.main.ui.updateDisassembly(this.pc)
     }
     if(ENABLE_COMPILER) {
@@ -4396,7 +4396,7 @@ JSSMS.Z80.prototype = {reset:function() {
         }
       }else {
         JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 8191));
-        if(DEBUGGER) {
+        if(DEBUG) {
           debugger
         }
       }
@@ -4422,7 +4422,7 @@ JSSMS.Z80.prototype = {reset:function() {
         }
       }else {
         JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 8191));
-        if(DEBUGGER) {
+        if(DEBUG) {
           debugger
         }
       }
@@ -4472,7 +4472,7 @@ JSSMS.Z80.prototype = {reset:function() {
                           return this.frameReg[2]
                         }else {
                           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-                          if(DEBUGGER) {
+                          if(DEBUG) {
                             debugger
                           }
                         }
@@ -4530,7 +4530,7 @@ JSSMS.Z80.prototype = {reset:function() {
                           return this.frameReg[2]
                         }else {
                           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-                          if(DEBUGGER) {
+                          if(DEBUG) {
                             debugger
                           }
                         }
@@ -4590,7 +4590,7 @@ JSSMS.Z80.prototype = {reset:function() {
                           return this.frameReg[2]
                         }else {
                           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-                          if(DEBUGGER) {
+                          if(DEBUG) {
                             debugger
                           }
                         }
@@ -4648,7 +4648,7 @@ JSSMS.Z80.prototype = {reset:function() {
                           return this.frameReg[2]
                         }else {
                           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-                          if(DEBUGGER) {
+                          if(DEBUG) {
                             debugger
                           }
                         }
@@ -9335,7 +9335,7 @@ if(window["$"]) {
         self.main.vdp.forceFullRedraw();
         self.main.start()
       });
-      if(DEBUGGER) {
+      if(ENABLE_DEBUGGER) {
         this.dissambler = $('<div id="dissambler"></div>');
         $(parent).after(this.dissambler);
         this.buttons.nextStep = $('<input type="button" value="Next step" class="btn" disabled="disabled">').click(function() {
@@ -9431,7 +9431,7 @@ if(window["$"]) {
       this.screen[0].width = SMS_WIDTH;
       this.screen[0].height = SMS_HEIGHT;
       this.log.empty();
-      if(DEBUGGER) {
+      if(ENABLE_DEBUGGER) {
         this.dissambler.empty()
       }
     }, setRoms:function(roms) {
@@ -9480,7 +9480,7 @@ if(window["$"]) {
       this.buttons.start.removeAttr("disabled");
       this.buttons.start.attr("value", "Start");
       this.buttons.reset.removeAttr("disabled");
-      if(DEBUGGER) {
+      if(ENABLE_DEBUGGER) {
         this.buttons.nextStep.removeAttr("disabled")
       }
       if(this.main.soundEnabled) {
@@ -12016,7 +12016,8 @@ Recompiler.prototype = {setRom:function(rom) {
   this.analyzer.analyzeFromAddress(this.bytecodes);
   return this
 }, generateCodeFromAst:function(fn) {
-  return window["escodegen"]["generate"](fn, {comment:true, renumber:true, hexadecimal:true, parse:window["esprima"]["parse"]})
+  return window["escodegen"]["generate"](fn, {comment:true, renumber:true, hexadecimal:true, parse:DEBUG ? window["esprima"]["parse"] : function() {
+  }})
 }, dump:function() {
   var output = [];
   for(var i in this.cpu.branches) {
