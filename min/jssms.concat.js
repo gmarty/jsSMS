@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 'use strict';var DEBUG = true;
 var DEBUGGER = false;
+var ENABLE_COMPILER = true;
 var ACCURATE = false;
 var LITTLE_ENDIAN = true;
 var FORCE_DATAVIEW = false;
@@ -229,7 +230,23 @@ JSSMS.Utils = {rndInt:function(range) {
       }
     }
   }
-}(), traverse:function(object, fn) {
+}(), console:{log:function(var_args) {
+  if(DEBUG) {
+    window.console.log.apply(window.console, arguments)
+  }
+}, error:function(var_args) {
+  if(DEBUG) {
+    window.console.error.apply(window.console, arguments)
+  }
+}, time:function(label) {
+  if(DEBUG) {
+    window.console.time(label)
+  }
+}, timeEnd:function(label) {
+  if(DEBUG) {
+    window.console.timeEnd(label)
+  }
+}}, traverse:function(object, fn) {
   var key, child;
   fn.call(null, object);
   for(key in object) {
@@ -363,6 +380,9 @@ JSSMS.Z80 = function(sms) {
       this[method] = JSSMS.Debugger.prototype[method]
     }
   }
+  if(ENABLE_COMPILER) {
+    this.recompiler = new Recompiler(this)
+  }
 };
 JSSMS.Z80.prototype = {reset:function() {
   this.a = this.a2 = 0;
@@ -384,7 +404,10 @@ JSSMS.Z80.prototype = {reset:function() {
   this.iff2 = false;
   this.EI_inst = false;
   this.interruptVector = 0;
-  this.halt = false
+  this.halt = false;
+  if(ENABLE_COMPILER) {
+    this.recompiler.reset()
+  }
 }, frame:function() {
   this.lineno = 0;
   this.tstates += this.main.cyclesPerLine;
@@ -398,13 +421,58 @@ JSSMS.Z80.prototype = {reset:function() {
     if(DEBUGGER) {
       this.main.ui.updateDisassembly(this.pc)
     }
-    this.interpret();
+    if(ENABLE_COMPILER) {
+      this.recompile()
+    }else {
+      this.interpret()
+    }
     if(this.tstates <= 0) {
       if(this.eol()) {
         return
       }
     }
   }
+}, recompile:function() {
+  if(this.pc < 1024) {
+    if(this.branches[0][this.pc]) {
+      this.branches[0][this.pc].call(this);
+      return
+    }
+    this.recompiler.recompileFromAddress(this.pc, 0, 0);
+    this.branches[0][this.pc].call(this);
+    return
+  }else {
+    if(this.pc < 16384) {
+      if(this.branches[this.frameReg[0]][this.pc]) {
+        this.branches[this.frameReg[0]][this.pc].call(this);
+        return
+      }
+      this.recompiler.recompileFromAddress(this.pc, this.frameReg[0], 0);
+      this.branches[this.frameReg[0]][this.pc].call(this);
+      return
+    }else {
+      if(this.pc < 32768) {
+        if(this.branches[this.frameReg[1]][this.pc - 16384]) {
+          this.branches[this.frameReg[1]][this.pc - 16384].call(this);
+          return
+        }
+        this.recompiler.recompileFromAddress(this.pc, this.frameReg[1], 1);
+        this.branches[this.frameReg[1]][this.pc - 16384].call(this);
+        return
+      }else {
+        if(this.pc < 49152) {
+          if(this.branches[this.frameReg[2]][this.pc - 32768]) {
+            this.branches[this.frameReg[2]][this.pc - 32768].call(this);
+            return
+          }
+          this.recompiler.recompileFromAddress(this.pc, this.frameReg[2], 2);
+          this.branches[this.frameReg[2]][this.pc - 32768].call(this);
+          return
+        }
+      }
+    }
+  }
+  this.interpret()
 }, eol:function() {
   if(this.main.soundEnabled) {
     this.main.updateSound(this.lineno)
@@ -434,7 +502,7 @@ JSSMS.Z80.prototype = {reset:function() {
     this.main.pause_button = false
   }
   this.main.doRepaint()
-}, interpret:function() {
+}, branches:[Object.create(null), Object.create(null), Object.create(null)], interpret:function() {
   var location = 0;
   var temp = 0;
   var opcode = this.readMem(this.pc++);
@@ -2122,9 +2190,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.a |= BIT_7;
       break;
     default:
-      if(DEBUG) {
-        console.log("Unimplemented CB Opcode: " + JSSMS.Utils.toHex(opcode))
-      }
+      JSSMS.Utils.console.log("Unimplemented CB Opcode: " + JSSMS.Utils.toHex(opcode));
       break
   }
 }, rlc:function(value) {
@@ -2470,9 +2536,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.sp = this.getIX();
       break;
     default:
-      if(DEBUG) {
-        console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex(opcode))
-      }
+      JSSMS.Utils.console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex(opcode));
       this.pc--;
       break
   }
@@ -2777,9 +2841,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.sp = this.getIY();
       break;
     default:
-      if(DEBUG) {
-        console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex(opcode))
-      }
+      JSSMS.Utils.console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex(opcode));
       this.pc--;
       break
   }
@@ -3445,9 +3507,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.writeMem(location, this.readMem(location) | BIT_7);
       break;
     default:
-      if(DEBUG) {
-        console.log("Unimplemented DDCB/FDCB Opcode: " + JSSMS.Utils.toHex(opcode))
-      }
+      JSSMS.Utils.console.log("Unimplemented DDCB/FDCB Opcode: " + JSSMS.Utils.toHex(opcode));
       break
   }
   this.pc++
@@ -3926,9 +3986,7 @@ JSSMS.Z80.prototype = {reset:function() {
       }
       break;
     default:
-      if(DEBUG) {
-        console.log("Unimplemented ED Opcode: " + JSSMS.Utils.toHex(opcode))
-      }
+      JSSMS.Utils.console.log("Unimplemented ED Opcode: " + JSSMS.Utils.toHex(opcode));
       this.pc++;
       break
   }
@@ -4292,16 +4350,24 @@ JSSMS.Z80.prototype = {reset:function() {
     this.frameReg[i] = i % 3
   }
 }, resetMemory:function(pages) {
+  var i = 0;
   if(pages) {
     this.rom = pages
   }
   if(this.rom.length) {
     this.number_of_pages = this.rom.length;
     this.romPageMask = this.number_of_pages - 1;
-    for(var i = 0;i < 3;i++) {
+    for(i = 0;i < 3;i++) {
       this.frameReg[i] = i % this.number_of_pages
     }
-    this.frameReg[3] = 0
+    this.frameReg[3] = 0;
+    if(ENABLE_COMPILER) {
+      this.branches = Array(this.number_of_pages);
+      for(i = 0;i < this.number_of_pages;i++) {
+        this.branches[i] = Object.create(null)
+      }
+      this.recompiler.setRom(this.rom)
+    }
   }else {
     this.number_of_pages = 0;
     this.romPageMask = 0
@@ -4329,8 +4395,8 @@ JSSMS.Z80.prototype = {reset:function() {
           }
         }
       }else {
-        if(DEBUG) {
-          console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 8191));
+        JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 8191));
+        if(DEBUGGER) {
           debugger
         }
       }
@@ -4355,8 +4421,8 @@ JSSMS.Z80.prototype = {reset:function() {
           }
         }
       }else {
-        if(DEBUG) {
-          console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 8191));
+        JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 8191));
+        if(DEBUGGER) {
           debugger
         }
       }
@@ -4405,8 +4471,8 @@ JSSMS.Z80.prototype = {reset:function() {
                         if(address == 65535) {
                           return this.frameReg[2]
                         }else {
-                          if(DEBUG) {
-                            console.error(JSSMS.Utils.toHex(address));
+                          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+                          if(DEBUGGER) {
                             debugger
                           }
                         }
@@ -4463,8 +4529,8 @@ JSSMS.Z80.prototype = {reset:function() {
                         if(address == 65535) {
                           return this.frameReg[2]
                         }else {
-                          if(DEBUG) {
-                            console.error(JSSMS.Utils.toHex(address));
+                          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+                          if(DEBUGGER) {
                             debugger
                           }
                         }
@@ -4523,8 +4589,8 @@ JSSMS.Z80.prototype = {reset:function() {
                         if(address == 65535) {
                           return this.frameReg[2]
                         }else {
-                          if(DEBUG) {
-                            console.error(JSSMS.Utils.toHex(address));
+                          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+                          if(DEBUGGER) {
                             debugger
                           }
                         }
@@ -4581,8 +4647,8 @@ JSSMS.Z80.prototype = {reset:function() {
                         if(address == 65535) {
                           return this.frameReg[2]
                         }else {
-                          if(DEBUG) {
-                            console.error(JSSMS.Utils.toHex(address));
+                          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+                          if(DEBUGGER) {
                             debugger
                           }
                         }
@@ -4673,22 +4739,23 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   this.parseInstructions();
   this.main.ui.updateStatus("Instructions parsed")
 }, parseInstructions:function() {
-  console.time("Instructions parsing");
+  JSSMS.Utils.console.time("Instructions parsing");
   var romSize = PAGE_SIZE * this.rom.length;
   var instruction;
   var currentAddress;
   var i = 0;
   var addresses = [];
-  addresses.push(0);
-  addresses.push(56);
-  addresses.push(102);
+  var entryPoints = [0, 56, 102];
+  entryPoints.forEach(function(entryPoint) {
+    addresses.push(entryPoint)
+  });
   while(addresses.length) {
     currentAddress = addresses.shift();
     if(this.instructions[currentAddress]) {
       continue
     }
     if(currentAddress >= romSize || currentAddress >> 10 >= 65) {
-      console.log("Invalid address", JSSMS.Utils.toHex(currentAddress));
+      JSSMS.Utils.console.log("Invalid address", JSSMS.Utils.toHex(currentAddress));
       continue
     }
     instruction = this.disassemble(currentAddress);
@@ -4700,9 +4767,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       addresses.push(instruction.target)
     }
   }
-  this.instructions[0].isJumpTarget = true;
-  this.instructions[56].isJumpTarget = true;
-  this.instructions[102].isJumpTarget = true;
+  entryPoints.forEach(function(entryPoint) {
+    if(!this.instructions[entryPoint]) {
+      return
+    }
+    this.instructions[entryPoint].isJumpTarget = true
+  }, this);
   for(;i < romSize;i++) {
     if(!this.instructions[i]) {
       continue
@@ -4715,13 +4785,13 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
         this.instructions[this.instructions[i].target].isJumpTarget = true;
         this.instructions[this.instructions[i].target].jumpTargetNb++
       }else {
-        console.log("Invalid target address", this.instructions[i].target)
+        JSSMS.Utils.console.log("Invalid target address", JSSMS.Utils.toHex(this.instructions[i].target))
       }
     }
   }
-  console.timeEnd("Instructions parsing")
+  JSSMS.Utils.console.timeEnd("Instructions parsing")
 }, writeGraphViz:function() {
-  console.time("DOT generation");
+  JSSMS.Utils.console.time("DOT generation");
   var tree = this.instructions;
   var INDENT = " ";
   var content = ["digraph G {"];
@@ -4740,10 +4810,10 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   content.push("}");
   content = content.join("\n");
   content = content.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
-  console.timeEnd("DOT generation");
+  JSSMS.Utils.console.timeEnd("DOT generation");
   return content
 }, writeJavaScript:function() {
-  console.time("JavaScript generation");
+  JSSMS.Utils.console.time("JavaScript generation");
   var tree = this.instructions;
   var toHex = JSSMS.Utils.toHex;
   var tstates = 0;
@@ -4758,8 +4828,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     if(!tree[i]) {
       continue
     }
-    if(prevAddress <= pageBreakPoint && tree[i].address > pageBreakPoint) {
-      code.push("this.pc = " + toHex(prevAddress) + ";");
+    if(prevAddress <= pageBreakPoint && tree[i].address >= pageBreakPoint) {
+      code.push("this.pc = " + toHex(tree[i].address) + ";");
       code.push("}");
       code.push("},");
       code.push("" + pageNumber + ": {");
@@ -4775,8 +4845,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
         code.push("this.pc = " + toHex(prevNextAddress) + ";")
       }
       code.push("},");
-      code.push("" + toHex(tree[i].address) + ": function(temp) {");
-      code.push("// Nb of instructions jumping here: " + tree[i].jumpTargetNb)
+      code.push("" + toHex(tree[i].address) + ": function(temp, location) {")
     }
     code.push("// " + tree[i].label);
     breakNeeded = tree[i].code.substr(-7) == "return;";
@@ -4793,7 +4862,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   code.push("}");
   code.push("}");
   code = code.join("\n");
-  console.timeEnd("JavaScript generation");
+  JSSMS.Utils.console.timeEnd("JavaScript generation");
   return code;
   function getTotalTStates(opcodes) {
     var tstates = 0;
@@ -4821,7 +4890,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   }
   function insertTStates() {
     if(tstates) {
-      code.push("this.tstates -= " + tstates + ";")
+      code.push("this.tstates -= " + toHex(tstates) + ";")
     }
     tstates = 0
   }
@@ -4836,6 +4905,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   var operand = "";
   var location = 0;
   address++;
+  var _inst = {};
   switch(opcode) {
     case 0:
       inst = "NOP";
@@ -4910,7 +4980,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 16:
       target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "DJNZ (" + toHex(target) + ")";
-      code = "this.b = (this.b - 1) & 0xff;" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "this.b = this.b - 0x01 & 0xFF;" + "if (this.b != 0x00) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address++;
       break;
     case 17:
@@ -4984,7 +5054,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 32:
       target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "JR NZ,(" + toHex(target) + ")";
-      code = "if (!((this.f & F_ZERO) != 0)) {" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 5;" + "return;" + "}";
+      code = "if (!((this.f & F_ZERO) != 0x00)) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address++;
       break;
     case 33:
@@ -5025,7 +5095,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 40:
       target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "JR Z,(" + toHex(target) + ")";
-      code = "if ((this.f & F_ZERO) != 0) {" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 5;" + "return;" + "}";
+      code = "if ((this.f & F_ZERO) != 0x00) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address++;
       break;
     case 41:
@@ -5063,7 +5133,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 48:
       target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "JR NC,(" + toHex(target) + ")";
-      code = "if (!((this.f & F_CARRY) != 0)) {" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 5;" + "return;" + "}";
+      code = "if (!((this.f & F_CARRY) != 0x00)) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address++;
       break;
     case 49:
@@ -5103,7 +5173,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 56:
       target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "JR C,(" + toHex(target) + ")";
-      code = "if ((this.f & F_CARRY) != 0) {" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 5;" + "return;" + "}";
+      code = "if ((this.f & F_CARRY) != 0x00) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address++;
       break;
     case 57:
@@ -5357,11 +5427,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 118:
       inst = "HALT";
       if(HALT_SPEEDUP) {
-        code = "this.tstates = 0;"
+        code = "this.tstates = 0x00;"
       }else {
         code = ""
       }
-      code += "this.halt = true; this.pc = " + toHex(address) + "; return;";
+      code += "this.halt = true; this.pc = " + toHex(address - 1) + "; return;";
       break;
     case 119:
       inst = "LD (HL),A";
@@ -5589,7 +5659,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 175:
       inst = "XOR A,A";
-      code = "this.a = " + toHex(0) + "; this.f = " + toHex(this.SZP_TABLE[0]) + ";";
+      code = "this.a = " + toHex(0) + "; this.f = this.SZP_TABLE[0x00];";
       break;
     case 176:
       inst = "OR A,B";
@@ -5657,16 +5727,16 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 192:
       inst = "RET NZ";
-      code = "if ((this.f & F_ZERO) == 0) {" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 2;" + "this.tstates -= 6;" + "return;" + "}";
+      code = "if ((this.f & F_ZERO) == 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
       break;
     case 193:
       inst = "POP BC";
-      code = "this.setBC(this.readMemWord(this.sp)); this.sp += 2;";
+      code = "this.setBC(this.readMemWord(this.sp)); this.sp += 0x02;";
       break;
     case 194:
       target = this.readRom16bit(address);
       inst = "JP NZ,(" + toHex(target) + ")";
-      code = "if ((this.f & F_ZERO) == 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_ZERO) == 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 195:
@@ -5678,7 +5748,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 196:
       target = this.readRom16bit(address);
       inst = "CALL NZ (" + toHex(target) + ")";
-      code = "if ((this.f & F_ZERO) == 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
+      code = "if ((this.f & F_ZERO) == 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 197:
@@ -5698,21 +5768,21 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 200:
       inst = "RET Z";
-      code = "if ((this.f & F_ZERO) != 0) {" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 2;" + "this.tstates -= 6;" + "return;" + "}";
+      code = "if ((this.f & F_ZERO) != 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
       break;
     case 201:
       inst = "RET";
-      code = "this.pc = this.readMemWord(this.sp); this.sp += 2; return;";
+      code = "this.pc = this.readMemWord(this.sp); this.sp += 0x02; return;";
       address = null;
       break;
     case 202:
       target = this.readRom16bit(address);
       inst = "JP Z,(" + toHex(target) + ")";
-      code = "if ((this.f & F_ZERO) != 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_ZERO) != 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 203:
-      var _inst = this.getCB(address);
+      _inst = this.getCB(address);
       inst = _inst.inst;
       code = _inst.code;
       opcodesArray = opcodesArray.concat(_inst.opcodes);
@@ -5721,7 +5791,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 204:
       target = this.readRom16bit(address);
       inst = "CALL Z (" + toHex(target) + ")";
-      code = "if ((this.f & F_ZERO) != 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
+      code = "if ((this.f & F_ZERO) != 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 205:
@@ -5743,16 +5813,16 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 208:
       inst = "RET NC";
-      code = "if ((this.f & F_CARRY) == 0) {" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 2;" + "this.tstates -= 6;" + "return;" + "}";
+      code = "if ((this.f & F_CARRY) == 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
       break;
     case 209:
       inst = "POP DE";
-      code = "this.setDE(this.readMemWord(this.sp)); this.sp += 2;";
+      code = "this.setDE(this.readMemWord(this.sp)); this.sp += 0x02;";
       break;
     case 210:
       target = this.readRom16bit(address);
       inst = "JP NC,(" + toHex(target) + ")";
-      code = "if ((this.f & F_CARRY) == 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_CARRY) == 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 211:
@@ -5764,7 +5834,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 212:
       target = this.readRom16bit(address);
       inst = "CALL NC (" + toHex(target) + ")";
-      code = "if ((this.f & F_CARRY) == 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
+      code = "if ((this.f & F_CARRY) == 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 213:
@@ -5784,7 +5854,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 216:
       inst = "RET C";
-      code = "if ((this.f & F_CARRY) != 0) {" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 2;" + "this.tstates -= 6;" + "return;" + "}";
+      code = "if ((this.f & F_CARRY) != 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
       break;
     case 217:
       inst = "EXX";
@@ -5793,7 +5863,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 218:
       target = this.readRom16bit(address);
       inst = "JP C,(" + toHex(target) + ")";
-      code = "if ((this.f & F_CARRY) != 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_CARRY) != 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 219:
@@ -5805,11 +5875,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 220:
       target = this.readRom16bit(address);
       inst = "CALL C (" + toHex(target) + ")";
-      code = "if ((this.f & F_CARRY) != 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
+      code = "if ((this.f & F_CARRY) != 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 221:
-      var _inst = this.getIndexOpIX(address);
+      _inst = this.getIndexOpIX(address);
       inst = _inst.inst;
       code = _inst.code;
       opcodesArray = opcodesArray.concat(_inst.opcodes);
@@ -5828,26 +5898,26 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 224:
       inst = "RET PO";
-      code = "if ((this.f & F_PARITY) == 0) {" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 2;" + "this.tstates -= 6;" + "return;" + "}";
+      code = "if ((this.f & F_PARITY) == 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
       break;
     case 225:
       inst = "POP HL";
-      code = "this.setHL(this.readMemWord(this.sp)); this.sp += 2;";
+      code = "this.setHL(this.readMemWord(this.sp)); this.sp += 0x02;";
       break;
     case 226:
       target = this.readRom16bit(address);
       inst = "JP PO,(" + toHex(target) + ")";
-      code = "if ((this.f & F_PARITY) == 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_PARITY) == 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 227:
       inst = "EX (SP),HL";
-      code = "temp = this.h;" + "this.h = this.readMem(this.sp + 1);" + "this.writeMem(this.sp + 1, temp);" + "temp = this.l;" + "this.l = this.readMem(this.sp);" + "this.writeMem(this.sp, temp);";
+      code = "temp = this.h;" + "this.h = this.readMem(this.sp + 0x01);" + "this.writeMem(this.sp + 0x01, temp);" + "temp = this.l;" + "this.l = this.readMem(this.sp);" + "this.writeMem(this.sp, temp);";
       break;
     case 228:
       target = this.readRom16bit(address);
       inst = "CALL PO (" + toHex(target) + ")";
-      code = "if ((this.f & F_PARITY) == 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
+      code = "if ((this.f & F_PARITY) == 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 229:
@@ -5867,7 +5937,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 232:
       inst = "RET PE";
-      code = "if ((this.f & F_PARITY) != 0) {" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 2;" + "this.tstates -= 6;" + "return;" + "}";
+      code = "if ((this.f & F_PARITY) != 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
       break;
     case 233:
       inst = "JP (HL)";
@@ -5877,7 +5947,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 234:
       target = this.readRom16bit(address);
       inst = "JP PE,(" + toHex(target) + ")";
-      code = "if ((this.f & F_PARITY) != 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_PARITY) != 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 235:
@@ -5887,11 +5957,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 236:
       target = this.readRom16bit(address);
       inst = "CALL PE (" + toHex(target) + ")";
-      code = "if ((this.f & F_PARITY) != 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
+      code = "if ((this.f & F_PARITY) != 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 237:
-      var _inst = this.getED(address);
+      _inst = this.getED(address);
       target = _inst.target;
       inst = _inst.inst;
       code = _inst.code;
@@ -5900,7 +5970,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 238:
       operand = toHex(this.readRom8bit(address));
-      inst = "XOR A," + operand;
+      inst = "XOR " + operand;
       code = "this.f = this.SZP_TABLE[this.a ^= " + operand + "];";
       address++;
       break;
@@ -5911,26 +5981,26 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 240:
       inst = "RET P";
-      code = "if ((this.f & F_SIGN) == 0) {" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 2;" + "this.tstates -= 6;" + "return;" + "}";
+      code = "if ((this.f & F_SIGN) == 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
       break;
     case 241:
       inst = "POP AF";
-      code = "this.f = this.readMem(this.sp++); this.a = this.readMem(this.sp++);";
+      code = "this.setAF(this.readMemWord(this.sp)); this.sp += 0x02;";
       break;
     case 242:
       target = this.readRom16bit(address);
       inst = "JP P,(" + toHex(target) + ")";
-      code = "if ((this.f & F_SIGN) == 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_SIGN) == 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 243:
       inst = "DI";
-      code = "this.iff1 = this.iff2 = false; this.EI_inst = true;";
+      code = "this.iff1 = false; this.iff2 = false; this.EI_inst = true;";
       break;
     case 244:
       target = this.readRom16bit(address);
       inst = "CALL P (" + toHex(target) + ")";
-      code = "if ((this.f & F_SIGN) == 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
+      code = "if ((this.f & F_SIGN) == 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 245:
@@ -5950,7 +6020,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 248:
       inst = "RET M";
-      code = "if ((this.f & F_SIGN) != 0) {" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 2;" + "this.tstates -= 6;" + "return;" + "}";
+      code = "if ((this.f & F_SIGN) != 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
       break;
     case 249:
       inst = "LD SP,HL";
@@ -5959,21 +6029,21 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 250:
       target = this.readRom16bit(address);
       inst = "JP M,(" + toHex(target) + ")";
-      code = "if ((this.f & F_SIGN) != 0) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_SIGN) != 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 251:
       inst = "EI";
-      code = "this.iff1 = this.iff2 = this.EI_inst = true;";
+      code = "this.iff1 = true; this.iff2 = true; this.EI_inst = true;";
       break;
     case 252:
       target = this.readRom16bit(address);
       inst = "CALL M (" + toHex(target) + ")";
-      code = "if ((this.f & F_SIGN) != 0) {" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "this.tstates -= 7;" + "return;" + "}";
+      code = "if ((this.f & F_SIGN) != 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 253:
-      var _inst = this.getIndexOpIY(address);
+      _inst = this.getIndexOpIY(address);
       inst = _inst.inst;
       code = _inst.code;
       opcodesArray = opcodesArray.concat(_inst.opcodes);
@@ -6002,27 +6072,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   switch(opcode) {
     case 0:
       inst = "RLC B";
-      code = "this.b = (this.rlc(this.b));";
+      code = "this.b = this.rlc(this.b);";
       break;
     case 1:
       inst = "RLC C";
-      code = "this.c = (this.rlc(this.c));";
+      code = "this.c = this.rlc(this.c);";
       break;
     case 2:
       inst = "RLC D";
-      code = "this.d = (this.rlc(this.d));";
+      code = "this.d = this.rlc(this.d);";
       break;
     case 3:
       inst = "RLC E";
-      code = "this.e = (this.rlc(this.e));";
+      code = "this.e = this.rlc(this.e);";
       break;
     case 4:
       inst = "RLC H";
-      code = "this.h = (this.rlc(this.h));";
+      code = "this.h = this.rlc(this.h);";
       break;
     case 5:
       inst = "RLC L";
-      code = "this.l = (this.rlc(this.l));";
+      code = "this.l = this.rlc(this.l);";
       break;
     case 6:
       inst = "RLC (HL)";
@@ -6030,31 +6100,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 7:
       inst = "RLC A";
-      code = "this.a = (this.rlc(this.a));";
+      code = "this.a = this.rlc(this.a);";
       break;
     case 8:
       inst = "RRC B";
-      code = "this.b = (this.rrc(this.b));";
+      code = "this.b = this.rrc(this.b);";
       break;
     case 9:
       inst = "RRC C";
-      code = "this.c = (this.rrc(this.c));";
+      code = "this.c = this.rrc(this.c);";
       break;
     case 10:
       inst = "RRC D";
-      code = "this.d = (this.rrc(this.d));";
+      code = "this.d = this.rrc(this.d);";
       break;
     case 11:
       inst = "RRC E";
-      code = "this.e = (this.rrc(this.e));";
+      code = "this.e = this.rrc(this.e);";
       break;
     case 12:
       inst = "RRC H";
-      code = "this.h = (this.rrc(this.h));";
+      code = "this.h = this.rrc(this.h);";
       break;
     case 13:
       inst = "RRC L";
-      code = "this.l = (this.rrc(this.l));";
+      code = "this.l = this.rrc(this.l);";
       break;
     case 14:
       inst = "RRC (HL)";
@@ -6062,31 +6132,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 15:
       inst = "RRC A";
-      code = "this.a = (this.rrc(this.a));";
+      code = "this.a = this.rrc(this.a);";
       break;
     case 16:
       inst = "RL B";
-      code = "this.b = (this.rl(this.b));";
+      code = "this.b = this.rl(this.b);";
       break;
     case 17:
       inst = "RL C";
-      code = "this.c = (this.rl(this.c));";
+      code = "this.c = this.rl(this.c);";
       break;
     case 18:
       inst = "RL D";
-      code = "this.d = (this.rl(this.d));";
+      code = "this.d = this.rl(this.d);";
       break;
     case 19:
       inst = "RL E";
-      code = "this.e = (this.rl(this.e));";
+      code = "this.e = this.rl(this.e);";
       break;
     case 20:
       inst = "RL H";
-      code = "this.h = (this.rl(this.h));";
+      code = "this.h = this.rl(this.h);";
       break;
     case 21:
       inst = "RL L";
-      code = "this.l = (this.rl(this.l));";
+      code = "this.l = this.rl(this.l);";
       break;
     case 22:
       inst = "RL (HL)";
@@ -6094,31 +6164,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 23:
       inst = "RL A";
-      code = "this.a = (this.rl(this.a));";
+      code = "this.a = this.rl(this.a);";
       break;
     case 24:
       inst = "RR B";
-      code = "this.b = (this.rr(this.b));";
+      code = "this.b = this.rr(this.b);";
       break;
     case 25:
       inst = "RR C";
-      code = "this.c = (this.rr(this.c));";
+      code = "this.c = this.rr(this.c);";
       break;
     case 26:
       inst = "RR D";
-      code = "this.d = (this.rr(this.d));";
+      code = "this.d = this.rr(this.d);";
       break;
     case 27:
       inst = "RR E";
-      code = "this.e = (this.rr(this.e));";
+      code = "this.e = this.rr(this.e);";
       break;
     case 28:
       inst = "RR H";
-      code = "this.h = (this.rr(this.h));";
+      code = "this.h = this.rr(this.h);";
       break;
     case 29:
       inst = "RR L";
-      code = "this.l = (this.rr(this.l));";
+      code = "this.l = this.rr(this.l);";
       break;
     case 30:
       inst = "RR (HL)";
@@ -6126,31 +6196,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 31:
       inst = "RR A";
-      code = "this.a = (this.rr(this.a));";
+      code = "this.a = this.rr(this.a);";
       break;
     case 32:
       inst = "SLA B";
-      code = "this.b = (this.sla(this.b));";
+      code = "this.b = this.sla(this.b);";
       break;
     case 33:
       inst = "SLA C";
-      code = "this.c = (this.sla(this.c));";
+      code = "this.c = this.sla(this.c);";
       break;
     case 34:
       inst = "SLA D";
-      code = "this.d = (this.sla(this.d));";
+      code = "this.d = this.sla(this.d);";
       break;
     case 35:
       inst = "SLA E";
-      code = "this.e = (this.sla(this.e));";
+      code = "this.e = this.sla(this.e);";
       break;
     case 36:
       inst = "SLA H";
-      code = "this.h = (this.sla(this.h));";
+      code = "this.h = this.sla(this.h);";
       break;
     case 37:
       inst = "SLA L";
-      code = "this.l = (this.sla(this.l));";
+      code = "this.l = this.sla(this.l);";
       break;
     case 38:
       inst = "SLA (HL)";
@@ -6158,31 +6228,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 39:
       inst = "SLA A";
-      code = "this.a = (this.sla(this.a));";
+      code = "this.a = this.sla(this.a);";
       break;
     case 40:
       inst = "SRA B";
-      code = "this.b = (this.sra(this.b));";
+      code = "this.b = this.sra(this.b);";
       break;
     case 41:
       inst = "SRA C";
-      code = "this.c = (this.sra(this.c));";
+      code = "this.c = this.sra(this.c);";
       break;
     case 42:
       inst = "SRA D";
-      code = "this.d = (this.sra(this.d));";
+      code = "this.d = this.sra(this.d);";
       break;
     case 43:
       inst = "SRA E";
-      code = "this.e = (this.sra(this.e));";
+      code = "this.e = this.sra(this.e);";
       break;
     case 44:
       inst = "SRA H";
-      code = "this.h = (this.sra(this.h));";
+      code = "this.h = this.sra(this.h);";
       break;
     case 45:
       inst = "SRA L";
-      code = "this.l = (this.sra(this.l));";
+      code = "this.l = this.sra(this.l);";
       break;
     case 46:
       inst = "SRA (HL)";
@@ -6190,31 +6260,31 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 47:
       inst = "SRA A";
-      code = "this.a = (this.sra(this.a));";
+      code = "this.a = this.sra(this.a);";
       break;
     case 48:
       inst = "SLL B";
-      code = "this.b = (this.sll(this.b));";
+      code = "this.b = this.sll(this.b);";
       break;
     case 49:
       inst = "SLL C";
-      code = "this.c = (this.sll(this.c));";
+      code = "this.c = this.sll(this.c);";
       break;
     case 50:
       inst = "SLL D";
-      code = "this.d = (this.sll(this.d));";
+      code = "this.d = this.sll(this.d);";
       break;
     case 51:
       inst = "SLL E";
-      code = "this.e = (this.sll(this.e));";
+      code = "this.e = this.sll(this.e);";
       break;
     case 52:
       inst = "SLL H";
-      code = "this.h = (this.sll(this.h));";
+      code = "this.h = this.sll(this.h);";
       break;
     case 53:
       inst = "SLL L";
-      code = "this.l = (this.sll(this.l));";
+      code = "this.l = this.sll(this.l);";
       break;
     case 54:
       inst = "SLL (HL)";
@@ -6222,7 +6292,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 55:
       inst = "SLL A";
-      code = "this.a = (this.sll(this.a));";
+      code = "this.a = this.sll(this.a);";
       break;
     case 56:
       inst = "SRL B";
@@ -7001,7 +7071,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     ;
     case 124:
       inst = "NEG";
-      code = "temp = this.a;" + "this.a = 0;" + "this.sub_a(temp);";
+      code = "temp = this.a;" + "this.a = 0x00;" + "this.sub_a(temp);";
       break;
     case 69:
     ;
@@ -7019,7 +7089,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     ;
     case 125:
       inst = "RETN / RETI";
-      code = "this.pc = this.readMemWord(this.sp);" + "this.sp += 2;" + "this.iff1 = this.iff2;";
+      code = "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "this.iff1 = this.iff2;" + "return;";
       address = null;
       break;
     case 70:
@@ -7030,7 +7100,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     ;
     case 110:
       inst = "IM 0";
-      code = "this.im = 0;";
+      code = "this.im = 0x00;";
       break;
     case 71:
       inst = "LD I,A";
@@ -7081,7 +7151,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     ;
     case 118:
       inst = "IM 1";
-      code = "this.im = 1;";
+      code = "this.im = 0x01;";
       break;
     case 87:
       inst = "LD A,I";
@@ -7102,7 +7172,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 91:
       operand = toHex(this.readRom16bit(address));
       inst = "LD DE,(" + operand + ")";
-      code = "this.setDE(" + operand + ");";
+      code = "this.setDE(this.readMemWord(" + operand + "));";
       address += 2;
       break;
     case 95:
@@ -7110,9 +7180,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       if(REFRESH_EMULATION) {
         code = "this.a = this.r;"
       }else {
-        code = "this.a = JSSMS.Utils.rndInt(255);"
+        code = "this.a = JSSMS.Utils.rndInt(0xFF);"
       }
-      code += "this.f = (this.f & F_CARRY) | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);";
+      code += "this.f = this.f & F_CARRY | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0x00);";
       break;
     case 96:
       inst = "IN H,(C)";
@@ -7135,7 +7205,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 103:
       inst = "RRD";
-      code = "var location = this.getHL();" + "temp = this.readMem(location);" + "this.writeMem(location, (temp >> 4) | ((this.a & 0x0F) << 4));" + "this.a = (this.a & 0xF0) | (temp & 0x0F);" + "this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];";
+      code = "var location = this.getHL();" + "temp = this.readMem(location);" + "this.writeMem(location, (temp >> 4) | ((this.a & 0x0F) << 4));" + "this.a = (this.a & 0xF0) | (temp & 0x0F);" + "this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
       break;
     case 104:
       inst = "IN L,(C)";
@@ -7157,7 +7227,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 111:
       inst = "RLD";
-      code = "var location = this.getHL();" + "temp = this.readMem(location);" + "this.writeMem(location, (temp & 0x0F) << 4 | (this.a & 0x0F));" + "this.a = (this.a & 0xF0) | (temp >> 4);" + "this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];";
+      code = "var location = this.getHL();" + "temp = this.readMem(location);" + "this.writeMem(location, (temp & 0x0F) << 4 | (this.a & 0x0F));" + "this.a = (this.a & 0xF0) | (temp >> 4);" + "this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
       break;
     case 113:
       inst = "OUT (C),0";
@@ -7176,7 +7246,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 120:
       inst = "IN A,(C)";
-      code = "this.a = this.port.in_(this.c);" + "this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];";
+      code = "this.a = this.port.in_(this.c);" + "this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
       break;
     case 121:
       inst = "OUT (C),A";
@@ -7194,19 +7264,19 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 160:
       inst = "LDI";
-      code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "this.f = (this.f & 0xC1) | (this.getBC() != 0 ? F_PARITY : 0);";
+      code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "this.f = this.f & 0xC1 | (this.getBC() != 0x00 ? F_PARITY : 0x00);";
       break;
     case 161:
       inst = "CPI";
-      code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);" + "this.f = (this.f & 0xF8) | temp;";
+      code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0x00 ? 0x00 : F_PARITY);" + "this.f = (this.f & 0xF8) | temp;";
       break;
     case 162:
       inst = "INI";
-      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "if ((temp & 0x80) == 0x80) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
       break;
     case 163:
       inst = "OUTI";
-      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.incHL();" + "this.b = this.dec8(this.b);" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.incHL();" + "this.b = this.dec8(this.b);" + "if (this.l + temp > 0xFF) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) == 0x80) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
       break;
     case 168:
       inst = "LDD";
@@ -7216,49 +7286,49 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 170:
       inst = "IND";
-      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if ((temp & 0x80) != 0x00) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
       break;
     case 171:
       inst = "OUTD";
-      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.decHL();" + "this.b = this.dec8(this.b);" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.decHL();" + "this.b = this.dec8(this.b);" + "if (this.l + temp > 0xFF) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) == 0x80) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
       break;
     case 176:
       inst = "LDIR";
       code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();";
       if(ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
-        code += "if (this.getBC() != 0) {" + "this.f |= F_PARITY;" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
+        code += "if (this.getBC() != 0x00) {" + "this.tstates -= 0x05;" + "this.f |= F_PARITY;" + "return;" + "} else {"
       }else {
-        code += "for (;this.getBC() != 0; this.f |= F_PARITY, this.tstates -= 5) {" + "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "}"
+        code += "for (;this.getBC() != 0x00; this.f |= F_PARITY, this.tstates -= 5) {" + "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "}" + "if (!(this.getBC() != 0x00)) {"
       }
-      code += "if (!(this.getBC() != 0)) this.f &= ~ F_PARITY;" + "this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
+      code += "this.f &= ~ F_PARITY;" + "}" + "this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
       break;
     case 177:
       inst = "CPIR";
-      code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);";
+      code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0x00 ? 0x00 : F_PARITY);";
       if(ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
-        code += "if ((temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
+        code += "if ((temp & F_PARITY) != 0x00 && (this.f & F_ZERO) == 0x00) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
       }else {
-        code += "for (;(temp & F_PARITY) != 0 && (this.f & F_ZERO) == 0; this.tstates -= 5) {" + "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0 ? 0 : F_PARITY);" + "}"
+        code += "for (;(temp & F_PARITY) != 0x00 && (this.f & F_ZERO) == 0x00; this.tstates -= 5) {" + "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() == 0x00 ? 0x00 : F_PARITY);" + "}"
       }
       code += "this.f = (this.f & 0xF8) | temp;";
       break;
     case 178:
       target = address - 2;
       inst = "INIR";
-      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}" + "if ((temp & 0x80) == 0x80) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "if (this.b != 0x00) {" + "this.tstates -= 0x05;" + "return;" + "}" + "if ((temp & 0x80) == 0x80) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
       break;
     case 179:
       inst = "OTIR";
       code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();";
       if(ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
-        code += "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}"
+        code += "if (this.b != 0x00) {" + "this.tstates -= 0x05;" + "return;" + "}"
       }else {
-        code += "for (;this.b != 0; this.tstates -= 5) {" + "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "}"
+        code += "for (;this.b != 0x00; this.tstates -= 5) {" + "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "}"
       }
-      code += "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code += "if (this.l + temp > 0xFF) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) != 0x00) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
       break;
     case 184:
       inst = "LDDR";
@@ -7269,12 +7339,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 186:
       target = address - 2;
       inst = "INDR";
-      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0x00) {" + "this.tstates -= 0x05;" + "return;" + "}" + "if ((temp & 0x80) != 0x00) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
       break;
     case 187:
       target = address - 2;
       inst = "OTDR";
-      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0) {" + "this.tstates -= 5;" + "this.pc = " + toHex(target) + ";" + "return;" + "}" + "if ((this.l + temp) > 255) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) != 0) this.f |= F_NEGATIVE;" + "else this.f &= ~ F_NEGATIVE;";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0x00) {" + "this.tstates -= 0x05;" + "return;" + "}" + "if (this.l + temp > 0xFF) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) != 0x00) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
       break
   }
   return{opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address, target:target}
@@ -7288,6 +7358,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   var operand = "";
   var location = 0;
   address++;
+  var offset = 0;
+  var _inst = {};
   switch(opcode) {
     case 9:
       inst = "ADD " + index + ",BC";
@@ -7348,19 +7420,19 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       address++;
       break;
     case 52:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "INC (" + index + "+" + toHex(offset) + ")";
       code = "this.incMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 53:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "DEC (" + index + "+" + toHex(offset) + ")";
       code = "this.decMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
       break;
     case 54:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       operand = toHex(this.readRom8bit(address + 1));
       inst = "LD (" + index + "+" + toHex(offset) + ")," + operand;
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", " + operand + ");";
@@ -7377,7 +7449,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD B," + index + "L *";
       break;
     case 70:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD B,(" + index + "+" + toHex(offset) + ")";
       code = "this.b = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
@@ -7389,7 +7461,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD C," + index + "L *";
       break;
     case 78:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD C,(" + index + "+" + toHex(offset) + ")";
       code = "this.c = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
@@ -7401,7 +7473,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD D," + index + "L *";
       break;
     case 86:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD D,(" + index + "+" + toHex(offset) + ")";
       code = "this.d = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
@@ -7413,7 +7485,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD E," + index + "L *";
       break;
     case 94:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD E,(" + index + "+" + toHex(offset) + ")";
       code = "this.e = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
@@ -7437,7 +7509,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD " + index + "H," + index + "L *";
       break;
     case 102:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD H,(" + index + "+" + toHex(offset) + ")";
       code = "this.h = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
@@ -7465,7 +7537,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "";
       break;
     case 110:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD L,(" + index + "+" + toHex(offset) + ")";
       code = "this.l = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
@@ -7475,43 +7547,43 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this." + index.toLowerCase() + "L = this.a;";
       break;
     case 112:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),B";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.b);";
       address++;
       break;
     case 113:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),C";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.c);";
       address++;
       break;
     case 114:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),D";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.d);";
       address++;
       break;
     case 115:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),E";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.e);";
       address++;
       break;
     case 116:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),H";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.h);";
       address++;
       break;
     case 117:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),L";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.l);";
       address++;
       break;
     case 119:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD (" + index + "+" + toHex(offset) + "),A";
       code = "this.writeMem(this.get" + index + "() + " + toHex(offset) + ", this.a);";
       address++;
@@ -7523,7 +7595,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "LD A," + index + "L *";
       break;
     case 126:
-      var offset = this.readRom8bit(address);
+      offset = this.readRom8bit(address);
       inst = "LD A,(" + index + "+" + toHex(offset) + ")";
       code = "this.a = this.readMem(this.get" + index + "() + " + toHex(offset) + ");";
       address++;
@@ -7535,8 +7607,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "ADD A," + index + "L *";
       break;
     case 134:
-      var offset = this.readRom8bit(address);
-      inst = "ADD A,(" + index + "+" + toHex(offset) + "))";
+      offset = this.readRom8bit(address);
+      inst = "ADD A,(" + index + "+" + toHex(offset) + ")";
       code = "this.add_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
       break;
@@ -7547,8 +7619,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "ADC A," + index + "L *";
       break;
     case 142:
-      var offset = this.readRom8bit(address);
-      inst = "ADC A,(" + index + "+" + toHex(offset) + "))";
+      offset = this.readRom8bit(address);
+      inst = "ADC A,(" + index + "+" + toHex(offset) + ")";
       code = "this.adc_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
       break;
@@ -7559,8 +7631,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "SUB " + index + "L *";
       break;
     case 150:
-      var offset = this.readRom8bit(address);
-      inst = "SUB A,(" + index + "+" + toHex(offset) + "))";
+      offset = this.readRom8bit(address);
+      inst = "SUB A,(" + index + "+" + toHex(offset) + ")";
       code = "this.sub_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
       break;
@@ -7571,8 +7643,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "SBC A," + index + "L *";
       break;
     case 158:
-      var offset = this.readRom8bit(address);
-      inst = "SBC A,(" + index + "+" + toHex(offset) + "))";
+      offset = this.readRom8bit(address);
+      inst = "SBC A,(" + index + "+" + toHex(offset) + ")";
       code = "this.sbc_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
       break;
@@ -7585,8 +7657,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.f = this.SZP_TABLE[this.a &= this." + index.toLowerCase() + "L];";
       break;
     case 166:
-      var offset = this.readRom8bit(address);
-      inst = "AND A,(" + index + "+" + toHex(offset) + "))";
+      offset = this.readRom8bit(address);
+      inst = "AND A,(" + index + "+" + toHex(offset) + ")";
       code = "this.f = this.SZP_TABLE[this.a &= this.readMem(this.get" + index + "() + " + toHex(offset) + ")] | F_HALFCARRY;";
       address++;
       break;
@@ -7599,8 +7671,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.f = this.SZP_TABLE[this.a |= this." + index.toLowerCase() + "L];";
       break;
     case 174:
-      var offset = this.readRom8bit(address);
-      inst = "XOR A,(" + index + "+" + toHex(offset) + "))";
+      offset = this.readRom8bit(address);
+      inst = "XOR A,(" + index + "+" + toHex(offset) + ")";
       code = "this.f = this.SZP_TABLE[this.a ^= this.readMem(this.get" + index + "() + " + toHex(offset) + ")];";
       address++;
       break;
@@ -7613,8 +7685,8 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.f = this.SZP_TABLE[this.a |= this." + index.toLowerCase() + "L];";
       break;
     case 182:
-      var offset = this.readRom8bit(address);
-      inst = "OR A,(" + index + "+" + toHex(offset) + "))";
+      offset = this.readRom8bit(address);
+      inst = "OR A,(" + index + "+" + toHex(offset) + ")";
       code = "this.f = this.SZP_TABLE[this.a |= this.readMem(this.get" + index + "() + " + toHex(offset) + ")];";
       address++;
       break;
@@ -7627,13 +7699,13 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.cp_a(this." + index.toLowerCase() + "L);";
       break;
     case 190:
-      var offset = this.readRom8bit(address);
-      inst = "CP (" + index + "+" + toHex(offset) + "))";
+      offset = this.readRom8bit(address);
+      inst = "CP (" + index + "+" + toHex(offset) + ")";
       code = "this.cp_a(this.readMem(this.get" + index + "() + " + toHex(offset) + "));";
       address++;
       break;
     case 203:
-      var _inst = this.getIndexCB(index, address);
+      _inst = this.getIndexCB(index, address);
       inst = _inst.inst;
       code = _inst.code;
       opcodesArray = opcodesArray.concat(_inst.opcodes);
@@ -7641,7 +7713,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 225:
       inst = "POP " + index;
-      code = "this.set" + index + "(this.readMemWord(this.sp)); this.sp += 2;";
+      code = "this.set" + index + "(this.readMemWord(this.sp)); this.sp += 0x02;";
       break;
     case 227:
       inst = "EX SP,(" + index + ")";
@@ -7653,7 +7725,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 233:
       inst = "JP (" + index + ")";
-      code = "this.pc = this.get" + index + "();";
+      code = "this.pc = this.get" + index + "(); return;";
       address = null;
       break;
     case 249:
@@ -7663,25 +7735,26 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   }
   return{opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address}
 }, getIndexCB:function(index, address) {
+  var toHex = JSSMS.Utils.toHex;
   var opcode = this.readRom8bit(address);
   var opcodesArray = [opcode];
   var inst = "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";
   var currAddr = address;
   var code = 'throw "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";';
-  var location = 0;
   address++;
+  var location = "location = this.get" + index + "() + " + toHex(this.readRom8bit(address)) + " & 0xFFFF;";
   switch(opcode) {
     case 0:
       inst = "LD B,RLC (" + index + ")";
-      code = "var location = (this.get" + index + "() + " + this.readRom8bit(address) + ") & 0xFFFF;" + "this.b = this.rlc(this.readMem(location)); this.writeMem(location, this.b);";
+      code = location + "this.b = this.rlc(this.readMem(location)); this.writeMem(location, this.b);";
       break;
     case 1:
       inst = "LD C,RLC (" + index + ")";
-      code = "var location = (this.get" + index + "() + " + this.readRom8bit(address) + ") & 0xFFFF;" + "this.c = this.rlc(this.readMem(location)); this.writeMem(location, this.c);";
+      code = location + "this.c = this.rlc(this.readMem(location)); this.writeMem(location, this.c);";
       break;
     case 2:
       inst = "LD D,RLC (" + index + ")";
-      code = "var location = (this.get" + index + "() + " + this.readRom8bit(address) + ") & 0xFFFF;" + "this.d = this.rlc(this.readMem(location)); this.writeMem(location, this.d);";
+      code = location + "this.d = this.rlc(this.readMem(location)); this.writeMem(location, this.d);";
       break;
     case 3:
       inst = "LD E,RLC (" + index + ")";
@@ -7694,11 +7767,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 6:
       inst = "RLC (" + index + ")";
-      code = "var location = (this.get" + index + "() + " + this.readRom8bit(address) + ") & 0xFFFF;" + "this.writeMem(location, this.rlc(this.readMem(location)));";
+      code = location + "this.writeMem(location, this.rlc(this.readMem(location)));";
       break;
     case 7:
       inst = "LD A,RLC (" + index + ")";
-      code = "var location = (this.get" + index + "() + " + this.readRom8bit(address) + ") & 0xFFFF;" + "this.a = this.rlc(this.readMem(location)); this.writeMem(location, this.a);";
+      code = location + "this.a = this.rlc(this.readMem(location)); this.writeMem(location, this.a);";
       break;
     case 8:
       inst = "LD B,RRC (" + index + ")";
@@ -7765,13 +7838,14 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 29:
       inst = "LD L,RR (" + index + ")";
-      code = "var location = (this.get" + index + "() + " + this.readRom8bit(address) + ") & 0xFFFF;" + "this.l = this.rr(this.readMem(location)); this.writeMem(location, this.l);";
+      code = location + "this.l = this.rr(this.readMem(location)); this.writeMem(location, this.l);";
       break;
     case 30:
       inst = "RR (" + index + ")";
       break;
     case 31:
       inst = "LD A,RR (" + index + ")";
+      code = location + "this.a = this.rr(this.readMem(location)); this.writeMem(location, this.a);";
       break;
     case 32:
       inst = "LD B,SLA (" + index + ")";
@@ -8278,6 +8352,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       inst = "SET 7,(" + index + ")";
       break
   }
+  address++;
   return{opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address}
 }, getIndexOpIX:function(opcode) {
   return this.getIndex("IX", opcode)
@@ -8300,13 +8375,14 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     return this.rom[address >> 14][address & 16383] & 255 | (this.rom[++address >> 14][address & 16383] & 255) << 8
   }
 }, peepholePortOut:function(port) {
+  return"this.port.out(" + JSSMS.Utils.toHex(port) + ", this.a);";
   if(this.main.is_gg && port < 7) {
     return""
   }
   switch(port & 193) {
     case 1:
       if(LIGHTGUN) {
-        return"var value = this.a;" + "this.port.oldTH = (this.port.getTH(PORT_A) != 0 || this.port.getTH(PORT_B) != 0);" + "this.port.writePort(PORT_A, value);" + "this.port.writePort(PORT_B, value >> 2);" + "if (!this.port.oldTH && (this.port.getTH(PORT_A) != 0 || this.port.getTH(PORT_B) != 0)) {" + "this.port.hCounter = this.port.getHCount();" + "}"
+        return"var value = this.a;" + "this.port.oldTH = (this.port.getTH(PORT_A) != 0x00 || this.port.getTH(PORT_B) != 0x00);" + "this.port.writePort(PORT_A, value);" + "this.port.writePort(PORT_B, value >> 2);" + "if (!this.port.oldTH && (this.port.getTH(PORT_A) != 0x00 || this.port.getTH(PORT_B) != 0x00)) {" + "this.port.hCounter = this.port.getHCount();" + "}"
       }else {
         var code = "var value = this.a;" + "this.port.ioPorts[0] = (value & 0x20) << 1;" + "this.port.ioPorts[1] = (value & 0x80);";
         if(this.port.europe == 0) {
@@ -8331,6 +8407,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   }
   return""
 }, peepholePortIn:function(port) {
+  return"this.a = this.port.in_(" + JSSMS.Utils.toHex(port) + ");";
   if(this.main.is_gg && port < 7) {
     switch(port) {
       case 0:
@@ -8362,7 +8439,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       return"this.a = this.port.keyboard.controller1;";
     case 193:
       if(LIGHTGUN) {
-        return"if (this.port.keyboard.lightgunClick)" + "this.port.lightPhaserSync();" + "this.a = (this.port.keyboard.controller2 & 0x3F) | (this.port.getTH(PORT_A) != 0 ? 0x40 : 0) | (this.port.getTH(PORT_B) != 0 ? 0x80 : 0);"
+        return"if (this.port.keyboard.lightgunClick)" + "this.port.lightPhaserSync();" + "this.a = (this.port.keyboard.controller2 & 0x3F) | (this.port.getTH(PORT_A) != 0x00 ? 0x40 : 0x00) | (this.port.getTH(PORT_B) != 0x00 ? 0x80 : 0x00);"
       }else {
         return"this.a = (this.port.keyboard.controller2 & 0x3F) | this.port.ioPorts[0] | this.port.ioPorts[1];"
       }
@@ -8799,8 +8876,7 @@ JSSMS.Vdp.prototype = {reset:function() {
             var old = this.sat;
             this.sat = (this.commandByte & ~1 & ~128) << 7;
             if(old != this.sat) {
-              this.isSatDirty = true;
-              DEBUG && console.log("New address written to SAT: " + old + " -> " + this.sat)
+              this.isSatDirty = true
             }
             break
         }
@@ -9069,13 +9145,11 @@ JSSMS.Vdp.prototype = {reset:function() {
     this.display[row_precal + 2] = this.CRAM[temp + 2]
   }
 }, decodeTiles:function() {
-  DEBUG && console.log("[" + this.line + "]" + " min dirty:" + this.minDirty + " max: " + this.maxDirty);
   for(var i = this.minDirty;i <= this.maxDirty;i++) {
     if(!this.isTileDirty[i]) {
       continue
     }
     this.isTileDirty[i] = false;
-    DEBUG && console.log("tile " + i + " is dirty");
     var tile = this.tiles[i];
     var pixel_index = 0;
     var address = i << 5;
@@ -9589,5 +9663,2369 @@ JSSMS.Ports.prototype = {reset:function() {
   this.europe = value ? 64 : 0
 }, isDomestic:function() {
   return this.europe != 0
+}};
+var Bytecode = function() {
+  var toHex = function() {
+    if(DEBUG) {
+      return JSSMS.Utils.toHex
+    }
+    return function(dec) {
+      return dec
+    }
+  }();
+  function Bytecode(address, page) {
+    this.address = address;
+    this.page = page;
+    this.opcode = [];
+    this.operand = null;
+    this.nextAddress = null;
+    this.target = null;
+    this.isFunctionEnder = false;
+    this.canEnd = false;
+    this.isJumpTarget = false;
+    this.jumpTargetNb = 0;
+    this.ast = null
+  }
+  Bytecode.prototype = {get hexOpcode() {
+    if(this.opcode.length) {
+      return this.opcode.map(toHex).join(" ")
+    }
+    return""
+  }, get label() {
+    var name = this.name ? this.name.replace(/(nn|n|PC\+e|d)/, toHex(this.target || this.operand || 0)) : "";
+    return toHex(this.address + this.page * PAGE_SIZE) + " " + this.hexOpcode + " " + name
+  }};
+  return Bytecode
+}();
+var Parser = function() {
+  var ACCURATE_INTERRUPT_EMULATION = true;
+  var parser = function(rom, frameReg) {
+    this.stream = new RomStream(rom);
+    this.frameReg = frameReg;
+    this.addresses = Array(rom.length);
+    this.entryPoints = [];
+    this.instructions = Array(rom.length);
+    if(DEBUG) {
+      this.instructionTypes = []
+    }
+    for(var i = 0;i < rom.length;i++) {
+      this.addresses[i] = [];
+      this.instructions[i] = [];
+      if(DEBUG) {
+        this.instructionTypes[i] = []
+      }
+    }
+  };
+  parser.prototype = {addEntryPoint:function(obj) {
+    this.entryPoints.push(obj);
+    this.addAddress(obj.address)
+  }, parse:function(page) {
+    JSSMS.Utils.console.time("Parsing");
+    var currentPage;
+    var pageStart;
+    var pageEnd;
+    if(page == undefined) {
+      pageStart = 0;
+      pageEnd = this.stream.length - 1
+    }else {
+      pageStart = 0;
+      pageEnd = 16384 - 1
+    }
+    for(currentPage = 0;currentPage < this.addresses.length;currentPage++) {
+      while(this.addresses[currentPage].length) {
+        var currentObj = this.addresses[currentPage].shift();
+        var currentAddress = currentObj.address % 16384;
+        if(currentAddress < pageStart || currentAddress > pageEnd) {
+          JSSMS.Utils.console.error("Address out of bound", JSSMS.Utils.toHex(currentAddress));
+          continue
+        }
+        if(this.instructions[currentPage][currentAddress]) {
+          continue
+        }
+        var bytecode = new Bytecode(currentAddress, currentPage);
+        this.instructions[currentPage][currentAddress] = disassemble(bytecode, this.stream);
+        if(this.instructions[currentPage][currentAddress].nextAddress != null && this.instructions[currentPage][currentAddress].nextAddress >= pageStart && this.instructions[currentPage][currentAddress].nextAddress <= pageEnd) {
+          this.addAddress(this.instructions[currentPage][currentAddress].nextAddress)
+        }
+        if(this.instructions[currentPage][currentAddress].target != null && this.instructions[currentPage][currentAddress].target >= pageStart && this.instructions[currentPage][currentAddress].target <= pageEnd) {
+          this.addAddress(this.instructions[currentPage][currentAddress].target)
+        }
+      }
+    }
+    if(this.instructions[0][1023]) {
+      this.instructions[0][1023].isFunctionEnder = true
+    }else {
+      if(this.instructions[0][1022]) {
+        this.instructions[0][1022].isFunctionEnder = true
+      }
+    }
+    for(var i = 0, length = this.entryPoints.length;i < length;i++) {
+      var entryPoint = this.entryPoints[i].address;
+      var romPage = this.entryPoints[i].romPage;
+      this.instructions[romPage][entryPoint].isJumpTarget = true;
+      this.instructions[romPage][entryPoint].jumpTargetNb++
+    }
+    for(currentPage = 0;currentPage < this.instructions.length;currentPage++) {
+      for(var i = 0, length = this.instructions[currentPage].length;i < length;i++) {
+        if(!this.instructions[currentPage][i]) {
+          continue
+        }
+        if(this.instructions[currentPage][i].nextAddress != null && this.instructions[currentPage][this.instructions[currentPage][i].nextAddress]) {
+          this.instructions[currentPage][this.instructions[currentPage][i].nextAddress].jumpTargetNb++
+        }
+        if(this.instructions[currentPage][i].target != null) {
+          var targetPage = Math.floor(this.instructions[currentPage][i].target / 16384);
+          var targetAddress = this.instructions[currentPage][i].target % 16384;
+          if(this.instructions[targetPage] && this.instructions[targetPage][targetAddress]) {
+            this.instructions[targetPage][targetAddress].isJumpTarget = true;
+            this.instructions[targetPage][targetAddress].jumpTargetNb++
+          }else {
+            JSSMS.Utils.console.log("Invalid target address", JSSMS.Utils.toHex(this.instructions[currentPage][i].target))
+          }
+        }
+      }
+    }
+    JSSMS.Utils.console.timeEnd("Parsing")
+  }, parseFromAddress:function(obj) {
+    var address = obj.address % 16384;
+    var romPage = obj.romPage;
+    var pageStart = romPage * 16384;
+    var pageEnd = (romPage + 1) * 16384;
+    var branch = [];
+    var bytecode;
+    var firstInstruction = true;
+    var absoluteAddress = 0;
+    if(address < 1024 && romPage == 0) {
+      pageStart = 0;
+      pageEnd = 1024
+    }
+    do {
+      if(this.instructions[romPage][address]) {
+        bytecode = this.instructions[romPage][address]
+      }else {
+        bytecode = new Bytecode(address, romPage);
+        this.instructions[romPage][address] = disassemble(bytecode, this.stream)
+      }
+      if(bytecode.canEnd && !firstInstruction) {
+        break
+      }
+      address = bytecode.nextAddress % 16384;
+      branch.push(bytecode);
+      firstInstruction = false;
+      absoluteAddress = address + romPage * 16384
+    }while(address != null && absoluteAddress >= pageStart && absoluteAddress < pageEnd && !bytecode.isFunctionEnder);
+    return branch
+  }, writeGraphViz:function() {
+    JSSMS.Utils.console.time("DOT generation");
+    var tree = this.instructions;
+    var INDENT = " ";
+    var content = ["digraph G {"];
+    for(var i = 0, length = tree.length;i < length;i++) {
+      if(!tree[i]) {
+        continue
+      }
+      content.push(INDENT + i + ' [label="' + tree[i].label + '"];');
+      if(tree[i].target != null) {
+        content.push(INDENT + i + " -> " + tree[i].target + ";")
+      }
+      if(tree[i].nextAddress != null) {
+        content.push(INDENT + i + " -> " + tree[i].nextAddress + ";")
+      }
+    }
+    content.push("}");
+    content = content.join("\n");
+    content = content.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
+    JSSMS.Utils.console.timeEnd("DOT generation");
+    return content
+  }, addAddress:function(address) {
+    var memPage = Math.floor(address / 16384);
+    var romPage = this.frameReg[memPage];
+    address = address % 16384;
+    this.addresses[romPage].push({address:address, romPage:romPage, memPage:memPage})
+  }};
+  function disassemble(bytecode, stream) {
+    stream.page = bytecode.page;
+    stream.seek(bytecode.address + stream.page * 16384);
+    var opcode = stream.getUint8();
+    var operand = null;
+    var target = null;
+    var isFunctionEnder = false;
+    var canEnd = false;
+    bytecode.opcode.push(opcode);
+    switch(opcode) {
+      case 0:
+        break;
+      case 1:
+        operand = stream.getUint16();
+        break;
+      case 2:
+        break;
+      case 3:
+        break;
+      case 4:
+        break;
+      case 5:
+        break;
+      case 6:
+        operand = stream.getUint8();
+        break;
+      case 7:
+        break;
+      case 8:
+        break;
+      case 9:
+        break;
+      case 10:
+        break;
+      case 11:
+        break;
+      case 12:
+        break;
+      case 13:
+        break;
+      case 14:
+        operand = stream.getUint8();
+        break;
+      case 15:
+        break;
+      case 16:
+        target = stream.position + stream.getInt8();
+        canEnd = true;
+        break;
+      case 17:
+        operand = stream.getUint16();
+        break;
+      case 18:
+        break;
+      case 19:
+        break;
+      case 20:
+        break;
+      case 21:
+        break;
+      case 22:
+        operand = stream.getUint8();
+        break;
+      case 23:
+        break;
+      case 24:
+        target = stream.position + stream.getInt8();
+        stream.seek(null);
+        isFunctionEnder = true;
+        break;
+      case 25:
+        break;
+      case 26:
+        break;
+      case 27:
+        break;
+      case 28:
+        break;
+      case 29:
+        break;
+      case 30:
+        operand = stream.getUint8();
+        break;
+      case 31:
+        break;
+      case 32:
+        target = stream.position + stream.getInt8();
+        canEnd = true;
+        break;
+      case 33:
+        operand = stream.getUint16();
+        break;
+      case 34:
+        operand = stream.getUint16();
+        break;
+      case 35:
+        break;
+      case 36:
+        break;
+      case 37:
+        break;
+      case 38:
+        operand = stream.getUint8();
+        break;
+      case 39:
+        break;
+      case 40:
+        target = stream.position + stream.getInt8();
+        canEnd = true;
+        break;
+      case 41:
+        break;
+      case 42:
+        operand = stream.getUint16();
+        break;
+      case 43:
+        break;
+      case 44:
+        break;
+      case 45:
+        break;
+      case 46:
+        operand = stream.getUint8();
+        break;
+      case 47:
+        break;
+      case 48:
+        target = stream.position + stream.getInt8();
+        canEnd = true;
+        break;
+      case 49:
+        operand = stream.getUint16();
+        break;
+      case 50:
+        operand = stream.getUint16();
+        break;
+      case 51:
+        break;
+      case 52:
+        break;
+      case 53:
+        break;
+      case 54:
+        operand = stream.getUint8();
+        break;
+      case 55:
+        break;
+      case 56:
+        target = stream.position + stream.getInt8();
+        canEnd = true;
+        break;
+      case 57:
+        break;
+      case 58:
+        operand = stream.getUint16();
+        break;
+      case 59:
+        break;
+      case 60:
+        break;
+      case 61:
+        break;
+      case 62:
+        operand = stream.getUint8();
+        break;
+      case 63:
+        break;
+      case 64:
+        break;
+      case 65:
+        break;
+      case 66:
+        break;
+      case 67:
+        break;
+      case 68:
+        break;
+      case 69:
+        break;
+      case 70:
+        break;
+      case 71:
+        break;
+      case 72:
+        break;
+      case 73:
+        break;
+      case 74:
+        break;
+      case 75:
+        break;
+      case 76:
+        break;
+      case 77:
+        break;
+      case 78:
+        break;
+      case 79:
+        break;
+      case 80:
+        break;
+      case 81:
+        break;
+      case 82:
+        break;
+      case 83:
+        break;
+      case 84:
+        break;
+      case 85:
+        break;
+      case 86:
+        break;
+      case 87:
+        break;
+      case 88:
+        break;
+      case 89:
+        break;
+      case 90:
+        break;
+      case 91:
+        break;
+      case 92:
+        break;
+      case 93:
+        break;
+      case 94:
+        break;
+      case 95:
+        break;
+      case 96:
+        break;
+      case 97:
+        break;
+      case 98:
+        break;
+      case 99:
+        break;
+      case 100:
+        break;
+      case 101:
+        break;
+      case 102:
+        break;
+      case 103:
+        break;
+      case 104:
+        break;
+      case 105:
+        break;
+      case 106:
+        break;
+      case 107:
+        break;
+      case 108:
+        break;
+      case 109:
+        break;
+      case 110:
+        break;
+      case 111:
+        break;
+      case 112:
+        break;
+      case 113:
+        break;
+      case 114:
+        break;
+      case 115:
+        break;
+      case 116:
+        break;
+      case 117:
+        break;
+      case 118:
+        isFunctionEnder = true;
+        break;
+      case 119:
+        break;
+      case 120:
+        break;
+      case 121:
+        break;
+      case 122:
+        break;
+      case 123:
+        break;
+      case 124:
+        break;
+      case 125:
+        break;
+      case 126:
+        break;
+      case 127:
+        break;
+      case 128:
+        break;
+      case 129:
+        break;
+      case 130:
+        break;
+      case 131:
+        break;
+      case 132:
+        break;
+      case 133:
+        break;
+      case 134:
+        break;
+      case 135:
+        break;
+      case 136:
+        break;
+      case 137:
+        break;
+      case 138:
+        break;
+      case 139:
+        break;
+      case 140:
+        break;
+      case 141:
+        break;
+      case 142:
+        break;
+      case 143:
+        break;
+      case 144:
+        break;
+      case 145:
+        break;
+      case 146:
+        break;
+      case 147:
+        break;
+      case 148:
+        break;
+      case 149:
+        break;
+      case 150:
+        break;
+      case 151:
+        break;
+      case 152:
+        break;
+      case 153:
+        break;
+      case 154:
+        break;
+      case 155:
+        break;
+      case 156:
+        break;
+      case 157:
+        break;
+      case 158:
+        break;
+      case 159:
+        break;
+      case 160:
+        break;
+      case 161:
+        break;
+      case 162:
+        break;
+      case 163:
+        break;
+      case 164:
+        break;
+      case 165:
+        break;
+      case 166:
+        break;
+      case 167:
+        break;
+      case 168:
+        break;
+      case 169:
+        break;
+      case 170:
+        break;
+      case 171:
+        break;
+      case 172:
+        break;
+      case 173:
+        break;
+      case 174:
+        break;
+      case 175:
+        break;
+      case 176:
+        break;
+      case 177:
+        break;
+      case 178:
+        break;
+      case 179:
+        break;
+      case 180:
+        break;
+      case 181:
+        break;
+      case 182:
+        break;
+      case 183:
+        break;
+      case 184:
+        break;
+      case 185:
+        break;
+      case 186:
+        break;
+      case 187:
+        break;
+      case 188:
+        break;
+      case 189:
+        break;
+      case 190:
+        break;
+      case 191:
+        break;
+      case 192:
+        canEnd = true;
+        break;
+      case 193:
+        break;
+      case 194:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 195:
+        target = stream.getUint16();
+        stream.seek(null);
+        isFunctionEnder = true;
+        break;
+      case 196:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 197:
+        break;
+      case 198:
+        operand = stream.getUint8();
+        break;
+      case 199:
+        target = 0;
+        isFunctionEnder = true;
+        break;
+      case 200:
+        canEnd = true;
+        break;
+      case 201:
+        stream.seek(null);
+        isFunctionEnder = true;
+        break;
+      case 202:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 203:
+        return getCB(bytecode, stream);
+        break;
+      case 204:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 205:
+        target = stream.getUint16();
+        isFunctionEnder = true;
+        break;
+      case 206:
+        operand = stream.getUint8();
+        break;
+      case 207:
+        target = 8;
+        isFunctionEnder = true;
+        break;
+      case 208:
+        canEnd = true;
+        break;
+      case 209:
+        break;
+      case 210:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 211:
+        operand = stream.getUint8();
+        break;
+      case 212:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 213:
+        break;
+      case 214:
+        operand = stream.getUint8();
+        break;
+      case 215:
+        target = 16;
+        isFunctionEnder = true;
+        break;
+      case 216:
+        canEnd = true;
+        break;
+      case 217:
+        break;
+      case 218:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 219:
+        operand = stream.getUint8();
+        break;
+      case 220:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 221:
+        return getIndex(bytecode, stream);
+        break;
+      case 222:
+        operand = stream.getUint8();
+        break;
+      case 223:
+        target = 24;
+        isFunctionEnder = true;
+        break;
+      case 224:
+        canEnd = true;
+        break;
+      case 225:
+        break;
+      case 226:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 227:
+        break;
+      case 228:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 229:
+        break;
+      case 230:
+        operand = stream.getUint8();
+        break;
+      case 231:
+        target = 32;
+        isFunctionEnder = true;
+        break;
+      case 232:
+        canEnd = true;
+        break;
+      case 233:
+        stream.seek(null);
+        isFunctionEnder = true;
+        break;
+      case 234:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 235:
+        break;
+      case 236:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 237:
+        return getED(bytecode, stream);
+        break;
+      case 238:
+        operand = stream.getUint8();
+        break;
+      case 239:
+        target = 40;
+        isFunctionEnder = true;
+        break;
+      case 240:
+        canEnd = true;
+        break;
+      case 241:
+        break;
+      case 242:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 243:
+        break;
+      case 244:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 245:
+        break;
+      case 246:
+        operand = stream.getUint8();
+        break;
+      case 247:
+        target = 48;
+        isFunctionEnder = true;
+        break;
+      case 248:
+        canEnd = true;
+        break;
+      case 249:
+        break;
+      case 250:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 251:
+        break;
+      case 252:
+        target = stream.getUint16();
+        canEnd = true;
+        break;
+      case 253:
+        return getIndex(bytecode, stream);
+        break;
+      case 254:
+        operand = stream.getUint8();
+        break;
+      case 255:
+        target = 56;
+        isFunctionEnder = true;
+        break;
+      default:
+        JSSMS.Utils.console.error("Unexpected opcode", JSSMS.Utils.toHex(opcode))
+    }
+    bytecode.nextAddress = stream.position;
+    bytecode.operand = operand;
+    bytecode.target = target;
+    bytecode.isFunctionEnder = isFunctionEnder;
+    bytecode.canEnd = canEnd;
+    return bytecode
+  }
+  function getCB(bytecode, stream) {
+    var opcode = stream.getUint8();
+    bytecode.opcode.push(opcode);
+    bytecode.nextAddress = stream.position;
+    return bytecode
+  }
+  function getED(bytecode, stream) {
+    var opcode = stream.getUint8();
+    var operand = null;
+    var target = null;
+    var isFunctionEnder = false;
+    var canEnd = false;
+    bytecode.opcode.push(opcode);
+    switch(opcode) {
+      case 64:
+        break;
+      case 65:
+        break;
+      case 66:
+        break;
+      case 67:
+        operand = stream.getUint16();
+        break;
+      case 68:
+      ;
+      case 76:
+      ;
+      case 84:
+      ;
+      case 92:
+      ;
+      case 100:
+      ;
+      case 108:
+      ;
+      case 116:
+      ;
+      case 124:
+        break;
+      case 69:
+      ;
+      case 77:
+      ;
+      case 85:
+      ;
+      case 93:
+      ;
+      case 101:
+      ;
+      case 109:
+      ;
+      case 117:
+      ;
+      case 125:
+        stream.seek(null);
+        isFunctionEnder = true;
+        break;
+      case 70:
+      ;
+      case 78:
+      ;
+      case 102:
+      ;
+      case 110:
+        break;
+      case 71:
+        break;
+      case 72:
+        break;
+      case 73:
+        break;
+      case 74:
+        break;
+      case 75:
+        operand = stream.getUint16();
+        break;
+      case 79:
+        break;
+      case 80:
+        break;
+      case 81:
+        break;
+      case 82:
+        break;
+      case 83:
+        operand = stream.getUint16();
+        break;
+      case 86:
+      ;
+      case 118:
+        break;
+      case 87:
+        break;
+      case 88:
+        break;
+      case 89:
+        break;
+      case 90:
+        break;
+      case 91:
+        operand = stream.getUint16();
+        break;
+      case 95:
+        break;
+      case 96:
+        break;
+      case 97:
+        break;
+      case 98:
+        break;
+      case 99:
+        operand = stream.getUint16();
+        break;
+      case 103:
+        break;
+      case 104:
+        break;
+      case 105:
+        break;
+      case 106:
+        break;
+      case 107:
+        operand = stream.getUint16();
+        break;
+      case 111:
+        break;
+      case 113:
+        break;
+      case 114:
+        break;
+      case 115:
+        operand = stream.getUint16();
+        break;
+      case 120:
+        break;
+      case 121:
+        break;
+      case 122:
+        break;
+      case 123:
+        operand = stream.getUint16();
+        break;
+      case 160:
+        break;
+      case 161:
+        break;
+      case 162:
+        break;
+      case 163:
+        break;
+      case 168:
+        break;
+      case 169:
+        break;
+      case 170:
+        break;
+      case 171:
+        break;
+      case 176:
+        if(ACCURATE_INTERRUPT_EMULATION) {
+          target = stream.position - 2;
+          canEnd = true
+        }
+        break;
+      case 177:
+        if(ACCURATE_INTERRUPT_EMULATION) {
+          target = stream.position - 2;
+          canEnd = true
+        }
+        break;
+      case 178:
+        if(ACCURATE_INTERRUPT_EMULATION) {
+          target = stream.position - 2;
+          canEnd = true
+        }
+        break;
+      case 179:
+        if(ACCURATE_INTERRUPT_EMULATION) {
+          target = stream.position - 2;
+          canEnd = true
+        }
+        break;
+      case 184:
+        break;
+      case 185:
+        break;
+      case 186:
+        if(ACCURATE_INTERRUPT_EMULATION) {
+          target = stream.position - 2;
+          canEnd = true
+        }
+        break;
+      case 187:
+        if(ACCURATE_INTERRUPT_EMULATION) {
+          target = stream.position - 2;
+          canEnd = true
+        }
+        break;
+      default:
+        JSSMS.Utils.console.error("Unexpected opcode", "0xED " + JSSMS.Utils.toHex(opcode))
+    }
+    bytecode.nextAddress = stream.position;
+    bytecode.operand = operand;
+    bytecode.target = target;
+    bytecode.isFunctionEnder = isFunctionEnder;
+    bytecode.canEnd = canEnd;
+    return bytecode
+  }
+  function getIndex(bytecode, stream) {
+    var opcode = stream.getUint8();
+    var operand = null;
+    var isFunctionEnder = false;
+    bytecode.opcode.push(opcode);
+    switch(opcode) {
+      case 9:
+        break;
+      case 25:
+        break;
+      case 33:
+        operand = stream.getUint16();
+        break;
+      case 34:
+        operand = stream.getUint16();
+        break;
+      case 35:
+        break;
+      case 36:
+        break;
+      case 37:
+        break;
+      case 38:
+        operand = stream.getUint8();
+        break;
+      case 41:
+        break;
+      case 42:
+        operand = stream.getUint16();
+        break;
+      case 43:
+        break;
+      case 44:
+        break;
+      case 45:
+        break;
+      case 46:
+        operand = stream.getUint8();
+        break;
+      case 52:
+        operand = stream.getUint8();
+        break;
+      case 53:
+        operand = stream.getUint8();
+        break;
+      case 54:
+        operand = stream.getUint16();
+        break;
+      case 57:
+        break;
+      case 68:
+        break;
+      case 69:
+        break;
+      case 70:
+        operand = stream.getUint8();
+        break;
+      case 76:
+        break;
+      case 77:
+        break;
+      case 78:
+        operand = stream.getUint8();
+        break;
+      case 84:
+        break;
+      case 85:
+        break;
+      case 86:
+        operand = stream.getUint8();
+        break;
+      case 92:
+        break;
+      case 93:
+        break;
+      case 94:
+        operand = stream.getUint8();
+        break;
+      case 96:
+        break;
+      case 97:
+        break;
+      case 98:
+        break;
+      case 99:
+        break;
+      case 100:
+        break;
+      case 101:
+        break;
+      case 102:
+        operand = stream.getUint8();
+        break;
+      case 103:
+        break;
+      case 104:
+        break;
+      case 105:
+        break;
+      case 106:
+        break;
+      case 107:
+        break;
+      case 108:
+        break;
+      case 109:
+        break;
+      case 110:
+        operand = stream.getUint8();
+        break;
+      case 111:
+        break;
+      case 112:
+        operand = stream.getUint8();
+        break;
+      case 113:
+        operand = stream.getUint8();
+        break;
+      case 114:
+        operand = stream.getUint8();
+        break;
+      case 115:
+        operand = stream.getUint8();
+        break;
+      case 116:
+        operand = stream.getUint8();
+        break;
+      case 117:
+        operand = stream.getUint8();
+        break;
+      case 119:
+        operand = stream.getUint8();
+        break;
+      case 124:
+        break;
+      case 125:
+        break;
+      case 126:
+        operand = stream.getUint8();
+        break;
+      case 132:
+        break;
+      case 133:
+        break;
+      case 134:
+        operand = stream.getUint8();
+        break;
+      case 140:
+        break;
+      case 141:
+        break;
+      case 142:
+        operand = stream.getUint8();
+        break;
+      case 148:
+        break;
+      case 149:
+        break;
+      case 150:
+        operand = stream.getUint8();
+        break;
+      case 156:
+        break;
+      case 157:
+        break;
+      case 158:
+        operand = stream.getUint8();
+        break;
+      case 164:
+        break;
+      case 165:
+        break;
+      case 166:
+        operand = stream.getUint8();
+        break;
+      case 172:
+        break;
+      case 173:
+        break;
+      case 174:
+        operand = stream.getUint8();
+        break;
+      case 180:
+        break;
+      case 181:
+        break;
+      case 182:
+        operand = stream.getUint8();
+        break;
+      case 188:
+        break;
+      case 189:
+        break;
+      case 190:
+        operand = stream.getUint8();
+        break;
+      case 203:
+        return getIndexCB(bytecode, stream);
+        break;
+      case 225:
+        break;
+      case 227:
+        break;
+      case 229:
+        break;
+      case 233:
+        stream.seek(null);
+        isFunctionEnder = true;
+        break;
+      case 249:
+        break;
+      default:
+        JSSMS.Utils.console.error("Unexpected opcode", "0xDD/0xFD " + JSSMS.Utils.toHex(opcode))
+    }
+    bytecode.nextAddress = stream.position;
+    bytecode.operand = operand;
+    bytecode.isFunctionEnder = isFunctionEnder;
+    return bytecode
+  }
+  function getIndexCB(bytecode, stream) {
+    var opcode = stream.getUint8();
+    var operand = stream.getUint8();
+    bytecode.opcode.push(opcode);
+    bytecode.nextAddress = stream.position;
+    bytecode.operand = operand;
+    return bytecode
+  }
+  function RomStream(rom) {
+    this.rom = rom;
+    this.pos = null;
+    this.page = 0
+  }
+  RomStream.prototype = {get position() {
+    return this.pos
+  }, get length() {
+    return this.rom.length * PAGE_SIZE
+  }, seek:function(pos) {
+    this.pos = pos
+  }, getUint8:function() {
+    var value = 0;
+    var page = this.page;
+    var address = this.pos & 16383;
+    if(SUPPORT_DATAVIEW) {
+      value = this.rom[page].getUint8(address);
+      this.pos++;
+      return value
+    }else {
+      value = this.rom[page][address] & 255;
+      this.pos++;
+      return value
+    }
+  }, getInt8:function() {
+    var value = 0;
+    var page = this.page;
+    var address = this.pos & 16383;
+    if(SUPPORT_DATAVIEW) {
+      value = this.rom[page].getInt8(address);
+      this.pos++;
+      return value + 1
+    }else {
+      value = this.rom[page][address] & 255;
+      if(value >= 128) {
+        value = value - 256
+      }
+      this.pos++;
+      return value + 1
+    }
+  }, getUint16:function() {
+    var value = 0;
+    var page = this.page;
+    var address = this.pos & 16383;
+    if(SUPPORT_DATAVIEW) {
+      if((address & 16383) < 16383) {
+        value = this.rom[page].getUint16(address, LITTLE_ENDIAN);
+        this.pos += 2;
+        return value
+      }else {
+        value = this.rom[page].getUint8(address) | this.rom[++page].getUint8(address) << 8;
+        this.pos += 2;
+        return value
+      }
+    }else {
+      value = this.rom[page][address] & 255 | (this.rom[++page][address] & 255) << 8;
+      this.pos += 2;
+      return value
+    }
+  }};
+  return parser
+}();
+var UINT8 = 1;
+var INT8 = 2;
+var UINT16 = 3;
+var n = {IfStatement:function(test, consequent, alternate) {
+  if(alternate == undefined) {
+    alternate = null
+  }
+  return{"type":"IfStatement", "test":test, "consequent":consequent, "alternate":alternate}
+}, BlockStatement:function(body) {
+  if(body == undefined) {
+    body = []
+  }
+  if(!Array.isArray(body)) {
+    body = [body]
+  }
+  return{"type":"BlockStatement", "body":body}
+}, ExpressionStatement:function(expression) {
+  return{"type":"ExpressionStatement", "expression":expression}
+}, ReturnStatement:function(argument) {
+  if(argument == undefined) {
+    argument = null
+  }
+  return{"type":"ReturnStatement", "argument":argument}
+}, Register:function(name) {
+  return{"type":"Register", "name":name}
+}, Identifier:function(name) {
+  return{"type":"Identifier", "name":name}
+}, Literal:function(value) {
+  return{"type":"Literal", "value":value, "raw":JSSMS.Utils.toHex(value)}
+}, CallExpression:function(callee, args) {
+  if(args == undefined) {
+    args = []
+  }
+  if(!Array.isArray(args)) {
+    args = [args]
+  }
+  return{"type":"CallExpression", "callee":n.Identifier(callee), "arguments":args}
+}, AssignmentExpression:function(operator, left, right) {
+  return{"type":"AssignmentExpression", "operator":operator, "left":left, "right":right}
+}, BinaryExpression:function(operator, left, right) {
+  return{"type":"BinaryExpression", "operator":operator, "left":left, "right":right}
+}, UnaryExpression:function(operator, argument) {
+  return{"type":"UnaryExpression", "operator":operator, "argument":argument}
+}, UpdateExpression:function(operator, argument, prefix) {
+  if(prefix == undefined) {
+    prefix = false
+  }
+  return{"type":"UpdateExpression", "operator":operator, "argument":argument, "prefix":prefix}
+}, MemberExpression:function(object, property) {
+  return{"type":"MemberExpression", "computed":true, "object":object, "property":property}
+}, ConditionalExpression:function(test, consequent, alternate) {
+  return{"type":"ConditionalExpression", "test":test, "consequent":consequent, "alternate":alternate}
+}};
+var o = {NOOP:function() {
+  return function() {
+    return
+  }
+}, LD8:function(srcRegister, dstRegister1, dstRegister2) {
+  if(dstRegister1 == undefined && dstRegister2 == undefined) {
+    return function(value) {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), n.Literal(value)))
+    }
+  }
+  if(dstRegister1 == "i" && dstRegister2 == undefined) {
+    return function() {
+      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), n.Register("i"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_CARRY")), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register(srcRegister))), n.ConditionalExpression(n.Identifier("iff2"), n.Identifier("F_PARITY"), n.Literal(0)))))]
+    }
+  }
+  if(dstRegister1 == "r" && dstRegister2 == undefined) {
+    return function() {
+      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), REFRESH_EMULATION ? n.Register("r") : n.CallExpression("JSSMS.Utils.rndInt", n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_CARRY")), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register(srcRegister))), n.ConditionalExpression(n.Identifier("iff2"), n.Identifier("F_PARITY"), 
+      n.Literal(0)))))]
+    }
+  }
+  if(dstRegister2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), n.Register(dstRegister1)))
+    }
+  }
+  if(dstRegister1 == "n" && dstRegister2 == "n") {
+    return function(value) {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), o.READ_MEM8(n.Literal(value))))
+    }
+  }else {
+    return function() {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), o.READ_MEM8(n.CallExpression("get" + (dstRegister1 + dstRegister2).toUpperCase()))))
+    }
+  }
+}, LD8_D:function(srcRegister, dstRegister1, dstRegister2) {
+  return function(value) {
+    return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + (dstRegister1 + dstRegister2).toUpperCase()), n.Literal(value)))))
+  }
+}, LD16:function(srcRegister1, srcRegister2, dstRegister1, dstRegister2) {
+  if(dstRegister1 == undefined && dstRegister2 == undefined) {
+    return function(value) {
+      return n.ExpressionStatement(n.CallExpression("set" + (srcRegister1 + srcRegister2).toUpperCase(), n.Literal(value)))
+    }
+  }
+  if(dstRegister1 == "n" && dstRegister2 == "n") {
+    return function(value) {
+      return n.ExpressionStatement(n.CallExpression("set" + (srcRegister1 + srcRegister2).toUpperCase(), o.READ_MEM16(n.Literal(value))))
+    }
+  }else {
+    throw Error("Wrong parameters number");
+  }
+}, LD_WRITE_MEM:function(srcRegister1, srcRegister2, dstRegister1, dstRegister2) {
+  if(dstRegister1 == undefined && dstRegister2 == undefined) {
+    return function(value) {
+      return n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + (srcRegister1 + srcRegister2).toUpperCase()), n.Literal(value)]))
+    }
+  }
+  if(srcRegister1 == "n" && srcRegister2 == "n" && dstRegister2 == undefined) {
+    return function(value) {
+      return n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal(value), n.Register(dstRegister1)]))
+    }
+  }
+  if(srcRegister1 == "n" && srcRegister2 == "n") {
+    return function(value) {
+      return[n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal(value), n.Register(dstRegister2)])), n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal(value + 1), n.Register(dstRegister1)]))]
+    }
+  }else {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + (srcRegister1 + srcRegister2).toUpperCase()), n.Register(dstRegister1)]))
+    }
+  }
+}, LD_SP:function(register1, register2) {
+  if(register1 == undefined && register2 == undefined) {
+    return function(value) {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), n.Literal(value)))
+    }
+  }else {
+    return function() {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), n.CallExpression("get" + (register1 + register2).toUpperCase())))
+    }
+  }
+}, LD_NN:function(register1, register2) {
+  if(register2 == undefined) {
+    return function(value) {
+      return[n.ExpressionStatement(n.CallExpression("writeMem", n.Literal(value), n.BinaryExpression("&", n.Identifier(register1), n.Literal(255)))), n.ExpressionStatement(n.CallExpression("writeMem", n.Literal(value + 1), n.BinaryExpression(">>", n.Identifier(register1), n.Literal(8))))]
+    }
+  }else {
+    return function(value) {
+      return[n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal(value), n.Register(register2)])), n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal(value + 1), n.Register(register1)]))]
+    }
+  }
+}, INC8:function(register1, register2) {
+  if(register2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.CallExpression("inc8", n.Register(register1))))
+    }
+  }
+  if(register1 == "s" && register2 == "p") {
+    return function() {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1))))
+    }
+  }else {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("incMem", n.CallExpression("getHL")))
+    }
+  }
+}, INC16:function(register1, register2) {
+  return function() {
+    return n.ExpressionStatement(n.CallExpression("inc" + (register1 + register2).toUpperCase()))
+  }
+}, DEC8:function(register1, register2) {
+  if(register2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.CallExpression("dec8", n.Register(register1))))
+    }
+  }
+  if(register1 == "s" && register2 == "p") {
+    return function() {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), n.BinaryExpression("-", n.Identifier("sp"), n.Literal(1))))
+    }
+  }else {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("decMem", n.CallExpression("getHL")))
+    }
+  }
+}, DEC16:function(register1, register2) {
+  return function() {
+    return n.ExpressionStatement(n.CallExpression("dec" + (register1 + register2).toUpperCase()))
+  }
+}, ADD16:function(register1, register2, register3, register4) {
+  if(register4 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("set" + (register1 + register2).toUpperCase(), n.CallExpression("add16", [n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Register(register3)])))
+    }
+  }else {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("set" + (register1 + register2).toUpperCase(), n.CallExpression("add16", [n.CallExpression("get" + (register1 + register2).toUpperCase()), n.CallExpression("get" + (register3 + register4).toUpperCase())])))
+    }
+  }
+}, ADC16:function(register1, register2) {
+  if(register2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("add16", n.Identifier(register1)))
+    }
+  }else {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("add16", n.CallExpression("get" + (register1 + register2).toUpperCase())))
+    }
+  }
+}, RLCA:function() {
+  return function() {
+    return n.ExpressionStatement(n.CallExpression("rlca_a"))
+  }
+}, RRCA:function() {
+  return function() {
+    return n.ExpressionStatement(n.CallExpression("rrca_a"))
+  }
+}, RLA:function() {
+  return function() {
+    return n.ExpressionStatement(n.CallExpression("rla_a"))
+  }
+}, RRA:function() {
+  return function() {
+    return n.ExpressionStatement(n.CallExpression("rra_a"))
+  }
+}, DAA:function() {
+  return function() {
+    return n.ExpressionStatement(n.CallExpression("daa"))
+  }
+}, CPL:function() {
+  return function() {
+    return n.ExpressionStatement(n.CallExpression("cpl_a"))
+  }
+}, SCF:function() {
+  return function() {
+    return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_CARRY"))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_NEGATIVE")))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_HALFCARRY"))))]
+  }
+}, CCF:function() {
+  return function() {
+    return n.ExpressionStatement(n.CallExpression("ccf"))
+  }
+}, ADD:function(register1, register2) {
+  if(register1 == undefined && register2 == undefined) {
+    return function(value) {
+      return n.ExpressionStatement(n.CallExpression("add_a", n.Literal(value)))
+    }
+  }
+  if(register2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("add_a", n.Register(register1)))
+    }
+  }else {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("add_a", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase()))))
+    }
+  }
+}, ADC:function(register1, register2) {
+  if(register1 == undefined && register2 == undefined) {
+    return function(value) {
+      return n.ExpressionStatement(n.CallExpression("adc_a", n.Literal(value)))
+    }
+  }
+  if(register2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("adc_a", n.Register(register1)))
+    }
+  }else {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("adc_a", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase()))))
+    }
+  }
+}, SUB:function(register1, register2) {
+  if(register1 == undefined && register2 == undefined) {
+    return function(value, target, nextAddress) {
+      return n.ExpressionStatement(n.CallExpression("sub_a", n.Literal(value)))
+    }
+  }
+  if(register2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("sub_a", n.Register(register1)))
+    }
+  }else {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("sub_a", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase()))))
+    }
+  }
+}, SBC:function(register1, register2) {
+  if(register1 == undefined && register2 == undefined) {
+    return function(value, target, nextAddress) {
+      return n.ExpressionStatement(n.CallExpression("sbc_a", n.Literal(value)))
+    }
+  }
+  if(register2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("sbc_a", n.Register(register1)))
+    }
+  }else {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("sbc_a", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase()))))
+    }
+  }
+}, AND:function(register1, register2) {
+  if(register1 == undefined && register2 == undefined) {
+    return function(value, target, nextAddress) {
+      return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Literal(value))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Identifier("F_HALFCARRY"))))]
+    }
+  }
+  if(register1 != "a" && register2 == undefined) {
+    return function() {
+      return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Register(register1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Identifier("F_HALFCARRY"))))]
+    }
+  }
+  if(register1 == "a" && register2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Identifier("F_HALFCARRY"))))
+    }
+  }else {
+    return function() {
+      return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Identifier("F_HALFCARRY"))))]
+    }
+  }
+}, XOR:function(register1, register2) {
+  if(register1 == undefined && register2 == undefined) {
+    return function(value, target, nextAddress) {
+      return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), n.Literal(value))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))]
+    }
+  }
+  if(register1 != "a" && register2 == undefined) {
+    return function() {
+      return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), n.Register(register1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))]
+    }
+  }
+  if(register1 == "a" && register2 == undefined) {
+    return function() {
+      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register("a"), n.Literal(0))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Literal(0))))]
+    }
+  }else {
+    return function() {
+      return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))]
+    }
+  }
+}, OR:function(register1, register2) {
+  if(register1 == undefined && register2 == undefined) {
+    return function(value, target, nextAddress) {
+      return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), n.Literal(value))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))]
+    }
+  }
+  if(register1 != "a" && register2 == undefined) {
+    return function() {
+      return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), n.Register(register1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))]
+    }
+  }
+  if(register1 == "a" && register2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))
+    }
+  }else {
+    return function() {
+      return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))]
+    }
+  }
+}, CP:function(register1, register2) {
+  if(register1 == undefined && register2 == undefined) {
+    return function(value) {
+      return n.ExpressionStatement(n.CallExpression("cp_a", n.Literal(value)))
+    }
+  }
+  if(register2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("cp_a", n.Register(register1)))
+    }
+  }else {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("cp_a", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase()))))
+    }
+  }
+}, POP:function(register1, register2) {
+  return function() {
+    return[n.ExpressionStatement(n.CallExpression("set" + (register1 + register2).toUpperCase(), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2)))]
+  }
+}, PUSH:function(register1, register2) {
+  return function() {
+    return n.ExpressionStatement(n.CallExpression("push2", [n.Register(register1), n.Register(register2)]))
+  }
+}, JR:function(test) {
+  return function(value, target) {
+    return n.IfStatement(test, n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), n.ReturnStatement()]))
+  }
+}, DJNZ:function() {
+  return function(value, target) {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register("b"), n.BinaryExpression("&", n.BinaryExpression("-", n.Register("b"), n.Literal(1)), n.Literal(255)))), o.JR(n.BinaryExpression("!=", n.Register("b"), n.Literal(0)))(undefined, target)]
+  }
+}, JRNZ:function() {
+  return function(value, target) {
+    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_ZERO")), n.Literal(0))))(undefined, target)
+  }
+}, JRZ:function() {
+  return function(value, target) {
+    return o.JR(n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_ZERO")), n.Literal(0)))(undefined, target)
+  }
+}, JRNC:function() {
+  return function(value, target) {
+    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_CARRY")), n.Literal(0))))(undefined, target)
+  }
+}, JRC:function() {
+  return function(value, target) {
+    return o.JR(n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_CARRY")), n.Literal(0)))(undefined, target)
+  }
+}, RET:function(operator, bitMask) {
+  if(operator == undefined && bitMask == undefined) {
+    return function() {
+      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2))), n.ReturnStatement()]
+    }
+  }else {
+    return function(value, target, nextAddress) {
+      return n.IfStatement(n.BinaryExpression(operator, n.BinaryExpression("&", n.Register("f"), n.Identifier(bitMask)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(6))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2))), n.ReturnStatement()]))
+    }
+  }
+}, JP:function(operator, bitMask) {
+  if(operator == undefined && bitMask == undefined) {
+    return function(value, target, nextAddress) {
+      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), n.ReturnStatement()]
+    }
+  }
+  if(operator == "h" && bitMask == "l") {
+    return function(value, target, nextAddress) {
+      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.CallExpression("get" + ("h" + "l").toUpperCase()))), n.ReturnStatement()]
+    }
+  }else {
+    return function(value, target) {
+      return n.IfStatement(n.BinaryExpression(operator, n.BinaryExpression("&", n.Register("f"), n.Identifier(bitMask)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), n.ReturnStatement()]))
+    }
+  }
+}, CALL:function(operator, bitMask) {
+  if(operator == undefined && bitMask == undefined) {
+    return function(value, target, nextAddress) {
+      return[n.ExpressionStatement(n.CallExpression("push1", n.Literal(nextAddress))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), n.ReturnStatement()]
+    }
+  }else {
+    return function(value, target, nextAddress) {
+      return n.IfStatement(n.BinaryExpression(operator, n.BinaryExpression("&", n.Register("f"), n.Identifier(bitMask)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(7))), n.ExpressionStatement(n.CallExpression("push1", n.Literal(nextAddress))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), n.ReturnStatement()]))
+    }
+  }
+}, RST:function(targetAddress) {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.CallExpression("push1", n.Literal(nextAddress))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(targetAddress))), n.ReturnStatement()]
+  }
+}, DI:function() {
+  return function() {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff1"), n.Literal(false))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff2"), n.Literal(false))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("EI_inst"), n.Literal(true)))]
+  }
+}, EI:function() {
+  return function() {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff1"), n.Literal(true))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff2"), n.Literal(true))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("EI_inst"), n.Literal(true)))]
+  }
+}, OUT:function(register1, register2) {
+  if(register2 == undefined) {
+    return function(value, target, nextAddress) {
+      return n.ExpressionStatement(n.CallExpression("port.out", [n.Literal(value), n.Register(register1)]))
+    }
+  }else {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("port.out", [n.Register(register1), n.Register(register2)]))
+    }
+  }
+}, IN:function(register1, register2) {
+  if(register2 == undefined) {
+    return function(value, target, nextAddress) {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.CallExpression("port.in_", n.Literal(value))))
+    }
+  }else {
+    return function(value, target, nextAddress) {
+      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.CallExpression("port.in_", n.Register(register2)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_CARRY")), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register(register1)))))]
+    }
+  }
+}, EX_AF:function() {
+  return function() {
+    return n.ExpressionStatement(n.CallExpression("exAF"))
+  }
+}, EXX:function() {
+  return function() {
+    return[n.ExpressionStatement(n.CallExpression("exBC")), n.ExpressionStatement(n.CallExpression("exDE")), n.ExpressionStatement(n.CallExpression("exHL"))]
+  }
+}, EX_SP_HL:function() {
+  return function() {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("h"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), o.READ_MEM8(n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1))))), n.ExpressionStatement(n.CallExpression("writeMem", [n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1)), n.Identifier("temp")])), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", 
+    n.Register("l"), o.READ_MEM8(n.Identifier("sp")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("sp"), n.Identifier("temp")]))]
+  }
+}, EX_DE_HL:function() {
+  return function() {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("d"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("d"), n.Register("h"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), n.Identifier("temp"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("e"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("e"), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", 
+    n.Register("l"), n.Identifier("temp")))]
+  }
+}, HALT:function() {
+  return function(value, target, nextAddress) {
+    var ret = [];
+    if(HALT_SPEEDUP) {
+      ret.push(n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("tstates"), n.Literal(0))))
+    }
+    return ret.concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("halt"), n.Literal(true))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(nextAddress - 1))), n.ReturnStatement()])
+  }
+}, RLC:generateCBFunctions("rlc"), RRC:generateCBFunctions("rrc"), RL:generateCBFunctions("rl"), RR:generateCBFunctions("rr"), SLA:generateCBFunctions("sla"), SRA:generateCBFunctions("sra"), SLL:generateCBFunctions("sll"), SRL:generateCBFunctions("srl"), BIT:function(bit, register1, register2) {
+  if(register2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", n.Register(register1), n.Identifier("BIT_" + bit))))
+    }
+  }else {
+    if(register1 == "h" && register2 == "l") {
+      return function() {
+        return n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())), n.Identifier("BIT_" + bit))))
+      }
+    }else {
+      if(register1 == "i") {
+        return function(value, target, nextAddress) {
+          return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.Identifier("BIT_" + bit))))]
+        }
+      }
+    }
+  }
+}, RES:function(bit, register1, register2) {
+  if(register2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.AssignmentExpression("&=", n.Register(register1), n.UnaryExpression("~", n.Identifier("BIT_" + bit))))
+    }
+  }else {
+    if(register1 == "h" && register2 == "l") {
+      return function() {
+        return n.ExpressionStatement(n.CallExpression("writeMem", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())), n.UnaryExpression("~", n.Identifier("BIT_" + bit)))))
+      }
+    }else {
+      if(register1 == "i") {
+        return function(value, target, nextAddress) {
+          return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.UnaryExpression("~", n.Identifier("BIT_" + bit)))]))]
+        }
+      }
+    }
+  }
+}, SET:function(bit, register1, register2) {
+  if(register2 == undefined) {
+    return function() {
+      return n.ExpressionStatement(n.AssignmentExpression("|=", n.Register(register1), n.Identifier("BIT_" + bit)))
+    }
+  }else {
+    if(register1 == "h" && register2 == "l") {
+      return function() {
+        return n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + (register1 + register2).toUpperCase()), n.BinaryExpression("|", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())), n.Identifier("BIT_" + bit))]))
+      }
+    }else {
+      if(register1 == "i") {
+        return function(value, target, nextAddress) {
+          return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.BinaryExpression("|", o.READ_MEM8(n.Identifier("location")), n.Identifier("BIT_" + bit))]))]
+        }
+      }
+    }
+  }
+}, LD_X:function(register1, register2, register3) {
+  if(register3 == undefined) {
+    return function(value, target, nextAddress) {
+      return[n.ExpressionStatement(n.CallExpression("writeMem", [n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value & 255)), n.Literal(value >> 8)]))]
+    }
+  }else {
+    return function(value, target, nextAddress) {
+      return[n.ExpressionStatement(n.CallExpression("writeMem", [n.BinaryExpression("+", n.CallExpression("get" + (register2 + register3).toUpperCase()), n.Literal(value)), n.Register(register1)]))]
+    }
+  }
+}, INC_X:function(register1, register2) {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.CallExpression("incMem", n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value))))]
+  }
+}, DEC_X:function(register1, register2) {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.CallExpression("decMem", n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value))))]
+  }
+}, ADD_X:function(register1, register2) {
+  return function(value, target, nextAddress) {
+    return n.ExpressionStatement(n.CallExpression("add_a", o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)))))
+  }
+}, ADC_X:function(register1, register2) {
+  return function(value, target, nextAddress) {
+    return n.ExpressionStatement(n.CallExpression("adc_a", o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)))))
+  }
+}, SUB_X:function(register1, register2) {
+  return function(value, target, nextAddress) {
+    return n.ExpressionStatement(n.CallExpression("sub_a", o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)))))
+  }
+}, SBC_X:function(register1, register2) {
+  return function(value, target, nextAddress) {
+    return n.ExpressionStatement(n.CallExpression("sbc_a", o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)))))
+  }
+}, OR_X:function(register1, register2) {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))]
+  }
+}, CP_X:function(register1, register2) {
+  return function(value) {
+    return n.ExpressionStatement(n.CallExpression("cp_a", o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)))))
+  }
+}, EX_SP_X:function(register1, register2) {
+  return function() {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("get" + (register1 + register2).toUpperCase()))), n.ExpressionStatement(n.CallExpression("set" + (register1 + register2).toUpperCase(), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("sp"), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(255))])), n.ExpressionStatement(n.CallExpression("writeMem", [n.BinaryExpression("+", n.Identifier("sp"), 
+    n.Literal(1)), n.BinaryExpression(">>", n.Identifier("sp"), n.Literal(8))]))]
+  }
+}, JP_X:function(register1, register2) {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.CallExpression("get" + (register1 + register2).toUpperCase()))), n.ReturnStatement()]
+  }
+}, SBC16:function(register1, register2) {
+  return function(value, target, nextAddress) {
+    return n.ExpressionStatement(n.CallExpression("sbc16", n.CallExpression("get" + (register1 + register2).toUpperCase())))
+  }
+}, NEG:function() {
+  return function() {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("a"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("a"), n.Literal(0))), n.ExpressionStatement(n.CallExpression("sub_a", n.Identifier("temp")))]
+  }
+}, RETN_RETI:function() {
+  return function() {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff1"), n.Identifier("iff2")))]
+  }
+}, IM:function(value) {
+  return function() {
+    return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("im"), n.Literal(value)))
+  }
+}, INI:function() {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("port.in_", n.Register("c")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("h" + "l").toUpperCase()), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    n.Register("f"), n.Identifier("F_NEGATIVE")))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_NEGATIVE"))))))]
+  }
+}, OUTI:function() {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), n.ExpressionStatement(n.CallExpression("incHL")), o.DEC8("b")(), n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
+    n.Identifier("F_CARRY"))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_HALFCARRY")))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_CARRY")))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_HALFCARRY"))))])), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), 
+    n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_NEGATIVE")))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_NEGATIVE"))))))]
+  }
+}, OUTD:function() {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), n.ExpressionStatement(n.CallExpression("decHL")), o.DEC8("b")(), n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
+    n.Identifier("F_CARRY"))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_HALFCARRY")))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_CARRY")))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_HALFCARRY"))))])), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), 
+    n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_NEGATIVE")))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_NEGATIVE"))))))]
+  }
+}, LDI:function() {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("incDE")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.BinaryExpression("!=", 
+    n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Identifier("F_PARITY"), n.Literal(0)))))]
+  }
+}, CPI:function() {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_CARRY")), n.Identifier("F_NEGATIVE")))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("==", 
+    n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Literal(0), n.Identifier("F_PARITY")))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp"))))]
+  }
+}, LDD:function() {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("decDE")), n.ExpressionStatement(n.CallExpression("decHL")), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.BinaryExpression("!=", 
+    n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Identifier("F_PARITY"), n.Literal(0)))))]
+  }
+}, LDIR:function() {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("incDE")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.CallExpression("decBC")), n.IfStatement(n.BinaryExpression("!=", n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", 
+    n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_PARITY"))), n.ReturnStatement()]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_PARITY"))))])), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_NEGATIVE")))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", 
+    n.Identifier("F_HALFCARRY"))))]
+  }
+}, OTIR:function() {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression("!=", n.Register("b"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()])), 
+    n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_CARRY"))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_HALFCARRY")))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_CARRY")))), n.ExpressionStatement(n.AssignmentExpression("&=", 
+    n.Register("f"), n.UnaryExpression("~", n.Identifier("F_HALFCARRY"))))])), n.IfStatement(n.BinaryExpression("!=", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(0)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_NEGATIVE")))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_NEGATIVE"))))))]
+  }
+}, LD_RLC:generateIndexCBFunctions("rlc"), LD_RRC:generateIndexCBFunctions("rrc"), LD_RL:generateIndexCBFunctions("rl"), LD_RR:generateIndexCBFunctions("rr"), LD_SLA:generateIndexCBFunctions("sla"), LD_SRA:generateIndexCBFunctions("sra"), LD_SLL:generateIndexCBFunctions("sll"), LD_SRL:generateIndexCBFunctions("srl"), READ_MEM8:function(value) {
+  return n.CallExpression("readMem", value)
+}, READ_MEM16:function(value) {
+  return n.CallExpression("readMemWord", value)
+}};
+function generateCBFunctions(fn) {
+  return function(register1, register2) {
+    if(register2 == undefined) {
+      return function() {
+        return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.CallExpression(fn, n.Register(register1))))
+      }
+    }else {
+      return function() {
+        return n.ExpressionStatement(n.CallExpression("writeMem", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.CallExpression(fn, o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())))))
+      }
+    }
+  }
+}
+function generateIndexCBFunctions(fn) {
+  return function(register1, register2, register3) {
+    if(register3 == undefined) {
+      return function(value, target, nextAddress) {
+        return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.CallExpression(fn, o.READ_MEM8(n.Identifier("location")))]))]
+      }
+    }else {
+      return function(value, target, nextAddress) {
+        return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)), n.Literal(65535)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register3), n.CallExpression(fn, o.READ_MEM8(n.Identifier("location"))))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.Register(register3)]))]
+      }
+    }
+  }
+}
+;var opcodeTableCB = [];
+var opcodeTableDDCB = [];
+var opcodeTableFDCB = [];
+var regs = {"B":["b"], "C":["c"], "D":["d"], "E":["e"], "H":["h"], "L":["l"], "(HL)":["h", "l"], "A":["a"]};
+["RLC", "RRC", "RL", "RR", "SLA", "SRA", "SLL", "SRL"].forEach(function(op) {
+  for(var reg in regs) {
+    opcodeTableCB.push({name:op + " " + reg, ast:o[op].apply(null, regs[reg])});
+    if(reg != "(HL)") {
+      opcodeTableDDCB.push({name:"LD " + reg + "," + op + " (IX)", ast:o["LD_" + op].apply(null, ["i", "x"].concat(regs[reg]))});
+      opcodeTableFDCB.push({name:"LD " + reg + "," + op + " (IY)", ast:o["LD_" + op].apply(null, ["i", "y"].concat(regs[reg]))})
+    }else {
+      opcodeTableDDCB.push({name:op + " (IX)", ast:o["LD_" + op]("i", "x")});
+      opcodeTableFDCB.push({name:op + " (IY)", ast:o["LD_" + op]("i", "y")})
+    }
+  }
+});
+["BIT", "RES", "SET"].forEach(function(op) {
+  for(var i = 0;i < 8;i++) {
+    for(var reg in regs) {
+      opcodeTableCB.push({name:op + " " + i + "," + reg, ast:o[op].apply(null, [i].concat(regs[reg]))})
+    }
+    for(var j = 0;j < 8;j++) {
+      opcodeTableDDCB.push({name:op + " " + i + " (IX)", ast:o[op].apply(null, [i].concat(["i", "x"]))});
+      opcodeTableFDCB.push({name:op + " " + i + " (IY)", ast:o[op].apply(null, [i].concat(["i", "y"]))})
+    }
+  }
+});
+function generateIndexTable(index) {
+  var register2 = index.substring(1, 2);
+  var register2LC = index.substring(1, 2).toLowerCase();
+  return{9:{name:"ADD " + index + ",BC", ast:o.ADD16("i", register2, "b", "c")}, 25:{name:"ADD " + index + ",DE", ast:o.ADD16("i", register2, "d", "e")}, 33:{name:"LD " + index + ",nn", ast:o.LD16("i", register2)}, 34:{name:"LD (nn)," + index, ast:o.LD_NN("i" + register2LC + "H", "i" + register2LC + "L")}, 35:{name:"INC " + index, ast:o.INC16("i", register2)}, 42:{name:"LD " + index + ",(nn)", ast:o.LD16("i", register2, "n", "n"), operand:UINT16}, 43:{name:"DEC " + index, ast:o.DEC16("i", register2)}, 
+  52:{name:"INC (" + index + "+d)", ast:o.INC_X("i", register2)}, 53:{name:"DEC (" + index + "+d)", ast:o.DEC_X("i", register2)}, 54:{name:"LD (" + index + "+d),n", ast:o.LD_X("i", register2)}, 70:{name:"LD B,(" + index + "+d)", ast:o.LD8_D("b", "i", register2)}, 78:{name:"LD C,(" + index + "+d)", ast:o.LD8_D("c", "i", register2)}, 84:{name:" LD D," + index + "H *", ast:o.LD8("d", "i" + register2LC + "H")}, 86:{name:"LD D,(" + index + "+d)", ast:o.LD8_D("d", "i", register2)}, 93:{name:"LD E," + index + 
+  "L *", ast:o.LD8("e", "i" + register2LC + "L")}, 94:{name:"LD E,(" + index + "+d)", ast:o.LD8_D("e", "i", register2)}, 96:{name:"LD " + index + "H,B", ast:o.LD8("i" + register2LC + "H", "b")}, 97:{name:"LD " + index + "H,C", ast:o.LD8("i" + register2LC + "H", "c")}, 98:{name:"LD " + index + "H,D", ast:o.LD8("i" + register2LC + "H", "d")}, 99:{name:"LD " + index + "H,E", ast:o.LD8("i" + register2LC + "H", "e")}, 100:{name:"LD " + index + "H," + index + "H", ast:o.NOOP()}, 101:{name:"LD " + index + 
+  "H," + index + "L *", ast:o.LD8_D("i" + register2LC + "H", "i" + register2LC + "L")}, 102:{name:"LD H,(" + index + "+d)", ast:o.LD8_D("h", "i", register2)}, 103:{name:"LD " + index + "H,A", ast:o.LD8("i" + register2LC + "H", "a")}, 104:{name:"LD " + index + "L,B", ast:o.LD8("i" + register2LC + "L", "b")}, 105:{name:"LD " + index + "L,C", ast:o.LD8("i" + register2LC + "L", "c")}, 106:{name:"LD " + index + "L,D", ast:o.LD8("i" + register2LC + "L", "d")}, 107:{name:"LD " + index + "L,E", ast:o.LD8("i" + 
+  register2LC + "L", "e")}, 108:{name:"LD " + index + "L," + index + "H", ast:o.LD8_D("i" + register2LC + "L", "i" + register2LC + "H")}, 109:{name:"LD " + index + "L," + index + "L *", ast:o.NOOP()}, 110:{name:"LD L,(" + index + "+d)", ast:o.LD8_D("l", "i", register2)}, 111:{name:"LD " + index + "L,A *", ast:o.LD8("i" + register2LC + "L", "a")}, 112:{name:"LD (" + index + "+d),B", ast:o.LD_X("b", "i", register2)}, 113:{name:"LD (" + index + "+d),C", ast:o.LD_X("c", "i", register2)}, 114:{name:"LD (" + 
+  index + "+d),D", ast:o.LD_X("d", "i", register2)}, 115:{name:"LD (" + index + "+d),E", ast:o.LD_X("e", "i", register2)}, 116:{name:"LD (" + index + "+d),H", ast:o.LD_X("h", "i", register2)}, 117:{name:"LD (" + index + "+d),L", ast:o.LD_X("l", "i", register2)}, 118:{name:"LD (" + index + "+d),B", ast:o.LD_X("b", "i", register2)}, 119:{name:"LD (" + index + "+d),A", ast:o.LD_X("a", "i", register2)}, 126:{name:"LD A,(" + index + "+d)", ast:o.LD8_D("a", "i", register2)}, 124:{name:"LD A," + index + 
+  "H", ast:o.LD8("a", "i" + register2LC + "H")}, 125:{name:"LD A," + index + "L", ast:o.LD8("a", "i" + register2LC + "L")}, 134:{name:"ADD A,(" + index + "+d)", ast:o.ADD_X("i", register2)}, 142:{name:"ADC A,(" + index + "+d)", ast:o.ADC_X("i", register2)}, 150:{name:"SUB A,(" + index + "+d)", ast:o.SUB_X("i", register2)}, 158:{name:"SBC A,(" + index + "+d)", ast:o.SBC_X("i", register2)}, 203:index == "IX" ? opcodeTableDDCB : opcodeTableFDCB, 182:{name:"OR A,(" + index + "+d)", ast:o.OR_X("i", register2)}, 
+  190:{name:"CP (" + index + "+d)", ast:o.CP_X("i", register2)}, 225:{name:"POP " + index, ast:o.POP("i", register2)}, 227:{name:"EX SP,(" + index + ")", ast:o.EX_SP_X("i", register2)}, 229:{name:"PUSH " + index, ast:o.PUSH("i" + register2LC + "H", "i" + register2LC + "L")}, 233:{name:"JP (" + index + ")", ast:o.JP_X("i", register2)}, 249:{name:"LD SP," + index, ast:o.LD_SP("i", register2)}}
+}
+;var opcodeTableED = {64:{name:"IN B,(C)", ast:o.IN("b", "c")}, 66:{name:"SBC HL,BC", ast:o.SBC16("b", "c")}, 65:{name:"OUT (C),B", ast:o.OUT("c", "b")}, 67:{name:"LD (nn),BC", ast:o.LD_NN("b", "c")}, 68:{name:"NEG", ast:o.NEG()}, 69:{name:"RETN / RETI", ast:o.RETN_RETI()}, 70:{name:"IM 0", ast:o.IM(0)}, 72:{name:"IN C,(C)", ast:o.IN("c", "c")}, 73:{name:"OUT (C),C", ast:o.OUT("c", "c")}, 74:{name:"ADC HL,BC", ast:o.ADC16("b", "c")}, 75:{name:"LD BC,(nn)", ast:o.LD16("b", "c", "n", "n"), operand:UINT16}, 
+76:{name:"NEG", ast:o.NEG()}, 77:{name:"RETN / RETI", ast:o.RETN_RETI()}, 78:{name:"IM 0", ast:o.IM(0)}, 80:{name:"IN D,(C)", ast:o.IN("d", "c")}, 81:{name:"OUT (C),D", ast:o.OUT("c", "d")}, 82:{name:"SBC HL,DE", ast:o.SBC16("d", "e")}, 83:{name:"LD (nn),DE", ast:o.LD_NN("d", "e")}, 84:{name:"NEG", ast:o.NEG()}, 85:{name:"RETN / RETI", ast:o.RETN_RETI()}, 86:{name:"IM 1", ast:o.IM(1)}, 87:{name:"LD A,I", ast:o.LD8("a", "i")}, 88:{name:"IN E,(C)", ast:o.IN("e", "c")}, 89:{name:"OUT (C),E", ast:o.OUT("c", 
+"e")}, 90:{name:"ADC HL,DE", ast:o.ADC16("d", "e")}, 91:{name:"LD DE,(nn)", ast:o.LD16("d", "e", "n", "n"), operand:UINT16}, 92:{name:"NEG", ast:o.NEG()}, 95:{name:"LD A,R", ast:o.LD8("a", "r")}, 96:{name:"IN H,(C)", ast:o.IN("h", "c")}, 97:{name:"OUT (C),H", ast:o.OUT("c", "h")}, 98:{name:"SBC HL,HL", ast:o.SBC16("h", "l")}, 99:{name:"LD (nn),HL", ast:o.LD_NN("h", "l")}, 100:{name:"NEG", ast:o.NEG()}, 102:{name:"IM 0", ast:o.IM(0)}, 104:{name:"IN L,(C)", ast:o.IN("l", "c")}, 105:{name:"OUT (C),L", 
+ast:o.OUT("c", "l")}, 106:{name:"ADC HL,HL", ast:o.ADC16("h", "l")}, 107:{name:"LD HL,(nn)", ast:o.LD16("h", "l", "n", "n"), operand:UINT16}, 108:{name:"NEG", ast:o.NEG()}, 110:{name:"IM 0", ast:o.IM(0)}, 115:{name:"LD (nn),SP", ast:o.LD_NN("sp")}, 116:{name:"NEG", ast:o.NEG()}, 118:{name:"IM 1", ast:o.IM(1)}, 120:{name:"IN A,(C)", ast:o.IN("a", "c")}, 121:{name:"OUT (C),A", ast:o.OUT("c", "a")}, 122:{name:"ADC HL,SP", ast:o.ADC16("sp")}, 124:{name:"NEG", ast:o.NEG()}, 160:{name:"LDI", ast:o.LDI()}, 
+161:{name:"CPI", ast:o.CPI()}, 162:{name:"INI", ast:o.INI()}, 163:{name:"OUTI", ast:o.OUTI()}, 168:{name:"LDD", ast:o.LDD()}, 171:{name:"OUTD", ast:o.OUTD()}, 176:{name:"LDIR", ast:o.LDIR()}, 179:{name:"OTIR", ast:o.OTIR()}};
+var opcodeTable = [{name:"NOP", ast:o.NOOP()}, {name:"LD BC,nn", ast:o.LD16("b", "c"), operand:UINT16}, {name:"LD (BC),A", ast:o.LD_WRITE_MEM("b", "c", "a")}, {name:"INC BC", ast:o.INC16("b", "c")}, {name:"INC B", ast:o.INC8("b")}, {name:"DEC B", ast:o.DEC8("b")}, {name:"LD B,n", ast:o.LD8("b"), operand:UINT8}, {name:"RLCA", ast:o.RLCA()}, {name:"EX AF AF'", ast:o.EX_AF()}, {name:"ADD HL,BC", ast:o.ADD16("h", "l", "b", "c")}, {name:"LD A,(BC)", ast:o.LD8("a", "b", "c")}, {name:"DEC BC", ast:o.DEC16("b", 
+"c")}, {name:"INC C", ast:o.INC8("c")}, {name:"DEC C", ast:o.DEC8("c")}, {name:"LD C,n", ast:o.LD8("c"), operand:UINT8}, {name:"RRCA", ast:o.RRCA()}, {name:"DJNZ (PC+e)", ast:o.DJNZ(), operand:INT8}, {name:"LD DE,nn", ast:o.LD16("d", "e"), operand:UINT16}, {name:"LD (DE),A", ast:o.LD_WRITE_MEM("d", "e", "a")}, {name:"INC DE", ast:o.INC16("d", "e")}, {name:"INC D", ast:o.INC8("d")}, {name:"DEC D", ast:o.DEC8("d")}, {name:"LD D,n", ast:o.LD8("d"), operand:UINT8}, {name:"RLA", ast:o.RLA()}, {name:"JR (PC+e)", 
+ast:o.JP(), operand:INT8}, {name:"ADD HL,DE", ast:o.ADD16("h", "l", "d", "e")}, {name:"LD A,(DE)", ast:o.LD8("a", "d", "e")}, {name:"DEC DE", ast:o.DEC16("d", "e")}, {name:"INC E", ast:o.INC8("e")}, {name:"DEC E", ast:o.DEC8("e")}, {name:"LD E,n", ast:o.LD8("e"), operand:UINT8}, {name:"RRA", ast:o.RRA()}, {name:"JR NZ,(PC+e)", ast:o.JRNZ(), operand:INT8}, {name:"LD HL,nn", ast:o.LD16("h", "l"), operand:UINT16}, {name:"LD (nn),HL", ast:o.LD_NN("h", "l"), operand:UINT16}, {name:"INC HL", ast:o.INC16("h", 
+"l")}, {name:"INC H", ast:o.INC8("h")}, {name:"DEC H", ast:o.DEC8("h")}, {name:"LD H,n", ast:o.LD8("h"), operand:UINT8}, {name:"DAA", ast:o.DAA()}, {name:"JR Z,(PC+e)", ast:o.JRZ(), operand:INT8}, {name:"ADD HL,HL", ast:o.ADD16("h", "l", "h", "l")}, {name:"LD HL,(nn)", ast:o.LD16("h", "l", "n", "n"), operand:UINT16}, {name:"DEC HL", ast:o.DEC16("h", "l")}, {name:"INC L", ast:o.INC8("l")}, {name:"DEC L", ast:o.DEC8("l")}, {name:"LD L,n", ast:o.LD8("l"), operand:UINT8}, {name:"CPL", ast:o.CPL()}, {name:"JR NC,(PC+e)", 
+ast:o.JRNC(), operand:INT8}, {name:"LD SP,nn", ast:o.LD_SP(), operand:UINT16}, {name:"LD (nn),A", ast:o.LD_WRITE_MEM("n", "n", "a"), operand:UINT16}, {name:"INC SP", ast:o.INC8("s", "p")}, {name:"INC (HL)", ast:o.INC8("h", "l")}, {name:"DEC (HL)", ast:o.DEC8("h", "l")}, {name:"LD (HL),n", ast:o.LD_WRITE_MEM("h", "l"), operand:UINT8}, {name:"SCF", ast:o.SCF()}, {name:"JR C,(PC+e)", ast:o.JRC(), operand:INT8}, {name:"ADD HL,SP", ast:o.ADD16("h", "l", "sp")}, {name:"LD A,(nn)", ast:o.LD8("a", "n", "n"), 
+operand:UINT16}, {name:"DEC SP", ast:o.DEC8("s", "p")}, {name:"INC A", ast:o.INC8("a")}, {name:"DEC A", ast:o.DEC8("a")}, {name:"LD A,n", ast:o.LD8("a"), operand:UINT8}, {name:"CCF", ast:o.CCF()}, {name:"LD B,B", ast:o.NOOP(), operand:UINT8}, {name:"LD B,C", ast:o.LD8("b", "c")}, {name:"LD B,D", ast:o.LD8("b", "d")}, {name:"LD B,E", ast:o.LD8("b", "e")}, {name:"LD B,H", ast:o.LD8("b", "h")}, {name:"LD B,L", ast:o.LD8("b", "l")}, {name:"LD B,(HL)", ast:o.LD8("b", "h", "l")}, {name:"LD B,A", ast:o.LD8("b", 
+"a")}, {name:"LD C,B", ast:o.LD8("c", "b")}, {name:"LD C,C", ast:o.NOOP()}, {name:"LD C,D", ast:o.LD8("c", "d")}, {name:"LD C,E", ast:o.LD8("c", "e")}, {name:"LD C,H", ast:o.LD8("c", "h")}, {name:"LD C,L", ast:o.LD8("c", "l")}, {name:"LD C,(HL)", ast:o.LD8("c", "h", "l")}, {name:"LD C,A", ast:o.LD8("c", "a")}, {name:"LD D,B", ast:o.LD8("d", "b")}, {name:"LD D,C", ast:o.LD8("d", "c")}, {name:"LD D,D", ast:o.NOOP()}, {name:"LD D,E", ast:o.LD8("d", "e")}, {name:"LD D,H", ast:o.LD8("d", "h")}, {name:"LD D,L", 
+ast:o.LD8("d", "l")}, {name:"LD D,(HL)", ast:o.LD8("d", "h", "l")}, {name:"LD D,A", ast:o.LD8("d", "a")}, {name:"LD E,B", ast:o.LD8("e", "b")}, {name:"LD E,C", ast:o.LD8("e", "c")}, {name:"LD E,D", ast:o.LD8("e", "d")}, {name:"LD E,E", ast:o.NOOP()}, {name:"LD E,H", ast:o.LD8("e", "h")}, {name:"LD E,L", ast:o.LD8("e", "l")}, {name:"LD E,(HL)", ast:o.LD8("e", "h", "l")}, {name:"LD E,A", ast:o.LD8("e", "a")}, {name:"LD H,B", ast:o.LD8("h", "b")}, {name:"LD H,C", ast:o.LD8("h", "c")}, {name:"LD H,D", 
+ast:o.LD8("h", "d")}, {name:"LD H,E", ast:o.LD8("h", "e")}, {name:"LD H,H", ast:o.NOOP()}, {name:"LD H,L", ast:o.LD8("h", "l")}, {name:"LD H,(HL)", ast:o.LD8("h", "h", "l")}, {name:"LD H,A", ast:o.LD8("h", "a")}, {name:"LD L,B", ast:o.LD8("l", "b")}, {name:"LD L,C", ast:o.LD8("l", "c")}, {name:"LD L,D", ast:o.LD8("l", "d")}, {name:"LD L,E", ast:o.LD8("l", "e")}, {name:"LD L,H", ast:o.LD8("l", "h")}, {name:"LD L,L", ast:o.NOOP()}, {name:"LD L,(HL)", ast:o.LD8("l", "h", "l")}, {name:"LD L,A", ast:o.LD8("l", 
+"a")}, {name:"LD (HL),B", ast:o.LD_WRITE_MEM("h", "l", "b")}, {name:"LD (HL),C", ast:o.LD_WRITE_MEM("h", "l", "c")}, {name:"LD (HL),D", ast:o.LD_WRITE_MEM("h", "l", "d")}, {name:"LD (HL),E", ast:o.LD_WRITE_MEM("h", "l", "e")}, {name:"LD (HL),H", ast:o.LD_WRITE_MEM("h", "l", "h")}, {name:"LD (HL),L", ast:o.LD_WRITE_MEM("h", "l", "l")}, {name:"HALT", ast:o.HALT()}, {name:"LD (HL),A", ast:o.LD_WRITE_MEM("h", "l", "a")}, {name:"LD A,B", ast:o.LD8("a", "b")}, {name:"LD A,C", ast:o.LD8("a", "c")}, {name:"LD A,D", 
+ast:o.LD8("a", "d")}, {name:"LD A,E", ast:o.LD8("a", "e")}, {name:"LD A,H", ast:o.LD8("a", "h")}, {name:"LD A,L", ast:o.LD8("a", "l")}, {name:"LD A,(HL)", ast:o.LD8("a", "h", "l")}, {name:"LD A,A", ast:o.NOOP()}, {name:"ADD A,B", ast:o.ADD("b")}, {name:"ADD A,C", ast:o.ADD("c")}, {name:"ADD A,D", ast:o.ADD("d")}, {name:"ADD A,E", ast:o.ADD("e")}, {name:"ADD A,H", ast:o.ADD("h")}, {name:"ADD A,L", ast:o.ADD("l")}, {name:"ADD A,(HL)", ast:o.ADD("h", "l")}, {name:"ADD A,A", ast:o.ADD("a")}, {name:"ADC A,B", 
+ast:o.ADC("b")}, {name:"ADC A,C", ast:o.ADC("c")}, {name:"ADC A,D", ast:o.ADC("d")}, {name:"ADC A,E", ast:o.ADC("e")}, {name:"ADC A,H", ast:o.ADC("h")}, {name:"ADC A,L", ast:o.ADC("l")}, {name:"ADC A,(HL)", ast:o.ADC("h", "l")}, {name:"ADC A,A", ast:o.ADC("a")}, {name:"SUB A,B", ast:o.SUB("b")}, {name:"SUB A,C", ast:o.SUB("c")}, {name:"SUB A,D", ast:o.SUB("d")}, {name:"SUB A,E", ast:o.SUB("e")}, {name:"SUB A,H", ast:o.SUB("h")}, {name:"SUB A,L", ast:o.SUB("l")}, {name:"SUB A,(HL)", ast:o.SUB("h", 
+"l")}, {name:"SUB A,A", ast:o.SUB("a")}, {name:"SBC A,B", ast:o.SBC("b")}, {name:"SBC A,C", ast:o.SBC("c")}, {name:"SBC A,D", ast:o.SBC("d")}, {name:"SBC A,E", ast:o.SBC("e")}, {name:"SBC A,H", ast:o.SBC("h")}, {name:"SBC A,L", ast:o.SBC("l")}, {name:"SBC A,(HL)", ast:o.SBC("h", "l")}, {name:"SBC A,A", ast:o.SBC("a")}, {name:"AND A,B", ast:o.AND("b")}, {name:"AND A,C", ast:o.AND("c")}, {name:"AND A,D", ast:o.AND("d")}, {name:"AND A,E", ast:o.AND("e")}, {name:"AND A,H", ast:o.AND("h")}, {name:"AND A,L", 
+ast:o.AND("l")}, {name:"AND A,(HL)", ast:o.AND("h", "l")}, {name:"AND A,A", ast:o.AND("a")}, {name:"XOR A,B", ast:o.XOR("b")}, {name:"XOR A,C", ast:o.XOR("c")}, {name:"XOR A,D", ast:o.XOR("d")}, {name:"XOR A,E", ast:o.XOR("e")}, {name:"XOR A,H", ast:o.XOR("h")}, {name:"XOR A,L", ast:o.XOR("l")}, {name:"XOR A,(HL)", ast:o.XOR("h", "l")}, {name:"XOR A,A", ast:o.XOR("a")}, {name:"OR A,B", ast:o.OR("b")}, {name:"OR A,C", ast:o.OR("c")}, {name:"OR A,D", ast:o.OR("d")}, {name:"OR A,E", ast:o.OR("e")}, 
+{name:"OR A,H", ast:o.OR("h")}, {name:"OR A,L", ast:o.OR("l")}, {name:"OR A,(HL)", ast:o.OR("h", "l")}, {name:"OR A,A", ast:o.OR("a")}, {name:"CP A,B", ast:o.CP("b")}, {name:"CP A,C", ast:o.CP("c")}, {name:"CP A,D", ast:o.CP("d")}, {name:"CP A,E", ast:o.CP("e")}, {name:"CP A,H", ast:o.CP("h")}, {name:"CP A,L", ast:o.CP("l")}, {name:"CP A,(HL)", ast:o.CP("h", "l")}, {name:"CP A,A", ast:o.CP("a")}, {name:"RET NZ", ast:o.RET("==", "F_ZERO")}, {name:"POP BC", ast:o.POP("b", "c")}, {name:"JP NZ,(nn)", 
+ast:o.JP("==", "F_ZERO")}, {name:"JP (nn)", ast:o.JP()}, {name:"CALL NZ (nn)", ast:o.CALL("==", "F_ZERO")}, {name:"PUSH BC", ast:o.PUSH("b", "c")}, {name:"ADD A,n", ast:o.ADD()}, {name:"RST 0x00", ast:o.RST(0)}, {name:"RET Z", ast:o.RET("!=", "F_ZERO")}, {name:"RET", ast:o.RET()}, {name:"JP Z,(nn)", ast:o.JP("!=", "F_ZERO")}, opcodeTableCB, {name:"CALL Z (nn)", ast:o.CALL("!=", "F_ZERO")}, {name:"CALL (nn)", ast:o.CALL()}, {name:"ADC A,n", ast:o.ADC()}, {name:"RST 0x08", ast:o.RST(8)}, {name:"RET NC", 
+ast:o.RET("==", "F_CARRY")}, {name:"POP DE", ast:o.POP("d", "e")}, {name:"JP NC,(nn)", ast:o.JP("==", "F_CARRY")}, {name:"OUT (n),A", ast:o.OUT("a")}, {name:"CALL NC (nn)", ast:o.CALL("==", "F_CARRY")}, {name:"PUSH DE", ast:o.PUSH("d", "e")}, {name:"SUB n", ast:o.SUB()}, {name:"RST 0x10", ast:o.RST(16)}, {name:"RET C", ast:o.RET("!=", "F_CARRY")}, {name:"EXX", ast:o.EXX()}, {name:"JP C,(nn)", ast:o.JP("!=", "F_CARRY")}, {name:"IN A,(n)", ast:o.IN("a")}, {name:"CALL C (nn)", ast:o.CALL("!=", "F_CARRY")}, 
+generateIndexTable("IX"), {name:"SBC A,n", ast:o.SBC()}, {name:"RST 0x18", ast:o.RST(24)}, {name:"RET PO", ast:o.RET("==", "F_PARITY")}, {name:"POP HL", ast:o.POP("h", "l")}, {name:"JP PO,(nn)", ast:o.JP("==", "F_PARITY")}, {name:"EX (SP),HL", ast:o.EX_SP_HL()}, {name:"CALL PO (nn)", ast:o.CALL("==", "F_PARITY")}, {name:"PUSH HL", ast:o.PUSH("h", "l")}, {name:"AND (n)", ast:o.AND()}, {name:"RST 0x20", ast:o.RST(32)}, {name:"RET PE", ast:o.RET("!=", "F_PARITY")}, {name:"JP (HL)", ast:o.JP("h", "l")}, 
+{name:"JP PE,(nn)", ast:o.JP("!=", "F_PARITY")}, {name:"EX DE,HL", ast:o.EX_DE_HL()}, {name:"CALL PE (nn)", ast:o.CALL("!=", "F_PARITY")}, opcodeTableED, {name:"XOR n", ast:o.XOR()}, {name:"RST 0x28", ast:o.RST(40)}, {name:"RET P", ast:o.RET("==", "F_SIGN")}, {name:"POP AF", ast:o.POP("a", "f")}, {name:"JP P,(nn)", ast:o.JP("==", "F_SIGN")}, {name:"DI", ast:o.DI()}, {name:"CALL P (nn)", ast:o.CALL("==", "F_SIGN")}, {name:"PUSH AF", ast:o.PUSH("a", "f")}, {name:"OR n", ast:o.OR()}, {name:"RST 0x30", 
+ast:o.RST(48)}, {name:"RET M", ast:o.RET("!=", "F_SIGN")}, {name:"LD SP,HL", ast:o.LD_SP("h", "l")}, {name:"JP M,(nn)", ast:o.JP("!=", "F_SIGN")}, {name:"EI", ast:o.EI()}, {name:"CALL M (nn)", ast:o.CALL("!=", "F_SIGN")}, generateIndexTable("IY"), {name:"CP n", ast:o.CP()}, {name:"RST 0x38", ast:o.RST(56)}];
+var Analyzer = function() {
+  this.bytecodes = {};
+  this.ast = [];
+  this.missingOpcodes = {}
+};
+Analyzer.prototype = {analyze:function(bytecodes) {
+  this.bytecodes = bytecodes;
+  this.ast = Array(this.bytecodes.length);
+  JSSMS.Utils.console.time("Analyzing");
+  for(var i = 0;i < this.bytecodes.length;i++) {
+    this.normalizeBytecode(i);
+    this.restructure(i)
+  }
+  JSSMS.Utils.console.timeEnd("Analyzing");
+  for(var i in this.missingOpcodes) {
+    console.error("Missing opcode", i, this.missingOpcodes[i])
+  }
+}, analyzeFromAddress:function(bytecodes) {
+  this.bytecodes = [bytecodes];
+  this.ast = [];
+  this.missingOpcodes = {};
+  this.normalizeBytecode(0);
+  this.bytecodes[0][this.bytecodes[0].length - 1].isFunctionEnder = true;
+  this.ast = [this.bytecodes];
+  for(var i in this.missingOpcodes) {
+    console.error("Missing opcode", i, this.missingOpcodes[i])
+  }
+}, normalizeBytecode:function(page) {
+  var self = this;
+  this.bytecodes[page] = this.bytecodes[page].map(function(bytecode) {
+    switch(bytecode.opcode.length) {
+      case 1:
+        var opcode = opcodeTable[bytecode.opcode[0]];
+        break;
+      case 2:
+        var opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]];
+        break;
+      case 3:
+        var opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]][bytecode.opcode[2]];
+        break;
+      default:
+        throw Error("Something went wrong in parsing. Opcode: [" + bytecode.opcode.join(",") + "]");
+    }
+    if(opcode && opcode.ast) {
+      var ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.nextAddress);
+      if(!Array.isArray(ast) && ast != undefined) {
+        ast = [ast]
+      }
+      bytecode.ast = ast;
+      if(DEBUG) {
+        bytecode.name = opcode.name;
+        if(opcode.opcode) {
+          bytecode.opcode = opcode.opcode(bytecode.operand, bytecode.target, bytecode.nextAddress)
+        }
+      }
+    }else {
+      var i = bytecode.hexOpcode;
+      self.missingOpcodes[i] = self.missingOpcodes[i] != undefined ? self.missingOpcodes[i] + 1 : 1
+    }
+    return bytecode
+  })
+}, restructure:function(page) {
+  this.ast[page] = [];
+  var self = this;
+  var pointer = -1;
+  var startNewFunction = true;
+  var prevBytecode = {};
+  this.bytecodes[page].forEach(function(bytecode) {
+    if(bytecode.isJumpTarget || startNewFunction) {
+      pointer++;
+      self.ast[page][pointer] = [];
+      startNewFunction = false;
+      prevBytecode.isFunctionEnder = true
+    }
+    self.ast[page][pointer].push(bytecode);
+    if(bytecode.isFunctionEnder) {
+      startNewFunction = true
+    }
+    prevBytecode = bytecode
+  })
+}};
+var Optimizer = function() {
+  this.ast = []
+};
+Optimizer.prototype = {optimize:function(functions) {
+  this.ast = functions;
+  for(var i = 0;i < this.ast.length;i++) {
+  }
+}, localOptimization:function(page) {
+  this.ast[page] = this.ast[page].map(this.inlineRegisters)
+}, inlineRegisters:function(fn) {
+  var definedReg = {a:false};
+  var definedRegValue = {a:{}};
+  return fn.map(function(bytecodes) {
+    var ast = bytecodes.ast;
+    if(!ast) {
+      return bytecodes
+    }
+    bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+      if(ast.type == "AssignmentExpression" && ast.operator == "=" && ast.left.type == "Register" && ast.right.type == "Literal" && ast.left.name == "a") {
+        definedReg[ast.left.name] = true;
+        definedRegValue[ast.left.name] = ast.right
+      }
+      if(ast.type == "AssignmentExpression" && ast.left.type == "Register" && ast.right.type != "Literal" && ast.left.name == "a") {
+        definedReg[ast.left.name] = false;
+        definedRegValue[ast.left.name] = {};
+        return ast
+      }
+      if(ast.type == "CallExpression" && ast.arguments[0] && ast.arguments[0].type == "Register" && definedReg[ast.arguments[0].name] && ast.arguments[0].name == "a") {
+        ast.arguments[0] = definedRegValue[ast.arguments[0].name];
+        return ast
+      }
+      if(ast.type == "CallExpression" && ast.arguments[1] && ast.arguments[1].type == "Register" && definedReg[ast.arguments[1].name] && ast.arguments[1].name == "a") {
+        ast.arguments[1] = definedRegValue[ast.arguments[1].name];
+        return ast
+      }
+      if(ast.type == "MemberExpression" && ast.property.type == "Register" && definedReg[ast.property.name] && ast.property.name == "a") {
+        ast.property = definedRegValue[ast.property.name];
+        return ast
+      }
+      return ast
+    });
+    return bytecodes
+  })
+}};
+var whitelist = ["F_CARRY", "F_NEGATIVE", "F_PARITY", "F_OVERFLOW", "F_BIT3", "F_HALFCARRY", "F_BIT5", "F_ZERO", "F_SIGN", "BIT_0", "BIT_1", "BIT_2", "BIT_3", "BIT_4", "BIT_5", "BIT_6", "BIT_7", "temp", "location", "JSSMS.Utils.rndInt"];
+var Generator = function() {
+  this.ast = []
+};
+Generator.prototype = {generate:function(functions) {
+  var self = this;
+  var toHex = JSSMS.Utils.toHex;
+  JSSMS.Utils.console.time("Generating");
+  for(var page = 0;page < functions.length;page++) {
+    functions[page] = functions[page].map(function(fn) {
+      var body = [];
+      var name = fn[0].address;
+      var jumpTargetNb = fn[0].jumpTargetNb;
+      var tstates = 0;
+      fn = fn.map(function(bytecode) {
+        if(bytecode.ast == null) {
+          bytecode.ast = []
+        }
+        tstates += self.getTotalTStates(bytecode.opcode);
+        if(bytecode.isFunctionEnder || bytecode.canEnd || bytecode.target != null) {
+          var decreaseTStateStmt = [{"type":"ExpressionStatement", "expression":{"type":"AssignmentExpression", "operator":"-=", "left":{"type":"Identifier", "name":"tstates"}, "right":{"type":"Literal", "value":tstates}}}];
+          if(DEBUG) {
+            if(decreaseTStateStmt[0]["expression"]["right"]["value"]) {
+              decreaseTStateStmt[0]["expression"]["right"]["raw"] = toHex(decreaseTStateStmt[0]["expression"]["right"]["value"])
+            }
+          }
+          bytecode.ast = [].concat(decreaseTStateStmt, bytecode.ast);
+          tstates = 0
+        }
+        if(bytecode.nextAddress != null) {
+          var updatePcStmt = {"type":"ExpressionStatement", "expression":{"type":"AssignmentExpression", "operator":"=", "left":{"type":"Identifier", "name":"pc"}, "right":{"type":"Literal", "value":bytecode.nextAddress}}};
+          if(DEBUG) {
+            updatePcStmt["expression"]["right"]["raw"] = toHex(updatePcStmt["expression"]["right"]["value"])
+          }
+          bytecode.ast.push(updatePcStmt)
+        }
+        if(DEBUG) {
+          if(bytecode.ast[0]) {
+            bytecode.ast[0].leadingComments = [{type:"Line", value:" " + bytecode.label}]
+          }
+        }
+        return bytecode.ast
+      });
+      fn.forEach(function(ast) {
+        body = body.concat(ast)
+      });
+      body = self.convertRegisters(body);
+      body = JSSMS.Utils.traverse(body, function(obj) {
+        if(obj.type && obj.type == "Identifier" && whitelist.indexOf(obj.name) == -1) {
+          obj.name = "this." + obj.name
+        }
+        return obj
+      });
+      return{"type":"Program", "body":[{"type":"FunctionDeclaration", "id":{"type":"Identifier", "name":name}, "params":[{"type":"Identifier", "name":"temp"}, {"type":"Identifier", "name":"location"}], "defaults":[], "body":{"type":"BlockStatement", "body":body}, "rest":null, "generator":false, "expression":false}]}
+    })
+  }
+  JSSMS.Utils.console.timeEnd("Generating");
+  this.ast = functions
+}, getTotalTStates:function(opcodes) {
+  var tstates = 0;
+  switch(opcodes[0]) {
+    case 203:
+      tstates = OP_CB_STATES[opcodes[1]];
+      break;
+    case 221:
+    ;
+    case 253:
+      if(opcodes.length == 2) {
+        tstates = OP_DD_STATES[opcodes[1]]
+      }else {
+        tstates = OP_INDEX_CB_STATES[opcodes[2]]
+      }
+      break;
+    case 237:
+      tstates = OP_ED_STATES[opcodes[1]];
+      break;
+    default:
+      tstates = OP_STATES[opcodes[0]];
+      break
+  }
+  return tstates
+}, convertRegisters:function(ast) {
+  var convertRegisters = function(node) {
+    if(node.type == "Register") {
+      node.type = "Identifier"
+    }
+    return node
+  };
+  return JSSMS.Utils.traverse(ast, convertRegisters)
+}};
+var Recompiler = function(cpu) {
+  this.cpu = cpu;
+  this.rom = [];
+  this.options = {};
+  this.parser = {};
+  this.analyzer = new Analyzer;
+  this.optimizer = new Optimizer;
+  this.generator = new Generator;
+  this.bytecodes = {}
+};
+Recompiler.prototype = {setRom:function(rom) {
+  this.rom = rom;
+  this.parser = new Parser(rom, this.cpu.frameReg)
+}, reset:function() {
+  var self = this;
+  this.options.entryPoints = [{address:0, romPage:0, memPage:0}, {address:56, romPage:0, memPage:0}, {address:102, romPage:0, memPage:0}];
+  if(this.rom.length <= 2) {
+    JSSMS.Utils.console.log("Parsing full ROM")
+  }else {
+    this.options.pageLimit = 0;
+    JSSMS.Utils.console.log("Parsing initial memory page of ROM")
+  }
+  var fns = this.parse().analyze().optimize().generate();
+  for(var page = 0;page < this.rom.length;page++) {
+    fns[page].forEach(function(fn) {
+      var funcName = fn.body[0].id.name;
+      fn.body[0].id.name = "_" + JSSMS.Utils.toHex(funcName);
+      var code = self.generateCodeFromAst(fn);
+      self.cpu.branches[page][funcName] = (new Function("return " + code))()
+    })
+  }
+}, parse:function() {
+  var self = this;
+  this.options.entryPoints.forEach(function(entryPoint) {
+    self.parser.addEntryPoint(entryPoint)
+  });
+  this.parser.parse(this.options.pageLimit);
+  return this
+}, analyze:function() {
+  this.analyzer.analyze(this.parser.instructions);
+  return this
+}, optimize:function() {
+  this.optimizer.optimize(this.analyzer.ast);
+  return this
+}, generate:function() {
+  this.generator.generate(this.optimizer.ast);
+  return this.generator.ast
+}, recompileFromAddress:function(address, romPage, memPage) {
+  var self = this;
+  var fns = this.parseFromAddress(address, romPage, memPage).analyzeFromAddress().optimize().generate();
+  fns[0].forEach(function(fn) {
+    var funcName = fn.body[0].id.name;
+    fn.body[0].id.name = "_" + JSSMS.Utils.toHex(funcName);
+    var code = self.generateCodeFromAst(fn);
+    self.cpu.branches[romPage][address % 16384] = (new Function("return " + code))()
+  })
+}, parseFromAddress:function(address, romPage, memPage) {
+  var obj = {address:address, romPage:romPage, memPage:memPage};
+  this.parser.entryPoints.push(obj);
+  this.bytecodes = this.parser.parseFromAddress(obj);
+  return this
+}, analyzeFromAddress:function() {
+  this.analyzer.analyzeFromAddress(this.bytecodes);
+  return this
+}, generateCodeFromAst:function(fn) {
+  return window["escodegen"]["generate"](fn, {comment:true, renumber:true, hexadecimal:true, parse:window["esprima"]["parse"]})
+}, dump:function() {
+  var output = [];
+  for(var i in this.cpu.branches) {
+    output.push("// Page " + i);
+    for(var j in this.cpu.branches[i]) {
+      output.push(this.cpu.branches[i][j])
+    }
+  }
+  output = output.join("\n");
+  console.log(output)
 }};
 

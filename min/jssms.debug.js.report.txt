@@ -1,41 +1,701 @@
-src\debugger.js:425: WARNING - assignment
+src\compiler\bytecode.js:82: WARNING - Property hexOpcode never defined on Bytecode
+          this.hexOpcode + ' ' +
+          ^
+
+src\compiler\opcodes-CB.js:41: WARNING - Cannot do '[]' access on a struct
+      ast: o[op].apply(null, regs[reg])
+             ^
+
+src\compiler\opcodes-CB.js:47: WARNING - Cannot do '[]' access on a struct
+        ast: o['LD_' + op].apply(null, ['i', 'x'].concat(regs[reg]))
+               ^
+
+src\compiler\opcodes-CB.js:51: WARNING - Cannot do '[]' access on a struct
+        ast: o['LD_' + op].apply(null, ['i', 'y'].concat(regs[reg]))
+               ^
+
+src\compiler\opcodes-CB.js:56: WARNING - Cannot do '[]' access on a struct
+        ast: o['LD_' + op]('i', 'x')
+               ^
+
+src\compiler\opcodes-CB.js:60: WARNING - Cannot do '[]' access on a struct
+        ast: o['LD_' + op]('i', 'y')
+               ^
+
+src\compiler\opcodes-CB.js:71: WARNING - Cannot do '[]' access on a struct
+        ast: o[op].apply(null, [i].concat(regs[reg]))
+               ^
+
+src\compiler\opcodes-CB.js:77: WARNING - Cannot do '[]' access on a struct
+        ast: o[op].apply(null, [i].concat(['i', 'x']))
+               ^
+
+src\compiler\opcodes-CB.js:81: WARNING - Cannot do '[]' access on a struct
+        ast: o[op].apply(null, [i].concat(['i', 'y']))
+               ^
+
+src\compiler\opcodes-ED.js:110: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('a', 'i')
+         ^
+
+src\compiler\opcodes-ED.js:135: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('a', 'r')
+         ^
+
+src\compiler\opcodes-ED.js:188: WARNING - Function o.LD_NN: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.LD_NN('sp')
+         ^
+
+src\compiler\opcodes-ED.js:208: WARNING - Function o.ADC16: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADC16('sp')
+         ^
+
+src\compiler\opcodes.js:31: WARNING - Function o.LD16: called with 2 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD16('b', 'c'),
+         ^
+
+src\compiler\opcodes.js:37: WARNING - Function o.LD_WRITE_MEM: called with 3 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD_WRITE_MEM('b', 'c', 'a')
+         ^
+
+src\compiler\opcodes.js:47: WARNING - Function o.INC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.INC8('b')
+         ^
+
+src\compiler\opcodes.js:52: WARNING - Function o.DEC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.DEC8('b')
+         ^
+
+src\compiler\opcodes.js:57: WARNING - Function o.LD8: called with 1 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('b'),
+         ^
+
+src\compiler\opcodes.js:88: WARNING - Function o.INC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.INC8('c')
+         ^
+
+src\compiler\opcodes.js:93: WARNING - Function o.DEC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.DEC8('c')
+         ^
+
+src\compiler\opcodes.js:98: WARNING - Function o.LD8: called with 1 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('c'),
+         ^
+
+src\compiler\opcodes.js:115: WARNING - Function o.LD16: called with 2 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD16('d', 'e'),
+         ^
+
+src\compiler\opcodes.js:121: WARNING - Function o.LD_WRITE_MEM: called with 3 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD_WRITE_MEM('d', 'e', 'a')
+         ^
+
+src\compiler\opcodes.js:131: WARNING - Function o.INC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.INC8('d')
+         ^
+
+src\compiler\opcodes.js:136: WARNING - Function o.DEC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.DEC8('d')
+         ^
+
+src\compiler\opcodes.js:141: WARNING - Function o.LD8: called with 1 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('d'),
+         ^
+
+src\compiler\opcodes.js:152: WARNING - Function o.JP: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.JP(),
+         ^
+
+src\compiler\opcodes.js:173: WARNING - Function o.INC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.INC8('e')
+         ^
+
+src\compiler\opcodes.js:178: WARNING - Function o.DEC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.DEC8('e')
+         ^
+
+src\compiler\opcodes.js:183: WARNING - Function o.LD8: called with 1 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('e'),
+         ^
+
+src\compiler\opcodes.js:200: WARNING - Function o.LD16: called with 2 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD16('h', 'l'),
+         ^
+
+src\compiler\opcodes.js:217: WARNING - Function o.INC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.INC8('h')
+         ^
+
+src\compiler\opcodes.js:222: WARNING - Function o.DEC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.DEC8('h')
+         ^
+
+src\compiler\opcodes.js:227: WARNING - Function o.LD8: called with 1 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('h'),
+         ^
+
+src\compiler\opcodes.js:260: WARNING - Function o.INC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.INC8('l')
+         ^
+
+src\compiler\opcodes.js:265: WARNING - Function o.DEC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.DEC8('l')
+         ^
+
+src\compiler\opcodes.js:270: WARNING - Function o.LD8: called with 1 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('l'),
+         ^
+
+src\compiler\opcodes.js:287: WARNING - Function o.LD_SP: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.LD_SP(),
+         ^
+
+src\compiler\opcodes.js:293: WARNING - Function o.LD_WRITE_MEM: called with 3 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD_WRITE_MEM('n', 'n', 'a'),
+         ^
+
+src\compiler\opcodes.js:314: WARNING - Function o.LD_WRITE_MEM: called with 2 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD_WRITE_MEM('h', 'l'),
+         ^
+
+src\compiler\opcodes.js:331: WARNING - Function o.ADD16: called with 3 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.ADD16('h', 'l', 'sp')
+         ^
+
+src\compiler\opcodes.js:347: WARNING - Function o.INC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.INC8('a')
+         ^
+
+src\compiler\opcodes.js:352: WARNING - Function o.DEC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.DEC8('a')
+         ^
+
+src\compiler\opcodes.js:357: WARNING - Function o.LD8: called with 1 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('a'),
+         ^
+
+src\compiler\opcodes.js:374: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('b', 'c')
+         ^
+
+src\compiler\opcodes.js:379: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('b', 'd')
+         ^
+
+src\compiler\opcodes.js:384: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('b', 'e')
+         ^
+
+src\compiler\opcodes.js:389: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('b', 'h')
+         ^
+
+src\compiler\opcodes.js:394: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('b', 'l')
+         ^
+
+src\compiler\opcodes.js:404: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('b', 'a')
+         ^
+
+src\compiler\opcodes.js:409: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('c', 'b')
+         ^
+
+src\compiler\opcodes.js:419: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('c', 'd')
+         ^
+
+src\compiler\opcodes.js:424: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('c', 'e')
+         ^
+
+src\compiler\opcodes.js:429: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('c', 'h')
+         ^
+
+src\compiler\opcodes.js:434: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('c', 'l')
+         ^
+
+src\compiler\opcodes.js:444: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('c', 'a')
+         ^
+
+src\compiler\opcodes.js:449: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('d', 'b')
+         ^
+
+src\compiler\opcodes.js:454: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('d', 'c')
+         ^
+
+src\compiler\opcodes.js:464: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('d', 'e')
+         ^
+
+src\compiler\opcodes.js:469: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('d', 'h')
+         ^
+
+src\compiler\opcodes.js:474: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('d', 'l')
+         ^
+
+src\compiler\opcodes.js:484: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('d', 'a')
+         ^
+
+src\compiler\opcodes.js:489: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('e', 'b')
+         ^
+
+src\compiler\opcodes.js:494: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('e', 'c')
+         ^
+
+src\compiler\opcodes.js:499: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('e', 'd')
+         ^
+
+src\compiler\opcodes.js:509: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('e', 'h')
+         ^
+
+src\compiler\opcodes.js:514: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('e', 'l')
+         ^
+
+src\compiler\opcodes.js:524: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('e', 'a')
+         ^
+
+src\compiler\opcodes.js:529: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('h', 'b')
+         ^
+
+src\compiler\opcodes.js:534: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('h', 'c')
+         ^
+
+src\compiler\opcodes.js:539: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('h', 'd')
+         ^
+
+src\compiler\opcodes.js:544: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('h', 'e')
+         ^
+
+src\compiler\opcodes.js:554: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('h', 'l')
+         ^
+
+src\compiler\opcodes.js:564: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('h', 'a')
+         ^
+
+src\compiler\opcodes.js:569: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('l', 'b')
+         ^
+
+src\compiler\opcodes.js:574: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('l', 'c')
+         ^
+
+src\compiler\opcodes.js:579: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('l', 'd')
+         ^
+
+src\compiler\opcodes.js:584: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('l', 'e')
+         ^
+
+src\compiler\opcodes.js:589: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('l', 'h')
+         ^
+
+src\compiler\opcodes.js:604: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('l', 'a')
+         ^
+
+src\compiler\opcodes.js:609: WARNING - Function o.LD_WRITE_MEM: called with 3 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD_WRITE_MEM('h', 'l', 'b')
+         ^
+
+src\compiler\opcodes.js:614: WARNING - Function o.LD_WRITE_MEM: called with 3 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD_WRITE_MEM('h', 'l', 'c')
+         ^
+
+src\compiler\opcodes.js:619: WARNING - Function o.LD_WRITE_MEM: called with 3 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD_WRITE_MEM('h', 'l', 'd')
+         ^
+
+src\compiler\opcodes.js:624: WARNING - Function o.LD_WRITE_MEM: called with 3 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD_WRITE_MEM('h', 'l', 'e')
+         ^
+
+src\compiler\opcodes.js:629: WARNING - Function o.LD_WRITE_MEM: called with 3 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD_WRITE_MEM('h', 'l', 'h')
+         ^
+
+src\compiler\opcodes.js:634: WARNING - Function o.LD_WRITE_MEM: called with 3 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD_WRITE_MEM('h', 'l', 'l')
+         ^
+
+src\compiler\opcodes.js:644: WARNING - Function o.LD_WRITE_MEM: called with 3 argument(s). Function requires at least 4 argument(s) and no more than 4 argument(s).
+    ast: o.LD_WRITE_MEM('h', 'l', 'a')
+         ^
+
+src\compiler\opcodes.js:649: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('a', 'b')
+         ^
+
+src\compiler\opcodes.js:654: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('a', 'c')
+         ^
+
+src\compiler\opcodes.js:659: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('a', 'd')
+         ^
+
+src\compiler\opcodes.js:664: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('a', 'e')
+         ^
+
+src\compiler\opcodes.js:669: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('a', 'h')
+         ^
+
+src\compiler\opcodes.js:674: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('a', 'l')
+         ^
+
+src\compiler\opcodes.js:689: WARNING - Function o.ADD: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADD('b')
+         ^
+
+src\compiler\opcodes.js:694: WARNING - Function o.ADD: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADD('c')
+         ^
+
+src\compiler\opcodes.js:699: WARNING - Function o.ADD: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADD('d')
+         ^
+
+src\compiler\opcodes.js:704: WARNING - Function o.ADD: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADD('e')
+         ^
+
+src\compiler\opcodes.js:709: WARNING - Function o.ADD: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADD('h')
+         ^
+
+src\compiler\opcodes.js:714: WARNING - Function o.ADD: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADD('l')
+         ^
+
+src\compiler\opcodes.js:724: WARNING - Function o.ADD: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADD('a')
+         ^
+
+src\compiler\opcodes.js:729: WARNING - Function o.ADC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADC('b')
+         ^
+
+src\compiler\opcodes.js:734: WARNING - Function o.ADC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADC('c')
+         ^
+
+src\compiler\opcodes.js:739: WARNING - Function o.ADC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADC('d')
+         ^
+
+src\compiler\opcodes.js:744: WARNING - Function o.ADC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADC('e')
+         ^
+
+src\compiler\opcodes.js:749: WARNING - Function o.ADC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADC('h')
+         ^
+
+src\compiler\opcodes.js:754: WARNING - Function o.ADC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADC('l')
+         ^
+
+src\compiler\opcodes.js:764: WARNING - Function o.ADC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADC('a')
+         ^
+
+src\compiler\opcodes.js:769: WARNING - Function o.SUB: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SUB('b')
+         ^
+
+src\compiler\opcodes.js:774: WARNING - Function o.SUB: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SUB('c')
+         ^
+
+src\compiler\opcodes.js:779: WARNING - Function o.SUB: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SUB('d')
+         ^
+
+src\compiler\opcodes.js:784: WARNING - Function o.SUB: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SUB('e')
+         ^
+
+src\compiler\opcodes.js:789: WARNING - Function o.SUB: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SUB('h')
+         ^
+
+src\compiler\opcodes.js:794: WARNING - Function o.SUB: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SUB('l')
+         ^
+
+src\compiler\opcodes.js:804: WARNING - Function o.SUB: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SUB('a')
+         ^
+
+src\compiler\opcodes.js:809: WARNING - Function o.SBC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SBC('b')
+         ^
+
+src\compiler\opcodes.js:814: WARNING - Function o.SBC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SBC('c')
+         ^
+
+src\compiler\opcodes.js:819: WARNING - Function o.SBC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SBC('d')
+         ^
+
+src\compiler\opcodes.js:824: WARNING - Function o.SBC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SBC('e')
+         ^
+
+src\compiler\opcodes.js:829: WARNING - Function o.SBC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SBC('h')
+         ^
+
+src\compiler\opcodes.js:834: WARNING - Function o.SBC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SBC('l')
+         ^
+
+src\compiler\opcodes.js:844: WARNING - Function o.SBC: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SBC('a')
+         ^
+
+src\compiler\opcodes.js:849: WARNING - Function o.AND: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.AND('b')
+         ^
+
+src\compiler\opcodes.js:854: WARNING - Function o.AND: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.AND('c')
+         ^
+
+src\compiler\opcodes.js:859: WARNING - Function o.AND: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.AND('d')
+         ^
+
+src\compiler\opcodes.js:864: WARNING - Function o.AND: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.AND('e')
+         ^
+
+src\compiler\opcodes.js:869: WARNING - Function o.AND: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.AND('h')
+         ^
+
+src\compiler\opcodes.js:874: WARNING - Function o.AND: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.AND('l')
+         ^
+
+src\compiler\opcodes.js:884: WARNING - Function o.AND: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.AND('a')
+         ^
+
+src\compiler\opcodes.js:889: WARNING - Function o.XOR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.XOR('b')
+         ^
+
+src\compiler\opcodes.js:894: WARNING - Function o.XOR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.XOR('c')
+         ^
+
+src\compiler\opcodes.js:899: WARNING - Function o.XOR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.XOR('d')
+         ^
+
+src\compiler\opcodes.js:904: WARNING - Function o.XOR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.XOR('e')
+         ^
+
+src\compiler\opcodes.js:909: WARNING - Function o.XOR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.XOR('h')
+         ^
+
+src\compiler\opcodes.js:914: WARNING - Function o.XOR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.XOR('l')
+         ^
+
+src\compiler\opcodes.js:924: WARNING - Function o.XOR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.XOR('a')
+         ^
+
+src\compiler\opcodes.js:929: WARNING - Function o.OR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.OR('b')
+         ^
+
+src\compiler\opcodes.js:934: WARNING - Function o.OR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.OR('c')
+         ^
+
+src\compiler\opcodes.js:939: WARNING - Function o.OR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.OR('d')
+         ^
+
+src\compiler\opcodes.js:944: WARNING - Function o.OR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.OR('e')
+         ^
+
+src\compiler\opcodes.js:949: WARNING - Function o.OR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.OR('h')
+         ^
+
+src\compiler\opcodes.js:954: WARNING - Function o.OR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.OR('l')
+         ^
+
+src\compiler\opcodes.js:964: WARNING - Function o.OR: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.OR('a')
+         ^
+
+src\compiler\opcodes.js:969: WARNING - Function o.CP: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.CP('b')
+         ^
+
+src\compiler\opcodes.js:974: WARNING - Function o.CP: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.CP('c')
+         ^
+
+src\compiler\opcodes.js:979: WARNING - Function o.CP: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.CP('d')
+         ^
+
+src\compiler\opcodes.js:984: WARNING - Function o.CP: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.CP('e')
+         ^
+
+src\compiler\opcodes.js:989: WARNING - Function o.CP: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.CP('h')
+         ^
+
+src\compiler\opcodes.js:994: WARNING - Function o.CP: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.CP('l')
+         ^
+
+src\compiler\opcodes.js:1004: WARNING - Function o.CP: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.CP('a')
+         ^
+
+src\compiler\opcodes.js:1024: WARNING - Function o.JP: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.JP()
+         ^
+
+src\compiler\opcodes.js:1039: WARNING - Function o.ADD: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADD()
+         ^
+
+src\compiler\opcodes.js:1054: WARNING - Function o.RET: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.RET()
+         ^
+
+src\compiler\opcodes.js:1071: WARNING - Function o.CALL: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.CALL()
+         ^
+
+src\compiler\opcodes.js:1076: WARNING - Function o.ADC: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.ADC()
+         ^
+
+src\compiler\opcodes.js:1101: WARNING - Function o.OUT: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.OUT('a')
+         ^
+
+src\compiler\opcodes.js:1116: WARNING - Function o.SUB: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SUB()
+         ^
+
+src\compiler\opcodes.js:1141: WARNING - Function o.IN: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.IN('a')
+         ^
+
+src\compiler\opcodes.js:1153: WARNING - Function o.SBC: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.SBC()
+         ^
+
+src\compiler\opcodes.js:1193: WARNING - Function o.AND: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.AND()
+         ^
+
+src\compiler\opcodes.js:1230: WARNING - Function o.XOR: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.XOR()
+         ^
+
+src\compiler\opcodes.js:1270: WARNING - Function o.OR: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.OR()
+         ^
+
+src\compiler\opcodes.js:1307: WARNING - Function o.CP: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+    ast: o.CP()
+         ^
+
+src\debugger.js:435: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1173: WARNING - assignment
+src\debugger.js:1184: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1213: WARNING - assignment
+src\debugger.js:1224: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:1443: WARNING - assignment
+src\debugger.js:1454: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:2662: WARNING - assignment
+src\debugger.js:2674: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:3486: WARNING - assignment
+src\debugger.js:3527: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
+
+src\debugger.js:4095: WARNING - unreachable code
+    if (this.main.is_gg && port < 0x07) {
+    ^
+
+src\debugger.js:4116: WARNING - Property port never defined on this
+          if (this.port.europe == 0) {
+              ^
+
+src\debugger.js:4157: WARNING - unreachable code
+    if (this.main.is_gg && port < 0x07) {
+    ^
 
 src\sms.js:68: WARNING - cannot instantiate non-constructor
   this.ui = new opts['ui'](this);
             ^
 
-0 error(s), 7 warning(s), 92.9% typed
+0 error(s), 172 warning(s), 86.0% typed
