@@ -21,6 +21,17 @@ module.exports = function(grunt) {
       'src/vdp.js',
       'src/ui.js',
       'src/ports.js',
+      'src/compiler/bytecode.js',
+      'src/compiler/parser.js',
+      'src/compiler/opcodes-ast.js',
+      'src/compiler/opcodes-CB.js',
+      'src/compiler/opcodes-DD-FD.js',
+      'src/compiler/opcodes-ED.js',
+      'src/compiler/opcodes.js',
+      'src/compiler/analyzer.js',
+      'src/compiler/optimizer.js',
+      'src/compiler/generator.js',
+      'src/compiler/recompiler.js',
       'src/build/exports.js'
     ],
     externs: [
@@ -45,6 +56,7 @@ module.exports = function(grunt) {
           define: [
             '"DEBUG=false"',
             '"DEBUGGER=false"',
+            '"ENABLE_COMPILER=true"',
             '"ACCURATE_INTERRUPT_EMULATION=false"'
           ],
           debug: false
@@ -65,6 +77,7 @@ module.exports = function(grunt) {
           define: [
             '"DEBUG=true"',
             '"DEBUGGER=true"',
+            '"ENABLE_COMPILER=true"',
             '"ACCURATE_INTERRUPT_EMULATION=false"'
           ],
           debug: true,
@@ -85,7 +98,18 @@ module.exports = function(grunt) {
           'src/psg.js',
           'src/vdp.js',
           'src/ui.js',
-          'src/ports.js'
+          'src/ports.js',
+          'src/compiler/bytecode.js',
+          'src/compiler/parser.js',
+          'src/compiler/opcodes-ast.js',
+          'src/compiler/opcodes-CB.js',
+          'src/compiler/opcodes-DD-FD.js',
+          'src/compiler/opcodes-ED.js',
+          'src/compiler/opcodes.js',
+          'src/compiler/analyzer.js',
+          'src/compiler/optimizer.js',
+          'src/compiler/generator.js',
+          'src/compiler/recompiler.js'
         ],
         jsOutputFile: 'min/jssms.concat.js',
         options: {
@@ -124,6 +148,7 @@ module.exports = function(grunt) {
           define: [
             '"DEBUG=false"',
             '"DEBUGGER=false"',
+            '"ENABLE_COMPILER=true"',
             '"FORCE_DATAVIEW=true"',
             '"ACCURATE_INTERRUPT_EMULATION=false"'
           ],
@@ -188,6 +213,7 @@ module.exports = function(grunt) {
           define: [
             '"DEBUG=true"',
             '"DEBUGGER=true"',
+            '"ENABLE_COMPILER=false"',
             '"ACCURATE_INTERRUPT_EMULATION=true"'
           ],
           debug: true,
@@ -205,7 +231,8 @@ module.exports = function(grunt) {
           removeAttributeQuotes: true,
           removeRedundantAttributes: true,
           removeEmptyAttributes: true,
-          removeOptionalTags: true
+          removeOptionalTags: true,
+          html5: true
         },
         files: {
           'alec/index.html': 'alec/src.html'

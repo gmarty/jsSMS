@@ -36,6 +36,13 @@ var DEBUGGER = false;
 
 
 /**
+ * Whether to enable compiler.
+ * @define {boolean}
+ */
+var ENABLE_COMPILER = true;
+
+
+/**
  * @type {boolean}
  */
 var ACCURATE = false;

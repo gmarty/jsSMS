@@ -378,6 +378,10 @@ JSSMS.Z80 = function(sms) {
       this[method] = JSSMS.Debugger.prototype[method];
     }
   }
+
+  if (ENABLE_COMPILER) {
+    this.recompiler = new Recompiler(this);
+  }
 };
 
 JSSMS.Z80.prototype = {
@@ -418,6 +422,10 @@ JSSMS.Z80.prototype = {
     this.EI_inst = false;
     this.interruptVector = 0;
     this.halt = false;
+
+    if (ENABLE_COMPILER) {
+      this.recompiler.reset();
+    }
   },
 
 
@@ -440,7 +448,11 @@ JSSMS.Z80.prototype = {
         this.main.ui.updateDisassembly(this.pc);
       }
 
-      this.interpret();
+      if (ENABLE_COMPILER) {
+        this.recompile();
+      } else {
+        this.interpret();
+      }
 
       // Execute eol() at end of scanlines and exit at end of frame.
       if (this.tstates <= 0) {
@@ -448,6 +460,58 @@ JSSMS.Z80.prototype = {
           return;
       }
     }
+  },
+
+
+  recompile: function() {
+    if (this.pc < 0x0400) {
+      if (this.branches[0][this.pc]) {
+        this.branches[0][this.pc].call(this);
+        return;
+      }
+
+      //console.log('> ' + JSSMS.Utils.toHex(this.pc));
+
+      this.recompiler.recompileFromAddress(this.pc, 0, 0);
+      this.branches[0][this.pc].call(this);
+      return;
+    } else if (this.pc < 0x4000) {
+      if (this.branches[this.frameReg[0]][this.pc]) {
+        this.branches[this.frameReg[0]][this.pc].call(this);
+        return;
+      }
+
+      //console.log('> ' + JSSMS.Utils.toHex(this.pc), this.frameReg[0]);
+
+      this.recompiler.recompileFromAddress(this.pc, this.frameReg[0], 0);
+      this.branches[this.frameReg[0]][this.pc].call(this);
+      return;
+    } else if (this.pc < 0x8000) {
+      if (this.branches[this.frameReg[1]][(this.pc - 0x4000)]) {
+        this.branches[this.frameReg[1]][(this.pc - 0x4000)].call(this);
+        return;
+      }
+
+      //console.log('> ' + JSSMS.Utils.toHex(this.pc), this.frameReg[1]);
+
+      this.recompiler.recompileFromAddress(this.pc, this.frameReg[1], 1);
+      this.branches[this.frameReg[1]][(this.pc - 0x4000)].call(this);
+      return;
+    } else if (this.pc < 0xC000) {
+      if (this.branches[this.frameReg[2]][(this.pc - 0x8000)]) {
+        this.branches[this.frameReg[2]][(this.pc - 0x8000)].call(this);
+        return;
+      }
+
+      //console.log('> ' + JSSMS.Utils.toHex(this.pc), this.frameReg[2]);
+
+      this.recompiler.recompileFromAddress(this.pc, this.frameReg[2], 2);
+      this.branches[this.frameReg[2]][(this.pc - 0x8000)].call(this);
+      return;
+    }
+
+    //throw 'PC: ' + JSSMS.Utils.toHex(this.pc);
+    this.interpret();
   },
 
 
@@ -506,6 +570,13 @@ JSSMS.Z80.prototype = {
 
     this.main.doRepaint();
   },
+
+
+  branches: [
+    Object.create(null),
+    Object.create(null),
+    Object.create(null)
+  ],
 
 
   /**
@@ -3187,6 +3258,8 @@ JSSMS.Z80.prototype = {
    * @param {Array.<Array.<number>>=} pages
    */
   resetMemory: function(pages) {
+    var i = 0;
+
     if (pages) {
       this.rom = pages;
     }
@@ -3197,10 +3270,20 @@ JSSMS.Z80.prototype = {
       this.romPageMask = this.number_of_pages - 1;
 
       // Paginated memory registers
-      for (var i = 0; i < 3; i++) {
+      for (i = 0; i < 3; i++) {
         this.frameReg[i] = i % this.number_of_pages;
       }
       this.frameReg[3] = 0;
+
+      if (ENABLE_COMPILER) {
+        // Reset container for branches.
+        this.branches = Array(this.number_of_pages);
+        for (i = 0; i < this.number_of_pages; i++) {
+          this.branches[i] = Object.create(null);
+        }
+
+        this.recompiler.setRom(this.rom);
+      }
     } else {
       this.number_of_pages = 0;
       this.romPageMask = 0;
