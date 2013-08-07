@@ -20,7 +20,6 @@
 'use strict';
 
 
-
 /**
  * @constructor
  * @param {JSSMS.Z80} cpu
@@ -162,7 +161,7 @@ Recompiler.prototype = {
       comment: true,
       renumber: true,
       hexadecimal: true,
-      parse: window['esprima']['parse']
+      parse: DEBUG ? window['esprima']['parse'] : function() {}
     });
   },
 
