@@ -25,8 +25,6 @@
  * @const
  */
 var whitelist = [
-  'F_CARRY', 'F_NEGATIVE', 'F_PARITY', 'F_OVERFLOW', 'F_BIT3', 'F_HALFCARRY', 'F_BIT5', 'F_ZERO', 'F_SIGN',
-  'BIT_0', 'BIT_1', 'BIT_2', 'BIT_3', 'BIT_4', 'BIT_5', 'BIT_6', 'BIT_7',
   'temp', 'location', 'JSSMS.Utils.rndInt'
 ];
 
@@ -94,8 +92,71 @@ Generator.prototype = {
                     tstates = 0;
                   }
 
+                  // Test tstates.
+                  /*var tStateCheck = [
+                    {
+                      'type': 'IfStatement',
+                      'test': {
+                        'type': 'LogicalExpression',
+                        'operator': '&&',
+                        'left': {
+                          'type': 'BinaryExpression',
+                          'operator': '<=',
+                          'left': {
+                            'type': 'Identifier',
+                            'name': 'tstates'
+                          },
+                          'right': {
+                            'type': 'Literal',
+                            'value': 0,
+                            'raw': '0'
+                          }
+                        },
+                        'right': {
+                          'type': 'CallExpression',
+                          'callee': {
+                            'type': 'Identifier',
+                            'name': 'eol'
+                          },
+                          'arguments': []
+                        }
+                      },
+                      'consequent': {
+                        'type': 'BlockStatement',
+                        'body': [
+                          {
+                            'type': 'ExpressionStatement',
+                            'expression': {
+                              'type': 'AssignmentExpression',
+                              'operator': '=',
+                              'left': {
+                                'type': 'Identifier',
+                                'name': 'pc'
+                              },
+                              'right': {
+                                'type': 'Literal',
+                                'value': bytecode.address + (bytecode.page * 0x4000)
+                              }
+                            }
+                          },
+                          {
+                            'type': 'ReturnStatement',
+                            'argument': null
+                          }
+                        ]
+                      },
+                      'alternate': null
+                    }
+                  ];
+
+                  if (DEBUG) {
+                    tStateCheck[0]['consequent']['body'][0]['expression']['right']['raw'] = toHex(tStateCheck[0]['consequent']['body'][0]['expression']['right']['value']);
+                  }
+
+                  bytecode.ast = [].concat(tStateCheck, bytecode.ast);*/
+
                   // Update `this.pc` statement.
-                  if (bytecode.isFunctionEnder && bytecode.nextAddress != null) {
+                  if (/*bytecode.isFunctionEnder &&*/ bytecode.nextAddress != null) {
                     var updatePcStmt = {
                       'type': 'ExpressionStatement',
                       'expression': {

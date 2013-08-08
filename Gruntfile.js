@@ -52,7 +52,7 @@ module.exports = function(grunt) {
           use_types_for_optimization: null,
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
-          //output_wrapper: '(function(window){%output%})(window);',
+          output_wrapper: '(function(window){%output%})(window);',
           define: [
             '"DEBUG=false"',
             '"ENABLE_DEBUGGER=false"',
@@ -155,7 +155,7 @@ module.exports = function(grunt) {
           use_types_for_optimization: null,
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
-          //output_wrapper: '(function(window){%output%})(window);',
+          output_wrapper: '(function(window){%output%})(window);',
           define: [
             '"DEBUG=false"',
             '"ENABLE_DEBUGGER=false"',

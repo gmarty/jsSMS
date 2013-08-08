@@ -1006,7 +1006,7 @@ var opcodeTable = [
   //0xC0
   {
     name: 'RET NZ',
-    ast: o.RET('==', 'F_ZERO')
+    ast: o.RET('==', F_ZERO)
   },
   //0xC1
   {
@@ -1016,7 +1016,7 @@ var opcodeTable = [
   //0xC2
   {
     name: 'JP NZ,(nn)',
-    ast: o.JP('==', 'F_ZERO')
+    ast: o.JP('==', F_ZERO)
   },
   //0xC3
   {
@@ -1026,7 +1026,7 @@ var opcodeTable = [
   //0xC4
   {
     name: 'CALL NZ (nn)',
-    ast: o.CALL('==', 'F_ZERO')
+    ast: o.CALL('==', F_ZERO)
   },
   //0xC5
   {
@@ -1046,7 +1046,7 @@ var opcodeTable = [
   //0xC8
   {
     name: 'RET Z',
-    ast: o.RET('!=', 'F_ZERO')
+    ast: o.RET('!=', F_ZERO)
   },
   //0xC9
   {
@@ -1056,14 +1056,14 @@ var opcodeTable = [
   //0xCA
   {
     name: 'JP Z,(nn)',
-    ast: o.JP('!=', 'F_ZERO')
+    ast: o.JP('!=', F_ZERO)
   },
   //0xCB
   opcodeTableCB,
   //0xCC
   {
     name: 'CALL Z (nn)',
-    ast: o.CALL('!=', 'F_ZERO')
+    ast: o.CALL('!=', F_ZERO)
   },
   //0xCD
   {
@@ -1083,7 +1083,7 @@ var opcodeTable = [
   //0xD0
   {
     name: 'RET NC',
-    ast: o.RET('==', 'F_CARRY')
+    ast: o.RET('==', F_CARRY)
   },
   //0xD1
   {
@@ -1093,7 +1093,7 @@ var opcodeTable = [
   //0xD2
   {
     name: 'JP NC,(nn)',
-    ast: o.JP('==', 'F_CARRY')
+    ast: o.JP('==', F_CARRY)
   },
   //0xD3
   {
@@ -1103,7 +1103,7 @@ var opcodeTable = [
   //0xD4
   {
     name: 'CALL NC (nn)',
-    ast: o.CALL('==', 'F_CARRY')
+    ast: o.CALL('==', F_CARRY)
   },
   //0xD5
   {
@@ -1123,7 +1123,7 @@ var opcodeTable = [
   //0xD8
   {
     name: 'RET C',
-    ast: o.RET('!=', 'F_CARRY')
+    ast: o.RET('!=', F_CARRY)
   },
   //0xD9
   {
@@ -1133,7 +1133,7 @@ var opcodeTable = [
   //0xDA
   {
     name: 'JP C,(nn)',
-    ast: o.JP('!=', 'F_CARRY')
+    ast: o.JP('!=', F_CARRY)
   },
   //0xDB
   {
@@ -1143,7 +1143,7 @@ var opcodeTable = [
   //0xDC
   {
     name: 'CALL C (nn)',
-    ast: o.CALL('!=', 'F_CARRY')
+    ast: o.CALL('!=', F_CARRY)
   },
   //0xDD
   generateIndexTable('IX'),
@@ -1160,7 +1160,7 @@ var opcodeTable = [
   //0xE0
   {
     name: 'RET PO',
-    ast: o.RET('==', 'F_PARITY')
+    ast: o.RET('==', F_PARITY)
   },
   //0xE1
   {
@@ -1170,7 +1170,7 @@ var opcodeTable = [
   //0xE2
   {
     name: 'JP PO,(nn)',
-    ast: o.JP('==', 'F_PARITY')
+    ast: o.JP('==', F_PARITY)
   },
   //0xE3
   {
@@ -1180,7 +1180,7 @@ var opcodeTable = [
   //0xE4
   {
     name: 'CALL PO (nn)',
-    ast: o.CALL('==', 'F_PARITY')
+    ast: o.CALL('==', F_PARITY)
   },
   //0xE5
   {
@@ -1200,7 +1200,7 @@ var opcodeTable = [
   //0xE8
   {
     name: 'RET PE',
-    ast: o.RET('!=', 'F_PARITY')
+    ast: o.RET('!=', F_PARITY)
   },
   //0xE9
   {
@@ -1210,7 +1210,7 @@ var opcodeTable = [
   //0xEA
   {
     name: 'JP PE,(nn)',
-    ast: o.JP('!=', 'F_PARITY')
+    ast: o.JP('!=', F_PARITY)
   },
   //0xEB
   {
@@ -1220,7 +1220,7 @@ var opcodeTable = [
   //0xEC
   {
     name: 'CALL PE (nn)',
-    ast: o.CALL('!=', 'F_PARITY')
+    ast: o.CALL('!=', F_PARITY)
   },
   //0xED
   opcodeTableED,
@@ -1237,7 +1237,7 @@ var opcodeTable = [
   //0xF0
   {
     name: 'RET P',
-    ast: o.RET('==', 'F_SIGN')
+    ast: o.RET('==', F_SIGN)
   },
   //0xF1
   {
@@ -1247,7 +1247,7 @@ var opcodeTable = [
   //0xF2
   {
     name: 'JP P,(nn)',
-    ast: o.JP('==', 'F_SIGN')
+    ast: o.JP('==', F_SIGN)
   },
   //0xF3
   {
@@ -1257,7 +1257,7 @@ var opcodeTable = [
   //0xF4
   {
     name: 'CALL P (nn)',
-    ast: o.CALL('==', 'F_SIGN')
+    ast: o.CALL('==', F_SIGN)
   },
   //0xF5
   {
@@ -1277,7 +1277,7 @@ var opcodeTable = [
   //0xF8
   {
     name: 'RET M',
-    ast: o.RET('!=', 'F_SIGN')
+    ast: o.RET('!=', F_SIGN)
   },
   //0xF9
   {
@@ -1287,7 +1287,7 @@ var opcodeTable = [
   //0xFA
   {
     name: 'JP M,(nn)',
-    ast: o.JP('!=', 'F_SIGN')
+    ast: o.JP('!=', F_SIGN)
   },
   //0xFB
   {
@@ -1297,7 +1297,7 @@ var opcodeTable = [
   //0xFC
   {
     name: 'CALL M (nn)',
-    ast: o.CALL('!=', 'F_SIGN')
+    ast: o.CALL('!=', F_SIGN)
   },
   //0xFD
   generateIndexTable('IY'),

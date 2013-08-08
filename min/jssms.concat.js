@@ -10984,6 +10984,7 @@ var Parser = function() {
 var UINT8 = 1;
 var INT8 = 2;
 var UINT16 = 3;
+var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128];
 var n = {IfStatement:function(test, consequent, alternate) {
   if(alternate == undefined) {
     alternate = null
@@ -11004,8 +11005,6 @@ var n = {IfStatement:function(test, consequent, alternate) {
     argument = null
   }
   return{"type":"ReturnStatement", "argument":argument}
-}, Register:function(name) {
-  return{"type":"Register", "name":name}
 }, Identifier:function(name) {
   return{"type":"Identifier", "name":name}
 }, Literal:function(value) {
@@ -11033,6 +11032,10 @@ var n = {IfStatement:function(test, consequent, alternate) {
   return{"type":"MemberExpression", "computed":true, "object":object, "property":property}
 }, ConditionalExpression:function(test, consequent, alternate) {
   return{"type":"ConditionalExpression", "test":test, "consequent":consequent, "alternate":alternate}
+}, Register:function(name) {
+  return{"type":"Register", "name":name}
+}, Bit:function(bitNumber) {
+  return n.Literal(BIT_TABLE[bitNumber])
 }};
 var o = {NOOP:function() {
   return function() {
@@ -11046,12 +11049,12 @@ var o = {NOOP:function() {
   }
   if(dstRegister1 == "i" && dstRegister2 == undefined) {
     return function() {
-      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), n.Register("i"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_CARRY")), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register(srcRegister))), n.ConditionalExpression(n.Identifier("iff2"), n.Identifier("F_PARITY"), n.Literal(0)))))]
+      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), n.Register("i"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register(srcRegister))), n.ConditionalExpression(n.Identifier("iff2"), n.Literal(F_PARITY), n.Literal(0)))))]
     }
   }
   if(dstRegister1 == "r" && dstRegister2 == undefined) {
     return function() {
-      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), REFRESH_EMULATION ? n.Register("r") : n.CallExpression("JSSMS.Utils.rndInt", n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_CARRY")), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register(srcRegister))), n.ConditionalExpression(n.Identifier("iff2"), n.Identifier("F_PARITY"), 
+      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), REFRESH_EMULATION ? n.Register("r") : n.CallExpression("JSSMS.Utils.rndInt", n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register(srcRegister))), n.ConditionalExpression(n.Identifier("iff2"), n.Literal(F_PARITY), 
       n.Literal(0)))))]
     }
   }
@@ -11210,7 +11213,7 @@ var o = {NOOP:function() {
   }
 }, SCF:function() {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_CARRY"))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_NEGATIVE")))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_HALFCARRY"))))]
+    return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))]
   }
 }, CCF:function() {
   return function() {
@@ -11279,21 +11282,21 @@ var o = {NOOP:function() {
 }, AND:function(register1, register2) {
   if(register1 == undefined && register2 == undefined) {
     return function(value, target, nextAddress) {
-      return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Literal(value))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Identifier("F_HALFCARRY"))))]
+      return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Literal(value))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))]
     }
   }
   if(register1 != "a" && register2 == undefined) {
     return function() {
-      return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Register(register1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Identifier("F_HALFCARRY"))))]
+      return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Register(register1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))]
     }
   }
   if(register1 == "a" && register2 == undefined) {
     return function() {
-      return n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Identifier("F_HALFCARRY"))))
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))
     }
   }else {
     return function() {
-      return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Identifier("F_HALFCARRY"))))]
+      return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))]
     }
   }
 }, XOR:function(register1, register2) {
@@ -11369,19 +11372,19 @@ var o = {NOOP:function() {
   }
 }, JRNZ:function() {
   return function(value, target) {
-    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_ZERO")), n.Literal(0))))(undefined, target)
+    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0))))(undefined, target)
   }
 }, JRZ:function() {
   return function(value, target) {
-    return o.JR(n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_ZERO")), n.Literal(0)))(undefined, target)
+    return o.JR(n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0)))(undefined, target)
   }
 }, JRNC:function() {
   return function(value, target) {
-    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_CARRY")), n.Literal(0))))(undefined, target)
+    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(0))))(undefined, target)
   }
 }, JRC:function() {
   return function(value, target) {
-    return o.JR(n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_CARRY")), n.Literal(0)))(undefined, target)
+    return o.JR(n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(0)))(undefined, target)
   }
 }, RET:function(operator, bitMask) {
   if(operator == undefined && bitMask == undefined) {
@@ -11390,7 +11393,7 @@ var o = {NOOP:function() {
     }
   }else {
     return function(value, target, nextAddress) {
-      return n.IfStatement(n.BinaryExpression(operator, n.BinaryExpression("&", n.Register("f"), n.Identifier(bitMask)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(6))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2))), n.ReturnStatement()]))
+      return n.IfStatement(n.BinaryExpression(operator, n.BinaryExpression("&", n.Register("f"), n.Literal(bitMask)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(6))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2))), n.ReturnStatement()]))
     }
   }
 }, JP:function(operator, bitMask) {
@@ -11405,7 +11408,7 @@ var o = {NOOP:function() {
     }
   }else {
     return function(value, target) {
-      return n.IfStatement(n.BinaryExpression(operator, n.BinaryExpression("&", n.Register("f"), n.Identifier(bitMask)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), n.ReturnStatement()]))
+      return n.IfStatement(n.BinaryExpression(operator, n.BinaryExpression("&", n.Register("f"), n.Literal(bitMask)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), n.ReturnStatement()]))
     }
   }
 }, CALL:function(operator, bitMask) {
@@ -11415,7 +11418,7 @@ var o = {NOOP:function() {
     }
   }else {
     return function(value, target, nextAddress) {
-      return n.IfStatement(n.BinaryExpression(operator, n.BinaryExpression("&", n.Register("f"), n.Identifier(bitMask)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(7))), n.ExpressionStatement(n.CallExpression("push1", n.Literal(nextAddress))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), n.ReturnStatement()]))
+      return n.IfStatement(n.BinaryExpression(operator, n.BinaryExpression("&", n.Register("f"), n.Literal(bitMask)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(7))), n.ExpressionStatement(n.CallExpression("push1", n.Literal(nextAddress))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), n.ReturnStatement()]))
     }
   }
 }, RST:function(targetAddress) {
@@ -11447,7 +11450,7 @@ var o = {NOOP:function() {
     }
   }else {
     return function(value, target, nextAddress) {
-      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.CallExpression("port.in_", n.Register(register2)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_CARRY")), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register(register1)))))]
+      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.CallExpression("port.in_", n.Register(register2)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register(register1)))))]
     }
   }
 }, EX_AF:function() {
@@ -11479,17 +11482,17 @@ var o = {NOOP:function() {
 }, RLC:generateCBFunctions("rlc"), RRC:generateCBFunctions("rrc"), RL:generateCBFunctions("rl"), RR:generateCBFunctions("rr"), SLA:generateCBFunctions("sla"), SRA:generateCBFunctions("sra"), SLL:generateCBFunctions("sll"), SRL:generateCBFunctions("srl"), BIT:function(bit, register1, register2) {
   if(register2 == undefined) {
     return function() {
-      return n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", n.Register(register1), n.Identifier("BIT_" + bit))))
+      return n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", n.Register(register1), n.Bit(bit))))
     }
   }else {
     if(register1 == "h" && register2 == "l") {
       return function() {
-        return n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())), n.Identifier("BIT_" + bit))))
+        return n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())), n.Bit(bit))))
       }
     }else {
       if(register1 == "i") {
         return function(value, target, nextAddress) {
-          return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.Identifier("BIT_" + bit))))]
+          return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.Bit(bit))))]
         }
       }
     }
@@ -11497,17 +11500,17 @@ var o = {NOOP:function() {
 }, RES:function(bit, register1, register2) {
   if(register2 == undefined) {
     return function() {
-      return n.ExpressionStatement(n.AssignmentExpression("&=", n.Register(register1), n.UnaryExpression("~", n.Identifier("BIT_" + bit))))
+      return n.ExpressionStatement(n.AssignmentExpression("&=", n.Register(register1), n.UnaryExpression("~", n.Bit(bit))))
     }
   }else {
     if(register1 == "h" && register2 == "l") {
       return function() {
-        return n.ExpressionStatement(n.CallExpression("writeMem", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())), n.UnaryExpression("~", n.Identifier("BIT_" + bit)))))
+        return n.ExpressionStatement(n.CallExpression("writeMem", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())), n.UnaryExpression("~", n.Bit(bit)))))
       }
     }else {
       if(register1 == "i") {
         return function(value, target, nextAddress) {
-          return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.UnaryExpression("~", n.Identifier("BIT_" + bit)))]))]
+          return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.UnaryExpression("~", n.Bit(bit)))]))]
         }
       }
     }
@@ -11515,17 +11518,17 @@ var o = {NOOP:function() {
 }, SET:function(bit, register1, register2) {
   if(register2 == undefined) {
     return function() {
-      return n.ExpressionStatement(n.AssignmentExpression("|=", n.Register(register1), n.Identifier("BIT_" + bit)))
+      return n.ExpressionStatement(n.AssignmentExpression("|=", n.Register(register1), n.Bit(bit)))
     }
   }else {
     if(register1 == "h" && register2 == "l") {
       return function() {
-        return n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + (register1 + register2).toUpperCase()), n.BinaryExpression("|", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())), n.Identifier("BIT_" + bit))]))
+        return n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + (register1 + register2).toUpperCase()), n.BinaryExpression("|", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())), n.Bit(bit))]))
       }
     }else {
       if(register1 == "i") {
         return function(value, target, nextAddress) {
-          return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.BinaryExpression("|", o.READ_MEM8(n.Identifier("location")), n.Identifier("BIT_" + bit))]))]
+          return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.BinaryExpression("|", o.READ_MEM8(n.Identifier("location")), n.Bit(bit))]))]
         }
       }
     }
@@ -11600,46 +11603,46 @@ var o = {NOOP:function() {
 }, INI:function() {
   return function(value, target, nextAddress) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("port.in_", n.Register("c")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("h" + "l").toUpperCase()), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
-    n.Register("f"), n.Identifier("F_NEGATIVE")))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_NEGATIVE"))))))]
+    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))]
   }
 }, OUTI:function() {
   return function(value, target, nextAddress) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), n.ExpressionStatement(n.CallExpression("incHL")), o.DEC8("b")(), n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
-    n.Identifier("F_CARRY"))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_HALFCARRY")))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_CARRY")))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_HALFCARRY"))))])), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), 
-    n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_NEGATIVE")))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_NEGATIVE"))))))]
+    n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))]
   }
 }, OUTD:function() {
   return function(value, target, nextAddress) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), n.ExpressionStatement(n.CallExpression("decHL")), o.DEC8("b")(), n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
-    n.Identifier("F_CARRY"))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_HALFCARRY")))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_CARRY")))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_HALFCARRY"))))])), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), 
-    n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_NEGATIVE")))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_NEGATIVE"))))))]
+    n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))]
   }
 }, LDI:function() {
   return function(value, target, nextAddress) {
     return[n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("incDE")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.BinaryExpression("!=", 
-    n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Identifier("F_PARITY"), n.Literal(0)))))]
+    n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Literal(F_PARITY), n.Literal(0)))))]
   }
 }, CPI:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Identifier("F_CARRY")), n.Identifier("F_NEGATIVE")))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("==", 
-    n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Literal(0), n.Identifier("F_PARITY")))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp"))))]
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("==", 
+    n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Literal(0), n.Literal(F_PARITY)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp"))))]
   }
 }, LDD:function() {
   return function(value, target, nextAddress) {
     return[n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("decDE")), n.ExpressionStatement(n.CallExpression("decHL")), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.BinaryExpression("!=", 
-    n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Identifier("F_PARITY"), n.Literal(0)))))]
+    n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Literal(F_PARITY), n.Literal(0)))))]
   }
 }, LDIR:function() {
   return function(value, target, nextAddress) {
     return[n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("incDE")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.CallExpression("decBC")), n.IfStatement(n.BinaryExpression("!=", n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", 
-    n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_PARITY"))), n.ReturnStatement()]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_PARITY"))))])), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_NEGATIVE")))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", 
-    n.Identifier("F_HALFCARRY"))))]
+    n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_PARITY))), n.ReturnStatement()]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_PARITY))))])), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", 
+    n.Literal(F_HALFCARRY))))]
   }
 }, OTIR:function() {
   return function(value, target, nextAddress) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression("!=", n.Register("b"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()])), 
-    n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_CARRY"))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_HALFCARRY")))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_CARRY")))), n.ExpressionStatement(n.AssignmentExpression("&=", 
-    n.Register("f"), n.UnaryExpression("~", n.Identifier("F_HALFCARRY"))))])), n.IfStatement(n.BinaryExpression("!=", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(0)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Identifier("F_NEGATIVE")))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Identifier("F_NEGATIVE"))))))]
+    n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", 
+    n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("!=", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(0)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))]
   }
 }, LD_RLC:generateIndexCBFunctions("rlc"), LD_RRC:generateIndexCBFunctions("rrc"), LD_RL:generateIndexCBFunctions("rl"), LD_RR:generateIndexCBFunctions("rr"), LD_SLA:generateIndexCBFunctions("sla"), LD_SRA:generateIndexCBFunctions("sra"), LD_SLL:generateIndexCBFunctions("sll"), LD_SRL:generateIndexCBFunctions("srl"), READ_MEM8:function(value) {
   return n.CallExpression("readMem", value)
@@ -11730,12 +11733,12 @@ ast:o.LD8("a", "d")}, {name:"LD A,E", ast:o.LD8("a", "e")}, {name:"LD A,H", ast:
 ast:o.ADC("b")}, {name:"ADC A,C", ast:o.ADC("c")}, {name:"ADC A,D", ast:o.ADC("d")}, {name:"ADC A,E", ast:o.ADC("e")}, {name:"ADC A,H", ast:o.ADC("h")}, {name:"ADC A,L", ast:o.ADC("l")}, {name:"ADC A,(HL)", ast:o.ADC("h", "l")}, {name:"ADC A,A", ast:o.ADC("a")}, {name:"SUB A,B", ast:o.SUB("b")}, {name:"SUB A,C", ast:o.SUB("c")}, {name:"SUB A,D", ast:o.SUB("d")}, {name:"SUB A,E", ast:o.SUB("e")}, {name:"SUB A,H", ast:o.SUB("h")}, {name:"SUB A,L", ast:o.SUB("l")}, {name:"SUB A,(HL)", ast:o.SUB("h", 
 "l")}, {name:"SUB A,A", ast:o.SUB("a")}, {name:"SBC A,B", ast:o.SBC("b")}, {name:"SBC A,C", ast:o.SBC("c")}, {name:"SBC A,D", ast:o.SBC("d")}, {name:"SBC A,E", ast:o.SBC("e")}, {name:"SBC A,H", ast:o.SBC("h")}, {name:"SBC A,L", ast:o.SBC("l")}, {name:"SBC A,(HL)", ast:o.SBC("h", "l")}, {name:"SBC A,A", ast:o.SBC("a")}, {name:"AND A,B", ast:o.AND("b")}, {name:"AND A,C", ast:o.AND("c")}, {name:"AND A,D", ast:o.AND("d")}, {name:"AND A,E", ast:o.AND("e")}, {name:"AND A,H", ast:o.AND("h")}, {name:"AND A,L", 
 ast:o.AND("l")}, {name:"AND A,(HL)", ast:o.AND("h", "l")}, {name:"AND A,A", ast:o.AND("a")}, {name:"XOR A,B", ast:o.XOR("b")}, {name:"XOR A,C", ast:o.XOR("c")}, {name:"XOR A,D", ast:o.XOR("d")}, {name:"XOR A,E", ast:o.XOR("e")}, {name:"XOR A,H", ast:o.XOR("h")}, {name:"XOR A,L", ast:o.XOR("l")}, {name:"XOR A,(HL)", ast:o.XOR("h", "l")}, {name:"XOR A,A", ast:o.XOR("a")}, {name:"OR A,B", ast:o.OR("b")}, {name:"OR A,C", ast:o.OR("c")}, {name:"OR A,D", ast:o.OR("d")}, {name:"OR A,E", ast:o.OR("e")}, 
-{name:"OR A,H", ast:o.OR("h")}, {name:"OR A,L", ast:o.OR("l")}, {name:"OR A,(HL)", ast:o.OR("h", "l")}, {name:"OR A,A", ast:o.OR("a")}, {name:"CP A,B", ast:o.CP("b")}, {name:"CP A,C", ast:o.CP("c")}, {name:"CP A,D", ast:o.CP("d")}, {name:"CP A,E", ast:o.CP("e")}, {name:"CP A,H", ast:o.CP("h")}, {name:"CP A,L", ast:o.CP("l")}, {name:"CP A,(HL)", ast:o.CP("h", "l")}, {name:"CP A,A", ast:o.CP("a")}, {name:"RET NZ", ast:o.RET("==", "F_ZERO")}, {name:"POP BC", ast:o.POP("b", "c")}, {name:"JP NZ,(nn)", 
-ast:o.JP("==", "F_ZERO")}, {name:"JP (nn)", ast:o.JP()}, {name:"CALL NZ (nn)", ast:o.CALL("==", "F_ZERO")}, {name:"PUSH BC", ast:o.PUSH("b", "c")}, {name:"ADD A,n", ast:o.ADD()}, {name:"RST 0x00", ast:o.RST(0)}, {name:"RET Z", ast:o.RET("!=", "F_ZERO")}, {name:"RET", ast:o.RET()}, {name:"JP Z,(nn)", ast:o.JP("!=", "F_ZERO")}, opcodeTableCB, {name:"CALL Z (nn)", ast:o.CALL("!=", "F_ZERO")}, {name:"CALL (nn)", ast:o.CALL()}, {name:"ADC A,n", ast:o.ADC()}, {name:"RST 0x08", ast:o.RST(8)}, {name:"RET NC", 
-ast:o.RET("==", "F_CARRY")}, {name:"POP DE", ast:o.POP("d", "e")}, {name:"JP NC,(nn)", ast:o.JP("==", "F_CARRY")}, {name:"OUT (n),A", ast:o.OUT("a")}, {name:"CALL NC (nn)", ast:o.CALL("==", "F_CARRY")}, {name:"PUSH DE", ast:o.PUSH("d", "e")}, {name:"SUB n", ast:o.SUB()}, {name:"RST 0x10", ast:o.RST(16)}, {name:"RET C", ast:o.RET("!=", "F_CARRY")}, {name:"EXX", ast:o.EXX()}, {name:"JP C,(nn)", ast:o.JP("!=", "F_CARRY")}, {name:"IN A,(n)", ast:o.IN("a")}, {name:"CALL C (nn)", ast:o.CALL("!=", "F_CARRY")}, 
-generateIndexTable("IX"), {name:"SBC A,n", ast:o.SBC()}, {name:"RST 0x18", ast:o.RST(24)}, {name:"RET PO", ast:o.RET("==", "F_PARITY")}, {name:"POP HL", ast:o.POP("h", "l")}, {name:"JP PO,(nn)", ast:o.JP("==", "F_PARITY")}, {name:"EX (SP),HL", ast:o.EX_SP_HL()}, {name:"CALL PO (nn)", ast:o.CALL("==", "F_PARITY")}, {name:"PUSH HL", ast:o.PUSH("h", "l")}, {name:"AND (n)", ast:o.AND()}, {name:"RST 0x20", ast:o.RST(32)}, {name:"RET PE", ast:o.RET("!=", "F_PARITY")}, {name:"JP (HL)", ast:o.JP("h", "l")}, 
-{name:"JP PE,(nn)", ast:o.JP("!=", "F_PARITY")}, {name:"EX DE,HL", ast:o.EX_DE_HL()}, {name:"CALL PE (nn)", ast:o.CALL("!=", "F_PARITY")}, opcodeTableED, {name:"XOR n", ast:o.XOR()}, {name:"RST 0x28", ast:o.RST(40)}, {name:"RET P", ast:o.RET("==", "F_SIGN")}, {name:"POP AF", ast:o.POP("a", "f")}, {name:"JP P,(nn)", ast:o.JP("==", "F_SIGN")}, {name:"DI", ast:o.DI()}, {name:"CALL P (nn)", ast:o.CALL("==", "F_SIGN")}, {name:"PUSH AF", ast:o.PUSH("a", "f")}, {name:"OR n", ast:o.OR()}, {name:"RST 0x30", 
-ast:o.RST(48)}, {name:"RET M", ast:o.RET("!=", "F_SIGN")}, {name:"LD SP,HL", ast:o.LD_SP("h", "l")}, {name:"JP M,(nn)", ast:o.JP("!=", "F_SIGN")}, {name:"EI", ast:o.EI()}, {name:"CALL M (nn)", ast:o.CALL("!=", "F_SIGN")}, generateIndexTable("IY"), {name:"CP n", ast:o.CP()}, {name:"RST 0x38", ast:o.RST(56)}];
+{name:"OR A,H", ast:o.OR("h")}, {name:"OR A,L", ast:o.OR("l")}, {name:"OR A,(HL)", ast:o.OR("h", "l")}, {name:"OR A,A", ast:o.OR("a")}, {name:"CP A,B", ast:o.CP("b")}, {name:"CP A,C", ast:o.CP("c")}, {name:"CP A,D", ast:o.CP("d")}, {name:"CP A,E", ast:o.CP("e")}, {name:"CP A,H", ast:o.CP("h")}, {name:"CP A,L", ast:o.CP("l")}, {name:"CP A,(HL)", ast:o.CP("h", "l")}, {name:"CP A,A", ast:o.CP("a")}, {name:"RET NZ", ast:o.RET("==", F_ZERO)}, {name:"POP BC", ast:o.POP("b", "c")}, {name:"JP NZ,(nn)", ast:o.JP("==", 
+F_ZERO)}, {name:"JP (nn)", ast:o.JP()}, {name:"CALL NZ (nn)", ast:o.CALL("==", F_ZERO)}, {name:"PUSH BC", ast:o.PUSH("b", "c")}, {name:"ADD A,n", ast:o.ADD()}, {name:"RST 0x00", ast:o.RST(0)}, {name:"RET Z", ast:o.RET("!=", F_ZERO)}, {name:"RET", ast:o.RET()}, {name:"JP Z,(nn)", ast:o.JP("!=", F_ZERO)}, opcodeTableCB, {name:"CALL Z (nn)", ast:o.CALL("!=", F_ZERO)}, {name:"CALL (nn)", ast:o.CALL()}, {name:"ADC A,n", ast:o.ADC()}, {name:"RST 0x08", ast:o.RST(8)}, {name:"RET NC", ast:o.RET("==", F_CARRY)}, 
+{name:"POP DE", ast:o.POP("d", "e")}, {name:"JP NC,(nn)", ast:o.JP("==", F_CARRY)}, {name:"OUT (n),A", ast:o.OUT("a")}, {name:"CALL NC (nn)", ast:o.CALL("==", F_CARRY)}, {name:"PUSH DE", ast:o.PUSH("d", "e")}, {name:"SUB n", ast:o.SUB()}, {name:"RST 0x10", ast:o.RST(16)}, {name:"RET C", ast:o.RET("!=", F_CARRY)}, {name:"EXX", ast:o.EXX()}, {name:"JP C,(nn)", ast:o.JP("!=", F_CARRY)}, {name:"IN A,(n)", ast:o.IN("a")}, {name:"CALL C (nn)", ast:o.CALL("!=", F_CARRY)}, generateIndexTable("IX"), {name:"SBC A,n", 
+ast:o.SBC()}, {name:"RST 0x18", ast:o.RST(24)}, {name:"RET PO", ast:o.RET("==", F_PARITY)}, {name:"POP HL", ast:o.POP("h", "l")}, {name:"JP PO,(nn)", ast:o.JP("==", F_PARITY)}, {name:"EX (SP),HL", ast:o.EX_SP_HL()}, {name:"CALL PO (nn)", ast:o.CALL("==", F_PARITY)}, {name:"PUSH HL", ast:o.PUSH("h", "l")}, {name:"AND (n)", ast:o.AND()}, {name:"RST 0x20", ast:o.RST(32)}, {name:"RET PE", ast:o.RET("!=", F_PARITY)}, {name:"JP (HL)", ast:o.JP("h", "l")}, {name:"JP PE,(nn)", ast:o.JP("!=", F_PARITY)}, 
+{name:"EX DE,HL", ast:o.EX_DE_HL()}, {name:"CALL PE (nn)", ast:o.CALL("!=", F_PARITY)}, opcodeTableED, {name:"XOR n", ast:o.XOR()}, {name:"RST 0x28", ast:o.RST(40)}, {name:"RET P", ast:o.RET("==", F_SIGN)}, {name:"POP AF", ast:o.POP("a", "f")}, {name:"JP P,(nn)", ast:o.JP("==", F_SIGN)}, {name:"DI", ast:o.DI()}, {name:"CALL P (nn)", ast:o.CALL("==", F_SIGN)}, {name:"PUSH AF", ast:o.PUSH("a", "f")}, {name:"OR n", ast:o.OR()}, {name:"RST 0x30", ast:o.RST(48)}, {name:"RET M", ast:o.RET("!=", F_SIGN)}, 
+{name:"LD SP,HL", ast:o.LD_SP("h", "l")}, {name:"JP M,(nn)", ast:o.JP("!=", F_SIGN)}, {name:"EI", ast:o.EI()}, {name:"CALL M (nn)", ast:o.CALL("!=", F_SIGN)}, generateIndexTable("IY"), {name:"CP n", ast:o.CP()}, {name:"RST 0x38", ast:o.RST(56)}];
 var Analyzer = function() {
   this.bytecodes = {};
   this.ast = [];
@@ -11861,7 +11864,7 @@ Optimizer.prototype = {optimize:function(functions) {
     return bytecodes
   })
 }};
-var whitelist = ["F_CARRY", "F_NEGATIVE", "F_PARITY", "F_OVERFLOW", "F_BIT3", "F_HALFCARRY", "F_BIT5", "F_ZERO", "F_SIGN", "BIT_0", "BIT_1", "BIT_2", "BIT_3", "BIT_4", "BIT_5", "BIT_6", "BIT_7", "temp", "location", "JSSMS.Utils.rndInt"];
+var whitelist = ["temp", "location", "JSSMS.Utils.rndInt"];
 var Generator = function() {
   this.ast = []
 };
