@@ -44,20 +44,20 @@ var regs = {
     if (reg != '(HL)') {
       opcodeTableDDCB.push({
         name: 'LD ' + reg + ',' + op + ' (IX)',
-        ast: o['LD_' + op].apply(null, ['i', 'x'].concat(regs[reg]))
+        ast: o['LD_' + op].apply(null, ['ixH', 'ixL'].concat(regs[reg]))
       });
       opcodeTableFDCB.push({
         name: 'LD ' + reg + ',' + op + ' (IY)',
-        ast: o['LD_' + op].apply(null, ['i', 'y'].concat(regs[reg]))
+        ast: o['LD_' + op].apply(null, ['iyH', 'iyL'].concat(regs[reg]))
       });
     } else {
       opcodeTableDDCB.push({
         name: op + ' (IX)',
-        ast: o['LD_' + op]('i', 'x')
+        ast: o['LD_' + op]('ixH', 'ixL')
       });
       opcodeTableFDCB.push({
         name: op + ' (IY)',
-        ast: o['LD_' + op]('i', 'y')
+        ast: o['LD_' + op]('iyH', 'iyL')
       });
     }
   }
@@ -74,11 +74,11 @@ var regs = {
     for (var j = 0; j < 8; j++) {
       opcodeTableDDCB.push({
         name: op + ' ' + i + ' (IX)',
-        ast: o[op].apply(null, [i].concat(['i', 'x']))
+        ast: o[op].apply(null, [i].concat(['ixH', 'ixL']))
       });
       opcodeTableFDCB.push({
         name: op + ' ' + i + ' (IY)',
-        ast: o[op].apply(null, [i].concat(['i', 'y']))
+        ast: o[op].apply(null, [i].concat(['iyH', 'iyL']))
       });
     }
   }

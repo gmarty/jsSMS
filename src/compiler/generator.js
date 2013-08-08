@@ -21,11 +21,11 @@
 
 
 /**
- * These properties shouldn't be preprended with `this`.
+ * These properties shouldn't be prepended with `this`.
  * @const
  */
 var whitelist = [
-  'temp', 'location', 'JSSMS.Utils.rndInt'
+  'temp', 'location', 'val', 'JSSMS.Utils.rndInt'
 ];
 
 

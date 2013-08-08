@@ -1923,13 +1923,13 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   REFRESH_EMULATION && this.incR();
   switch($opcode$$) {
     case 9:
-      this.setIX(this.add16(this.getIX(), this.getBC()));
+      this.setIXHIXL(this.add16(this.getIXHIXL(), this.getBC()));
       break;
     case 25:
-      this.setIX(this.add16(this.getIX(), this.getDE()));
+      this.setIXHIXL(this.add16(this.getIXHIXL(), this.getDE()));
       break;
     case 33:
-      this.setIX(this.readMemWord(this.pc));
+      this.setIXHIXL(this.readMemWord(this.pc));
       this.pc += 2;
       break;
     case 34:
@@ -1939,7 +1939,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc += 2;
       break;
     case 35:
-      this.incIX();
+      this.incIXHIXL();
       break;
     case 36:
       this.ixH = this.inc8(this.ixH);
@@ -1951,7 +1951,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.ixH = this.readMem(this.pc++);
       break;
     case 41:
-      this.setIX(this.add16(this.getIX(), this.getIX()));
+      this.setIXHIXL(this.add16(this.getIXHIXL(), this.getIXHIXL()));
       break;
     case 42:
       $location$$22_temp$$ = this.readMemWord(this.pc);
@@ -1960,7 +1960,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc += 2;
       break;
     case 43:
-      this.decIX();
+      this.decIXHIXL();
       break;
     case 44:
       this.ixL = this.inc8(this.ixL);
@@ -1972,19 +1972,19 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.ixL = this.readMem(this.pc++);
       break;
     case 52:
-      this.incMem(this.getIX() + this.d_());
+      this.incMem(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 53:
-      this.decMem(this.getIX() + this.d_());
+      this.decMem(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 54:
-      this.writeMem(this.getIX() + this.d_(), this.readMem(++this.pc));
+      this.writeMem(this.getIXHIXL() + this.d_(), this.readMem(++this.pc));
       this.pc++;
       break;
     case 57:
-      this.setIX(this.add16(this.getIX(), this.sp));
+      this.setIXHIXL(this.add16(this.getIXHIXL(), this.sp));
       break;
     case 68:
       this.b = this.ixH;
@@ -1993,7 +1993,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.b = this.ixL;
       break;
     case 70:
-      this.b = this.readMem(this.getIX() + this.d_());
+      this.b = this.readMem(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 76:
@@ -2003,7 +2003,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.c = this.ixL;
       break;
     case 78:
-      this.c = this.readMem(this.getIX() + this.d_());
+      this.c = this.readMem(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 84:
@@ -2013,7 +2013,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.d = this.ixL;
       break;
     case 86:
-      this.d = this.readMem(this.getIX() + this.d_());
+      this.d = this.readMem(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 92:
@@ -2023,7 +2023,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.e = this.ixL;
       break;
     case 94:
-      this.e = this.readMem(this.getIX() + this.d_());
+      this.e = this.readMem(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 96:
@@ -2044,7 +2044,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.ixH = this.ixL;
       break;
     case 102:
-      this.h = this.readMem(this.getIX() + this.d_());
+      this.h = this.readMem(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 103:
@@ -2068,38 +2068,38 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 109:
       break;
     case 110:
-      this.l = this.readMem(this.getIX() + this.d_());
+      this.l = this.readMem(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 111:
       this.ixL = this.a;
       break;
     case 112:
-      this.writeMem(this.getIX() + this.d_(), this.b);
+      this.writeMem(this.getIXHIXL() + this.d_(), this.b);
       this.pc++;
       break;
     case 113:
-      this.writeMem(this.getIX() + this.d_(), this.c);
+      this.writeMem(this.getIXHIXL() + this.d_(), this.c);
       this.pc++;
       break;
     case 114:
-      this.writeMem(this.getIX() + this.d_(), this.d);
+      this.writeMem(this.getIXHIXL() + this.d_(), this.d);
       this.pc++;
       break;
     case 115:
-      this.writeMem(this.getIX() + this.d_(), this.e);
+      this.writeMem(this.getIXHIXL() + this.d_(), this.e);
       this.pc++;
       break;
     case 116:
-      this.writeMem(this.getIX() + this.d_(), this.h);
+      this.writeMem(this.getIXHIXL() + this.d_(), this.h);
       this.pc++;
       break;
     case 117:
-      this.writeMem(this.getIX() + this.d_(), this.l);
+      this.writeMem(this.getIXHIXL() + this.d_(), this.l);
       this.pc++;
       break;
     case 119:
-      this.writeMem(this.getIX() + this.d_(), this.a);
+      this.writeMem(this.getIXHIXL() + this.d_(), this.a);
       this.pc++;
       break;
     case 124:
@@ -2109,7 +2109,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.a = this.ixL;
       break;
     case 126:
-      this.a = this.readMem(this.getIX() + this.d_());
+      this.a = this.readMem(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 132:
@@ -2119,7 +2119,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.add_a(this.ixL);
       break;
     case 134:
-      this.add_a(this.readMem(this.getIX() + this.d_()));
+      this.add_a(this.readMem(this.getIXHIXL() + this.d_()));
       this.pc++;
       break;
     case 140:
@@ -2129,7 +2129,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.adc_a(this.ixL);
       break;
     case 142:
-      this.adc_a(this.readMem(this.getIX() + this.d_()));
+      this.adc_a(this.readMem(this.getIXHIXL() + this.d_()));
       this.pc++;
       break;
     case 148:
@@ -2139,7 +2139,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.sub_a(this.ixL);
       break;
     case 150:
-      this.sub_a(this.readMem(this.getIX() + this.d_()));
+      this.sub_a(this.readMem(this.getIXHIXL() + this.d_()));
       this.pc++;
       break;
     case 156:
@@ -2149,7 +2149,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.sbc_a(this.ixL);
       break;
     case 158:
-      this.sbc_a(this.readMem(this.getIX() + this.d_()));
+      this.sbc_a(this.readMem(this.getIXHIXL() + this.d_()));
       this.pc++;
       break;
     case 164:
@@ -2159,7 +2159,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a &= this.ixL] | F_HALFCARRY;
       break;
     case 166:
-      this.f = this.SZP_TABLE[this.a &= this.readMem(this.getIX() + this.d_())] | F_HALFCARRY;
+      this.f = this.SZP_TABLE[this.a &= this.readMem(this.getIXHIXL() + this.d_())] | F_HALFCARRY;
       this.pc++;
       break;
     case 172:
@@ -2169,7 +2169,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a ^= this.ixL];
       break;
     case 174:
-      this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIX() + this.d_())];
+      this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIXHIXL() + this.d_())];
       this.pc++;
       break;
     case 180:
@@ -2179,7 +2179,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a |= this.ixL];
       break;
     case 182:
-      this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIX() + this.d_())];
+      this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIXHIXL() + this.d_())];
       this.pc++;
       break;
     case 188:
@@ -2189,19 +2189,19 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.cp_a(this.ixL);
       break;
     case 190:
-      this.cp_a(this.readMem(this.getIX() + this.d_()));
+      this.cp_a(this.readMem(this.getIXHIXL() + this.d_()));
       this.pc++;
       break;
     case 203:
-      this.doIndexCB(this.getIX());
+      this.doIndexCB(this.getIXHIXL());
       break;
     case 225:
-      this.setIX(this.readMemWord(this.sp));
+      this.setIXHIXL(this.readMemWord(this.sp));
       this.sp += 2;
       break;
     case 227:
-      $location$$22_temp$$ = this.getIX();
-      this.setIX(this.readMemWord(this.sp));
+      $location$$22_temp$$ = this.getIXHIXL();
+      this.setIXHIXL(this.readMemWord(this.sp));
       this.writeMem(this.sp, $location$$22_temp$$ & 255);
       this.writeMem(this.sp + 1, $location$$22_temp$$ >> 8);
       break;
@@ -2209,10 +2209,10 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.push2(this.ixH, this.ixL);
       break;
     case 233:
-      this.pc = this.getIX();
+      this.pc = this.getIXHIXL();
       break;
     case 249:
-      this.sp = this.getIX();
+      this.sp = this.getIXHIXL();
       break;
     default:
       JSSMS.Utils.console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex($opcode$$)), this.pc--
@@ -2222,13 +2222,13 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   REFRESH_EMULATION && this.incR();
   switch($location$$23_opcode$$3_temp$$) {
     case 9:
-      this.setIY(this.add16(this.getIY(), this.getBC()));
+      this.setIYHIYL(this.add16(this.getIYHIYL(), this.getBC()));
       break;
     case 25:
-      this.setIY(this.add16(this.getIY(), this.getDE()));
+      this.setIYHIYL(this.add16(this.getIYHIYL(), this.getDE()));
       break;
     case 33:
-      this.setIY(this.readMemWord(this.pc));
+      this.setIYHIYL(this.readMemWord(this.pc));
       this.pc += 2;
       break;
     case 34:
@@ -2238,7 +2238,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc += 2;
       break;
     case 35:
-      this.incIY();
+      this.incIYHIYL();
       break;
     case 36:
       this.iyH = this.inc8(this.iyH);
@@ -2250,7 +2250,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.iyH = this.readMem(this.pc++);
       break;
     case 41:
-      this.setIY(this.add16(this.getIY(), this.getIY()));
+      this.setIYHIYL(this.add16(this.getIYHIYL(), this.getIYHIYL()));
       break;
     case 42:
       $location$$23_opcode$$3_temp$$ = this.readMemWord(this.pc);
@@ -2259,7 +2259,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc += 2;
       break;
     case 43:
-      this.decIY();
+      this.decIYHIYL();
       break;
     case 44:
       this.iyL = this.inc8(this.iyL);
@@ -2271,19 +2271,19 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.iyL = this.readMem(this.pc++);
       break;
     case 52:
-      this.incMem(this.getIY() + this.d_());
+      this.incMem(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 53:
-      this.decMem(this.getIY() + this.d_());
+      this.decMem(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 54:
-      this.writeMem(this.getIY() + this.d_(), this.readMem(++this.pc));
+      this.writeMem(this.getIYHIYL() + this.d_(), this.readMem(++this.pc));
       this.pc++;
       break;
     case 57:
-      this.setIY(this.add16(this.getIY(), this.sp));
+      this.setIYHIYL(this.add16(this.getIYHIYL(), this.sp));
       break;
     case 68:
       this.b = this.iyH;
@@ -2292,7 +2292,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.b = this.iyL;
       break;
     case 70:
-      this.b = this.readMem(this.getIY() + this.d_());
+      this.b = this.readMem(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 76:
@@ -2302,7 +2302,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.c = this.iyL;
       break;
     case 78:
-      this.c = this.readMem(this.getIY() + this.d_());
+      this.c = this.readMem(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 84:
@@ -2312,7 +2312,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.d = this.iyL;
       break;
     case 86:
-      this.d = this.readMem(this.getIY() + this.d_());
+      this.d = this.readMem(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 92:
@@ -2322,7 +2322,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.e = this.iyL;
       break;
     case 94:
-      this.e = this.readMem(this.getIY() + this.d_());
+      this.e = this.readMem(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 96:
@@ -2343,7 +2343,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.iyH = this.iyL;
       break;
     case 102:
-      this.h = this.readMem(this.getIY() + this.d_());
+      this.h = this.readMem(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 103:
@@ -2367,38 +2367,38 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 109:
       break;
     case 110:
-      this.l = this.readMem(this.getIY() + this.d_());
+      this.l = this.readMem(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 111:
       this.iyL = this.a;
       break;
     case 112:
-      this.writeMem(this.getIY() + this.d_(), this.b);
+      this.writeMem(this.getIYHIYL() + this.d_(), this.b);
       this.pc++;
       break;
     case 113:
-      this.writeMem(this.getIY() + this.d_(), this.c);
+      this.writeMem(this.getIYHIYL() + this.d_(), this.c);
       this.pc++;
       break;
     case 114:
-      this.writeMem(this.getIY() + this.d_(), this.d);
+      this.writeMem(this.getIYHIYL() + this.d_(), this.d);
       this.pc++;
       break;
     case 115:
-      this.writeMem(this.getIY() + this.d_(), this.e);
+      this.writeMem(this.getIYHIYL() + this.d_(), this.e);
       this.pc++;
       break;
     case 116:
-      this.writeMem(this.getIY() + this.d_(), this.h);
+      this.writeMem(this.getIYHIYL() + this.d_(), this.h);
       this.pc++;
       break;
     case 117:
-      this.writeMem(this.getIY() + this.d_(), this.l);
+      this.writeMem(this.getIYHIYL() + this.d_(), this.l);
       this.pc++;
       break;
     case 119:
-      this.writeMem(this.getIY() + this.d_(), this.a);
+      this.writeMem(this.getIYHIYL() + this.d_(), this.a);
       this.pc++;
       break;
     case 124:
@@ -2408,7 +2408,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.a = this.iyL;
       break;
     case 126:
-      this.a = this.readMem(this.getIY() + this.d_());
+      this.a = this.readMem(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 132:
@@ -2418,7 +2418,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.add_a(this.iyL);
       break;
     case 134:
-      this.add_a(this.readMem(this.getIY() + this.d_()));
+      this.add_a(this.readMem(this.getIYHIYL() + this.d_()));
       this.pc++;
       break;
     case 140:
@@ -2428,7 +2428,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.adc_a(this.iyL);
       break;
     case 142:
-      this.adc_a(this.readMem(this.getIY() + this.d_()));
+      this.adc_a(this.readMem(this.getIYHIYL() + this.d_()));
       this.pc++;
       break;
     case 148:
@@ -2438,7 +2438,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.sub_a(this.iyL);
       break;
     case 150:
-      this.sub_a(this.readMem(this.getIY() + this.d_()));
+      this.sub_a(this.readMem(this.getIYHIYL() + this.d_()));
       this.pc++;
       break;
     case 156:
@@ -2448,7 +2448,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.sbc_a(this.iyL);
       break;
     case 158:
-      this.sbc_a(this.readMem(this.getIY() + this.d_()));
+      this.sbc_a(this.readMem(this.getIYHIYL() + this.d_()));
       this.pc++;
       break;
     case 164:
@@ -2458,7 +2458,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a &= this.iyL] | F_HALFCARRY;
       break;
     case 166:
-      this.f = this.SZP_TABLE[this.a &= this.readMem(this.getIY() + this.d_())] | F_HALFCARRY;
+      this.f = this.SZP_TABLE[this.a &= this.readMem(this.getIYHIYL() + this.d_())] | F_HALFCARRY;
       this.pc++;
       break;
     case 172:
@@ -2468,7 +2468,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a ^= this.iyL];
       break;
     case 174:
-      this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIY() + this.d_())];
+      this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIYHIYL() + this.d_())];
       this.pc++;
       break;
     case 180:
@@ -2478,7 +2478,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a |= this.iyL];
       break;
     case 182:
-      this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIY() + this.d_())];
+      this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIYHIYL() + this.d_())];
       this.pc++;
       break;
     case 188:
@@ -2488,19 +2488,19 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.cp_a(this.iyL);
       break;
     case 190:
-      this.cp_a(this.readMem(this.getIY() + this.d_()));
+      this.cp_a(this.readMem(this.getIYHIYL() + this.d_()));
       this.pc++;
       break;
     case 203:
-      this.doIndexCB(this.getIY());
+      this.doIndexCB(this.getIYHIYL());
       break;
     case 225:
-      this.setIY(this.readMemWord(this.sp));
+      this.setIYHIYL(this.readMemWord(this.sp));
       this.sp += 2;
       break;
     case 227:
-      $location$$23_opcode$$3_temp$$ = this.getIY();
-      this.setIY(this.readMemWord(this.sp));
+      $location$$23_opcode$$3_temp$$ = this.getIYHIYL();
+      this.setIYHIYL(this.readMemWord(this.sp));
       this.writeMem(this.sp, $location$$23_opcode$$3_temp$$ & 255);
       this.writeMem(this.sp + 1, $location$$23_opcode$$3_temp$$ >> 8);
       break;
@@ -2508,10 +2508,10 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.push2(this.iyH, this.iyL);
       break;
     case 233:
-      this.pc = this.getIY();
+      this.pc = this.getIYHIYL();
       break;
     case 249:
-      this.sp = this.getIY();
+      this.sp = this.getIYHIYL();
       break;
     default:
       JSSMS.Utils.console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex($location$$23_opcode$$3_temp$$)), this.pc--
@@ -3627,9 +3627,9 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   return this.d << 8 | this.e
 }, getHL:function $JSSMS$Z80$$getHL$() {
   return this.h << 8 | this.l
-}, getIX:function $JSSMS$Z80$$getIX$() {
+}, getIXHIXL:function $JSSMS$Z80$$getIXHIXL$() {
   return this.ixH << 8 | this.ixL
-}, getIY:function $JSSMS$Z80$$getIY$() {
+}, getIYHIYL:function $JSSMS$Z80$$getIYHIYL$() {
   return this.iyH << 8 | this.iyL
 }, setBC:function $JSSMS$Z80$$setBC$($value$$) {
   this.b = $value$$ >> 8;
@@ -3643,10 +3643,10 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
 }, setAF:function $JSSMS$Z80$$setAF$($value$$) {
   this.a = $value$$ >> 8;
   this.f = $value$$ & 255
-}, setIX:function $JSSMS$Z80$$setIX$($value$$) {
+}, setIXHIXL:function $JSSMS$Z80$$setIXHIXL$($value$$) {
   this.ixH = $value$$ >> 8;
   this.ixL = $value$$ & 255
-}, setIY:function $JSSMS$Z80$$setIY$($value$$) {
+}, setIYHIYL:function $JSSMS$Z80$$setIYHIYL$($value$$) {
   this.iyH = $value$$ >> 8;
   this.iyL = $value$$ & 255
 }, incBC:function $JSSMS$Z80$$incBC$() {
@@ -3658,10 +3658,10 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
 }, incHL:function $JSSMS$Z80$$incHL$() {
   this.l = this.l + 1 & 255;
   0 == this.l && (this.h = this.h + 1 & 255)
-}, incIX:function $JSSMS$Z80$$incIX$() {
+}, incIXHIXL:function $JSSMS$Z80$$incIXHIXL$() {
   this.ixL = this.ixL + 1 & 255;
   0 == this.ixL && (this.ixH = this.ixH + 1 & 255)
-}, incIY:function $JSSMS$Z80$$incIY$() {
+}, incIYHIYL:function $JSSMS$Z80$$incIYHIYL$() {
   this.iyL = this.iyL + 1 & 255;
   0 == this.iyL && (this.iyH = this.iyH + 1 & 255)
 }, decBC:function $JSSMS$Z80$$decBC$() {
@@ -3673,10 +3673,10 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
 }, decHL:function $JSSMS$Z80$$decHL$() {
   this.l = this.l - 1 & 255;
   255 == this.l && (this.h = this.h - 1 & 255)
-}, decIX:function $JSSMS$Z80$$decIX$() {
+}, decIXHIXL:function $JSSMS$Z80$$decIXHIXL$() {
   this.ixL = this.ixL - 1 & 255;
   255 == this.ixL && (this.ixH = this.ixH - 1 & 255)
-}, decIY:function $JSSMS$Z80$$decIY$() {
+}, decIYHIYL:function $JSSMS$Z80$$decIYHIYL$() {
   this.iyL = this.iyL - 1 & 255;
   255 == this.iyL && (this.iyH = this.iyH - 1 & 255)
 }, inc8:function $JSSMS$Z80$$inc8$($value$$) {
@@ -3984,7 +3984,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   $state$$[2] = this.a | this.a2 << 8 | this.f << 16 | this.f2 << 24;
   $state$$[3] = this.getBC() | this.getDE() << 16;
   $state$$[4] = this.getHL() | this.r << 16 | this.i << 24;
-  $state$$[5] = this.getIX() | this.getIY() << 16;
+  $state$$[5] = this.getIXHIXL() | this.getIYHIYL() << 16;
   this.exBC();
   this.exDE();
   this.exHL();
@@ -4017,8 +4017,8 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   this.r = $temp$$ >> 16 & 255;
   this.i = $temp$$ >> 24 & 255;
   $temp$$ = $state$$[5];
-  this.setIX($temp$$ & 65535);
-  this.setIY($temp$$ >> 16 & 65535);
+  this.setIXHIXL($temp$$ & 65535);
+  this.setIYHIYL($temp$$ >> 16 & 65535);
   this.exBC();
   this.exDE();
   this.exHL();
@@ -9420,6 +9420,8 @@ var UINT8 = 1, INT8 = 2, UINT16 = 3, BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], 
 }, ReturnStatement:function($argument$$) {
   void 0 == $argument$$ && ($argument$$ = null);
   return{type:"ReturnStatement", argument:$argument$$}
+}, VariableDeclaration:function($name$$, $init$$) {
+  return{type:"VariableDeclaration", declarations:[{type:"VariableDeclarator", id:{type:"Identifier", name:$name$$}, init:$init$$}], kind:"var"}
 }, Identifier:function($name$$) {
   return{type:"Identifier", name:$name$$}
 }, Literal:function($value$$) {
@@ -9445,7 +9447,9 @@ var UINT8 = 1, INT8 = 2, UINT16 = 3, BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], 
   return{type:"Register", name:$name$$}
 }, Bit:function($bitNumber$$) {
   return n.Literal(BIT_TABLE[$bitNumber$$])
-}}, o = {NOOP:function() {
+}}, o = {SET16:function($register1$$, $register2$$, $value$$) {
+  return[n.VariableDeclaration("val", $value$$), n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.BinaryExpression(">>", n.Identifier("val"), n.Literal(8)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register2$$), n.BinaryExpression("&", n.Identifier("val"), n.Literal(255))))]
+}, NOOP:function() {
   return function() {
   }
 }, LD8:function($srcRegister$$, $dstRegister1$$, $dstRegister2$$) {
@@ -9470,12 +9474,12 @@ var UINT8 = 1, INT8 = 2, UINT16 = 3, BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], 
 }, LD16:function($srcRegister1$$, $srcRegister2$$, $dstRegister1$$, $dstRegister2$$) {
   if(void 0 == $dstRegister1$$ && void 0 == $dstRegister2$$) {
     return function($value$$) {
-      return n.ExpressionStatement(n.CallExpression("set" + ($srcRegister1$$ + $srcRegister2$$).toUpperCase(), n.Literal($value$$)))
+      return o.SET16($srcRegister1$$, $srcRegister2$$, n.Literal($value$$))
     }
   }
   if("n" == $dstRegister1$$ && "n" == $dstRegister2$$) {
     return function($value$$) {
-      return n.ExpressionStatement(n.CallExpression("set" + ($srcRegister1$$ + $srcRegister2$$).toUpperCase(), o.READ_MEM16(n.Literal($value$$))))
+      return o.SET16($srcRegister1$$, $srcRegister2$$, o.READ_MEM16(n.Literal($value$$)))
     }
   }
   throw Error("Wrong parameters number");
@@ -9527,9 +9531,9 @@ var UINT8 = 1, INT8 = 2, UINT16 = 3, BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], 
   }
 }, ADD16:function($register1$$, $register2$$, $register3$$, $register4$$) {
   return void 0 == $register4$$ ? function() {
-    return n.ExpressionStatement(n.CallExpression("set" + ($register1$$ + $register2$$).toUpperCase(), n.CallExpression("add16", [n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Register($register3$$)])))
+    return o.SET16($register1$$, $register2$$, n.CallExpression("add16", [n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Register($register3$$)]))
   } : function() {
-    return n.ExpressionStatement(n.CallExpression("set" + ($register1$$ + $register2$$).toUpperCase(), n.CallExpression("add16", [n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.CallExpression("get" + ($register3$$ + $register4$$).toUpperCase())])))
+    return o.SET16($register1$$, $register2$$, n.CallExpression("add16", [n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.CallExpression("get" + ($register3$$ + $register4$$).toUpperCase())]))
   }
 }, ADC16:function($register1$$, $register2$$) {
   return void 0 == $register2$$ ? function() {
@@ -9641,7 +9645,7 @@ var UINT8 = 1, INT8 = 2, UINT16 = 3, BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], 
   }
 }, POP:function($register1$$, $register2$$) {
   return function() {
-    return[n.ExpressionStatement(n.CallExpression("set" + ($register1$$ + $register2$$).toUpperCase(), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2)))]
+    return[].concat(o.SET16($register1$$, $register2$$, o.READ_MEM16(n.Identifier("sp"))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2))))
   }
 }, PUSH:function($register1$$, $register2$$) {
   return function() {
@@ -9827,8 +9831,8 @@ var UINT8 = 1, INT8 = 2, UINT16 = 3, BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], 
   }
 }, EX_SP_X:function($register1$$, $register2$$) {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()))), n.ExpressionStatement(n.CallExpression("set" + ($register1$$ + $register2$$).toUpperCase(), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("sp"), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(255))])), n.ExpressionStatement(n.CallExpression("writeMem", [n.BinaryExpression("+", n.Identifier("sp"), 
-    n.Literal(1)), n.BinaryExpression(">>", n.Identifier("sp"), n.Literal(8))]))]
+    return[].concat(n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()))), o.SET16($register1$$, $register2$$, o.READ_MEM16(n.Identifier("sp"))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("sp"), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(255))])), n.ExpressionStatement(n.CallExpression("writeMem", [n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1)), n.BinaryExpression(">>", 
+    n.Identifier("sp"), n.Literal(8))])))
   }
 }, JP_X:function($register1$$, $register2$$) {
   return function($value$$, $target$$, $nextAddress$$) {
@@ -9919,8 +9923,8 @@ function generateIndexCBFunctions($fn$$) {
 ;var opcodeTableCB = [], opcodeTableDDCB = [], opcodeTableFDCB = [], regs = {B:["b"], C:["c"], D:["d"], E:["e"], H:["h"], L:["l"], "(HL)":["h", "l"], A:["a"]};
 "RLC RRC RL RR SLA SRA SLL SRL".split(" ").forEach(function($op$$) {
   for(var $reg$$ in regs) {
-    opcodeTableCB.push({name:$op$$ + " " + $reg$$, ast:o[$op$$].apply(null, regs[$reg$$])}), "(HL)" != $reg$$ ? (opcodeTableDDCB.push({name:"LD " + $reg$$ + "," + $op$$ + " (IX)", ast:o["LD_" + $op$$].apply(null, ["i", "x"].concat(regs[$reg$$]))}), opcodeTableFDCB.push({name:"LD " + $reg$$ + "," + $op$$ + " (IY)", ast:o["LD_" + $op$$].apply(null, ["i", "y"].concat(regs[$reg$$]))})) : (opcodeTableDDCB.push({name:$op$$ + " (IX)", ast:o["LD_" + $op$$]("i", "x")}), opcodeTableFDCB.push({name:$op$$ + 
-    " (IY)", ast:o["LD_" + $op$$]("i", "y")}))
+    opcodeTableCB.push({name:$op$$ + " " + $reg$$, ast:o[$op$$].apply(null, regs[$reg$$])}), "(HL)" != $reg$$ ? (opcodeTableDDCB.push({name:"LD " + $reg$$ + "," + $op$$ + " (IX)", ast:o["LD_" + $op$$].apply(null, ["ixH", "ixL"].concat(regs[$reg$$]))}), opcodeTableFDCB.push({name:"LD " + $reg$$ + "," + $op$$ + " (IY)", ast:o["LD_" + $op$$].apply(null, ["iyH", "iyL"].concat(regs[$reg$$]))})) : (opcodeTableDDCB.push({name:$op$$ + " (IX)", ast:o["LD_" + $op$$]("ixH", "ixL")}), opcodeTableFDCB.push({name:$op$$ + 
+    " (IY)", ast:o["LD_" + $op$$]("iyH", "iyL")}))
   }
 });
 ["BIT", "RES", "SET"].forEach(function($op$$) {
@@ -9929,21 +9933,22 @@ function generateIndexCBFunctions($fn$$) {
       opcodeTableCB.push({name:$op$$ + " " + $i$$ + "," + $reg$$, ast:o[$op$$].apply(null, [$i$$].concat(regs[$reg$$]))})
     }
     for(var $j$$ = 0;8 > $j$$;$j$$++) {
-      opcodeTableDDCB.push({name:$op$$ + " " + $i$$ + " (IX)", ast:o[$op$$].apply(null, [$i$$].concat(["i", "x"]))}), opcodeTableFDCB.push({name:$op$$ + " " + $i$$ + " (IY)", ast:o[$op$$].apply(null, [$i$$].concat(["i", "y"]))})
+      opcodeTableDDCB.push({name:$op$$ + " " + $i$$ + " (IX)", ast:o[$op$$].apply(null, [$i$$].concat(["ixH", "ixL"]))}), opcodeTableFDCB.push({name:$op$$ + " " + $i$$ + " (IY)", ast:o[$op$$].apply(null, [$i$$].concat(["iyH", "iyL"]))})
     }
   }
 });
 function generateIndexTable($index$$) {
-  var $register2$$ = $index$$.substring(1, 2), $register2LC$$ = $index$$.substring(1, 2).toLowerCase();
-  return{9:{name:"ADD " + $index$$ + ",BC", ast:o.ADD16("i", $register2$$, "b", "c")}, 25:{name:"ADD " + $index$$ + ",DE", ast:o.ADD16("i", $register2$$, "d", "e")}, 33:{name:"LD " + $index$$ + ",nn", ast:o.LD16("i", $register2$$)}, 34:{name:"LD (nn)," + $index$$, ast:o.LD_NN("i" + $register2LC$$ + "H", "i" + $register2LC$$ + "L")}, 35:{name:"INC " + $index$$, ast:o.INC16("i", $register2$$)}, 42:{name:"LD " + $index$$ + ",(nn)", ast:o.LD16("i", $register2$$, "n", "n"), operand:UINT16}, 43:{name:"DEC " + 
-  $index$$, ast:o.DEC16("i", $register2$$)}, 52:{name:"INC (" + $index$$ + "+d)", ast:o.INC_X("i", $register2$$)}, 53:{name:"DEC (" + $index$$ + "+d)", ast:o.DEC_X("i", $register2$$)}, 54:{name:"LD (" + $index$$ + "+d),n", ast:o.LD_X("i", $register2$$)}, 70:{name:"LD B,(" + $index$$ + "+d)", ast:o.LD8_D("b", "i", $register2$$)}, 78:{name:"LD C,(" + $index$$ + "+d)", ast:o.LD8_D("c", "i", $register2$$)}, 84:{name:" LD D," + $index$$ + "H *", ast:o.LD8("d", "i" + $register2LC$$ + "H")}, 86:{name:"LD D,(" + 
-  $index$$ + "+d)", ast:o.LD8_D("d", "i", $register2$$)}, 93:{name:"LD E," + $index$$ + "L *", ast:o.LD8("e", "i" + $register2LC$$ + "L")}, 94:{name:"LD E,(" + $index$$ + "+d)", ast:o.LD8_D("e", "i", $register2$$)}, 96:{name:"LD " + $index$$ + "H,B", ast:o.LD8("i" + $register2LC$$ + "H", "b")}, 97:{name:"LD " + $index$$ + "H,C", ast:o.LD8("i" + $register2LC$$ + "H", "c")}, 98:{name:"LD " + $index$$ + "H,D", ast:o.LD8("i" + $register2LC$$ + "H", "d")}, 99:{name:"LD " + $index$$ + "H,E", ast:o.LD8("i" + 
-  $register2LC$$ + "H", "e")}, 100:{name:"LD " + $index$$ + "H," + $index$$ + "H", ast:o.NOOP()}, 101:{name:"LD " + $index$$ + "H," + $index$$ + "L *", ast:o.LD8_D("i" + $register2LC$$ + "H", "i" + $register2LC$$ + "L")}, 102:{name:"LD H,(" + $index$$ + "+d)", ast:o.LD8_D("h", "i", $register2$$)}, 103:{name:"LD " + $index$$ + "H,A", ast:o.LD8("i" + $register2LC$$ + "H", "a")}, 104:{name:"LD " + $index$$ + "L,B", ast:o.LD8("i" + $register2LC$$ + "L", "b")}, 105:{name:"LD " + $index$$ + "L,C", ast:o.LD8("i" + 
-  $register2LC$$ + "L", "c")}, 106:{name:"LD " + $index$$ + "L,D", ast:o.LD8("i" + $register2LC$$ + "L", "d")}, 107:{name:"LD " + $index$$ + "L,E", ast:o.LD8("i" + $register2LC$$ + "L", "e")}, 108:{name:"LD " + $index$$ + "L," + $index$$ + "H", ast:o.LD8_D("i" + $register2LC$$ + "L", "i" + $register2LC$$ + "H")}, 109:{name:"LD " + $index$$ + "L," + $index$$ + "L *", ast:o.NOOP()}, 110:{name:"LD L,(" + $index$$ + "+d)", ast:o.LD8_D("l", "i", $register2$$)}, 111:{name:"LD " + $index$$ + "L,A *", ast:o.LD8("i" + 
-  $register2LC$$ + "L", "a")}, 112:{name:"LD (" + $index$$ + "+d),B", ast:o.LD_X("b", "i", $register2$$)}, 113:{name:"LD (" + $index$$ + "+d),C", ast:o.LD_X("c", "i", $register2$$)}, 114:{name:"LD (" + $index$$ + "+d),D", ast:o.LD_X("d", "i", $register2$$)}, 115:{name:"LD (" + $index$$ + "+d),E", ast:o.LD_X("e", "i", $register2$$)}, 116:{name:"LD (" + $index$$ + "+d),H", ast:o.LD_X("h", "i", $register2$$)}, 117:{name:"LD (" + $index$$ + "+d),L", ast:o.LD_X("l", "i", $register2$$)}, 118:{name:"LD (" + 
-  $index$$ + "+d),B", ast:o.LD_X("b", "i", $register2$$)}, 119:{name:"LD (" + $index$$ + "+d),A", ast:o.LD_X("a", "i", $register2$$)}, 126:{name:"LD A,(" + $index$$ + "+d)", ast:o.LD8_D("a", "i", $register2$$)}, 124:{name:"LD A," + $index$$ + "H", ast:o.LD8("a", "i" + $register2LC$$ + "H")}, 125:{name:"LD A," + $index$$ + "L", ast:o.LD8("a", "i" + $register2LC$$ + "L")}, 134:{name:"ADD A,(" + $index$$ + "+d)", ast:o.ADD_X("i", $register2$$)}, 142:{name:"ADC A,(" + $index$$ + "+d)", ast:o.ADC_X("i", 
-  $register2$$)}, 150:{name:"SUB A,(" + $index$$ + "+d)", ast:o.SUB_X("i", $register2$$)}, 158:{name:"SBC A,(" + $index$$ + "+d)", ast:o.SBC_X("i", $register2$$)}, 203:"IX" == $index$$ ? opcodeTableDDCB : opcodeTableFDCB, 182:{name:"OR A,(" + $index$$ + "+d)", ast:o.OR_X("i", $register2$$)}, 190:{name:"CP (" + $index$$ + "+d)", ast:o.CP_X("i", $register2$$)}, 225:{name:"POP " + $index$$, ast:o.POP("i", $register2$$)}, 227:{name:"EX SP,(" + $index$$ + ")", ast:o.EX_SP_X("i", $register2$$)}, 229:{name:"PUSH " + 
-  $index$$, ast:o.PUSH("i" + $register2LC$$ + "H", "i" + $register2LC$$ + "L")}, 233:{name:"JP (" + $index$$ + ")", ast:o.JP_X("i", $register2$$)}, 249:{name:"LD SP," + $index$$, ast:o.LD_SP("i", $register2$$)}}
+  var $register_registerL$$ = $index$$.substring(1, 2).toLowerCase(), $registerH$$ = "i" + $register_registerL$$ + "H", $register_registerL$$ = "i" + $register_registerL$$ + "L";
+  return{9:{name:"ADD " + $index$$ + ",BC", ast:o.ADD16($registerH$$, $register_registerL$$, "b", "c")}, 25:{name:"ADD " + $index$$ + ",DE", ast:o.ADD16($registerH$$, $register_registerL$$, "d", "e")}, 33:{name:"LD " + $index$$ + ",nn", ast:o.LD16($registerH$$, $register_registerL$$)}, 34:{name:"LD (nn)," + $index$$, ast:o.LD_NN($registerH$$, $register_registerL$$)}, 35:{name:"INC " + $index$$, ast:o.INC16($registerH$$, $register_registerL$$)}, 42:{name:"LD " + $index$$ + ",(nn)", ast:o.LD16($registerH$$, 
+  $register_registerL$$, "n", "n"), operand:UINT16}, 43:{name:"DEC " + $index$$, ast:o.DEC16($registerH$$, $register_registerL$$)}, 52:{name:"INC (" + $index$$ + "+d)", ast:o.INC_X($registerH$$, $register_registerL$$)}, 53:{name:"DEC (" + $index$$ + "+d)", ast:o.DEC_X($registerH$$, $register_registerL$$)}, 54:{name:"LD (" + $index$$ + "+d),n", ast:o.LD_X($registerH$$, $register_registerL$$)}, 70:{name:"LD B,(" + $index$$ + "+d)", ast:o.LD8_D("b", $registerH$$, $register_registerL$$)}, 78:{name:"LD C,(" + 
+  $index$$ + "+d)", ast:o.LD8_D("c", $registerH$$, $register_registerL$$)}, 84:{name:" LD D," + $index$$ + "H *", ast:o.LD8("d", $registerH$$)}, 86:{name:"LD D,(" + $index$$ + "+d)", ast:o.LD8_D("d", $registerH$$, $register_registerL$$)}, 93:{name:"LD E," + $index$$ + "L *", ast:o.LD8("e", $register_registerL$$)}, 94:{name:"LD E,(" + $index$$ + "+d)", ast:o.LD8_D("e", $registerH$$, $register_registerL$$)}, 96:{name:"LD " + $index$$ + "H,B", ast:o.LD8($registerH$$, "b")}, 97:{name:"LD " + $index$$ + 
+  "H,C", ast:o.LD8($registerH$$, "c")}, 98:{name:"LD " + $index$$ + "H,D", ast:o.LD8($registerH$$, "d")}, 99:{name:"LD " + $index$$ + "H,E", ast:o.LD8($registerH$$, "e")}, 100:{name:"LD " + $index$$ + "H," + $index$$ + "H", ast:o.NOOP()}, 101:{name:"LD " + $index$$ + "H," + $index$$ + "L *", ast:o.LD8_D($registerH$$, $register_registerL$$)}, 102:{name:"LD H,(" + $index$$ + "+d)", ast:o.LD8_D("h", $registerH$$, $register_registerL$$)}, 103:{name:"LD " + $index$$ + "H,A", ast:o.LD8($registerH$$, "a")}, 
+  104:{name:"LD " + $index$$ + "L,B", ast:o.LD8($register_registerL$$, "b")}, 105:{name:"LD " + $index$$ + "L,C", ast:o.LD8($register_registerL$$, "c")}, 106:{name:"LD " + $index$$ + "L,D", ast:o.LD8($register_registerL$$, "d")}, 107:{name:"LD " + $index$$ + "L,E", ast:o.LD8($register_registerL$$, "e")}, 108:{name:"LD " + $index$$ + "L," + $index$$ + "H", ast:o.LD8_D($register_registerL$$, $registerH$$)}, 109:{name:"LD " + $index$$ + "L," + $index$$ + "L *", ast:o.NOOP()}, 110:{name:"LD L,(" + $index$$ + 
+  "+d)", ast:o.LD8_D("l", $registerH$$, $register_registerL$$)}, 111:{name:"LD " + $index$$ + "L,A *", ast:o.LD8($register_registerL$$, "a")}, 112:{name:"LD (" + $index$$ + "+d),B", ast:o.LD_X("b", $registerH$$, $register_registerL$$)}, 113:{name:"LD (" + $index$$ + "+d),C", ast:o.LD_X("c", $registerH$$, $register_registerL$$)}, 114:{name:"LD (" + $index$$ + "+d),D", ast:o.LD_X("d", $registerH$$, $register_registerL$$)}, 115:{name:"LD (" + $index$$ + "+d),E", ast:o.LD_X("e", $registerH$$, $register_registerL$$)}, 
+  116:{name:"LD (" + $index$$ + "+d),H", ast:o.LD_X("h", $registerH$$, $register_registerL$$)}, 117:{name:"LD (" + $index$$ + "+d),L", ast:o.LD_X("l", $registerH$$, $register_registerL$$)}, 118:{name:"LD (" + $index$$ + "+d),B", ast:o.LD_X("b", $registerH$$, $register_registerL$$)}, 119:{name:"LD (" + $index$$ + "+d),A", ast:o.LD_X("a", $registerH$$, $register_registerL$$)}, 126:{name:"LD A,(" + $index$$ + "+d)", ast:o.LD8_D("a", $registerH$$, $register_registerL$$)}, 124:{name:"LD A," + $index$$ + 
+  "H", ast:o.LD8("a", $registerH$$)}, 125:{name:"LD A," + $index$$ + "L", ast:o.LD8("a", $register_registerL$$)}, 134:{name:"ADD A,(" + $index$$ + "+d)", ast:o.ADD_X($registerH$$, $register_registerL$$)}, 142:{name:"ADC A,(" + $index$$ + "+d)", ast:o.ADC_X($registerH$$, $register_registerL$$)}, 150:{name:"SUB A,(" + $index$$ + "+d)", ast:o.SUB_X($registerH$$, $register_registerL$$)}, 158:{name:"SBC A,(" + $index$$ + "+d)", ast:o.SBC_X($registerH$$, $register_registerL$$)}, 203:"IX" == $index$$ ? 
+  opcodeTableDDCB : opcodeTableFDCB, 182:{name:"OR A,(" + $index$$ + "+d)", ast:o.OR_X($registerH$$, $register_registerL$$)}, 190:{name:"CP (" + $index$$ + "+d)", ast:o.CP_X($registerH$$, $register_registerL$$)}, 225:{name:"POP " + $index$$, ast:o.POP($registerH$$, $register_registerL$$)}, 227:{name:"EX SP,(" + $index$$ + ")", ast:o.EX_SP_X($registerH$$, $register_registerL$$)}, 229:{name:"PUSH " + $index$$, ast:o.PUSH($registerH$$, $register_registerL$$)}, 233:{name:"JP (" + $index$$ + ")", ast:o.JP_X($registerH$$, 
+  $register_registerL$$)}, 249:{name:"LD SP," + $index$$, ast:o.LD_SP($registerH$$, $register_registerL$$)}}
 }
 ;var opcodeTableED = {64:{name:"IN B,(C)", ast:o.IN("b", "c")}, 66:{name:"SBC HL,BC", ast:o.SBC16("b", "c")}, 65:{name:"OUT (C),B", ast:o.OUT("c", "b")}, 67:{name:"LD (nn),BC", ast:o.LD_NN("b", "c")}, 68:{name:"NEG", ast:o.NEG()}, 69:{name:"RETN / RETI", ast:o.RETN_RETI()}, 70:{name:"IM 0", ast:o.IM(0)}, 72:{name:"IN C,(C)", ast:o.IN("c", "c")}, 73:{name:"OUT (C),C", ast:o.OUT("c", "c")}, 74:{name:"ADC HL,BC", ast:o.ADC16("b", "c")}, 75:{name:"LD BC,(nn)", ast:o.LD16("b", "c", "n", "n"), operand:UINT16}, 
 76:{name:"NEG", ast:o.NEG()}, 77:{name:"RETN / RETI", ast:o.RETN_RETI()}, 78:{name:"IM 0", ast:o.IM(0)}, 80:{name:"IN D,(C)", ast:o.IN("d", "c")}, 81:{name:"OUT (C),D", ast:o.OUT("c", "d")}, 82:{name:"SBC HL,DE", ast:o.SBC16("d", "e")}, 83:{name:"LD (nn),DE", ast:o.LD_NN("d", "e")}, 84:{name:"NEG", ast:o.NEG()}, 85:{name:"RETN / RETI", ast:o.RETN_RETI()}, 86:{name:"IM 1", ast:o.IM(1)}, 87:{name:"LD A,I", ast:o.LD8("a", "i")}, 88:{name:"IN E,(C)", ast:o.IN("e", "c")}, 89:{name:"OUT (C),E", ast:o.OUT("c", 
@@ -10040,6 +10045,7 @@ var Optimizer = function $Optimizer$() {
 Optimizer.prototype = {optimize:function $Optimizer$$optimize$($functions_i$$) {
   this.ast = $functions_i$$;
   for($functions_i$$ = 0;$functions_i$$ < this.ast.length;$functions_i$$++) {
+    this.localOptimization($functions_i$$)
   }
 }, localOptimization:function $Optimizer$$localOptimization$($page$$) {
   this.ast[$page$$] = this.ast[$page$$].map(this.inlineRegisters)
@@ -10067,7 +10073,7 @@ Optimizer.prototype = {optimize:function $Optimizer$$optimize$($functions_i$$) {
     return $bytecodes$$
   })
 }};
-var whitelist = ["temp", "location", "JSSMS.Utils.rndInt"], Generator = function $Generator$() {
+var whitelist = ["temp", "location", "val", "JSSMS.Utils.rndInt"], Generator = function $Generator$() {
   this.ast = []
 };
 Generator.prototype = {generate:function $Generator$$generate$($functions$$) {
