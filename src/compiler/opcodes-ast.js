@@ -164,15 +164,43 @@ var n = {
 /** @struct */
 var o = {
   // Helper function for setting 2 registers at the same time.
-  // var val = value;
-  // h = value >> 8;
-  // l = value & 0xFF;
   SET16: function(register1, register2, value) {
+    if (value.type == 'Literal') {
+      // We can evaluate the expression:
+      // h = 0x00;
+      // l = 0xFF;
+      var hi = evaluate(n.BinaryExpression('>>', value, n.Literal(8)));
+      var lo = evaluate(n.BinaryExpression('&', value, n.Literal(0xFF)));
+      return [
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register1), hi)),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register2), lo))
+      ];
+    } else {
+      // We can't evaluate the expression: it will be done at runtime:
+      // var val = value;
+      // h = value >> 8;
+      // l = value & 0xFF;
+      return [
+        n.VariableDeclaration('val', value),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register1), n.BinaryExpression('>>', n.Identifier('val'), n.Literal(8)))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register2), n.BinaryExpression('&', n.Identifier('val'), n.Literal(0xFF))))
+      ];
+    }
+  },
+  EX: function(register1, register2) {
+    // temp = a;
+    // a = a2;
+    // a2 = temp;
+    // temp = f;
+    // f = f2;
+    // f2 = temp;
     return [
-      n.VariableDeclaration('val', value),
-      n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register1), n.BinaryExpression('>>', n.Identifier('val'), n.Literal(8)))),
-      n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register2), n.BinaryExpression('&', n.Identifier('val'), n.Literal(0xFF))))
-      //n.ExpressionStatement(n.CallExpression('set' + (register1 + register2).toUpperCase(), n.Identifier('val')))
+      n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.Register(register1))),
+      n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register1), n.Identifier(register1 + '2'))),
+      n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier(register1 + '2'), n.Identifier('temp'))),
+      n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.Register(register2))),
+      n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register2), n.Identifier(register2 + '2'))),
+      n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier(register2 + '2'), n.Identifier('temp')))
     ];
   },
   NOOP: function() {
@@ -1034,19 +1062,17 @@ var o = {
   },
   EX_AF: function() {
     return function() {
-      return n.ExpressionStatement(
-          n.CallExpression('exAF')
-      );
+      return o.EX('a', 'f');
     };
   },
   EXX: function() {
     return function() {
       // exBC(); exDE(); exHL();
-      return [
-        n.ExpressionStatement(n.CallExpression('exBC')),
-        n.ExpressionStatement(n.CallExpression('exDE')),
-        n.ExpressionStatement(n.CallExpression('exHL'))
-      ];
+      return [].concat(
+          o.EX('b', 'c'),
+          o.EX('d', 'e'),
+          o.EX('h', 'l')
+      );
     };
   },
   EX_SP_HL: function() {
@@ -1299,7 +1325,7 @@ var o = {
   },
   SBC_X: function(register1, register2) {
     return function(value, target, nextAddress) {
-      // sbc_a(readMem(this.getIXHIXL() + value));
+      // sbc_a(readMem(getIXHIXL() + value));
       return n.ExpressionStatement(
           n.CallExpression('sbc_a', o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
           n.Literal(value))))
@@ -1784,4 +1810,25 @@ function generateIndexCBFunctions(fn) {
         ];
       };
   };
+}
+
+function evaluate(expression) {
+  switch (expression.type) {
+    case 'BinaryExpression':
+      if (expression.left.type != 'Literal' && expression.right.type != 'Literal') {
+        break;
+      }
+      switch (expression.operator) {
+        case '>>':
+          return n.Literal(expression.left.value >> expression.right.value);
+          break;
+        case '&':
+          return n.Literal(expression.left.value & expression.right.value);
+          break;
+      }
+
+      break;
+  }
+
+  return expression;
 }
