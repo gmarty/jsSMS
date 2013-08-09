@@ -2625,7 +2625,7 @@ JSSMS.Z80.prototype = {
 
     var a_copy = this.a;
     var correction = 0;
-    var carry = (flags & F_CARRY);
+    var carry = flags & F_CARRY;
     var carry_copy = carry;
     if ((flags & F_HALFCARRY) != 0 || (a_copy & 0x0F) > 0x09) {
       correction |= 0x06;
@@ -2650,7 +2650,7 @@ JSSMS.Z80.prototype = {
     if (this.getParity(this.a)) {
       flags = (flags & 0xFB) | F_PARITY;
     } else {
-      flags = (flags & 0xFB);
+      flags = flags & 0xFB;
     }
 
     return this.a | (flags << 8);
@@ -2726,7 +2726,7 @@ JSSMS.Z80.prototype = {
    */
   cpl_a: function() {
     this.a ^= 0xFF;
-    this.f |= (F_NEGATIVE | F_HALFCARRY);
+    this.f |= F_NEGATIVE | F_HALFCARRY;
   },
 
 
@@ -2823,7 +2823,7 @@ JSSMS.Z80.prototype = {
    * @param {number} value
    */
   setBC: function(value) {
-    this.b = (value >> 8);
+    this.b = value >> 8;
     this.c = value & 0xFF;
   },
 
@@ -2832,7 +2832,7 @@ JSSMS.Z80.prototype = {
    * @param {number} value
    */
   setDE: function(value) {
-    this.d = (value >> 8);
+    this.d = value >> 8;
     this.e = value & 0xFF;
   },
 
@@ -2841,7 +2841,7 @@ JSSMS.Z80.prototype = {
    * @param {number} value
    */
   setHL: function(value) {
-    this.h = (value >> 8);
+    this.h = value >> 8;
     this.l = value & 0xFF;
   },
 
@@ -2850,7 +2850,7 @@ JSSMS.Z80.prototype = {
    * @param {number} value
    */
   setAF: function(value) {
-    this.a = (value >> 8);
+    this.a = value >> 8;
     this.f = value & 0xFF;
   },
 
@@ -2859,7 +2859,7 @@ JSSMS.Z80.prototype = {
    * @param {number} value
    */
   setIXHIXL: function(value) {
-    this.ixH = (value >> 8);
+    this.ixH = value >> 8;
     this.ixL = value & 0xFF;
   },
 
@@ -2868,7 +2868,7 @@ JSSMS.Z80.prototype = {
    * @param {number} value
    */
   setIYHIYL: function(value) {
-    this.iyH = (value >> 8);
+    this.iyH = value >> 8;
     this.iyL = value & 0xFF;
   },
 
@@ -3065,21 +3065,21 @@ JSSMS.Z80.prototype = {
       //vf = 0;
 
       // Parity bits (0x04)
-      pf = (this.getParity(i) ? F_PARITY : 0);
+      pf = this.getParity(i) ? F_PARITY : 0;
 
       // Generate Sign/Zero Table
-      this.SZ_TABLE[i] = (sf | zf | yf | xf);
+      this.SZ_TABLE[i] = sf | zf | yf | xf;
 
       // Generate Sign/Zero/Parity Table
-      this.SZP_TABLE[i] = (sf | zf | yf | xf | pf);
+      this.SZP_TABLE[i] = sf | zf | yf | xf | pf;
 
       // Generate table for inc8 instruction
-      this.SZHV_INC_TABLE[i] = (sf | zf | yf | xf);
+      this.SZHV_INC_TABLE[i] = sf | zf | yf | xf;
       this.SZHV_INC_TABLE[i] |= (i == 0x80) ? F_OVERFLOW : 0;
       this.SZHV_INC_TABLE[i] |= ((i & 0x0F) == 0x00) ? F_HALFCARRY : 0;
 
       // Generate table for dec8 instruction
-      this.SZHV_DEC_TABLE[i] = (sf | zf | yf | xf | F_NEGATIVE);
+      this.SZHV_DEC_TABLE[i] = sf | zf | yf | xf | F_NEGATIVE;
       this.SZHV_DEC_TABLE[i] |= (i == 0x7F) ? F_OVERFLOW : 0;
       this.SZHV_DEC_TABLE[i] |= ((i & 0x0F) == 0x0F) ? F_HALFCARRY : 0;
 
@@ -3135,6 +3135,7 @@ JSSMS.Z80.prototype = {
         }
 
         this.SZHVC_ADD_TABLE[padc] |= (newval & (F_BIT5 | F_BIT3)); /* undocumented flag bits 5+3 */
+
         if ((newval & 0x0F) <= (oldval & 0x0F)) {
           this.SZHVC_ADD_TABLE[padc] |= F_HALFCARRY;
         }
@@ -3159,6 +3160,7 @@ JSSMS.Z80.prototype = {
         }
 
         this.SZHVC_SUB_TABLE[psub] |= (newval & (F_BIT5 | F_BIT3)); /* undocumented flag bits 5+3 */
+
         if ((newval & 0x0F) > (oldval & 0x0F)) {
           this.SZHVC_SUB_TABLE[psub] |= F_HALFCARRY;
         }
@@ -3183,6 +3185,7 @@ JSSMS.Z80.prototype = {
         }
 
         this.SZHVC_SUB_TABLE[psbc] |= (newval & (F_BIT5 | F_BIT3)); /* undocumented flag bits 5+3 */
+
         if ((newval & 0x0F) >= (oldval & 0x0F)) {
           this.SZHVC_SUB_TABLE[psbc] |= F_HALFCARRY;
         }
