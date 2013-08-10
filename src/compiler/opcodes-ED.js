@@ -239,8 +239,16 @@ var opcodeTableED = {
     name: 'LDIR',
     ast: o.LDIR()
   },
+  0xB1: {
+    name: 'CPIR',
+    ast: o.CPIR()
+  },
   0xB3: {
     name: 'OTIR',
     ast: o.OTIR()
+  },
+  0xB8: {
+    name: 'LDDR',
+    ast: o.LDDR()
   }
 };

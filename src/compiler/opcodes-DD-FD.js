@@ -66,6 +66,10 @@ function generateIndexTable(index) {
       name: 'LD (' + index + '+d),n',
       ast: o.LD_X(registerH, registerL)
     },
+    0x39: {
+      name: 'ADD ' + index + ',SP',
+      ast: o.ADD16(registerH, registerL, 'sp')
+    },
     0x46: {
       name: 'LD B,(' + index + '+d)',
       ast: o.LD8_D('b', registerH, registerL)
