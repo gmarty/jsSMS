@@ -409,9 +409,23 @@ var o = {
   },
   INC16: function(register1, register2) {
     return function() {
-      return n.ExpressionStatement(
-          n.CallExpression('inc' + (register1 + register2).toUpperCase())
-      );
+      // c = (c + 1) & 0xFF;
+      // if (c == 0) {
+      //   b = (b + 1) & 0xFF;
+      // }
+      return [
+        n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register(register2), n.BinaryExpression('&', n.BinaryExpression('+', n.Register(register2), n.Literal(1)), n.Literal(0xFF)))
+        ),
+        n.IfStatement(
+            n.BinaryExpression('==', n.Register(register2), n.Literal(0)),
+            n.BlockStatement([
+              n.ExpressionStatement(
+                n.AssignmentExpression('=', n.Register(register1), n.BinaryExpression('&', n.BinaryExpression('+', n.Register(register1), n.Literal(1)), n.Literal(0xFF)))
+              )
+            ])
+        )
+      ];
     };
   },
   DEC8: function(register1, register2) {
@@ -439,9 +453,23 @@ var o = {
   },
   DEC16: function(register1, register2) {
     return function() {
-      return n.ExpressionStatement(
-          n.CallExpression('dec' + (register1 + register2).toUpperCase())
-      );
+      // c = (c - 1) & 0xFF;
+      // if (c == 255) {
+      //   b = (b - 1) & 0xFF;
+      // }
+      return [
+        n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register(register2), n.BinaryExpression('&', n.BinaryExpression('-', n.Register(register2), n.Literal(1)), n.Literal(0xFF)))
+        ),
+        n.IfStatement(
+            n.BinaryExpression('==', n.Register(register2), n.Literal(255)),
+            n.BlockStatement([
+              n.ExpressionStatement(
+                n.AssignmentExpression('=', n.Register(register1), n.BinaryExpression('&', n.BinaryExpression('-', n.Register(register1), n.Literal(1)), n.Literal(0xFF)))
+              )
+            ])
+        )
+      ];
     };
   },
   ADD16: function(register1, register2, register3, register4) {

@@ -20,6 +20,7 @@
 'use strict';
 
 
+
 /**
  * @constructor
  * @param {JSSMS.Z80} cpu
@@ -171,6 +172,7 @@ Recompiler.prototype = {
   dump: function() {
     var output = [];
 
+    // @todo Sort branches here.
     for (var i in this.cpu.branches) {
       output.push('// Page ' + i);
       for (var j in this.cpu.branches[i]) {
