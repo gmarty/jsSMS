@@ -364,7 +364,7 @@ JSSMS.Vdp.prototype = {
   getVCount: function() {
     if (this.videoMode == NTSC) {
       if (this.line > 0xDA) // Values from 00 to DA, then jump to D5-FF
-        return this.line - 6;
+        return this.line - 0x06;
     } else {
       // PAL
       if (this.line > 0xF2)
