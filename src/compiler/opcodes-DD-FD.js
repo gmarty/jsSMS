@@ -202,17 +202,49 @@ function generateIndexTable(index) {
       name: 'LD A,' + index + 'L',
       ast: o.LD8('a', registerL)
     },
+    0x84: {
+      name: 'ADD A,' + index + 'H',
+      ast: o.ADD(registerL)
+    },
+    0x85: {
+      name: 'ADD A,' + index + 'L',
+      ast: o.ADD(registerL)
+    },
     0x86: {
       name: 'ADD A,(' + index + '+d)',
       ast: o.ADD_X(registerH, registerL)
+    },
+    0x8C: {
+      name: 'ADC A,' + index + 'H',
+      ast: o.ADC(registerL)
+    },
+    0x8D: {
+      name: 'ADC A,' + index + 'L',
+      ast: o.ADC(registerL)
     },
     0x8E: {
       name: 'ADC A,(' + index + '+d)',
       ast: o.ADC_X(registerH, registerL)
     },
+    0x94: {
+      name: 'SUB A,' + index + 'H',
+      ast: o.SUB(registerL)
+    },
+    0x95: {
+      name: 'SUB A,' + index + 'L',
+      ast: o.SUB(registerL)
+    },
     0x96: {
       name: 'SUB A,(' + index + '+d)',
       ast: o.SUB_X(registerH, registerL)
+    },
+    0x9C: {
+      name: 'SBC A,' + index + 'H',
+      ast: o.SBC(registerL)
+    },
+    0x9D: {
+      name: 'SBC A,' + index + 'L',
+      ast: o.SBC(registerL)
     },
     0x9E: {
       name: 'SBC A,(' + index + '+d)',
