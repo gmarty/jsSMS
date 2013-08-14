@@ -235,6 +235,11 @@ JSSMS.Debugger.prototype = {
       // Decrement tstates.
       tstates += getTotalTStates(tree[i].opcodes);
 
+      /*if (tstates >= this.main.cyclesPerLine) {
+        insertTStates();
+        code.push('if (this.tstates <= 0) {this.pc = ' + toHex(prevNextAddress) + '; return;}');
+      }*/
+
       if (/return;/.test(tree[i].code) || /this\.tstates/.test(tree[i].code)) {
         insertTStates();
       }
@@ -3546,15 +3551,15 @@ JSSMS.Debugger.prototype = {
    * @return {Object}
    */
   getIndexCB: function(index, address) {
+    // @todo Test me.
     var toHex = JSSMS.Utils.toHex;
+    var currAddr = address;
+    var location = 'location = this.get' + index + '() + ' + toHex(this.readRom8bit(address++)) + ' & 0xFFFF;';
     var opcode = this.readRom8bit(address);
     var opcodesArray = [opcode];
     var inst = 'Unimplemented 0xDDCB or 0xFDCB prefixed opcode';
-    var currAddr = address;
     var code = 'throw "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";';
     address++;
-
-    var location = 'location = this.get' + index + '() + ' + toHex(this.readRom8bit(address)) + ' & 0xFFFF;';
 
     switch (opcode) {
       case 0x00:

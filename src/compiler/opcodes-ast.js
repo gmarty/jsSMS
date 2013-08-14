@@ -1201,7 +1201,7 @@ var o = {
             n.CallExpression('bit', n.BinaryExpression('&', o.READ_MEM8(n.CallExpression('get' + (register1 + register2).toUpperCase())), n.Bit(bit)))
         );
       };
-    else if (register1 == 'i')
+    else
       return function(value, target, nextAddress) {
         // location = (getIYHIYL() + value) & 0xFFFF;
         // bit(readMem(location) & BIT_0);
@@ -1236,7 +1236,7 @@ var o = {
             )
         );
       };
-    else if (register1 == 'i')
+    else
       return function(value, target, nextAddress) {
         // location = (getIYHIYL() + value) & 0xFFFF;
         // writeMem(location, readMem(location) & ~BIT_0);
@@ -1274,7 +1274,7 @@ var o = {
             ])
         );
       };
-    else if (register1 == 'i')
+    else
       return function(value, target, nextAddress) {
         // location = (getIYHIYL() + value) & 0xFFFF;
         // writeMem(location, readMem(location) | BIT_0);

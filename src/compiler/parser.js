@@ -1374,8 +1374,8 @@ var Parser = (function() {
    * @return {Bytecode}
    */
   function getIndexCB(bytecode, stream) {
-    var opcode = stream.getUint8();
     var operand = stream.getUint8();
+    var opcode = stream.getUint8();
 
     bytecode.opcode.push(opcode);
     bytecode.nextAddress = stream.position;
