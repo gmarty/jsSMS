@@ -465,48 +465,32 @@ JSSMS.Z80.prototype = {
 
   recompile: function() {
     if (this.pc < 0x0400) {
-      if (this.branches[0][this.pc]) {
-        this.branches[0][this.pc].call(this);
-        return;
+      if (!this.branches[0][this.pc]) {
+        this.recompiler.recompileFromAddress(this.pc, 0, 0);
       }
-
-      //console.log('> ' + JSSMS.Utils.toHex(this.pc));
-
-      this.recompiler.recompileFromAddress(this.pc, 0, 0);
       this.branches[0][this.pc].call(this);
+
       return;
     } else if (this.pc < 0x4000) {
-      if (this.branches[this.frameReg[0]][this.pc]) {
-        this.branches[this.frameReg[0]][this.pc].call(this);
-        return;
+      if (!this.branches[this.frameReg[0]][this.pc]) {
+        this.recompiler.recompileFromAddress(this.pc, this.frameReg[0], 0);
       }
-
-      //console.log('> ' + JSSMS.Utils.toHex(this.pc), this.frameReg[0]);
-
-      this.recompiler.recompileFromAddress(this.pc, this.frameReg[0], 0);
       this.branches[this.frameReg[0]][this.pc].call(this);
+
       return;
     } else if (this.pc < 0x8000) {
-      if (this.branches[this.frameReg[1]][(this.pc - 0x4000)]) {
-        this.branches[this.frameReg[1]][(this.pc - 0x4000)].call(this);
-        return;
+      if (!this.branches[this.frameReg[1]][(this.pc - 0x4000)]) {
+        this.recompiler.recompileFromAddress(this.pc, this.frameReg[1], 1);
       }
-
-      //console.log('> ' + JSSMS.Utils.toHex(this.pc), this.frameReg[1]);
-
-      this.recompiler.recompileFromAddress(this.pc, this.frameReg[1], 1);
       this.branches[this.frameReg[1]][(this.pc - 0x4000)].call(this);
+
       return;
     } else if (this.pc < 0xC000) {
-      if (this.branches[this.frameReg[2]][(this.pc - 0x8000)]) {
-        this.branches[this.frameReg[2]][(this.pc - 0x8000)].call(this);
-        return;
+      if (!this.branches[this.frameReg[2]][(this.pc - 0x8000)]) {
+        this.recompiler.recompileFromAddress(this.pc, this.frameReg[2], 2);
       }
-
-      //console.log('> ' + JSSMS.Utils.toHex(this.pc), this.frameReg[2]);
-
-      this.recompiler.recompileFromAddress(this.pc, this.frameReg[2], 2);
       this.branches[this.frameReg[2]][(this.pc - 0x8000)].call(this);
+
       return;
     }
 
@@ -914,7 +898,7 @@ JSSMS.Z80.prototype = {
    */
   interrupt: function() {
     // Interrupts not allowed OR
-    // Interupts not allowed after EI instruction
+    // Interrupts not allowed after EI instruction
     if (!this.iff1 || (ACCURATE_INTERRUPT_EMULATION && this.EI_inst)) return;
 
     // If we're in a halt instruction, increment the PC and get out of it
@@ -2033,20 +2017,20 @@ JSSMS.Z80.prototype = {
       this.incR();
 
     switch (opcode) {
-      //  -- ED40 IN B,(C) -------------------------
+      // -- ED40 IN B,(C) -------------------------
       case 0x40:
         this.b = this.port.in_(this.c);
         this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.b];
         this.pc++;
         break;
 
-      //  -- ED41 OUT (C),B -------------------------
+      // -- ED41 OUT (C),B -------------------------
       case 0x41: this.port.out(this.c, this.b); this.pc++; break;
 
-      // --  ED42 SBC HL,BC ------------------------
+      // -- ED42 SBC HL,BC ------------------------
       case 0x42: this.sbc16(this.getBC()); this.pc++; break;
 
-      //  -- ED43 LD (nn),BC ------------------------
+      // -- ED43 LD (nn),BC ------------------------
       case 0x43:
         location = this.readMemWord(++this.pc);
         this.writeMem(location++, this.c);
@@ -2054,7 +2038,7 @@ JSSMS.Z80.prototype = {
         this.pc += 2;
         break;
 
-      //  -- ED44 NEG -------------------------------
+      // -- ED44 NEG -------------------------------
       case 0x44:
       case 0x4C:
       case 0x54:
@@ -2070,7 +2054,7 @@ JSSMS.Z80.prototype = {
         this.pc++;
         break;
 
-      //  -- ED45 RETN / RETI ------------------------------
+      // -- ED45 RETN / RETI ------------------------------
       case 0x45:
       case 0x4D:
       case 0x55:
@@ -2084,7 +2068,7 @@ JSSMS.Z80.prototype = {
         this.iff1 = this.iff2;
         break;
 
-      //  -- ED46 IM 0-------------------------------
+      // -- ED46 IM 0-------------------------------
       case 0x46:
       case 0x4E:
       case 0x66:
@@ -2093,45 +2077,45 @@ JSSMS.Z80.prototype = {
         this.pc++;
         break;
 
-      //  -- ED47 LD I,A ---------------------------
+      // -- ED47 LD I,A ---------------------------
       case 0x47: this.i = this.a; this.pc++; break;
 
-      //  -- ED48 IN C,(C) -------------------------
+      // -- ED48 IN C,(C) -------------------------
       case 0x48:
         this.c = this.port.in_(this.c);
         this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.c];
         this.pc++;
         break;
 
-      //  -- ED49 OUT (C),C -------------------------
+      // -- ED49 OUT (C),C -------------------------
       case 0x49: this.port.out(this.c, this.c); this.pc++; break;
 
-      //  -- ED4A ADC HL,BC ------------------------
+      // -- ED4A ADC HL,BC ------------------------
       case 0x4A: this.adc16(this.getBC()); this.pc++; break;
 
-      //  -- ED4B LD BC,(nn) -----------------------
+      // -- ED4B LD BC,(nn) -----------------------
       case 0x4B:
         this.setBC(this.readMemWord(this.readMemWord(++this.pc)));
         this.pc += 2;
         break;
 
-      //  -- ED4F LD R,A ---------------------------
+      // -- ED4F LD R,A ---------------------------
       case 0x4F: this.r = this.a; this.pc++; break;
 
-      //  -- ED50 IN D,(C) -------------------------
+      // -- ED50 IN D,(C) -------------------------
       case 0x50:
         this.d = this.port.in_(this.c);
         this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.d];
         this.pc++;
         break;
 
-      //  -- ED51 OUT (C),D -------------------------
+      // -- ED51 OUT (C),D -------------------------
       case 0x51: this.port.out(this.c, this.d); this.pc++; break;
 
-      // --  ED52 SBC HL,DE ------------------------
+      // -- ED52 SBC HL,DE ------------------------
       case 0x52: this.sbc16(this.getDE()); this.pc++; break;
 
-      //  -- ED53 LD (nn),DE ------------------------
+      // -- ED53 LD (nn),DE ------------------------
       case 0x53:
         location = this.readMemWord(++this.pc);
         this.writeMem(location++, this.e); // SPl
@@ -2139,31 +2123,31 @@ JSSMS.Z80.prototype = {
         this.pc += 2;
         break;
 
-      //  -- ED56 IM 1-------------------------------
+      // -- ED56 IM 1-------------------------------
       case 0x56:
       case 0x76: this.im = 1; this.pc++; break;
 
-      //  -- ED57 LD A,I ---------------------------
+      // -- ED57 LD A,I ---------------------------
       case 0x57:
         this.a = this.i;
         this.f = (this.f & F_CARRY) | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);
         this.pc++;
         break;
 
-      //  -- ED58 IN E,(C) -------------------------
+      // -- ED58 IN E,(C) -------------------------
       case 0x58:
         this.e = this.port.in_(this.c);
         this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.e];
         this.pc++;
         break;
 
-      //  -- ED59 OUT (C),E -------------------------
+      // -- ED59 OUT (C),E -------------------------
       case 0x59: this.port.out(this.c, this.e); this.pc++; break;
 
-      //  -- ED5A ADC HL,DE ------------------------
+      // -- ED5A ADC HL,DE ------------------------
       case 0x5A: this.adc16(this.getDE()); this.pc++; break;
 
-      //  -- ED5B LD DE,(nn) -----------------------
+      // -- ED5B LD DE,(nn) -----------------------
       case 0x5B:
         this.setDE(this.readMemWord(this.readMemWord(++this.pc)));
         this.pc += 2;
@@ -2177,20 +2161,20 @@ JSSMS.Z80.prototype = {
         this.pc++;
         break;
 
-      //  -- ED60 IN H,(C) -------------------------
+      // -- ED60 IN H,(C) -------------------------
       case 0x60:
         this.h = this.port.in_(this.c);
         this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.h];
         this.pc++;
         break;
 
-      //  -- ED61 OUT (C),H -------------------------
+      // -- ED61 OUT (C),H -------------------------
       case 0x61: this.port.out(this.c, this.h); this.pc++; break;
 
-      // --  ED62 SBC HL,HL ------------------------
+      // -- ED62 SBC HL,HL ------------------------
       case 0x62: this.sbc16(this.getHL()); this.pc++; break;
 
-      //  -- ED63 LD (nn),HL ------------------------
+      // -- ED63 LD (nn),HL ------------------------
       case 0x63:
         location = this.readMemWord(++this.pc);
         this.writeMem(location++, this.l); // SPl
@@ -2198,7 +2182,7 @@ JSSMS.Z80.prototype = {
         this.pc += 2;
         break;
 
-      //  -- ED67 RRD -------------------------------
+      // -- ED67 RRD -------------------------------
       case 0x67:
         location = this.getHL();
         temp = this.readMem(location);
@@ -2213,26 +2197,26 @@ JSSMS.Z80.prototype = {
         this.pc++;
         break;
 
-      //  -- ED68 IN L,(C) --------------------------
+      // -- ED68 IN L,(C) --------------------------
       case 0x68:
         this.l = this.port.in_(this.c);
         this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.l];
         this.pc++;
         break;
 
-      //  -- ED69 OUT (C),L -------------------------
+      // -- ED69 OUT (C),L -------------------------
       case 0x69: this.port.out(this.c, this.l); this.pc++; break;
 
-      //  -- ED6A ADC HL,HL ------------------------
+      // -- ED6A ADC HL,HL ------------------------
       case 0x6A: this.adc16(this.getHL()); this.pc++; break;
 
-      //  -- ED6B LD HL,(nn) -----------------------
+      // -- ED6B LD HL,(nn) -----------------------
       case 0x6B:
         this.setHL(this.readMemWord(this.readMemWord(++this.pc)));
         this.pc += 2;
         break;
 
-      //  -- ED6F RLD -------------------------------
+      // -- ED6F RLD -------------------------------
       case 0x6F:
         location = this.getHL();
         temp = this.readMem(location);
@@ -2251,10 +2235,10 @@ JSSMS.Z80.prototype = {
       //  *- ED71 OUT (C),0 -------------------------
       case 0x71: this.port.out(this.c, 0); this.pc++; break;
 
-      // --  ED72 SBC HL,SP ------------------------
+      // -- ED72 SBC HL,SP ------------------------
       case 0x72: this.sbc16(this.sp); this.pc++; break;
 
-      //  -- ED73 LD (nn),SP ------------------------
+      // -- ED73 LD (nn),SP ------------------------
       case 0x73:
         location = this.readMemWord(++this.pc);
         this.writeMem(location++, this.sp & 0xFF); // SPl
@@ -2262,38 +2246,39 @@ JSSMS.Z80.prototype = {
         this.pc += 2;
         break;
 
-      //  -- ED78 IN A,(C) -------------------------
+      // -- ED78 IN A,(C) -------------------------
       case 0x78:
         this.a = this.port.in_(this.c);
         this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];
         this.pc++;
         break;
 
-      //  -- ED79 OUT (C),A -------------------------
+      // -- ED79 OUT (C),A -------------------------
       case 0x79: this.port.out(this.c, this.a); this.pc++; break;
 
-      // --  ED7A ADC HL,SP ------------------------
+      // -- ED7A ADC HL,SP ------------------------
       case 0x7A: this.adc16(this.sp); this.pc++; break;
 
-      //  -- ED7B LD SP,(nn) -----------------------
+      // -- ED7B LD SP,(nn) -----------------------
       case 0x7B:
         this.sp = this.readMemWord(this.readMemWord(++this.pc));
         this.pc += 2;
         break;
 
-      //  -- EDA0 LDI ----------------------------------
+      // -- EDA0 LDI ----------------------------------
       case 0xA0:
-        // (DE) <- (HL)
-        this.writeMem(this.getDE(), this.readMem(this.getHL()));
+        temp = this.readMem(this.getHL());
+        this.writeMem(this.getDE(), temp);
+        this.decBC();
         this.incDE();
         this.incHL();
-        this.decBC();
 
-        this.f = (this.f & 0xC1) | (this.getBC() != 0 ? F_PARITY : 0);
+        temp = (temp + this.a) & 0xFF;
+        this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);
         this.pc++;
         break;
 
-      //  -- EDA1 CPI ------------------------------
+      // -- EDA1 CPI ------------------------------
       case 0xA1:
         temp = (this.f & F_CARRY) | F_NEGATIVE;
         this.cp_a(this.readMem(this.getHL())); // sets some flags
@@ -2306,7 +2291,7 @@ JSSMS.Z80.prototype = {
         this.pc++;
         break;
 
-      //  -- EDA2 INI -------------------------------
+      // -- EDA2 INI -------------------------------
       case 0xA2:
         temp = this.port.in_(this.c);
         this.writeMem(this.getHL(), temp);
@@ -2319,7 +2304,7 @@ JSSMS.Z80.prototype = {
         // undocumented flags not finished.
         break;
 
-      //  -- EDA3 OUTI ------------------------------
+      // -- EDA3 OUTI ------------------------------
       // see p14 of undocumented z80 for additional flag info
       case 0xA3:
         temp = this.readMem(this.getHL());
@@ -2340,19 +2325,20 @@ JSSMS.Z80.prototype = {
         this.pc++;
         break;
 
-      //  -- EDA8 LDD ----------------------------------
+      // -- EDA8 LDD ----------------------------------
       case 0xA8:
-        // (DE) <- (HL)
-        this.writeMem(this.getDE(), this.readMem(this.getHL()));
+        temp = this.readMem(this.getHL());
+        this.writeMem(this.getDE(), temp);
+        this.decBC();
         this.decDE();
         this.decHL();
-        this.decBC();
 
-        this.f = (this.f & 0xC1) | (this.getBC() != 0 ? F_PARITY : 0);
+        temp = (temp + this.a) & 0xFF;
+        this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & F_BIT3) | ((temp & F_NEGATIVE) ? 0x20 : 0);
         this.pc++;
         break;
 
-      //  -- EDA9 CPD ------------------------------
+      // -- EDA9 CPD ------------------------------
       case 0xA9:
         temp = (this.f & F_CARRY) | F_NEGATIVE;
         this.cp_a(this.readMem(this.getHL())); // sets some flags
@@ -2365,7 +2351,7 @@ JSSMS.Z80.prototype = {
         this.pc++;
         break;
 
-      //  -- EDAA IND -------------------------------
+      // -- EDAA IND -------------------------------
       case 0xAA:
         temp = this.port.in_(this.c);
         this.writeMem(this.getHL(), temp);
@@ -2378,7 +2364,7 @@ JSSMS.Z80.prototype = {
         // undocumented flags not finished.
         break;
 
-      //  -- EDAB OUTD ------------------------------
+      // -- EDAB OUTD ------------------------------
       // see p14 of undocumented z80 for additional flag info
       case 0xAB:
         temp = this.readMem(this.getHL());
@@ -2399,26 +2385,25 @@ JSSMS.Z80.prototype = {
         this.pc++;
         break;
 
-      //  -- EDB0 LDIR ------------------------------
+      // -- EDB0 LDIR ------------------------------
       case 0xB0:
-        this.writeMem(this.getDE(), this.readMem(this.getHL()));
+        temp = this.readMem(this.getHL());
+        this.writeMem(this.getDE(), temp);
+        this.decBC();
         this.incDE();
         this.incHL();
-        this.decBC();
 
+        temp = (temp + this.a) & 0xFF;
+        this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);
         if (this.getBC() != 0) {
-          this.f |= F_PARITY;
           this.tstates -= 5;
           this.pc--;
         } else {
-          this.f &= ~ F_PARITY;
           this.pc++;
         }
-
-        this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;
         break;
 
-      //  -- EDB1 CPIR ------------------------------
+      // -- EDB1 CPIR ------------------------------
       case 0xB1:
         temp = (this.f & F_CARRY) | F_NEGATIVE;
         this.cp_a(this.readMem(this.getHL())); // sets zero flag for us
@@ -2438,7 +2423,7 @@ JSSMS.Z80.prototype = {
         this.f = (this.f & 0xF8) | temp; // Sign set by the cp instruction
         break;
 
-      //  -- EDB2 INIR ------------------------------
+      // -- EDB2 INIR ------------------------------
       case 0xB2:
         temp = this.port.in_(this.c);
         this.writeMem(this.getHL(), temp);
@@ -2457,7 +2442,7 @@ JSSMS.Z80.prototype = {
         // undocumented flags not finished.
         break;
 
-      //  -- EDB3 OTIR ------------------------------
+      // -- EDB3 OTIR ------------------------------
       case 0xB3:
         temp = this.readMem(this.getHL());
         // (C) <- (HL)
@@ -2485,21 +2470,20 @@ JSSMS.Z80.prototype = {
 
       // -- EDB8 LDDR ---------------------------------
       case 0xB8:
-        this.writeMem(this.getDE(), this.readMem(this.getHL()));
+        temp = this.readMem(this.getHL());
+        this.writeMem(this.getDE(), temp);
+        this.decBC();
         this.decDE();
         this.decHL();
-        this.decBC();
 
+        temp = (temp + this.a) & 0xFF;
+        this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & F_BIT3) | ((temp & F_NEGATIVE) ? 0x20 : 0);
         if (this.getBC() != 0) {
-          this.f |= F_PARITY;
           this.tstates -= 5;
           this.pc--;
         } else {
-          this.f &= ~ F_PARITY;
           this.pc++;
         }
-
-        this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;
         break;
 
       // -- EDB9 CPDR ------------------------------------
@@ -2522,7 +2506,7 @@ JSSMS.Z80.prototype = {
         this.f = (this.f & 0xF8) | temp;
         break;
 
-      //  -- EDBA INDR ------------------------------
+      // -- EDBA INDR ------------------------------
       case 0xBA:
         temp = this.port.in_(this.c);
         this.writeMem(this.getHL(), temp);
@@ -2541,7 +2525,7 @@ JSSMS.Z80.prototype = {
         // undocumented flags not finished.
         break;
 
-      //  -- EDBB OTDR ------------------------------
+      // -- EDBB OTDR ------------------------------
       case 0xBB:
         temp = this.readMem(this.getHL());
         // (C) <- (HL)

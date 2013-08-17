@@ -2866,10 +2866,13 @@ JSSMS.Debugger.prototype = {
         break;
       case 0xA0:
         inst = 'LDI';
-        // (DE) <- (HL)
-        code = 'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
-            'this.incDE();this.incHL();this.decBC();' +
-            'this.f = this.f & 0xC1 | (this.getBC() != 0x00 ? F_PARITY : 0x00);';
+        code = 'temp = this.readMem(this.getHL());' +
+            'this.writeMem(this.getDE(), temp);' +
+            'this.decBC();' +
+            'this.incDE();' +
+            'this.incHL();' +
+            'temp = (temp + this.a) & 0xFF;' +
+            'this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);';
         break;
       case 0xA1:
         inst = 'CPI';
@@ -2953,9 +2956,12 @@ JSSMS.Debugger.prototype = {
             '}';
         break;
       case 0xB0:
+        // @todo Update to match Z80.
         inst = 'LDIR';
         code = 'this.writeMem(this.getDE(), this.readMem(this.getHL()));' +
-            'this.incDE();this.incHL();this.decBC();';
+            'this.incDE();' +
+            'this.incHL();' +
+            'this.decBC();';
         if (ACCURATE_INTERRUPT_EMULATION) {
           target = address - 2;
           code += 'if (this.getBC() != 0x00) {' +
