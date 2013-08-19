@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Benchmarking jsSMS - JavaScript Sega Master System &amp; Game Gear emulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="css/bootstrap-responsive.min.css">
+<style>
+html, body {
+  background: #eee;
+}
+/* IE10 is not tested though */
+a, input, button {
+  -ms-touch-action: none !important;
+}
+.container {
+  margin-top: 20px;
+}
+.content {
+  background: #fff;
+  padding: 20px;
+  margin: 0 -20px;
+  border-radius: 10px;
+}
+.page-header {
+  background: #f5f5f5;
+  padding: 20px 20px 10px;
+  margin: -20px -20px 20px;
+  border-radius: 10px 10px 0 0;
+  border: 0;
+}
+#emulator > div {
+  text-align: center;
+}
+#screen {
+  height: 192px;
+  width: 256px;
+  margin: auto;
+}
+#screen canvas {
+  background: #000;
+  margin: auto;
+  display: block;
+  image-rendering: -moz-crisp-edges;          /* FF 6.0+ */
+  image-rendering: -o-crisp-edges;            /* Opera */
+  image-rendering: -webkit-optimize-contrast; /* Webkit (Safari now, Chrome soon) */
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;   /* IE */
+}
+#screen:-webkit-full-screen {
+  height: 100%;
+  width: 100%;
+}
+.gamepad {
+  height: 80px;
+  position: relative;
+}
+div .direction > div,
+div .buttons > div {
+  width: 40px;
+  height: 40px;
+  float: left;
+  display: inline;
+}
+div .direction {
+  background: lightgrey;
+  width: 80px;
+  height: 80px;
+  border-radius: 40px;
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+.up, .down {
+  background: darkgrey;
+}
+.up {
+  border-radius: 40px 0 0 0;
+}
+.down {
+  border-radius: 0 0 40px 0;
+}
+div .buttons {
+  position: absolute;
+  right: 0;
+  top: 20px;
+}
+div .buttons .start {
+  background: darkblue;
+  border-radius: 0 40px 40px 0;
+  width: 25px;
+}
+.fire1, .fire2 {
+  background: black;
+  margin-left: 10px;
+  border-radius: 40px;
+}
+#romSelector {
+  clear: both;
+  margin-top: 80px;
+}
+select, .btn {
+  margin: 5px 5px 0 0;
+}
+footer {
+  padding-top: 10px;
+}
+@media (max-width: 768px) {
+  .container {
+    margin-top: 0;
+  }
+}
+@media (orientation: portrait) {
+  #screen canvas {
+    height: auto;
+    width: 100%;
+  }
+}
+@media (orientation: landscape) {
+  #screen canvas {
+    height: 100%;
+    width: auto;
+  }
+}
+/* Debugger */
+div.row-fluid .span8 {
+  position: relative;
+}
+#dissambler {
+  font-family: monospace;
+  font-size: small;
+  color: #aaa;
+  right: 0;
+  position: absolute;
+  top: 0;
+}
+.current {
+  color: #333;
+}
+.current code {
+  background: pink;
+  border-color: #DD1144;
+}
+code {
+  padding: 0 2px;
+}
+</style>
+<script>(function(G,o,O,g,l){G.GoogleAnalyticsObject=O;G[O]||(G[O]=function(){(G[O].q=G[O].q||[]).push(arguments)});G[O].l=Date.now();g=o.createElement('script'),l=o.scripts[0];g.src='//www.google-analytics.com/analytics.js';l.parentNode.insertBefore(g,l)}(this,document,'ga'));ga('create','UA-207391-16',{'siteSpeedSampleRate':100});ga('send','pageview')</script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script>
+if (!window.$) {
+  document.write('<script src="lib/jquery.min.js"><\/script>');
+}
+</script>
+</head>
+<body>
+<div class="container">
+  <div class="content">
+    <div class="page-header">
+      <h1>jsSMS<small> JavaScript Sega Master System &amp; Game Gear emulator</small></h1>
+    </div>
+    <div class="row-fluid">
+      <div class="span12">
+        <h3>Benchmarking</h3>
+        <p>Open the console.</p>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <p>© 2012-2013 Guillaume Marty (<a href="https://github.com/gmarty">https://github.com/gmarty</a>)</p>
+  </footer>
+</div>
+<a href="http://github.com/gmarty/jsSMS"><img style="position: absolute; top: 0; right: 0; border: 0;" src="//s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork jsSMS on GitHub"></a>
+<script src="lib/benchmark.js"></script>
+<script src="src/setup.js"></script>
+<script src="src/sms.js"></script>
+<script src="src/utils.js"></script>
+<script src="src/z80.js"></script>
+<script src="src/debugger.js"></script>
+<script src="src/vdp.js"></script>
+<script src="src/psg.js"></script>
+<script src="src/ui.js"></script>
+<script src="src/keyboard.js"></script>
+<script src="src/ports.js"></script>
+<script src="src/compiler/bytecode.js"></script>
+<script src="src/compiler/parser.js"></script>
+<script src="src/compiler/opcodes-ast.js"></script>
+<script src="src/compiler/opcodes-CB.js"></script>
+<script src="src/compiler/opcodes-DD-FD.js"></script>
+<script src="src/compiler/opcodes-ED.js"></script>
+<script src="src/compiler/opcodes.js"></script>
+<script src="src/compiler/analyzer.js"></script>
+<script src="src/compiler/optimizer.js"></script>
+<script src="src/compiler/generator.js"></script>
+<script src="src/compiler/recompiler.js"></script>
+<script src="lib/escodegen.browser.js"></script>
+<script src="lib/esprima.js"></script>
+<script>
+'use strict';
+
+var sms;
+var romData;
+
+$.ajax({
+  url: escape('rom/homebrew/blockhead.sms'),
+  xhr: function() {
+    var xhr = $.ajaxSettings.xhr();
+    if (xhr.overrideMimeType != undefined) {
+      // Download as binary
+      xhr.overrideMimeType('text/plain; charset=x-user-defined');
+    }
+    self.xhr = xhr;
+    return xhr;
+  },
+  complete: function(xhr, status) {
+    if (status == 'error') {
+      throw 'The selected ROM file could not be loaded.';
+    }
+
+    romData = xhr.responseText;
+
+    suite.run();
+  }
+});
+
+var suite = new Benchmark.Suite('JSSMS');
+
+suite.add('Interpreter', {
+  'onStart': function() {
+    DEBUG = false;
+    ENABLE_COMPILER = false;
+
+    sms = new JSSMS;
+    sms.stop();
+    sms.readRomDirectly(romData, 'blockhead.sms');
+    sms.reset();
+    sms.vdp.forceFullRedraw();
+  },
+
+  'fn':function() {
+    for (var i = 0; i < 100; i++) {
+      sms.cpu.frame();
+    }
+  }
+});
+
+suite.add('Compiler in debug mode', {
+  'onStart': function() {
+    DEBUG = true;
+    ENABLE_COMPILER = true;
+
+    sms = new JSSMS;
+    sms.stop();
+    sms.readRomDirectly(romData, 'blockhead.sms');
+    sms.reset();
+    sms.vdp.forceFullRedraw();
+  },
+
+  'fn':function() {
+    for (var i = 0; i < 100; i++) {
+      sms.cpu.frame();
+    }
+  }
+});
+
+suite.add('Compiler', {
+  'onStart': function() {
+    DEBUG = false;
+    ENABLE_COMPILER = true;
+
+    sms = new JSSMS;
+    sms.stop();
+    sms.readRomDirectly(romData, 'blockhead.sms');
+    sms.reset();
+    sms.vdp.forceFullRedraw();
+  },
+
+  'fn':function() {
+    for (var i = 0; i < 100; i++) {
+      sms.cpu.frame();
+    }
+  }
+});
+
+suite.on('cycle', function(event) {
+  console.log(String(event.target));
+});
+
+suite.on('complete', function() {
+  console.log('Fastest is ' + this.filter('fastest').pluck('name'));
+});
+</script>
+</body>
