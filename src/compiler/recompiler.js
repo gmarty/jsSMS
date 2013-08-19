@@ -22,8 +22,8 @@
 
 
 /**
- * @constructor
  * @param {JSSMS.Z80} cpu
+ * @constructor
  */
 var Recompiler = (function() {
   var toHex = JSSMS.Utils.toHex;
@@ -174,6 +174,7 @@ var Recompiler = (function() {
         }
       });
     },
+
 
     /**
      * Generate a string representation of the branches generated.
