@@ -34,6 +34,8 @@ JSSMS.DummyUI = function(sms) {
   };
   this.updateStatus = function() {
   };
+  this.writeFrame = function() {
+  };
   this.canvasImageData = {
     data: []
   };

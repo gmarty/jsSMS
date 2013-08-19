@@ -44,7 +44,7 @@ var CLOCK_PAL = 3546893;
 
 /**
  * @constructor
- * @param {Object.<string, *>} opts
+ * @param {Object.<string, *>=} opts
  */
 function JSSMS(opts) {
   /**
@@ -65,7 +65,7 @@ function JSSMS(opts) {
   }
 
   this.keyboard = new JSSMS.Keyboard(this);
-  this.ui = new opts['ui'](this);
+  this.ui = new this.opts['ui'](this);
   this.vdp = new JSSMS.Vdp(this);
   this.psg = new JSSMS.SN76489(this);
   this.ports = new JSSMS.Ports(this);
