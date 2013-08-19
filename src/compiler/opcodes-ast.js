@@ -82,7 +82,7 @@ var n = {
     };
   },
   Literal: function(value) {
-    if (DEBUG) {
+    if (DEBUG && typeof value == 'number') {
       return {
         'type': 'Literal',
         'value': value,
