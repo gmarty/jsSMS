@@ -82,11 +82,18 @@ var n = {
     };
   },
   Literal: function(value) {
-    return {
-      'type': 'Literal',
-      'value': value,
-      'raw': JSSMS.Utils.toHex(value)
-    };
+    if (DEBUG) {
+      return {
+        'type': 'Literal',
+        'value': value,
+        'raw': JSSMS.Utils.toHex(value)
+      };
+    } else {
+      return {
+        'type': 'Literal',
+        'value': value
+      };
+    }
   },
   CallExpression: function(callee, args) {
     if (args == undefined) args = [];
@@ -1614,7 +1621,7 @@ var o = {
         n.ExpressionStatement(n.CallExpression('incDE')),
         n.ExpressionStatement(n.CallExpression('incHL')),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.BinaryExpression('&',
-            n.BinaryExpression('&', n.Identifier('temp'), n.Register('a')), n.Literal(0xFF)))),
+            n.BinaryExpression('+', n.Identifier('temp'), n.Register('a')), n.Literal(0xFF)))),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Register('f'),
             n.BinaryExpression('|',
             n.BinaryExpression('|',
@@ -1684,7 +1691,7 @@ var o = {
         n.ExpressionStatement(n.CallExpression('decDE')),
         n.ExpressionStatement(n.CallExpression('decHL')),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.BinaryExpression('&',
-            n.BinaryExpression('&', n.Identifier('temp'), n.Register('a')), n.Literal(0xFF)))),
+            n.BinaryExpression('+', n.Identifier('temp'), n.Register('a')), n.Literal(0xFF)))),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Register('f'),
             n.BinaryExpression('|',
             n.BinaryExpression('|',
@@ -1725,7 +1732,7 @@ var o = {
         n.ExpressionStatement(n.CallExpression('incDE')),
         n.ExpressionStatement(n.CallExpression('incHL')),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.BinaryExpression('&',
-            n.BinaryExpression('&', n.Identifier('temp'), n.Register('a')), n.Literal(0xFF)))),
+            n.BinaryExpression('+', n.Identifier('temp'), n.Register('a')), n.Literal(0xFF)))),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Register('f'),
             n.BinaryExpression('|',
             n.BinaryExpression('|',
@@ -1742,7 +1749,6 @@ var o = {
             n.BinaryExpression('!=', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0)),
             n.BlockStatement([
               n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
-              n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Literal(F_PARITY))),
               n.ReturnStatement()
             ])
         )
@@ -1887,7 +1893,7 @@ var o = {
         n.ExpressionStatement(n.CallExpression('decDE')),
         n.ExpressionStatement(n.CallExpression('decHL')),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.BinaryExpression('&',
-            n.BinaryExpression('&', n.Identifier('temp'), n.Register('a')), n.Literal(0xFF)))),
+            n.BinaryExpression('+', n.Identifier('temp'), n.Register('a')), n.Literal(0xFF)))),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Register('f'),
             n.BinaryExpression('|',
             n.BinaryExpression('|',
