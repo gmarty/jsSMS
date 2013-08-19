@@ -57,9 +57,7 @@ Analyzer.prototype = {
 
     this.missingOpcodes = {};
 
-    JSSMS.Utils.console.time('Analyzing');
     this.normalizeBytecode(0);
-    JSSMS.Utils.console.timeEnd('Analyzing');
 
     this.bytecodes[0][this.bytecodes[0].length - 1].isFunctionEnder = true;
     this.ast = [this.bytecodes];
