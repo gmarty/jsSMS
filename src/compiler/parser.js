@@ -26,6 +26,7 @@
  */
 var Parser = (function() {
   /** @const */ var ACCURATE_INTERRUPT_EMULATION = true;
+  var toHex = JSSMS.Utils.toHex;
 
   /**
    * @param {Array.<Array|DataView>} rom
@@ -85,7 +86,7 @@ var Parser = (function() {
           var currentAddress = currentObj.address % 0x4000;
 
           if (currentAddress < pageStart || currentAddress > pageEnd) {
-            JSSMS.Utils.console.error('Address out of bound', JSSMS.Utils.toHex(currentAddress));
+            JSSMS.Utils.console.error('Address out of bound', toHex(currentAddress));
             continue;
           }
 
@@ -144,7 +145,7 @@ var Parser = (function() {
               this.instructions[targetPage][targetAddress].isJumpTarget = true;
               this.instructions[targetPage][targetAddress].jumpTargetNb++;
             } else {
-              JSSMS.Utils.console.log('Invalid target address', JSSMS.Utils.toHex(this.instructions[currentPage][i].target));
+              JSSMS.Utils.console.log('Invalid target address', toHex(this.instructions[currentPage][i].target));
             }
           }
         }
@@ -903,7 +904,7 @@ var Parser = (function() {
         isFunctionEnder = true;
         break;
       default:
-        JSSMS.Utils.console.error('Unexpected opcode', JSSMS.Utils.toHex(opcode));
+        JSSMS.Utils.console.error('Unexpected opcode', toHex(opcode));
     }
 
     bytecode.nextAddress = stream.position;
@@ -1118,7 +1119,7 @@ var Parser = (function() {
         }
         break;
       default:
-        JSSMS.Utils.console.error('Unexpected opcode', '0xED ' + JSSMS.Utils.toHex(opcode));
+        JSSMS.Utils.console.error('Unexpected opcode', '0xED ' + toHex(opcode));
     }
 
     bytecode.nextAddress = stream.position;
@@ -1355,7 +1356,7 @@ var Parser = (function() {
       case 0xF9:
         break;
       default:
-        JSSMS.Utils.console.error('Unexpected opcode', '0xDD/0xFD ' + JSSMS.Utils.toHex(opcode));
+        JSSMS.Utils.console.error('Unexpected opcode', '0xDD/0xFD ' + toHex(opcode));
     }
 
     bytecode.nextAddress = stream.position;

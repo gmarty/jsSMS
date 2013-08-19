@@ -27,19 +27,7 @@
  * @constructor
  */
 var Bytecode = (function() {
-  /**
-   * in DEBUG mode, get a hex from a decimal. Pad with 0 if necessary.
-   *
-   * @param {number} dec A decimal integer.
-   * @return {string} A hex representation of the input.
-   */
-  var toHex = function() {
-    if (DEBUG)
-      return JSSMS.Utils.toHex;
-    return function(dec) {
-      return dec;
-    }
-  }();
+  var toHex = JSSMS.Utils.toHex;
 
   /**
    * A bytecode is made of:

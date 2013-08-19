@@ -216,36 +216,49 @@ Generator.prototype = {
               return obj;
             });
 
-            return {
-              'type': 'Program',
-              'body': [
-                {
-                  'type': 'FunctionDeclaration',
-                  'id': {
-                    'type': 'Identifier',
-                    'name': name // Name of the function
-                  },
-                  'params': [
-                    {
+            if (DEBUG) {
+              return {
+                'type': 'Program',
+                'body': [
+                  {
+                    'type': 'FunctionDeclaration',
+                    'id': {
                       'type': 'Identifier',
-                      'name': 'temp'
+                      'name': name // Name of the function
                     },
-                    {
-                      'type': 'Identifier',
-                      'name': 'location'
-                    }
-                  ],
-                  'defaults': [],
-                  'body': {
-                    'type': 'BlockStatement',
-                    'body': body
-                  },
-                  'rest': null,
-                  'generator': false,
-                  'expression': false
-                }
-              ]
-            };
+                    'params': [
+                      {
+                        'type': 'Identifier',
+                        'name': 'temp'
+                      },
+                      {
+                        'type': 'Identifier',
+                        'name': 'location'
+                      }
+                    ],
+                    'defaults': [],
+                    'body': {
+                      'type': 'BlockStatement',
+                      'body': body
+                    },
+                    'rest': null,
+                    'generator': false,
+                    'expression': false
+                  }
+                ]
+              };
+            } else {
+              return {
+                'type': 'Program',
+                'body': body,
+                'comments': [
+                  {
+                    'type': 'Line',
+                    'value': name // Name of the function
+                  }
+                ]
+              };
+            }
           });
     }
     JSSMS.Utils.console.timeEnd('Generating');
