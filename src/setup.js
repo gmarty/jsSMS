@@ -41,6 +41,26 @@ var ENABLE_DEBUGGER = false;
  */
 var ENABLE_COMPILER = true;
 
+/** @const */ var WRITE_MODE = 0;
+/** @const */ var READ_MODE = 1;
+
+
+/**
+ * Whether to enable server logging of various data used for debugging purposes.
+ * This setting requires the server to be launched doing:
+ * `node bin/sync-server.js`
+ * Then, because of same domain policy, the emulator should be accessed from:
+ * `http://127.0.0.1:8124/`
+ * @define {boolean}
+ */
+var ENABLE_SERVER_LOGGER = false;
+
+
+/**
+ * @const
+ */
+var SYNC_MODE = READ_MODE;
+
 
 /**
  * @type {boolean}

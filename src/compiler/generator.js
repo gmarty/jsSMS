@@ -61,99 +61,52 @@ Generator.prototype = {
                   if (bytecode.ast == null)
                     bytecode.ast = [];
 
+                  if (ENABLE_SERVER_LOGGER) {
+                    // Sync server.
+                    var syncServerStmt = {
+                      'type': 'ExpressionStatement',
+                      'expression': {
+                        'type': 'CallExpression',
+                        'callee': n.Identifier('sync'),
+                        'arguments': []
+                      }
+                    };
+                  }
+
                   // Decrement tstates.
                   tstates += self.getTotalTStates(bytecode.opcode);
 
-                  if (bytecode.isFunctionEnder || bytecode.canEnd || bytecode.target != null) {
-                    var decreaseTStateStmt = [
-                      {
-                        'type': 'ExpressionStatement',
-                        'expression': {
-                          'type': 'AssignmentExpression',
-                          'operator': '-=',
-                          'left': {
-                            'type': 'Identifier',
-                            'name': 'tstates'
-                          },
-                          'right': {
-                            'type': 'Literal',
-                            'value': tstates
-                          }
-                        }
-                      }
-                    ];
-
-                    if (DEBUG) {
-                      if (decreaseTStateStmt[0]['expression']['right']['value'])
-                        decreaseTStateStmt[0]['expression']['right']['raw'] = toHex(decreaseTStateStmt[0]['expression']['right']['value']);
-                    }
-
-                    bytecode.ast = [].concat(decreaseTStateStmt, bytecode.ast);
-                    tstates = 0;
-                  }
-
-                  // Test tstates.
-                  /*var tStateCheck = [
+                  //if (bytecode.isFunctionEnder || bytecode.canEnd || bytecode.target != null) {
+                  var decreaseTStateStmt = [
                     {
-                      'type': 'IfStatement',
-                      'test': {
-                        'type': 'LogicalExpression',
-                        'operator': '&&',
+                      'type': 'ExpressionStatement',
+                      'expression': {
+                        'type': 'AssignmentExpression',
+                        'operator': '-=',
                         'left': {
-                          'type': 'BinaryExpression',
-                          'operator': '<=',
-                          'left': {
-                            'type': 'Identifier',
-                            'name': 'tstates'
-                          },
-                          'right': {
-                            'type': 'Literal',
-                            'value': 0,
-                            'raw': '0'
-                          }
+                          'type': 'Identifier',
+                          'name': 'tstates'
                         },
                         'right': {
-                          'type': 'CallExpression',
-                          'callee': {
-                            'type': 'Identifier',
-                            'name': 'eol'
-                          },
-                          'arguments': []
+                          'type': 'Literal',
+                          'value': tstates
                         }
-                      },
-                      'consequent': {
-                        'type': 'BlockStatement',
-                        'body': [
-                          {
-                            'type': 'ExpressionStatement',
-                            'expression': {
-                              'type': 'AssignmentExpression',
-                              'operator': '=',
-                              'left': {
-                                'type': 'Identifier',
-                                'name': 'pc'
-                              },
-                              'right': {
-                                'type': 'Literal',
-                                'value': bytecode.address + (bytecode.page * 0x4000)
-                              }
-                            }
-                          },
-                          {
-                            'type': 'ReturnStatement',
-                            'argument': null
-                          }
-                        ]
-                      },
-                      'alternate': null
+                      }
                     }
                   ];
 
+                  tstates = 0;
+
                   if (DEBUG) {
-                    tStateCheck[0]['consequent']['body'][0]['expression']['right']['raw'] = toHex(tStateCheck[0]['consequent']['body'][0]['expression']['right']['value']);
+                    decreaseTStateStmt[0]['expression']['right']['raw'] = toHex(decreaseTStateStmt[0]['expression']['right']['value']);
                   }
 
-                  bytecode.ast = [].concat(tStateCheck, bytecode.ast);*/
+                  if (ENABLE_SERVER_LOGGER) {
+                    decreaseTStateStmt = [].concat(syncServerStmt, decreaseTStateStmt);
+                  }
+
+                  bytecode.ast = [].concat(decreaseTStateStmt, bytecode.ast);
+                  //}
 
                   // Update `this.pc` statement.
                   if (/*bytecode.isFunctionEnder &&*/ bytecode.nextAddress != null) {
@@ -179,6 +132,67 @@ Generator.prototype = {
 
                     bytecode.ast.push(updatePcStmt);
                   }
+
+                  // Test tstates.
+                  /*var tStateCheck = {
+                    'type': 'IfStatement',
+                    'test': {
+                      'type': 'LogicalExpression',
+                      'operator': '&&',
+                      'left': {
+                        'type': 'BinaryExpression',
+                        'operator': '<=',
+                        'left': {
+                          'type': 'Identifier',
+                          'name': 'tstates'
+                        },
+                        'right': {
+                          'type': 'Literal',
+                          'value': 0,
+                          'raw': '0'
+                        }
+                      },
+                      'right': {
+                        'type': 'CallExpression',
+                        'callee': {
+                          'type': 'Identifier',
+                          'name': 'eol'
+                        },
+                        'arguments': []
+                      }
+                    },
+                    'consequent': {
+                      'type': 'BlockStatement',
+                      'body': [
+                        {
+                          'type': 'ExpressionStatement',
+                          'expression': {
+                            'type': 'AssignmentExpression',
+                            'operator': '=',
+                            'left': {
+                              'type': 'Identifier',
+                              'name': 'pc'
+                            },
+                            'right': {
+                              'type': 'Literal',
+                              'value': bytecode.address + (bytecode.page * 0x4000)
+                            }
+                          }
+                        },
+                        {
+                          'type': 'ReturnStatement',
+                          'argument': null
+                        }
+                      ]
+                    },
+                    'alternate': null
+                  };
+
+                  if (DEBUG) {
+                    //tStateCheck[0]['consequent']['body'][0]['expression']['right']['raw'] = toHex(tStateCheck[0]['consequent']['body'][0]['expression']['right']['value']);
+                  }
+
+                  bytecode.ast.push(tStateCheck);*/
 
                   if (DEBUG) {
                     // Inline comment about the current bytecode.

@@ -382,6 +382,24 @@ JSSMS.Z80 = function(sms) {
   if (ENABLE_COMPILER) {
     this.recompiler = new Recompiler(this);
   }
+
+  if (ENABLE_SERVER_LOGGER) {
+    if (SYNC_MODE == WRITE_MODE) {
+      this.syncServer = new SyncWriter();
+    } else {
+      this.syncServer = new SyncReader();
+    }
+
+    this.syncServer.tick();
+
+    this.sync = function() {
+      this.syncServer.sync16(this.pc, 'pc');
+      //this.syncServer.sync16(this.tstates, 'tstates');
+      //this.syncServer.sync16(Number(this.interruptLine), 'interruptLine');
+      //this.syncServer.sync16(this.sp, 'sp');
+      //this.syncServer.sync16(this.readMemWord(this.sp), 'readMemWord(sp)');
+    };
+  }
 };
 
 JSSMS.Z80.prototype = {
@@ -451,14 +469,23 @@ JSSMS.Z80.prototype = {
       if (ENABLE_COMPILER) {
         this.recompile();
       } else {
+        if (ENABLE_SERVER_LOGGER) {
+          this.sync();
+        }
+
         this.interpret();
       }
 
       // Execute eol() at end of scanlines and exit at end of frame.
       if (this.tstates <= 0) {
         if (this.eol())
-          return;
+          break;
       }
+    }
+
+    if (ENABLE_SERVER_LOGGER) {
+      // After each frame, we send logs to the server.
+      this.syncServer.tick();
     }
   },
 
