@@ -89,27 +89,8 @@ module.exports = function(grunt) {
       // @todo Refactor to remove 'src/build/exports.js' from object `js` prop.
       concat: {
         js: [
-          'src/setup.js',
-          'src/sms.js',
-          'src/utils.js',
-          'src/z80.js',
-          'src/debugger.js',
-          'src/keyboard.js',
-          'src/psg.js',
-          'src/vdp.js',
-          'src/ui.js',
-          'src/ports.js',
-          'src/compiler/bytecode.js',
-          'src/compiler/parser.js',
-          'src/compiler/opcodes-ast.js',
-          'src/compiler/opcodes-CB.js',
-          'src/compiler/opcodes-DD-FD.js',
-          'src/compiler/opcodes-ED.js',
-          'src/compiler/opcodes.js',
-          'src/compiler/analyzer.js',
-          'src/compiler/optimizer.js',
-          'src/compiler/generator.js',
-          'src/compiler/recompiler.js'
+          '<%= js %>',
+          '!src/build/exports.js'
         ],
         jsOutputFile: 'min/jssms.concat.js',
         options: {
@@ -125,27 +106,7 @@ module.exports = function(grunt) {
       // Generates a minified version of the script for the Firefox OS app.
       alec: {
         js: [
-          'src/setup.js',
-          'src/sms.js',
-          'src/utils.js',
-          'src/z80.js',
-          'src/keyboard.js',
-          'src/psg.js',
-          'src/vdp.js',
-          'src/alec/ui.js',
-          'src/ports.js',
-          'src/compiler/bytecode.js',
-          'src/compiler/parser.js',
-          'src/compiler/opcodes-ast.js',
-          'src/compiler/opcodes-CB.js',
-          'src/compiler/opcodes-DD-FD.js',
-          'src/compiler/opcodes-ED.js',
-          'src/compiler/opcodes.js',
-          'src/compiler/analyzer.js',
-          'src/compiler/optimizer.js',
-          'src/compiler/generator.js',
-          'src/compiler/recompiler.js',
-          'src/build/exports.js'
+          '<%= js %>'
         ],
         jsOutputFile: 'alec/min/alec.min.js',
         options: {
