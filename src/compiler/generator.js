@@ -34,7 +34,7 @@ var Generator = (function() {
    * @const
    */
   var whitelist = [
-    'temp', 'location', 'val', 'JSSMS.Utils.rndInt'
+    'temp', 'location', 'val', 'value', 'JSSMS.Utils.rndInt'
   ];
 
   /**

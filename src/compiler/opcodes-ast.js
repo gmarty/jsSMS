@@ -127,15 +127,6 @@ var n = {
       'argument': argument
     };
   },
-  UpdateExpression: function(operator, argument, prefix) {
-    if (prefix == undefined) prefix = false;
-    return {
-      'type': 'UpdateExpression',
-      'operator': operator,
-      'argument': argument,
-      'prefix': prefix
-    };
-  },
   MemberExpression: function(object, property) {
     return {
       'type': 'MemberExpression',
