@@ -60,19 +60,21 @@ Optimizer.prototype = {
   /**
    * This pass replaces references to defined registers with their respective values. Ex:
    * ```
-   * a = 0x03;
-   * writeMem(0xFFFE, a);
+   * b = 0x03;
+   * writeMem(0xFFFE, b);
    * ```
    *
    * Is optimized into:
    * ```
-   * a = 0x03;
+   * b = 0x03;
    * writeMem(0xFFFE, 0x03);
    * ```
    *
    * It has many flaws and can be optimized:
-   *  * Limited to register A (Others are tricky as they can be modified indirectly `this.setBC()`).
-   *  * Does not work if the register is modified indirectly (ex: `this.rra_a()`, `this.setAF()`).
+   *  * Inlining all getBC(), getDE()... methods will provide better efficiency.
+   *  * Limited to all registers but A and F:
+   *    * A support requires inlining of methods like `add_a`, `adc_a`, `sub_a`, `sbc_a`...
+   *    * F support requires inlining of methods like `ccf`, `add16`, `daa`, `rlc`...
    *  * Assignment to non literal can be improved (ex: `b = b - 1` forces b to be not inlinable).
    *
    *  Anyway, it is just a dummy example to test the integration in the workflow.
@@ -82,10 +84,24 @@ Optimizer.prototype = {
    */
   inlineRegisters: function(fn) {
     var definedReg = {
-      a: false
+      //a: false,
+      //f: false,
+      b: false,
+      c: false,
+      d: false,
+      e: false,
+      h: false,
+      l: false
     };
     var definedRegValue = {
-      a: {}
+      //a: {},
+      //f: {},
+      b: {},
+      c: {},
+      d: {},
+      e: {},
+      h: {},
+      l: {}
     };
 
     return fn.map(function(bytecodes) {
@@ -100,7 +116,8 @@ Optimizer.prototype = {
             ast.operator == '=' &&
             ast.left.type == 'Register' &&
             ast.right.type == 'Literal' &&
-            ast.left.name == 'a') {
+            ast.left.name != 'a' &&
+            ast.left.name != 'f') {
           definedReg[ast.left.name] = true;
           definedRegValue[ast.left.name] = ast.right;
         }
@@ -109,39 +126,63 @@ Optimizer.prototype = {
         if (ast.type == 'AssignmentExpression' &&
             ast.left.type == 'Register' &&
             ast.right.type != 'Literal' &&
-            ast.left.name == 'a') {
+            ast.left.name != 'a' &&
+            ast.left.name != 'f') {
           definedReg[ast.left.name] = false;
           definedRegValue[ast.left.name] = {};
           return ast;
         }
 
         // Then inline arguments.
-        if (ast.type == 'CallExpression' &&
-            ast.arguments[0] &&
-            ast.arguments[0].type == 'Register' &&
-            definedReg[ast.arguments[0].name] &&
-            ast.arguments[0].name == 'a') {
-          ast.arguments[0] = definedRegValue[ast.arguments[0].name];
-          //JSSMS.Utils.console.log(ast.callee.name);
+        if (ast.type == 'CallExpression') {
+          if (ast.arguments[0] &&
+              ast.arguments[0].type == 'Register' &&
+              definedReg[ast.arguments[0].name] &&
+              ast.arguments[0].name != 'a' &&
+              ast.arguments[0].name != 'f') {
+            ast.arguments[0] = definedRegValue[ast.arguments[0].name];
+            //JSSMS.Utils.console.log(ast.callee.name);
+          }
+          if (ast.arguments[1] &&
+              ast.arguments[1].type == 'Register' &&
+              definedReg[ast.arguments[1].name] &&
+              ast.arguments[1].name != 'a' &&
+              ast.arguments[1].name != 'f') {
+            ast.arguments[1] = definedRegValue[ast.arguments[1].name];
+            //JSSMS.Utils.console.log(ast.callee.name);
+          }
           return ast;
         }
-        if (ast.type == 'CallExpression' &&
-            ast.arguments[1] &&
-            ast.arguments[1].type == 'Register' &&
-            definedReg[ast.arguments[1].name] &&
-            ast.arguments[1].name == 'a') {
-          ast.arguments[1] = definedRegValue[ast.arguments[1].name];
-          //JSSMS.Utils.console.log(ast.callee.name);
-          return ast;
-        }
+
         // Inline object/array properties.
         if (ast.type == 'MemberExpression' &&
             ast.property.type == 'Register' &&
             definedReg[ast.property.name] &&
-            ast.property.name == 'a') {
+            ast.property.name != 'a' &&
+            ast.property.name != 'f') {
           ast.property = definedRegValue[ast.property.name];
           //JSSMS.Utils.console.log(ast.property.name);
           return ast;
+        }
+
+        // Inline binary expressions.
+        if (ast.type == 'BinaryExpression') {
+          if (ast.right.type == 'Register' &&
+              definedReg[ast.right.name] &&
+              ast.right.name != 'a' &&
+              ast.right.name != 'f') {
+            ast.right = definedRegValue[ast.right.name];
+            //JSSMS.Utils.console.log(ast.right.name);
+            return ast;
+          }
+          if (ast.left.type == 'Register' &&
+              definedReg[ast.left.name] &&
+              ast.left.name != 'a' &&
+              ast.left.name != 'f') {
+            ast.left = definedRegValue[ast.left.name];
+            //JSSMS.Utils.console.log(ast.right.name);
+            return ast;
+          }
         }
 
         return ast;

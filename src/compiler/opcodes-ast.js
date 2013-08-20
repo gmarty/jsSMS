@@ -240,7 +240,7 @@ var o = {
               n.Register(srcRegister),
               n.Register('i')
               )),
-          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('f'),
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Register('f'),
               n.BinaryExpression('|',
               n.BinaryExpression('|',
                 n.BinaryExpression('&', n.Register('f'), n.Literal(F_CARRY)),
@@ -259,7 +259,7 @@ var o = {
               n.Register(srcRegister),
               REFRESH_EMULATION ? n.Register('r') : n.CallExpression('JSSMS.Utils.rndInt', n.Literal(255))
               )),
-          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('f'),
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Register('f'),
               n.BinaryExpression('|',
               n.BinaryExpression('|',
                 n.BinaryExpression('&', n.Register('f'), n.Literal(F_CARRY)),
@@ -503,24 +503,6 @@ var o = {
             [n.CallExpression('get' + (register1 + register2).toUpperCase()),
              n.CallExpression('get' + (register3 + register4).toUpperCase())]
             ));
-      };
-  },
-  ADC16: function(register1, register2) {
-    if (register2 == undefined)
-      return function() {
-        // adc16(sp);
-        return n.ExpressionStatement(
-            n.CallExpression('add16', n.Identifier(register1))
-        );
-      };
-    else
-      return function() {
-        // adc16(getBC());
-        return n.ExpressionStatement(
-            n.CallExpression('add16',
-            n.CallExpression('get' + (register1 + register2).toUpperCase())
-            )
-        );
       };
   },
   RLCA: function() {
@@ -1438,12 +1420,186 @@ var o = {
     };
   },
   // ED prefixed opcodes.
+  ADC16: function(register1, register2) {
+    return function(value, target, nextAddress) {
+      if (register2 == undefined)
+        // var value = sp;
+        var valueAST = n.VariableDeclaration('value', n.Identifier(register1));
+      else
+        // var val = (b << 8) | c;
+        var valueAST = n.VariableDeclaration('value', n.BinaryExpression('|', n.BinaryExpression('<<', n.Register(register1), n.Literal(8)), n.Register(register2)));
+
+      // var value = getBC();
+      // var val = (h << 8) | l;
+      // temp = val + value + (f & F_CARRY);
+      // f = (((val ^ temp ^ value) >> 8) & 0x10) | ((temp >> 16) & 1) | ((temp >> 8) & 0x80) | (((temp & 0xFFFF) != 0) ? 0 : 0x40) | (((value ^ val ^ 0x8000) & (value ^ temp) & 0x8000) >> 13);
+      // h = (temp >> 8) & 0xFF;
+      // l = temp & 0xFF;
+      return [
+        valueAST,
+        n.VariableDeclaration('val', n.BinaryExpression('|', n.BinaryExpression('<<', n.Register('h'), n.Literal(8)), n.Register('l'))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'),
+            n.BinaryExpression('+',
+            n.BinaryExpression('+', n.Identifier('val'), n.Identifier('value')),
+            n.BinaryExpression('&', n.Register('f'), n.Literal(F_CARRY)))
+            )
+        ),
+        n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register('f'),
+            n.BinaryExpression('|',
+              n.BinaryExpression('|',
+                n.BinaryExpression('|',
+                  n.BinaryExpression('|',
+                    n.BinaryExpression('&',
+                      n.BinaryExpression('>>',
+                        n.BinaryExpression('^',
+                          n.BinaryExpression('^', n.Identifier('val'), n.Identifier('temp')),
+                          n.Identifier('value')
+                        ),
+                        n.Literal(0x08)
+                      ),
+                      n.Literal(0x10)
+                    ),
+                    n.BinaryExpression('&',
+                      n.BinaryExpression('>>', n.Identifier('temp'), n.Literal(0x10)),
+                      n.Literal(0x01)
+                    )
+                  ),
+                  n.BinaryExpression('&',
+                    n.BinaryExpression('>>', n.Identifier('temp'), n.Literal(0x08)),
+                    n.Literal(0x80)
+                  )
+                ),
+                n.ConditionalExpression(
+                  n.BinaryExpression('!=',
+                    n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0xFFFF)),
+                    n.Literal(0x00)
+                  ),
+                  n.Literal(0x00),
+                  n.Literal(0x40)
+                )
+              ),
+              n.BinaryExpression('>>',
+                n.BinaryExpression('&',
+                  n.BinaryExpression('&',
+                    n.BinaryExpression('^',
+                      n.BinaryExpression('^', n.Identifier('value'), n.Identifier('val')),
+                      n.Literal(0x8000)
+                    ),
+                    n.BinaryExpression('^', n.Identifier('value'), n.Identifier('temp'))
+                  ),
+                  n.Literal(0x8000)
+                ),
+                n.Literal(0x0D)
+              )
+            )
+            )
+        ),
+        n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register('h'),
+            n.BinaryExpression('&',
+              n.BinaryExpression('>>', n.Identifier('temp'), n.Literal(0x08)),
+              n.Literal(0xFF)
+            )
+            )
+        ),
+        n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register('l'),
+            n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0xFF))
+            )
+        )
+      ];
+    };
+  },
   SBC16: function(register1, register2) {
     return function(value, target, nextAddress) {
-      // sbc16(getBC());
-      return n.ExpressionStatement(
-          n.CallExpression('sbc16', n.CallExpression('get' + (register1 + register2).toUpperCase()))
-      );
+      if (register2 == undefined)
+        // var value = sp;
+        var valueAST = n.VariableDeclaration('value', n.Identifier(register1));
+      else
+        // var val = (b << 8) | c;
+        var valueAST = n.VariableDeclaration('value', n.BinaryExpression('|', n.BinaryExpression('<<', n.Register(register1), n.Literal(8)), n.Register(register2)));
+
+      // var value = getBC();
+      // var val = (h << 8) | l;
+      // temp = val - value - (f & F_CARRY);
+      // f = (((val ^ temp ^ value) >> 8) & 0x10) | ((temp >> 16) & 1) | ((temp >> 8) & 0x80) | (((temp & 0xFFFF) != 0) ? 0 : 0x40) | (((value ^ val ^ 0x8000) & (value ^ temp) & 0x8000) >> 13);
+      // h = (temp >> 8) & 0xFF;
+      // l = temp & 0xFF;
+      return [
+        valueAST,
+        n.VariableDeclaration('val', n.BinaryExpression('|', n.BinaryExpression('<<', n.Register('h'), n.Literal(8)), n.Register('l'))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'),
+            n.BinaryExpression('-',
+            n.BinaryExpression('-', n.Identifier('val'), n.Identifier('value')),
+            n.BinaryExpression('&', n.Register('f'), n.Literal(F_CARRY)))
+            )
+        ),
+        n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register('f'),
+            n.BinaryExpression('|',
+              n.BinaryExpression('|',
+                n.BinaryExpression('|',
+                  n.BinaryExpression('|',
+                    n.BinaryExpression('|',
+                      n.BinaryExpression('&',
+                        n.BinaryExpression('>>',
+                          n.BinaryExpression('^',
+                            n.BinaryExpression('^', n.Identifier('val'), n.Identifier('temp')),
+                            n.Identifier('value')
+                          ),
+                          n.Literal(0x08)
+                        ),
+                        n.Literal(0x10)
+                      ),
+                      n.Literal(0x02)
+                    ),
+                    n.BinaryExpression('&',
+                      n.BinaryExpression('>>', n.Identifier('temp'), n.Literal(0x10)),
+                      n.Literal(0x01)
+                    )
+                  ),
+                  n.BinaryExpression('&',
+                    n.BinaryExpression('>>', n.Identifier('temp'), n.Literal(0x08)),
+                    n.Literal(0x80)
+                  )
+                ),
+                n.ConditionalExpression(
+                  n.BinaryExpression('!=',
+                    n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0xFFFF)),
+                    n.Literal(0x00)
+                  ),
+                  n.Literal(0x00),
+                  n.Literal(0x40)
+                )
+              ),
+              n.BinaryExpression('>>',
+                n.BinaryExpression('&',
+                  n.BinaryExpression('&',
+                    n.BinaryExpression('^', n.Identifier('value'), n.Identifier('val')),
+                    n.BinaryExpression('^', n.Identifier('val'), n.Identifier('temp'))
+                  ),
+                  n.Literal(0x8000)
+                ),
+                n.Literal(0x0D)
+              )
+            )
+            )
+        ),
+        n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register('h'),
+            n.BinaryExpression('&',
+              n.BinaryExpression('>>', n.Identifier('temp'), n.Literal(0x08)),
+              n.Literal(0xFF)
+            )
+            )
+        ),
+        n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register('l'),
+              n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0xFF))
+            )
+        )
+      ];
     };
   },
   NEG: function() {
@@ -1602,13 +1758,13 @@ var o = {
   },
   LDI: function() {
     return function(value, target, nextAddress) {
-      // temp = this.readMem(this.getHL());
-      // this.writeMem(this.getDE(), temp);
-      // this.decBC();
-      // this.incDE();
-      // this.incHL();
-      // temp = (temp + this.a) & 0xFF;
-      // this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);
+      // temp = readMem(getHL());
+      // writeMem(getDE(), temp);
+      // decBC();
+      // incDE();
+      // incHL();
+      // temp = (temp + a) & 0xFF;
+      // f = (f & 0xC1) | (getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);
 
       return [
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), o.READ_MEM8(n.CallExpression('get' + ('h' + 'l').toUpperCase())))),
@@ -1709,15 +1865,15 @@ var o = {
   },
   LDIR: function() {
     return function(value, target, nextAddress) {
-      // temp = this.readMem(this.getHL());
-      // this.writeMem(this.getDE(), temp);
-      // this.decBC();
-      // this.incDE();
-      // this.incHL();
-      // temp = (temp + this.a) & 0xFF;
-      // this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);
-      // if (this.getBC() != 0) {
-      //   this.tstates -= 5;
+      // temp = readMem(getHL());
+      // writeMem(getDE(), temp);
+      // decBC();
+      // incDE();
+      // incHL();
+      // temp = (temp + a) & 0xFF;
+      // f = (f & 0xC1) | (getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);
+      // if (getBC() != 0) {
+      //   tstates -= 5;
       //   return;
       // }
 
