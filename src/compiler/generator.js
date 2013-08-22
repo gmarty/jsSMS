@@ -38,6 +38,35 @@ var Generator = (function() {
   ];
 
   /**
+   * @param {Array.<number>} opcodes
+   * @return {number}
+   */
+  function getTotalTStates(opcodes) {
+    var tstates = 0;
+
+    switch (opcodes[0]) {
+      case 0xCB:
+        tstates = OP_CB_STATES[opcodes[1]];
+        break;
+      case 0xDD:
+      case 0xFD:
+        if (opcodes.length == 2)
+          tstates = OP_DD_STATES[opcodes[1]];
+        else
+          tstates = OP_INDEX_CB_STATES[opcodes[2]];
+        break;
+      case 0xED:
+        tstates = OP_ED_STATES[opcodes[1]];
+        break;
+      default:
+        tstates = OP_STATES[opcodes[0]];
+        break;
+    }
+
+    return tstates;
+  }
+
+  /**
    * Replace `Register` type with `Identifier`.
    */
   function convertRegisters(ast) {
@@ -90,7 +119,7 @@ var Generator = (function() {
                     }
 
                     // Decrement tstates.
-                    tstates += self.getTotalTStates(bytecode.opcode);
+                    tstates += getTotalTStates(bytecode.opcode);
 
                     //if (bytecode.isFunctionEnder || bytecode.canEnd || bytecode.target != null) {
                     var decreaseTStateStmt = [
@@ -315,32 +344,6 @@ var Generator = (function() {
       JSSMS.Utils.console.timeEnd('Generating');
 
       this.ast = functions;
-    },
-
-
-    getTotalTStates: function(opcodes) {
-      var tstates = 0;
-
-      switch (opcodes[0]) {
-        case 0xCB:
-          tstates = OP_CB_STATES[opcodes[1]];
-          break;
-        case 0xDD:
-        case 0xFD:
-          if (opcodes.length == 2)
-            tstates = OP_DD_STATES[opcodes[1]];
-          else
-            tstates = OP_INDEX_CB_STATES[opcodes[2]];
-          break;
-        case 0xED:
-          tstates = OP_ED_STATES[opcodes[1]];
-          break;
-        default:
-          tstates = OP_STATES[opcodes[0]];
-          break;
-      }
-
-      return tstates;
     }
   };
 
