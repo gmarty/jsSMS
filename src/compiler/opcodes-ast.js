@@ -166,8 +166,6 @@ var n = {
 
 // List of common operations for the Z80.
 // Each entry returns a function accepting an optional parameter.
-// @todo Remove useless returns and make sure isFunctionEnder is correctly set in Parser.
-/** @struct */
 var o = {
   // Helper function for setting 2 registers at the same time.
   SET16: function(register1, register2, value) {
