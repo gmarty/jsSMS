@@ -1657,8 +1657,8 @@ var o = {
     return function(value, target, nextAddress) {
       // temp = readMem(getHL());
       // port.out(c, temp);
-      // incHL();
       // b = dec8(b);
+      // incHL();
       // if ((l + temp) > 255) {
       //   f |= F_CARRY;
       //   f |= F_HALFCARRY;
@@ -1675,8 +1675,8 @@ var o = {
       return [
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), o.READ_MEM8(n.CallExpression('get' + ('h' + 'l').toUpperCase())))),
         n.ExpressionStatement(n.CallExpression('port.out', [n.Register('c'), n.Identifier('temp')])),
-        n.ExpressionStatement(n.CallExpression('incHL')),
         o.DEC8('b')(),
+        n.ExpressionStatement(n.CallExpression('incHL')),
         n.IfStatement(
             n.BinaryExpression('>', n.BinaryExpression('+', n.Register('l'), n.Identifier('temp')), n.Literal(255)),
             n.BlockStatement([
@@ -1704,8 +1704,8 @@ var o = {
     return function(value, target, nextAddress) {
       // temp = readMem(getHL());
       // port.out(c, temp);
-      // decHL();
       // b = dec8(b);
+      // decHL();
       // if ((l + temp) > 255) {
       //   f |= F_CARRY;
       //   f |= F_HALFCARRY;
@@ -1722,8 +1722,8 @@ var o = {
       return [
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), o.READ_MEM8(n.CallExpression('get' + ('h' + 'l').toUpperCase())))),
         n.ExpressionStatement(n.CallExpression('port.out', [n.Register('c'), n.Identifier('temp')])),
-        n.ExpressionStatement(n.CallExpression('decHL')),
         o.DEC8('b')(),
+        n.ExpressionStatement(n.CallExpression('decHL')),
         n.IfStatement(
             n.BinaryExpression('>', n.BinaryExpression('+', n.Register('l'), n.Identifier('temp')), n.Literal(255)),
             n.BlockStatement([
@@ -1788,8 +1788,8 @@ var o = {
     return function(value, target, nextAddress) {
       // temp = (f & F_CARRY) | F_NEGATIVE;
       // cp_a(readMem(getHL())); // sets some flags
-      // incHL();
       // decBC();
+      // incHL();
       // temp |= (getBC() == 0 ? 0 : F_PARITY);
       // f = (f & 0xF8) | temp;
       return [
@@ -1804,8 +1804,8 @@ var o = {
               o.READ_MEM8(n.CallExpression('get' + ('h' + 'l').toUpperCase()))
             ])
         ),
-        n.ExpressionStatement(n.CallExpression('incHL')),
         n.ExpressionStatement(n.CallExpression('decBC')),
+        n.ExpressionStatement(n.CallExpression('incHL')),
         n.ExpressionStatement(n.AssignmentExpression('|=', n.Identifier('temp'), n.ConditionalExpression(
             n.BinaryExpression('==', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0)),
             n.Literal(0),
@@ -1906,8 +1906,8 @@ var o = {
     return function(value, target, nextAddress) {
       // temp = (f & F_CARRY) | F_NEGATIVE;
       // cp_a(readMem(getHL())); // sets zero flag for us
-      // incHL();
       // decBC();
+      // incHL();
       // temp |= (getBC() == 0 ? 0 : F_PARITY);
       // Repeat instruction until a = (hl) or bc == 0
       // if ((temp & F_PARITY) != 0 && (f & F_ZERO) == 0) {
@@ -1929,8 +1929,8 @@ var o = {
               o.READ_MEM8(n.CallExpression('get' + ('h' + 'l').toUpperCase()))
             ])
         ),
-        n.ExpressionStatement(n.CallExpression('incHL')),
         n.ExpressionStatement(n.CallExpression('decBC')),
+        n.ExpressionStatement(n.CallExpression('incHL')),
         n.ExpressionStatement(n.AssignmentExpression('|=', n.Identifier('temp'), n.ConditionalExpression(
             n.BinaryExpression('==', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0)),
             n.Literal(0),

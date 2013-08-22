@@ -2309,8 +2309,8 @@ JSSMS.Z80.prototype = {
       case 0xA1:
         temp = (this.f & F_CARRY) | F_NEGATIVE;
         this.cp_a(this.readMem(this.getHL())); // sets some flags
-        this.incHL();
         this.decBC();
+        this.incHL();
 
         temp |= (this.getBC() == 0 ? 0 : F_PARITY);
 
@@ -2337,10 +2337,10 @@ JSSMS.Z80.prototype = {
         temp = this.readMem(this.getHL());
         // (C) <- (HL)
         this.port.out(this.c, temp);
-        // HL <- HL + 1
-        this.incHL();
         // B <- B -1
         this.b = this.dec8(this.b); // Flags in OUTI adjusted in same way as dec b anyway.
+        // HL <- HL + 1
+        this.incHL();
 
         if ((this.l + temp) > 255) {
           this.f |= F_CARRY; this.f |= F_HALFCARRY;
@@ -2369,8 +2369,8 @@ JSSMS.Z80.prototype = {
       case 0xA9:
         temp = (this.f & F_CARRY) | F_NEGATIVE;
         this.cp_a(this.readMem(this.getHL())); // sets some flags
-        this.decHL();
         this.decBC();
+        this.decHL();
 
         temp |= (this.getBC() == 0 ? 0 : F_PARITY);
 
@@ -2397,10 +2397,10 @@ JSSMS.Z80.prototype = {
         temp = this.readMem(this.getHL());
         // (C) <- (HL)
         this.port.out(this.c, temp);
-        // HL <- HL - 1
-        this.decHL();
         // B <- B -1
         this.b = this.dec8(this.b); // Flags in OUTI adjusted in same way as dec b anyway.
+        // HL <- HL - 1
+        this.decHL();
 
         if ((this.l + temp) > 255) {
           this.f |= F_CARRY; this.f |= F_HALFCARRY;
@@ -2434,8 +2434,8 @@ JSSMS.Z80.prototype = {
       case 0xB1:
         temp = (this.f & F_CARRY) | F_NEGATIVE;
         this.cp_a(this.readMem(this.getHL())); // sets zero flag for us
-        this.incHL();
         this.decBC();
+        this.incHL();
 
         temp |= (this.getBC() == 0 ? 0 : F_PARITY);
 
@@ -2517,8 +2517,8 @@ JSSMS.Z80.prototype = {
       case 0xB9:
         temp = (this.f & F_CARRY) | F_NEGATIVE;
         this.cp_a(this.readMem(this.getHL())); // sets zero flag for us
-        this.decHL();
         this.decBC();
+        this.decHL();
 
         temp |= (this.getBC() == 0 ? 0 : F_PARITY);
 
