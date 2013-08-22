@@ -87,7 +87,7 @@ var Recompiler = (function() {
             self.cpu.branches[page][funcName] = new Function('return ' + self.generateCodeFromAst(fn))();
           } else {
             var funcName = fn.comments[0].value;
-            self.cpu.branches[page][funcName] = new Function('temp', 'location', self.generateCodeFromAst(fn));
+            self.cpu.branches[page][funcName] = new Function('page', 'temp', 'location', self.generateCodeFromAst(fn));
           }
         });
       }
@@ -143,7 +143,7 @@ var Recompiler = (function() {
           fn.body[0].id.name = '_' + toHex(funcName);
           self.cpu.branches[romPage][address % 0x4000] = new Function('return ' + self.generateCodeFromAst(fn))();
         } else {
-          self.cpu.branches[romPage][address % 0x4000] = new Function('temp', 'location', self.generateCodeFromAst(fn));
+          self.cpu.branches[romPage][address % 0x4000] = new Function('page', 'temp', 'location', self.generateCodeFromAst(fn));
         }
       });
     },

@@ -34,7 +34,7 @@ var Generator = (function() {
    * @const
    */
   var whitelist = [
-    'temp', 'location', 'val', 'value', 'JSSMS.Utils.rndInt'
+    'page', 'temp', 'location', 'val', 'value', 'JSSMS.Utils.rndInt'
   ];
 
   /**
@@ -136,14 +136,31 @@ var Generator = (function() {
                             'name': 'pc'
                           },
                           'right': {
-                            'type': 'Literal',
-                            'value': bytecode.nextAddress
+                            'type': 'BinaryExpression',
+                            'operator': '+',
+                            'left': {
+                              'type': 'Literal',
+                              'value': bytecode.nextAddress % 0x4000
+                            },
+                            'right': {
+                              'type': 'BinaryExpression',
+                              'operator': '*',
+                              'left': {
+                                'type': 'Identifier',
+                                'name': 'page'
+                              },
+                              'right': {
+                                'type': 'Literal',
+                                'value': 0x4000
+                              }
+                            }
                           }
                         }
                       };
 
                       if (DEBUG) {
-                        updatePcStmt['expression']['right']['raw'] = toHex(updatePcStmt['expression']['right']['value']);
+                        updatePcStmt['expression']['right']['left']['raw'] = toHex(updatePcStmt['expression']['right']['left']['value']);
+                        updatePcStmt['expression']['right']['right']['right']['raw'] = '0x4000';
                       }
 
                       bytecode.ast.push(updatePcStmt);
@@ -257,6 +274,10 @@ var Generator = (function() {
                         'name': name // Name of the function
                       },
                       'params': [
+                        {
+                          'type': 'Identifier',
+                          'name': 'page'
+                        },
                         {
                           'type': 'Identifier',
                           'name': 'temp'

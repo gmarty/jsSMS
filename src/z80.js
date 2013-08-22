@@ -495,28 +495,28 @@ JSSMS.Z80.prototype = {
       if (!this.branches[0][this.pc]) {
         this.recompiler.recompileFromAddress(this.pc, 0, 0);
       }
-      this.branches[0][this.pc].call(this);
+      this.branches[0][this.pc].call(this, 0);
 
       return;
     } else if (this.pc < 0x4000) {
       if (!this.branches[this.frameReg[0]][this.pc]) {
         this.recompiler.recompileFromAddress(this.pc, this.frameReg[0], 0);
       }
-      this.branches[this.frameReg[0]][this.pc].call(this);
+      this.branches[this.frameReg[0]][this.pc].call(this, 0);
 
       return;
     } else if (this.pc < 0x8000) {
       if (!this.branches[this.frameReg[1]][(this.pc - 0x4000)]) {
         this.recompiler.recompileFromAddress(this.pc, this.frameReg[1], 1);
       }
-      this.branches[this.frameReg[1]][(this.pc - 0x4000)].call(this);
+      this.branches[this.frameReg[1]][(this.pc - 0x4000)].call(this, 1);
 
       return;
     } else if (this.pc < 0xC000) {
       if (!this.branches[this.frameReg[2]][(this.pc - 0x8000)]) {
         this.recompiler.recompileFromAddress(this.pc, this.frameReg[2], 2);
       }
-      this.branches[this.frameReg[2]][(this.pc - 0x8000)].call(this);
+      this.branches[this.frameReg[2]][(this.pc - 0x8000)].call(this, 2);
 
       return;
     }
