@@ -985,9 +985,15 @@ var o = {
   CALL: function(operator, bitMask) {
     if (operator == undefined && bitMask == undefined)
       return function(value, target, nextAddress) {
-        // push1(nextAddress + 2); pc = target; return;
+        // push1(nextAddress + (page * 0x4000));
+        // pc = target;
+        // return;
         return [
-          n.ExpressionStatement(n.CallExpression('push1', n.Literal(nextAddress))),
+          n.ExpressionStatement(n.CallExpression('push1', n.BinaryExpression('+',
+            n.Literal(nextAddress % 0x4000), n.BinaryExpression('*',
+              n.Identifier('page'), n.Literal(0x4000)
+            ))
+          )),
           n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
           n.ReturnStatement()
         ];
@@ -995,7 +1001,7 @@ var o = {
     else
       return function(value, target, nextAddress) {
         // if ((f & F_ZERO) == 0) {
-        //   push1(nextAddress + 2);
+        //   push1(nextAddress + (page * 0x4000));
         //   tstates -= 7;
         //   pc = target;
         //   return;
@@ -1007,7 +1013,11 @@ var o = {
             ),
             n.BlockStatement([
               n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(7))),
-              n.ExpressionStatement(n.CallExpression('push1', n.Literal(nextAddress))),
+              n.ExpressionStatement(n.CallExpression('push1', n.BinaryExpression('+',
+                n.Literal(nextAddress % 0x4000), n.BinaryExpression('*',
+                  n.Identifier('page'), n.Literal(0x4000)
+                ))
+              )),
               n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
               n.ReturnStatement()
             ])
@@ -1016,9 +1026,15 @@ var o = {
   },
   RST: function(targetAddress) {
     return function(value, target, nextAddress) {
-      // push1(nextAddress); pc = target; return;
+      // push1(nextAddress + (page * 0x4000));
+      // pc = target;
+      // return;
       return [
-        n.ExpressionStatement(n.CallExpression('push1', n.Literal(nextAddress))),
+        n.ExpressionStatement(n.CallExpression('push1', n.BinaryExpression('+',
+          n.Literal(nextAddress % 0x4000), n.BinaryExpression('*',
+            n.Identifier('page'), n.Literal(0x4000)
+          ))
+        )),
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(targetAddress))),
         n.ReturnStatement()
       ];
@@ -1142,7 +1158,7 @@ var o = {
     return function(value, target, nextAddress) {
       // if (HALT_SPEEDUP) tstates = 0;
       // halt = true;
-      // pc = nextAddress - 1;
+      // pc = (nextAddress - 1) + (page * 0x4000);
       // return;
       var ret = [];
       if (HALT_SPEEDUP)
@@ -1150,7 +1166,10 @@ var o = {
 
       return ret.concat([
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('halt'), n.Literal(true))),
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(nextAddress - 1))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.BinaryExpression('+',
+          n.Literal((nextAddress - 1) % 0x4000), n.BinaryExpression('*',
+            n.Identifier('page'), n.Literal(0x4000)
+          )))),
         n.ReturnStatement()
       ]);
     };

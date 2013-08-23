@@ -227,21 +227,6 @@ var Generator = (function() {
                         'type': 'BlockStatement',
                         'body': [
                           {
-                            'type': 'ExpressionStatement',
-                            'expression': {
-                              'type': 'AssignmentExpression',
-                              'operator': '=',
-                              'left': {
-                                'type': 'Identifier',
-                                'name': 'pc'
-                              },
-                              'right': {
-                                'type': 'Literal',
-                                'value': bytecode.address + (bytecode.page * 0x4000)
-                              }
-                            }
-                          },
-                          {
                             'type': 'ReturnStatement',
                             'argument': null
                           }
@@ -249,10 +234,6 @@ var Generator = (function() {
                       },
                       'alternate': null
                     };
-
-                    if (DEBUG) {
-                      //tStateCheck[0]['consequent']['body'][0]['expression']['right']['raw'] = toHex(tStateCheck[0]['consequent']['body'][0]['expression']['right']['value']);
-                    }
 
                     bytecode.ast.push(tStateCheck);*/
 
