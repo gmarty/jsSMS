@@ -250,6 +250,10 @@ function generateIndexTable(index) {
       name: 'SBC A,(' + index + '+d)',
       ast: o.SBC_X(registerH, registerL)
     },
+    0xAE: {
+      name: 'XOR A,(' + index + '+d)',
+      ast: o.XOR_X(registerH, registerL)
+    },
     0xCB:
         index == 'IX' ? opcodeTableDDCB : opcodeTableFDCB,
     0xB6: {

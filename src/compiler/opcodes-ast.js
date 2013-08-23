@@ -1391,6 +1391,21 @@ var o = {
       ];
     };
   },
+  XOR_X: function(register1, register2) {
+    return function(value, target, nextAddress) {
+      // a ^= readMem(getIXHIXL() + value); f = SZP_TABLE[a];
+      return [
+        n.ExpressionStatement(
+            n.AssignmentExpression('^=', n.Register('a'), o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
+            n.Literal(value))))),
+        n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register('f'),
+            n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a'))
+            )
+        )
+      ];
+    };
+  },
   CP_X: function(register1, register2) {
     return function(value) {
       // cp_a(readMem(getIXHIXL() + value));

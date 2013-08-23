@@ -77,6 +77,10 @@ var opcodeTableED = {
     name: 'IM 0',
     ast: o.IM(0)
   },
+  0x4F: {
+    name: 'LD R,A',
+    ast: o.LD8('r', 'a')
+  },
   0x50: {
     name: 'IN D,(C)',
     ast: o.IN('d', 'c')
