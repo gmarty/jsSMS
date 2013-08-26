@@ -876,13 +876,16 @@ var o = {
     return function(value, target) {
       // if (test) {
       //   tstates -= 5;
-      //   pc = target;
+      //   pc = target + (page * 0x4000);
       // }
       return n.IfStatement(
           test,
           n.BlockStatement([
             n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
-            n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
+            n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.BinaryExpression('+',
+                n.Literal(target % 0x4000), n.BinaryExpression('*',
+                n.Identifier('page'), n.Literal(0x4000)
+                )))),
             n.ReturnStatement()
           ])
       );
