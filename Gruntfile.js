@@ -1,5 +1,4 @@
 module.exports = function(grunt) {
-
   grunt.loadNpmTasks('grunt-closure-compiler');
   grunt.loadNpmTasks('grunt-contrib-htmlmin');
   grunt.loadNpmTasks('grunt-contrib-concat');
@@ -20,7 +19,7 @@ module.exports = function(grunt) {
       'src/keyboard.js',
       'src/psg.js',
       'src/vdp.js',
-      'src/ui.js',
+      '<%= grunt.task.current.name == "closure-compiler:alec" ? "src/alec/ui.js" : grunt.task.current.name == "closure-compiler:node" ? "src/node/ui.js" : "src/ui.js" %>',
       'src/ports.js',
       'src/compiler/bytecode.js',
       'src/compiler/parser.js',
@@ -33,7 +32,7 @@ module.exports = function(grunt) {
       'src/compiler/optimizer.js',
       'src/compiler/generator.js',
       'src/compiler/recompiler.js',
-      'src/build/exports.js'
+      'src/build/exports.js' // Only required inADVANCED_OPTIMIZATIONS mode, that is node target.
     ],
     externs: [
       '<%= closurePath %>/contrib/externs/webkit_console.js',
@@ -91,30 +90,7 @@ module.exports = function(grunt) {
       // Generates a unminified concatenated version.
       // @todo Refactor to remove 'src/build/exports.js' from object `js` prop.
       concat: {
-        js: [
-          'src/setup.js',
-          'src/sms.js',
-          'src/utils.js',
-          'src/sync-client.js',
-          'src/z80.js',
-          'src/debugger.js',
-          'src/keyboard.js',
-          'src/psg.js',
-          'src/vdp.js',
-          'src/ui.js',
-          'src/ports.js',
-          'src/compiler/bytecode.js',
-          'src/compiler/parser.js',
-          'src/compiler/opcodes-ast.js',
-          'src/compiler/opcodes-CB.js',
-          'src/compiler/opcodes-DD-FD.js',
-          'src/compiler/opcodes-ED.js',
-          'src/compiler/opcodes.js',
-          'src/compiler/analyzer.js',
-          'src/compiler/optimizer.js',
-          'src/compiler/generator.js',
-          'src/compiler/recompiler.js'
-        ],
+        js: '<%= js %>',
         jsOutputFile: 'min/jssms.concat.js',
         options: {
           compilation_level: 'WHITESPACE_ONLY',
@@ -149,8 +125,7 @@ module.exports = function(grunt) {
           'src/compiler/analyzer.js',
           'src/compiler/optimizer.js',
           'src/compiler/generator.js',
-          'src/compiler/recompiler.js',
-          'src/build/exports.js'
+          'src/compiler/recompiler.js'
         ],
         jsOutputFile: 'alec/min/alec.min.js',
         options: {
@@ -201,37 +176,14 @@ module.exports = function(grunt) {
 
       // Generates a minified version of the script to use with node.js.
       node: {
-        js: [
-          'src/setup.js',
-          'src/sms.js',
-          'src/utils.js',
-          'src/sync-client.js',
-          'src/z80.js',
-          'src/debugger.js',
-          'src/keyboard.js',
-          'src/psg.js',
-          'src/vdp.js',
-          'src/node/ui.js',
-          'src/ports.js',
-          'src/compiler/bytecode.js',
-          'src/compiler/parser.js',
-          'src/compiler/opcodes-ast.js',
-          'src/compiler/opcodes-CB.js',
-          'src/compiler/opcodes-DD-FD.js',
-          'src/compiler/opcodes-ED.js',
-          'src/compiler/opcodes.js',
-          'src/compiler/analyzer.js',
-          'src/compiler/optimizer.js',
-          'src/compiler/generator.js',
-          'src/compiler/recompiler.js',
-          'src/node/build/exports.js'
-        ],
+        js: '<%= js %>',
         jsOutputFile: 'min/jssms.node.js',
         options: {
           externs: [
             'node_modules/closurecompiler-externs/core.js',
             '<%= closurePath %>/contrib/externs/webkit_console.js',
-            '<%= closurePath %>/contrib/html5.js'
+            '<%= closurePath %>/contrib/html5.js',
+            '<%= closurePath %>/contrib/externs/jquery-1.7.js'
           ],
           compilation_level: 'ADVANCED_OPTIMIZATIONS',
           language_in: 'ECMASCRIPT5_STRICT',
@@ -332,5 +284,4 @@ module.exports = function(grunt) {
     'closure-compiler:node',
     'concat:node'
   ]);
-
 };

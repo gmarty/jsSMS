@@ -170,13 +170,11 @@ JSSMS.Utils = {rndInt:function $JSSMS$Utils$rndInt$($range$$) {
   var $key$$, $child$$;
   $fn$$.call(null, $object$$);
   for($key$$ in $object$$) {
-    $object$$.hasOwnProperty($key$$) && ($child$$ = $object$$[$key$$], "object" === typeof $child$$ && null !== $child$$ && ($object$$[$key$$] = JSSMS.Utils.traverse($child$$, $fn$$)))
+    $object$$.hasOwnProperty($key$$) && ($child$$ = $object$$[$key$$], Object($child$$) === $child$$ && ($object$$[$key$$] = JSSMS.Utils.traverse($child$$, $fn$$)))
   }
   return $object$$
 }, getTimestamp:function() {
-  return window.performance && window.performance.now ? function() {
-    return window.performance.now()
-  } : function() {
+  return window.performance && window.performance.now ? window.performance.now.bind(window.performance) : function() {
     return(new Date).getTime()
   }
 }(), toHex:function $JSSMS$Utils$toHex$($dec_hex$$) {
@@ -221,7 +219,7 @@ function BinaryRequest($method$$, $url$$, $args$$, $data$$, $cb$$) {
     }
   };
   $xhr$$.onload = function onload() {
-    ArrayBuffer.prototype.isPrototypeOf(this.response) ? $cb$$(this.response) : console.error("Bad response type: " + typeof this.response + " for " + JSON.stringify(this.response))
+    this.response instanceof ArrayBuffer ? $cb$$(this.response) : console.error("Bad response type: " + typeof this.response + " for " + JSON.stringify(this.response))
   };
   $xhr$$.send($data$$);
   this.always = function $this$always$($cb$$) {
@@ -8166,11 +8164,11 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
       }else {
         var $lastTime$$ = 0;
         this.requestAnimationFrame = function $this$requestAnimationFrame$($callback$$) {
-          var $currTime$$ = JSSMS.Utils.getTimestamp(), $timeToCall$$ = Math.max(0, 16 - ($currTime$$ - $lastTime$$));
+          var $currTime_timeToCall$$ = JSSMS.Utils.getTimestamp(), $currTime_timeToCall$$ = Math.max(0, 1E3 / 60 - ($currTime_timeToCall$$ - $lastTime$$));
           window.setTimeout(function() {
-            $callback$$($currTime$$ + $timeToCall$$)
-          }, $timeToCall$$);
-          $lastTime$$ = $currTime$$ + $timeToCall$$
+            $lastTime$$ = JSSMS.Utils.getTimestamp();
+            $callback$$()
+          }, $currTime_timeToCall$$)
         }
       }
       this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + " moz-opaque></canvas>");
@@ -9485,14 +9483,14 @@ var Parser = function() {
       }
     }
     this.instructions[0][1023] ? this.instructions[0][1023].isFunctionEnder = !0 : this.instructions[0][1022] && (this.instructions[0][1022].isFunctionEnder = !0);
-    $i$$ = 0;
+    $i$$ = $length$$ = $i$$ = 0;
     for($length$$ = this.entryPoints.length;$i$$ < $length$$;$i$$++) {
       $currentPage_entryPoint$$2_page$$ = this.entryPoints[$i$$].address, $currentAddress$$ = this.entryPoints[$i$$].romPage, this.instructions[$currentAddress$$][$currentPage_entryPoint$$2_page$$].isJumpTarget = !0, this.instructions[$currentAddress$$][$currentPage_entryPoint$$2_page$$].jumpTargetNb++
     }
     for($currentPage_entryPoint$$2_page$$ = 0;$currentPage_entryPoint$$2_page$$ < this.instructions.length;$currentPage_entryPoint$$2_page$$++) {
       for($i$$ = 0, $length$$ = this.instructions[$currentPage_entryPoint$$2_page$$].length;$i$$ < $length$$;$i$$++) {
         this.instructions[$currentPage_entryPoint$$2_page$$][$i$$] && (null != this.instructions[$currentPage_entryPoint$$2_page$$][$i$$].nextAddress && this.instructions[$currentPage_entryPoint$$2_page$$][this.instructions[$currentPage_entryPoint$$2_page$$][$i$$].nextAddress] && this.instructions[$currentPage_entryPoint$$2_page$$][this.instructions[$currentPage_entryPoint$$2_page$$][$i$$].nextAddress].jumpTargetNb++, null != this.instructions[$currentPage_entryPoint$$2_page$$][$i$$].target && ($currentAddress$$ = 
-        Math.floor(this.instructions[$currentPage_entryPoint$$2_page$$][$i$$].target / 16384), $bytecode$$ = this.instructions[$currentPage_entryPoint$$2_page$$][$i$$].target % 16384, this.instructions[$currentAddress$$] && this.instructions[$currentAddress$$][$bytecode$$] ? (this.instructions[$currentAddress$$][$bytecode$$].isJumpTarget = !0, this.instructions[$currentAddress$$][$bytecode$$].jumpTargetNb++) : JSSMS.Utils.console.log("Invalid target address", $toHex$$(this.instructions[$currentPage_entryPoint$$2_page$$][$i$$].target))))
+        ~~(this.instructions[$currentPage_entryPoint$$2_page$$][$i$$].target / 16384), $bytecode$$ = this.instructions[$currentPage_entryPoint$$2_page$$][$i$$].target % 16384, this.instructions[$currentAddress$$] && this.instructions[$currentAddress$$][$bytecode$$] ? (this.instructions[$currentAddress$$][$bytecode$$].isJumpTarget = !0, this.instructions[$currentAddress$$][$bytecode$$].jumpTargetNb++) : JSSMS.Utils.console.log("Invalid target address", $toHex$$(this.instructions[$currentPage_entryPoint$$2_page$$][$i$$].target))))
       }
     }
     JSSMS.Utils.console.timeEnd("Parsing")
@@ -9523,7 +9521,7 @@ var Parser = function() {
     JSSMS.Utils.console.timeEnd("DOT generation");
     return $content$$
   }, addAddress:function $$parser$$$$addAddress$($address$$) {
-    var $memPage$$ = Math.floor($address$$ / 16384), $romPage$$ = this.frameReg[$memPage$$];
+    var $memPage$$ = ~~($address$$ / 16384), $romPage$$ = this.frameReg[$memPage$$];
     this.addresses[$romPage$$].push({address:$address$$ % 16384, romPage:$romPage$$, memPage:$memPage$$})
   }};
   $RomStream$$.prototype = {get position() {
@@ -9794,7 +9792,7 @@ var UINT8 = 1, INT8 = 2, UINT16 = 3, BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], 
   }
 }, JR:function($test$$) {
   return function($value$$, $target$$) {
-    return n.IfStatement($test$$, n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($target$$))), n.ReturnStatement()]))
+    return n.IfStatement($test$$, n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.BinaryExpression("+", n.Literal($target$$ % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ReturnStatement()]))
   }
 }, DJNZ:function() {
   return function($value$$, $target$$) {
@@ -9832,13 +9830,14 @@ var UINT8 = 1, INT8 = 2, UINT16 = 3, BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], 
   }
 }, CALL:function($operator$$, $bitMask$$) {
   return void 0 == $operator$$ && void 0 == $bitMask$$ ? function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.CallExpression("push1", n.Literal($nextAddress$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($target$$))), n.ReturnStatement()]
+    return[n.ExpressionStatement(n.CallExpression("push1", n.BinaryExpression("+", n.Literal($nextAddress$$ % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($target$$))), n.ReturnStatement()]
   } : function($value$$, $target$$, $nextAddress$$) {
-    return n.IfStatement(n.BinaryExpression($operator$$, n.BinaryExpression("&", n.Register("f"), n.Literal($bitMask$$)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(7))), n.ExpressionStatement(n.CallExpression("push1", n.Literal($nextAddress$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($target$$))), n.ReturnStatement()]))
+    return n.IfStatement(n.BinaryExpression($operator$$, n.BinaryExpression("&", n.Register("f"), n.Literal($bitMask$$)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(7))), n.ExpressionStatement(n.CallExpression("push1", n.BinaryExpression("+", n.Literal($nextAddress$$ % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($target$$))), 
+    n.ReturnStatement()]))
   }
 }, RST:function($targetAddress$$) {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.CallExpression("push1", n.Literal($nextAddress$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($targetAddress$$))), n.ReturnStatement()]
+    return[n.ExpressionStatement(n.CallExpression("push1", n.BinaryExpression("+", n.Literal($nextAddress$$ % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($targetAddress$$))), n.ReturnStatement()]
   }
 }, DI:function() {
   return function() {
@@ -9882,7 +9881,7 @@ var UINT8 = 1, INT8 = 2, UINT16 = 3, BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], 
   return function($ret_value$$, $target$$, $nextAddress$$) {
     $ret_value$$ = [];
     HALT_SPEEDUP && $ret_value$$.push(n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("tstates"), n.Literal(0))));
-    return $ret_value$$.concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("halt"), n.Literal(!0))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($nextAddress$$ - 1))), n.ReturnStatement()])
+    return $ret_value$$.concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("halt"), n.Literal(!0))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.BinaryExpression("+", n.Literal(($nextAddress$$ - 1) % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ReturnStatement()])
   }
 }, RLC:generateCBFunctions("rlc"), RRC:generateCBFunctions("rrc"), RL:generateCBFunctions("rl"), RR:generateCBFunctions("rr"), SLA:generateCBFunctions("sla"), SRA:generateCBFunctions("sra"), SLL:generateCBFunctions("sll"), SRL:generateCBFunctions("srl"), BIT:function($bit$$, $register1$$, $register2$$) {
   return void 0 == $register2$$ ? function() {
@@ -9941,6 +9940,10 @@ var UINT8 = 1, INT8 = 2, UINT16 = 3, BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], 
 }, OR_X:function($register1$$, $register2$$) {
   return function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))]
+  }
+}, XOR_X:function($register1$$, $register2$$) {
+  return function($value$$, $target$$, $nextAddress$$) {
+    return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))]
   }
 }, CP_X:function($register1$$, $register2$$) {
   return function($value$$) {
@@ -10105,14 +10108,14 @@ function generateIndexTable($index$$) {
   $register_registerL$$)}, 115:{name:"LD (" + $index$$ + "+d),E", ast:o.LD_X("e", $registerH$$, $register_registerL$$)}, 116:{name:"LD (" + $index$$ + "+d),H", ast:o.LD_X("h", $registerH$$, $register_registerL$$)}, 117:{name:"LD (" + $index$$ + "+d),L", ast:o.LD_X("l", $registerH$$, $register_registerL$$)}, 118:{name:"LD (" + $index$$ + "+d),B", ast:o.LD_X("b", $registerH$$, $register_registerL$$)}, 119:{name:"LD (" + $index$$ + "+d),A", ast:o.LD_X("a", $registerH$$, $register_registerL$$)}, 126:{name:"LD A,(" + 
   $index$$ + "+d)", ast:o.LD8_D("a", $registerH$$, $register_registerL$$)}, 124:{name:"LD A," + $index$$ + "H", ast:o.LD8("a", $registerH$$)}, 125:{name:"LD A," + $index$$ + "L", ast:o.LD8("a", $register_registerL$$)}, 132:{name:"ADD A," + $index$$ + "H", ast:o.ADD($register_registerL$$)}, 133:{name:"ADD A," + $index$$ + "L", ast:o.ADD($register_registerL$$)}, 134:{name:"ADD A,(" + $index$$ + "+d)", ast:o.ADD_X($registerH$$, $register_registerL$$)}, 140:{name:"ADC A," + $index$$ + "H", ast:o.ADC($register_registerL$$)}, 
   141:{name:"ADC A," + $index$$ + "L", ast:o.ADC($register_registerL$$)}, 142:{name:"ADC A,(" + $index$$ + "+d)", ast:o.ADC_X($registerH$$, $register_registerL$$)}, 148:{name:"SUB A," + $index$$ + "H", ast:o.SUB($register_registerL$$)}, 149:{name:"SUB A," + $index$$ + "L", ast:o.SUB($register_registerL$$)}, 150:{name:"SUB A,(" + $index$$ + "+d)", ast:o.SUB_X($registerH$$, $register_registerL$$)}, 156:{name:"SBC A," + $index$$ + "H", ast:o.SBC($register_registerL$$)}, 157:{name:"SBC A," + $index$$ + 
-  "L", ast:o.SBC($register_registerL$$)}, 158:{name:"SBC A,(" + $index$$ + "+d)", ast:o.SBC_X($registerH$$, $register_registerL$$)}, 203:"IX" == $index$$ ? opcodeTableDDCB : opcodeTableFDCB, 182:{name:"OR A,(" + $index$$ + "+d)", ast:o.OR_X($registerH$$, $register_registerL$$)}, 190:{name:"CP (" + $index$$ + "+d)", ast:o.CP_X($registerH$$, $register_registerL$$)}, 225:{name:"POP " + $index$$, ast:o.POP($registerH$$, $register_registerL$$)}, 227:{name:"EX SP,(" + $index$$ + ")", ast:o.EX_SP_X($registerH$$, 
-  $register_registerL$$)}, 229:{name:"PUSH " + $index$$, ast:o.PUSH($registerH$$, $register_registerL$$)}, 233:{name:"JP (" + $index$$ + ")", ast:o.JP_X($registerH$$, $register_registerL$$)}, 249:{name:"LD SP," + $index$$, ast:o.LD_SP($registerH$$, $register_registerL$$)}}
+  "L", ast:o.SBC($register_registerL$$)}, 158:{name:"SBC A,(" + $index$$ + "+d)", ast:o.SBC_X($registerH$$, $register_registerL$$)}, 174:{name:"XOR A,(" + $index$$ + "+d)", ast:o.XOR_X($registerH$$, $register_registerL$$)}, 203:"IX" == $index$$ ? opcodeTableDDCB : opcodeTableFDCB, 182:{name:"OR A,(" + $index$$ + "+d)", ast:o.OR_X($registerH$$, $register_registerL$$)}, 190:{name:"CP (" + $index$$ + "+d)", ast:o.CP_X($registerH$$, $register_registerL$$)}, 225:{name:"POP " + $index$$, ast:o.POP($registerH$$, 
+  $register_registerL$$)}, 227:{name:"EX SP,(" + $index$$ + ")", ast:o.EX_SP_X($registerH$$, $register_registerL$$)}, 229:{name:"PUSH " + $index$$, ast:o.PUSH($registerH$$, $register_registerL$$)}, 233:{name:"JP (" + $index$$ + ")", ast:o.JP_X($registerH$$, $register_registerL$$)}, 249:{name:"LD SP," + $index$$, ast:o.LD_SP($registerH$$, $register_registerL$$)}}
 }
 ;var opcodeTableED = {64:{name:"IN B,(C)", ast:o.IN("b", "c")}, 66:{name:"SBC HL,BC", ast:o.SBC16("b", "c")}, 65:{name:"OUT (C),B", ast:o.OUT("c", "b")}, 67:{name:"LD (nn),BC", ast:o.LD_NN("b", "c")}, 68:{name:"NEG", ast:o.NEG()}, 69:{name:"RETN / RETI", ast:o.RETN_RETI()}, 70:{name:"IM 0", ast:o.IM(0)}, 72:{name:"IN C,(C)", ast:o.IN("c", "c")}, 73:{name:"OUT (C),C", ast:o.OUT("c", "c")}, 74:{name:"ADC HL,BC", ast:o.ADC16("b", "c")}, 75:{name:"LD BC,(nn)", ast:o.LD16("b", "c", "n", "n"), operand:UINT16}, 
-76:{name:"NEG", ast:o.NEG()}, 77:{name:"RETN / RETI", ast:o.RETN_RETI()}, 78:{name:"IM 0", ast:o.IM(0)}, 80:{name:"IN D,(C)", ast:o.IN("d", "c")}, 81:{name:"OUT (C),D", ast:o.OUT("c", "d")}, 82:{name:"SBC HL,DE", ast:o.SBC16("d", "e")}, 83:{name:"LD (nn),DE", ast:o.LD_NN("d", "e")}, 84:{name:"NEG", ast:o.NEG()}, 85:{name:"RETN / RETI", ast:o.RETN_RETI()}, 86:{name:"IM 1", ast:o.IM(1)}, 87:{name:"LD A,I", ast:o.LD8("a", "i")}, 88:{name:"IN E,(C)", ast:o.IN("e", "c")}, 89:{name:"OUT (C),E", ast:o.OUT("c", 
-"e")}, 90:{name:"ADC HL,DE", ast:o.ADC16("d", "e")}, 91:{name:"LD DE,(nn)", ast:o.LD16("d", "e", "n", "n"), operand:UINT16}, 92:{name:"NEG", ast:o.NEG()}, 95:{name:"LD A,R", ast:o.LD8("a", "r")}, 96:{name:"IN H,(C)", ast:o.IN("h", "c")}, 97:{name:"OUT (C),H", ast:o.OUT("c", "h")}, 98:{name:"SBC HL,HL", ast:o.SBC16("h", "l")}, 99:{name:"LD (nn),HL", ast:o.LD_NN("h", "l")}, 100:{name:"NEG", ast:o.NEG()}, 102:{name:"IM 0", ast:o.IM(0)}, 104:{name:"IN L,(C)", ast:o.IN("l", "c")}, 105:{name:"OUT (C),L", 
-ast:o.OUT("c", "l")}, 106:{name:"ADC HL,HL", ast:o.ADC16("h", "l")}, 107:{name:"LD HL,(nn)", ast:o.LD16("h", "l", "n", "n"), operand:UINT16}, 108:{name:"NEG", ast:o.NEG()}, 110:{name:"IM 0", ast:o.IM(0)}, 115:{name:"LD (nn),SP", ast:o.LD_NN("sp")}, 116:{name:"NEG", ast:o.NEG()}, 118:{name:"IM 1", ast:o.IM(1)}, 120:{name:"IN A,(C)", ast:o.IN("a", "c")}, 121:{name:"OUT (C),A", ast:o.OUT("c", "a")}, 122:{name:"ADC HL,SP", ast:o.ADC16("sp")}, 124:{name:"NEG", ast:o.NEG()}, 160:{name:"LDI", ast:o.LDI()}, 
-161:{name:"CPI", ast:o.CPI()}, 162:{name:"INI", ast:o.INI()}, 163:{name:"OUTI", ast:o.OUTI()}, 168:{name:"LDD", ast:o.LDD()}, 171:{name:"OUTD", ast:o.OUTD()}, 176:{name:"LDIR", ast:o.LDIR()}, 177:{name:"CPIR", ast:o.CPIR()}, 179:{name:"OTIR", ast:o.OTIR()}, 184:{name:"LDDR", ast:o.LDDR()}};
+76:{name:"NEG", ast:o.NEG()}, 77:{name:"RETN / RETI", ast:o.RETN_RETI()}, 78:{name:"IM 0", ast:o.IM(0)}, 79:{name:"LD R,A", ast:o.LD8("r", "a")}, 80:{name:"IN D,(C)", ast:o.IN("d", "c")}, 81:{name:"OUT (C),D", ast:o.OUT("c", "d")}, 82:{name:"SBC HL,DE", ast:o.SBC16("d", "e")}, 83:{name:"LD (nn),DE", ast:o.LD_NN("d", "e")}, 84:{name:"NEG", ast:o.NEG()}, 85:{name:"RETN / RETI", ast:o.RETN_RETI()}, 86:{name:"IM 1", ast:o.IM(1)}, 87:{name:"LD A,I", ast:o.LD8("a", "i")}, 88:{name:"IN E,(C)", ast:o.IN("e", 
+"c")}, 89:{name:"OUT (C),E", ast:o.OUT("c", "e")}, 90:{name:"ADC HL,DE", ast:o.ADC16("d", "e")}, 91:{name:"LD DE,(nn)", ast:o.LD16("d", "e", "n", "n"), operand:UINT16}, 92:{name:"NEG", ast:o.NEG()}, 95:{name:"LD A,R", ast:o.LD8("a", "r")}, 96:{name:"IN H,(C)", ast:o.IN("h", "c")}, 97:{name:"OUT (C),H", ast:o.OUT("c", "h")}, 98:{name:"SBC HL,HL", ast:o.SBC16("h", "l")}, 99:{name:"LD (nn),HL", ast:o.LD_NN("h", "l")}, 100:{name:"NEG", ast:o.NEG()}, 102:{name:"IM 0", ast:o.IM(0)}, 104:{name:"IN L,(C)", 
+ast:o.IN("l", "c")}, 105:{name:"OUT (C),L", ast:o.OUT("c", "l")}, 106:{name:"ADC HL,HL", ast:o.ADC16("h", "l")}, 107:{name:"LD HL,(nn)", ast:o.LD16("h", "l", "n", "n"), operand:UINT16}, 108:{name:"NEG", ast:o.NEG()}, 110:{name:"IM 0", ast:o.IM(0)}, 115:{name:"LD (nn),SP", ast:o.LD_NN("sp")}, 116:{name:"NEG", ast:o.NEG()}, 118:{name:"IM 1", ast:o.IM(1)}, 120:{name:"IN A,(C)", ast:o.IN("a", "c")}, 121:{name:"OUT (C),A", ast:o.OUT("c", "a")}, 122:{name:"ADC HL,SP", ast:o.ADC16("sp")}, 124:{name:"NEG", 
+ast:o.NEG()}, 160:{name:"LDI", ast:o.LDI()}, 161:{name:"CPI", ast:o.CPI()}, 162:{name:"INI", ast:o.INI()}, 163:{name:"OUTI", ast:o.OUTI()}, 168:{name:"LDD", ast:o.LDD()}, 171:{name:"OUTD", ast:o.OUTD()}, 176:{name:"LDIR", ast:o.LDIR()}, 177:{name:"CPIR", ast:o.CPIR()}, 179:{name:"OTIR", ast:o.OTIR()}, 184:{name:"LDDR", ast:o.LDDR()}};
 var opcodeTable = [{name:"NOP", ast:o.NOOP()}, {name:"LD BC,nn", ast:o.LD16("b", "c"), operand:UINT16}, {name:"LD (BC),A", ast:o.LD_WRITE_MEM("b", "c", "a")}, {name:"INC BC", ast:o.INC16("b", "c")}, {name:"INC B", ast:o.INC8("b")}, {name:"DEC B", ast:o.DEC8("b")}, {name:"LD B,n", ast:o.LD8("b"), operand:UINT8}, {name:"RLCA", ast:o.RLCA()}, {name:"EX AF AF'", ast:o.EX_AF()}, {name:"ADD HL,BC", ast:o.ADD16("h", "l", "b", "c")}, {name:"LD A,(BC)", ast:o.LD8("a", "b", "c")}, {name:"DEC BC", ast:o.DEC16("b", 
 "c")}, {name:"INC C", ast:o.INC8("c")}, {name:"DEC C", ast:o.DEC8("c")}, {name:"LD C,n", ast:o.LD8("c"), operand:UINT8}, {name:"RRCA", ast:o.RRCA()}, {name:"DJNZ (PC+e)", ast:o.DJNZ(), operand:INT8}, {name:"LD DE,nn", ast:o.LD16("d", "e"), operand:UINT16}, {name:"LD (DE),A", ast:o.LD_WRITE_MEM("d", "e", "a")}, {name:"INC DE", ast:o.INC16("d", "e")}, {name:"INC D", ast:o.INC8("d")}, {name:"DEC D", ast:o.DEC8("d")}, {name:"LD D,n", ast:o.LD8("d"), operand:UINT8}, {name:"RLA", ast:o.RLA()}, {name:"JR (PC+e)", 
 ast:o.JP(), operand:INT8}, {name:"ADD HL,DE", ast:o.ADD16("h", "l", "d", "e")}, {name:"LD A,(DE)", ast:o.LD8("a", "d", "e")}, {name:"DEC DE", ast:o.DEC16("d", "e")}, {name:"INC E", ast:o.INC8("e")}, {name:"DEC E", ast:o.DEC8("e")}, {name:"LD E,n", ast:o.LD8("e"), operand:UINT8}, {name:"RRA", ast:o.RRA()}, {name:"JR NZ,(PC+e)", ast:o.JRNZ(), operand:INT8}, {name:"LD HL,nn", ast:o.LD16("h", "l"), operand:UINT16}, {name:"LD (nn),HL", ast:o.LD_NN("h", "l"), operand:UINT16}, {name:"INC HL", ast:o.INC16("h", 
