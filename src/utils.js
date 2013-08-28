@@ -144,7 +144,7 @@ JSSMS.Utils = {
     for (key in object) {
       if (object.hasOwnProperty(key)) {
         child = object[key];
-        if (typeof child === 'object' && child !== null) {
+        if (Object(child) === child && child !== null) {
           object[key] = JSSMS.Utils.traverse(child, fn);
         }
       }
@@ -161,9 +161,7 @@ JSSMS.Utils = {
    */
   getTimestamp: function() {
     if (window.performance && window.performance.now) {
-      return function() {
-        return window.performance.now();
-      }
+      return window.performance.now.bind(performance);
     } else {
       return function() {
         return new Date().getTime();

@@ -67,7 +67,7 @@ function BinaryRequest(method, url, args, data, cb) {
     }
   };
   xhr.onload = function onload() {
-    if (ArrayBuffer.prototype.isPrototypeOf(this.response)) {
+    if (this.response instanceof ArrayBuffer) {
       cb(this.response);
     } else {
       console.error('Bad response type: ' + typeof(this.response) + ' for ' + JSON.stringify(this.response));

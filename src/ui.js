@@ -82,11 +82,11 @@ if (window['$']) {
         var lastTime = 0;
         this.requestAnimationFrame = function(callback) {
           var currTime = JSSMS.Utils.getTimestamp();
-          var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+          var timeToCall = Math.max(0, (1000 / 60) - (currTime - lastTime));
           window.setTimeout(function() {
-            callback(currTime + timeToCall);
+            lastTime = JSSMS.Utils.getTimestamp();
+            callback();
           }, timeToCall);
-          lastTime = currTime + timeToCall;
         };
       }
 
