@@ -118,8 +118,11 @@ var Parser = (function() {
         this.instructions[0][0x03FE].isFunctionEnder = true;
       }
 
+      var i = 0;
+      var length = 0;
+
       // Flag entry points as jump target.
-      for (var i = 0, length = this.entryPoints.length; i < length; i++) {
+      for (i = 0, length = this.entryPoints.length; i < length; i++) {
         var entryPoint = this.entryPoints[i].address;
         var romPage = this.entryPoints[i].romPage;
 
@@ -129,7 +132,7 @@ var Parser = (function() {
 
       // Mark all jump target instructions.
       for (currentPage = 0; currentPage < this.instructions.length; currentPage++) {
-        for (var i = 0, length = this.instructions[currentPage].length; i < length; i++) {
+        for (i = 0, length = this.instructions[currentPage].length; i < length; i++) {
           if (!this.instructions[currentPage][i]) {
             continue;
           }
@@ -139,7 +142,7 @@ var Parser = (function() {
             this.instructions[currentPage][this.instructions[currentPage][i].nextAddress].jumpTargetNb++;
           }
           if (this.instructions[currentPage][i].target != null) {
-            var targetPage = Math.floor(this.instructions[currentPage][i].target / 0x4000);
+            var targetPage = ~~(this.instructions[currentPage][i].target / 0x4000);
             var targetAddress = this.instructions[currentPage][i].target % 0x4000;
             if (this.instructions[targetPage] && this.instructions[targetPage][targetAddress]) {
               this.instructions[targetPage][targetAddress].isJumpTarget = true;
@@ -247,7 +250,7 @@ var Parser = (function() {
      * @param {number} address
      */
     addAddress: function(address) {
-      var memPage = Math.floor(address / 0x4000);
+      var memPage = ~~(address / 0x4000);
       var romPage = this.frameReg[memPage];
       address = address % 0x4000;
 
