@@ -643,12 +643,7 @@ JSSMS.Z80.prototype = {
       case 0x1F: this.rra_a(); break;                                          // RRA
       case 0x20: this.jr(!((this.f & F_ZERO) != 0)); break;                         // JR NZ,(PC+e)
       case 0x21: this.setHL(this.readMemWord(this.pc++)); this.pc++; break;             // LD HL,nn
-      case 0x22:                                                        // LD (nn),HL
-        location = this.readMemWord(this.pc);
-        this.writeMem(location++, this.l);
-        this.writeMem(location, this.h);
-        this.pc += 2;
-        break;
+      case 0x22: this.writeMemWord(this.readMemWord(this.pc++), this.getHL()); this.pc++; break; // LD (nn),HL
       case 0x23: this.incHL(); break;                                          // INC HL
       case 0x24: this.h = this.inc8(this.h); break;                                      // INC H
       case 0x25: this.h = this.dec8(this.h); break;                                      // DEC H
@@ -656,15 +651,15 @@ JSSMS.Z80.prototype = {
       case 0x27: this.daa(); break;                                            // DAA
       case 0x28: this.jr((this.f & F_ZERO) != 0); break;                          // JR Z,(PC+e)
       case 0x29: this.setHL(this.add16(this.getHL(), this.getHL())); break;                   // ADD HL,HL
-      case 0x2A: this.setHL(this.readMemWord(this.readMemWord(this.pc))); this.pc += 2; break; // LD HL,(nn)
+      case 0x2A: this.setHL(this.readMemWord(this.readMemWord(this.pc++))); this.pc++; break; // LD HL,(nn)
       case 0x2B: this.decHL(); break;                                          // DEC HL
       case 0x2C: this.l = this.inc8(this.l); break;                                      // INC L
       case 0x2D: this.l = this.dec8(this.l); break;                                      // DEC L
       case 0x2E: this.l = this.readMem(this.pc++); break;                                // LD L,n
       case 0x2F: this.cpl_a(); break;                                          // CPL
       case 0x30: this.jr(!((this.f & F_CARRY) != 0)); break;                        // JR NC,(PC+e)
-      case 0x31: this.sp = this.readMemWord(this.pc); this.pc += 2; break;                      // LD SP,nn
-      case 0x32: this.writeMem(this.readMemWord(this.pc), this.a); this.pc += 2; break;              // LD (nn),A
+      case 0x31: this.sp = this.readMemWord(this.pc++); this.pc++; break;                      // LD SP,nn
+      case 0x32: this.writeMem(this.readMemWord(this.pc++), this.a); this.pc++; break;              // LD (nn),A
       case 0x33: this.sp++; break;                                             // INC SP
       case 0x34: this.incMem(this.getHL()); break;                                  // INC (HL)
       case 0x35: this.decMem(this.getHL()); break;                                  // DEC (HL)
@@ -672,7 +667,7 @@ JSSMS.Z80.prototype = {
       case 0x37: this.f |= F_CARRY; this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY; break;       // SCF
       case 0x38: this.jr((this.f & F_CARRY) != 0); break;                           // JR C,(PC+e)
       case 0x39: this.setHL(this.add16(this.getHL(), this.sp)); break;                        // ADD HL,SP
-      case 0x3A: this.a = this.readMem(this.readMemWord(this.pc)); this.pc += 2; break;              // LD A,(nn)
+      case 0x3A: this.a = this.readMem(this.readMemWord(this.pc++)); this.pc++; break;              // LD A,(nn)
       case 0x3B: this.sp--; break;                                             // DEC SP
       case 0x3C: this.a = this.inc8(this.a); break;                                      // INC A
       case 0x3D: this.a = this.dec8(this.a); break;                                      // DEC A
@@ -842,12 +837,9 @@ JSSMS.Z80.prototype = {
       case 0xE1: this.setHL(this.readMemWord(this.sp)); this.sp += 2; break;                    // POP HL
       case 0xE2: this.jp((this.f & F_PARITY) == 0); break;                          // JP PO,(nn)
       case 0xE3:                                                       // EX (SP),HL
-        temp = this.h;
-        this.h = this.readMem(this.sp + 1);
-        this.writeMem(this.sp + 1, temp);
-        temp = this.l;
-        this.l = this.readMem(this.sp);
-        this.writeMem(this.sp, temp);
+        temp = this.getHL();
+        this.setHL(this.readMemWord(this.sp));
+        this.writeMemWord(this.sp, temp);
         break;
       case 0xE4: this.call((this.f & F_PARITY) == 0); break;                        // CALL PO (nn)
       case 0xE5: this.push2(this.h, this.l); break;                                       // PUSH HL
@@ -1032,8 +1024,8 @@ JSSMS.Z80.prototype = {
    * @param {number} value Value to push.
    */
   push1: function(value) {
-    this.writeMem(--this.sp, value >> 8);   // (SP - 1) <- high
-    this.writeMem(--this.sp, value & 0xFF); // (SP - 2) <- low
+    this.sp -= 2;
+    this.writeMemWord(this.sp, value);
   },
 
 
@@ -1044,8 +1036,8 @@ JSSMS.Z80.prototype = {
    * @param {number} lo Value to push.
    */
   push2: function(hi, lo) {
-    this.writeMem(--this.sp, hi);           // (SP - 1) <- high
-    this.writeMem(--this.sp, lo);           // (SP - 2) <- low
+    this.sp -= 2;
+    this.writeMemWord(this.sp, hi << 8 | lo);
   },
 
 
@@ -1516,23 +1508,18 @@ JSSMS.Z80.prototype = {
     switch (opcode) {
       case 0x09: this.setIXHIXL(this.add16(this.getIXHIXL(), this.getBC())); break;             // ADD IX,BC
       case 0x19: this.setIXHIXL(this.add16(this.getIXHIXL(), this.getDE())); break;             // ADD IX,DE
-      case 0x21: this.setIXHIXL(this.readMemWord(this.pc)); this.pc += 2; break;              // LD IX,nn
-      case 0x22:                                                  // LD (nn),IX
-        location = this.readMemWord(this.pc);
-        this.writeMem(location++, this.ixL);
-        this.writeMem(location, this.ixH);
-        this.pc += 2;
-        break;
+      case 0x21: this.setIXHIXL(this.readMemWord(this.pc++)); this.pc++; break;              // LD IX,nn
+      case 0x22: this.writeMemWord(this.readMemWord(this.pc++), this.getIXHIXL()); this.pc++; break; // LD (nn),IX
       case 0x23: this.incIXHIXL(); break;                                    // INC IX
       case 0x24: this.ixH = this.inc8(this.ixH); break;                            // INC IXH *
       case 0x25: this.ixH = this.dec8(this.ixH); break;                            // DEC IXH *
       case 0x26: this.ixH = this.readMem(this.pc++); break;                        // LD IXH,n *
       case 0x29: this.setIXHIXL(this.add16(this.getIXHIXL(), this.getIXHIXL())); break;             // ADD IX,IX
       case 0x2A:                                                  // LD IX,(nn)
-        location = this.readMemWord(this.pc);
-        this.ixL = this.readMem(location++);
-        this.ixH = this.readMem(location);
-        this.pc += 2;
+        location = this.readMemWord(this.pc++);
+        this.ixL = this.readMem(location);
+        this.ixH = this.readMem(location + 1);
+        this.pc++;
         break;
       case 0x2B: this.decIXHIXL(); break;                                    // DEC IX
       case 0x2C: this.ixL = this.inc8(this.ixL); break;                            // INC IXL *
@@ -1609,8 +1596,7 @@ JSSMS.Z80.prototype = {
       case 0xE3:                                                                // EX SP,(IX)
         temp = this.getIXHIXL();
         this.setIXHIXL(this.readMemWord(this.sp));
-        this.writeMem(this.sp, temp & 0xFF);
-        this.writeMem(this.sp + 1, temp >> 8);
+        this.writeMemWord(this.sp, temp);
         break;
       case 0xE5: this.push2(this.ixH, this.ixL); break;                          // PUSH IX
       case 0xE9: this.pc = this.getIXHIXL(); break;                                 // JP (IX)
@@ -1640,23 +1626,18 @@ JSSMS.Z80.prototype = {
     switch (opcode) {
       case 0x09: this.setIYHIYL(this.add16(this.getIYHIYL(), this.getBC())); break;             // ADD IY,BC
       case 0x19: this.setIYHIYL(this.add16(this.getIYHIYL(), this.getDE())); break;             // ADD IY,DE
-      case 0x21: this.setIYHIYL(this.readMemWord(this.pc)); this.pc += 2; break;              // LD IY,nn
-      case 0x22:                                                  // LD (nn),IY
-        location = this.readMemWord(this.pc);
-        this.writeMem(location++, this.iyL);
-        this.writeMem(location, this.iyH);
-        this.pc += 2;
-        break;
+      case 0x21: this.setIYHIYL(this.readMemWord(this.pc++)); this.pc++; break;              // LD IY,nn
+      case 0x22: this.writeMemWord(this.readMemWord(this.pc++), this.getIYHIYL()); this.pc++; break; // LD (nn),IY
       case 0x23: this.incIYHIYL(); break;                                    // INC IY
       case 0x24: this.iyH = this.inc8(this.iyH); break;                            // INC IYH *
       case 0x25: this.iyH = this.dec8(this.iyH); break;                            // DEC IYH *
       case 0x26: this.iyH = this.readMem(this.pc++); break;                        // LD IYH,n *
       case 0x29: this.setIYHIYL(this.add16(this.getIYHIYL(), this.getIYHIYL())); break;             // ADD IY,IY
       case 0x2A:                                                  // LD IY,(nn)
-        location = this.readMemWord(this.pc);
-        this.iyL = this.readMem(location++);
-        this.iyH = this.readMem(location);
-        this.pc += 2;
+        location = this.readMemWord(this.pc++);
+        this.iyL = this.readMem(location);
+        this.iyH = this.readMem(location + 1);
+        this.pc++;
         break;
       case 0x2B: this.decIYHIYL(); break;                                    // DEC IY
       case 0x2C: this.iyL = this.inc8(this.iyL); break;                            // INC IYL *
@@ -1733,8 +1714,7 @@ JSSMS.Z80.prototype = {
       case 0xE3:                                                                // EX SP,(IY)
         temp = this.getIYHIYL();
         this.setIYHIYL(this.readMemWord(this.sp));
-        this.writeMem(this.sp, temp & 0xFF);
-        this.writeMem(this.sp + 1, temp >> 8);
+        this.writeMemWord(this.sp, temp);
         break;
       case 0xE5: this.push2(this.iyH, this.iyL); break;                          // PUSH IY
       case 0xE9: this.pc = this.getIYHIYL(); break;                                 // JP (IY)
@@ -2059,9 +2039,7 @@ JSSMS.Z80.prototype = {
 
       // -- ED43 LD (nn),BC ------------------------
       case 0x43:
-        location = this.readMemWord(++this.pc);
-        this.writeMem(location++, this.c);
-        this.writeMem(location, this.b);
+        this.writeMemWord(this.readMemWord(++this.pc), this.getBC());
         this.pc += 2;
         break;
 
@@ -2144,9 +2122,7 @@ JSSMS.Z80.prototype = {
 
       // -- ED53 LD (nn),DE ------------------------
       case 0x53:
-        location = this.readMemWord(++this.pc);
-        this.writeMem(location++, this.e); // SPl
-        this.writeMem(location, this.d);   // SPh
+        this.writeMemWord(this.readMemWord(++this.pc), this.getDE());
         this.pc += 2;
         break;
 
@@ -2203,9 +2179,7 @@ JSSMS.Z80.prototype = {
 
       // -- ED63 LD (nn),HL ------------------------
       case 0x63:
-        location = this.readMemWord(++this.pc);
-        this.writeMem(location++, this.l); // SPl
-        this.writeMem(location, this.h);   // SPh
+        this.writeMemWord(this.readMemWord(++this.pc), this.getHL());
         this.pc += 2;
         break;
 
@@ -2267,9 +2241,7 @@ JSSMS.Z80.prototype = {
 
       // -- ED73 LD (nn),SP ------------------------
       case 0x73:
-        location = this.readMemWord(++this.pc);
-        this.writeMem(location++, this.sp & 0xFF); // SPl
-        this.writeMem(location, this.sp >> 8);     // SPh
+        this.writeMemWord(this.readMemWord(++this.pc), this.sp);
         this.pc += 2;
         break;
 
@@ -3316,7 +3288,7 @@ JSSMS.Z80.prototype = {
 
 
   /**
-   * Write to a memory location.
+   * Write a signed value to a memory location.
    */
   writeMem: function() {
     if (SUPPORT_DATAVIEW) {
@@ -3326,7 +3298,7 @@ JSSMS.Z80.prototype = {
        */
       return function(address, value) {
         if (address <= 0xFFFF) {
-          this.memWriteMap.setInt8(address & 0x1FFF, value);
+          this.memWriteMap.setUint8(address & 0x1FFF, value);
           if (address == 0xFFFC) {
             this.frameReg[3] = value;
           } else if (address == 0xFFFD) {
@@ -3359,6 +3331,64 @@ JSSMS.Z80.prototype = {
           } else if (address == 0xFFFF) {
             this.frameReg[2] = value & this.romPageMask;
           }
+        } else {
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
+          if (DEBUG)
+            debugger;
+        }
+      }
+    }
+  }(),
+
+
+
+  /**
+   * Write a word (two bytes) to a memory location.
+   */
+  writeMemWord: function() {
+    if (SUPPORT_DATAVIEW) {
+      /**
+       * @param {number} address Memory address.
+       * @param {number} value Value to write.
+       */
+      return function(address, value) {
+        if (address < 0xFFFC) {
+          address = address & 0x1FFF;
+          this.memWriteMap.setUint16(address, value, LITTLE_ENDIAN);
+        } else if (address == 0xFFFC) {
+          this.frameReg[3] = value & 0xFF;
+          this.frameReg[0] = value >> 8;
+        } else if (address == 0xFFFD) {
+          this.frameReg[0] = (value & 0xFF) & this.romPageMask;
+          this.frameReg[1] = (value >> 8) & this.romPageMask;
+        } else if (address == 0xFFFE) {
+          this.frameReg[1] = (value & 0xFF) & this.romPageMask;
+          this.frameReg[2] = (value >> 8) & this.romPageMask;
+        } else {
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
+          if (DEBUG)
+            debugger;
+        }
+      }
+    } else {
+      /**
+       * @param {number} address Memory address.
+       * @param {number} value Value to write.
+       */
+      return function(address, value) {
+        if (address < 0xFFFC) {
+          address &= 0x1FFF;
+          this.memWriteMap[address] = value & 0xFF;
+          this.memWriteMap[address + 1] = value >> 8;
+        } else if (address == 0xFFFC) {
+          this.frameReg[3] = value & 0xFF;
+          this.frameReg[0] = value >> 8;
+        } else if (address == 0xFFFD) {
+          this.frameReg[0] = (value & 0xFF) & this.romPageMask;
+          this.frameReg[1] = (value >> 8) & this.romPageMask;
+        } else if (address == 0xFFFE) {
+          this.frameReg[1] = (value & 0xFF) & this.romPageMask;
+          this.frameReg[2] = (value >> 8) & this.romPageMask;
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
           if (DEBUG)
