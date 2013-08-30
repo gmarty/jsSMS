@@ -86,7 +86,28 @@ var FORCE_DATAVIEW = false;
  * Does browser support ArrayBuffer and DataView?
  * @const
  */
-var SUPPORT_DATAVIEW = FORCE_DATAVIEW || (!!(window['DataView'] && window['ArrayBuffer']));
+var SUPPORT_DATAVIEW = FORCE_DATAVIEW || ('ArrayBuffer' in window && 'DataView' in window);
+
+
+/**
+ * Force use of destructuring assignments.
+ * @define {boolean}
+ */
+var FORCE_DESTRUCTURING = false;
+
+
+/**
+ * Does browser support destructuring assignments? Used in `EX ...` opcodes.
+ * @const
+ */
+var SUPPORT_DESTRUCTURING = FORCE_DESTRUCTURING || function() {
+  try {
+    eval('var [a]=[1]');
+    return true;
+  } catch (e) {
+    return false;
+  }
+}();
 
 
 // Sound Output

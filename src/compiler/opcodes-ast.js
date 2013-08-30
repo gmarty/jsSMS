@@ -135,6 +135,12 @@ var n = {
       'property': property
     };
   },
+  ArrayExpression: function(elements) {
+    return {
+      'type': 'ArrayExpression',
+      'elements': elements
+    };
+  },
   ConditionalExpression: function(test, consequent, alternate) {
     return {
       'type': 'ConditionalExpression',
@@ -192,20 +198,24 @@ var o = {
     }
   },
   EX: function(register1, register2) {
-    // temp = a;
-    // a = a2;
-    // a2 = temp;
-    // temp = f;
-    // f = f2;
-    // f2 = temp;
-    return [
-      n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.Register(register1))),
-      n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register1), n.Identifier(register1 + '2'))),
-      n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier(register1 + '2'), n.Identifier('temp'))),
-      n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.Register(register2))),
-      n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register2), n.Identifier(register2 + '2'))),
-      n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier(register2 + '2'), n.Identifier('temp')))
-    ];
+    if (SUPPORT_DESTRUCTURING) {
+      // [a, a2] = [a2, a];
+      return [
+        n.ExpressionStatement(n.AssignmentExpression('=',
+            n.ArrayExpression([n.Register(register1), n.Register(register2)]),
+            n.ArrayExpression([n.Register(register2), n.Register(register1)])
+            ))
+      ];
+    } else {
+      // temp = a;
+      // a = a2;
+      // a2 = temp;
+      return [
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.Register(register1))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register1), n.Register(register2))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register2), n.Identifier('temp')))
+      ];
+    }
   },
   NOOP: function() {
     return function() {
@@ -1133,18 +1143,29 @@ var o = {
   },
   EX_AF: function() {
     return function() {
-      return o.EX('a', 'f');
+      return [].concat(
+          o.EX('a', 'a2'),
+          o.EX('f', 'f2')
+      );
     };
   },
   EXX: function() {
     return function() {
-      // exBC();
-      // exDE();
-      // exHL();
       return [].concat(
-          o.EX('b', 'c'),
-          o.EX('d', 'e'),
-          o.EX('h', 'l')
+          o.EX('b', 'b2'),
+          o.EX('c', 'c2'),
+          o.EX('d', 'd2'),
+          o.EX('e', 'e2'),
+          o.EX('h', 'h2'),
+          o.EX('l', 'l2')
+      );
+    };
+  },
+  EX_DE_HL: function() {
+    return function() {
+      return [].concat(
+          o.EX('d', 'h'),
+          o.EX('e', 'l')
       );
     };
   },
@@ -1169,24 +1190,6 @@ var o = {
             [n.Identifier('sp'),
              n.Identifier('temp')]
             ))
-      ];
-    };
-  },
-  EX_DE_HL: function() {
-    return function() {
-      // temp = d;
-      // d = h;
-      // h = temp;
-      // temp = e;
-      // e = l;
-      // l = temp;
-      return [
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.Register('d'))),
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Register('d'), n.Register('h'))),
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Register('h'), n.Identifier('temp'))),
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), n.Register('e'))),
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Register('e'), n.Register('l'))),
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Register('l'), n.Identifier('temp')))
       ];
     };
   },

@@ -849,12 +849,16 @@ JSSMS.Z80.prototype = {
       case 0xE9: this.pc = this.getHL(); break;                                     // JP (HL)
       case 0xEA: this.jp((this.f & F_PARITY) != 0); break;                          // JP PE,(nn)
       case 0xEB:                                                       // EX DE,HL
+        /*if (SUPPORT_DESTRUCTURING) {
+          [this.d, this.e, this.h, this.l] = [this.h, this.l, this.d, this.e];
+        } else {*/
         temp = this.d;
         this.d = this.h;
         this.h = temp;
         temp = this.e;
         this.e = this.l;
         this.l = temp;
+        //}
         break;
       case 0xEC: this.call((this.f & F_PARITY) != 0); break;                        // CALL PE (nn)
       case 0xED: this.doED(this.d_()); break;                                // ED Opcode
@@ -2940,26 +2944,42 @@ JSSMS.Z80.prototype = {
 
   // EXCHANGE REGISTER BANKS
   exAF: function() {
+    /*if (SUPPORT_DESTRUCTURING) {
+      [this.a, this.a2, this.f, this.f2] = [this.a2, this.a, this.f2, this.f];
+    } else {*/
     var temp = this.a; this.a = this.a2; this.a2 = temp;
     temp = this.f; this.f = this.f2; this.f2 = temp;
+    //}
   },
 
 
   exBC: function() {
+    /*if (SUPPORT_DESTRUCTURING) {
+      [this.b, this.b2, this.c, this.c2] = [this.b2, this.b, this.c2, this.c];
+    } else {*/
     var temp = this.b; this.b = this.b2; this.b2 = temp;
     temp = this.c; this.c = this.c2; this.c2 = temp;
+    //}
   },
 
 
   exDE: function() {
+    /*if (SUPPORT_DESTRUCTURING) {
+      [this.d, this.d2, this.e, this.e2] = [this.d2, this.d, this.e2, this.e];
+    } else {*/
     var temp = this.d; this.d = this.d2; this.d2 = temp;
     temp = this.e; this.e = this.e2; this.e2 = temp;
+    //}
   },
 
 
   exHL: function() {
+    /*if (SUPPORT_DESTRUCTURING) {
+      [this.h, this.h2, this.l, this.l2] = [this.h2, this.h, this.l2, this.l];
+    } else {*/
     var temp = this.h; this.h = this.h2; this.h2 = temp;
     temp = this.l; this.l = this.l2; this.l2 = temp;
+    //}
   },
 
 
