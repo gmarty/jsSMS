@@ -876,9 +876,10 @@ var o = {
   },
   PUSH: function(register1, register2) {
     return function() {
-      // push2(b, c);
+      // We're not using push() here to allow inlining of registers by the optimizer.
+      // pushUint8(b, c);
       return n.ExpressionStatement(
-          n.CallExpression('push2', [n.Register(register1), n.Register(register2)])
+          n.CallExpression('pushUint8', [n.Register(register1), n.Register(register2)])
       );
     };
   },
@@ -1021,11 +1022,11 @@ var o = {
   CALL: function(operator, bitMask) {
     if (operator == undefined && bitMask == undefined)
       return function(value, target, nextAddress) {
-        // push1(nextAddress + (page * 0x4000));
+        // push(nextAddress + (page * 0x4000));
         // pc = target;
         // return;
         return [
-          n.ExpressionStatement(n.CallExpression('push1', n.BinaryExpression('+',
+          n.ExpressionStatement(n.CallExpression('push', n.BinaryExpression('+',
               n.Literal(nextAddress % 0x4000), n.BinaryExpression('*',
               n.Identifier('page'), n.Literal(0x4000)
               ))
@@ -1037,7 +1038,7 @@ var o = {
     else
       return function(value, target, nextAddress) {
         // if ((f & F_ZERO) == 0) {
-        //   push1(nextAddress + (page * 0x4000));
+        //   push(nextAddress + (page * 0x4000));
         //   tstates -= 7;
         //   pc = target;
         //   return;
@@ -1049,7 +1050,7 @@ var o = {
             ),
             n.BlockStatement([
               n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(7))),
-              n.ExpressionStatement(n.CallExpression('push1', n.BinaryExpression('+',
+              n.ExpressionStatement(n.CallExpression('push', n.BinaryExpression('+',
                   n.Literal(nextAddress % 0x4000), n.BinaryExpression('*',
                   n.Identifier('page'), n.Literal(0x4000)
                   ))
@@ -1062,11 +1063,11 @@ var o = {
   },
   RST: function(targetAddress) {
     return function(value, target, nextAddress) {
-      // push1(nextAddress + (page * 0x4000));
+      // push(nextAddress + (page * 0x4000));
       // pc = target;
       // return;
       return [
-        n.ExpressionStatement(n.CallExpression('push1', n.BinaryExpression('+',
+        n.ExpressionStatement(n.CallExpression('push', n.BinaryExpression('+',
             n.Literal(nextAddress % 0x4000), n.BinaryExpression('*',
             n.Identifier('page'), n.Literal(0x4000)
             ))
