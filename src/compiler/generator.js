@@ -92,11 +92,19 @@ var Generator = (function() {
     generate: function(functions) {
       var self = this;
 
-      JSSMS.Utils.console.time('Generating');
       for (var page = 0; page < functions.length; page++) {
         functions[page] = functions[page]
           .map(function(fn) {
-              var body = [];
+              var body = [
+                {
+                  'type': 'ExpressionStatement',
+                  'expression': {
+                    'type': 'Literal',
+                    'value': 'use strict',
+                    'raw': '"use strict"'
+                  }
+                }
+              ];
               var name = fn[0].address;
               var jumpTargetNb = fn[0].jumpTargetNb;
               var tstates = 0;
@@ -134,17 +142,14 @@ var Generator = (function() {
                           },
                           'right': {
                             'type': 'Literal',
-                            'value': tstates
+                            'value': tstates,
+                            'raw': DEBUG ? toHex(tstates) : '' + tstates
                           }
                         }
                       }
                     ];
 
                     tstates = 0;
-
-                    if (DEBUG) {
-                      decreaseTStateStmt[0]['expression']['right']['raw'] = toHex(decreaseTStateStmt[0]['expression']['right']['value']);
-                    }
 
                     if (ENABLE_SERVER_LOGGER) {
                       decreaseTStateStmt = [].concat(syncServerStmt, decreaseTStateStmt);
@@ -155,6 +160,7 @@ var Generator = (function() {
 
                     // Update `this.pc` statement.
                     if (/*bytecode.isFunctionEnder &&*/ bytecode.nextAddress != null) {
+                      var nextAddress = bytecode.nextAddress % 0x4000;
                       var updatePcStmt = {
                         'type': 'ExpressionStatement',
                         'expression': {
@@ -169,7 +175,8 @@ var Generator = (function() {
                             'operator': '+',
                             'left': {
                               'type': 'Literal',
-                              'value': bytecode.nextAddress % 0x4000
+                              'value': nextAddress,
+                              'raw': DEBUG ? toHex(nextAddress) : '' + nextAddress
                             },
                             'right': {
                               'type': 'BinaryExpression',
@@ -180,17 +187,13 @@ var Generator = (function() {
                               },
                               'right': {
                                 'type': 'Literal',
-                                'value': 0x4000
+                                'value': 0x4000,
+                                'raw': '0x4000'
                               }
                             }
                           }
                         }
                       };
-
-                      if (DEBUG) {
-                        updatePcStmt['expression']['right']['left']['raw'] = toHex(updatePcStmt['expression']['right']['left']['value']);
-                        updatePcStmt['expression']['right']['right']['right']['raw'] = '0x4000';
-                      }
 
                       bytecode.ast.push(updatePcStmt);
                     }
@@ -322,7 +325,6 @@ var Generator = (function() {
               }
             });
       }
-      JSSMS.Utils.console.timeEnd('Generating');
 
       this.ast = functions;
     }

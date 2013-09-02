@@ -82,16 +82,17 @@ var n = {
     };
   },
   Literal: function(value) {
-    if (DEBUG && typeof value == 'number') {
+    if (typeof value == 'number') {
       return {
         'type': 'Literal',
         'value': value,
-        'raw': JSSMS.Utils.toHex(value)
+        'raw': DEBUG ? JSSMS.Utils.toHex(value) : '' + value
       };
     } else {
       return {
         'type': 'Literal',
-        'value': value
+        'value': value,
+        'raw': '' + value
       };
     }
   },
@@ -202,6 +203,7 @@ var o = {
       // [a, a2] = [a2, a];
       return [
         n.ExpressionStatement(n.AssignmentExpression('=',
+            // Should be `ArrayPattern`.
             n.ArrayExpression([n.Register(register1), n.Register(register2)]),
             n.ArrayExpression([n.Register(register2), n.Register(register1)])
             ))
