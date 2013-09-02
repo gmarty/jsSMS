@@ -40,12 +40,10 @@ var Parser = (function() {
     this.addresses = Array(rom.length);
     this.entryPoints = [];
     this.instructions = Array(rom.length);
-    if (DEBUG) this.instructionTypes = [];
 
     for (var i = 0; i < rom.length; i++) {
       this.addresses[i] = [];
       this.instructions[i] = [];
-      if (DEBUG) this.instructionTypes[i] = [];
     }
   };
 
