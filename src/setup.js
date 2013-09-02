@@ -76,6 +76,20 @@ var LITTLE_ENDIAN = true;
 
 
 /**
+ * Force the use of typed arrays.
+ * @define {boolean}
+ */
+var FORCE_TYPED_ARRAYS = false;
+
+
+/**
+ * Does browser support typed arrays?
+ * @const
+ */
+var SUPPORT_TYPED_ARRAYS = FORCE_TYPED_ARRAYS || ('Uint8Array' in window);
+
+
+/**
  * Force ArrayBuffer and DataView use.
  * @define {boolean}
  */

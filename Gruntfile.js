@@ -32,7 +32,7 @@ module.exports = function(grunt) {
       'src/compiler/optimizer.js',
       'src/compiler/generator.js',
       'src/compiler/recompiler.js',
-      'src/build/exports.js' // Only required inADVANCED_OPTIMIZATIONS mode, that is node target.
+      'src/build/exports.js' // Only required in ADVANCED_OPTIMIZATIONS mode (=node target).
     ],
     externs: [
       '<%= closurePath %>/contrib/externs/webkit_console.js',
@@ -140,7 +140,9 @@ module.exports = function(grunt) {
             '"DEBUG=false"',
             '"ENABLE_DEBUGGER=false"',
             '"ENABLE_COMPILER=true"',
+            '"FORCE_TYPED_ARRAYS=true"',
             '"FORCE_DATAVIEW=true"',
+            '"FORCE_DESTRUCTURING=true"',
             '"ACCURATE_INTERRUPT_EMULATION=false"',
             '"ENABLE_SERVER_LOGGER=false"'
           ],

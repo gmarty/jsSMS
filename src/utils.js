@@ -32,6 +32,25 @@ JSSMS.Utils = {
   },
 
 
+  Uint8Array: function() {
+    /**
+     * @param {number} length
+     * @return {Uint8Array}
+     */
+    if (SUPPORT_TYPED_ARRAYS) {
+      return function(length) {
+        return new Uint8Array(length);
+      }
+    } else {
+      /**
+       * @param {number} length
+       * @return {Array}
+       */
+      return Array;
+    }
+  }(),
+
+
   /**
    * Simple polyfill for DataView and ArrayBuffer.
    * \@todo We must use Uint8Array for browsers supporting them but not DataView.
