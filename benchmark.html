@@ -147,11 +147,9 @@ code {
 </style>
 <script>(function(G,o,O,g,l){G.GoogleAnalyticsObject=O;G[O]||(G[O]=function(){(G[O].q=G[O].q||[]).push(arguments)});G[O].l=Date.now();g=o.createElement('script'),l=o.scripts[0];g.src='//www.google-analytics.com/analytics.js';l.parentNode.insertBefore(g,l)}(this,document,'ga'));ga('create','UA-207391-16',{'siteSpeedSampleRate':100});ga('send','pageview')</script>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-<script>
-if (!window.$) {
-  document.write('<script src="lib/jquery.min.js"><\/script>');
-}
-</script>
+<script>if(!window.$)document.write('<script src="lib/jquery.min.js"><\/script>')</script>
+<script src="https://www.google.com/jsapi"></script>
+<script>google.load('visualization','1',{packages:['corechart']})</script>
 </head>
 <body>
 <div class="container">
@@ -166,12 +164,12 @@ if (!window.$) {
         <table class="table" id="resultTable" style="display:none">
           <tr id="runningRow">
             <td>Running...</td>
-            <td></td>
           </tr>
         </table>
+        <div id="chart" style="width:256px;height:132px;background:#777"></div>
         <p>Notes:</p>
         <ul>
-          <li>Each iteration will run 60 frames of the emulator.</li>
+          <li>Each iteration will run several frames of the emulator.</li>
           <li>This benchmark doesn't take the screen update into consideration.</li>
           <li>The initial static compilation time is not counted into the benchmark.</li>
         </ul>
@@ -214,16 +212,20 @@ var sms;
 var romData;
 var launchBtn = $('#launchBtn');
 
+//var romPath = 'rom/gg/Japan/Columns (J).gg';
+var romPath = 'rom/homebrew/blockhead.sms';
+var FRAME_NB = 10;
+
 launchBtn.click(function() {
   launchBtn.attr('disabled', true);
   $('#resultTable').show();
   setTimeout(function() {
-    suite.run();
+    suite.run({async: true});
   }, 300);
 });
 
 $.ajax({
-  url: escape('rom/homebrew/blockhead.sms'),
+  url: escape(romPath),
   xhr: function() {
     var xhr = $.ajaxSettings.xhr();
     if (xhr.overrideMimeType != undefined) {
@@ -239,13 +241,26 @@ $.ajax({
     }
 
     romData = xhr.responseText;
-    $('#launchBtn').show();
+    launchBtn.show();
   }
 });
 
 var suite = new Benchmark.Suite('JSSMS');
+
+var initSuite = function() {
+  sms = new JSSMS;
+  sms.stop();
+  sms.readRomDirectly(romData, romPath);
+  sms.reset();
+  sms.vdp.forceFullRedraw();
+  // We do a first run to force deopt as some globals changed.
+  for (var i = 0; i < FRAME_NB; i++) {
+    sms.cpu.frame();
+  }
+};
+
 var fn = function() {
-  for (var i = 0; i < 60; i++) {
+  for (var i = 0; i < FRAME_NB; i++) {
     sms.cpu.frame();
   }
 };
@@ -255,56 +270,87 @@ suite.add('Interpreter', {
     DEBUG = false;
     ENABLE_COMPILER = false;
 
-    sms = new JSSMS;
-    sms.stop();
-    sms.readRomDirectly(romData, 'blockhead.sms');
-    sms.reset();
-    sms.vdp.forceFullRedraw();
-    sms.cpu.frame();
+    initSuite();
   },
 
   'fn': fn
 });
 
-suite.add('Compiler in debug mode', {
-  'onStart': function() {
-    DEBUG = true;
-    ENABLE_COMPILER = true;
-
-    sms = new JSSMS;
-    sms.stop();
-    sms.readRomDirectly(romData, 'blockhead.sms');
-    sms.reset();
-    sms.vdp.forceFullRedraw();
-    sms.cpu.frame();
-  },
-
-  'fn': fn
-});
-
-suite.add('Compiler', {
+suite.add('Recompiler', {
   'onStart': function() {
     DEBUG = false;
     ENABLE_COMPILER = true;
 
-    sms = new JSSMS;
-    sms.stop();
-    sms.readRomDirectly(romData, 'blockhead.sms');
-    sms.reset();
-    sms.vdp.forceFullRedraw();
-    sms.cpu.frame();
+    initSuite();
+  },
+
+  'fn': fn
+});
+
+suite.add('Recompiler (Debug)', { // Debug mode
+  'onStart': function() {
+    DEBUG = true;
+    ENABLE_COMPILER = true;
+
+    initSuite();
   },
 
   'fn': fn
 });
 
 suite.on('cycle', function(event) {
-  $('#resultTable').append('<tr><td>' + event.target.name + '</td><td>' + String(event.target) + '</td></tr>');
+  $('#resultTable').append('<tr><td>' + String(event.target) + '</td></tr>');
 });
 
 suite.on('complete', function() {
   $('#runningRow').empty();
-  console.log('Fastest is ' + this.filter('fastest').pluck('name'));
+
+  console.log(this)
+
+  var data = this.map(function(testCase) {
+    // We multiply by the number of frames benchmarked to get the FPS.
+    return [testCase.name, testCase.hz * FRAME_NB];
+  });
+
+  drawChart(data);
+  launchBtn.removeAttr('disabled');
 });
+
+function drawChart(rows) {
+  var data = new google.visualization.DataTable();
+
+  data.addColumn('string', 'Emulation mode');
+  data.addColumn('number', 'FPS');
+
+  data.addRows(rows);
+
+  var options = {
+    title: 'Benchmark',
+    titlePosition: 'none',
+    legend: {
+      position: 'none'
+    },
+    chartArea: {width: '236', height: '104'},
+    backgroundColor: '#000',
+    colors: ['#FA0'],
+    hAxis: {
+      textPosition: 'out',
+      baselineColor: '#FFF',
+      textStyle: {color: '#FFF'},
+      minValue: 0
+    },
+    vAxis: {
+      textPosition: 'in',
+      baselineColor: '#FFF',
+      textStyle: {
+        color: '#FFF',
+        fontSize: 14
+      }
+    }
+  };
+
+  var chart = new google.visualization.BarChart(document.getElementById('chart'));
+  chart.draw(data, options);
+}
 </script>
 </body>
