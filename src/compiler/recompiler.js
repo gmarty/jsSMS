@@ -170,8 +170,7 @@ var Recompiler = (function() {
         comment: true,
         renumber: true,
         hexadecimal: true,
-        parse: DEBUG ? window['esprima']['parse'] : function() {
-        }
+        parse: DEBUG ? window['esprima']['parse'] : null
       });
     },
 
