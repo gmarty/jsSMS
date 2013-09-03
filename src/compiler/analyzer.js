@@ -22,7 +22,7 @@
 
 
 /**
- * The analyzer rearranges instructions to use JavaScript control flow constructs.
+ * The analyzer rearranges bytecodes to use JavaScript control flow constructs.
  *
  * @constructor
  */

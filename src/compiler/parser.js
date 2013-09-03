@@ -21,7 +21,6 @@
 
 
 /**
- * @todo Define address types to instructionTypes (instruction or operand).
  * @todo Keep a track of memory locations parsed.
  */
 var Parser = (function() {
@@ -39,11 +38,11 @@ var Parser = (function() {
 
     this.addresses = Array(rom.length);
     this.entryPoints = [];
-    this.instructions = Array(rom.length);
+    this.bytecodes = Array(rom.length);
 
     for (var i = 0; i < rom.length; i++) {
       this.addresses[i] = [];
-      this.instructions[i] = [];
+      this.bytecodes[i] = [];
     }
   };
 
@@ -88,32 +87,32 @@ var Parser = (function() {
             continue;
           }
 
-          // Make sure instructions are not parsed twice.
-          if (this.instructions[currentPage][currentAddress]) {
+          // Make sure bytecodes are only parsed once.
+          if (this.bytecodes[currentPage][currentAddress]) {
             continue;
           }
 
           var bytecode = new Bytecode(currentAddress, currentPage);
-          this.instructions[currentPage][currentAddress] = disassemble(bytecode, this.stream);
+          this.bytecodes[currentPage][currentAddress] = disassemble(bytecode, this.stream);
 
-          if (this.instructions[currentPage][currentAddress].nextAddress != null &&
-              this.instructions[currentPage][currentAddress].nextAddress >= pageStart &&
-              this.instructions[currentPage][currentAddress].nextAddress <= pageEnd) {
-            this.addAddress(this.instructions[currentPage][currentAddress].nextAddress);
+          if (this.bytecodes[currentPage][currentAddress].nextAddress != null &&
+              this.bytecodes[currentPage][currentAddress].nextAddress >= pageStart &&
+              this.bytecodes[currentPage][currentAddress].nextAddress <= pageEnd) {
+            this.addAddress(this.bytecodes[currentPage][currentAddress].nextAddress);
           }
-          if (this.instructions[currentPage][currentAddress].target != null &&
-              this.instructions[currentPage][currentAddress].target >= pageStart &&
-              this.instructions[currentPage][currentAddress].target <= pageEnd) {
-            this.addAddress(this.instructions[currentPage][currentAddress].target);
+          if (this.bytecodes[currentPage][currentAddress].target != null &&
+              this.bytecodes[currentPage][currentAddress].target >= pageStart &&
+              this.bytecodes[currentPage][currentAddress].target <= pageEnd) {
+            this.addAddress(this.bytecodes[currentPage][currentAddress].target);
           }
         }
       }
 
       // We consider the first 0x0400 bytes as an independent memory page.
-      if (this.instructions[0][0x03FF]) {
-        this.instructions[0][0x03FF].isFunctionEnder = true;
-      } else if (this.instructions[0][0x03FE]) {
-        this.instructions[0][0x03FE].isFunctionEnder = true;
+      if (this.bytecodes[0][0x03FF]) {
+        this.bytecodes[0][0x03FF].isFunctionEnder = true;
+      } else if (this.bytecodes[0][0x03FE]) {
+        this.bytecodes[0][0x03FE].isFunctionEnder = true;
       }
 
       var i = 0;
@@ -124,29 +123,29 @@ var Parser = (function() {
         var entryPoint = this.entryPoints[i].address;
         var romPage = this.entryPoints[i].romPage;
 
-        this.instructions[romPage][entryPoint].isJumpTarget = true;
-        this.instructions[romPage][entryPoint].jumpTargetNb++;
+        this.bytecodes[romPage][entryPoint].isJumpTarget = true;
+        this.bytecodes[romPage][entryPoint].jumpTargetNb++;
       }
 
-      // Mark all jump target instructions.
-      for (currentPage = 0; currentPage < this.instructions.length; currentPage++) {
-        for (i = 0, length = this.instructions[currentPage].length; i < length; i++) {
-          if (!this.instructions[currentPage][i]) {
+      // Mark all jump target bytecodes.
+      for (currentPage = 0; currentPage < this.bytecodes.length; currentPage++) {
+        for (i = 0, length = this.bytecodes[currentPage].length; i < length; i++) {
+          if (!this.bytecodes[currentPage][i]) {
             continue;
           }
           // Comparing with null is important here as `0` is a valid address (0x00).
-          if (this.instructions[currentPage][i].nextAddress != null &&
-              this.instructions[currentPage][this.instructions[currentPage][i].nextAddress]) {
-            this.instructions[currentPage][this.instructions[currentPage][i].nextAddress].jumpTargetNb++;
+          if (this.bytecodes[currentPage][i].nextAddress != null &&
+              this.bytecodes[currentPage][this.bytecodes[currentPage][i].nextAddress]) {
+            this.bytecodes[currentPage][this.bytecodes[currentPage][i].nextAddress].jumpTargetNb++;
           }
-          if (this.instructions[currentPage][i].target != null) {
-            var targetPage = ~~(this.instructions[currentPage][i].target / 0x4000);
-            var targetAddress = this.instructions[currentPage][i].target % 0x4000;
-            if (this.instructions[targetPage] && this.instructions[targetPage][targetAddress]) {
-              this.instructions[targetPage][targetAddress].isJumpTarget = true;
-              this.instructions[targetPage][targetAddress].jumpTargetNb++;
+          if (this.bytecodes[currentPage][i].target != null) {
+            var targetPage = ~~(this.bytecodes[currentPage][i].target / 0x4000);
+            var targetAddress = this.bytecodes[currentPage][i].target % 0x4000;
+            if (this.bytecodes[targetPage] && this.bytecodes[targetPage][targetAddress]) {
+              this.bytecodes[targetPage][targetAddress].isJumpTarget = true;
+              this.bytecodes[targetPage][targetAddress].jumpTargetNb++;
             } else {
-              JSSMS.Utils.console.log('Invalid target address', toHex(this.instructions[currentPage][i].target));
+              JSSMS.Utils.console.log('Invalid target address', toHex(this.bytecodes[currentPage][i].target));
             }
           }
         }
@@ -158,7 +157,7 @@ var Parser = (function() {
 
     /**
      * This method only parsed a single function. The result of the parsing is added to the parsed
-     * instructions array, but returns only the bytecodes newly parsed.
+     * bytecodes array, but returns only the bytecodes newly parsed.
      *
      * @param {Object} obj
      * @return {Array}
@@ -172,7 +171,7 @@ var Parser = (function() {
       var branch = [];
       var bytecode;
 
-      var firstInstruction = true;
+      var startingBytecode = true;
       var absoluteAddress = 0;
 
       // We consider the first 0x0400 bytes as an independent memory page.
@@ -182,22 +181,22 @@ var Parser = (function() {
       }
 
       do {
-        if (this.instructions[romPage][address]) {
-          bytecode = this.instructions[romPage][address];
+        if (this.bytecodes[romPage][address]) {
+          bytecode = this.bytecodes[romPage][address];
         } else {
           bytecode = new Bytecode(address, romPage);
-          this.instructions[romPage][address] = disassemble(bytecode, this.stream);
+          this.bytecodes[romPage][address] = disassemble(bytecode, this.stream);
         }
 
-        if (bytecode.canEnd && !firstInstruction) {
-          // Because canEnd tagged instructions are jump targets. This method doesn't tag jump
+        if (bytecode.canEnd && !startingBytecode) {
+          // Because canEnd tagged bytecodes are jump targets. This method doesn't tag jump
           // targets as opposed to a full parse().
           break;
         }
 
         address = bytecode.nextAddress % 0x4000;
         branch.push(bytecode);
-        firstInstruction = false;
+        startingBytecode = false;
         absoluteAddress = address + (romPage * 0x4000);
       } while (address != null && absoluteAddress >= pageStart && absoluteAddress < pageEnd && !bytecode.isFunctionEnder);
 
@@ -206,14 +205,14 @@ var Parser = (function() {
 
 
     /**
-     * Return a dot file representation of parsed instructions.
+     * Return a dot file representation of parsed bytecodes.
      *
      * @return {string} The content of a Dot file.
      */
     writeGraphViz: function() {
       JSSMS.Utils.console.time('DOT generation');
 
-      var tree = this.instructions;
+      var tree = this.bytecodes;
       var INDENT = ' ';
 
       var content = ['digraph G {'];
@@ -262,7 +261,7 @@ var Parser = (function() {
 
 
   /**
-   * Returns the instruction associated to an opcode.
+   * Returns the bytecode associated to an opcode.
    *
    * @param {Bytecode} bytecode
    * @param {RomStream} stream
@@ -919,7 +918,7 @@ var Parser = (function() {
 
 
   /**
-   * Returns the instruction associated to an opcode.
+   * Returns the bytecode associated to an opcode.
    *
    * @param {Bytecode} bytecode
    * @param {RomStream} stream
@@ -936,7 +935,7 @@ var Parser = (function() {
 
 
   /**
-   * Returns the instruction associated to an opcode.
+   * Returns the bytecode associated to an opcode.
    *
    * @param {Bytecode} bytecode
    * @param {RomStream} stream
@@ -1134,7 +1133,7 @@ var Parser = (function() {
 
 
   /**
-   * Returns the instruction associated to an opcode.
+   * Returns the bytecode associated to an opcode.
    *
    * @param {Bytecode} bytecode
    * @param {RomStream} stream
@@ -1369,7 +1368,7 @@ var Parser = (function() {
 
 
   /**
-   * Returns the instruction associated to an opcode.
+   * Returns the bytecode associated to an opcode.
    *
    * @param {Bytecode} bytecode
    * @param {RomStream} stream

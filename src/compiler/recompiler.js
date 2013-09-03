@@ -107,7 +107,7 @@ var Recompiler = (function() {
 
 
     analyze: function() {
-      this.analyzer.analyze(this.parser.instructions);
+      this.analyzer.analyze(this.parser.bytecodes);
 
       return this;
     },

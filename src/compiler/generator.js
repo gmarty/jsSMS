@@ -90,8 +90,6 @@ var Generator = (function() {
      * Process bytecodes.
      */
     generate: function(functions) {
-      var self = this;
-
       for (var page = 0; page < functions.length; page++) {
         functions[page] = functions[page]
           .map(function(fn) {
@@ -159,7 +157,7 @@ var Generator = (function() {
                     //}
 
                     // Update `this.pc` statement.
-                    if (/*bytecode.isFunctionEnder &&*/ bytecode.nextAddress != null) {
+                    if ((ENABLE_SERVER_LOGGER || bytecode.isFunctionEnder) && bytecode.nextAddress != null) {
                       var nextAddress = bytecode.nextAddress % 0x4000;
                       var updatePcStmt = {
                         'type': 'ExpressionStatement',
@@ -258,7 +256,7 @@ var Generator = (function() {
                 // Inject data about current branch into a comment.
                 fn[0][0].leadingComments = [].concat({
                   type: 'Line',
-                  value: ' Nb of instructions jumping here: ' + jumpTargetNb
+                  value: ' Nb of bytecodes jumping here: ' + jumpTargetNb
                 }, fn[0][0].leadingComments);*/
 
               // Flatten the array.
