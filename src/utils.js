@@ -116,31 +116,45 @@ JSSMS.Utils = {
     /**
      * @param {...string} var_args
      */
-    log: function(var_args) {
-      if (DEBUG)
-        window.console.log.apply(window.console, arguments);
-    },
+    log: function() {
+      if (DEBUG && window.console.log)
+        return function(var_args) {
+          window.console.log(var_args); // IE doesn't support bind() on console methods.
+        };
+      return function() {
+      };
+    }(),
     /**
      * @param {...string} var_args
      */
-    error: function(var_args) {
-      if (DEBUG)
-        window.console.error.apply(window.console, arguments);
-    },
+    error: function() {
+      if (DEBUG && window.console.error)
+        return function(var_args) {
+          window.console.error(var_args); // IE doesn't support bind() on console methods.
+        };
+      return function() {
+      };
+    }(),
     /**
+     * @todo Develop a polyfill for non supporting browsers like IE.
      * @param {string} label
      */
-    time: function(label) {
-      if (DEBUG)
-        window.console.time(label);
-    },
+    time: function() {
+      if (DEBUG && window.console.time)
+        return window.console.time.bind(window.console);
+      return function(label) {
+      };
+    }(),
     /**
+     * @todo Develop a polyfill for non supporting browsers like IE.
      * @param {string} label
      */
-    timeEnd: function(label) {
-      if (DEBUG)
-        window.console.timeEnd(label);
-    }
+    timeEnd: function() {
+      if (DEBUG && window.console.timeEnd)
+        return window.console.timeEnd.bind(window.console);
+      return function(label) {
+      };
+    }()
   },
 
 
