@@ -132,7 +132,7 @@ JSSMS.Vdp = function(sms) {
    * 16K of Video RAM.
    * @type {Uint8Array}
    */
-  this.VRAM = JSSMS.Utils.Uint8Array(0x4000);
+  this.VRAM = new JSSMS.Utils.Uint8Array(0x4000);
 
   /**
    * Colour RAM.
@@ -141,7 +141,7 @@ JSSMS.Vdp = function(sms) {
    * 64 bytes.
    * @type {Uint8Array}
    */
-  this.CRAM = JSSMS.Utils.Uint8Array(0x20 * 3);
+  this.CRAM = new JSSMS.Utils.Uint8Array(0x20 * 3);
   for (i = 0; i < 0x20 * 3; i++) {
     this.CRAM[i] = 0xFF;
   }
@@ -151,7 +151,7 @@ JSSMS.Vdp = function(sms) {
    * 15 Registers, (0-10) used by SMS, but some programs write > 10.
    * @type {Uint8Array}
    */
-  this.vdpreg = JSSMS.Utils.Uint8Array(16);
+  this.vdpreg = new JSSMS.Utils.Uint8Array(16);
 
   /**
    * Status register.
@@ -205,14 +205,14 @@ JSSMS.Vdp = function(sms) {
    * Background priorities.
    * @type {Uint8Array}
    */
-  this.bgPriority = JSSMS.Utils.Uint8Array(SMS_WIDTH);
+  this.bgPriority = new JSSMS.Utils.Uint8Array(SMS_WIDTH);
 
   /** Sprite collisions. */
   if (VDP_SPRITE_COLLISIONS) {
     /**
      * @type {Uint8Array}
      */
-    this.spriteCol = JSSMS.Utils.Uint8Array(SMS_WIDTH);
+    this.spriteCol = new JSSMS.Utils.Uint8Array(SMS_WIDTH);
   }
 
   /**
@@ -235,14 +235,14 @@ JSSMS.Vdp = function(sms) {
   this.display = /** @type {Uint8ClampedArray} */ (sms.ui.canvasImageData.data);
 
   /** SMS colours converted to RGB hex. */
-  /** @type {Uint8Array} */ this.main_JAVA_R = JSSMS.Utils.Uint8Array(0x40);
-  /** @type {Uint8Array} */ this.main_JAVA_G = JSSMS.Utils.Uint8Array(0x40);
-  /** @type {Uint8Array} */ this.main_JAVA_B = JSSMS.Utils.Uint8Array(0x40);
+  /** @type {Uint8Array} */ this.main_JAVA_R = new JSSMS.Utils.Uint8Array(0x40);
+  /** @type {Uint8Array} */ this.main_JAVA_G = new JSSMS.Utils.Uint8Array(0x40);
+  /** @type {Uint8Array} */ this.main_JAVA_B = new JSSMS.Utils.Uint8Array(0x40);
 
   /** GG colours converted to RGB hex. */
-  /** @type {Uint8Array} */ this.GG_JAVA_R = JSSMS.Utils.Uint8Array(0x100);
-  /** @type {Uint8Array} */ this.GG_JAVA_G = JSSMS.Utils.Uint8Array(0x100);
-  /** @type {Uint8Array} */ this.GG_JAVA_B = JSSMS.Utils.Uint8Array(0x10);
+  /** @type {Uint8Array} */ this.GG_JAVA_R = new JSSMS.Utils.Uint8Array(0x100);
+  /** @type {Uint8Array} */ this.GG_JAVA_G = new JSSMS.Utils.Uint8Array(0x100);
+  /** @type {Uint8Array} */ this.GG_JAVA_B = new JSSMS.Utils.Uint8Array(0x10);
 
   /**
    * Horizontal viewport start.
@@ -275,7 +275,7 @@ JSSMS.Vdp = function(sms) {
    */
   this.lineSprites = new Array(SMS_HEIGHT);
   for (i = 0; i < SMS_HEIGHT; i++) {
-    this.lineSprites[i] = JSSMS.Utils.Uint8Array(1 + (3 * SPRITES_PER_LINE));
+    this.lineSprites[i] = new JSSMS.Utils.Uint8Array(1 + (3 * SPRITES_PER_LINE));
   }
 
   // Decoded Tiles
@@ -289,7 +289,7 @@ JSSMS.Vdp = function(sms) {
    * Store whether tile has been written to.
    * @type {Uint8Array}
    */
-  this.isTileDirty = JSSMS.Utils.Uint8Array(TOTAL_TILES);
+  this.isTileDirty = new JSSMS.Utils.Uint8Array(TOTAL_TILES);
 
   /** Min / Max of dirty tile index. */
   /** @type {number} */ this.minDirty = 0;
@@ -1058,11 +1058,11 @@ JSSMS.Vdp.prototype = {
   // h = horizontal flip
   // n = pattern index (0 - 512)
   createCachedImages: function() {
-    //this.tiles = JSSMS.Utils.Uint8Array(TOTAL_TILES);
+    //this.tiles = new JSSMS.Utils.Uint8Array(TOTAL_TILES);
     for (var i = 0; i < TOTAL_TILES; i++) {
-      this.tiles[i] = JSSMS.Utils.Uint8Array(TILE_SIZE * TILE_SIZE);
+      this.tiles[i] = new JSSMS.Utils.Uint8Array(TILE_SIZE * TILE_SIZE);
     }
-    //this.isTileDirty = JSSMS.Utils.Uint8Array(TOTAL_TILES);
+    //this.isTileDirty = new JSSMS.Utils.Uint8Array(TOTAL_TILES);
   },
 
 

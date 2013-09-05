@@ -58,13 +58,11 @@ JSSMS.Utils = {
 
   Uint8Array: function() {
     /**
-     * @param {number} length
+     * @param {number|ArrayBufferView|Array.<number>|ArrayBuffer} length or array or buffer.
      * @return {Uint8Array}
      */
     if (SUPPORT_TYPED_ARRAYS) {
-      return function(length) {
-        return new Uint8Array(length);
-      }
+      return Uint8Array;
     } else {
       /**
        * @param {number} length
