@@ -250,12 +250,14 @@ function generateIndexTable(index) {
       name: 'SBC A,(' + index + '+d)',
       ast: o.SBC_X(registerH, registerL)
     },
+    0xA6: {
+      name: 'AND A,(' + index + '+d)',
+      ast: o.AND_X(registerH, registerL)
+    },
     0xAE: {
       name: 'XOR A,(' + index + '+d)',
       ast: o.XOR_X(registerH, registerL)
     },
-    0xCB:
-        index == 'IX' ? opcodeTableDDCB : opcodeTableFDCB,
     0xB6: {
       name: 'OR A,(' + index + '+d)',
       ast: o.OR_X(registerH, registerL)
@@ -264,6 +266,8 @@ function generateIndexTable(index) {
       name: 'CP (' + index + '+d)',
       ast: o.CP_X(registerH, registerL)
     },
+    0xCB:
+        index == 'IX' ? opcodeTableDDCB : opcodeTableFDCB,
     0xE1: {
       name: 'POP ' + index,
       ast: o.POP(registerH, registerL)

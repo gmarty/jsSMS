@@ -318,7 +318,7 @@ var o = {
         return o.SET16(srcRegister1, srcRegister2, o.READ_MEM16(n.Literal(value)));
       };
     else
-      throw Error('Wrong parameters number');
+      JSSMS.Utils.console.error('Wrong parameters number');
   },
   LD_WRITE_MEM: function(srcRegister1, srcRegister2, dstRegister1, dstRegister2) {
     if (dstRegister1 == undefined && dstRegister2 == undefined)
@@ -1420,19 +1420,19 @@ var o = {
       );
     };
   },
-  OR_X: function(register1, register2) {
+  AND_X: function(register1, register2) {
     return function(value, target, nextAddress) {
-      // a |= readMem(getIXHIXL() + value);
-      // f = SZP_TABLE[a];
+      // a &= readMem(getIXHIXL() + value);
+      // f = SZP_TABLE[a] | F_HALFCARRY;
       return [
         n.ExpressionStatement(
-            n.AssignmentExpression('|=', n.Register('a'), o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
-            n.Literal(value))))),
+            n.AssignmentExpression('&=', n.Register('a'),
+            o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()), n.Literal(value)))
+            )),
         n.ExpressionStatement(
             n.AssignmentExpression('=', n.Register('f'),
-            n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a'))
-            )
-        )
+            n.BinaryExpression('|', n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a')), n.Literal(F_HALFCARRY))
+            ))
       ];
     };
   },
@@ -1443,6 +1443,22 @@ var o = {
       return [
         n.ExpressionStatement(
             n.AssignmentExpression('^=', n.Register('a'), o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
+            n.Literal(value))))),
+        n.ExpressionStatement(
+            n.AssignmentExpression('=', n.Register('f'),
+            n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a'))
+            )
+        )
+      ];
+    };
+  },
+  OR_X: function(register1, register2) {
+    return function(value, target, nextAddress) {
+      // a |= readMem(getIXHIXL() + value);
+      // f = SZP_TABLE[a];
+      return [
+        n.ExpressionStatement(
+            n.AssignmentExpression('|=', n.Register('a'), o.READ_MEM8(n.BinaryExpression('+', n.CallExpression('get' + (register1 + register2).toUpperCase()),
             n.Literal(value))))),
         n.ExpressionStatement(
             n.AssignmentExpression('=', n.Register('f'),
