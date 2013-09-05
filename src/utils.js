@@ -19,6 +19,30 @@
 
 'use strict';
 
+// Fix console inconsistencies on browsers.
+(function() {
+  if (!('console' in window)) {
+    window.console = {
+      log: function() {
+      },
+      error: function() {
+      }
+    };
+  } else if (!('bind' in window.console.log)) {
+    // native functions in IE9 might not have bind.
+    window.console.log = (function(fn) {
+      return function(msg) {
+        return fn(msg);
+      };
+    })(window.console.log);
+    window.console.error = (function(fn) {
+      return function(msg) {
+        return fn(msg);
+      };
+    })(window.console.error);
+  }
+})();
+
 JSSMS.Utils = {
   /**
    * Generate a random integer.
@@ -113,31 +137,20 @@ JSSMS.Utils = {
    * A proxy for console that is activated in DEBUG mode only.
    */
   console: {
-    /**
-     * @param {...string} var_args
-     */
     log: function() {
-      if (DEBUG && window.console.log)
-        return function(var_args) {
-          window.console.log(var_args); // IE doesn't support bind() on console methods.
-        };
-      return function() {
+      if (DEBUG)
+        return window.console.log.bind(window.console);
+      return function(var_args) {
       };
     }(),
-    /**
-     * @param {...string} var_args
-     */
     error: function() {
-      if (DEBUG && window.console.error)
-        return function(var_args) {
-          window.console.error(var_args); // IE doesn't support bind() on console methods.
-        };
-      return function() {
+      if (DEBUG)
+        return window.console.error.bind(window.console);
+      return function(var_args) {
       };
     }(),
     /**
      * @todo Develop a polyfill for non supporting browsers like IE.
-     * @param {string} label
      */
     time: function() {
       if (DEBUG && window.console.time)
@@ -147,7 +160,6 @@ JSSMS.Utils = {
     }(),
     /**
      * @todo Develop a polyfill for non supporting browsers like IE.
-     * @param {string} label
      */
     timeEnd: function() {
       if (DEBUG && window.console.timeEnd)
