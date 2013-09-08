@@ -861,7 +861,7 @@ JSSMS.Z80.prototype = {
         //}
         break;
       case 0xEC: this.call((this.f & F_PARITY) != 0); break;                        // CALL PE (nn)
-      case 0xED: this.doED(this.d_()); break;                                // ED Opcode
+      case 0xED: this.doED(this.readMem(this.pc)); break;                                // ED Opcode
       case 0xEE: this.f = this.SZP_TABLE[this.a ^= this.readMem(this.pc++)]; break;                // XOR n
       case 0xEF: this.push(this.pc); this.pc = 0x28; break;                                // RST 28H
       case 0xF0: this.ret((this.f & F_SIGN) == 0); break;                           // RET P
@@ -1731,7 +1731,7 @@ JSSMS.Z80.prototype = {
    * @param {number} index Index register to use.
    */
   doIndexCB: function(index) {
-    var location = (index + this.d_()) & 0xFFFF;
+    var location = (index + this.readMem(this.pc)) & 0xFFFF;
     var opcode = this.readMem(++this.pc);
 
     this.tstates -= OP_INDEX_CB_STATES[opcode];
@@ -3328,7 +3328,7 @@ JSSMS.Z80.prototype = {
             this.frameReg[2] = value & this.romPageMask;
           }
         } else {
-          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
           if (DEBUG)
             debugger;
         }
@@ -3351,7 +3351,7 @@ JSSMS.Z80.prototype = {
             this.frameReg[2] = value & this.romPageMask;
           }
         } else {
-          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
           if (DEBUG)
             debugger;
         }
@@ -3372,11 +3372,10 @@ JSSMS.Z80.prototype = {
        */
       return function(address, value) {
         if (address < 0xFFFC) {
-          address = address & 0x1FFF;
-          this.memWriteMap.setUint16(address, value, LITTLE_ENDIAN);
+          this.memWriteMap.setUint16(address & 0x1FFF, value, LITTLE_ENDIAN);
         } else if (address == 0xFFFC) {
           this.frameReg[3] = value & 0xFF;
-          this.frameReg[0] = value >> 8;
+          this.frameReg[0] = (value >> 8) & this.romPageMask;
         } else if (address == 0xFFFD) {
           this.frameReg[0] = (value & 0xFF) & this.romPageMask;
           this.frameReg[1] = (value >> 8) & this.romPageMask;
@@ -3384,7 +3383,7 @@ JSSMS.Z80.prototype = {
           this.frameReg[1] = (value & 0xFF) & this.romPageMask;
           this.frameReg[2] = (value >> 8) & this.romPageMask;
         } else {
-          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
           if (DEBUG)
             debugger;
         }
@@ -3397,11 +3396,11 @@ JSSMS.Z80.prototype = {
       return function(address, value) {
         if (address < 0xFFFC) {
           address &= 0x1FFF;
-          this.memWriteMap[address] = value & 0xFF;
-          this.memWriteMap[address + 1] = value >> 8;
+          this.memWriteMap[address++] = value & 0xFF;
+          this.memWriteMap[address] = value >> 8;
         } else if (address == 0xFFFC) {
           this.frameReg[3] = value & 0xFF;
-          this.frameReg[0] = value >> 8;
+          this.frameReg[0] = (value >> 8) & this.romPageMask;
         } else if (address == 0xFFFD) {
           this.frameReg[0] = (value & 0xFF) & this.romPageMask;
           this.frameReg[1] = (value >> 8) & this.romPageMask;
@@ -3409,7 +3408,7 @@ JSSMS.Z80.prototype = {
           this.frameReg[1] = (value & 0xFF) & this.romPageMask;
           this.frameReg[2] = (value >> 8) & this.romPageMask;
         } else {
-          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 0x1FFF));
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
           if (DEBUG)
             debugger;
         }
@@ -3479,7 +3478,7 @@ JSSMS.Z80.prototype = {
           return this.rom[this.frameReg[0]][address];
         } else if (address < 0x8000) {
           return this.rom[this.frameReg[1]][address - 0x4000];
-        } else if (address < 0xc000) {
+        } else if (address < 0xC000) {
           if ((this.frameReg[3] & 12) == 8) {
             this.useSRAM = true;
             return this.sram[address - 0x8000];
@@ -3572,25 +3571,25 @@ JSSMS.Z80.prototype = {
        */
       return function(address) {
         if (address < 0x0400) {
-          return this.rom[0][address] | this.rom[0][++address] << 8;
+          return this.rom[0][address++] | this.rom[0][address] << 8;
         } else if (address < 0x4000) {
-          return this.rom[this.frameReg[0]][address] | this.rom[this.frameReg[0]][++address] << 8;
+          return this.rom[this.frameReg[0]][address++] | this.rom[this.frameReg[0]][address] << 8;
         } else if (address < 0x8000) {
-          return this.rom[this.frameReg[1]][address - 0x4000] | this.rom[this.frameReg[1]][++address - 0x4000] << 8;
+          return this.rom[this.frameReg[1]][address++ - 0x4000] | this.rom[this.frameReg[1]][address - 0x4000] << 8;
         } else if (address < 0xC000) {
           if ((this.frameReg[3] & 12) == 8) {
             this.useSRAM = true;
-            return this.sram[address - 0x8000] | this.sram[++address - 0x8000] << 8;
+            return this.sram[address++ - 0x8000] | this.sram[address - 0x8000] << 8;
           } else if ((this.frameReg[3] & 12) == 12) {
             this.useSRAM = true;
-            return this.sram[address - 0x4000] | this.sram[++address - 0x4000] << 8;
+            return this.sram[address++ - 0x4000] | this.sram[address - 0x4000] << 8;
           } else {
-            return this.rom[this.frameReg[2]][address - 0x8000] | this.rom[this.frameReg[2]][++address - 0x8000] << 8;
+            return this.rom[this.frameReg[2]][address++ - 0x8000] | this.rom[this.frameReg[2]][address - 0x8000] << 8;
           }
         } else if (address < 0xE000) {
-          return this.memWriteMap[address - 0xC000] | this.memWriteMap[++address - 0xC000] << 8;
+          return this.memWriteMap[address++ - 0xC000] | this.memWriteMap[address - 0xC000] << 8;
         } else if (address < 0xFFFC) {
-          return this.memWriteMap[address - 0xE000] | this.memWriteMap[++address - 0xE000] << 8;
+          return this.memWriteMap[address++ - 0xE000] | this.memWriteMap[address - 0xE000] << 8;
         } else if (address == 0xFFFC) {
           // 0xFFFC: RAM/ROM select register
           return this.frameReg[3];
