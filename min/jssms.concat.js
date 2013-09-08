@@ -25,8 +25,12 @@ var ENABLE_SERVER_LOGGER = false;
 var SYNC_MODE = READ_MODE;
 var ACCURATE = false;
 var LITTLE_ENDIAN = true;
+var FORCE_TYPED_ARRAYS = false;
+var SUPPORT_TYPED_ARRAYS = FORCE_TYPED_ARRAYS || "Uint8Array" in window;
 var FORCE_DATAVIEW = false;
-var SUPPORT_DATAVIEW = FORCE_DATAVIEW || !!(window["DataView"] && window["ArrayBuffer"]);
+var SUPPORT_DATAVIEW = FORCE_DATAVIEW || "ArrayBuffer" in window && "DataView" in window;
+var FORCE_DESTRUCTURING = false;
+var SUPPORT_DESTRUCTURING = false;
 var SAMPLE_RATE = 44100;
 var DEBUG_TIMING = DEBUG;
 var REFRESH_EMULATION = false;
@@ -210,9 +214,35 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
     return false
   }
 }};
+(function() {
+  if(!("console" in window)) {
+    window.console = {log:function() {
+    }, error:function() {
+    }}
+  }else {
+    if(!("bind" in window.console.log)) {
+      window.console.log = function(fn) {
+        return function(msg) {
+          return fn(msg)
+        }
+      }(window.console.log);
+      window.console.error = function(fn) {
+        return function(msg) {
+          return fn(msg)
+        }
+      }(window.console.error)
+    }
+  }
+})();
 JSSMS.Utils = {rndInt:function(range) {
   return Math.round(Math.random() * range)
-}, Array:function() {
+}, Uint8Array:function() {
+  if(SUPPORT_TYPED_ARRAYS) {
+    return Uint8Array
+  }else {
+    return Array
+  }
+}(), Array:function() {
   if(SUPPORT_DATAVIEW) {
     return function(length) {
       return new DataView(new ArrayBuffer(length))
@@ -234,29 +264,37 @@ JSSMS.Utils = {rndInt:function(range) {
       }
     }
   }
-}(), console:{log:function(var_args) {
+}(), console:{log:function() {
   if(DEBUG) {
-    window.console.log.apply(window.console, arguments)
+    return window.console.log.bind(window.console)
   }
-}, error:function(var_args) {
+  return function(var_args) {
+  }
+}(), error:function() {
   if(DEBUG) {
-    window.console.error.apply(window.console, arguments)
+    return window.console.error.bind(window.console)
   }
-}, time:function(label) {
-  if(DEBUG) {
-    window.console.time(label)
+  return function(var_args) {
   }
-}, timeEnd:function(label) {
-  if(DEBUG) {
-    window.console.timeEnd(label)
+}(), time:function() {
+  if(DEBUG && window.console.time) {
+    return window.console.time.bind(window.console)
   }
-}}, traverse:function(object, fn) {
+  return function(label) {
+  }
+}(), timeEnd:function() {
+  if(DEBUG && window.console.timeEnd) {
+    return window.console.timeEnd.bind(window.console)
+  }
+  return function(label) {
+  }
+}()}, traverse:function(object, fn) {
   var key, child;
   fn.call(null, object);
   for(key in object) {
     if(object.hasOwnProperty(key)) {
       child = object[key];
-      if(typeof child === "object" && child !== null) {
+      if(Object(child) === child) {
         object[key] = JSSMS.Utils.traverse(child, fn)
       }
     }
@@ -264,9 +302,7 @@ JSSMS.Utils = {rndInt:function(range) {
   return object
 }, getTimestamp:function() {
   if(window.performance && window.performance.now) {
-    return function() {
-      return window.performance.now()
-    }
+    return window.performance.now.bind(window.performance)
   }else {
     return function() {
       return(new Date).getTime()
@@ -328,7 +364,7 @@ function BinaryRequest(method, url, args, data, cb) {
     }
   };
   xhr.onload = function onload() {
-    if(ArrayBuffer.prototype.isPrototypeOf(this.response)) {
+    if(this.response instanceof ArrayBuffer) {
       cb(this.response)
     }else {
       console.error("Bad response type: " + typeof this.response + " for " + JSON.stringify(this.response))
@@ -803,10 +839,8 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 34:
-      location = this.readMemWord(this.pc);
-      this.writeMem(location++, this.l);
-      this.writeMem(location, this.h);
-      this.pc += 2;
+      this.writeMemWord(this.readMemWord(this.pc++), this.getHL());
+      this.pc++;
       break;
     case 35:
       this.incHL();
@@ -830,8 +864,8 @@ JSSMS.Z80.prototype = {reset:function() {
       this.setHL(this.add16(this.getHL(), this.getHL()));
       break;
     case 42:
-      this.setHL(this.readMemWord(this.readMemWord(this.pc)));
-      this.pc += 2;
+      this.setHL(this.readMemWord(this.readMemWord(this.pc++)));
+      this.pc++;
       break;
     case 43:
       this.decHL();
@@ -852,12 +886,12 @@ JSSMS.Z80.prototype = {reset:function() {
       this.jr(!((this.f & F_CARRY) != 0));
       break;
     case 49:
-      this.sp = this.readMemWord(this.pc);
-      this.pc += 2;
+      this.sp = this.readMemWord(this.pc++);
+      this.pc++;
       break;
     case 50:
-      this.writeMem(this.readMemWord(this.pc), this.a);
-      this.pc += 2;
+      this.writeMem(this.readMemWord(this.pc++), this.a);
+      this.pc++;
       break;
     case 51:
       this.sp++;
@@ -883,8 +917,8 @@ JSSMS.Z80.prototype = {reset:function() {
       this.setHL(this.add16(this.getHL(), this.sp));
       break;
     case 58:
-      this.a = this.readMem(this.readMemWord(this.pc));
-      this.pc += 2;
+      this.a = this.readMem(this.readMemWord(this.pc++));
+      this.pc++;
       break;
     case 59:
       this.sp--;
@@ -1299,13 +1333,13 @@ JSSMS.Z80.prototype = {reset:function() {
       this.call((this.f & F_ZERO) == 0);
       break;
     case 197:
-      this.push2(this.b, this.c);
+      this.push(this.getBC());
       break;
     case 198:
       this.add_a(this.readMem(this.pc++));
       break;
     case 199:
-      this.push1(this.pc);
+      this.push(this.pc);
       this.pc = 0;
       break;
     case 200:
@@ -1325,14 +1359,14 @@ JSSMS.Z80.prototype = {reset:function() {
       this.call((this.f & F_ZERO) != 0);
       break;
     case 205:
-      this.push1(this.pc + 2);
+      this.push(this.pc + 2);
       this.pc = this.readMemWord(this.pc);
       break;
     case 206:
       this.adc_a(this.readMem(this.pc++));
       break;
     case 207:
-      this.push1(this.pc);
+      this.push(this.pc);
       this.pc = 8;
       break;
     case 208:
@@ -1352,13 +1386,13 @@ JSSMS.Z80.prototype = {reset:function() {
       this.call((this.f & F_CARRY) == 0);
       break;
     case 213:
-      this.push2(this.d, this.e);
+      this.push(this.getDE());
       break;
     case 214:
       this.sub_a(this.readMem(this.pc++));
       break;
     case 215:
-      this.push1(this.pc);
+      this.push(this.pc);
       this.pc = 16;
       break;
     case 216:
@@ -1385,7 +1419,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.sbc_a(this.readMem(this.pc++));
       break;
     case 223:
-      this.push1(this.pc);
+      this.push(this.pc);
       this.pc = 24;
       break;
     case 224:
@@ -1399,24 +1433,21 @@ JSSMS.Z80.prototype = {reset:function() {
       this.jp((this.f & F_PARITY) == 0);
       break;
     case 227:
-      temp = this.h;
-      this.h = this.readMem(this.sp + 1);
-      this.writeMem(this.sp + 1, temp);
-      temp = this.l;
-      this.l = this.readMem(this.sp);
-      this.writeMem(this.sp, temp);
+      temp = this.getHL();
+      this.setHL(this.readMemWord(this.sp));
+      this.writeMemWord(this.sp, temp);
       break;
     case 228:
       this.call((this.f & F_PARITY) == 0);
       break;
     case 229:
-      this.push2(this.h, this.l);
+      this.push(this.getHL());
       break;
     case 230:
       this.f = this.SZP_TABLE[this.a &= this.readMem(this.pc++)] | F_HALFCARRY;
       break;
     case 231:
-      this.push1(this.pc);
+      this.push(this.pc);
       this.pc = 32;
       break;
     case 232:
@@ -1440,13 +1471,13 @@ JSSMS.Z80.prototype = {reset:function() {
       this.call((this.f & F_PARITY) != 0);
       break;
     case 237:
-      this.doED(this.d_());
+      this.doED(this.readMem(this.pc));
       break;
     case 238:
       this.f = this.SZP_TABLE[this.a ^= this.readMem(this.pc++)];
       break;
     case 239:
-      this.push1(this.pc);
+      this.push(this.pc);
       this.pc = 40;
       break;
     case 240:
@@ -1467,13 +1498,13 @@ JSSMS.Z80.prototype = {reset:function() {
       this.call((this.f & F_SIGN) == 0);
       break;
     case 245:
-      this.push2(this.a, this.f);
+      this.push(this.getAF());
       break;
     case 246:
       this.f = this.SZP_TABLE[this.a |= this.readMem(this.pc++)];
       break;
     case 247:
-      this.push1(this.pc);
+      this.push(this.pc);
       this.pc = 48;
       break;
     case 248:
@@ -1498,7 +1529,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.cp_a(this.readMem(this.pc++));
       break;
     case 255:
-      this.push1(this.pc);
+      this.push(this.pc);
       this.pc = 56;
       break
   }
@@ -1514,7 +1545,7 @@ JSSMS.Z80.prototype = {reset:function() {
     this.pc++;
     this.halt = false
   }
-  this.push1(this.pc);
+  this.push(this.pc);
   this.pc = 102;
   this.tstates -= 11
 }, interrupt:function() {
@@ -1530,7 +1561,7 @@ JSSMS.Z80.prototype = {reset:function() {
   }
   this.iff1 = this.iff2 = false;
   this.interruptLine = false;
-  this.push1(this.pc);
+  this.push(this.pc);
   if(this.im == 0) {
     this.pc = this.interruptVector == 0 || this.interruptVector == 255 ? 56 : this.interruptVector;
     this.tstates -= 13
@@ -1563,7 +1594,7 @@ JSSMS.Z80.prototype = {reset:function() {
   return d
 }, call:function(condition) {
   if(condition) {
-    this.push1(this.pc + 2);
+    this.push(this.pc + 2);
     this.pc = this.readMemWord(this.pc);
     this.tstates -= 7
   }else {
@@ -1575,12 +1606,12 @@ JSSMS.Z80.prototype = {reset:function() {
     this.sp += 2;
     this.tstates -= 6
   }
-}, push1:function(value) {
-  this.writeMem(--this.sp, value >> 8);
-  this.writeMem(--this.sp, value & 255)
-}, push2:function(hi, lo) {
-  this.writeMem(--this.sp, hi);
-  this.writeMem(--this.sp, lo)
+}, push:function(value) {
+  this.sp -= 2;
+  this.writeMemWord(this.sp, value)
+}, pushUint8:function(hi, lo) {
+  this.sp -= 2;
+  this.writeMemWord(this.sp, hi << 8 | lo)
 }, incMem:function(offset) {
   this.writeMem(offset, this.inc8(this.readMem(offset)))
 }, decMem:function(offset) {
@@ -2433,14 +2464,12 @@ JSSMS.Z80.prototype = {reset:function() {
       this.setIXHIXL(this.add16(this.getIXHIXL(), this.getDE()));
       break;
     case 33:
-      this.setIXHIXL(this.readMemWord(this.pc));
-      this.pc += 2;
+      this.setIXHIXL(this.readMemWord(this.pc++));
+      this.pc++;
       break;
     case 34:
-      location = this.readMemWord(this.pc);
-      this.writeMem(location++, this.ixL);
-      this.writeMem(location, this.ixH);
-      this.pc += 2;
+      this.writeMemWord(this.readMemWord(this.pc++), this.getIXHIXL());
+      this.pc++;
       break;
     case 35:
       this.incIXHIXL();
@@ -2458,10 +2487,8 @@ JSSMS.Z80.prototype = {reset:function() {
       this.setIXHIXL(this.add16(this.getIXHIXL(), this.getIXHIXL()));
       break;
     case 42:
-      location = this.readMemWord(this.pc);
-      this.ixL = this.readMem(location++);
-      this.ixH = this.readMem(location);
-      this.pc += 2;
+      this.setIXHIXL(this.readMemWord(this.readMemWord(this.pc++)));
+      this.pc++;
       break;
     case 43:
       this.decIXHIXL();
@@ -2706,11 +2733,10 @@ JSSMS.Z80.prototype = {reset:function() {
     case 227:
       temp = this.getIXHIXL();
       this.setIXHIXL(this.readMemWord(this.sp));
-      this.writeMem(this.sp, temp & 255);
-      this.writeMem(this.sp + 1, temp >> 8);
+      this.writeMemWord(this.sp, temp);
       break;
     case 229:
-      this.push2(this.ixH, this.ixL);
+      this.push(this.getIXHIXL());
       break;
     case 233:
       this.pc = this.getIXHIXL();
@@ -2738,14 +2764,12 @@ JSSMS.Z80.prototype = {reset:function() {
       this.setIYHIYL(this.add16(this.getIYHIYL(), this.getDE()));
       break;
     case 33:
-      this.setIYHIYL(this.readMemWord(this.pc));
-      this.pc += 2;
+      this.setIYHIYL(this.readMemWord(this.pc++));
+      this.pc++;
       break;
     case 34:
-      location = this.readMemWord(this.pc);
-      this.writeMem(location++, this.iyL);
-      this.writeMem(location, this.iyH);
-      this.pc += 2;
+      this.writeMemWord(this.readMemWord(this.pc++), this.getIYHIYL());
+      this.pc++;
       break;
     case 35:
       this.incIYHIYL();
@@ -2763,10 +2787,8 @@ JSSMS.Z80.prototype = {reset:function() {
       this.setIYHIYL(this.add16(this.getIYHIYL(), this.getIYHIYL()));
       break;
     case 42:
-      location = this.readMemWord(this.pc);
-      this.iyL = this.readMem(location++);
-      this.iyH = this.readMem(location);
-      this.pc += 2;
+      this.setIYHIYL(this.readMemWord(this.readMemWord(this.pc++)));
+      this.pc++;
       break;
     case 43:
       this.decIYHIYL();
@@ -3011,11 +3033,10 @@ JSSMS.Z80.prototype = {reset:function() {
     case 227:
       temp = this.getIYHIYL();
       this.setIYHIYL(this.readMemWord(this.sp));
-      this.writeMem(this.sp, temp & 255);
-      this.writeMem(this.sp + 1, temp >> 8);
+      this.writeMemWord(this.sp, temp);
       break;
     case 229:
-      this.push2(this.iyH, this.iyL);
+      this.push(this.getIYHIYL());
       break;
     case 233:
       this.pc = this.getIYHIYL();
@@ -3029,7 +3050,7 @@ JSSMS.Z80.prototype = {reset:function() {
       break
   }
 }, doIndexCB:function(index) {
-  var location = index + this.d_() & 65535;
+  var location = index + this.readMem(this.pc) & 65535;
   var opcode = this.readMem(++this.pc);
   this.tstates -= OP_INDEX_CB_STATES[opcode];
   switch(opcode) {
@@ -3716,9 +3737,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 67:
-      location = this.readMemWord(++this.pc);
-      this.writeMem(location++, this.c);
-      this.writeMem(location, this.b);
+      this.writeMemWord(this.readMemWord(++this.pc), this.getBC());
       this.pc += 2;
       break;
     case 68:
@@ -3809,9 +3828,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 83:
-      location = this.readMemWord(++this.pc);
-      this.writeMem(location++, this.e);
-      this.writeMem(location, this.d);
+      this.writeMemWord(this.readMemWord(++this.pc), this.getDE());
       this.pc += 2;
       break;
     case 86:
@@ -3861,9 +3878,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 99:
-      location = this.readMemWord(++this.pc);
-      this.writeMem(location++, this.l);
-      this.writeMem(location, this.h);
+      this.writeMemWord(this.readMemWord(++this.pc), this.getHL());
       this.pc += 2;
       break;
     case 103:
@@ -3908,9 +3923,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.pc++;
       break;
     case 115:
-      location = this.readMemWord(++this.pc);
-      this.writeMem(location++, this.sp & 255);
-      this.writeMem(location, this.sp >> 8);
+      this.writeMemWord(this.readMemWord(++this.pc), this.sp);
       this.pc += 2;
       break;
     case 120:
@@ -4262,6 +4275,8 @@ JSSMS.Z80.prototype = {reset:function() {
   return this.d << 8 | this.e
 }, getHL:function() {
   return this.h << 8 | this.l
+}, getAF:function() {
+  return this.a << 8 | this.f
 }, getIXHIXL:function() {
   return this.ixH << 8 | this.ixL
 }, getIYHIYL:function() {
@@ -4563,7 +4578,7 @@ JSSMS.Z80.prototype = {reset:function() {
   if(SUPPORT_DATAVIEW) {
     return function(address, value) {
       if(address <= 65535) {
-        this.memWriteMap.setInt8(address & 8191, value);
+        this.memWriteMap.setUint8(address & 8191, value);
         if(address == 65532) {
           this.frameReg[3] = value
         }else {
@@ -4580,7 +4595,7 @@ JSSMS.Z80.prototype = {reset:function() {
           }
         }
       }else {
-        JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 8191));
+        JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
         if(DEBUG) {
           debugger
         }
@@ -4606,9 +4621,65 @@ JSSMS.Z80.prototype = {reset:function() {
           }
         }
       }else {
-        JSSMS.Utils.console.error(JSSMS.Utils.toHex(address), JSSMS.Utils.toHex(address & 8191));
+        JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
         if(DEBUG) {
           debugger
+        }
+      }
+    }
+  }
+}(), writeMemWord:function() {
+  if(SUPPORT_DATAVIEW) {
+    return function(address, value) {
+      if(address < 65532) {
+        this.memWriteMap.setUint16(address & 8191, value, LITTLE_ENDIAN)
+      }else {
+        if(address == 65532) {
+          this.frameReg[3] = value & 255;
+          this.frameReg[0] = value >> 8 & this.romPageMask
+        }else {
+          if(address == 65533) {
+            this.frameReg[0] = value & 255 & this.romPageMask;
+            this.frameReg[1] = value >> 8 & this.romPageMask
+          }else {
+            if(address == 65534) {
+              this.frameReg[1] = value & 255 & this.romPageMask;
+              this.frameReg[2] = value >> 8 & this.romPageMask
+            }else {
+              JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+              if(DEBUG) {
+                debugger
+              }
+            }
+          }
+        }
+      }
+    }
+  }else {
+    return function(address, value) {
+      if(address < 65532) {
+        address &= 8191;
+        this.memWriteMap[address++] = value & 255;
+        this.memWriteMap[address] = value >> 8
+      }else {
+        if(address == 65532) {
+          this.frameReg[3] = value & 255;
+          this.frameReg[0] = value >> 8 & this.romPageMask
+        }else {
+          if(address == 65533) {
+            this.frameReg[0] = value & 255 & this.romPageMask;
+            this.frameReg[1] = value >> 8 & this.romPageMask
+          }else {
+            if(address == 65534) {
+              this.frameReg[1] = value & 255 & this.romPageMask;
+              this.frameReg[2] = value >> 8 & this.romPageMask
+            }else {
+              JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+              if(DEBUG) {
+                debugger
+              }
+            }
+          }
         }
       }
     }
@@ -4793,32 +4864,32 @@ JSSMS.Z80.prototype = {reset:function() {
   }else {
     return function(address) {
       if(address < 1024) {
-        return this.rom[0][address] | this.rom[0][++address] << 8
+        return this.rom[0][address++] | this.rom[0][address] << 8
       }else {
         if(address < 16384) {
-          return this.rom[this.frameReg[0]][address] | this.rom[this.frameReg[0]][++address] << 8
+          return this.rom[this.frameReg[0]][address++] | this.rom[this.frameReg[0]][address] << 8
         }else {
           if(address < 32768) {
-            return this.rom[this.frameReg[1]][address - 16384] | this.rom[this.frameReg[1]][++address - 16384] << 8
+            return this.rom[this.frameReg[1]][address++ - 16384] | this.rom[this.frameReg[1]][address - 16384] << 8
           }else {
             if(address < 49152) {
               if((this.frameReg[3] & 12) == 8) {
                 this.useSRAM = true;
-                return this.sram[address - 32768] | this.sram[++address - 32768] << 8
+                return this.sram[address++ - 32768] | this.sram[address - 32768] << 8
               }else {
                 if((this.frameReg[3] & 12) == 12) {
                   this.useSRAM = true;
-                  return this.sram[address - 16384] | this.sram[++address - 16384] << 8
+                  return this.sram[address++ - 16384] | this.sram[address - 16384] << 8
                 }else {
-                  return this.rom[this.frameReg[2]][address - 32768] | this.rom[this.frameReg[2]][++address - 32768] << 8
+                  return this.rom[this.frameReg[2]][address++ - 32768] | this.rom[this.frameReg[2]][address - 32768] << 8
                 }
               }
             }else {
               if(address < 57344) {
-                return this.memWriteMap[address - 49152] | this.memWriteMap[++address - 49152] << 8
+                return this.memWriteMap[address++ - 49152] | this.memWriteMap[address - 49152] << 8
               }else {
                 if(address < 65532) {
-                  return this.memWriteMap[address - 57344] | this.memWriteMap[++address - 57344] << 8
+                  return this.memWriteMap[address++ - 57344] | this.memWriteMap[address - 57344] << 8
                 }else {
                   if(address == 65532) {
                     return this.frameReg[3]
@@ -8932,12 +9003,12 @@ JSSMS.Vdp = function(sms) {
   this.main = sms;
   var i = 0;
   this.videoMode = NTSC;
-  this.VRAM = new Uint8Array(16384);
-  this.CRAM = new Uint8Array(32 * 3);
+  this.VRAM = new JSSMS.Utils.Uint8Array(16384);
+  this.CRAM = new JSSMS.Utils.Uint8Array(32 * 3);
   for(i = 0;i < 32 * 3;i++) {
     this.CRAM[i] = 255
   }
-  this.vdpreg = new Uint8Array(16);
+  this.vdpreg = new JSSMS.Utils.Uint8Array(16);
   this.status = 0;
   this.firstByte = false;
   this.commandByte = 0;
@@ -8946,29 +9017,29 @@ JSSMS.Vdp = function(sms) {
   this.readBuffer = 0;
   this.line = 0;
   this.counter = 0;
-  this.bgPriority = new Uint8Array(SMS_WIDTH);
+  this.bgPriority = new JSSMS.Utils.Uint8Array(SMS_WIDTH);
   if(VDP_SPRITE_COLLISIONS) {
-    this.spriteCol = new Uint8Array(SMS_WIDTH)
+    this.spriteCol = new JSSMS.Utils.Uint8Array(SMS_WIDTH)
   }
   this.bgt = 0;
   this.vScrollLatch = 0;
   this.display = (sms.ui.canvasImageData.data);
-  this.main_JAVA_R = new Uint8Array(64);
-  this.main_JAVA_G = new Uint8Array(64);
-  this.main_JAVA_B = new Uint8Array(64);
-  this.GG_JAVA_R = new Uint8Array(256);
-  this.GG_JAVA_G = new Uint8Array(256);
-  this.GG_JAVA_B = new Uint8Array(16);
+  this.main_JAVA_R = new JSSMS.Utils.Uint8Array(64);
+  this.main_JAVA_G = new JSSMS.Utils.Uint8Array(64);
+  this.main_JAVA_B = new JSSMS.Utils.Uint8Array(64);
+  this.GG_JAVA_R = new JSSMS.Utils.Uint8Array(256);
+  this.GG_JAVA_G = new JSSMS.Utils.Uint8Array(256);
+  this.GG_JAVA_B = new JSSMS.Utils.Uint8Array(16);
   this.h_start = 0;
   this.h_end = 0;
   this.sat = 0;
   this.isSatDirty = false;
   this.lineSprites = new Array(SMS_HEIGHT);
   for(i = 0;i < SMS_HEIGHT;i++) {
-    this.lineSprites[i] = new Uint8Array(1 + 3 * SPRITES_PER_LINE)
+    this.lineSprites[i] = new JSSMS.Utils.Uint8Array(1 + 3 * SPRITES_PER_LINE)
   }
   this.tiles = new Array(TOTAL_TILES);
-  this.isTileDirty = new Uint8Array(TOTAL_TILES);
+  this.isTileDirty = new JSSMS.Utils.Uint8Array(TOTAL_TILES);
   this.minDirty = 0;
   this.maxDirty = 0;
   this.createCachedImages();
@@ -9398,7 +9469,7 @@ JSSMS.Vdp.prototype = {reset:function() {
   }
 }, createCachedImages:function() {
   for(var i = 0;i < TOTAL_TILES;i++) {
-    this.tiles[i] = new Uint8Array(TILE_SIZE * TILE_SIZE)
+    this.tiles[i] = new JSSMS.Utils.Uint8Array(TILE_SIZE * TILE_SIZE)
   }
 }, generateConvertedPals:function() {
   var i;
@@ -9479,11 +9550,11 @@ if(window["$"]) {
         var lastTime = 0;
         this.requestAnimationFrame = function(callback) {
           var currTime = JSSMS.Utils.getTimestamp();
-          var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+          var timeToCall = Math.max(0, 1E3 / 60 - (currTime - lastTime));
           window.setTimeout(function() {
-            callback(currTime + timeToCall)
-          }, timeToCall);
-          lastTime = currTime + timeToCall
+            lastTime = JSSMS.Utils.getTimestamp();
+            callback()
+          }, timeToCall)
         }
       }
       this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + " moz-opaque></canvas>");
@@ -9885,16 +9956,10 @@ var Parser = function() {
     this.frameReg = frameReg;
     this.addresses = Array(rom.length);
     this.entryPoints = [];
-    this.instructions = Array(rom.length);
-    if(DEBUG) {
-      this.instructionTypes = []
-    }
+    this.bytecodes = Array(rom.length);
     for(var i = 0;i < rom.length;i++) {
       this.addresses[i] = [];
-      this.instructions[i] = [];
-      if(DEBUG) {
-        this.instructionTypes[i] = []
-      }
+      this.bytecodes[i] = []
     }
   };
   parser.prototype = {addEntryPoint:function(obj) {
@@ -9920,48 +9985,50 @@ var Parser = function() {
           JSSMS.Utils.console.error("Address out of bound", toHex(currentAddress));
           continue
         }
-        if(this.instructions[currentPage][currentAddress]) {
+        if(this.bytecodes[currentPage][currentAddress]) {
           continue
         }
         var bytecode = new Bytecode(currentAddress, currentPage);
-        this.instructions[currentPage][currentAddress] = disassemble(bytecode, this.stream);
-        if(this.instructions[currentPage][currentAddress].nextAddress != null && this.instructions[currentPage][currentAddress].nextAddress >= pageStart && this.instructions[currentPage][currentAddress].nextAddress <= pageEnd) {
-          this.addAddress(this.instructions[currentPage][currentAddress].nextAddress)
+        this.bytecodes[currentPage][currentAddress] = disassemble(bytecode, this.stream);
+        if(this.bytecodes[currentPage][currentAddress].nextAddress != null && this.bytecodes[currentPage][currentAddress].nextAddress >= pageStart && this.bytecodes[currentPage][currentAddress].nextAddress <= pageEnd) {
+          this.addAddress(this.bytecodes[currentPage][currentAddress].nextAddress)
         }
-        if(this.instructions[currentPage][currentAddress].target != null && this.instructions[currentPage][currentAddress].target >= pageStart && this.instructions[currentPage][currentAddress].target <= pageEnd) {
-          this.addAddress(this.instructions[currentPage][currentAddress].target)
+        if(this.bytecodes[currentPage][currentAddress].target != null && this.bytecodes[currentPage][currentAddress].target >= pageStart && this.bytecodes[currentPage][currentAddress].target <= pageEnd) {
+          this.addAddress(this.bytecodes[currentPage][currentAddress].target)
         }
       }
     }
-    if(this.instructions[0][1023]) {
-      this.instructions[0][1023].isFunctionEnder = true
+    if(this.bytecodes[0][1023]) {
+      this.bytecodes[0][1023].isFunctionEnder = true
     }else {
-      if(this.instructions[0][1022]) {
-        this.instructions[0][1022].isFunctionEnder = true
+      if(this.bytecodes[0][1022]) {
+        this.bytecodes[0][1022].isFunctionEnder = true
       }
     }
-    for(var i = 0, length = this.entryPoints.length;i < length;i++) {
+    var i = 0;
+    var length = 0;
+    for(i = 0, length = this.entryPoints.length;i < length;i++) {
       var entryPoint = this.entryPoints[i].address;
       var romPage = this.entryPoints[i].romPage;
-      this.instructions[romPage][entryPoint].isJumpTarget = true;
-      this.instructions[romPage][entryPoint].jumpTargetNb++
+      this.bytecodes[romPage][entryPoint].isJumpTarget = true;
+      this.bytecodes[romPage][entryPoint].jumpTargetNb++
     }
-    for(currentPage = 0;currentPage < this.instructions.length;currentPage++) {
-      for(var i = 0, length = this.instructions[currentPage].length;i < length;i++) {
-        if(!this.instructions[currentPage][i]) {
+    for(currentPage = 0;currentPage < this.bytecodes.length;currentPage++) {
+      for(i = 0, length = this.bytecodes[currentPage].length;i < length;i++) {
+        if(!this.bytecodes[currentPage][i]) {
           continue
         }
-        if(this.instructions[currentPage][i].nextAddress != null && this.instructions[currentPage][this.instructions[currentPage][i].nextAddress]) {
-          this.instructions[currentPage][this.instructions[currentPage][i].nextAddress].jumpTargetNb++
+        if(this.bytecodes[currentPage][i].nextAddress != null && this.bytecodes[currentPage][this.bytecodes[currentPage][i].nextAddress]) {
+          this.bytecodes[currentPage][this.bytecodes[currentPage][i].nextAddress].jumpTargetNb++
         }
-        if(this.instructions[currentPage][i].target != null) {
-          var targetPage = Math.floor(this.instructions[currentPage][i].target / 16384);
-          var targetAddress = this.instructions[currentPage][i].target % 16384;
-          if(this.instructions[targetPage] && this.instructions[targetPage][targetAddress]) {
-            this.instructions[targetPage][targetAddress].isJumpTarget = true;
-            this.instructions[targetPage][targetAddress].jumpTargetNb++
+        if(this.bytecodes[currentPage][i].target != null) {
+          var targetPage = ~~(this.bytecodes[currentPage][i].target / 16384);
+          var targetAddress = this.bytecodes[currentPage][i].target % 16384;
+          if(this.bytecodes[targetPage] && this.bytecodes[targetPage][targetAddress]) {
+            this.bytecodes[targetPage][targetAddress].isJumpTarget = true;
+            this.bytecodes[targetPage][targetAddress].jumpTargetNb++
           }else {
-            JSSMS.Utils.console.log("Invalid target address", toHex(this.instructions[currentPage][i].target))
+            JSSMS.Utils.console.log("Invalid target address", toHex(this.bytecodes[currentPage][i].target))
           }
         }
       }
@@ -9974,31 +10041,31 @@ var Parser = function() {
     var pageEnd = (romPage + 1) * 16384;
     var branch = [];
     var bytecode;
-    var firstInstruction = true;
+    var startingBytecode = true;
     var absoluteAddress = 0;
     if(address < 1024 && romPage == 0) {
       pageStart = 0;
       pageEnd = 1024
     }
     do {
-      if(this.instructions[romPage][address]) {
-        bytecode = this.instructions[romPage][address]
+      if(this.bytecodes[romPage][address]) {
+        bytecode = this.bytecodes[romPage][address]
       }else {
         bytecode = new Bytecode(address, romPage);
-        this.instructions[romPage][address] = disassemble(bytecode, this.stream)
+        this.bytecodes[romPage][address] = disassemble(bytecode, this.stream)
       }
-      if(bytecode.canEnd && !firstInstruction) {
+      if(bytecode.canEnd && !startingBytecode) {
         break
       }
       address = bytecode.nextAddress % 16384;
       branch.push(bytecode);
-      firstInstruction = false;
+      startingBytecode = false;
       absoluteAddress = address + romPage * 16384
     }while(address != null && absoluteAddress >= pageStart && absoluteAddress < pageEnd && !bytecode.isFunctionEnder);
     return branch
   }, writeGraphViz:function() {
     JSSMS.Utils.console.time("DOT generation");
-    var tree = this.instructions;
+    var tree = this.bytecodes;
     var INDENT = " ";
     var content = ["digraph G {"];
     for(var i = 0, length = tree.length;i < length;i++) {
@@ -10019,7 +10086,7 @@ var Parser = function() {
     JSSMS.Utils.console.timeEnd("DOT generation");
     return content
   }, addAddress:function(address) {
-    var memPage = Math.floor(address / 16384);
+    var memPage = ~~(address / 16384);
     var romPage = this.frameReg[memPage];
     address = address % 16384;
     this.addresses[romPage].push({address:address, romPage:romPage, memPage:memPage})
@@ -11191,10 +11258,10 @@ var n = {IfStatement:function(test, consequent, alternate) {
 }, Identifier:function(name) {
   return{"type":"Identifier", "name":name}
 }, Literal:function(value) {
-  if(DEBUG && typeof value == "number") {
-    return{"type":"Literal", "value":value, "raw":JSSMS.Utils.toHex(value)}
+  if(typeof value == "number") {
+    return{"type":"Literal", "value":value, "raw":DEBUG ? JSSMS.Utils.toHex(value) : "" + value}
   }else {
-    return{"type":"Literal", "value":value}
+    return{"type":"Literal", "value":value, "raw":"" + value}
   }
 }, CallExpression:function(callee, args) {
   if(args == undefined) {
@@ -11212,6 +11279,8 @@ var n = {IfStatement:function(test, consequent, alternate) {
   return{"type":"UnaryExpression", "operator":operator, "argument":argument}
 }, MemberExpression:function(object, property) {
   return{"type":"MemberExpression", "computed":true, "object":object, "property":property}
+}, ArrayExpression:function(elements) {
+  return{"type":"ArrayExpression", "elements":elements}
 }, ConditionalExpression:function(test, consequent, alternate) {
   return{"type":"ConditionalExpression", "test":test, "consequent":consequent, "alternate":alternate}
 }, LogicalExpression:function(operator, left, right) {
@@ -11230,8 +11299,11 @@ var o = {SET16:function(register1, register2, value) {
     return[n.VariableDeclaration("val", value), n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.BinaryExpression(">>", n.Identifier("val"), n.Literal(8)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register2), n.BinaryExpression("&", n.Identifier("val"), n.Literal(255))))]
   }
 }, EX:function(register1, register2) {
-  return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register(register1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.Identifier(register1 + "2"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier(register1 + "2"), n.Identifier("temp"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register(register2))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register2), n.Identifier(register2 + 
-  "2"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier(register2 + "2"), n.Identifier("temp")))]
+  if(SUPPORT_DESTRUCTURING) {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.ArrayExpression([n.Register(register1), n.Register(register2)]), n.ArrayExpression([n.Register(register2), n.Register(register1)])))]
+  }else {
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register(register1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.Register(register2))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register2), n.Identifier("temp")))]
+  }
 }, NOOP:function() {
   return function() {
     return
@@ -11281,7 +11353,7 @@ var o = {SET16:function(register1, register2, value) {
       return o.SET16(srcRegister1, srcRegister2, o.READ_MEM16(n.Literal(value)))
     }
   }else {
-    throw Error("Wrong parameters number");
+    JSSMS.Utils.console.error("Wrong parameters number")
   }
 }, LD_WRITE_MEM:function(srcRegister1, srcRegister2, dstRegister1, dstRegister2) {
   if(dstRegister1 == undefined && dstRegister2 == undefined) {
@@ -11544,11 +11616,11 @@ var o = {SET16:function(register1, register2, value) {
   }
 }, PUSH:function(register1, register2) {
   return function() {
-    return n.ExpressionStatement(n.CallExpression("push2", [n.Register(register1), n.Register(register2)]))
+    return n.ExpressionStatement(n.CallExpression("pushUint8", [n.Register(register1), n.Register(register2)]))
   }
 }, JR:function(test) {
   return function(value, target) {
-    return n.IfStatement(test, n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), n.ReturnStatement()]))
+    return n.IfStatement(test, n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.BinaryExpression("+", n.Literal(target % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ReturnStatement()]))
   }
 }, DJNZ:function() {
   return function(value, target) {
@@ -11598,16 +11670,17 @@ var o = {SET16:function(register1, register2, value) {
 }, CALL:function(operator, bitMask) {
   if(operator == undefined && bitMask == undefined) {
     return function(value, target, nextAddress) {
-      return[n.ExpressionStatement(n.CallExpression("push1", n.Literal(nextAddress))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), n.ReturnStatement()]
+      return[n.ExpressionStatement(n.CallExpression("push", n.BinaryExpression("+", n.Literal(nextAddress % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), n.ReturnStatement()]
     }
   }else {
     return function(value, target, nextAddress) {
-      return n.IfStatement(n.BinaryExpression(operator, n.BinaryExpression("&", n.Register("f"), n.Literal(bitMask)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(7))), n.ExpressionStatement(n.CallExpression("push1", n.Literal(nextAddress))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), n.ReturnStatement()]))
+      return n.IfStatement(n.BinaryExpression(operator, n.BinaryExpression("&", n.Register("f"), n.Literal(bitMask)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(7))), n.ExpressionStatement(n.CallExpression("push", n.BinaryExpression("+", n.Literal(nextAddress % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target))), 
+      n.ReturnStatement()]))
     }
   }
 }, RST:function(targetAddress) {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.CallExpression("push1", n.Literal(nextAddress))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(targetAddress))), n.ReturnStatement()]
+    return[n.ExpressionStatement(n.CallExpression("push", n.BinaryExpression("+", n.Literal(nextAddress % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(targetAddress))), n.ReturnStatement()]
   }
 }, DI:function() {
   return function() {
@@ -11639,21 +11712,20 @@ var o = {SET16:function(register1, register2, value) {
   }
 }, EX_AF:function() {
   return function() {
-    return o.EX("a", "f")
+    return[].concat(o.EX("a", "a2"), o.EX("f", "f2"))
   }
 }, EXX:function() {
   return function() {
-    return[].concat(o.EX("b", "c"), o.EX("d", "e"), o.EX("h", "l"))
+    return[].concat(o.EX("b", "b2"), o.EX("c", "c2"), o.EX("d", "d2"), o.EX("e", "e2"), o.EX("h", "h2"), o.EX("l", "l2"))
+  }
+}, EX_DE_HL:function() {
+  return function() {
+    return[].concat(o.EX("d", "h"), o.EX("e", "l"))
   }
 }, EX_SP_HL:function() {
   return function() {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("h"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), o.READ_MEM8(n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1))))), n.ExpressionStatement(n.CallExpression("writeMem", [n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1)), n.Identifier("temp")])), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", 
     n.Register("l"), o.READ_MEM8(n.Identifier("sp")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("sp"), n.Identifier("temp")]))]
-  }
-}, EX_DE_HL:function() {
-  return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("d"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("d"), n.Register("h"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), n.Identifier("temp"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("e"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("e"), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", 
-    n.Register("l"), n.Identifier("temp")))]
   }
 }, HALT:function() {
   return function(value, target, nextAddress) {
@@ -11661,7 +11733,7 @@ var o = {SET16:function(register1, register2, value) {
     if(HALT_SPEEDUP) {
       ret.push(n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("tstates"), n.Literal(0))))
     }
-    return ret.concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("halt"), n.Literal(true))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(nextAddress - 1))), n.ReturnStatement()])
+    return ret.concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("halt"), n.Literal(true))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.BinaryExpression("+", n.Literal((nextAddress - 1) % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ReturnStatement()])
   }
 }, RLC:generateCBFunctions("rlc"), RRC:generateCBFunctions("rrc"), RL:generateCBFunctions("rl"), RR:generateCBFunctions("rr"), SLA:generateCBFunctions("sla"), SRA:generateCBFunctions("sra"), SLL:generateCBFunctions("sll"), SRL:generateCBFunctions("srl"), BIT:function(bit, register1, register2) {
   if(register2 == undefined) {
@@ -11744,6 +11816,14 @@ var o = {SET16:function(register1, register2, value) {
 }, SBC_X:function(register1, register2) {
   return function(value, target, nextAddress) {
     return n.ExpressionStatement(n.CallExpression("sbc_a", o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value)))))
+  }
+}, AND_X:function(register1, register2) {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))]
+  }
+}, XOR_X:function(register1, register2) {
+  return function(value, target, nextAddress) {
+    return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.Literal(value))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))]
   }
 }, OR_X:function(register1, register2) {
   return function(value, target, nextAddress) {
@@ -11943,14 +12023,14 @@ function generateIndexTable(index) {
   index + "L," + index + "H", ast:o.LD8_D(registerL, registerH)}, 109:{name:"LD " + index + "L," + index + "L *", ast:o.NOOP()}, 110:{name:"LD L,(" + index + "+d)", ast:o.LD8_D("l", registerH, registerL)}, 111:{name:"LD " + index + "L,A *", ast:o.LD8(registerL, "a")}, 112:{name:"LD (" + index + "+d),B", ast:o.LD_X("b", registerH, registerL)}, 113:{name:"LD (" + index + "+d),C", ast:o.LD_X("c", registerH, registerL)}, 114:{name:"LD (" + index + "+d),D", ast:o.LD_X("d", registerH, registerL)}, 115:{name:"LD (" + 
   index + "+d),E", ast:o.LD_X("e", registerH, registerL)}, 116:{name:"LD (" + index + "+d),H", ast:o.LD_X("h", registerH, registerL)}, 117:{name:"LD (" + index + "+d),L", ast:o.LD_X("l", registerH, registerL)}, 118:{name:"LD (" + index + "+d),B", ast:o.LD_X("b", registerH, registerL)}, 119:{name:"LD (" + index + "+d),A", ast:o.LD_X("a", registerH, registerL)}, 126:{name:"LD A,(" + index + "+d)", ast:o.LD8_D("a", registerH, registerL)}, 124:{name:"LD A," + index + "H", ast:o.LD8("a", registerH)}, 
   125:{name:"LD A," + index + "L", ast:o.LD8("a", registerL)}, 132:{name:"ADD A," + index + "H", ast:o.ADD(registerL)}, 133:{name:"ADD A," + index + "L", ast:o.ADD(registerL)}, 134:{name:"ADD A,(" + index + "+d)", ast:o.ADD_X(registerH, registerL)}, 140:{name:"ADC A," + index + "H", ast:o.ADC(registerL)}, 141:{name:"ADC A," + index + "L", ast:o.ADC(registerL)}, 142:{name:"ADC A,(" + index + "+d)", ast:o.ADC_X(registerH, registerL)}, 148:{name:"SUB A," + index + "H", ast:o.SUB(registerL)}, 149:{name:"SUB A," + 
-  index + "L", ast:o.SUB(registerL)}, 150:{name:"SUB A,(" + index + "+d)", ast:o.SUB_X(registerH, registerL)}, 156:{name:"SBC A," + index + "H", ast:o.SBC(registerL)}, 157:{name:"SBC A," + index + "L", ast:o.SBC(registerL)}, 158:{name:"SBC A,(" + index + "+d)", ast:o.SBC_X(registerH, registerL)}, 203:index == "IX" ? opcodeTableDDCB : opcodeTableFDCB, 182:{name:"OR A,(" + index + "+d)", ast:o.OR_X(registerH, registerL)}, 190:{name:"CP (" + index + "+d)", ast:o.CP_X(registerH, registerL)}, 225:{name:"POP " + 
-  index, ast:o.POP(registerH, registerL)}, 227:{name:"EX SP,(" + index + ")", ast:o.EX_SP_X(registerH, registerL)}, 229:{name:"PUSH " + index, ast:o.PUSH(registerH, registerL)}, 233:{name:"JP (" + index + ")", ast:o.JP_X(registerH, registerL)}, 249:{name:"LD SP," + index, ast:o.LD_SP(registerH, registerL)}}
+  index + "L", ast:o.SUB(registerL)}, 150:{name:"SUB A,(" + index + "+d)", ast:o.SUB_X(registerH, registerL)}, 156:{name:"SBC A," + index + "H", ast:o.SBC(registerL)}, 157:{name:"SBC A," + index + "L", ast:o.SBC(registerL)}, 158:{name:"SBC A,(" + index + "+d)", ast:o.SBC_X(registerH, registerL)}, 166:{name:"AND A,(" + index + "+d)", ast:o.AND_X(registerH, registerL)}, 174:{name:"XOR A,(" + index + "+d)", ast:o.XOR_X(registerH, registerL)}, 182:{name:"OR A,(" + index + "+d)", ast:o.OR_X(registerH, 
+  registerL)}, 190:{name:"CP (" + index + "+d)", ast:o.CP_X(registerH, registerL)}, 203:index == "IX" ? opcodeTableDDCB : opcodeTableFDCB, 225:{name:"POP " + index, ast:o.POP(registerH, registerL)}, 227:{name:"EX SP,(" + index + ")", ast:o.EX_SP_X(registerH, registerL)}, 229:{name:"PUSH " + index, ast:o.PUSH(registerH, registerL)}, 233:{name:"JP (" + index + ")", ast:o.JP_X(registerH, registerL)}, 249:{name:"LD SP," + index, ast:o.LD_SP(registerH, registerL)}}
 }
 ;var opcodeTableED = {64:{name:"IN B,(C)", ast:o.IN("b", "c")}, 66:{name:"SBC HL,BC", ast:o.SBC16("b", "c")}, 65:{name:"OUT (C),B", ast:o.OUT("c", "b")}, 67:{name:"LD (nn),BC", ast:o.LD_NN("b", "c")}, 68:{name:"NEG", ast:o.NEG()}, 69:{name:"RETN / RETI", ast:o.RETN_RETI()}, 70:{name:"IM 0", ast:o.IM(0)}, 72:{name:"IN C,(C)", ast:o.IN("c", "c")}, 73:{name:"OUT (C),C", ast:o.OUT("c", "c")}, 74:{name:"ADC HL,BC", ast:o.ADC16("b", "c")}, 75:{name:"LD BC,(nn)", ast:o.LD16("b", "c", "n", "n"), operand:UINT16}, 
-76:{name:"NEG", ast:o.NEG()}, 77:{name:"RETN / RETI", ast:o.RETN_RETI()}, 78:{name:"IM 0", ast:o.IM(0)}, 80:{name:"IN D,(C)", ast:o.IN("d", "c")}, 81:{name:"OUT (C),D", ast:o.OUT("c", "d")}, 82:{name:"SBC HL,DE", ast:o.SBC16("d", "e")}, 83:{name:"LD (nn),DE", ast:o.LD_NN("d", "e")}, 84:{name:"NEG", ast:o.NEG()}, 85:{name:"RETN / RETI", ast:o.RETN_RETI()}, 86:{name:"IM 1", ast:o.IM(1)}, 87:{name:"LD A,I", ast:o.LD8("a", "i")}, 88:{name:"IN E,(C)", ast:o.IN("e", "c")}, 89:{name:"OUT (C),E", ast:o.OUT("c", 
-"e")}, 90:{name:"ADC HL,DE", ast:o.ADC16("d", "e")}, 91:{name:"LD DE,(nn)", ast:o.LD16("d", "e", "n", "n"), operand:UINT16}, 92:{name:"NEG", ast:o.NEG()}, 95:{name:"LD A,R", ast:o.LD8("a", "r")}, 96:{name:"IN H,(C)", ast:o.IN("h", "c")}, 97:{name:"OUT (C),H", ast:o.OUT("c", "h")}, 98:{name:"SBC HL,HL", ast:o.SBC16("h", "l")}, 99:{name:"LD (nn),HL", ast:o.LD_NN("h", "l")}, 100:{name:"NEG", ast:o.NEG()}, 102:{name:"IM 0", ast:o.IM(0)}, 104:{name:"IN L,(C)", ast:o.IN("l", "c")}, 105:{name:"OUT (C),L", 
-ast:o.OUT("c", "l")}, 106:{name:"ADC HL,HL", ast:o.ADC16("h", "l")}, 107:{name:"LD HL,(nn)", ast:o.LD16("h", "l", "n", "n"), operand:UINT16}, 108:{name:"NEG", ast:o.NEG()}, 110:{name:"IM 0", ast:o.IM(0)}, 115:{name:"LD (nn),SP", ast:o.LD_NN("sp")}, 116:{name:"NEG", ast:o.NEG()}, 118:{name:"IM 1", ast:o.IM(1)}, 120:{name:"IN A,(C)", ast:o.IN("a", "c")}, 121:{name:"OUT (C),A", ast:o.OUT("c", "a")}, 122:{name:"ADC HL,SP", ast:o.ADC16("sp")}, 124:{name:"NEG", ast:o.NEG()}, 160:{name:"LDI", ast:o.LDI()}, 
-161:{name:"CPI", ast:o.CPI()}, 162:{name:"INI", ast:o.INI()}, 163:{name:"OUTI", ast:o.OUTI()}, 168:{name:"LDD", ast:o.LDD()}, 171:{name:"OUTD", ast:o.OUTD()}, 176:{name:"LDIR", ast:o.LDIR()}, 177:{name:"CPIR", ast:o.CPIR()}, 179:{name:"OTIR", ast:o.OTIR()}, 184:{name:"LDDR", ast:o.LDDR()}};
+76:{name:"NEG", ast:o.NEG()}, 77:{name:"RETN / RETI", ast:o.RETN_RETI()}, 78:{name:"IM 0", ast:o.IM(0)}, 79:{name:"LD R,A", ast:o.LD8("r", "a")}, 80:{name:"IN D,(C)", ast:o.IN("d", "c")}, 81:{name:"OUT (C),D", ast:o.OUT("c", "d")}, 82:{name:"SBC HL,DE", ast:o.SBC16("d", "e")}, 83:{name:"LD (nn),DE", ast:o.LD_NN("d", "e")}, 84:{name:"NEG", ast:o.NEG()}, 85:{name:"RETN / RETI", ast:o.RETN_RETI()}, 86:{name:"IM 1", ast:o.IM(1)}, 87:{name:"LD A,I", ast:o.LD8("a", "i")}, 88:{name:"IN E,(C)", ast:o.IN("e", 
+"c")}, 89:{name:"OUT (C),E", ast:o.OUT("c", "e")}, 90:{name:"ADC HL,DE", ast:o.ADC16("d", "e")}, 91:{name:"LD DE,(nn)", ast:o.LD16("d", "e", "n", "n"), operand:UINT16}, 92:{name:"NEG", ast:o.NEG()}, 95:{name:"LD A,R", ast:o.LD8("a", "r")}, 96:{name:"IN H,(C)", ast:o.IN("h", "c")}, 97:{name:"OUT (C),H", ast:o.OUT("c", "h")}, 98:{name:"SBC HL,HL", ast:o.SBC16("h", "l")}, 99:{name:"LD (nn),HL", ast:o.LD_NN("h", "l")}, 100:{name:"NEG", ast:o.NEG()}, 102:{name:"IM 0", ast:o.IM(0)}, 104:{name:"IN L,(C)", 
+ast:o.IN("l", "c")}, 105:{name:"OUT (C),L", ast:o.OUT("c", "l")}, 106:{name:"ADC HL,HL", ast:o.ADC16("h", "l")}, 107:{name:"LD HL,(nn)", ast:o.LD16("h", "l", "n", "n"), operand:UINT16}, 108:{name:"NEG", ast:o.NEG()}, 110:{name:"IM 0", ast:o.IM(0)}, 115:{name:"LD (nn),SP", ast:o.LD_NN("sp")}, 116:{name:"NEG", ast:o.NEG()}, 118:{name:"IM 1", ast:o.IM(1)}, 120:{name:"IN A,(C)", ast:o.IN("a", "c")}, 121:{name:"OUT (C),A", ast:o.OUT("c", "a")}, 122:{name:"ADC HL,SP", ast:o.ADC16("sp")}, 124:{name:"NEG", 
+ast:o.NEG()}, 160:{name:"LDI", ast:o.LDI()}, 161:{name:"CPI", ast:o.CPI()}, 162:{name:"INI", ast:o.INI()}, 163:{name:"OUTI", ast:o.OUTI()}, 168:{name:"LDD", ast:o.LDD()}, 171:{name:"OUTD", ast:o.OUTD()}, 176:{name:"LDIR", ast:o.LDIR()}, 177:{name:"CPIR", ast:o.CPIR()}, 179:{name:"OTIR", ast:o.OTIR()}, 184:{name:"LDDR", ast:o.LDDR()}};
 var opcodeTable = [{name:"NOP", ast:o.NOOP()}, {name:"LD BC,nn", ast:o.LD16("b", "c"), operand:UINT16}, {name:"LD (BC),A", ast:o.LD_WRITE_MEM("b", "c", "a")}, {name:"INC BC", ast:o.INC16("b", "c")}, {name:"INC B", ast:o.INC8("b")}, {name:"DEC B", ast:o.DEC8("b")}, {name:"LD B,n", ast:o.LD8("b"), operand:UINT8}, {name:"RLCA", ast:o.RLCA()}, {name:"EX AF AF'", ast:o.EX_AF()}, {name:"ADD HL,BC", ast:o.ADD16("h", "l", "b", "c")}, {name:"LD A,(BC)", ast:o.LD8("a", "b", "c")}, {name:"DEC BC", ast:o.DEC16("b", 
 "c")}, {name:"INC C", ast:o.INC8("c")}, {name:"DEC C", ast:o.DEC8("c")}, {name:"LD C,n", ast:o.LD8("c"), operand:UINT8}, {name:"RRCA", ast:o.RRCA()}, {name:"DJNZ (PC+e)", ast:o.DJNZ(), operand:INT8}, {name:"LD DE,nn", ast:o.LD16("d", "e"), operand:UINT16}, {name:"LD (DE),A", ast:o.LD_WRITE_MEM("d", "e", "a")}, {name:"INC DE", ast:o.INC16("d", "e")}, {name:"INC D", ast:o.INC8("d")}, {name:"DEC D", ast:o.DEC8("d")}, {name:"LD D,n", ast:o.LD8("d"), operand:UINT8}, {name:"RLA", ast:o.RLA()}, {name:"JR (PC+e)", 
 ast:o.JP(), operand:INT8}, {name:"ADD HL,DE", ast:o.ADD16("h", "l", "d", "e")}, {name:"LD A,(DE)", ast:o.LD8("a", "d", "e")}, {name:"DEC DE", ast:o.DEC16("d", "e")}, {name:"INC E", ast:o.INC8("e")}, {name:"DEC E", ast:o.DEC8("e")}, {name:"LD E,n", ast:o.LD8("e"), operand:UINT8}, {name:"RRA", ast:o.RRA()}, {name:"JR NZ,(PC+e)", ast:o.JRNZ(), operand:INT8}, {name:"LD HL,nn", ast:o.LD16("h", "l"), operand:UINT16}, {name:"LD (nn),HL", ast:o.LD_NN("h", "l"), operand:UINT16}, {name:"INC HL", ast:o.INC16("h", 
@@ -11972,86 +12052,90 @@ ast:o.SBC()}, {name:"RST 0x18", ast:o.RST(24)}, {name:"RET PO", ast:o.RET("==", 
 {name:"EX DE,HL", ast:o.EX_DE_HL()}, {name:"CALL PE (nn)", ast:o.CALL("!=", F_PARITY)}, opcodeTableED, {name:"XOR n", ast:o.XOR()}, {name:"RST 0x28", ast:o.RST(40)}, {name:"RET P", ast:o.RET("==", F_SIGN)}, {name:"POP AF", ast:o.POP("a", "f")}, {name:"JP P,(nn)", ast:o.JP("==", F_SIGN)}, {name:"DI", ast:o.DI()}, {name:"CALL P (nn)", ast:o.CALL("==", F_SIGN)}, {name:"PUSH AF", ast:o.PUSH("a", "f")}, {name:"OR n", ast:o.OR()}, {name:"RST 0x30", ast:o.RST(48)}, {name:"RET M", ast:o.RET("!=", F_SIGN)}, 
 {name:"LD SP,HL", ast:o.LD_SP("h", "l")}, {name:"JP M,(nn)", ast:o.JP("!=", F_SIGN)}, {name:"EI", ast:o.EI()}, {name:"CALL M (nn)", ast:o.CALL("!=", F_SIGN)}, generateIndexTable("IY"), {name:"CP n", ast:o.CP()}, {name:"RST 0x38", ast:o.RST(56)}];
 var Analyzer = function() {
-  this.bytecodes = {};
-  this.ast = [];
-  this.missingOpcodes = {}
-};
-Analyzer.prototype = {analyze:function(bytecodes) {
-  this.bytecodes = bytecodes;
-  this.ast = Array(this.bytecodes.length);
-  JSSMS.Utils.console.time("Analyzing");
-  for(var i = 0;i < this.bytecodes.length;i++) {
-    this.normalizeBytecode(i);
-    this.restructure(i)
-  }
-  JSSMS.Utils.console.timeEnd("Analyzing");
-  for(var i in this.missingOpcodes) {
-    console.error("Missing opcode", i, this.missingOpcodes[i])
-  }
-}, analyzeFromAddress:function(bytecodes) {
-  this.bytecodes = [bytecodes];
-  this.ast = [];
-  this.missingOpcodes = {};
-  this.normalizeBytecode(0);
-  this.bytecodes[0][this.bytecodes[0].length - 1].isFunctionEnder = true;
-  this.ast = [this.bytecodes];
-  for(var i in this.missingOpcodes) {
-    console.error("Missing opcode", i, this.missingOpcodes[i])
-  }
-}, normalizeBytecode:function(page) {
-  var self = this;
-  this.bytecodes[page] = this.bytecodes[page].map(function(bytecode) {
-    switch(bytecode.opcode.length) {
-      case 1:
-        var opcode = opcodeTable[bytecode.opcode[0]];
-        break;
-      case 2:
-        var opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]];
-        break;
-      case 3:
-        var opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]][bytecode.opcode[2]];
-        break;
-      default:
-        throw Error("Something went wrong in parsing. Opcode: [" + bytecode.opcode.join(",") + "]");
+  var Analyzer = function() {
+    this.bytecodes = {};
+    this.ast = [];
+    this.missingOpcodes = {}
+  };
+  Analyzer.prototype = {analyze:function(bytecodes) {
+    var i = 0;
+    this.bytecodes = bytecodes;
+    this.ast = Array(this.bytecodes.length);
+    JSSMS.Utils.console.time("Analyzing");
+    for(i = 0;i < this.bytecodes.length;i++) {
+      this.normalizeBytecode(i);
+      this.restructure(i)
     }
-    if(opcode && opcode.ast) {
-      var ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.nextAddress);
-      if(!Array.isArray(ast) && ast != undefined) {
-        ast = [ast]
+    JSSMS.Utils.console.timeEnd("Analyzing");
+    for(i in this.missingOpcodes) {
+      console.error("Missing opcode", i, this.missingOpcodes[i])
+    }
+  }, analyzeFromAddress:function(bytecodes) {
+    this.bytecodes = [bytecodes];
+    this.ast = [];
+    this.missingOpcodes = {};
+    this.normalizeBytecode(0);
+    this.bytecodes[0][this.bytecodes[0].length - 1].isFunctionEnder = true;
+    this.ast = [this.bytecodes];
+    for(var i in this.missingOpcodes) {
+      console.error("Missing opcode", i, this.missingOpcodes[i])
+    }
+  }, normalizeBytecode:function(page) {
+    var self = this;
+    this.bytecodes[page] = this.bytecodes[page].map(function(bytecode) {
+      switch(bytecode.opcode.length) {
+        case 1:
+          var opcode = opcodeTable[bytecode.opcode[0]];
+          break;
+        case 2:
+          var opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]];
+          break;
+        case 3:
+          var opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]][bytecode.opcode[2]];
+          break;
+        default:
+          JSSMS.Utils.console.error("Something went wrong in parsing. Opcode: [" + bytecode.opcode.join(" ") + "]")
       }
-      bytecode.ast = ast;
-      if(DEBUG) {
-        bytecode.name = opcode.name;
-        if(opcode.opcode) {
-          bytecode.opcode = opcode.opcode(bytecode.operand, bytecode.target, bytecode.nextAddress)
+      if(opcode && opcode.ast) {
+        var ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.nextAddress);
+        if(!Array.isArray(ast) && ast != undefined) {
+          ast = [ast]
         }
+        bytecode.ast = ast;
+        if(DEBUG) {
+          bytecode.name = opcode.name;
+          if(opcode.opcode) {
+            bytecode.opcode = opcode.opcode(bytecode.operand, bytecode.target, bytecode.nextAddress)
+          }
+        }
+      }else {
+        var i = bytecode.hexOpcode;
+        self.missingOpcodes[i] = self.missingOpcodes[i] != undefined ? self.missingOpcodes[i] + 1 : 1
       }
-    }else {
-      var i = bytecode.hexOpcode;
-      self.missingOpcodes[i] = self.missingOpcodes[i] != undefined ? self.missingOpcodes[i] + 1 : 1
-    }
-    return bytecode
-  })
-}, restructure:function(page) {
-  this.ast[page] = [];
-  var self = this;
-  var pointer = -1;
-  var startNewFunction = true;
-  var prevBytecode = {};
-  this.bytecodes[page].forEach(function(bytecode) {
-    if(bytecode.isJumpTarget || startNewFunction) {
-      pointer++;
-      self.ast[page][pointer] = [];
-      startNewFunction = false;
-      prevBytecode.isFunctionEnder = true
-    }
-    self.ast[page][pointer].push(bytecode);
-    if(bytecode.isFunctionEnder) {
-      startNewFunction = true
-    }
-    prevBytecode = bytecode
-  })
-}};
+      return bytecode
+    })
+  }, restructure:function(page) {
+    this.ast[page] = [];
+    var self = this;
+    var pointer = -1;
+    var startNewFunction = true;
+    var prevBytecode = {};
+    this.bytecodes[page].forEach(function(bytecode) {
+      if(bytecode.isJumpTarget || startNewFunction) {
+        pointer++;
+        self.ast[page][pointer] = [];
+        startNewFunction = false;
+        prevBytecode.isFunctionEnder = true
+      }
+      self.ast[page][pointer].push(bytecode);
+      if(bytecode.isFunctionEnder) {
+        startNewFunction = true
+      }
+      prevBytecode = bytecode
+    })
+  }};
+  return Analyzer
+}();
 var Optimizer = function() {
   var Optimizer = function() {
     this.ast = []
@@ -12150,11 +12234,9 @@ var Generator = function() {
     this.ast = []
   };
   Generator.prototype = {generate:function(functions) {
-    var self = this;
-    JSSMS.Utils.console.time("Generating");
     for(var page = 0;page < functions.length;page++) {
       functions[page] = functions[page].map(function(fn) {
-        var body = [];
+        var body = [{"type":"ExpressionStatement", "expression":{"type":"Literal", "value":"use strict", "raw":'"use strict"'}}];
         var name = fn[0].address;
         var jumpTargetNb = fn[0].jumpTargetNb;
         var tstates = 0;
@@ -12166,21 +12248,15 @@ var Generator = function() {
             var syncServerStmt = {"type":"ExpressionStatement", "expression":{"type":"CallExpression", "callee":n.Identifier("sync"), "arguments":[]}}
           }
           tstates += getTotalTStates(bytecode.opcode);
-          var decreaseTStateStmt = [{"type":"ExpressionStatement", "expression":{"type":"AssignmentExpression", "operator":"-=", "left":{"type":"Identifier", "name":"tstates"}, "right":{"type":"Literal", "value":tstates}}}];
+          var decreaseTStateStmt = [{"type":"ExpressionStatement", "expression":{"type":"AssignmentExpression", "operator":"-=", "left":{"type":"Identifier", "name":"tstates"}, "right":{"type":"Literal", "value":tstates, "raw":DEBUG ? toHex(tstates) : "" + tstates}}}];
           tstates = 0;
-          if(DEBUG) {
-            decreaseTStateStmt[0]["expression"]["right"]["raw"] = toHex(decreaseTStateStmt[0]["expression"]["right"]["value"])
-          }
           if(ENABLE_SERVER_LOGGER) {
             decreaseTStateStmt = [].concat(syncServerStmt, decreaseTStateStmt)
           }
           bytecode.ast = [].concat(decreaseTStateStmt, bytecode.ast);
-          if(bytecode.nextAddress != null) {
-            var updatePcStmt = {"type":"ExpressionStatement", "expression":{"type":"AssignmentExpression", "operator":"=", "left":{"type":"Identifier", "name":"pc"}, "right":{"type":"BinaryExpression", "operator":"+", "left":{"type":"Literal", "value":bytecode.nextAddress % 16384}, "right":{"type":"BinaryExpression", "operator":"*", "left":{"type":"Identifier", "name":"page"}, "right":{"type":"Literal", "value":16384}}}}};
-            if(DEBUG) {
-              updatePcStmt["expression"]["right"]["left"]["raw"] = toHex(updatePcStmt["expression"]["right"]["left"]["value"]);
-              updatePcStmt["expression"]["right"]["right"]["right"]["raw"] = "0x4000"
-            }
+          if((ENABLE_SERVER_LOGGER || bytecode.isFunctionEnder) && bytecode.nextAddress != null) {
+            var nextAddress = bytecode.nextAddress % 16384;
+            var updatePcStmt = {"type":"ExpressionStatement", "expression":{"type":"AssignmentExpression", "operator":"=", "left":{"type":"Identifier", "name":"pc"}, "right":{"type":"BinaryExpression", "operator":"+", "left":{"type":"Literal", "value":nextAddress, "raw":DEBUG ? toHex(nextAddress) : "" + nextAddress}, "right":{"type":"BinaryExpression", "operator":"*", "left":{"type":"Identifier", "name":"page"}, "right":{"type":"Literal", "value":16384, "raw":"0x4000"}}}}};
             bytecode.ast.push(updatePcStmt)
           }
           if(DEBUG) {
@@ -12207,7 +12283,6 @@ var Generator = function() {
         }
       })
     }
-    JSSMS.Utils.console.timeEnd("Generating");
     this.ast = functions
   }};
   return Generator
@@ -12257,7 +12332,7 @@ var Recompiler = function() {
     this.parser.parse(this.options.pageLimit);
     return this
   }, analyze:function() {
-    this.analyzer.analyze(this.parser.instructions);
+    this.analyzer.analyze(this.parser.bytecodes);
     return this
   }, optimize:function() {
     this.optimizer.optimize(this.analyzer.ast);
@@ -12286,8 +12361,7 @@ var Recompiler = function() {
     this.analyzer.analyzeFromAddress(this.bytecodes);
     return this
   }, generateCodeFromAst:function(fn) {
-    return window["escodegen"]["generate"](fn, {comment:true, renumber:true, hexadecimal:true, parse:DEBUG ? window["esprima"]["parse"] : function() {
-    }})
+    return window["escodegen"]["generate"](fn, {comment:true, renumber:true, hexadecimal:true, parse:DEBUG ? window["esprima"]["parse"] : null})
   }, dump:function() {
     var output = [];
     for(var i in this.cpu.branches) {
@@ -12301,4 +12375,5 @@ var Recompiler = function() {
   }};
   return Recompiler
 }();
+window["JSSMS"] = JSSMS;
 

@@ -13,20 +13,25 @@
     "256": "/jsSMS/alec/img/icon256.png"
   },
   "developer": {
-    "name": "G. Marty",
+    "name": "G.C. Marty",
     "url": "https://github.com/gmarty"
   },
   "installs_allowed_from": ["*"],
   "default_locale": "en",
   "permissions": {
     "desktop-notification": {
-      "description": "To show update notifications"
+      "description": "To notify you of new updates"
     }
   },
   "appcache_path": "/jsSMS/alec/manifest.appcache",
   "locales": {
     "fr": {
-      "description": "Émulateur de Sega Master System et Game Gear"
+      "description": "Émulateur de Sega Master System et Game Gear",
+      "permissions": {
+        "desktop-notification": {
+          "description": "Pour vous informer des mises à jour disponibles"
+        }
+      }
     },
     "ja": {
       "description": "セガ マスターシステム・ゲームギアのエミュレータ"

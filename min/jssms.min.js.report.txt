@@ -1,52 +1,36 @@
-src\compiler\bytecode.js:82: WARNING - Property hexOpcode never defined on Bytecode
+src\compiler\analyzer.js:47: WARNING - Property normalizeBytecode never defined on Analyzer
+        this.normalizeBytecode(i);
+        ^
+
+src\compiler\analyzer.js:48: WARNING - Property restructure never defined on Analyzer
+        this.restructure(i);
+        ^
+
+src\compiler\analyzer.js:64: WARNING - Property normalizeBytecode never defined on Analyzer
+      this.normalizeBytecode(0);
+      ^
+
+src\compiler\bytecode.js:70: WARNING - Property hexOpcode never defined on Bytecode
           this.hexOpcode + ' ' +
           ^
 
-src\compiler\opcodes-CB.js:41: WARNING - Cannot do '[]' access on a struct
-      ast: o[op].apply(null, regs[reg])
-             ^
+src\compiler\opcodes-ED.js:82: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+    ast: o.LD8('r', 'a')
+         ^
 
-src\compiler\opcodes-CB.js:47: WARNING - Cannot do '[]' access on a struct
-        ast: o['LD_' + op].apply(null, ['i', 'x'].concat(regs[reg]))
-               ^
-
-src\compiler\opcodes-CB.js:51: WARNING - Cannot do '[]' access on a struct
-        ast: o['LD_' + op].apply(null, ['i', 'y'].concat(regs[reg]))
-               ^
-
-src\compiler\opcodes-CB.js:56: WARNING - Cannot do '[]' access on a struct
-        ast: o['LD_' + op]('i', 'x')
-               ^
-
-src\compiler\opcodes-CB.js:60: WARNING - Cannot do '[]' access on a struct
-        ast: o['LD_' + op]('i', 'y')
-               ^
-
-src\compiler\opcodes-CB.js:71: WARNING - Cannot do '[]' access on a struct
-        ast: o[op].apply(null, [i].concat(regs[reg]))
-               ^
-
-src\compiler\opcodes-CB.js:77: WARNING - Cannot do '[]' access on a struct
-        ast: o[op].apply(null, [i].concat(['i', 'x']))
-               ^
-
-src\compiler\opcodes-CB.js:81: WARNING - Cannot do '[]' access on a struct
-        ast: o[op].apply(null, [i].concat(['i', 'y']))
-               ^
-
-src\compiler\opcodes-ED.js:110: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+src\compiler\opcodes-ED.js:114: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
     ast: o.LD8('a', 'i')
          ^
 
-src\compiler\opcodes-ED.js:135: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
+src\compiler\opcodes-ED.js:139: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
     ast: o.LD8('a', 'r')
          ^
 
-src\compiler\opcodes-ED.js:188: WARNING - Function o.LD_NN: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+src\compiler\opcodes-ED.js:192: WARNING - Function o.LD_NN: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
     ast: o.LD_NN('sp')
          ^
 
-src\compiler\opcodes-ED.js:208: WARNING - Function o.ADC16: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+src\compiler\opcodes-ED.js:212: WARNING - Function o.ADC16: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
     ast: o.ADC16('sp')
          ^
 
@@ -646,6 +630,38 @@ src\compiler\opcodes.js:1307: WARNING - Function o.CP: called with 0 argument(s)
     ast: o.CP()
          ^
 
+src\compiler\optimizer.js:44: WARNING - Property localOptimization never defined on Optimizer
+        this.localOptimization(i);
+        ^
+
+src\compiler\optimizer.js:55: WARNING - Property inlineRegisters never defined on Optimizer
+      this.ast[page] = this.ast[page].map(this.inlineRegisters);
+                                          ^
+
+src\compiler\recompiler.js:75: WARNING - Property parse never defined on Recompiler
+      var fns = this
+                ^
+
+src\compiler\recompiler.js:87: WARNING - Property generateCodeFromAst never defined on Recompiler
+            self.cpu.branches[page][funcName] = new Function('return ' + self.generateCodeFromAst(fn))();
+                                                                         ^
+
+src\compiler\recompiler.js:90: WARNING - Property generateCodeFromAst never defined on Recompiler
+            self.cpu.branches[page][funcName] = new Function('page', 'temp', 'location', self.generateCodeFromAst(fn));
+                                                                                         ^
+
+src\compiler\recompiler.js:133: WARNING - Property parseFromAddress never defined on Recompiler
+      var fns = this
+                ^
+
+src\compiler\recompiler.js:144: WARNING - Property generateCodeFromAst never defined on Recompiler
+          self.cpu.branches[romPage][address % 0x4000] = new Function('return ' + self.generateCodeFromAst(fn))();
+                                                                                  ^
+
+src\compiler\recompiler.js:146: WARNING - Property generateCodeFromAst never defined on Recompiler
+          self.cpu.branches[romPage][address % 0x4000] = new Function('page', 'temp', 'location', self.generateCodeFromAst(fn));
+                                                                                                  ^
+
 src\debugger.js:435: WARNING - assignment
 found   : null
 required: number
@@ -676,26 +692,56 @@ required: number
         address = null;
         ^
 
-src\debugger.js:3527: WARNING - assignment
+src\debugger.js:3533: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
 
-src\debugger.js:4095: WARNING - unreachable code
+src\debugger.js:4101: WARNING - unreachable code
     if (this.main.is_gg && port < 0x07) {
     ^
 
-src\debugger.js:4116: WARNING - Property port never defined on this
+src\debugger.js:4122: WARNING - Property port never defined on this
           if (this.port.europe == 0) {
               ^
 
-src\debugger.js:4157: WARNING - unreachable code
+src\debugger.js:4163: WARNING - unreachable code
     if (this.main.is_gg && port < 0x07) {
     ^
 
-src\sms.js:68: WARNING - cannot instantiate non-constructor
-  this.ui = new opts['ui'](this);
-            ^
+src\utils.js:25: WARNING - assignment to property console of Window
+found   : {error: function (): undefined, log: function (): undefined}
+required: (Console|null)
+    window.console = {
+    ^
 
-0 error(s), 172 warning(s), 86.0% typed
+src\utils.js:35: WARNING - "function (this:Console, ...[*]): ?" must be called with a "this" type
+        return fn(msg);
+               ^
+
+src\utils.js:40: WARNING - "function (this:Console, ...[*]): ?" must be called with a "this" type
+        return fn(msg);
+               ^
+
+src\z80.js:496: WARNING - Property recompileFromAddress never defined on JSSMS.Z80.recompiler
+        this.recompiler.recompileFromAddress(this.pc, 0, 0);
+        ^
+
+src\z80.js:503: WARNING - Property recompileFromAddress never defined on JSSMS.Z80.recompiler
+        this.recompiler.recompileFromAddress(this.pc, this.frameReg[0], 0);
+        ^
+
+src\z80.js:510: WARNING - Property recompileFromAddress never defined on JSSMS.Z80.recompiler
+        this.recompiler.recompileFromAddress(this.pc, this.frameReg[1], 1);
+        ^
+
+src\z80.js:517: WARNING - Property recompileFromAddress never defined on JSSMS.Z80.recompiler
+        this.recompiler.recompileFromAddress(this.pc, this.frameReg[2], 2);
+        ^
+
+src\z80.js:3290: WARNING - Property setRom never defined on JSSMS.Z80.recompiler
+        this.recompiler.setRom(this.rom);
+        ^
+
+0 error(s), 183 warning(s), 84.5% typed
