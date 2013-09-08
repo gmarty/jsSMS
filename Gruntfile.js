@@ -32,7 +32,7 @@ module.exports = function(grunt) {
       'src/compiler/optimizer.js',
       'src/compiler/generator.js',
       'src/compiler/recompiler.js',
-      'src/build/exports.js' // Only required in ADVANCED_OPTIMIZATIONS mode (=node target).
+      'src/build/exports.js' // Required for targets using `output_wrapper`.
     ],
     externs: [
       '<%= closurePath %>/contrib/externs/webkit_console.js',
@@ -125,7 +125,8 @@ module.exports = function(grunt) {
           'src/compiler/analyzer.js',
           'src/compiler/optimizer.js',
           'src/compiler/generator.js',
-          'src/compiler/recompiler.js'
+          'src/compiler/recompiler.js',
+          'src/build/exports.js'
         ],
         jsOutputFile: 'alec/min/alec.min.js',
         options: {
