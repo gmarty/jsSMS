@@ -166,7 +166,7 @@ code {
             <td>Running...</td>
           </tr>
         </table>
-        <div id="chart" style="width:256px;height:132px;background:#777"></div>
+        <div id="chart" style="width:256px;height:136px;background:#777"></div>
         <p>Notes:</p>
         <ul>
           <li>Each iteration will run several frames of the emulator.</li>
@@ -266,36 +266,36 @@ var fn = function() {
 };
 
 suite.add('Interpreter', {
-  'onStart': function() {
+  onStart: function() {
     DEBUG = false;
     ENABLE_COMPILER = false;
 
     initSuite();
   },
 
-  'fn': fn
+  fn: fn
 });
 
 suite.add('Recompiler', {
-  'onStart': function() {
+  onStart: function() {
     DEBUG = false;
     ENABLE_COMPILER = true;
 
     initSuite();
   },
 
-  'fn': fn
+  fn: fn
 });
 
 suite.add('Recompiler (Debug)', { // Debug mode
-  'onStart': function() {
+  onStart: function() {
     DEBUG = true;
     ENABLE_COMPILER = true;
 
     initSuite();
   },
 
-  'fn': fn
+  fn: fn
 });
 
 suite.on('cycle', function(event) {
