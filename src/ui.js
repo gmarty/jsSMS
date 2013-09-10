@@ -36,6 +36,8 @@ JSSMS.DummyUI = function(sms) {
   };
   this.writeFrame = function() {
   };
+  this.updateDisassembly = function() {
+  };
   this.canvasImageData = {
     data: []
   };
