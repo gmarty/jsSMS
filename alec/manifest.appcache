@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# Version 0.0.7
+# Version 0.0.8
 
 css/responsive.css
 css/base.css
@@ -15,6 +15,7 @@ img/headers/icons/list.png
 img/headers/ui/shadow.png
 img/headers/ui/header.png
 img/headers/icons/play.png
+img/headers/icons/pause.png
 img/buttons/ui/shadow.png
 img/toolbars/icons/update.png
 img/headers/icons/fullscreen.png
