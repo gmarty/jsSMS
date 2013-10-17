@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-'use strict';var DEBUG = !0, ENABLE_DEBUGGER = !0, ENABLE_COMPILER = !0, WRITE_MODE = 0, READ_MODE = 1, ENABLE_SERVER_LOGGER = !1, SYNC_MODE = READ_MODE, ACCURATE = !1, LITTLE_ENDIAN = !0, FORCE_TYPED_ARRAYS = !1, SUPPORT_TYPED_ARRAYS = FORCE_TYPED_ARRAYS || "Uint8Array" in window, FORCE_DATAVIEW = !1, SUPPORT_DATAVIEW = FORCE_DATAVIEW || "ArrayBuffer" in window && "DataView" in window, FORCE_DESTRUCTURING = !1, SUPPORT_DESTRUCTURING = !1, SAMPLE_RATE = 44100, DEBUG_TIMING = DEBUG, REFRESH_EMULATION = 
+'use strict';var DEBUG = !1, ENABLE_DEBUGGER = !0, ENABLE_COMPILER = !0, WRITE_MODE = 0, READ_MODE = 1, ENABLE_SERVER_LOGGER = !1, SYNC_MODE = READ_MODE, ACCURATE = !1, LITTLE_ENDIAN = !0, FORCE_TYPED_ARRAYS = !1, SUPPORT_TYPED_ARRAYS = FORCE_TYPED_ARRAYS || "Uint8Array" in window, FORCE_DATAVIEW = !1, SUPPORT_DATAVIEW = FORCE_DATAVIEW || "ArrayBuffer" in window && "DataView" in window, FORCE_DESTRUCTURING = !1, SUPPORT_DESTRUCTURING = !1, SAMPLE_RATE = 44100, DEBUG_TIMING = DEBUG, REFRESH_EMULATION = 
 !1, ACCURATE_INTERRUPT_EMULATION = !1, LIGHTGUN = !1, VDP_SPRITE_COLLISIONS = ACCURATE, PAGE_SIZE = 16384;
 var fpsInterval = 500, CLOCK_NTSC = 3579545, CLOCK_PAL = 3546893;
 function JSSMS($opts$$) {
@@ -26,6 +26,8 @@ function JSSMS($opts$$) {
       void 0 != $opts$$[$key$$] && (this.opts[$key$$] = $opts$$[$key$$])
     }
   }
+  void 0 != $opts$$.DEBUG && (DEBUG = $opts$$.DEBUG);
+  void 0 != $opts$$.ENABLE_COMPILER && (ENABLE_COMPILER = $opts$$.ENABLE_COMPILER);
   this.keyboard = new JSSMS.Keyboard(this);
   this.ui = new this.opts.ui(this);
   this.vdp = new JSSMS.Vdp(this);
@@ -8187,6 +8189,8 @@ JSSMS.DummyUI = function $JSSMS$DummyUI$($sms$$) {
   this.updateStatus = function $this$updateStatus$() {
   };
   this.writeFrame = function $this$writeFrame$() {
+  };
+  this.updateDisassembly = function $this$updateDisassembly$() {
   };
   this.canvasImageData = {data:[]}
 };

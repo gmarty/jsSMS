@@ -85,7 +85,7 @@ JSSMS.Utils = {
        */
       return function(length) {
         return new DataView(new ArrayBuffer(length));
-      }
+      };
     } else {
       /**
        * @param {number} length
@@ -208,7 +208,7 @@ JSSMS.Utils = {
     } else {
       return function() {
         return new Date().getTime();
-      }
+      };
     }
   }(),
 

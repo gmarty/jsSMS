@@ -64,6 +64,14 @@ function JSSMS(opts) {
     }
   }
 
+  // Modify global flags set in setup.js on a per instance basis.
+  if (opts.DEBUG != undefined) {
+    DEBUG = opts.DEBUG;
+  }
+  if (opts.ENABLE_COMPILER != undefined) {
+    ENABLE_COMPILER = opts.ENABLE_COMPILER;
+  }
+
   this.keyboard = new JSSMS.Keyboard(this);
   this.ui = new this.opts['ui'](this);
   this.vdp = new JSSMS.Vdp(this);

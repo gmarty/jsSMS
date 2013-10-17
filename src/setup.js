@@ -23,9 +23,8 @@
 // Constants
 /**
  * Whether to enable debug code globally. Set to false at build time.
- * @define {boolean}
  */
-var DEBUG = true;
+var DEBUG = false;
 
 
 /**
@@ -37,7 +36,6 @@ var ENABLE_DEBUGGER = false;
 
 /**
  * Whether to enable compiler.
- * @define {boolean}
  */
 var ENABLE_COMPILER = true;
 

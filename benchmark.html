@@ -247,8 +247,8 @@ $.ajax({
 
 var suite = new Benchmark.Suite('JSSMS');
 
-var initSuite = function() {
-  sms = new JSSMS;
+var initSuite = function(opts) {
+  sms = new JSSMS(opts);
   sms.stop();
   sms.readRomDirectly(romData, romPath);
   sms.reset();
@@ -267,10 +267,10 @@ var fn = function() {
 
 suite.add('Interpreter', {
   onStart: function() {
-    DEBUG = false;
-    ENABLE_COMPILER = false;
-
-    initSuite();
+    initSuite({
+      DEBUG: false,
+      ENABLE_COMPILER: false
+    });
   },
 
   fn: fn
@@ -278,10 +278,10 @@ suite.add('Interpreter', {
 
 suite.add('Recompiler', {
   onStart: function() {
-    DEBUG = false;
-    ENABLE_COMPILER = true;
-
-    initSuite();
+    initSuite({
+      DEBUG: false,
+      ENABLE_COMPILER: true
+    });
   },
 
   fn: fn
@@ -289,10 +289,10 @@ suite.add('Recompiler', {
 
 suite.add('Recompiler (Debug)', { // Debug mode
   onStart: function() {
-    DEBUG = true;
-    ENABLE_COMPILER = true;
-
-    initSuite();
+    initSuite({
+      DEBUG: true,
+      ENABLE_COMPILER: true
+    });
   },
 
   fn: fn
@@ -304,8 +304,6 @@ suite.on('cycle', function(event) {
 
 suite.on('complete', function() {
   $('#runningRow').empty();
-
-  console.log(this)
 
   var data = this.map(function(testCase) {
     // We multiply by the number of frames benchmarked to get the FPS.

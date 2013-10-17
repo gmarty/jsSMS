@@ -54,9 +54,9 @@ module.exports = function(grunt) {
           warning_level: 'VERBOSE',
           output_wrapper: '(function(window){%output%})(window);',
           define: [
-            '"DEBUG=false"',
+            //'"DEBUG=false"',
             '"ENABLE_DEBUGGER=false"',
-            '"ENABLE_COMPILER=true"',
+            //'"ENABLE_COMPILER=true"',
             '"ACCURATE_INTERRUPT_EMULATION=false"',
             '"ENABLE_SERVER_LOGGER=false"'
           ],
@@ -76,9 +76,9 @@ module.exports = function(grunt) {
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
           define: [
-            '"DEBUG=true"',
+            //'"DEBUG=true"',
             '"ENABLE_DEBUGGER=true"',
-            '"ENABLE_COMPILER=true"',
+            //'"ENABLE_COMPILER=true"',
             '"ACCURATE_INTERRUPT_EMULATION=false"',
             '"ENABLE_SERVER_LOGGER=false"'
           ],
@@ -138,9 +138,9 @@ module.exports = function(grunt) {
           warning_level: 'VERBOSE',
           output_wrapper: '(function(window){%output%})(window);',
           define: [
-            '"DEBUG=false"',
+            //'"DEBUG=false"',
             '"ENABLE_DEBUGGER=false"',
-            '"ENABLE_COMPILER=true"',
+            //'"ENABLE_COMPILER=true"',
             '"FORCE_TYPED_ARRAYS=true"',
             '"FORCE_DATAVIEW=true"',
             '"FORCE_DESTRUCTURING=true"',
@@ -171,7 +171,7 @@ module.exports = function(grunt) {
           warning_level: 'VERBOSE',
           output_wrapper: '(function(window,document,navigator){%output%})(window,document,navigator);',
           define: [
-            '"DEBUG=false"'
+            //'"DEBUG=false"'
           ],
           debug: false
         }
@@ -195,9 +195,9 @@ module.exports = function(grunt) {
           warning_level: 'VERBOSE',
           output_wrapper: '(function(window){%output%})(global);',
           define: [
-            '"DEBUG=true"',
+            //'"DEBUG=true"',
             '"ENABLE_DEBUGGER=true"',
-            '"ENABLE_COMPILER=false"',
+            //'"ENABLE_COMPILER=false"',
             '"ACCURATE_INTERRUPT_EMULATION=true"',
             '"ENABLE_SERVER_LOGGER=false"'
           ],
@@ -266,7 +266,6 @@ module.exports = function(grunt) {
         }
       }
     }
-
   });
 
   // Default task.
