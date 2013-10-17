@@ -744,4 +744,4 @@ src\z80.js:3290: WARNING - Property setRom never defined on JSSMS.Z80.recompiler
         this.recompiler.setRom(this.rom);
         ^
 
-0 error(s), 183 warning(s), 84.5% typed
+0 error(s), 183 warning(s), 84.4% typed

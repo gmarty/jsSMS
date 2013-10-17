@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-'use strict';var DEBUG = true;
+'use strict';var DEBUG = false;
 var ENABLE_DEBUGGER = false;
 var ENABLE_COMPILER = true;
 var WRITE_MODE = 0;
@@ -50,6 +50,12 @@ function JSSMS(opts) {
         this.opts[key] = opts[key]
       }
     }
+  }
+  if(opts.DEBUG != undefined) {
+    DEBUG = opts.DEBUG
+  }
+  if(opts.ENABLE_COMPILER != undefined) {
+    ENABLE_COMPILER = opts.ENABLE_COMPILER
   }
   this.keyboard = new JSSMS.Keyboard(this);
   this.ui = new this.opts["ui"](this);
@@ -9524,6 +9530,8 @@ JSSMS.DummyUI = function(sms) {
   this.updateStatus = function() {
   };
   this.writeFrame = function() {
+  };
+  this.updateDisassembly = function() {
   };
   this.canvasImageData = {data:[]}
 };
