@@ -37,9 +37,9 @@ function BinaryRequest(method, url, args, data, cb) {
     var arg_str = [];
     var i;
     for (i in args) {
-      var arg = escape(i);
-      if (args[i] != undefined) {
-        arg += '=' + escape(args[i]);
+      var arg = encodeURI(i);
+      if (args[i] !== undefined) {
+        arg += '=' + encodeURI(args[i]);
       }
       arg_str.push(arg);
     }
@@ -137,7 +137,7 @@ SyncWriter.prototype = {
           });
     }
 
-    return this.buffers.length == 0;
+    return this.buffers.length === 0;
   },
 
 

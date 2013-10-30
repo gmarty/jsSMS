@@ -245,7 +245,7 @@ if (window['$']) {
       this.log.appendTo(root);
       root.appendTo($(parent));
 
-      if (roms != undefined) {
+      if (roms !== undefined) {
         this.setRoms(roms);
       }
 
@@ -260,33 +260,39 @@ if (window['$']) {
             //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
           });
 
+      function touchStart(key) {
+        return function(evt) {
+          self.main.keyboard.controller1 &= ~key;
+          evt.preventDefault();
+        };
+      }
+
+      function touchEnd(key) {
+        return function(evt) {
+          self.main.keyboard.controller1 |= key;
+          evt.preventDefault();
+        };
+      }
+
       for (i in this.gamepad) {
         this.gamepad[i].e
-          .on('mousedown touchstart', function(key) {
-              return function(evt) {
-                self.main.keyboard.controller1 &= ~key;
-                evt.preventDefault();
-              };
-            }(this.gamepad[i].k))
-          .on('mouseup touchend', function(key) {
-              return function(evt) {
-                self.main.keyboard.controller1 |= key;
-                evt.preventDefault();
-              };
-            }(this.gamepad[i].k));
+          .on('mousedown touchstart', touchStart(this.gamepad[i].k))
+          .on('mouseup touchend', touchEnd(this.gamepad[i].k));
       }
 
       startButton
         .on('mousedown touchstart', function(evt) {
-            if (self.main.is_sms)
+            if (self.main.is_sms) {
               self.main.pause_button = true;       // Pause
-            else
+            } else {
               self.main.keyboard.ggstart &= ~0x80; // Start
+            }
             evt.preventDefault();
           })
         .on('mouseup touchend', function(evt) {
-            if (!self.main.is_sms)
-              self.main.keyboard.ggstart |= 0x80; // Start
+            if (!self.main.is_sms) {
+              self.main.keyboard.ggstart |= 0x80;  // Start
+            }
             evt.preventDefault();
           });
     };
@@ -344,10 +350,10 @@ if (window['$']) {
 
         this.updateStatus('Downloading...');
         $.ajax({
-          url: escape(this.romSelect.val()),
+          url: encodeURI(this.romSelect.val()),
           xhr: function() {
             var xhr = $.ajaxSettings.xhr();
-            if (xhr.overrideMimeType != undefined) {
+            if (xhr.overrideMimeType !== undefined) {
               // Download as binary
               xhr.overrideMimeType('text/plain; charset=x-user-defined');
             }
@@ -441,11 +447,11 @@ if (window['$']) {
             }
 
             this.canvasContext.putImageData(this.canvasImageData, 0, 0);
-          }
+          };
         } else {
           return function() {
             this.canvasContext.putImageData(this.canvasImageData, 0, 0);
-          }
+          };
         }
       }(),
 

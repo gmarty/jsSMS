@@ -96,13 +96,13 @@ JSSMS.Ports.prototype = {
       case 0x01:
         // Accurate emulation with HCounter
         if (LIGHTGUN) {
-          this.oldTH = (this.getTH(PORT_A) != 0 || this.getTH(PORT_B) != 0);
+          this.oldTH = (this.getTH(PORT_A) !== 0 || this.getTH(PORT_B) !== 0);
 
           this.writePort(PORT_A, value);
           this.writePort(PORT_B, value >> 2);
 
           // Toggling TH latches H Counter
-          if (!this.oldTH && (this.getTH(PORT_A) != 0 || this.getTH(PORT_B) != 0)) {
+          if (!this.oldTH && (this.getTH(PORT_A) !== 0 || this.getTH(PORT_B) !== 0)) {
             this.hCounter = this.getHCount();
           }
         } else {
@@ -110,7 +110,7 @@ JSSMS.Ports.prototype = {
           this.ioPorts[0] = (value & 0x20) << 1;
           this.ioPorts[1] = (value & 0x80);
 
-          if (this.europe == 0) {
+          if (this.europe === 0) {
             // Not European system
             this.ioPorts[0] = ~this.ioPorts[0];
             this.ioPorts[1] = ~this.ioPorts[1];
@@ -131,7 +131,9 @@ JSSMS.Ports.prototype = {
       // 0x7F: PSG
       case 0x40:
       case 0x41:
-        if (this.main.soundEnabled) this.psg.write(value);
+        if (this.main.soundEnabled) {
+          this.psg.write(value);
+        }
         break;
     }
   },
@@ -204,10 +206,12 @@ JSSMS.Ports.prototype = {
       // 0xD0 : Port B LEFT pin input
       case 0xC1:
         if (LIGHTGUN) {
-          if (this.keyboard.lightgunClick)
+          if (this.keyboard.lightgunClick) {
             this.lightPhaserSync();
+          }
 
-          return (this.keyboard.controller2 & 0x3F) | (this.getTH(PORT_A) != 0 ? 0x40 : 0) | (this.getTH(PORT_B) != 0 ? 0x80 : 0);
+          return (this.keyboard.controller2 & 0x3F) | (this.getTH(PORT_A) !== 0 ? 0x40 : 0) |
+              (this.getTH(PORT_B) !== 0 ? 0x80 : 0);
         } else {
           return (this.keyboard.controller2 & 0x3F) | this.ioPorts[0] | this.ioPorts[1];
         }
@@ -227,7 +231,7 @@ JSSMS.Ports.prototype = {
     this.ioPorts[index + IO_TR_DIRECTION] = value & 0x01;
     this.ioPorts[index + IO_TH_DIRECTION] = value & 0x02;
     this.ioPorts[index + IO_TR_OUTPUT] = value & 0x10;
-    this.ioPorts[index + IO_TH_OUTPUT] = this.europe == 0 ? (~value) & 0x20 : value & 0x20;
+    this.ioPorts[index + IO_TH_OUTPUT] = this.europe === 0 ? (~value) & 0x20 : value & 0x20;
   },
 
 
@@ -236,7 +240,7 @@ JSSMS.Ports.prototype = {
    * @return {number}
    */
   getTH: function(index) {
-    return (this.ioPorts[index + IO_TH_DIRECTION] == 0) ?
+    return (this.ioPorts[index + IO_TH_DIRECTION] === 0) ?
         this.ioPorts[index + IO_TH_OUTPUT] :
         this.ioPorts[index + IO_TH_INPUT];
   },
@@ -273,8 +277,9 @@ JSSMS.Ports.prototype = {
   getHCount: function() {
     var pixels = Math.round((this.main.cpu.getCycle() * SMS_X_PIXELS) / this.main.cyclesPerLine);
     var v = ((pixels - 8) >> 1);
-    if (v > 0x93)
+    if (v > 0x93) {
       v += 0xE9 - 0x94;
+    }
 
     return v & 0xFF;
   },
@@ -310,14 +315,16 @@ JSSMS.Ports.prototype = {
       this.setTH(PORT_A, false);
 
       // TH has been toggled, update with lightgun position
-      if (oldTH != this.getTH(PORT_A))
+      if (oldTH != this.getTH(PORT_A)) {
         this.hCounter = 20 + (this.keyboard.lightgunX >> 1);
+      }
     } else {
       this.setTH(PORT_A, true);
 
       // TH has been toggled, update with usual HCounter value
-      if (oldTH != this.getTH(PORT_A))
+      if (oldTH != this.getTH(PORT_A)) {
         this.hCounter = hc;
+      }
     }
   },
 
@@ -336,6 +343,6 @@ JSSMS.Ports.prototype = {
    * @return {boolean}
    */
   isDomestic: function() {
-    return this.europe != 0;
+    return this.europe !== 0;
   }
 };

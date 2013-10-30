@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* jshint -W079, -W098 */
+
 'use strict';
 
 
@@ -112,14 +114,14 @@ var FORCE_DESTRUCTURING = false;
  * Does browser support destructuring assignments? Used in `EX ...` opcodes.
  * @const
  */
-var SUPPORT_DESTRUCTURING = false/*FORCE_DESTRUCTURING || function() {
+var SUPPORT_DESTRUCTURING = false;/*FORCE_DESTRUCTURING || function() {
   try {
     eval('var [a]=[1]');
     return true;
   } catch (e) {
     return false;
   }
-}()*/;
+}()*/
 
 
 // Sound Output

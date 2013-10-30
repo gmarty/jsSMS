@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* exported JSSMS */
+/* jshint -W020 */
+
 'use strict';
 
 
@@ -55,21 +58,21 @@ function JSSMS(opts) {
     'ui': JSSMS.DummyUI,
     'swfPath': 'lib/'
   };
-  if (opts != undefined) {
+  if (opts !== undefined) {
     var key;
     for (key in this.opts) {
-      if (opts[key] != undefined) {
+      if (opts[key] !== undefined) {
         this.opts[key] = opts[key];
       }
     }
   }
 
   // Modify global flags set in setup.js on a per instance basis.
-  if (opts.DEBUG != undefined) {
-    DEBUG = opts.DEBUG;
+  if (opts['DEBUG'] !== undefined) {
+    DEBUG = opts['DEBUG'];
   }
-  if (opts.ENABLE_COMPILER != undefined) {
-    ENABLE_COMPILER = opts.ENABLE_COMPILER;
+  if (opts['ENABLE_COMPILER'] !== undefined) {
+    ENABLE_COMPILER = opts['ENABLE_COMPILER'];
   }
 
   this.keyboard = new JSSMS.Keyboard(this);
@@ -402,10 +405,11 @@ JSSMS.prototype = {
 
       this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps);
 
-      if (this.audioBuffer.length == 0 || this.audioBuffer.length != this.samplesPerFrame)
+      if (this.audioBuffer.length === 0 || this.audioBuffer.length != this.samplesPerFrame) {
         this.audioBuffer = new Array(this.samplesPerFrame);
+      }
 
-      if (this.samplesPerLine.length == 0 || this.samplesPerLine.length != this.no_of_scanlines) {
+      if (this.samplesPerLine.length === 0 || this.samplesPerLine.length != this.no_of_scanlines) {
         this.samplesPerLine = new Array(this.no_of_scanlines);
 
         var fractional = 0;
@@ -440,9 +444,8 @@ JSSMS.prototype = {
 
   printFps: function() {
     var now = JSSMS.Utils.getTimestamp();
-    var s = 'Running: '
-      + (this.fpsFrameCount / ((now - this.lastFpsTime) / 1000)).toFixed(2)
-      + ' FPS';
+    var s = 'Running: ' +
+        (this.fpsFrameCount / ((now - this.lastFpsTime) / 1000)).toFixed(2) + ' FPS';
     this.ui.updateStatus(s);
     this.fpsFrameCount = 0;
     this.lastFpsTime = now;
@@ -459,8 +462,9 @@ JSSMS.prototype = {
    * @param {number} line
    */
   updateSound: function(line) {
-    if (line == 0)
+    if (line === 0) {
       this.audioBufferOffset = 0;
+    }
 
     var samplesToGenerate = this.samplesPerLine[line];
     this.audioBuffer = this.psg.update(this.audioBufferOffset, samplesToGenerate);
@@ -484,8 +488,11 @@ JSSMS.prototype = {
     var size = data.length;
 
     // Toggle SMS / GG emulation mode
-    if (mode == 1) this.setSMS();
-    else if (mode == 2) this.setGG();
+    if (mode == 1) {
+      this.setSMS();
+    } else if (mode == 2) {
+      this.setGG();
+    }
 
     if (size <= PAGE_SIZE) {
       return false;
@@ -493,7 +500,9 @@ JSSMS.prototype = {
 
     pages = this.loadROM(data, size);
 
-    if (pages == null) return false;
+    if (pages === null) {
+      return false;
+    }
 
     // Default Mapping (Needed or Shinobi doesn't work)
     this.cpu.resetMemory(pages);
@@ -515,7 +524,7 @@ JSSMS.prototype = {
    */
   loadROM: function(data, size) {
     // Strip 512 Byte File Headers
-    if ((size % 1024) != 0) {
+    if ((size % 1024) !== 0) {
       data = data.substr(512); // skip 512 bytes
       size -= 512;
     }
@@ -551,7 +560,7 @@ JSSMS.prototype = {
    * @return {boolean}
    */
   reloadRom: function() {
-    if (this.romData != '' && this.romFileName != '') {
+    if (this.romData !== '' && this.romFileName !== '') {
       return this.readRomDirectly(this.romData, this.romFileName);
     } else {
       return false;

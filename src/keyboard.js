@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* jshint -W079 */
+
 'use strict';
 
 /** @const */ var KEY_UP = 0x01;
@@ -103,11 +105,12 @@ JSSMS.Keyboard.prototype = {
       case 90: this.controller1 &= ~KEY_FIRE2; break;  // Z
       case 13:
         //this.controller1 &= ~KEY_START;
-        if (this.main.is_sms)
+        if (this.main.is_sms) {
           //this.controller2 &= ~0x10; // Reset
           this.main.pause_button = true; // Pause
-        else
+        } else {
           this.ggstart &= ~0x80;   // Start
+        }
         break;  // Enter
 
       case 104: this.controller2 &= ~KEY_UP; break;    // Num-8
@@ -137,10 +140,11 @@ JSSMS.Keyboard.prototype = {
       case 90: this.controller1 |= KEY_FIRE2; break;  // Z
       case 13:
         //this.controller1 |= KEY_START;
-        if (!this.main.is_sms)
+        if (!this.main.is_sms) {
           //  controller2 |= 0x10;    // Reset/Start
           //else
           this.ggstart |= 0x80;    // Start
+        }
         break;  // Enter
 
       case 104: this.controller2 |= KEY_UP; break;    // Num-8

@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* jshint -W079, -W098 */
+
 'use strict';
 
 /** @const */ var NTSC = 0;
@@ -363,12 +365,14 @@ JSSMS.Vdp.prototype = {
    */
   getVCount: function() {
     if (this.videoMode == NTSC) {
-      if (this.line > 0xDA) // Values from 00 to DA, then jump to D5-FF
-        return this.line - 0x06;
+      if (this.line > 0xDA) {
+        return this.line - 0x06; // Values from 00 to DA, then jump to D5-FF
+      }
     } else {
       // PAL
-      if (this.line > 0xF2)
+      if (this.line > 0xF2) {
         return this.line - 0x39;
+      }
     }
 
     return this.line;
@@ -414,7 +418,7 @@ JSSMS.Vdp.prototype = {
       this.location = this.commandByte | (value << 8);
 
       // Read value from VRAM
-      if (this.operation == 0) {
+      if (this.operation === 0) {
         this.readBuffer = this.VRAM[(this.location++) & 0x3FFF] & 0xFF;
       } else if (this.operation == 2) {
         // Set VDP Register
@@ -428,19 +432,22 @@ JSSMS.Vdp.prototype = {
           // IRQ line if bit 4 of register $00 is set, and it will de-assert the IRQ line
           // if the same bit is cleared.
           case 0:
-            if (ACCURATE_INTERRUPT_EMULATION && (this.status & STATUS_HINT) != 0)
-              this.main.cpu.interruptLine = (this.commandByte & 0x10) != 0;
+            if (ACCURATE_INTERRUPT_EMULATION && (this.status & STATUS_HINT) !== 0) {
+              this.main.cpu.interruptLine = (this.commandByte & 0x10) !== 0;
+            }
             break;
 
           // Interrupt Control 1
           case 1:
-            if (((this.status & STATUS_VINT) != 0) && (this.commandByte & 0x20) != 0)
+            if (((this.status & STATUS_VINT) !== 0) && (this.commandByte & 0x20) !== 0) {
               this.main.cpu.interruptLine = true;
+            }
 
             // By writing here we've updated the height of the sprites and need to update
             // the sprites on each line
-            if ((this.commandByte & 3) != (this.vdpreg[reg] & 3))
+            if ((this.commandByte & 3) != (this.vdpreg[reg] & 3)) {
               this.isSatDirty = true;
+            }
             break;
 
           // BGT Written
@@ -504,17 +511,22 @@ JSSMS.Vdp.prototype = {
         // Check VRAM value has actually changed
         if (value != (this.VRAM[address] & 0xFF)) {
           //if (address >= bgt && address < bgt + BGT_LENGTH); // Don't write dirty to BGT
-          if (address >= this.sat && address < this.sat + 64) // Don't write dirty to SAT
+          if (address >= this.sat && address < this.sat + 64) {
+            // Don't write dirty to SAT
             this.isSatDirty = true;
-          else if (address >= this.sat + 128 && address < this.sat + 256)
+          } else if (address >= this.sat + 128 && address < this.sat + 256) {
             this.isSatDirty = true;
-          else {
+          } else {
             var tileIndex = address >> 5;
 
             // Get tile number that's being written to (divide VRAM location by 32).
             this.isTileDirty[tileIndex] = 1;
-            if (tileIndex < this.minDirty) this.minDirty = tileIndex;
-            if (tileIndex > this.maxDirty) this.maxDirty = tileIndex;
+            if (tileIndex < this.minDirty) {
+              this.minDirty = tileIndex;
+            }
+            if (tileIndex > this.maxDirty) {
+              this.maxDirty = tileIndex;
+            }
           }
 
           this.VRAM[address] = value;
@@ -531,7 +543,7 @@ JSSMS.Vdp.prototype = {
           this.CRAM[temp + 2] = this.main_JAVA_B[value];
         } else {
           temp = ((this.location & 0x3F) >> 1) * 3;
-          if ((this.location & 0x01) == 0) {
+          if ((this.location & 0x01) === 0) {
             // first byte
             this.CRAM[temp] = this.GG_JAVA_R[value]; // GG
             this.CRAM[temp + 1] = this.GG_JAVA_G[value]; // GG
@@ -542,8 +554,9 @@ JSSMS.Vdp.prototype = {
         break;
     }
 
-    if (ACCURATE)
+    if (ACCURATE) {
       this.readBuffer = value;
+    }
 
     this.location++;
   },
@@ -565,11 +578,12 @@ JSSMS.Vdp.prototype = {
       //
       // e.g. Chicago Syndicate on GG
 
-      if (!ACCURATE_INTERRUPT_EMULATION && lineno == 192)
+      if (!ACCURATE_INTERRUPT_EMULATION && lineno == 192) {
         this.status |= STATUS_VINT;
+      }
 
       // Counter Expired = Line Interrupt Pending
-      if (this.counter == 0) {
+      if (this.counter === 0) {
         // Reload Counter
         this.counter = this.vdpreg[10];
         this.status |= STATUS_HINT;
@@ -579,20 +593,23 @@ JSSMS.Vdp.prototype = {
       }
 
       // Line Interrupts Enabled and Pending. Assert IRQ Line.
-      if (((this.status & STATUS_HINT) != 0) && ((this.vdpreg[0] & 0x10) != 0))
+      if (((this.status & STATUS_HINT) !== 0) && ((this.vdpreg[0] & 0x10) !== 0)) {
         this.main.cpu.interruptLine = true;
+      }
     } else {
       // lineno >= 193
       // Reload counter on every line outside active display + 1
       this.counter = this.vdpreg[10];
 
       // Frame Interrupts Enabled and Pending. Assert IRQ Line.
-      if (((this.status & STATUS_VINT) != 0) && ((this.vdpreg[1] & 0x20) != 0) && (lineno < 224))
+      if (((this.status & STATUS_VINT) !== 0) && ((this.vdpreg[1] & 0x20) !== 0) && (lineno < 224)) {
         this.main.cpu.interruptLine = true;
+      }
 
       // Update the VSCROLL latch for the next active display period
-      if (ACCURATE && lineno == this.main.no_of_scanlines - 1)
+      if (ACCURATE && lineno == this.main.no_of_scanlines - 1) {
         this.vScrollLatch = this.vdpreg[9];
+      }
     }
   },
 
@@ -614,33 +631,38 @@ JSSMS.Vdp.prototype = {
 
     // Check we are in the visible drawing region
     if (this.main.is_gg) {
-      if (lineno < GG_Y_OFFSET || lineno >= GG_Y_OFFSET + GG_HEIGHT)
+      if (lineno < GG_Y_OFFSET || lineno >= GG_Y_OFFSET + GG_HEIGHT) {
         return;
+      }
     }
 
     // Clear sprite collision array if enabled
     if (VDP_SPRITE_COLLISIONS) {
-      for (i = 0; i < SMS_WIDTH /* this.spriteCol.length */; i++)
+      for (i = 0; i < SMS_WIDTH /* this.spriteCol.length */; i++) {
         this.spriteCol[i] = false;
+      }
     }
 
     // Check Screen is switched on
-    if ((this.vdpreg[1] & 0x40) != 0) {
+    if ((this.vdpreg[1] & 0x40) !== 0) {
       // Draw Background Layer
-      if (this.maxDirty != -1)
+      if (this.maxDirty != -1) {
         this.decodeTiles();
+      }
 
       this.drawBg(lineno);
 
       // Draw Sprite Layer
-      if (this.isSatDirty)
+      if (this.isSatDirty) {
         this.decodeSat();
+      }
 
-      if (this.lineSprites[lineno][SPRITE_COUNT] != 0)
+      if (this.lineSprites[lineno][SPRITE_COUNT] !== 0) {
         this.drawSprite(lineno);
+      }
 
       // Blank Leftmost Column (SMS Only)
-      if (this.main.is_sms && (this.vdpreg[0] & 0x20) != 0) {
+      if (this.main.is_sms && (this.vdpreg[0] & 0x20) !== 0) {
         var location = lineno << 8;
 
         // Don't use a loop here for speed purposes
@@ -676,8 +698,9 @@ JSSMS.Vdp.prototype = {
 
     // Top Two Rows Not Affected by Horizontal Scrolling (SMS Only)
     // We don't actually need the SMS check here as we don't draw this line for GG now
-    if (lineno < 16 && ((this.vdpreg[0] & 0x40) != 0) /*&& this.main.is_sms*/)
+    if (lineno < 16 && ((this.vdpreg[0] & 0x40) !== 0) /*&& this.main.is_sms*/) {
       hscroll = 0;
+    }
 
     // Lock Right eight columns
     var lock = this.vdpreg[0] & 0x80;
@@ -688,8 +711,9 @@ JSSMS.Vdp.prototype = {
     // Row to start drawing at (0 - 27)
     var tile_row = (lineno + vscroll) >> 3;
 
-    if (tile_row > 27)
+    if (tile_row > 27) {
       tile_row -= 28;
+    }
 
     // Actual y position in tile (0 - 7) (Also times by 8 here for quick access to pixel)
     var tile_y = ((lineno + (vscroll & 7)) & 7) << 3;
@@ -709,20 +733,20 @@ JSSMS.Vdp.prototype = {
       var sx = (tx << 3) + (hscroll & 7);
 
       // Do V-Flip (take into account the fact that everything is times 8)
-      var pixY = ((secondbyte & 0x04) == 0) ? tile_y : ((7 << 3) - tile_y);
+      var pixY = ((secondbyte & 0x04) === 0) ? tile_y : ((7 << 3) - tile_y);
 
       // Pattern Number (0 - 512)
       var tile = this.tiles[(this.VRAM[tile_props] & 0xFF) + ((secondbyte & 0x01) << 8)];
 
       // Plot 8 Pixel Row (No H-Flip)
-      if ((secondbyte & 0x02) == 0) {
+      if ((secondbyte & 0x02) === 0) {
         for (pixX = 0; pixX < 8 && sx < SMS_WIDTH; pixX++, sx++) {
           colour = tile[pixX + pixY];
           temp = (sx + row_precal) * 4;
           temp2 = (colour + pal) * 3;
 
           // Set Priority Array (Sprites over/under background tile)
-          this.bgPriority[sx] = ((secondbyte & 0x10) != 0) && (colour != 0);
+          this.bgPriority[sx] = ((secondbyte & 0x10) !== 0) && (colour !== 0);
           this.display[temp] = this.CRAM[temp2];
           this.display[temp + 1] = this.CRAM[temp2 + 1];
           this.display[temp + 2] = this.CRAM[temp2 + 2];
@@ -735,7 +759,7 @@ JSSMS.Vdp.prototype = {
           temp2 = (colour + pal) * 3;
 
           // Set Priority Array (Sprites over/under background tile)
-          this.bgPriority[sx] = ((secondbyte & 0x10) != 0) && (colour != 0);
+          this.bgPriority[sx] = ((secondbyte & 0x10) !== 0) && (colour !== 0);
           this.display[temp] = this.CRAM[temp2];
           this.display[temp + 1] = this.CRAM[temp2 + 1];
           this.display[temp + 2] = this.CRAM[temp2 + 2];
@@ -744,7 +768,7 @@ JSSMS.Vdp.prototype = {
       tile_column++;
 
       // Rightmost 8 columns Not Affected by Vertical Scrolling
-      if (lock != 0 && tx == 23) {
+      if (lock !== 0 && tx == 23) {
         tile_row = lineno >> 3;
         tile_y = (lineno & 7) << 3;
       }
@@ -795,8 +819,9 @@ JSSMS.Vdp.prototype = {
       var tileRow = (lineno - y) >> zoomed;
 
       // When using 8x16 sprites LSB has no effect
-      if ((this.vdpreg[1] & 0x02) != 0)
+      if ((this.vdpreg[1] & 0x02) !== 0) {
         n &= ~0x01;
+      }
 
       // Pattern Number (0 - 512)
       var tile = this.tiles[n + ((tileRow & 0x08) >> 3)];
@@ -813,11 +838,11 @@ JSSMS.Vdp.prototype = {
       var offset = pix + ((tileRow & 7) << 3);
 
       // Plot Normal Sprites (Width = 8)
-      if (zoomed == 0) {
+      if (zoomed === 0) {
         for (; pix < 8 && x < SMS_WIDTH; pix++, x++) {
           colour = tile[offset++];
 
-          if (colour != 0 && !this.bgPriority[x]) {
+          if (colour !== 0 && !this.bgPriority[x]) {
             temp = (x + row_precal) * 4;
             temp2 = (colour + 16) * 3;
 
@@ -827,10 +852,11 @@ JSSMS.Vdp.prototype = {
 
             // Emulate sprite collision (when two opaque pixels overlap)
             if (VDP_SPRITE_COLLISIONS) {
-              if (!this.spriteCol[x])
+              if (!this.spriteCol[x]) {
                 this.spriteCol[x] = true;
-              else
+              } else {
                 this.status |= STATUS_COLLISION; // Bit 5 of status flag indicates collision
+              }
             }
           }
         }
@@ -840,7 +866,7 @@ JSSMS.Vdp.prototype = {
           colour = tile[offset++];
 
           // Plot first pixel
-          if (colour != 0 && !this.bgPriority[x]) {
+          if (colour !== 0 && !this.bgPriority[x]) {
             temp = (x + row_precal) * 4;
             temp2 = (colour + 16) * 3;
 
@@ -849,15 +875,16 @@ JSSMS.Vdp.prototype = {
             this.display[temp + 2] = this.CRAM[temp2 + 2];
 
             if (VDP_SPRITE_COLLISIONS) {
-              if (!this.spriteCol[x])
+              if (!this.spriteCol[x]) {
                 this.spriteCol[x] = true;
-              else
+              } else {
                 this.status |= STATUS_COLLISION; // Bit 5 of status flag indicates collision
+              }
             }
           }
 
           // Plot second pixel
-          if (colour != 0 && !this.bgPriority[x + 1]) {
+          if (colour !== 0 && !this.bgPriority[x + 1]) {
             temp = (x + row_precal + 1) * 4;
             temp2 = (colour + 16) * 3;
 
@@ -866,10 +893,11 @@ JSSMS.Vdp.prototype = {
             this.display[temp + 2] = this.CRAM[temp2 + 2];
 
             if (VDP_SPRITE_COLLISIONS) {
-              if (!this.spriteCol[x + 1])
+              if (!this.spriteCol[x + 1]) {
                 this.spriteCol[x + 1] = true;
-              else
+              } else {
                 this.status |= STATUS_COLLISION; // Bit 5 of status flag indicates collision
+              }
             }
           }
         }
@@ -907,7 +935,9 @@ JSSMS.Vdp.prototype = {
 
     for (var i = this.minDirty; i <= this.maxDirty; i++) {
       // Only decode tiles that have changed since the last iteration
-      if (!this.isTileDirty[i]) continue;
+      if (!this.isTileDirty[i]) {
+        continue;
+      }
 
       // Note that we've updated the tile
       this.isTileDirty[i] = 0;
@@ -928,14 +958,22 @@ JSSMS.Vdp.prototype = {
         var address3 = this.VRAM[address++];
 
         // Plot row of 8 pixels
-        for (var bit = 0x80; bit != 0; bit >>= 1) {
+        for (var bit = 0x80; bit !== 0; bit >>= 1) {
           var colour = 0;
 
           // Set Colour of Pixel (0-15)
-          if ((address0 & bit) != 0) colour |= 0x01;
-          if ((address1 & bit) != 0) colour |= 0x02;
-          if ((address2 & bit) != 0) colour |= 0x04;
-          if ((address3 & bit) != 0) colour |= 0x08;
+          if ((address0 & bit) !== 0) {
+            colour |= 0x01;
+          }
+          if ((address1 & bit) !== 0) {
+            colour |= 0x02;
+          }
+          if ((address2 & bit) !== 0) {
+            colour |= 0x04;
+          }
+          if ((address3 & bit) !== 0) {
+            colour |= 0x08;
+          }
 
           tile[pixel_index++] = colour;
         }
@@ -986,7 +1024,7 @@ JSSMS.Vdp.prototype = {
     }
 
     // Height of Sprites (8x8 or 8x16)
-    var height = (this.vdpreg[1] & 0x02) == 0 ? 8 : 16;
+    var height = (this.vdpreg[1] & 0x02) === 0 ? 8 : 16;
 
     // Enable Zoomed Sprites
     if ((this.vdpreg[1] & 0x01) == 0x01) {
@@ -1133,7 +1171,7 @@ JSSMS.Vdp.prototype = {
     var temp = state[0];
     this.videoMode = temp & 0xFF;
     this.status = (temp >> 8) & 0xFF;
-    this.firstByte = ((temp >> 16) & 0xFF) != 0;
+    this.firstByte = ((temp >> 16) & 0xFF) !== 0;
     this.commandByte = (temp >> 24) & 0xFF;
 
     temp = state[1];

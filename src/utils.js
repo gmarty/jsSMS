@@ -136,14 +136,16 @@ JSSMS.Utils = {
    */
   console: {
     log: function() {
-      if (DEBUG)
+      if (DEBUG) {
         return window.console.log.bind(window.console);
+      }
       return function(var_args) {
       };
     }(),
     error: function() {
-      if (DEBUG)
+      if (DEBUG) {
         return window.console.error.bind(window.console);
+      }
       return function(var_args) {
       };
     }(),
@@ -151,8 +153,9 @@ JSSMS.Utils = {
      * @todo Develop a polyfill for non supporting browsers like IE.
      */
     time: function() {
-      if (DEBUG && window.console.time)
+      if (DEBUG && window.console.time) {
         return window.console.time.bind(window.console);
+      }
       return function(label) {
       };
     }(),
@@ -160,8 +163,9 @@ JSSMS.Utils = {
      * @todo Develop a polyfill for non supporting browsers like IE.
      */
     timeEnd: function() {
-      if (DEBUG && window.console.timeEnd)
+      if (DEBUG && window.console.timeEnd) {
         return window.console.timeEnd.bind(window.console);
+      }
       return function(label) {
       };
     }()
@@ -239,7 +243,7 @@ JSSMS.Utils = {
   getPrefix: function(arr, obj) {
     var prefix = false;
 
-    if (obj == undefined) {
+    if (obj === undefined) {
       obj = document;
     }
 
