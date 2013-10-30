@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global o */
+
 'use strict';
 
 function generateIndexTable(index) {
@@ -47,8 +49,7 @@ function generateIndexTable(index) {
     },
     0x2A: {
       name: 'LD ' + index + ',(nn)',
-      ast: o.LD16(registerH, registerL, 'n', 'n'),
-      operand: UINT16
+      ast: o.LD16(registerH, registerL, 'n', 'n')
     },
     0x2B: {
       name: 'DEC ' + index,

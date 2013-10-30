@@ -19,10 +19,6 @@
 
 'use strict';
 
-/** @const */ var UINT8 = 1;
-/** @const */ var INT8 = 2;
-/** @const */ var UINT16 = 3;
-
 var BIT_TABLE = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80];
 
 

@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global o */
+
 'use strict';
 
 var opcodeTable = [
@@ -28,8 +30,7 @@ var opcodeTable = [
   //0x01
   {
     name: 'LD BC,nn',
-    ast: o.LD16('b', 'c'),
-    operand: UINT16
+    ast: o.LD16('b', 'c')
   },
   //0x02
   {
@@ -54,8 +55,7 @@ var opcodeTable = [
   //0x06
   {
     name: 'LD B,n',
-    ast: o.LD8('b'),
-    operand: UINT8
+    ast: o.LD8('b')
   },
   //0x07
   {
@@ -95,8 +95,7 @@ var opcodeTable = [
   //0x0E
   {
     name: 'LD C,n',
-    ast: o.LD8('c'),
-    operand: UINT8
+    ast: o.LD8('c')
   },
   //0x0F
   {
@@ -106,14 +105,12 @@ var opcodeTable = [
   //0x10
   {
     name: 'DJNZ (PC+e)',
-    ast: o.DJNZ(),
-    operand: INT8
+    ast: o.DJNZ()
   },
   //0x11
   {
     name: 'LD DE,nn',
-    ast: o.LD16('d', 'e'),
-    operand: UINT16
+    ast: o.LD16('d', 'e')
   },
   //0x12
   {
@@ -138,8 +135,7 @@ var opcodeTable = [
   //0x16
   {
     name: 'LD D,n',
-    ast: o.LD8('d'),
-    operand: UINT8
+    ast: o.LD8('d')
   },
   //0x17
   {
@@ -149,8 +145,7 @@ var opcodeTable = [
   //0x18
   {
     name: 'JR (PC+e)',
-    ast: o.JP(),
-    operand: INT8
+    ast: o.JP()
   },
   //0x19
   {
@@ -180,8 +175,7 @@ var opcodeTable = [
   //0x1E
   {
     name: 'LD E,n',
-    ast: o.LD8('e'),
-    operand: UINT8
+    ast: o.LD8('e')
   },
   //0x1F
   {
@@ -191,20 +185,17 @@ var opcodeTable = [
   //0x20
   {
     name: 'JR NZ,(PC+e)',
-    ast: o.JRNZ(),
-    operand: INT8
+    ast: o.JRNZ()
   },
   //0x21
   {
     name: 'LD HL,nn',
-    ast: o.LD16('h', 'l'),
-    operand: UINT16
+    ast: o.LD16('h', 'l')
   },
   //0x22
   {
     name: 'LD (nn),HL',
-    ast: o.LD_NN('h', 'l'),
-    operand: UINT16
+    ast: o.LD_NN('h', 'l')
   },
   //0x23
   {
@@ -224,8 +215,7 @@ var opcodeTable = [
   //0x26
   {
     name: 'LD H,n',
-    ast: o.LD8('h'),
-    operand: UINT8
+    ast: o.LD8('h')
   },
   //0x27
   {
@@ -235,8 +225,7 @@ var opcodeTable = [
   //0x28
   {
     name: 'JR Z,(PC+e)',
-    ast: o.JRZ(),
-    operand: INT8
+    ast: o.JRZ()
   },
   //0x29
   {
@@ -246,8 +235,7 @@ var opcodeTable = [
   //0x2A
   {
     name: 'LD HL,(nn)',
-    ast: o.LD16('h', 'l', 'n', 'n'),
-    operand: UINT16
+    ast: o.LD16('h', 'l', 'n', 'n')
   },
   //0x2B
   {
@@ -267,8 +255,7 @@ var opcodeTable = [
   //0x2E
   {
     name: 'LD L,n',
-    ast: o.LD8('l'),
-    operand: UINT8
+    ast: o.LD8('l')
   },
   //0x2F
   {
@@ -278,20 +265,17 @@ var opcodeTable = [
   //0x30
   {
     name: 'JR NC,(PC+e)',
-    ast: o.JRNC(),
-    operand: INT8
+    ast: o.JRNC()
   },
   //0x31
   {
     name: 'LD SP,nn',
-    ast: o.LD_SP(),
-    operand: UINT16
+    ast: o.LD_SP()
   },
   //0x32
   {
     name: 'LD (nn),A',
-    ast: o.LD_WRITE_MEM('n', 'n', 'a'),
-    operand: UINT16
+    ast: o.LD_WRITE_MEM('n', 'n', 'a')
   },
   //0x33
   {
@@ -311,8 +295,7 @@ var opcodeTable = [
   //0x36
   {
     name: 'LD (HL),n',
-    ast: o.LD_WRITE_MEM('h', 'l'),
-    operand: UINT8
+    ast: o.LD_WRITE_MEM('h', 'l')
   },
   //0x37
   {
@@ -322,8 +305,7 @@ var opcodeTable = [
   //0x38
   {
     name: 'JR C,(PC+e)',
-    ast: o.JRC(),
-    operand: INT8
+    ast: o.JRC()
   },
   //0x39
   {
@@ -333,8 +315,7 @@ var opcodeTable = [
   //0x3A
   {
     name: 'LD A,(nn)',
-    ast: o.LD8('a', 'n', 'n'),
-    operand: UINT16
+    ast: o.LD8('a', 'n', 'n')
   },
   //0x3B
   {
@@ -354,8 +335,7 @@ var opcodeTable = [
   //0x3E
   {
     name: 'LD A,n',
-    ast: o.LD8('a'),
-    operand: UINT8
+    ast: o.LD8('a')
   },
   //0x3F
   {
@@ -365,8 +345,7 @@ var opcodeTable = [
   //0x40
   {
     name: 'LD B,B',
-    ast: o.NOOP(),
-    operand: UINT8
+    ast: o.NOOP()
   },
   //0x41
   {

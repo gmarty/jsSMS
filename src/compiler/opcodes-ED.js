@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global o */
+
 'use strict';
 
 var opcodeTableED = {
@@ -62,8 +64,7 @@ var opcodeTableED = {
   },
   0x4B: {
     name: 'LD BC,(nn)',
-    ast: o.LD16('b', 'c', 'n', 'n'),
-    operand: UINT16
+    ast: o.LD16('b', 'c', 'n', 'n')
   },
   0x4C: {
     name: 'NEG',
@@ -127,8 +128,7 @@ var opcodeTableED = {
   },
   0x5B: {
     name: 'LD DE,(nn)',
-    ast: o.LD16('d', 'e', 'n', 'n'),
-    operand: UINT16
+    ast: o.LD16('d', 'e', 'n', 'n')
   },
   0x5C: {
     name: 'NEG',
@@ -176,8 +176,7 @@ var opcodeTableED = {
   },
   0x6B: {
     name: 'LD HL,(nn)',
-    ast: o.LD16('h', 'l', 'n', 'n'),
-    operand: UINT16
+    ast: o.LD16('h', 'l', 'n', 'n')
   },
   0x6C: {
     name: 'NEG',
