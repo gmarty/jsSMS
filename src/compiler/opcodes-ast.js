@@ -177,19 +177,17 @@ var o = {
   // Helper function for setting 2 registers at the same time.
   SET16: function(register1, register2, value) {
     if (value.type == 'Literal') {
-      // We can evaluate the expression:
-      // h = 0x00;
-      // l = 0xFF;
-      var hi = evaluate(n.BinaryExpression('>>', value, n.Literal(8)));
-      var lo = evaluate(n.BinaryExpression('&', value, n.Literal(0xFF)));
+      // The optimizer can evaluate the expression:
+      // h = 0x0903 >> 0x08;
+      // l = 0x0903 & 0xFF;
       return [
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register1), hi)),
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register2), lo))
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register1), n.BinaryExpression('>>', value, n.Literal(8)))),
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Register(register2), n.BinaryExpression('&', value, n.Literal(0xFF))))
       ];
     } else {
       // We can't evaluate the expression: it will be done at runtime:
       // var val = value;
-      // h = value >> 8;
+      // h = value >> 0x08;
       // l = value & 0xFF;
       return [
         n.VariableDeclaration('val', value),
@@ -2225,25 +2223,4 @@ function generateIndexCBFunctions(fn) {
         ];
       };
   };
-}
-
-function evaluate(expression) {
-  switch (expression.type) {
-    case 'BinaryExpression':
-      if (expression.left.type != 'Literal' && expression.right.type != 'Literal') {
-        break;
-      }
-      switch (expression.operator) {
-        case '>>':
-          return n.Literal(expression.left.value >> expression.right.value);
-          break;
-        case '&':
-          return n.Literal(expression.left.value & expression.right.value);
-          break;
-      }
-
-      break;
-  }
-
-  return expression;
 }

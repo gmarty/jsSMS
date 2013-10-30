@@ -52,12 +52,71 @@ var Optimizer = (function() {
      * @param {number} page
      */
     localOptimization: function(page) {
+      this.ast[page] = this.ast[page].map(this.evaluateBinaryExpressions);
       this.ast[page] = this.ast[page].map(this.inlineRegisters);
     },
 
 
     /**
-     * This pass replaces references to defined registers with their respective values. Ex:
+     * Evaluate binary expressions when both operands are literal:
+     * ```
+     * this.h = 0x0903 >> 0x08;
+     * ```
+     *
+     * Is optimized into:
+     * ```
+     * this.h = 0x09;
+     * ```
+     *
+     * The only operators used in the generated code are `>>` and `&`.
+     *
+     * @param {Array.<Bytecode>} fn
+     * @return {Array.<Bytecode>}
+     */
+    evaluateBinaryExpressions: function(fn) {
+      return fn.map(function(bytecodes) {
+        var ast = bytecodes.ast;
+
+        if (!ast) {
+          return bytecodes;
+        }
+
+        bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+          if (ast.type == 'BinaryExpression' &&
+              ast.left.type == 'Literal' &&
+              ast.right.type == 'Literal') {
+            var value = 0;
+            switch (ast.operator) {
+              case '>>':
+                value = ast.left.value >> ast.right.value;
+                break;
+              case '&':
+                value = ast.left.value & ast.right.value;
+                break;
+              default:
+                JSSMS.Utils.console.log('Unimplemented evaluation optimization for operator',
+                    ast.operator);
+                return ast;
+            }
+
+            // Change the properties of the AST node.
+            ast.type = 'Literal';
+            ast.value = value;
+            ast.raw = DEBUG ? JSSMS.Utils.toHex(value) : '' + value;
+            delete ast.right;
+            delete ast.left;
+          }
+
+          return ast;
+        });
+
+        return bytecodes;
+      });
+    },
+
+
+    /**
+     * This pass replaces references to defined registers with their respective values:
      * ```
      * b = 0x03;
      * writeMem(0xFFFE, b);
@@ -106,8 +165,9 @@ var Optimizer = (function() {
       return fn.map(function(bytecodes) {
         var ast = bytecodes.ast;
 
-        if (!ast)
+        if (!ast) {
           return bytecodes;
+        }
 
         bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
           // 1st, we tag defined registers.
