@@ -194,19 +194,19 @@ var Optimizer = (function() {
 
           // Then inline arguments.
           if (ast.type == 'CallExpression') {
-            if (ast.arguments[0] &&
-                ast.arguments[0].type == 'Register' &&
-                definedReg[ast.arguments[0].name] &&
-                ast.arguments[0].name != 'a' &&
-                ast.arguments[0].name != 'f') {
-              ast.arguments[0] = definedRegValue[ast.arguments[0].name];
+            if (ast['arguments'][0] &&
+                ast['arguments'][0].type == 'Register' &&
+                definedReg[ast['arguments'][0].name] &&
+                ast['arguments'][0].name != 'a' &&
+                ast['arguments'][0].name != 'f') {
+              ast['arguments'][0] = definedRegValue[ast['arguments'][0].name];
             }
-            if (ast.arguments[1] &&
-                ast.arguments[1].type == 'Register' &&
-                definedReg[ast.arguments[1].name] &&
-                ast.arguments[1].name != 'a' &&
-                ast.arguments[1].name != 'f') {
-              ast.arguments[1] = definedRegValue[ast.arguments[1].name];
+            if (ast['arguments'][1] &&
+                ast['arguments'][1].type == 'Register' &&
+                definedReg[ast['arguments'][1].name] &&
+                ast['arguments'][1].name != 'a' &&
+                ast['arguments'][1].name != 'f') {
+              ast['arguments'][1] = definedRegValue[ast['arguments'][1].name];
             }
             return ast;
           }

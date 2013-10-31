@@ -69,7 +69,7 @@ var Parser = (function() {
       var pageStart;
       var pageEnd;
 
-      if (page == undefined) {
+      if (page === undefined) {
         pageStart = 0x0000;
         pageEnd = this.stream.length - 1;
       } else {
@@ -95,12 +95,12 @@ var Parser = (function() {
           var bytecode = new Bytecode(currentAddress, currentPage);
           this.bytecodes[currentPage][currentAddress] = disassemble(bytecode, this.stream);
 
-          if (this.bytecodes[currentPage][currentAddress].nextAddress != null &&
+          if (this.bytecodes[currentPage][currentAddress].nextAddress !== null &&
               this.bytecodes[currentPage][currentAddress].nextAddress >= pageStart &&
               this.bytecodes[currentPage][currentAddress].nextAddress <= pageEnd) {
             this.addAddress(this.bytecodes[currentPage][currentAddress].nextAddress);
           }
-          if (this.bytecodes[currentPage][currentAddress].target != null &&
+          if (this.bytecodes[currentPage][currentAddress].target !== null &&
               this.bytecodes[currentPage][currentAddress].target >= pageStart &&
               this.bytecodes[currentPage][currentAddress].target <= pageEnd) {
             this.addAddress(this.bytecodes[currentPage][currentAddress].target);
@@ -134,11 +134,11 @@ var Parser = (function() {
             continue;
           }
           // Comparing with null is important here as `0` is a valid address (0x00).
-          if (this.bytecodes[currentPage][i].nextAddress != null &&
+          if (this.bytecodes[currentPage][i].nextAddress !== null &&
               this.bytecodes[currentPage][this.bytecodes[currentPage][i].nextAddress]) {
             this.bytecodes[currentPage][this.bytecodes[currentPage][i].nextAddress].jumpTargetNb++;
           }
-          if (this.bytecodes[currentPage][i].target != null) {
+          if (this.bytecodes[currentPage][i].target !== null) {
             var targetPage = ~~(this.bytecodes[currentPage][i].target / 0x4000);
             var targetAddress = this.bytecodes[currentPage][i].target % 0x4000;
             if (this.bytecodes[targetPage] && this.bytecodes[targetPage][targetAddress]) {
@@ -175,7 +175,7 @@ var Parser = (function() {
       var absoluteAddress = 0;
 
       // We consider the first 0x0400 bytes as an independent memory page.
-      if (address < 0x0400 && romPage == 0) {
+      if (address < 0x0400 && romPage === 0) {
         pageStart = 0;
         pageEnd = 0x0400;
       }
@@ -198,7 +198,7 @@ var Parser = (function() {
         branch.push(bytecode);
         startingBytecode = false;
         absoluteAddress = address + (romPage * 0x4000);
-      } while (address != null && absoluteAddress >= pageStart && absoluteAddress < pageEnd && !bytecode.isFunctionEnder);
+      } while (address !== null && absoluteAddress >= pageStart && absoluteAddress < pageEnd && !bytecode.isFunctionEnder);
 
       return branch;
     },
@@ -218,16 +218,19 @@ var Parser = (function() {
       var content = ['digraph G {'];
 
       for (var i = 0, length = tree.length; i < length; i++) {
-        if (!tree[i])
+        if (!tree[i]) {
           continue;
+        }
 
         content.push(INDENT + i + ' [label="' + tree[i].label + '"];');
 
-        if (tree[i].target != null)
+        if (tree[i].target !== null) {
           content.push(INDENT + i + ' -> ' + tree[i].target + ';');
+        }
 
-        if (tree[i].nextAddress != null)
+        if (tree[i].nextAddress !== null) {
           content.push(INDENT + i + ' -> ' + tree[i].nextAddress + ';');
+        }
       }
 
       content.push('}');
@@ -735,7 +738,6 @@ var Parser = (function() {
         break;
       case 0xCB:
         return getCB(bytecode, stream);
-        break;
       case 0xCC:
         target = stream.getUint16();
         canEnd = true;
@@ -794,7 +796,6 @@ var Parser = (function() {
         break;
       case 0xDD:
         return getIndex(bytecode, stream);
-        break;
       case 0xDE:
         operand = stream.getUint8();
         break;
@@ -846,7 +847,6 @@ var Parser = (function() {
         break;
       case 0xED:
         return getED(bytecode, stream);
-        break;
       case 0xEE:
         operand = stream.getUint8();
         break;
@@ -895,7 +895,6 @@ var Parser = (function() {
         break;
       case 0xFD:
         return getIndex(bytecode, stream);
-        break;
       case 0xFE:
         operand = stream.getUint8();
         break;
@@ -1341,7 +1340,6 @@ var Parser = (function() {
         break;
       case 0xCB:
         return getIndexCB(bytecode, stream);
-        break;
       case 0xE1:
         break;
       case 0xE3:

@@ -82,15 +82,16 @@ var Analyzer = (function() {
       this.bytecodes[page] = this.bytecodes[page]
           // Populate AST for each bytecode.
         .map(function(bytecode) {
+            var opcode;
             switch (bytecode.opcode.length) {
               case 1:
-                var opcode = opcodeTable[bytecode.opcode[0]];
+                opcode = opcodeTable[bytecode.opcode[0]];
                 break;
               case 2:
-                var opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]];
+                opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]];
                 break;
               case 3:
-                var opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]][bytecode.opcode[2]];
+                opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]][bytecode.opcode[2]];
                 break;
               default:
                 JSSMS.Utils.console.error('Something went wrong in parsing. Opcode: [' + bytecode.opcode.join(' ') + ']');
@@ -100,19 +101,21 @@ var Analyzer = (function() {
               var ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.nextAddress);
 
               // Force ast property to always be an array.
-              if (!Array.isArray(ast) && ast != undefined)
+              if (!Array.isArray(ast) && ast !== undefined) {
                 ast = [ast];
+              }
 
               bytecode.ast = ast;
 
               if (DEBUG) {
                 bytecode.name = opcode.name;
-                if (opcode.opcode)
+                if (opcode.opcode) {
                   bytecode.opcode = opcode.opcode(bytecode.operand, bytecode.target, bytecode.nextAddress);
+                }
               }
             } else {
               var i = bytecode.hexOpcode;
-              self.missingOpcodes[i] = self.missingOpcodes[i] != undefined ?
+              self.missingOpcodes[i] = self.missingOpcodes[i] !== undefined ?
                   self.missingOpcodes[i] + 1 : 1;
             }
 

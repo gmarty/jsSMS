@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global n */
+
 'use strict';
 
 
@@ -42,35 +44,27 @@ var Generator = (function() {
    * @return {number}
    */
   function getTotalTStates(opcodes) {
-    var tstates = 0;
-
     switch (opcodes[0]) {
       case 0xCB:
-        tstates = OP_CB_STATES[opcodes[1]];
-        break;
+        return OP_CB_STATES[opcodes[1]];
       case 0xDD:
       case 0xFD:
-        if (opcodes.length == 2)
-          tstates = OP_DD_STATES[opcodes[1]];
-        else
-          tstates = OP_INDEX_CB_STATES[opcodes[2]];
-        break;
+        if (opcodes.length == 2) {
+          return OP_DD_STATES[opcodes[1]];
+        }
+        return OP_INDEX_CB_STATES[opcodes[2]];
       case 0xED:
-        tstates = OP_ED_STATES[opcodes[1]];
-        break;
+        return OP_ED_STATES[opcodes[1]];
       default:
-        tstates = OP_STATES[opcodes[0]];
-        break;
+        return OP_STATES[opcodes[0]];
     }
-
-    return tstates;
   }
 
   /**
    * Replace `Register` type with `Identifier`.
    */
   function convertRegisters(ast) {
-    var convertRegisters = function(node) {
+    var convertRegistersFunc = function(node) {
       if (node.type == 'Register') {
         node.type = 'Identifier';
       }
@@ -78,7 +72,7 @@ var Generator = (function() {
       return node;
     };
 
-    return JSSMS.Utils.traverse(ast, convertRegisters);
+    return JSSMS.Utils.traverse(ast, convertRegistersFunc);
   }
 
   var Generator = function() {
@@ -109,8 +103,9 @@ var Generator = (function() {
 
               fn = fn
               .map(function(bytecode) {
-                    if (bytecode.ast == null)
+                    if (bytecode.ast === undefined) {
                       bytecode.ast = [];
+                    }
 
                     if (ENABLE_SERVER_LOGGER) {
                       // Sync server.
@@ -157,7 +152,7 @@ var Generator = (function() {
                     //}
 
                     // Update `this.pc` statement.
-                    if ((ENABLE_SERVER_LOGGER || bytecode.isFunctionEnder) && bytecode.nextAddress != null) {
+                    if ((ENABLE_SERVER_LOGGER || bytecode.isFunctionEnder) && bytecode.nextAddress !== null) {
                       var nextAddress = bytecode.nextAddress % 0x4000;
                       var updatePcStmt = {
                         'type': 'ExpressionStatement',
@@ -236,17 +231,18 @@ var Generator = (function() {
                       'alternate': null
                     };
 
-                    bytecode.ast.push(tStateCheck);*/
+                 bytecode.ast.push(tStateCheck);*/
 
                     if (DEBUG) {
                       // Inline comment about the current bytecode.
-                      if (bytecode.ast[0])
+                      if (bytecode.ast[0]) {
                         bytecode.ast[0].leadingComments = [
                           {
                             type: 'Line',
                             value: ' ' + bytecode.label
                           }
                         ];
+                      }
                     }
 
                     return bytecode.ast;
@@ -269,8 +265,9 @@ var Generator = (function() {
 
               // Append `this` to all identifiers.
               body = JSSMS.Utils.traverse(body, function(obj) {
-                if (obj.type && obj.type == 'Identifier' && whitelist.indexOf(obj.name) == -1)
+                if (obj.type && obj.type == 'Identifier' && whitelist.indexOf(obj.name) == -1) {
                   obj.name = 'this.' + obj.name;
+                }
                 return obj;
               });
 

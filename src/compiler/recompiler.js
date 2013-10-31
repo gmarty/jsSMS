@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* jshint -W079, -W098 */
+
 'use strict';
 
 
@@ -81,12 +83,13 @@ var Recompiler = (function() {
       // Attach generated code to an attach point in Z80 instance.
       for (var page = 0; page < this.rom.length; page++) {
         fns[page].forEach(function(fn) {
+          var funcName;
           if (DEBUG) {
-            var funcName = fn.body[0].id.name;
+            funcName = fn.body[0].id.name;
             fn.body[0].id.name = '_' + toHex(funcName);
             self.cpu.branches[page][funcName] = new Function('return ' + self.generateCodeFromAst(fn))();
           } else {
-            var funcName = fn.comments[0].value;
+            funcName = fn.comments[0].value;
             self.cpu.branches[page][funcName] = new Function('page', 'temp', 'location', self.generateCodeFromAst(fn));
           }
         });

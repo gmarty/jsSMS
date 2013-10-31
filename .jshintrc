@@ -30,7 +30,7 @@
   "debug": true,
   "eqnull": false,
   "esnext": false,
-  "evil": false,
+  "evil": true, // Because the recompiler generates new functions!
   "expr": true,
   "funcscope": true,
   "globalstrict": true,
@@ -38,7 +38,7 @@
   "lastsemic": false,
   "laxbreak": false,
   "laxcomma": false,
-  "loopfunc": false,
+  "loopfunc": true,
   "multistr": false,
   "proto": false,
   "scripturl": true,
@@ -106,6 +106,7 @@
     // Globals defined in src/compiler.
     "Recompiler": false,
     "SyncWriter": false,
-    "SyncReader": false
+    "SyncReader": false,
+    "opcodeTable": false
   }
 }
