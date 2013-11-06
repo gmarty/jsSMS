@@ -212,7 +212,6 @@ var sms;
 var romData;
 var launchBtn = $('#launchBtn');
 
-//var romPath = 'rom/gg/Japan/Columns (J).gg';
 var romPath = 'rom/homebrew/blockhead.sms';
 var FRAME_NB = 10;
 
@@ -305,16 +304,20 @@ suite.on('cycle', function(event) {
 suite.on('complete', function() {
   $('#runningRow').empty();
 
-  var data = this.map(function(testCase) {
+  drawChart(this.map(function(testCase) {
     // We multiply by the number of frames benchmarked to get the FPS.
     return [testCase.name, testCase.hz * FRAME_NB];
-  });
+  }));
 
-  drawChart(data);
   launchBtn.removeAttr('disabled');
 });
 
 function drawChart(rows) {
+  if (typeof google === 'undefined' || !google.visualization || !google.visualization.DataTable) {
+    console.log('Google Charts API not loaded.');
+    return;
+  }
+
   var data = new google.visualization.DataTable();
 
   data.addColumn('string', 'Emulation mode');
