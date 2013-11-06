@@ -22,7 +22,6 @@
 'use strict';
 
 
-
 /**
  * @param {JSSMS.Z80} cpu
  * @constructor
@@ -83,15 +82,11 @@ var Recompiler = (function() {
       // Attach generated code to an attach point in Z80 instance.
       for (var page = 0; page < this.rom.length; page++) {
         fns[page].forEach(function(fn) {
-          var funcName;
+          var funcName = fn.body[0].id.name;
           if (DEBUG) {
-            funcName = fn.body[0].id.name;
             fn.body[0].id.name = '_' + toHex(funcName);
-            self.cpu.branches[page][funcName] = new Function('return ' + self.generateCodeFromAst(fn))();
-          } else {
-            funcName = fn.comments[0].value;
-            self.cpu.branches[page][funcName] = new Function('page', 'temp', 'location', self.generateCodeFromAst(fn));
           }
+          self.cpu.branches[page][funcName] = new Function('return ' + self.generateCodeFromAst(fn))();
         });
       }
     },
@@ -142,12 +137,9 @@ var Recompiler = (function() {
       // Attach generated code to an attach point in Z80 instance.
       fns[0].forEach(function(fn) {
         if (DEBUG) {
-          var funcName = fn.body[0].id.name;
-          fn.body[0].id.name = '_' + toHex(funcName);
-          self.cpu.branches[romPage][address % 0x4000] = new Function('return ' + self.generateCodeFromAst(fn))();
-        } else {
-          self.cpu.branches[romPage][address % 0x4000] = new Function('page', 'temp', 'location', self.generateCodeFromAst(fn));
+          fn.body[0].id.name = '_' + toHex(fn.body[0].id.name);
         }
+        self.cpu.branches[romPage][address % 0x4000] = new Function('return ' + self.generateCodeFromAst(fn))();
       });
     },
 

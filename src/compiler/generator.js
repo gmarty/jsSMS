@@ -271,53 +271,40 @@ var Generator = (function() {
                 return obj;
               });
 
-              if (DEBUG) {
-                return {
-                  'type': 'Program',
-                  'body': [
-                    {
-                      'type': 'FunctionDeclaration',
-                      'id': {
+            return {
+                'type': 'Program',
+                'body': [
+                  {
+                    'type': 'FunctionDeclaration',
+                    'id': {
+                      'type': 'Identifier',
+                      'name': name // Name of the function
+                    },
+                    'params': [
+                      {
                         'type': 'Identifier',
-                        'name': name // Name of the function
+                        'name': 'page'
                       },
-                      'params': [
-                        {
-                          'type': 'Identifier',
-                          'name': 'page'
-                        },
-                        {
-                          'type': 'Identifier',
-                          'name': 'temp'
-                        },
-                        {
-                          'type': 'Identifier',
-                          'name': 'location'
-                        }
-                      ],
-                      'defaults': [],
-                      'body': {
-                        'type': 'BlockStatement',
-                        'body': body
+                      {
+                        'type': 'Identifier',
+                        'name': 'temp'
                       },
-                      'rest': null,
-                      'generator': false,
-                      'expression': false
-                    }
-                  ]
-                };
-              } else {
-                return {
-                  'type': 'Program',
-                  'body': body,
-                  'comments': [
-                    {
-                      'type': 'Line',
-                      'value': name // Name of the function
-                    }
-                  ]
-                };
-              }
+                      {
+                        'type': 'Identifier',
+                        'name': 'location'
+                      }
+                    ],
+                    'defaults': [],
+                    'body': {
+                      'type': 'BlockStatement',
+                      'body': body
+                    },
+                    'rest': null,
+                    'generator': false,
+                    'expression': false
+                  }
+                ]
+              };
             });
       }
 
