@@ -514,14 +514,14 @@ JSSMS.Z80.prototype = {
       if (!this.branches[this.frameReg[1]][(this.pc - 0x4000)]) {
         this.recompiler.recompileFromAddress(this.pc, this.frameReg[1], 1);
       }
-      this.branches[this.frameReg[1]][(this.pc - 0x4000)].call(this, 1);
+      this.branches[this.frameReg[1]][this.pc - 0x4000].call(this, 1);
 
       return;
     } else if (this.pc < 0xC000) {
       if (!this.branches[this.frameReg[2]][(this.pc - 0x8000)]) {
         this.recompiler.recompileFromAddress(this.pc, this.frameReg[2], 2);
       }
-      this.branches[this.frameReg[2]][(this.pc - 0x8000)].call(this, 2);
+      this.branches[this.frameReg[2]][this.pc - 0x8000].call(this, 2);
 
       return;
     }
@@ -3460,7 +3460,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address Memory address.
        * @param {number} value Value to write.
        */
-      return function(address, value) {
+      return function writeMem(address, value) {
         if (address <= 0xFFFF) {
           this.memWriteMap.setUint8(address & 0x1FFF, value);
           if (address === 0xFFFC) {
@@ -3474,9 +3474,6 @@ JSSMS.Z80.prototype = {
           }
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-          if (DEBUG) {
-            debugger;
-          }
         }
       };
     } else {
@@ -3484,7 +3481,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address Memory address.
        * @param {number} value Value to write.
        */
-      return function(address, value) {
+      return function writeMem(address, value) {
         if (address <= 0xFFFF) {
           this.memWriteMap[address & 0x1FFF] = value;
           if (address === 0xFFFC) {
@@ -3498,9 +3495,6 @@ JSSMS.Z80.prototype = {
           }
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-          if (DEBUG) {
-            debugger;
-          }
         }
       };
     }
@@ -3516,7 +3510,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address Memory address.
        * @param {number} value Value to write.
        */
-      return function(address, value) {
+      return function writeMemWord(address, value) {
         if (address < 0xFFFC) {
           this.memWriteMap.setUint16(address & 0x1FFF, value, LITTLE_ENDIAN);
         } else if (address === 0xFFFC) {
@@ -3530,9 +3524,6 @@ JSSMS.Z80.prototype = {
           this.frameReg[2] = (value >> 8) & this.romPageMask;
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-          if (DEBUG) {
-            debugger;
-          }
         }
       };
     } else {
@@ -3540,7 +3531,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address Memory address.
        * @param {number} value Value to write.
        */
-      return function(address, value) {
+      return function writeMemWord(address, value) {
         if (address < 0xFFFC) {
           address &= 0x1FFF;
           this.memWriteMap[address++] = value & 0xFF;
@@ -3556,9 +3547,6 @@ JSSMS.Z80.prototype = {
           this.frameReg[2] = (value >> 8) & this.romPageMask;
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-          if (DEBUG) {
-            debugger;
-          }
         }
       };
     }
@@ -3574,7 +3562,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address
        * @return {number} Value from memory location.
        */
-      return function(address) {
+      return function readMem(address) {
         if (address < 0x0400) {
           return this.rom[0].getUint8(address);
         } else if (address < 0x4000) {
@@ -3609,9 +3597,6 @@ JSSMS.Z80.prototype = {
           return this.frameReg[2];
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-          if (DEBUG) {
-            debugger;
-          }
         }
         return 0x00;
       };
@@ -3620,7 +3605,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address
        * @return {number} Value from memory location.
        */
-      return function(address) {
+      return function readMem(address) {
         if (address < 0x0400) {
           return this.rom[0][address];
         } else if (address < 0x4000) {
@@ -3655,9 +3640,6 @@ JSSMS.Z80.prototype = {
           return this.frameReg[2];
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-          if (DEBUG) {
-            debugger;
-          }
         }
         return 0x00;
       };
@@ -3674,7 +3656,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address
        * @return {number} Value from memory location.
        */
-      return function(address) {
+      return function readMemWord(address) {
         if (address < 0x0400) {
           return this.rom[0].getUint16(address, LITTLE_ENDIAN);
         } else if (address < 0x4000) {
@@ -3709,9 +3691,6 @@ JSSMS.Z80.prototype = {
           return this.frameReg[2];
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-          if (DEBUG) {
-            debugger;
-          }
         }
         return 0x00;
       };
@@ -3720,7 +3699,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address
        * @return {number} Value from memory location.
        */
-      return function(address) {
+      return function readMemWord(address) {
         if (address < 0x0400) {
           return this.rom[0][address++] | this.rom[0][address] << 8;
         } else if (address < 0x4000) {
@@ -3755,9 +3734,6 @@ JSSMS.Z80.prototype = {
           return this.frameReg[2];
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
-          if (DEBUG) {
-            debugger;
-          }
         }
         return 0x00;
       };
