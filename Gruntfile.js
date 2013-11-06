@@ -171,7 +171,7 @@ module.exports = function(grunt) {
           warning_level: 'VERBOSE',
           output_wrapper: '(function(window,document,navigator){%output%})(window,document,navigator);',
           define: [
-            //'"DEBUG=false"'
+            '"DEBUG=false"'
           ],
           debug: false
         }
