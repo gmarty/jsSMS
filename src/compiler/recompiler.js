@@ -165,7 +165,19 @@ var Recompiler = (function() {
         comment: true,
         renumber: true,
         hexadecimal: true,
-        parse: DEBUG ? window['esprima']['parse'] : null
+        parse: DEBUG ? window['esprima']['parse'] : function(c) {
+          return {'type': 'Program',
+            'body': [
+              {'type': 'ExpressionStatement',
+                'expression': {
+                  'type': 'Literal',
+                  'value': c,
+                  'raw': c
+                }
+              }
+            ]
+          };
+        }
       });
     },
 
