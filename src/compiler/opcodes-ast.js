@@ -932,6 +932,7 @@ var o = {
       // if (test) {
       //   tstates -= 5;
       //   pc = target + (page * 0x4000);
+      //   return;
       // }
       return n.IfStatement(
           test,
@@ -952,6 +953,7 @@ var o = {
       // if (b != 0) {
       //   tstates -= 5;
       //   pc = target;
+      //   return;
       // }
       return [
         n.ExpressionStatement(
@@ -1000,11 +1002,9 @@ var o = {
       return function() {
         // pc = readMemWord(sp);
         // sp += 2;
-        // return;
         return [
           n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), o.READ_MEM16(n.Identifier('sp')))),
-          n.ExpressionStatement(n.AssignmentExpression('+=', n.Identifier('sp'), n.Literal(2))),
-          n.ReturnStatement()
+          n.ExpressionStatement(n.AssignmentExpression('+=', n.Identifier('sp'), n.Literal(2)))
         ];
       };
     } else {
@@ -1031,20 +1031,16 @@ var o = {
     if (operator === undefined && bitMask === undefined) {
       return function(value, target, nextAddress) {
         // pc = readMemWord(target);
-        // return;
         return [
-          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target))),
-          n.ReturnStatement()
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.Literal(target)))
         ];
       };
     }
     if (operator == 'h' && bitMask == 'l') {
       return function(value, target, nextAddress) {
         // pc = getHL();
-        // return;
         return [
-          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.CallExpression('get' + ('h' + 'l').toUpperCase()))),
-          n.ReturnStatement()
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.CallExpression('get' + ('h' + 'l').toUpperCase())))
         ];
       };
     } else {
@@ -1552,8 +1548,7 @@ var o = {
     return function(value, target, nextAddress) {
       // pc = getIXHIXL();
       return [
-        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.CallExpression('get' + (register1 + register2).toUpperCase()))),
-        n.ReturnStatement()
+        n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.CallExpression('get' + (register1 + register2).toUpperCase())))
       ];
     };
   },
