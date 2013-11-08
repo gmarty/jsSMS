@@ -384,7 +384,7 @@ JSSMS.prototype = {
         i, v;
 
     // Game Gear should only work in NTSC
-    if (mode == NTSC || this.is_gg) {
+    if (mode === NTSC || this.is_gg) {
       this.fps = 60;
       this.no_of_scanlines = SMS_Y_PIXELS_NTSC;
       clockSpeedHz = CLOCK_NTSC;
@@ -405,11 +405,11 @@ JSSMS.prototype = {
 
       this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps);
 
-      if (this.audioBuffer.length === 0 || this.audioBuffer.length != this.samplesPerFrame) {
+      if (this.audioBuffer.length === 0 || this.audioBuffer.length !== this.samplesPerFrame) {
         this.audioBuffer = new Array(this.samplesPerFrame);
       }
 
-      if (this.samplesPerLine.length === 0 || this.samplesPerLine.length != this.no_of_scanlines) {
+      if (this.samplesPerLine.length === 0 || this.samplesPerLine.length !== this.no_of_scanlines) {
         this.samplesPerLine = new Array(this.no_of_scanlines);
 
         var fractional = 0;
@@ -484,13 +484,13 @@ JSSMS.prototype = {
    */
   readRomDirectly: function(data, fileName) {
     var pages;
-    var mode = fileName.substr(-3).toLowerCase() == '.gg' ? 2 : 1;
+    var mode = fileName.substr(-3).toLowerCase() === '.gg' ? 2 : 1;
     var size = data.length;
 
     // Toggle SMS / GG emulation mode
-    if (mode == 1) {
+    if (mode === 1) {
       this.setSMS();
-    } else if (mode == 2) {
+    } else if (mode === 2) {
       this.setGG();
     }
 

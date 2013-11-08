@@ -49,7 +49,7 @@ var Generator = (function() {
         return OP_CB_STATES[opcodes[1]];
       case 0xDD:
       case 0xFD:
-        if (opcodes.length == 2) {
+        if (opcodes.length === 2) {
           return OP_DD_STATES[opcodes[1]];
         }
         return OP_INDEX_CB_STATES[opcodes[2]];
@@ -65,7 +65,7 @@ var Generator = (function() {
    */
   function convertRegisters(ast) {
     var convertRegistersFunc = function(node) {
-      if (node.type == 'Register') {
+      if (node.type === 'Register') {
         node.type = 'Identifier';
       }
 
@@ -98,7 +98,6 @@ var Generator = (function() {
                 }
               ];
               var name = fn[0].address;
-              var jumpTargetNb = fn[0].jumpTargetNb;
               var tstates = 0;
 
               fn = fn
@@ -252,7 +251,7 @@ var Generator = (function() {
                 // Inject data about current branch into a comment.
                 fn[0][0].leadingComments = [].concat({
                   type: 'Line',
-                  value: ' Nb of bytecodes jumping here: ' + jumpTargetNb
+                  value: ' Nb of bytecodes jumping here: ' + fn[0].jumpTargetNb
                 }, fn[0][0].leadingComments);*/
 
               // Flatten the array.
@@ -265,13 +264,13 @@ var Generator = (function() {
 
               // Append `this` to all identifiers.
               body = JSSMS.Utils.traverse(body, function(obj) {
-                if (obj.type && obj.type == 'Identifier' && whitelist.indexOf(obj.name) == -1) {
+                if (obj.type && obj.type === 'Identifier' && whitelist.indexOf(obj.name) === -1) {
                   obj.name = 'this.' + obj.name;
                 }
                 return obj;
               });
 
-            return {
+              return {
                 'type': 'Program',
                 'body': [
                   {

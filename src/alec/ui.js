@@ -63,7 +63,7 @@ if (window['$']) {
        * Contains the fullscreen API prefix or false if not supported.
        * @type {string|boolean}
        */
-      var fullscreenSupport = JSSMS.Utils.getPrefix(['fullscreenEnabled', 'mozFullScreenEnabled']);
+      //var fullscreenSupport = JSSMS.Utils.getPrefix(['fullscreenEnabled', 'mozFullScreenEnabled']);
 
       var requestAnimationFramePrefix = JSSMS.Utils.getPrefix(['requestAnimationFrame', 'mozRequestAnimationFrame'], window);
 
@@ -319,7 +319,7 @@ if (window['$']) {
           complete: function(xhr, status) {
             var data;
 
-            if (status == 'error') {
+            if (status === 'error') {
               alert('The selected ROM file could not be loaded.');
               return;
             }
@@ -422,7 +422,7 @@ if (window['$']) {
 
         for (; num < 16 && i <= length; i++) {
           if (instructions[i]) {
-            html += '<div' + (instructions[i].address == currentAddress ? ' class="current"' : '') + '>' + instructions[i].hexAddress +
+            html += '<div' + (instructions[i].address === currentAddress ? ' class="current"' : '') + '>' + instructions[i].hexAddress +
                 (instructions[i].isJumpTarget ? ':' : ' ') +
                 '<code>' + instructions[i].inst + '</code></div>';
 

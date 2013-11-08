@@ -178,7 +178,7 @@ JSSMS.SN76489.prototype = {
       this.freqPolarity[i] = 1;
 
       // Do not use intermediate positions
-      if (i != 3) {
+      if (i !== 3) {
         this.freqPos[i] = NO_ANTIALIAS;
       }
     }
@@ -217,7 +217,7 @@ JSSMS.SN76489.prototype = {
       // TONE REGISTERS
       // If the currently latched register is a tone register then the low 6
       // bits of the byte are placed into the high 6 bits of the latched register.
-      if (this.regLatch === 0 || this.regLatch == 2 || this.regLatch == 4) {
+      if (this.regLatch === 0 || this.regLatch === 2 || this.regLatch === 4) {
         // ddddDDDDDD (10 bits total) - keep lower 4 bits and replace upper 6 bits.
         // ddddDDDDDD gives the 10-bit half-wave counter reset value.
         this.reg[this.regLatch] = (this.reg[this.regLatch] & 0x0F) | ((value & 0x3F) << 4);
@@ -268,7 +268,7 @@ JSSMS.SN76489.prototype = {
     for (; sample < samplesToGenerate; sample++) {
       // Generate Sound from Tone Channels
       for (i = 0; i < 3; i++) {
-        if (this.freqPos[i] != NO_ANTIALIAS) {
+        if (this.freqPos[i] !== NO_ANTIALIAS) {
           this.outputChannel[i] = (PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPos[i]) >> SCALE;
         } else {
           this.outputChannel[i] = PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPolarity[i];
@@ -309,7 +309,7 @@ JSSMS.SN76489.prototype = {
       this.freqCounter[2] -= clockCycles;
 
       // Decrement Noise Counter OR Match to Tone 2
-      if (this.noiseFreq == 0x80) {
+      if (this.noiseFreq === 0x80) {
         this.freqCounter[3] = this.freqCounter[2];
       } else {
         this.freqCounter[3] -= clockCycles;
@@ -357,12 +357,12 @@ JSSMS.SN76489.prototype = {
         this.freqPolarity[3] = -this.freqPolarity[3];
 
         // Not matching Tone 2 Value, so reload counter
-        if (this.noiseFreq != 0x80) {
+        if (this.noiseFreq !== 0x80) {
           this.freqCounter[3] += this.noiseFreq * (clockCycles / this.noiseFreq + 1);
         }
 
         // Positive Amplitude i.e. We only want to do this once per cycle
-        if (this.freqPolarity[3] == 1) {
+        if (this.freqPolarity[3] === 1) {
           var feedback = 0;
 
           // White Noise Selected

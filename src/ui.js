@@ -54,7 +54,7 @@ if (window['$']) {
       this.main = sms;
 
       // Exit if ran from Opera Mini.
-      if (Object.prototype.toString.call(window['operamini']) == '[object OperaMini]') {
+      if (Object.prototype.toString.call(window['operamini']) === '[object OperaMini]') {
         $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser can\'t run this emulator. Try the latest version of Firefox, Google Chrome, Opera or Safari!</div>');
         return;
       }
@@ -363,7 +363,7 @@ if (window['$']) {
           complete: function(xhr, status) {
             var data;
 
-            if (status == 'error') {
+            if (status === 'error') {
               self.updateStatus('The selected ROM file could not be loaded.');
               return;
             }
@@ -470,7 +470,7 @@ if (window['$']) {
 
         for (; num < 16 && i <= length; i++) {
           if (instructions[i]) {
-            html += '<div' + (instructions[i].address == currentAddress ? ' class="current"' : '') + '>' + instructions[i].hexAddress +
+            html += '<div' + (instructions[i].address === currentAddress ? ' class="current"' : '') + '>' + instructions[i].hexAddress +
                 (instructions[i].isJumpTarget ? ':' : ' ') +
                 '<code>' + instructions[i].inst + '</code></div>';
 

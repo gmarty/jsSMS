@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global F_CARRY , F_NEGATIVE, F_PARITY, F_BIT3, F_HALFCARRY, F_ZERO */
+/* global F_CARRY, F_NEGATIVE, F_PARITY, F_BIT3, F_HALFCARRY, F_ZERO */
 
 'use strict';
 
@@ -88,7 +88,7 @@ var n = {
     };
   },
   Literal: function(value) {
-    if (typeof value == 'number') {
+    if (typeof value === 'number') {
       return {
         'type': 'Literal',
         'value': value,
@@ -186,7 +186,7 @@ var n = {
 var o = {
   // Helper function for setting 2 registers at the same time.
   SET16: function(register1, register2, value) {
-    if (value.type == 'Literal') {
+    if (value.type === 'Literal') {
       // The optimizer can evaluate the expression:
       // h = 0x0903 >> 0x08;
       // l = 0x0903 & 0xFF;
@@ -240,7 +240,7 @@ var o = {
         );
       };
     }
-    if (dstRegister1 == 'i' && dstRegister2 === undefined) {
+    if (dstRegister1 === 'i' && dstRegister2 === undefined) {
       // a = i;
       // f = (f & F_CARRY) | SZ_TABLE[a] | (iff2 ? F_PARITY : 0);
       return function() {
@@ -260,7 +260,7 @@ var o = {
         ];
       };
     }
-    if (dstRegister1 == 'r' && dstRegister2 === undefined) {
+    if (dstRegister1 === 'r' && dstRegister2 === undefined) {
       // a = REFRESH_EMULATION ? r : JSSMS.Utils.rndInt(255);
       // f = (f & F_CARRY) | SZ_TABLE[a] | (iff2 ? F_PARITY : 0);
       return function() {
@@ -288,7 +288,7 @@ var o = {
         );
       };
     }
-    if (dstRegister1 == 'n' && dstRegister2 == 'n') {
+    if (dstRegister1 === 'n' && dstRegister2 === 'n') {
       // Direct address value assignment (ex: `LD A,(nn)`).
       return function(value) {
         return n.ExpressionStatement(
@@ -325,7 +325,7 @@ var o = {
         return o.SET16(srcRegister1, srcRegister2, n.Literal(value));
       };
     }
-    if (dstRegister1 == 'n' && dstRegister2 == 'n') {
+    if (dstRegister1 === 'n' && dstRegister2 === 'n') {
       // Direct address value assignment (ex: `LD HL,(nn)`).
       return function(value) {
         return o.SET16(srcRegister1, srcRegister2, o.READ_MEM16(n.Literal(value)));
@@ -342,7 +342,7 @@ var o = {
         );
       };
     }
-    if (srcRegister1 == 'n' && srcRegister2 == 'n' && dstRegister2 === undefined) {
+    if (srcRegister1 === 'n' && srcRegister2 === 'n' && dstRegister2 === undefined) {
       // Direct address assignment (ex: `LD (nn),A`).
       return function(value) {
         return n.ExpressionStatement(
@@ -350,7 +350,7 @@ var o = {
         );
       };
     }
-    if (srcRegister1 == 'n' && srcRegister2 == 'n') {
+    if (srcRegister1 === 'n' && srcRegister2 === 'n') {
       // Direct address assignment (ex: `LD (nn),HL`).
       return function(value) {
         return [
@@ -429,7 +429,7 @@ var o = {
         );
       };
     }
-    if (register1 == 's' && register2 == 'p') {
+    if (register1 === 's' && register2 === 'p') {
       return function() {
         // sp = sp + 1;
         return n.ExpressionStatement(
@@ -448,7 +448,7 @@ var o = {
   INC16: function(register1, register2) {
     return function() {
       // c = (c + 1) & 0xFF;
-      // if (c == 0) {
+      // if (c === 0) {
       //   b = (b + 1) & 0xFF;
       // }
       return [
@@ -456,7 +456,7 @@ var o = {
             n.AssignmentExpression('=', n.Register(register2), n.BinaryExpression('&', n.BinaryExpression('+', n.Register(register2), n.Literal(1)), n.Literal(0xFF)))
         ),
         n.IfStatement(
-            n.BinaryExpression('==', n.Register(register2), n.Literal(0)),
+            n.BinaryExpression('===', n.Register(register2), n.Literal(0)),
             n.BlockStatement([
               n.ExpressionStatement(
                 n.AssignmentExpression('=', n.Register(register1), n.BinaryExpression('&', n.BinaryExpression('+', n.Register(register1), n.Literal(1)), n.Literal(0xFF)))
@@ -475,7 +475,7 @@ var o = {
         );
       };
     }
-    if (register1 == 's' && register2 == 'p') {
+    if (register1 === 's' && register2 === 'p') {
       return function() {
         // sp = sp - 1;
         return n.ExpressionStatement(
@@ -494,7 +494,7 @@ var o = {
   DEC16: function(register1, register2) {
     return function() {
       // c = (c - 1) & 0xFF;
-      // if (c == 255) {
+      // if (c === 255) {
       //   b = (b - 1) & 0xFF;
       // }
       return [
@@ -502,7 +502,7 @@ var o = {
             n.AssignmentExpression('=', n.Register(register2), n.BinaryExpression('&', n.BinaryExpression('-', n.Register(register2), n.Literal(1)), n.Literal(0xFF)))
         ),
         n.IfStatement(
-            n.BinaryExpression('==', n.Register(register2), n.Literal(255)),
+            n.BinaryExpression('===', n.Register(register2), n.Literal(255)),
             n.BlockStatement([
               n.ExpressionStatement(
                 n.AssignmentExpression('=', n.Register(register1), n.BinaryExpression('&', n.BinaryExpression('-', n.Register(register1), n.Literal(1)), n.Literal(0xFF)))
@@ -711,7 +711,7 @@ var o = {
         ];
       };
     }
-    if (register1 != 'a' && register2 === undefined) {
+    if (register1 !== 'a' && register2 === undefined) {
       return function() {
         // a &= b;
         // f = SZP_TABLE[a] | F_HALFCARRY;
@@ -729,7 +729,7 @@ var o = {
         ];
       };
     }
-    if (register1 == 'a' && register2 === undefined) {
+    if (register1 === 'a' && register2 === undefined) {
       return function() {
         // f = SZP_TABLE[a] | F_HALFCARRY;
         return n.ExpressionStatement(
@@ -776,7 +776,7 @@ var o = {
         ];
       };
     }
-    if (register1 != 'a' && register2 === undefined) {
+    if (register1 !== 'a' && register2 === undefined) {
       return function() {
         // a ^= b;
         // f = SZP_TABLE[a];
@@ -792,7 +792,7 @@ var o = {
         ];
       };
     }
-    if (register1 == 'a' && register2 === undefined) {
+    if (register1 === 'a' && register2 === undefined) {
       return function() {
         // a = 0;
         // f = SZP_TABLE[0];
@@ -841,7 +841,7 @@ var o = {
         ];
       };
     }
-    if (register1 != 'a' && register2 === undefined) {
+    if (register1 !== 'a' && register2 === undefined) {
       return function() {
         // a |= b;
         // f = SZP_TABLE[a];
@@ -857,7 +857,7 @@ var o = {
         ];
       };
     }
-    if (register1 == 'a' && register2 === undefined) {
+    if (register1 === 'a' && register2 === undefined) {
       return function() {
         // f = SZP_TABLE[a];
         return n.ExpressionStatement(
@@ -950,7 +950,7 @@ var o = {
   DJNZ: function() {
     return function(value, target) {
       // b = (b - 1) & 0xFF;
-      // if (b != 0) {
+      // if (b !== 0) {
       //   tstates -= 5;
       //   pc = target;
       //   return;
@@ -959,40 +959,40 @@ var o = {
         n.ExpressionStatement(
             n.AssignmentExpression('=', n.Register('b'), n.BinaryExpression('&', n.BinaryExpression('-', n.Register('b'), n.Literal(1)), n.Literal(0xFF)))
         ),
-        o.JR(n.BinaryExpression('!=', n.Register('b'), n.Literal(0)))(undefined, target)
+        o.JR(n.BinaryExpression('!==', n.Register('b'), n.Literal(0)))(undefined, target)
       ];
     };
   },
   JRNZ: function() {
     return function(value, target) {
-      // jr(!((f & F_ZERO) != 0));
+      // jr(!((f & F_ZERO) !== 0));
       return o.JR(n.UnaryExpression('!',
-          n.BinaryExpression('!=',
+          n.BinaryExpression('!==',
           n.BinaryExpression('&', n.Register('f'), n.Literal(F_ZERO)),
           n.Literal(0))))(undefined, target);
     };
   },
   JRZ: function() {
     return function(value, target) {
-      // jr((f & F_ZERO) != 0);
-      return o.JR(n.BinaryExpression('!=',
+      // jr((f & F_ZERO) !== 0);
+      return o.JR(n.BinaryExpression('!==',
           n.BinaryExpression('&', n.Register('f'), n.Literal(F_ZERO)),
           n.Literal(0)))(undefined, target);
     };
   },
   JRNC: function() {
     return function(value, target) {
-      // jr(!((f & F_CARRY) != 0));
+      // jr(!((f & F_CARRY) !== 0));
       return o.JR(n.UnaryExpression('!',
-          n.BinaryExpression('!=',
+          n.BinaryExpression('!==',
           n.BinaryExpression('&', n.Register('f'), n.Literal(F_CARRY)),
           n.Literal(0))))(undefined, target);
     };
   },
   JRC: function() {
     return function(value, target) {
-      // jr((f & F_CARRY) != 0);
-      return o.JR(n.BinaryExpression('!=',
+      // jr((f & F_CARRY) !== 0);
+      return o.JR(n.BinaryExpression('!==',
           n.BinaryExpression('&', n.Register('f'), n.Literal(F_CARRY)),
           n.Literal(0)))(undefined, target);
     };
@@ -1009,7 +1009,7 @@ var o = {
       };
     } else {
       return function(value, target, nextAddress) {
-        // if ((f & F_ZERO) == 0) {
+        // if ((f & F_ZERO) === 0) {
         //   tstates -= 6;
         //   pc = readMemWord(sp);
         //   sp += 2;
@@ -1036,7 +1036,7 @@ var o = {
         ];
       };
     }
-    if (operator == 'h' && bitMask == 'l') {
+    if (operator === 'h' && bitMask === 'l') {
       return function(value, target, nextAddress) {
         // pc = getHL();
         return [
@@ -1045,7 +1045,7 @@ var o = {
       };
     } else {
       return function(value, target) {
-        // if ((f & F_SIGN) != 0) {
+        // if ((f & F_SIGN) !== 0) {
         //   pc = target;
         //   return;
         // }
@@ -1080,7 +1080,7 @@ var o = {
       };
     } else {
       return function(value, target, nextAddress) {
-        // if ((f & F_ZERO) == 0) {
+        // if ((f & F_ZERO) === 0) {
         //   push(nextAddress + (page * 0x4000));
         //   tstates -= 7;
         //   pc = target;
@@ -1280,7 +1280,7 @@ var o = {
             n.CallExpression('bit', n.BinaryExpression('&', n.Register(register1), n.Bit(bit)))
         );
       };
-    } else if (register1 == 'h' && register2 == 'l') {
+    } else if (register1 === 'h' && register2 === 'l') {
       return function() {
         // bit(readMem(getHL()) & BIT_0);
         return n.ExpressionStatement(
@@ -1312,7 +1312,7 @@ var o = {
             n.AssignmentExpression('&=', n.Register(register1), n.UnaryExpression('~', n.Bit(bit)))
         );
       };
-    } else if (register1 == 'h' && register2 == 'l') {
+    } else if (register1 === 'h' && register2 === 'l') {
       return function() {
         // writeMem(getHL(), readMem(getHL()) & ~BIT_0);
         return n.ExpressionStatement(
@@ -1352,7 +1352,7 @@ var o = {
             n.AssignmentExpression('|=', n.Register(register1), n.Bit(bit))
         );
       };
-    } else if (register1 == 'h' && register2 == 'l') {
+    } else if (register1 === 'h' && register2 === 'l') {
       return function() {
         // writeMem(getHL(), readMem(getHL()) | BIT_0);
         return n.ExpressionStatement(
@@ -1567,7 +1567,7 @@ var o = {
       // var value = getBC();
       // var val = (h << 8) | l;
       // temp = val + value + (f & F_CARRY);
-      // f = (((val ^ temp ^ value) >> 8) & 0x10) | ((temp >> 16) & 1) | ((temp >> 8) & 0x80) | (((temp & 0xFFFF) != 0) ? 0 : 0x40) | (((value ^ val ^ 0x8000) & (value ^ temp) & 0x8000) >> 13);
+      // f = (((val ^ temp ^ value) >> 8) & 0x10) | ((temp >> 16) & 1) | ((temp >> 8) & 0x80) | (((temp & 0xFFFF) !== 0) ? 0 : 0x40) | (((value ^ val ^ 0x8000) & (value ^ temp) & 0x8000) >> 13);
       // h = (temp >> 8) & 0xFF;
       // l = temp & 0xFF;
       return [
@@ -1606,7 +1606,7 @@ var o = {
                   )
                 ),
                 n.ConditionalExpression(
-                  n.BinaryExpression('!=',
+                  n.BinaryExpression('!==',
                     n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0xFFFF)),
                     n.Literal(0x00)
                   ),
@@ -1660,7 +1660,7 @@ var o = {
       // var value = getBC();
       // var val = (h << 8) | l;
       // temp = val - value - (f & F_CARRY);
-      // f = (((val ^ temp ^ value) >> 8) & 0x10) | ((temp >> 16) & 1) | ((temp >> 8) & 0x80) | (((temp & 0xFFFF) != 0) ? 0 : 0x40) | (((value ^ val ^ 0x8000) & (value ^ temp) & 0x8000) >> 13);
+      // f = (((val ^ temp ^ value) >> 8) & 0x10) | ((temp >> 16) & 1) | ((temp >> 8) & 0x80) | (((temp & 0xFFFF) !== 0) ? 0 : 0x40) | (((value ^ val ^ 0x8000) & (value ^ temp) & 0x8000) >> 13);
       // h = (temp >> 8) & 0xFF;
       // l = temp & 0xFF;
       return [
@@ -1702,7 +1702,7 @@ var o = {
                   )
                 ),
                 n.ConditionalExpression(
-                  n.BinaryExpression('!=',
+                  n.BinaryExpression('!==',
                     n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0xFFFF)),
                     n.Literal(0x00)
                   ),
@@ -1777,7 +1777,7 @@ var o = {
       // writeMem(getHL(), temp);
       // b = dec8(b);
       // incHL();
-      // if ((temp & 0x80) == 0x80) {
+      // if ((temp & 0x80) === 0x80) {
       //   f |= F_NEGATIVE;
       // } else {
       //   f &= ~ F_NEGATIVE;
@@ -1790,7 +1790,7 @@ var o = {
         o.DEC8('b')(),
         n.ExpressionStatement(n.CallExpression('incHL')),
         n.IfStatement(
-            n.BinaryExpression('==', n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0x80)), n.Literal(0x80)),
+            n.BinaryExpression('===', n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0x80)), n.Literal(0x80)),
             n.BlockStatement(
             n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Literal(F_NEGATIVE)))
             ),
@@ -1814,7 +1814,7 @@ var o = {
       //   f &= ~ F_CARRY;
       //   f &= ~ F_HALFCARRY;
       // }
-      // if ((temp & 0x80) == 0x80) {
+      // if ((temp & 0x80) === 0x80) {
       //   f |= F_NEGATIVE;
       // } else {
       //   f &= ~ F_NEGATIVE;
@@ -1837,7 +1837,7 @@ var o = {
             ])
         ),
         n.IfStatement(
-            n.BinaryExpression('==', n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0x80)), n.Literal(0x80)),
+            n.BinaryExpression('===', n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0x80)), n.Literal(0x80)),
             n.BlockStatement(
             n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Literal(F_NEGATIVE)))
             ),
@@ -1861,7 +1861,7 @@ var o = {
       //   f &= ~ F_CARRY;
       //   f &= ~ F_HALFCARRY;
       // }
-      // if ((temp & 0x80) == 0x80) {
+      // if ((temp & 0x80) === 0x80) {
       //   f |= F_NEGATIVE;
       // } else {
       //   f &= ~ F_NEGATIVE;
@@ -1884,7 +1884,7 @@ var o = {
             ])
         ),
         n.IfStatement(
-            n.BinaryExpression('==', n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0x80)), n.Literal(0x80)),
+            n.BinaryExpression('===', n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0x80)), n.Literal(0x80)),
             n.BlockStatement(
             n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Literal(F_NEGATIVE)))
             ),
@@ -1937,7 +1937,7 @@ var o = {
       // cp_a(readMem(getHL())); // sets some flags
       // decBC();
       // incHL();
-      // temp |= (getBC() == 0 ? 0 : F_PARITY);
+      // temp |= (getBC() === 0 ? 0 : F_PARITY);
       // f = (f & 0xF8) | temp;
       return [
         n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'),
@@ -1954,7 +1954,7 @@ var o = {
         n.ExpressionStatement(n.CallExpression('decBC')),
         n.ExpressionStatement(n.CallExpression('incHL')),
         n.ExpressionStatement(n.AssignmentExpression('|=', n.Identifier('temp'), n.ConditionalExpression(
-            n.BinaryExpression('==', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0)),
+            n.BinaryExpression('===', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0)),
             n.Literal(0),
             n.Literal(F_PARITY)
             ))),
@@ -2010,7 +2010,7 @@ var o = {
       // incHL();
       // temp = (temp + a) & 0xFF;
       // f = (f & 0xC1) | (getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);
-      // if (getBC() != 0) {
+      // if (getBC() !== 0) {
       //   tstates -= 5;
       //   return;
       // }
@@ -2039,7 +2039,7 @@ var o = {
               n.Literal(0))
             ))),
         n.IfStatement(
-            n.BinaryExpression('!=', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0)),
+            n.BinaryExpression('!==', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0)),
             n.BlockStatement([
               n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
               n.ReturnStatement()
@@ -2054,9 +2054,9 @@ var o = {
       // cp_a(readMem(getHL())); // sets zero flag for us
       // decBC();
       // incHL();
-      // temp |= (getBC() == 0 ? 0 : F_PARITY);
-      // Repeat instruction until a = (hl) or bc == 0
-      // if ((temp & F_PARITY) != 0 && (f & F_ZERO) == 0) {
+      // temp |= (getBC() === 0 ? 0 : F_PARITY);
+      // Repeat instruction until a = (hl) or bc === 0
+      // if ((temp & F_PARITY) !== 0 && (f & F_ZERO) === 0) {
       //   tstates -= 5;
       //   f = (f & 0xF8) | temp;
       //   return;
@@ -2077,14 +2077,14 @@ var o = {
         n.ExpressionStatement(n.CallExpression('decBC')),
         n.ExpressionStatement(n.CallExpression('incHL')),
         n.ExpressionStatement(n.AssignmentExpression('|=', n.Identifier('temp'), n.ConditionalExpression(
-            n.BinaryExpression('==', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0)),
+            n.BinaryExpression('===', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0)),
             n.Literal(0),
             n.Literal(F_PARITY)
             ))),
         n.IfStatement(
             n.LogicalExpression('&&',
-            n.BinaryExpression('!=', n.BinaryExpression('&', n.Identifier('temp'), n.Literal(F_PARITY)), n.Literal(0)),
-            n.BinaryExpression('==', n.BinaryExpression('&', n.Register('f'), n.Literal(F_ZERO)), n.Literal(0))
+            n.BinaryExpression('!==', n.BinaryExpression('&', n.Identifier('temp'), n.Literal(F_PARITY)), n.Literal(0)),
+            n.BinaryExpression('===', n.BinaryExpression('&', n.Register('f'), n.Literal(F_ZERO)), n.Literal(0))
             ),
             n.BlockStatement([
               n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
@@ -2115,12 +2115,12 @@ var o = {
       //   f &= ~ F_CARRY;
       //   f &= ~ F_HALFCARRY;
       // }
-      // if ((temp & 0x80) != 0) {
+      // if ((temp & 0x80) !== 0) {
       //   f |= F_NEGATIVE;
       // } else {
       //   f &= ~ F_NEGATIVE;
       // }
-      // if (b != 0) {
+      // if (b !== 0) {
       //   tstates -= 5;
       //   return;
       // }
@@ -2141,7 +2141,7 @@ var o = {
             ])
         ),
         n.IfStatement(
-            n.BinaryExpression('!=', n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0x80)), n.Literal(0)),
+            n.BinaryExpression('!==', n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0x80)), n.Literal(0)),
             n.BlockStatement(
             n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Literal(F_NEGATIVE)))
             ),
@@ -2150,7 +2150,7 @@ var o = {
             )
         ),
         n.IfStatement(
-            n.BinaryExpression('!=', n.Register('b'), n.Literal(0)),
+            n.BinaryExpression('!==', n.Register('b'), n.Literal(0)),
             n.BlockStatement([
               n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
               n.ReturnStatement()
@@ -2168,7 +2168,7 @@ var o = {
       // decHL();
       // temp = (temp + a) & 0xFF;
       // f = (f & 0xC1) | (getBC() ? F_PARITY : 0) | (temp & F_BIT3) | ((temp & F_NEGATIVE) ? 0x20 : 0);
-      // if (getBC() != 0) {
+      // if (getBC() !== 0) {
       //   tstates -= 5;
       //   return;
       // }
@@ -2197,7 +2197,7 @@ var o = {
               n.Literal(0))
             ))),
         n.IfStatement(
-            n.BinaryExpression('!=', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0)),
+            n.BinaryExpression('!==', n.CallExpression('get' + ('b' + 'c').toUpperCase()), n.Literal(0)),
             n.BlockStatement([
               n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
               n.ReturnStatement()

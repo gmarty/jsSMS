@@ -82,9 +82,9 @@ var Optimizer = (function() {
         }
 
         bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
-          if (ast.type == 'BinaryExpression' &&
-              ast.left.type == 'Literal' &&
-              ast.right.type == 'Literal') {
+          if (ast.type === 'BinaryExpression' &&
+              ast.left.type === 'Literal' &&
+              ast.right.type === 'Literal') {
             var value = 0;
             switch (ast.operator) {
               case '>>':
@@ -171,68 +171,68 @@ var Optimizer = (function() {
 
         bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
           // 1st, we tag defined registers.
-          if (ast.type == 'AssignmentExpression' &&
-              ast.operator == '=' &&
-              ast.left.type == 'Register' &&
-              ast.right.type == 'Literal' &&
-              ast.left.name != 'a' &&
-              ast.left.name != 'f') {
+          if (ast.type === 'AssignmentExpression' &&
+              ast.operator === '=' &&
+              ast.left.type === 'Register' &&
+              ast.right.type === 'Literal' &&
+              ast.left.name !== 'a' &&
+              ast.left.name !== 'f') {
             definedReg[ast.left.name] = true;
             definedRegValue[ast.left.name] = ast.right;
           }
 
           // And we make sure to tag undefined registers.
-          if (ast.type == 'AssignmentExpression' &&
-              ast.left.type == 'Register' &&
-              ast.right.type != 'Literal' &&
-              ast.left.name != 'a' &&
-              ast.left.name != 'f') {
+          if (ast.type === 'AssignmentExpression' &&
+              ast.left.type === 'Register' &&
+              ast.right.type !== 'Literal' &&
+              ast.left.name !== 'a' &&
+              ast.left.name !== 'f') {
             definedReg[ast.left.name] = false;
             definedRegValue[ast.left.name] = {};
             return ast;
           }
 
           // Then inline arguments.
-          if (ast.type == 'CallExpression') {
+          if (ast.type === 'CallExpression') {
             if (ast['arguments'][0] &&
-                ast['arguments'][0].type == 'Register' &&
+                ast['arguments'][0].type === 'Register' &&
                 definedReg[ast['arguments'][0].name] &&
-                ast['arguments'][0].name != 'a' &&
-                ast['arguments'][0].name != 'f') {
+                ast['arguments'][0].name !== 'a' &&
+                ast['arguments'][0].name !== 'f') {
               ast['arguments'][0] = definedRegValue[ast['arguments'][0].name];
             }
             if (ast['arguments'][1] &&
-                ast['arguments'][1].type == 'Register' &&
+                ast['arguments'][1].type === 'Register' &&
                 definedReg[ast['arguments'][1].name] &&
-                ast['arguments'][1].name != 'a' &&
-                ast['arguments'][1].name != 'f') {
+                ast['arguments'][1].name !== 'a' &&
+                ast['arguments'][1].name !== 'f') {
               ast['arguments'][1] = definedRegValue[ast['arguments'][1].name];
             }
             return ast;
           }
 
           // Inline object/array properties.
-          if (ast.type == 'MemberExpression' &&
-              ast.property.type == 'Register' &&
+          if (ast.type === 'MemberExpression' &&
+              ast.property.type === 'Register' &&
               definedReg[ast.property.name] &&
-              ast.property.name != 'a' &&
-              ast.property.name != 'f') {
+              ast.property.name !== 'a' &&
+              ast.property.name !== 'f') {
             ast.property = definedRegValue[ast.property.name];
             return ast;
           }
 
           // Inline binary expressions.
-          if (ast.type == 'BinaryExpression') {
-            if (ast.right.type == 'Register' &&
+          if (ast.type === 'BinaryExpression') {
+            if (ast.right.type === 'Register' &&
                 definedReg[ast.right.name] &&
-                ast.right.name != 'a' &&
-                ast.right.name != 'f') {
+                ast.right.name !== 'a' &&
+                ast.right.name !== 'f') {
               ast.right = definedRegValue[ast.right.name];
             }
-            if (ast.left.type == 'Register' &&
+            if (ast.left.type === 'Register' &&
                 definedReg[ast.left.name] &&
-                ast.left.name != 'a' &&
-                ast.left.name != 'f') {
+                ast.left.name !== 'a' &&
+                ast.left.name !== 'f') {
               ast.left = definedRegValue[ast.left.name];
             }
             return ast;

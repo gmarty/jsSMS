@@ -62,7 +62,7 @@ function BinaryRequest(method, url, args, data, cb) {
     console.error('responseType arrayBuffer not supported!');
   }
   xhr.onreadystatechange = function onreadystatechange() {
-    if (xhr.readyState == 4) {
+    if (xhr.readyState === 4) {
       invokeAlways();
     }
   };
@@ -77,7 +77,7 @@ function BinaryRequest(method, url, args, data, cb) {
 
   this.always = function(cb) {
     // If the request has already completed then ensure the callback is called.
-    if (xhr.readyState == 4) {
+    if (xhr.readyState === 4) {
       cb();
     }
     alwaysCallbacks.push(cb);
@@ -259,11 +259,11 @@ SyncReader.prototype = {
 
     var toHex = JSSMS.Utils.toHex;
     var writtenVal = this.pop();
-    if (val == writtenVal) {
+    if (val === writtenVal) {
       console.log(name, toHex(val), toHex(writtenVal));
     } else {
       console.log('%c' + name, 'color: red;', toHex(val), toHex(writtenVal));
-      if (name == 'pc') {
+      if (name === 'pc') {
         debugger;
         // Flag that we're out of sync so that we don't keep spamming errors.
         //this.oos = true;

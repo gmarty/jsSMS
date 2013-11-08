@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global o */
+
 'use strict';
 
 var opcodeTableCB = [];
@@ -41,7 +43,7 @@ var regs = {
       ast: o[op].apply(null, regs[reg])
     });
     // @todo Refactor and clean this section.
-    if (reg != '(HL)') {
+    if (reg !== '(HL)') {
       opcodeTableDDCB.push({
         name: 'LD ' + reg + ',' + op + ' (IX)',
         ast: o['LD_' + op].apply(null, ['ixH', 'ixL'].concat(regs[reg]))

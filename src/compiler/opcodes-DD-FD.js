@@ -268,7 +268,7 @@ function generateIndexTable(index) {
       ast: o.CP_X(registerH, registerL)
     },
     0xCB:
-        index == 'IX' ? opcodeTableDDCB : opcodeTableFDCB,
+        index === 'IX' ? opcodeTableDDCB : opcodeTableFDCB,
     0xE1: {
       name: 'POP ' + index,
       ast: o.POP(registerH, registerL)

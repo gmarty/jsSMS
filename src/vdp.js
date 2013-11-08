@@ -364,7 +364,7 @@ JSSMS.Vdp.prototype = {
    * @return {number} VCounter Value.
    */
   getVCount: function() {
-    if (this.videoMode == NTSC) {
+    if (this.videoMode === NTSC) {
       if (this.line > 0xDA) {
         return this.line - 0x06; // Values from 00 to DA, then jump to D5-FF
       }
@@ -420,7 +420,7 @@ JSSMS.Vdp.prototype = {
       // Read value from VRAM
       if (this.operation === 0) {
         this.readBuffer = this.VRAM[(this.location++) & 0x3FFF] & 0xFF;
-      } else if (this.operation == 2) {
+      } else if (this.operation === 2) {
         // Set VDP Register
         var reg = (value & 0x0F);
 
@@ -445,7 +445,7 @@ JSSMS.Vdp.prototype = {
 
             // By writing here we've updated the height of the sprites and need to update
             // the sprites on each line
-            if ((this.commandByte & 3) != (this.vdpreg[reg] & 3)) {
+            if ((this.commandByte & 3) !== (this.vdpreg[reg] & 3)) {
               this.isSatDirty = true;
             }
             break;
@@ -462,7 +462,7 @@ JSSMS.Vdp.prototype = {
             // Address of Sprite Attribute Table in RAM
             this.sat = (this.commandByte & ~0x01 & ~0x80) << 7;
 
-            if (old != this.sat) {
+            if (old !== this.sat) {
               // Should also probably update tiles here?
               this.isSatDirty = true;
               //JSSMS.Utils.console.log('New address written to SAT: ' + old + ' -> ' + this.sat);
@@ -509,7 +509,7 @@ JSSMS.Vdp.prototype = {
       case 0x02:
         var address = this.location & 0x3FFF;
         // Check VRAM value has actually changed
-        if (value != (this.VRAM[address] & 0xFF)) {
+        if (value !== (this.VRAM[address] & 0xFF)) {
           //if (address >= bgt && address < bgt + BGT_LENGTH); // Don't write dirty to BGT
           if (address >= this.sat && address < this.sat + 64) {
             // Don't write dirty to SAT
@@ -578,7 +578,7 @@ JSSMS.Vdp.prototype = {
       //
       // e.g. Chicago Syndicate on GG
 
-      if (!ACCURATE_INTERRUPT_EMULATION && lineno == 192) {
+      if (!ACCURATE_INTERRUPT_EMULATION && lineno === 192) {
         this.status |= STATUS_VINT;
       }
 
@@ -607,7 +607,7 @@ JSSMS.Vdp.prototype = {
       }
 
       // Update the VSCROLL latch for the next active display period
-      if (ACCURATE && lineno == this.main.no_of_scanlines - 1) {
+      if (ACCURATE && lineno === this.main.no_of_scanlines - 1) {
         this.vScrollLatch = this.vdpreg[9];
       }
     }
@@ -646,7 +646,7 @@ JSSMS.Vdp.prototype = {
     // Check Screen is switched on
     if ((this.vdpreg[1] & 0x40) !== 0) {
       // Draw Background Layer
-      if (this.maxDirty != -1) {
+      if (this.maxDirty !== -1) {
         this.decodeTiles();
       }
 
@@ -768,7 +768,7 @@ JSSMS.Vdp.prototype = {
       tile_column++;
 
       // Rightmost 8 columns Not Affected by Vertical Scrolling
-      if (lock !== 0 && tx == 23) {
+      if (lock !== 0 && tx === 23) {
         tile_row = lineno >> 3;
         tile_y = (lineno & 7) << 3;
       }
@@ -1027,7 +1027,7 @@ JSSMS.Vdp.prototype = {
     var height = (this.vdpreg[1] & 0x02) === 0 ? 8 : 16;
 
     // Enable Zoomed Sprites
-    if ((this.vdpreg[1] & 0x01) == 0x01) {
+    if ((this.vdpreg[1] & 0x01) === 0x01) {
       height <<= 1;
     }
 
@@ -1036,8 +1036,8 @@ JSSMS.Vdp.prototype = {
       // Sprite Y Position
       var y = this.VRAM[this.sat + spriteno] & 0xFF;
 
-      // VDP stops drawing if y == 208
-      if (y == 208) {
+      // VDP stops drawing if y === 208
+      if (y === 208) {
         return;
       }
 

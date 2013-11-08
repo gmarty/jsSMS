@@ -315,14 +315,14 @@ JSSMS.Ports.prototype = {
       this.setTH(PORT_A, false);
 
       // TH has been toggled, update with lightgun position
-      if (oldTH != this.getTH(PORT_A)) {
+      if (oldTH !== this.getTH(PORT_A)) {
         this.hCounter = 20 + (this.keyboard.lightgunX >> 1);
       }
     } else {
       this.setTH(PORT_A, true);
 
       // TH has been toggled, update with usual HCounter value
-      if (oldTH != this.getTH(PORT_A)) {
+      if (oldTH !== this.getTH(PORT_A)) {
         this.hCounter = hc;
       }
     }
