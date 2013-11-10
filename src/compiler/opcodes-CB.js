@@ -36,52 +36,75 @@ var regs = {
   'A': ['a']
 };
 
-['RLC', 'RRC', 'RL', 'RR', 'SLA', 'SRA', 'SLL', 'SRL'].forEach(function(op) {
-  for (var reg in regs) {
+var opcodesList = {
+  RLC: 'RLC',
+  RRC: 'RRC',
+  RL: 'RL',
+  RR: 'RR',
+  SLA: 'SLA',
+  SRA: 'SRA',
+  SLL: 'SLL',
+  SRL: 'SRL'
+};
+
+var op = '';
+var reg = '';
+
+for (op in opcodesList) {
+  for (reg in regs) {
     opcodeTableCB.push({
-      name: op + ' ' + reg,
+      name: opcodesList[op] + ' ' + reg,
       ast: o[op].apply(null, regs[reg])
     });
     // @todo Refactor and clean this section.
     if (reg !== '(HL)') {
       opcodeTableDDCB.push({
-        name: 'LD ' + reg + ',' + op + ' (IX)',
-        ast: o['LD_' + op].apply(null, ['ixH', 'ixL'].concat(regs[reg]))
+        name: 'LD ' + reg + ',' + opcodesList[op] + ' (IX)',
+        ast: o['LD_' + opcodesList[op]].apply(null, ['ixH', 'ixL'].concat(regs[reg]))
       });
       opcodeTableFDCB.push({
-        name: 'LD ' + reg + ',' + op + ' (IY)',
-        ast: o['LD_' + op].apply(null, ['iyH', 'iyL'].concat(regs[reg]))
+        name: 'LD ' + reg + ',' + opcodesList[op] + ' (IY)',
+        ast: o['LD_' + opcodesList[op]].apply(null, ['iyH', 'iyL'].concat(regs[reg]))
       });
     } else {
       opcodeTableDDCB.push({
-        name: op + ' (IX)',
-        ast: o['LD_' + op]('ixH', 'ixL')
+        name: opcodesList[op] + ' (IX)',
+        ast: o['LD_' + opcodesList[op]]('ixH', 'ixL')
       });
       opcodeTableFDCB.push({
-        name: op + ' (IY)',
-        ast: o['LD_' + op]('iyH', 'iyL')
+        name: opcodesList[op] + ' (IY)',
+        ast: o['LD_' + opcodesList[op]]('iyH', 'iyL')
       });
     }
   }
-});
+}
 
-['BIT', 'RES', 'SET'].forEach(function(op) {
-  for (var i = 0; i < 8; i++) {
-    for (var reg in regs) {
+opcodesList = {
+  BIT: 'BIT',
+  RES: 'RES',
+  SET: 'SET'
+};
+
+var i = 0;
+var j = 0;
+
+for (op in opcodesList) {
+  for (i = 0; i < 8; i++) {
+    for (reg in regs) {
       opcodeTableCB.push({
-        name: op + ' ' + i + ',' + reg,
+        name: opcodesList[op] + ' ' + i + ',' + reg,
         ast: o[op].apply(null, [i].concat(regs[reg]))
       });
     }
-    for (var j = 0; j < 8; j++) {
+    for (j = 0; j < 8; j++) {
       opcodeTableDDCB.push({
-        name: op + ' ' + i + ' (IX)',
+        name: opcodesList[op] + ' ' + i + ' (IX)',
         ast: o[op].apply(null, [i].concat(['ixH', 'ixL']))
       });
       opcodeTableFDCB.push({
-        name: op + ' ' + i + ' (IY)',
+        name: opcodesList[op] + ' ' + i + ' (IY)',
         ast: o[op].apply(null, [i].concat(['iyH', 'iyL']))
       });
     }
   }
-});
+}

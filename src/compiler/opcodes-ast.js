@@ -2207,10 +2207,10 @@ var o = {
     };
   },
   // DD/FD CB prefixed opcodes.
-  LD_RLC: generateIndexCBFunctions('rlc'),
-  LD_RRC: generateIndexCBFunctions('rrc'),
-  LD_RL: generateIndexCBFunctions('rl'),
-  LD_RR: generateIndexCBFunctions('rr'),
+  'LD_RLC': generateIndexCBFunctions('rlc'),
+  'LD_RRC': generateIndexCBFunctions('rrc'),
+  'LD_RL': generateIndexCBFunctions('rl'),
+  'LD_RR': generateIndexCBFunctions('rr'),
   LD_SLA: generateIndexCBFunctions('sla'),
   LD_SRA: generateIndexCBFunctions('sra'),
   LD_SLL: generateIndexCBFunctions('sll'),

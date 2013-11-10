@@ -53,7 +53,8 @@ fs.readFile(argv.file, {encoding: 'binary'}, function(err, data) {
   if (err) return new Error(err);
 
   var sms = new JSSMS({
-    ui: JSSMS.NodeUI
+    ui: JSSMS.NodeUI,
+    ENABLE_COMPILER: false
   });
 
   sms.readRomDirectly(data, argv.file);

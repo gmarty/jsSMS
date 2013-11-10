@@ -19,7 +19,7 @@ module.exports = function(grunt) {
       'src/keyboard.js',
       'src/psg.js',
       'src/vdp.js',
-      '<%= grunt.task.current.name == "closure-compiler:alec" ? "src/alec/ui.js" : grunt.task.current.name == "closure-compiler:node" ? "src/node/ui.js" : "src/ui.js" %>',
+      '<%= grunt.task.current.nameArgs == "closure-compiler:alec" ? "src/alec/ui.js" : grunt.task.current.nameArgs == "closure-compiler:node" ? "src/node/ui.js" : "src/ui.js" %>',
       'src/ports.js',
       'src/compiler/bytecode.js',
       'src/compiler/parser.js',
@@ -32,7 +32,7 @@ module.exports = function(grunt) {
       'src/compiler/optimizer.js',
       'src/compiler/generator.js',
       'src/compiler/recompiler.js',
-      'src/build/exports.js' // Required for targets using `output_wrapper`.
+      '<%= grunt.task.current.nameArgs == "closure-compiler:node" ? "src/node/build/exports.js" : "src/build/exports.js" %>' // Required for targets using `output_wrapper`.
     ],
     externs: [
       '<%= closurePath %>/contrib/externs/webkit_console.js',
@@ -197,7 +197,7 @@ module.exports = function(grunt) {
           define: [
             //'"DEBUG=true"',
             '"ENABLE_DEBUGGER=true"',
-            //'"ENABLE_COMPILER=false"',
+            '"ENABLE_COMPILER=false"',
             '"ACCURATE_INTERRUPT_EMULATION=true"',
             '"ENABLE_SERVER_LOGGER=false"'
           ],
