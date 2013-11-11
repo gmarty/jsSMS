@@ -55,9 +55,9 @@ var Optimizer = (function() {
      * @param {number} page
      */
     localOptimization: function(page) {
+      this.ast[page] = this.ast[page].map(this.portPeephole.bind(this));
       this.ast[page] = this.ast[page].map(this.evaluateBinaryExpressions);
       this.ast[page] = this.ast[page].map(this.inlineRegisters);
-      this.ast[page] = this.ast[page].map(this.portPeephole.bind(this));
     },
 
 
@@ -251,7 +251,19 @@ var Optimizer = (function() {
 
 
     /**
-     * This pass inline the port communication through bypassing port.out and port.in_.
+     * This pass inlines the port communication through bypassing port.out and port.in_ and calling
+     * directly the method based on the value passed:
+     * ```
+     * this.a = this.port.in_(0x7E);
+     * ```
+     *
+     * Becomes:
+     * ```
+     * this.a = this.vdp.getVCount();
+     * ```
+     *
+     * Please note that this is Sega Master System & Game Gear specific. Don't use this pass if you
+     * emulate another Z80 system.
      *
      * @param {Array.<Bytecode>} fn
      * @return {Array.<Bytecode>}
