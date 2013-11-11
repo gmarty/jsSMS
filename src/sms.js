@@ -365,8 +365,8 @@ JSSMS.prototype = {
     this.is_gg = true;
     this.is_sms = false;
 
-    this.vdp.h_start = 5;
-    this.vdp.h_end = 27;
+    this.vdp.h_start = 6;
+    this.vdp.h_end = 26;
 
     this.emuWidth = GG_WIDTH;
     this.emuHeight = GG_HEIGHT;

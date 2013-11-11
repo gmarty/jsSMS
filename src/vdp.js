@@ -511,10 +511,9 @@ JSSMS.Vdp.prototype = {
         // Check VRAM value has actually changed
         if (value !== (this.VRAM[address] & 0xFF)) {
           //if (address >= bgt && address < bgt + BGT_LENGTH); // Don't write dirty to BGT
-          if (address >= this.sat && address < this.sat + 64) {
+          if ((address >= this.sat && address < this.sat + 64) ||
+              (address >= this.sat + 128 && address < this.sat + 256)) {
             // Don't write dirty to SAT
-            this.isSatDirty = true;
-          } else if (address >= this.sat + 128 && address < this.sat + 256) {
             this.isSatDirty = true;
           } else {
             var tileIndex = address >> 5;
@@ -543,10 +542,10 @@ JSSMS.Vdp.prototype = {
           this.CRAM[temp + 2] = this.main_JAVA_B[value];
         } else {
           temp = ((this.location & 0x3F) >> 1) * 3;
-          if ((this.location & 0x01) === 0) {
+          if (!(this.location & 0x01)) {
             // first byte
-            this.CRAM[temp] = this.GG_JAVA_R[value]; // GG
-            this.CRAM[temp + 1] = this.GG_JAVA_G[value]; // GG
+            this.CRAM[temp] = this.GG_JAVA_R[value];
+            this.CRAM[temp + 1] = this.GG_JAVA_G[value];
           } else {
             this.CRAM[temp + 2] = this.GG_JAVA_B[value];
           }
@@ -602,7 +601,7 @@ JSSMS.Vdp.prototype = {
       this.counter = this.vdpreg[10];
 
       // Frame Interrupts Enabled and Pending. Assert IRQ Line.
-      if (((this.status & STATUS_VINT) !== 0) && ((this.vdpreg[1] & 0x20) !== 0) && (lineno < 224)) {
+      if ((this.status & STATUS_VINT) !== 0 && (this.vdpreg[1] & 0x20) !== 0 && lineno < 224) {
         this.main.cpu.interruptLine = true;
       }
 
@@ -625,21 +624,19 @@ JSSMS.Vdp.prototype = {
    * @param {number} lineno Line Number to Render.
    */
   drawLine: function(lineno) {
-    var i = 0;
-    var temp = 0;
-    var temp2 = 0;
+    var x = 0;
+    var location = 0;
+    var colour = 0;
 
     // Check we are in the visible drawing region
-    if (this.main.is_gg) {
-      if (lineno < GG_Y_OFFSET || lineno >= GG_Y_OFFSET + GG_HEIGHT) {
-        return;
-      }
+    if (this.main.is_gg && (lineno < GG_Y_OFFSET || lineno >= GG_Y_OFFSET + GG_HEIGHT)) {
+      return;
     }
 
     // Clear sprite collision array if enabled
     if (VDP_SPRITE_COLLISIONS) {
-      for (i = 0; i < SMS_WIDTH /* this.spriteCol.length */; i++) {
-        this.spriteCol[i] = false;
+      for (x = 0; x < SMS_WIDTH /* this.spriteCol.length */; x++) {
+        this.spriteCol[x] = false;
       }
     }
 
@@ -662,16 +659,14 @@ JSSMS.Vdp.prototype = {
       }
 
       // Blank Leftmost Column (SMS Only)
-      if (this.main.is_sms && (this.vdpreg[0] & 0x20) !== 0) {
-        var location = lineno << 8;
+      if (this.main.is_sms && (this.vdpreg[0] & 0x20)) {
+        location = (lineno << 8) * 4;
+        colour = ((this.vdpreg[7] & 0x0F) + 16) * 3;
 
-        // Don't use a loop here for speed purposes
-        temp = location * 4;
-        temp2 = ((this.vdpreg[7] & 0x0F) + 16) * 3;
-        for (i = 0; i < 8; i++) {
-          this.display[temp + i] = this.CRAM[temp2];
-          this.display[temp + i + 1] = this.CRAM[temp2 + 1];
-          this.display[temp + i + 2] = this.CRAM[temp2 + 2];
+        for (x = location; x < location + (8 * 4); x = x + 4) {
+          this.display[x] = this.CRAM[colour];
+          this.display[x + 1] = this.CRAM[colour + 1];
+          this.display[x + 2] = this.CRAM[colour + 2];
         }
       }
     } else {
@@ -739,7 +734,7 @@ JSSMS.Vdp.prototype = {
       var tile = this.tiles[(this.VRAM[tile_props] & 0xFF) + ((secondbyte & 0x01) << 8)];
 
       // Plot 8 Pixel Row (No H-Flip)
-      if ((secondbyte & 0x02) === 0) {
+      if (!(secondbyte & 0x02)) {
         for (pixX = 0; pixX < 8 && sx < SMS_WIDTH; pixX++, sx++) {
           colour = tile[pixX + pixY];
           temp = (sx + row_precal) * 4;
@@ -747,9 +742,11 @@ JSSMS.Vdp.prototype = {
 
           // Set Priority Array (Sprites over/under background tile)
           this.bgPriority[sx] = ((secondbyte & 0x10) !== 0) && (colour !== 0);
-          this.display[temp] = this.CRAM[temp2];
-          this.display[temp + 1] = this.CRAM[temp2 + 1];
-          this.display[temp + 2] = this.CRAM[temp2 + 2];
+          if (sx >= (this.h_start) * 8 && sx < this.h_end * 8) {
+            this.display[temp] = this.CRAM[temp2];
+            this.display[temp + 1] = this.CRAM[temp2 + 1];
+            this.display[temp + 2] = this.CRAM[temp2 + 2];
+          }
         }
       } else {
         // Plot 8 Pixel Row (H-Flip)
@@ -760,9 +757,11 @@ JSSMS.Vdp.prototype = {
 
           // Set Priority Array (Sprites over/under background tile)
           this.bgPriority[sx] = ((secondbyte & 0x10) !== 0) && (colour !== 0);
-          this.display[temp] = this.CRAM[temp2];
-          this.display[temp + 1] = this.CRAM[temp2 + 1];
-          this.display[temp + 2] = this.CRAM[temp2 + 2];
+          if (sx >= (this.h_start) * 8 && sx < this.h_end * 8) {
+            this.display[temp] = this.CRAM[temp2];
+            this.display[temp + 1] = this.CRAM[temp2 + 1];
+            this.display[temp + 2] = this.CRAM[temp2 + 2];
+          }
         }
       }
       tile_column++;
@@ -830,7 +829,7 @@ JSSMS.Vdp.prototype = {
       var pix = 0;
 
       if (x < 0) {
-        pix = (-x);
+        pix = -x;
         x = 0;
       }
 
@@ -838,11 +837,11 @@ JSSMS.Vdp.prototype = {
       var offset = pix + ((tileRow & 7) << 3);
 
       // Plot Normal Sprites (Width = 8)
-      if (zoomed === 0) {
-        for (; pix < 8 && x < SMS_WIDTH; pix++, x++) {
+      if (!zoomed) {
+        for (; pix < 8 && x < this.h_end * 8; pix++, x++) {
           colour = tile[offset++];
 
-          if (colour !== 0 && !this.bgPriority[x]) {
+          if (x >= this.h_start * 8 && colour !== 0 && !this.bgPriority[x]) {
             temp = (x + row_precal) * 4;
             temp2 = (colour + 16) * 3;
 
@@ -862,11 +861,11 @@ JSSMS.Vdp.prototype = {
         }
       } else {
         // Plot Zoomed Sprites (Width = 16)
-        for (; pix < 8 && x < SMS_WIDTH; pix++, x += 2) {
+        for (; pix < 8 && x < this.h_end * 8; pix++, x += 2) {
           colour = tile[offset++];
 
           // Plot first pixel
-          if (colour !== 0 && !this.bgPriority[x]) {
+          if (x >= this.h_start * 8 && colour !== 0 && !this.bgPriority[x]) {
             temp = (x + row_precal) * 4;
             temp2 = (colour + 16) * 3;
 
@@ -884,7 +883,7 @@ JSSMS.Vdp.prototype = {
           }
 
           // Plot second pixel
-          if (colour !== 0 && !this.bgPriority[x + 1]) {
+          if (x + 1 >= this.h_start * 8 && colour !== 0 && !this.bgPriority[x + 1]) {
             temp = (x + row_precal + 1) * 4;
             temp2 = (colour + 16) * 3;
 
@@ -917,14 +916,14 @@ JSSMS.Vdp.prototype = {
    * @param {number} lineno Line number to render.
    */
   drawBGColour: function(lineno) {
-    var row_precal = lineno << 8;
-    var length = (row_precal + (SMS_WIDTH * 4)) * 4;
-    var temp = ((this.vdpreg[7] & 0x0F) + 16) * 3;
+    var x = 0;
+    var location = (lineno << 8) * 4;
+    var colour = ((this.vdpreg[7] & 0x0F) + 16) * 3;
 
-    for (row_precal = row_precal * 4; row_precal < length; row_precal = row_precal + 4) {
-      this.display[row_precal] = this.CRAM[temp];
-      this.display[row_precal + 1] = this.CRAM[temp + 1];
-      this.display[row_precal + 2] = this.CRAM[temp + 2];
+    for (x = location + (this.h_start * 8 * 4); x < location + (this.h_end * 8 * 4); x = x + 4) {
+      this.display[x] = this.CRAM[colour];
+      this.display[x + 1] = this.CRAM[colour + 1];
+      this.display[x + 2] = this.CRAM[colour + 2];
     }
   },
 
@@ -1065,13 +1064,13 @@ JSSMS.Vdp.prototype = {
           var address = this.sat + (spriteno << 1) + 0x80;
 
           // Sprite X Position
-          sprites[off++] = (this.VRAM[address++] & 0xFF);
+          sprites[off++] = this.VRAM[address++] & 0xFF;
 
           // Sprite Y Position
           sprites[off++] = y;
 
           // Sprite Pattern Index
-          sprites[off++] = (this.VRAM[address] & 0xFF);
+          sprites[off++] = this.VRAM[address] & 0xFF;
 
           // Increment number of sprites on this scanline
           sprites[SPRITE_COUNT]++;
