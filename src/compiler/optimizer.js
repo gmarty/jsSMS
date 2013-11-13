@@ -58,6 +58,7 @@ var Optimizer = (function() {
       this.ast[page] = this.ast[page].map(this.portPeephole.bind(this));
       this.ast[page] = this.ast[page].map(this.evaluateBinaryExpressions);
       this.ast[page] = this.ast[page].map(this.inlineRegisters);
+      this.ast[page] = this.ast[page].map(this.evaluateMemberExpressions.bind(this));
     },
 
 
@@ -109,6 +110,53 @@ var Optimizer = (function() {
             ast['raw'] = DEBUG ? JSSMS.Utils.toHex(value) : '' + value;
             delete ast['right'];
             delete ast['left'];
+          }
+
+          return ast;
+        });
+
+        return bytecodes;
+      });
+    },
+
+
+    /**
+     * Evaluate members expressions when the property is a literal:
+     * ```
+     * this.f = this.SZP_TABLE[0x00];
+     * ```
+     *
+     * Is optimized into:
+     * ```
+     * this.f = 0x44;
+     * ```
+     *
+     * @param {Array.<Bytecode>} fn
+     * @return {Array.<Bytecode>}
+     */
+    evaluateMemberExpressions: function(fn) {
+      var self = this;
+
+      return fn.map(function(bytecodes) {
+        var ast = bytecodes.ast;
+
+        if (!ast) {
+          return bytecodes;
+        }
+
+        bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+          if (ast['type'] === 'MemberExpression' &&
+              ast['object']['name'] === 'SZP_TABLE' &&
+              ast['property']['type'] === 'Literal') {
+            var value = self.main.cpu.SZP_TABLE[ast['property']['value']];
+
+            // Change the properties of the AST node.
+            ast['type'] = 'Literal';
+            ast['value'] = value;
+            ast['raw'] = DEBUG ? JSSMS.Utils.toHex(value) : '' + value;
+            delete ast['computed'];
+            delete ast['object'];
+            delete ast['property'];
           }
 
           return ast;
