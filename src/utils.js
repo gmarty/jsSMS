@@ -260,6 +260,22 @@ JSSMS.Utils = {
 
 
   /**
+   * Given a file name, returns the extension.
+   *
+   * @param {string} fileName The filename, possibly including a path.
+   * @return {string} The extension of the file without the leading dot.
+   */
+  getFileExtension: function(fileName) {
+    if (typeof fileName !== 'string') {
+      return '';
+    }
+
+    var parts = fileName.split('.');
+    return parts[parts.length - 1].toLowerCase();
+  },
+
+
+  /**
    * Return true if current browser is IE. Not used at the moment.
    *
    * @return {boolean}
