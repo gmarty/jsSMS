@@ -276,6 +276,46 @@ JSSMS.Utils = {
 
 
   /**
+   * CRC32 algorithm.
+   * @see http://stackoverflow.com/questions/18638900/javascript-crc32
+   * @see http://jsperf.com/js-crc32
+   *
+   * @param {string} str
+   * @returns {number}
+   */
+  crc32: function(str) {
+    var toHex = JSSMS.Utils.toHex;
+
+    // Lazy initialisation pattern by David Bruant (@DavidBruant).
+    var crcTable = (function makeCRCTable() {
+      var c = 0;
+      var crcTable = new Array(256);
+      for (var n = 0; n < 256; n++) {
+        c = n;
+        for (var k = 0; k < 8; k++) {
+          c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        }
+        crcTable[n] = c;
+      }
+
+      return crcTable;
+    })();
+
+    this.crc32 = function(str) {
+      var crc = 0 ^ -1;
+
+      for (var i = 0; i < str.length; i++) {
+        crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xFF];
+      }
+
+      return toHex((crc ^ -1) >>> 0);
+    };
+
+    return this.crc32(str);
+  },
+
+
+  /**
    * Return true if current browser is IE. Not used at the moment.
    *
    * @return {boolean}
