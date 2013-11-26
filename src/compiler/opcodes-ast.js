@@ -2211,10 +2211,10 @@ var o = {
   'LD_RRC': generateIndexCBFunctions('rrc'),
   'LD_RL': generateIndexCBFunctions('rl'),
   'LD_RR': generateIndexCBFunctions('rr'),
-  LD_SLA: generateIndexCBFunctions('sla'),
-  LD_SRA: generateIndexCBFunctions('sra'),
-  LD_SLL: generateIndexCBFunctions('sll'),
-  LD_SRL: generateIndexCBFunctions('srl'),
+  'LD_SLA': generateIndexCBFunctions('sla'),
+  'LD_SRA': generateIndexCBFunctions('sra'),
+  'LD_SLL': generateIndexCBFunctions('sll'),
+  'LD_SRL': generateIndexCBFunctions('srl'),
   // Below these point, properties can't be called from outside object `n`.
   // Move to object `o`? Mark as private?
   READ_MEM8: function(value) {
