@@ -224,7 +224,7 @@ launchBtn.click(function() {
 });
 
 $.ajax({
-  url: escape(romPath),
+  url: encodeURI(romPath),
   xhr: function() {
     var xhr = $.ajaxSettings.xhr();
     if (xhr.overrideMimeType != undefined) {
