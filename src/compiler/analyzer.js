@@ -94,7 +94,7 @@ var Analyzer = (function() {
                 opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]][bytecode.opcode[2]];
                 break;
               default:
-                JSSMS.Utils.console.error('Something went wrong in parsing. Opcode: [' + bytecode.opcode.join(' ') + ']');
+                JSSMS.Utils.console.error('Something went wrong in parsing. Opcode: [' + bytecode.hexOpcode + ']');
             }
 
             if (opcode && opcode.ast) {
