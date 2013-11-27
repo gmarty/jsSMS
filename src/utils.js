@@ -284,12 +284,10 @@ JSSMS.Utils = {
    * @returns {number}
    */
   crc32: function(str) {
-    var toHex = JSSMS.Utils.toHex;
-
     // Lazy initialisation pattern by David Bruant (@DavidBruant).
     var crcTable = (function makeCRCTable() {
       var c = 0;
-      var crcTable = new Array(256);
+      var crcTable = new Uint32Array(256);
       for (var n = 0; n < 256; n++) {
         c = n;
         for (var k = 0; k < 8; k++) {
@@ -308,7 +306,7 @@ JSSMS.Utils = {
         crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xFF];
       }
 
-      return toHex((crc ^ -1) >>> 0);
+      return ((crc ^ -1) >>> 0).toString(16).toUpperCase();
     };
 
     return this.crc32(str);

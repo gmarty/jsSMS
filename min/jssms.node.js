@@ -442,8 +442,8 @@ var $JSSMS$Utils$$ = {$rndInt$:function($range$$5$$) {
   $fileName$$1_parts$$ = $fileName$$1_parts$$.split(".");
   return $fileName$$1_parts$$[$fileName$$1_parts$$.length - 1].toLowerCase();
 }, $crc32$:function($str$$9$$) {
-  var $toHex$$ = $JSSMS$Utils$$.$toHex$, $crcTable$$ = function makeCRCTable() {
-    for (var $c$$ = 0, $crcTable$$1$$ = Array(256), $n$$3$$ = 0;256 > $n$$3$$;$n$$3$$++) {
+  var $crcTable$$ = function makeCRCTable() {
+    for (var $c$$ = 0, $crcTable$$1$$ = new Uint32Array(256), $n$$3$$ = 0;256 > $n$$3$$;$n$$3$$++) {
       for (var $c$$ = $n$$3$$, $k$$ = 0;8 > $k$$;$k$$++) {
         $c$$ = $c$$ & 1 ? 3988292384 ^ $c$$ >>> 1 : $c$$ >>> 1;
       }
@@ -455,7 +455,7 @@ var $JSSMS$Utils$$ = {$rndInt$:function($range$$5$$) {
     for (var $crc$$ = -1, $i$$6$$ = 0;$i$$6$$ < $str$$10$$.length;$i$$6$$++) {
       $crc$$ = $crc$$ >>> 8 ^ $crcTable$$[($crc$$ ^ $str$$10$$.charCodeAt($i$$6$$)) & 255];
     }
-    return $toHex$$(($crc$$ ^ -1) >>> 0);
+    return(($crc$$ ^ -1) >>> 0).toString(16).toUpperCase();
   };
   return this.$crc32$($str$$9$$);
 }, $g$:function() {
@@ -4208,7 +4208,7 @@ function $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_readR
   return $SUPPORT_DATAVIEW$$ ? $JSCompiler_StaticMethods_readRom8bit$self$$.$rom$[$address$$13$$ >> 14].getUint8($address$$13$$ & 16383) : $JSCompiler_StaticMethods_readRom8bit$self$$.$rom$[$address$$13$$ >> 14][$address$$13$$ & 16383] & 255;
 }
 function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $index$$47$$, $address$$11_address$$inline_151$$) {
-  var $opcode$$inline_155_toHex$$5$$ = $JSSMS$Utils$$.$toHex$, $opcode$$9$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$), $opcodesArray$$3$$ = [$opcode$$9$$], $inst$$3_location$$inline_154_toHex$$inline_152$$ = "Unimplemented 0xDD or 0xFD prefixed opcode", $currAddr$$3$$ = $address$$11_address$$inline_151$$, $code$$8_code$$inline_158$$ = 'throw "Unimplemented 0xDD or 0xFD prefixed opcode";', $inst$$inline_157_operand$$2$$ = 
+  var $opcode$$inline_155_toHex$$4$$ = $JSSMS$Utils$$.$toHex$, $opcode$$9$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$), $opcodesArray$$3$$ = [$opcode$$9$$], $inst$$3_location$$inline_154_toHex$$inline_152$$ = "Unimplemented 0xDD or 0xFD prefixed opcode", $currAddr$$3$$ = $address$$11_address$$inline_151$$, $code$$8_code$$inline_158$$ = 'throw "Unimplemented 0xDD or 0xFD prefixed opcode";', $inst$$inline_157_operand$$2$$ = 
   "", $location$$25_offset$$17$$ = 0;
   $address$$11_address$$inline_151$$++;
   $location$$25_offset$$17$$ = 0;
@@ -4222,16 +4222,16 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $code$$8_code$$inline_158$$ = "this.set" + $index$$47$$ + "(this.add16(this.get" + $index$$47$$ + "(), this.getDE()));";
       break;
     case 33:
-      $inst$$inline_157_operand$$2$$ = $opcode$$inline_155_toHex$$5$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$));
+      $inst$$inline_157_operand$$2$$ = $opcode$$inline_155_toHex$$4$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$));
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD " + $index$$47$$ + "," + $inst$$inline_157_operand$$2$$;
       $code$$8_code$$inline_158$$ = "this.set" + $index$$47$$ + "(" + $inst$$inline_157_operand$$2$$ + ");";
       $address$$11_address$$inline_151$$ += 2;
       break;
     case 34:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$inline_157_operand$$2$$ = $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$);
+      $inst$$inline_157_operand$$2$$ = $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $inst$$inline_157_operand$$2$$ + ")," + $index$$47$$;
-      $code$$8_code$$inline_158$$ = "this.writeMem(" + $inst$$inline_157_operand$$2$$ + ", this." + $index$$47$$.toLowerCase() + "L);this.writeMem(" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$ + 1) + ", this." + $index$$47$$.toLowerCase() + "H);";
+      $code$$8_code$$inline_158$$ = "this.writeMem(" + $inst$$inline_157_operand$$2$$ + ", this." + $index$$47$$.toLowerCase() + "L);this.writeMem(" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$ + 1) + ", this." + $index$$47$$.toLowerCase() + "H);";
       $address$$11_address$$inline_151$$ += 2;
       break;
     case 35:
@@ -4245,7 +4245,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "DEC " + $index$$47$$ + "H *";
       break;
     case 38:
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD " + $index$$47$$ + "H," + $opcode$$inline_155_toHex$$5$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$)) + " *";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD " + $index$$47$$ + "H," + $opcode$$inline_155_toHex$$4$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$)) + " *";
       $address$$11_address$$inline_151$$++;
       break;
     case 41:
@@ -4253,8 +4253,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 42:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD " + $index$$47$$ + " (" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.ixL = this.readMem(" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ");this.ixH = this.readMem(" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$ + 1) + ");";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD " + $index$$47$$ + " (" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.ixL = this.readMem(" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ");this.ixH = this.readMem(" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$ + 1) + ");";
       $address$$11_address$$inline_151$$ += 2;
       break;
     case 43:
@@ -4268,26 +4268,26 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "DEC " + $index$$47$$ + "L *";
       break;
     case 46:
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD " + $index$$47$$ + "L," + $opcode$$inline_155_toHex$$5$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$));
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD " + $index$$47$$ + "L," + $opcode$$inline_155_toHex$$4$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$));
       $address$$11_address$$inline_151$$++;
       break;
     case 52:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "INC (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.incMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ");";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "INC (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.incMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 53:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "DEC (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.decMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ");";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "DEC (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.decMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 54:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$inline_157_operand$$2$$ = $opcode$$inline_155_toHex$$5$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$ + 1));
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")," + $inst$$inline_157_operand$$2$$;
-      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ", " + $inst$$inline_157_operand$$2$$ + ");";
+      $inst$$inline_157_operand$$2$$ = $opcode$$inline_155_toHex$$4$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$ + 1));
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")," + $inst$$inline_157_operand$$2$$;
+      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ", " + $inst$$inline_157_operand$$2$$ + ");";
       $address$$11_address$$inline_151$$ += 2;
       break;
     case 57:
@@ -4302,8 +4302,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 70:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD B,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.b = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ");";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD B,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.b = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 76:
@@ -4314,8 +4314,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 78:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD C,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.c = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ");";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD C,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.c = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 84:
@@ -4326,8 +4326,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 86:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD D,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.d = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ");";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD D,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.d = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 92:
@@ -4338,8 +4338,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 94:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD E,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.e = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ");";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD E,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.e = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 96:
@@ -4362,8 +4362,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 102:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD H,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.h = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ");";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD H,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.h = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 103:
@@ -4390,8 +4390,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 110:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD L,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.l = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ");";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD L,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.l = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 111:
@@ -4400,44 +4400,44 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 112:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + "),B";
-      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ", this.b);";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + "),B";
+      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ", this.b);";
       $address$$11_address$$inline_151$$++;
       break;
     case 113:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + "),C";
-      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ", this.c);";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + "),C";
+      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ", this.c);";
       $address$$11_address$$inline_151$$++;
       break;
     case 114:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + "),D";
-      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ", this.d);";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + "),D";
+      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ", this.d);";
       $address$$11_address$$inline_151$$++;
       break;
     case 115:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + "),E";
-      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ", this.e);";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + "),E";
+      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ", this.e);";
       $address$$11_address$$inline_151$$++;
       break;
     case 116:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + "),H";
-      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ", this.h);";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + "),H";
+      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ", this.h);";
       $address$$11_address$$inline_151$$++;
       break;
     case 117:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + "),L";
-      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ", this.l);";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + "),L";
+      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ", this.l);";
       $address$$11_address$$inline_151$$++;
       break;
     case 119:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + "),A";
-      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ", this.a);";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + "),A";
+      $code$$8_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ", this.a);";
       $address$$11_address$$inline_151$$++;
       break;
     case 124:
@@ -4448,8 +4448,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 126:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.a = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ");";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.a = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 132:
@@ -4460,8 +4460,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 134:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "ADD A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.add_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + "));";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "ADD A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.add_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + "));";
       $address$$11_address$$inline_151$$++;
       break;
     case 140:
@@ -4472,8 +4472,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 142:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "ADC A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.adc_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + "));";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "ADC A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.adc_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + "));";
       $address$$11_address$$inline_151$$++;
       break;
     case 148:
@@ -4484,8 +4484,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 150:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "SUB A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.sub_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + "));";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "SUB A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.sub_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + "));";
       $address$$11_address$$inline_151$$++;
       break;
     case 156:
@@ -4496,8 +4496,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 158:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "SBC A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.sbc_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + "));";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "SBC A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.sbc_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + "));";
       $address$$11_address$$inline_151$$++;
       break;
     case 164:
@@ -4510,8 +4510,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 166:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "AND A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.f = this.SZP_TABLE[this.a &= this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")] | F_HALFCARRY;";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "AND A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.f = this.SZP_TABLE[this.a &= this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")] | F_HALFCARRY;";
       $address$$11_address$$inline_151$$++;
       break;
     case 172:
@@ -4524,8 +4524,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 174:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "XOR A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.f = this.SZP_TABLE[this.a ^= this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")];";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "XOR A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.f = this.SZP_TABLE[this.a ^= this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")];";
       $address$$11_address$$inline_151$$++;
       break;
     case 180:
@@ -4538,8 +4538,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 182:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "OR A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.f = this.SZP_TABLE[this.a |= this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")];";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "OR A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.f = this.SZP_TABLE[this.a |= this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")];";
       $address$$11_address$$inline_151$$++;
       break;
     case 188:
@@ -4552,19 +4552,19 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 190:
       $location$$25_offset$$17$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "CP (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + ")";
-      $code$$8_code$$inline_158$$ = "this.cp_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$5$$($location$$25_offset$$17$$) + "));";
+      $inst$$3_location$$inline_154_toHex$$inline_152$$ = "CP (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + ")";
+      $code$$8_code$$inline_158$$ = "this.cp_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$17$$) + "));";
       $address$$11_address$$inline_151$$++;
       break;
     case 203:
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = $JSSMS$Utils$$.$toHex$;
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "location = this.get" + $index$$47$$ + "() + " + $inst$$3_location$$inline_154_toHex$$inline_152$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$++)) + " & 0xFFFF;";
-      $opcode$$inline_155_toHex$$5$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
-      $JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$ = [$opcode$$inline_155_toHex$$5$$];
+      $opcode$$inline_155_toHex$$4$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
+      $JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$ = [$opcode$$inline_155_toHex$$4$$];
       $inst$$inline_157_operand$$2$$ = "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";
       $code$$8_code$$inline_158$$ = 'throw "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";';
       $address$$11_address$$inline_151$$++;
-      switch($opcode$$inline_155_toHex$$5$$) {
+      switch($opcode$$inline_155_toHex$$4$$) {
         case 0:
           $inst$$inline_157_operand$$2$$ = "LD B,RLC (" + $index$$47$$ + ")";
           $code$$8_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.b = this.rlc(this.readMem(location)); this.writeMem(location, this.b);";
@@ -5199,8 +5199,8 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
   return{$opcode$:$opcode$$9$$, $opcodes$:$opcodesArray$$3$$, $inst$:$inst$$3_location$$inline_154_toHex$$inline_152$$, code:$code$$8_code$$inline_158$$, $address$:$currAddr$$3$$, $nextAddress$:$address$$11_address$$inline_151$$};
 }
 function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$) {
-  var $address$$inline_161_toHex$$3_toHex$$inline_170$$ = $JSSMS$Utils$$.$toHex$, $opcode$$6_options$$inline_180$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$), $opcodesArray_toHex$$inline_181$$ = [$opcode$$6_options$$inline_180$$], $inst_opcode$$inline_162_opcode$$inline_171$$ = "Unknown Opcode", $currAddr_defaultInstruction$$inline_182$$ = $address$$8$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = null, $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = 
-  'throw "Unimplemented opcode ' + $address$$inline_161_toHex$$3_toHex$$inline_170$$($opcode$$6_options$$inline_180$$) + '";', $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "", $currAddr$$inline_165_currAddr$$inline_174_location$$23$$ = 0;
+  var $address$$inline_161_toHex$$2_toHex$$inline_170$$ = $JSSMS$Utils$$.$toHex$, $opcode$$6_options$$inline_180$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$), $opcodesArray_toHex$$inline_181$$ = [$opcode$$6_options$$inline_180$$], $inst_opcode$$inline_162_opcode$$inline_171$$ = "Unknown Opcode", $currAddr_defaultInstruction$$inline_182$$ = $address$$8$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = null, $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = 
+  'throw "Unimplemented opcode ' + $address$$inline_161_toHex$$2_toHex$$inline_170$$($opcode$$6_options$$inline_180$$) + '";', $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "", $currAddr$$inline_165_currAddr$$inline_174_location$$23$$ = 0;
   $address$$8$$++;
   $_inst_inst$$inline_164_inst$$inline_173_operand$$ = {};
   switch($opcode$$6_options$$inline_180$$) {
@@ -5209,7 +5209,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "";
       break;
     case 1:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD BC," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setBC(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
       $address$$8$$ += 2;
@@ -5231,7 +5231,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.b = this.dec8(this.b);";
       break;
     case 6:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD B," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.b = " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ";";
       $address$$8$$++;
@@ -5265,7 +5265,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.c = this.dec8(this.c);";
       break;
     case 14:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD C," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.c = " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ";";
       $address$$8$$++;
@@ -5276,12 +5276,12 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 16:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $address$$8$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$) + 1);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "DJNZ (" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.b = this.b - 0x01 & 0xFF;if (this.b !== 0x00) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "DJNZ (" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.b = this.b - 0x01 & 0xFF;if (this.b !== 0x00) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$++;
       break;
     case 17:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD DE," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setDE(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
       $address$$8$$ += 2;
@@ -5303,7 +5303,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.d = this.dec8(this.d);";
       break;
     case 22:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD D," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.d = " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ";";
       $address$$8$$++;
@@ -5314,8 +5314,8 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 24:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $address$$8$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$) + 1);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JR (" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JR (" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
       $address$$8$$ = null;
       break;
     case 25:
@@ -5339,7 +5339,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.e = this.dec8(this.e);";
       break;
     case 30:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD E," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.e = " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ";";
       $address$$8$$++;
@@ -5350,21 +5350,21 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 32:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $address$$8$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$) + 1);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JR NZ,(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if (!((this.f & F_ZERO) !== 0x00)) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JR NZ,(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if (!((this.f & F_ZERO) !== 0x00)) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$++;
       break;
     case 33:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD HL," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setHL(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
       $address$$8$$ += 2;
       break;
     case 34:
       $currAddr$$inline_165_currAddr$$inline_174_location$$23$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($currAddr$$inline_165_currAddr$$inline_174_location$$23$$);
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($currAddr$$inline_165_currAddr$$inline_174_location$$23$$);
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + "),HL";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ", this.l);this.writeMem(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($currAddr$$inline_165_currAddr$$inline_174_location$$23$$ + 1) + ", this.h);";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ", this.l);this.writeMem(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($currAddr$$inline_165_currAddr$$inline_174_location$$23$$ + 1) + ", this.h);";
       $address$$8$$ += 2;
       break;
     case 35:
@@ -5380,7 +5380,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.h = this.dec8(this.h);";
       break;
     case 38:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD H," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.h = " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ";";
       $address$$8$$++;
@@ -5391,8 +5391,8 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 40:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $address$$8$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$) + 1);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JR Z,(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JR Z,(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$++;
       break;
     case 41:
@@ -5400,7 +5400,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setHL(this.add16(this.getHL(), this.getHL()));";
       break;
     case 42:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD HL,(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ")";
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setHL(this.readMemWord(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + "));";
       $address$$8$$ += 2;
@@ -5418,7 +5418,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.l = this.dec8(this.l);";
       break;
     case 46:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD L," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.l = " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ";";
       $address$$8$$++;
@@ -5429,18 +5429,18 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 48:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $address$$8$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$) + 1);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JR NC,(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if (!((this.f & F_CARRY) !== 0x00)) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JR NC,(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if (!((this.f & F_CARRY) !== 0x00)) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$++;
       break;
     case 49:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD SP," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.sp = " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ";";
       $address$$8$$ += 2;
       break;
     case 50:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + "),A";
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ", this.a);";
       $address$$8$$ += 2;
@@ -5458,7 +5458,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.decMem(this.getHL());";
       break;
     case 54:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (HL)," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(this.getHL(), " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
       $address$$8$$++;
@@ -5469,8 +5469,8 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 56:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $address$$8$$ + $JSCompiler_StaticMethods_signExtend$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$) + 1);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JR C,(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JR C,(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$++;
       break;
     case 57:
@@ -5478,7 +5478,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setHL(this.add16(this.getHL(), this.sp));";
       break;
     case 58:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD A,(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ")";
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.a = this.readMem(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
       $address$$8$$ += 2;
@@ -5496,7 +5496,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.a = this.dec8(this.a);";
       break;
     case 62:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD A," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.a = " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ";";
       $address$$8$$++;
@@ -5723,7 +5723,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 118:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "HALT";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.tstates = 0x00;" + ("this.halt = true; this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$ - 1) + "; return;");
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.tstates = 0x00;" + ("this.halt = true; this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$ - 1) + "; return;");
       break;
     case 119:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (HL),A";
@@ -5951,7 +5951,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 175:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "XOR A,A";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.a = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$(0) + "; this.f = this.SZP_TABLE[0x00];";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.a = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$(0) + "; this.f = this.SZP_TABLE[0x00];";
       break;
     case 176:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "OR A,B";
@@ -6027,20 +6027,20 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 194:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP NZ,(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) === 0x00) {this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP NZ,(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) === 0x00) {this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 195:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP (" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP (" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
       $address$$8$$ = null;
       break;
     case 196:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL NZ (" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) === 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL NZ (" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) === 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 197:
@@ -6048,15 +6048,15 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push2(this.b, this.c);";
       break;
     case 198:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "ADD A," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.add_a(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
       $address$$8$$++;
       break;
     case 199:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = 0;
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
       break;
     case 200:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET Z";
@@ -6069,14 +6069,14 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 202:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP Z,(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) !== 0x00) {this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP Z,(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) !== 0x00) {this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 203:
-      var $address$$inline_161_toHex$$3_toHex$$inline_170$$ = $address$$8$$, $inst_opcode$$inline_162_opcode$$inline_171$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_161_toHex$$3_toHex$$inline_170$$), $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = [$inst_opcode$$inline_162_opcode$$inline_171$$], $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "Unimplemented 0xCB prefixed opcode", $currAddr$$inline_165_currAddr$$inline_174_location$$23$$ = 
-      $address$$inline_161_toHex$$3_toHex$$inline_170$$, $code$$inline_166_target$$inline_175$$ = 'throw "Unimplemented 0xCB prefixed opcode";';
-      $address$$inline_161_toHex$$3_toHex$$inline_170$$++;
+      var $address$$inline_161_toHex$$2_toHex$$inline_170$$ = $address$$8$$, $inst_opcode$$inline_162_opcode$$inline_171$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_161_toHex$$2_toHex$$inline_170$$), $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = [$inst_opcode$$inline_162_opcode$$inline_171$$], $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "Unimplemented 0xCB prefixed opcode", $currAddr$$inline_165_currAddr$$inline_174_location$$23$$ = 
+      $address$$inline_161_toHex$$2_toHex$$inline_170$$, $code$$inline_166_target$$inline_175$$ = 'throw "Unimplemented 0xCB prefixed opcode";';
+      $address$$inline_161_toHex$$2_toHex$$inline_170$$++;
       switch($inst_opcode$$inline_162_opcode$$inline_171$$) {
         case 0:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RLC B";
@@ -7029,7 +7029,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
         case 255:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 7,A", $code$$inline_166_target$$inline_175$$ = "this.a |= BIT_7;";
       }
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = {$opcode$:$inst_opcode$$inline_162_opcode$$inline_171$$, $opcodes$:$code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$, $inst$:$_inst_inst$$inline_164_inst$$inline_173_operand$$, code:$code$$inline_166_target$$inline_175$$, $address$:$currAddr$$inline_165_currAddr$$inline_174_location$$23$$, $nextAddress$:$address$$inline_161_toHex$$3_toHex$$inline_170$$};
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = {$opcode$:$inst_opcode$$inline_162_opcode$$inline_171$$, $opcodes$:$code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$, $inst$:$_inst_inst$$inline_164_inst$$inline_173_operand$$, code:$code$$inline_166_target$$inline_175$$, $address$:$currAddr$$inline_165_currAddr$$inline_174_location$$23$$, $nextAddress$:$address$$inline_161_toHex$$2_toHex$$inline_170$$};
       $inst_opcode$$inline_162_opcode$$inline_171$$ = $_inst_inst$$inline_164_inst$$inline_173_operand$$.$inst$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = $_inst_inst$$inline_164_inst$$inline_173_operand$$.code;
       $opcodesArray_toHex$$inline_181$$ = $opcodesArray_toHex$$inline_181$$.concat($_inst_inst$$inline_164_inst$$inline_173_operand$$.$opcodes$);
@@ -7037,26 +7037,26 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 204:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL Z (" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL Z (" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 205:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL (" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$ + 2) + "); this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL (" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$ + 2) + "); this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
       $address$$8$$ += 2;
       break;
     case 206:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "ADC ," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.adc_a(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
       $address$$8$$++;
       break;
     case 207:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = 8;
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
       break;
     case 208:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET NC";
@@ -7068,20 +7068,20 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 210:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP NC,(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) === 0x00) {this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP NC,(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) === 0x00) {this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 211:
       $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "OUT (" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($_inst_inst$$inline_164_inst$$inline_173_operand$$) + "),A";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "OUT (" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($_inst_inst$$inline_164_inst$$inline_173_operand$$) + "),A";
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = $JSCompiler_StaticMethods_peepholePortOut$$($JSCompiler_StaticMethods_disassemble$self$$, $_inst_inst$$inline_164_inst$$inline_173_operand$$);
       $address$$8$$++;
       break;
     case 212:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL NC (" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) === 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL NC (" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) === 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 213:
@@ -7089,15 +7089,15 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push2(this.d, this.e);";
       break;
     case 214:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "SUB " + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.sub_a(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
       $address$$8$$++;
       break;
     case 215:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = 16;
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
       break;
     case 216:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET C";
@@ -7109,20 +7109,20 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 218:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP C,(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) !== 0x00) {this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP C,(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) !== 0x00) {this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 219:
       $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "IN A,(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($_inst_inst$$inline_164_inst$$inline_173_operand$$) + ")";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "IN A,(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($_inst_inst$$inline_164_inst$$inline_173_operand$$) + ")";
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = $JSCompiler_StaticMethods_peepholePortIn$$($JSCompiler_StaticMethods_disassemble$self$$, $_inst_inst$$inline_164_inst$$inline_173_operand$$);
       $address$$8$$++;
       break;
     case 220:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL C (" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL C (" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 221:
@@ -7133,15 +7133,15 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $address$$8$$ = $_inst_inst$$inline_164_inst$$inline_173_operand$$.$nextAddress$;
       break;
     case 222:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "SBC A," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.sbc_a(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
       $address$$8$$++;
       break;
     case 223:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = 24;
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
       break;
     case 224:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET PO";
@@ -7153,8 +7153,8 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 226:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP PO,(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_PARITY) === 0x00) {this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP PO,(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_PARITY) === 0x00) {this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 227:
@@ -7163,8 +7163,8 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 228:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL PO (" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_PARITY) === 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL PO (" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_PARITY) === 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 229:
@@ -7172,15 +7172,15 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push2(this.h, this.l);";
       break;
     case 230:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "AND (" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ")";
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.f = this.SZP_TABLE[this.a &= " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + "] | F_HALFCARRY;";
       $address$$8$$++;
       break;
     case 231:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = 32;
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
       break;
     case 232:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET PE";
@@ -7193,8 +7193,8 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 234:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP PE,(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_PARITY) !== 0x00) {this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP PE,(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_PARITY) !== 0x00) {this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 235:
@@ -7203,12 +7203,12 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 236:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL PE (" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_PARITY) !== 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL PE (" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_PARITY) !== 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 237:
-      var $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $address$$8$$, $address$$inline_161_toHex$$3_toHex$$inline_170$$ = $JSSMS$Utils$$.$toHex$, $inst_opcode$$inline_162_opcode$$inline_171$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$), $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = [$inst_opcode$$inline_162_opcode$$inline_171$$], $_inst_inst$$inline_164_inst$$inline_173_operand$$ = 
+      var $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $address$$8$$, $address$$inline_161_toHex$$2_toHex$$inline_170$$ = $JSSMS$Utils$$.$toHex$, $inst_opcode$$inline_162_opcode$$inline_171$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$), $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = [$inst_opcode$$inline_162_opcode$$inline_171$$], $_inst_inst$$inline_164_inst$$inline_173_operand$$ = 
       "Unimplemented 0xED prefixed opcode", $currAddr$$inline_165_currAddr$$inline_174_location$$23$$ = $address$$inline_169_hexOpcodes$$inline_184_target$$46$$, $code$$inline_166_target$$inline_175$$ = null, $code$$inline_176$$ = 'throw "Unimplemented 0xED prefixed opcode";', $operand$$inline_177$$ = "", $location$$inline_178$$ = 0;
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$++;
       switch($inst_opcode$$inline_162_opcode$$inline_171$$) {
@@ -7226,9 +7226,9 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 67:
           $location$$inline_178$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
-          $operand$$inline_177$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($location$$inline_178$$);
+          $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$);
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD (" + $operand$$inline_177$$ + "),BC";
-          $code$$inline_176$$ = "this.writeMem(" + $operand$$inline_177$$ + ", this.c);this.writeMem(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.b);";
+          $code$$inline_176$$ = "this.writeMem(" + $operand$$inline_177$$ + ", this.c);this.writeMem(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.b);";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
           break;
         case 68:
@@ -7295,7 +7295,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           $code$$inline_176$$ = "this.adc16(this.getBC());";
           break;
         case 75:
-          $operand$$inline_177$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$));
+          $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$));
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD BC,(" + $operand$$inline_177$$ + ")";
           $code$$inline_176$$ = "this.setBC(this.readMemWord(" + $operand$$inline_177$$ + "));";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
@@ -7318,9 +7318,9 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 83:
           $location$$inline_178$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
-          $operand$$inline_177$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($location$$inline_178$$);
+          $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$);
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD (" + $operand$$inline_177$$ + "),DE";
-          $code$$inline_176$$ = "this.writeMem(" + $operand$$inline_177$$ + ", this.e);this.writeMem(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.d);";
+          $code$$inline_176$$ = "this.writeMem(" + $operand$$inline_177$$ + ", this.e);this.writeMem(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.d);";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
           break;
         case 86:
@@ -7346,7 +7346,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           $code$$inline_176$$ = "this.adc16(this.getDE());";
           break;
         case 91:
-          $operand$$inline_177$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$));
+          $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$));
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD DE,(" + $operand$$inline_177$$ + ")";
           $code$$inline_176$$ = "this.setDE(this.readMemWord(" + $operand$$inline_177$$ + "));";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
@@ -7369,9 +7369,9 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 99:
           $location$$inline_178$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
-          $operand$$inline_177$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($location$$inline_178$$);
+          $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$);
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD (" + $operand$$inline_177$$ + "),HL";
-          $code$$inline_176$$ = "this.writeMem(" + $operand$$inline_177$$ + ", this.l);this.writeMem(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.h);";
+          $code$$inline_176$$ = "this.writeMem(" + $operand$$inline_177$$ + ", this.l);this.writeMem(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.h);";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
           break;
         case 103:
@@ -7391,7 +7391,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           $code$$inline_176$$ = "this.adc16(this.getHL());";
           break;
         case 107:
-          $operand$$inline_177$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$));
+          $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$));
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD HL,(" + $operand$$inline_177$$ + ")";
           $code$$inline_176$$ = "this.setHL(this.readMemWord(" + $operand$$inline_177$$ + "));";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
@@ -7410,9 +7410,9 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 115:
           $location$$inline_178$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
-          $operand$$inline_177$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($location$$inline_178$$);
+          $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$);
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD (" + $operand$$inline_177$$ + "),SP";
-          $code$$inline_176$$ = "this.writeMem(" + $operand$$inline_177$$ + ", this.sp & 0xFF);this.writeMem(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.sp >> 8);";
+          $code$$inline_176$$ = "this.writeMem(" + $operand$$inline_177$$ + ", this.sp & 0xFF);this.writeMem(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.sp >> 8);";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
           break;
         case 120:
@@ -7428,7 +7428,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           $code$$inline_176$$ = "this.adc16(this.sp);";
           break;
         case 123:
-          $operand$$inline_177$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$));
+          $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$));
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD SP,(" + $operand$$inline_177$$ + ")";
           $code$$inline_176$$ = "this.sp = this.readMemWord(" + $operand$$inline_177$$ + ");";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
@@ -7471,7 +7471,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
         case 177:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "CPIR";
           $code$$inline_166_target$$inline_175$$ = $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ - 2;
-          $code$$inline_176$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.readMem(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);" + ("if ((temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($code$$inline_166_target$$inline_175$$) + ";return;}");
+          $code$$inline_176$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.readMem(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);" + ("if ((temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($code$$inline_166_target$$inline_175$$) + ";return;}");
           $code$$inline_176$$ += "this.f = (this.f & 0xF8) | temp;";
           break;
         case 178:
@@ -7507,15 +7507,15 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $address$$8$$ = $_inst_inst$$inline_164_inst$$inline_173_operand$$.$nextAddress$;
       break;
     case 238:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "XOR " + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.f = this.SZP_TABLE[this.a ^= " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + "];";
       $address$$8$$++;
       break;
     case 239:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = 40;
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
       break;
     case 240:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET P";
@@ -7527,8 +7527,8 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 242:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP P,(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_SIGN) === 0x00) {this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP P,(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_SIGN) === 0x00) {this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 243:
@@ -7537,8 +7537,8 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 244:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL P (" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_SIGN) === 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL P (" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_SIGN) === 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 245:
@@ -7546,15 +7546,15 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push2(this.a, this.f);";
       break;
     case 246:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "OR " + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.f = this.SZP_TABLE[this.a |= " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + "];";
       $address$$8$$++;
       break;
     case 247:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = 48;
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + "; return;";
       break;
     case 248:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET M";
@@ -7566,8 +7566,8 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 250:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP M,(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_SIGN) !== 0x00) {this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP M,(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_SIGN) !== 0x00) {this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 251:
@@ -7576,8 +7576,8 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 252:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
-      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL M (" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
-      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_SIGN) !== 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
+      $inst_opcode$$inline_162_opcode$$inline_171$$ = "CALL M (" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ")";
+      $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_SIGN) !== 0x00) {this.tstates -= 0x07;this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$ + 2) + ");this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + ";return;}";
       $address$$8$$ += 2;
       break;
     case 253:
@@ -7588,13 +7588,13 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $address$$8$$ = $_inst_inst$$inline_164_inst$$inline_173_operand$$.$nextAddress$;
       break;
     case 254:
-      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$3_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
+      $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "CP " + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
       $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.cp_a(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
       $address$$8$$++;
       break;
     case 255:
-      $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = 56, $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$), $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$3_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + 
+      $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = 56, $inst_opcode$$inline_162_opcode$$inline_171$$ = "RST " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$), $code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.push1(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$8$$) + "); this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($address$$inline_169_hexOpcodes$$inline_184_target$$46$$) + 
       "; return;";
   }
   var $opcode$$6_options$$inline_180$$ = {$opcode$:$opcode$$6_options$$inline_180$$, $opcodes$:$opcodesArray_toHex$$inline_181$$, $inst$:$inst_opcode$$inline_162_opcode$$inline_171$$, code:$code$$5_opcodesArray$$inline_163_opcodesArray$$inline_172$$, $address$:$currAddr_defaultInstruction$$inline_182$$, $nextAddress$:$address$$8$$, target:$address$$inline_169_hexOpcodes$$inline_184_target$$46$$}, $opcodesArray_toHex$$inline_181$$ = $JSSMS$Utils$$.$toHex$, $currAddr_defaultInstruction$$inline_182$$ = 
@@ -7628,17 +7628,17 @@ function $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$$($J
     return $tstates$$1$$;
   }
   function $insertTStates$$() {
-    $tstates$$ && $code$$4$$.push("this.tstates -= " + $toHex$$2$$($tstates$$) + ";");
+    $tstates$$ && $code$$4$$.push("this.tstates -= " + $toHex$$1$$($tstates$$) + ";");
     $tstates$$ = 0;
   }
   $JSSMS$Utils$$.console.time("JavaScript generation");
   $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$ = $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$.$u$;
-  for (var $toHex$$2$$ = $JSSMS$Utils$$.$toHex$, $tstates$$ = 0, $prevAddress$$ = 0, $prevNextAddress$$ = 0, $breakNeeded$$ = !1, $pageBreakPoint$$ = 1024, $pageNumber$$ = 0, $i$$17$$ = 0, $length$$17$$ = 0, $code$$4$$ = ['"": {', '"": function() {', 'throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'], $i$$17$$ = 0, $length$$17$$ = $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$.length;$i$$17$$ < $length$$17$$;$i$$17$$++) {
+  for (var $toHex$$1$$ = $JSSMS$Utils$$.$toHex$, $tstates$$ = 0, $prevAddress$$ = 0, $prevNextAddress$$ = 0, $breakNeeded$$ = !1, $pageBreakPoint$$ = 1024, $pageNumber$$ = 0, $i$$17$$ = 0, $length$$17$$ = 0, $code$$4$$ = ['"": {', '"": function() {', 'throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'], $i$$17$$ = 0, $length$$17$$ = $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$.length;$i$$17$$ < $length$$17$$;$i$$17$$++) {
     if ($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$17$$]) {
-      $prevAddress$$ <= $pageBreakPoint$$ && $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$17$$].$address$ >= $pageBreakPoint$$ && ($code$$4$$.push("this.pc = " + $toHex$$2$$($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$17$$].$address$) + ";"), $code$$4$$.push("}"), $code$$4$$.push("},"), $code$$4$$.push("" + $pageNumber$$ + ": {"), $code$$4$$.push('"": function() {'), $code$$4$$.push('throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'), 
+      $prevAddress$$ <= $pageBreakPoint$$ && $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$17$$].$address$ >= $pageBreakPoint$$ && ($code$$4$$.push("this.pc = " + $toHex$$1$$($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$17$$].$address$) + ";"), $code$$4$$.push("}"), $code$$4$$.push("},"), $code$$4$$.push("" + $pageNumber$$ + ": {"), $code$$4$$.push('"": function() {'), $code$$4$$.push('throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'), 
       $breakNeeded$$ = !0, $pageNumber$$++, $pageBreakPoint$$ = 16384 * $pageNumber$$);
       if ($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$17$$].$isJumpTarget$ || $prevNextAddress$$ !== $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$17$$].$address$ || $breakNeeded$$) {
-        $insertTStates$$(), $prevNextAddress$$ && !$breakNeeded$$ && $code$$4$$.push("this.pc = " + $toHex$$2$$($prevNextAddress$$) + ";"), $code$$4$$.push("},"), $code$$4$$.push("" + $toHex$$2$$($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$17$$].$address$) + ": function(temp, location) {");
+        $insertTStates$$(), $prevNextAddress$$ && !$breakNeeded$$ && $code$$4$$.push("this.pc = " + $toHex$$1$$($prevNextAddress$$) + ";"), $code$$4$$.push("},"), $code$$4$$.push("" + $toHex$$1$$($JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$17$$].$address$) + ": function(temp, location) {");
       }
       $code$$4$$.push("// " + $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$17$$].label);
       $breakNeeded$$ = "return;" === $JSCompiler_StaticMethods_JSSMS_Debugger_prototype$writeJavaScript$self_tree$$1$$[$i$$17$$].code.substr(-7);
@@ -7986,12 +7986,12 @@ function $JSCompiler_StaticMethods_out$$($JSCompiler_StaticMethods_JSSMS_SN76489
     this.$jumpTargetNb$ = 0;
     this.$ast$ = null;
   }
-  var $toHex$$8$$ = $JSSMS$Utils$$.$toHex$;
+  var $toHex$$7$$ = $JSSMS$Utils$$.$toHex$;
   $Bytecode$$1$$.prototype = {get $hexOpcode$() {
-    return this.$opcode$.length ? this.$opcode$.map($toHex$$8$$).join(" ") : "";
+    return this.$opcode$.length ? this.$opcode$.map($toHex$$7$$).join(" ") : "";
   }, get label() {
-    var $name$$61$$ = this.name ? this.name.replace(/(nn|n|PC\+e|d)/, $toHex$$8$$(this.target || this.$operand$ || 0)) : "";
-    return $toHex$$8$$(this.$address$ + 16384 * this.page) + " " + this.$hexOpcode$ + " " + $name$$61$$;
+    var $name$$61$$ = this.name ? this.name.replace(/(nn|n|PC\+e|d)/, $toHex$$7$$(this.target || this.$operand$ || 0)) : "";
+    return $toHex$$7$$(this.$address$ + 16384 * this.page) + " " + this.$hexOpcode$ + " " + $name$$61$$;
   }};
   return $Bytecode$$1$$;
 }();
@@ -8751,7 +8751,7 @@ var $Parser$$ = function() {
             $canEnd_canEnd$$inline_302$$ = !0;
             break;
           default:
-            $JSSMS$Utils$$.console.error("Unexpected opcode", "0xED " + $toHex$$9$$($opcode$$13_opcode$$inline_294_opcode$$inline_298$$));
+            $JSSMS$Utils$$.console.error("Unexpected opcode", "0xED " + $toHex$$8$$($opcode$$13_opcode$$inline_294_opcode$$inline_298$$));
         }
         $bytecode$$.$nextAddress$ = $stream$$.$RomStream_prototype$position$;
         $bytecode$$.$operand$ = $operand$$3_operand$$inline_299$$;
@@ -8815,7 +8815,7 @@ var $Parser$$ = function() {
         $isFunctionEnder_isFunctionEnder$$inline_301$$ = !0;
         break;
       default:
-        $JSSMS$Utils$$.console.error("Unexpected opcode", $toHex$$9$$($opcode$$13_opcode$$inline_294_opcode$$inline_298$$));
+        $JSSMS$Utils$$.console.error("Unexpected opcode", $toHex$$8$$($opcode$$13_opcode$$inline_294_opcode$$inline_298$$));
     }
     $bytecode$$.$nextAddress$ = $stream$$.$RomStream_prototype$position$;
     $bytecode$$.$operand$ = $operand$$3_operand$$inline_299$$;
@@ -9033,7 +9033,7 @@ var $Parser$$ = function() {
       case 249:
         break;
       default:
-        $JSSMS$Utils$$.console.error("Unexpected opcode", "0xDD/0xFD " + $toHex$$9$$($opcode$$16_operand$$inline_306$$));
+        $JSSMS$Utils$$.console.error("Unexpected opcode", "0xDD/0xFD " + $toHex$$8$$($opcode$$16_operand$$inline_306$$));
     }
     $bytecode$$3$$.$nextAddress$ = $stream$$3$$.$RomStream_prototype$position$;
     $bytecode$$3$$.$operand$ = $opcode$$inline_307_operand$$5$$;
@@ -9045,7 +9045,7 @@ var $Parser$$ = function() {
     this.$a$ = null;
     this.page = 0;
   }
-  var $toHex$$9$$ = $JSSMS$Utils$$.$toHex$;
+  var $toHex$$8$$ = $JSSMS$Utils$$.$toHex$;
   $parser$$.prototype = {$addEntryPoint$:function $$parser$$$$$addEntryPoint$$($obj$$36$$) {
     this.$entryPoints$.push($obj$$36$$);
     this.$f$($obj$$36$$.$address$);
@@ -9057,7 +9057,7 @@ var $Parser$$ = function() {
       for (;this.$a$[$currentPage_entryPoint$$2_page$$1$$].length;) {
         var $currentAddress$$1_romPage_targetPage$$ = this.$a$[$currentPage_entryPoint$$2_page$$1$$].shift().$address$ % 16384;
         if ($currentAddress$$1_romPage_targetPage$$ < $i$$29_pageStart$$ || $currentAddress$$1_romPage_targetPage$$ > $length$$18_pageEnd$$) {
-          $JSSMS$Utils$$.console.error("Address out of bound", $toHex$$9$$($currentAddress$$1_romPage_targetPage$$));
+          $JSSMS$Utils$$.console.error("Address out of bound", $toHex$$8$$($currentAddress$$1_romPage_targetPage$$));
         } else {
           if (!this.$bytecodes$[$currentPage_entryPoint$$2_page$$1$$][$currentAddress$$1_romPage_targetPage$$]) {
             var $bytecode$$5_targetAddress$$ = new $Bytecode$$($currentAddress$$1_romPage_targetPage$$, $currentPage_entryPoint$$2_page$$1$$);
@@ -9077,7 +9077,7 @@ var $Parser$$ = function() {
       for ($i$$29_pageStart$$ = 0, $length$$18_pageEnd$$ = this.$bytecodes$[$currentPage_entryPoint$$2_page$$1$$].length;$i$$29_pageStart$$ < $length$$18_pageEnd$$;$i$$29_pageStart$$++) {
         this.$bytecodes$[$currentPage_entryPoint$$2_page$$1$$][$i$$29_pageStart$$] && (null !== this.$bytecodes$[$currentPage_entryPoint$$2_page$$1$$][$i$$29_pageStart$$].$nextAddress$ && this.$bytecodes$[$currentPage_entryPoint$$2_page$$1$$][this.$bytecodes$[$currentPage_entryPoint$$2_page$$1$$][$i$$29_pageStart$$].$nextAddress$] && this.$bytecodes$[$currentPage_entryPoint$$2_page$$1$$][this.$bytecodes$[$currentPage_entryPoint$$2_page$$1$$][$i$$29_pageStart$$].$nextAddress$].$jumpTargetNb$++, null !== 
         this.$bytecodes$[$currentPage_entryPoint$$2_page$$1$$][$i$$29_pageStart$$].target && ($currentAddress$$1_romPage_targetPage$$ = ~~(this.$bytecodes$[$currentPage_entryPoint$$2_page$$1$$][$i$$29_pageStart$$].target / 16384), $bytecode$$5_targetAddress$$ = this.$bytecodes$[$currentPage_entryPoint$$2_page$$1$$][$i$$29_pageStart$$].target % 16384, this.$bytecodes$[$currentAddress$$1_romPage_targetPage$$] && this.$bytecodes$[$currentAddress$$1_romPage_targetPage$$][$bytecode$$5_targetAddress$$] ? 
-        (this.$bytecodes$[$currentAddress$$1_romPage_targetPage$$][$bytecode$$5_targetAddress$$].$isJumpTarget$ = !0, this.$bytecodes$[$currentAddress$$1_romPage_targetPage$$][$bytecode$$5_targetAddress$$].$jumpTargetNb$++) : $JSSMS$Utils$$.console.log("Invalid target address", $toHex$$9$$(this.$bytecodes$[$currentPage_entryPoint$$2_page$$1$$][$i$$29_pageStart$$].target))));
+        (this.$bytecodes$[$currentAddress$$1_romPage_targetPage$$][$bytecode$$5_targetAddress$$].$isJumpTarget$ = !0, this.$bytecodes$[$currentAddress$$1_romPage_targetPage$$][$bytecode$$5_targetAddress$$].$jumpTargetNb$++) : $JSSMS$Utils$$.console.log("Invalid target address", $toHex$$8$$(this.$bytecodes$[$currentPage_entryPoint$$2_page$$1$$][$i$$29_pageStart$$].target))));
       }
     }
     $JSSMS$Utils$$.console.timeEnd("Parsing");
@@ -9982,7 +9982,7 @@ var $Generator$$ = function() {
       return $node$$4$$;
     });
   }
-  var $toHex$$10$$ = $JSSMS$Utils$$.$toHex$, $whitelist$$ = "page temp location val value JSSMS.Utils.rndInt".split(" ");
+  var $toHex$$9$$ = $JSSMS$Utils$$.$toHex$, $whitelist$$ = "page temp location val value JSSMS.Utils.rndInt".split(" ");
   $Generator$$1$$.prototype = {$generate$:function $$Generator$$1$$$$$generate$$($functions$$1$$) {
     for (var $page$$8$$ = 0;$page$$8$$ < $functions$$1$$.length;$page$$8$$++) {
       $functions$$1$$[$page$$8$$] = $functions$$1$$[$page$$8$$].map(function($fn$$9$$) {
@@ -9990,10 +9990,10 @@ var $Generator$$ = function() {
         $fn$$9$$ = $fn$$9$$.map(function($bytecode$$9$$) {
           void 0 === $bytecode$$9$$.$ast$ && ($bytecode$$9$$.$ast$ = []);
           $tstates$$2$$ += $getTotalTStates$$1$$($bytecode$$9$$.$opcode$);
-          var $decreaseTStateStmt_nextAddress$$44_updatePcStmt$$ = [{type:"ExpressionStatement", expression:{type:"AssignmentExpression", operator:"-=", left:{type:"Identifier", name:"tstates"}, right:{type:"Literal", value:$tstates$$2$$, raw:$DEBUG$$ ? $toHex$$10$$($tstates$$2$$) : "" + $tstates$$2$$}}}];
+          var $decreaseTStateStmt_nextAddress$$44_updatePcStmt$$ = [{type:"ExpressionStatement", expression:{type:"AssignmentExpression", operator:"-=", left:{type:"Identifier", name:"tstates"}, right:{type:"Literal", value:$tstates$$2$$, raw:$DEBUG$$ ? $toHex$$9$$($tstates$$2$$) : "" + $tstates$$2$$}}}];
           $tstates$$2$$ = 0;
           $bytecode$$9$$.$ast$ = [].concat($decreaseTStateStmt_nextAddress$$44_updatePcStmt$$, $bytecode$$9$$.$ast$);
-          $bytecode$$9$$.$isFunctionEnder$ && null !== $bytecode$$9$$.$nextAddress$ && ($decreaseTStateStmt_nextAddress$$44_updatePcStmt$$ = $bytecode$$9$$.$nextAddress$ % 16384, $decreaseTStateStmt_nextAddress$$44_updatePcStmt$$ = {type:"ExpressionStatement", expression:{type:"AssignmentExpression", operator:"=", left:{type:"Identifier", name:"pc"}, right:{type:"BinaryExpression", operator:"+", left:{type:"Literal", value:$decreaseTStateStmt_nextAddress$$44_updatePcStmt$$, raw:$DEBUG$$ ? $toHex$$10$$($decreaseTStateStmt_nextAddress$$44_updatePcStmt$$) : 
+          $bytecode$$9$$.$isFunctionEnder$ && null !== $bytecode$$9$$.$nextAddress$ && ($decreaseTStateStmt_nextAddress$$44_updatePcStmt$$ = $bytecode$$9$$.$nextAddress$ % 16384, $decreaseTStateStmt_nextAddress$$44_updatePcStmt$$ = {type:"ExpressionStatement", expression:{type:"AssignmentExpression", operator:"=", left:{type:"Identifier", name:"pc"}, right:{type:"BinaryExpression", operator:"+", left:{type:"Literal", value:$decreaseTStateStmt_nextAddress$$44_updatePcStmt$$, raw:$DEBUG$$ ? $toHex$$9$$($decreaseTStateStmt_nextAddress$$44_updatePcStmt$$) : 
           "" + $decreaseTStateStmt_nextAddress$$44_updatePcStmt$$}, right:{type:"BinaryExpression", operator:"*", left:{type:"Identifier", name:"page"}, right:{type:"Literal", value:16384, raw:"0x4000"}}}}}, $bytecode$$9$$.$ast$.push($decreaseTStateStmt_nextAddress$$44_updatePcStmt$$));
           $DEBUG$$ && $bytecode$$9$$.$ast$[0] && ($bytecode$$9$$.$ast$[0].$leadingComments$ = [{type:"Line", value:" " + $bytecode$$9$$.label}]);
           return $bytecode$$9$$.$ast$;
@@ -10024,7 +10024,7 @@ var $Recompiler$$ = function() {
     this.$generator$ = new $Generator$$;
     this.$bytecodes$ = {};
   }
-  var $toHex$$11$$ = $JSSMS$Utils$$.$toHex$;
+  var $toHex$$10$$ = $JSSMS$Utils$$.$toHex$;
   $Recompiler$$1$$.prototype = {$g$:function $$Recompiler$$1$$$$$g$$($rom$$2$$) {
     this.$rom$ = $rom$$2$$;
     this.$parser$ = new $Parser$$($rom$$2$$, this.$cpu$.$frameReg$);
@@ -10035,7 +10035,7 @@ var $Recompiler$$ = function() {
     for (var $fns$$ = this.parse().$analyze$().$optimize$().$generate$(), $page$$9$$ = 0;$page$$9$$ < this.$rom$.length;$page$$9$$++) {
       $fns$$[$page$$9$$].forEach(function($fn$$10$$) {
         var $funcName$$ = $fn$$10$$.body[0].id.name;
-        $DEBUG$$ && ($fn$$10$$.body[0].id.name = "_" + $toHex$$11$$($funcName$$));
+        $DEBUG$$ && ($fn$$10$$.body[0].id.name = "_" + $toHex$$10$$($funcName$$));
         $self$$8$$.$cpu$.$branches$[$page$$9$$][$funcName$$] = (new Function("return " + $self$$8$$.$f$($fn$$10$$)))();
       });
     }
@@ -10058,7 +10058,7 @@ var $Recompiler$$ = function() {
   }, $a$:function $$Recompiler$$1$$$$$a$$($address$$24$$, $romPage$$3$$, $memPage$$1$$) {
     var $self$$10$$ = this;
     this.$parseFromAddress$($address$$24$$, $romPage$$3$$, $memPage$$1$$).$analyzeFromAddress$().$optimize$().$generate$()[0].forEach(function($fn$$11$$) {
-      $DEBUG$$ && ($fn$$11$$.body[0].id.name = "_" + $toHex$$11$$($fn$$11$$.body[0].id.name));
+      $DEBUG$$ && ($fn$$11$$.body[0].id.name = "_" + $toHex$$10$$($fn$$11$$.body[0].id.name));
       $self$$10$$.$cpu$.$branches$[$romPage$$3$$][$address$$24$$ % 16384] = (new Function("return " + $self$$10$$.$f$($fn$$11$$)))();
     });
   }, $parseFromAddress$:function $$Recompiler$$1$$$$$parseFromAddress$$($address$$25_obj$$39$$, $romPage$$4$$, $memPage$$2$$) {
@@ -10080,6 +10080,7 @@ $JSSMS$$.prototype.readRomDirectly = $JSSMS$$.prototype.$readRomDirectly$;
 $JSSMS$$.prototype.start = $JSSMS$$.prototype.$JSSMS_prototype$start$;
 $JSSMS$$.prototype.stop = $JSSMS$$.prototype.$JSSMS_prototype$stop$;
 $JSSMS$$.Utils = $JSSMS$Utils$$;
+$JSSMS$$.Utils.getFileExtension = $JSSMS$Utils$$.$getFileExtension$;
 $JSSMS$$.Utils.crc32 = $JSSMS$Utils$$.$crc32$;
 $JSSMS$$.NodeUI = $JSSMS$NodeUI$$;
 $JSSMS$$.NodeUI.prototype.writeGraphViz = $JSSMS$NodeUI$$.prototype.$a$;
