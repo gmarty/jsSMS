@@ -270,8 +270,24 @@ JSSMS.Utils = {
       return '';
     }
 
+    return fileName.split('.').pop().toLowerCase();
+  },
+
+
+  /**
+   * Given a file name, returns the filename, without path or extension.
+   *
+   * @param {string} fileName The filename, possibly including a path.
+   * @return {string} The filename of the file.
+   */
+  getFileName: function(fileName) {
+    if (typeof fileName !== 'string') {
+      return '';
+    }
+
     var parts = fileName.split('.');
-    return parts[parts.length - 1].toLowerCase();
+    parts.pop();
+    return parts.join('.').split('/').pop();
   },
 
 
@@ -306,7 +322,7 @@ JSSMS.Utils = {
         crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xFF];
       }
 
-      return ((crc ^ -1) >>> 0).toString(16).toUpperCase();
+      return (crc ^ -1) >>> 0;
     };
 
     return this.crc32(str);
