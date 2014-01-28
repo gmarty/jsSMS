@@ -94,7 +94,9 @@ if (window['$']) {
 
       // Screen
       this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + ' moz-opaque></canvas>');
-      this.canvasContext = this.screen[0].getContext('2d');
+      this.canvasContext = this.screen[0].getContext('2d', {
+        'alpha': false // See http://my.opera.com/ODIN/blog/opera-19-released
+      });
 
       // Nearest-neighbour rendering for scaling pixel-art.
       this.canvasContext['webkitImageSmoothingEnabled'] = false;
@@ -357,7 +359,7 @@ if (window['$']) {
               // Download as binary
               xhr.overrideMimeType('text/plain; charset=x-user-defined');
             }
-            self.xhr = xhr;
+            self.xhr = xhr; // ???
             return xhr;
           },
           complete: function(xhr, status) {
