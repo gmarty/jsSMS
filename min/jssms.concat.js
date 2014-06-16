@@ -117,13 +117,13 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
 }, setGG:function() {
   this.is_gg = true;
   this.is_sms = false;
-  this.vdp.h_start = 5;
-  this.vdp.h_end = 27;
+  this.vdp.h_start = 6;
+  this.vdp.h_end = 26;
   this.emuWidth = GG_WIDTH;
   this.emuHeight = GG_HEIGHT;
 }, setVideoTiming:function(mode) {
   var clockSpeedHz = 0, i, v;
-  if (mode == NTSC || this.is_gg) {
+  if (mode === NTSC || this.is_gg) {
     this.fps = 60;
     this.no_of_scanlines = SMS_Y_PIXELS_NTSC;
     clockSpeedHz = CLOCK_NTSC;
@@ -137,10 +137,10 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   if (this.soundEnabled) {
     this.psg.init(clockSpeedHz, SAMPLE_RATE);
     this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps);
-    if (this.audioBuffer.length === 0 || this.audioBuffer.length != this.samplesPerFrame) {
+    if (this.audioBuffer.length === 0 || this.audioBuffer.length !== this.samplesPerFrame) {
       this.audioBuffer = new Array(this.samplesPerFrame);
     }
-    if (this.samplesPerLine.length === 0 || this.samplesPerLine.length != this.no_of_scanlines) {
+    if (this.samplesPerLine.length === 0 || this.samplesPerLine.length !== this.no_of_scanlines) {
       this.samplesPerLine = new Array(this.no_of_scanlines);
       var fractional = 0;
       for (i = 0;i < this.no_of_scanlines;i++) {
@@ -172,12 +172,12 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   this.audioBufferOffset += samplesToGenerate;
 }, readRomDirectly:function(data, fileName) {
   var pages;
-  var mode = fileName.substr(-3).toLowerCase() == ".gg" ? 2 : 1;
+  var mode = JSSMS.Utils.getFileExtension(fileName) === "gg" ? 2 : 1;
   var size = data.length;
-  if (mode == 1) {
+  if (mode === 1) {
     this.setSMS();
   } else {
-    if (mode == 2) {
+    if (mode === 2) {
       this.setGG();
     }
   }
@@ -333,6 +333,39 @@ JSSMS.Utils = {rndInt:function(range) {
     return false;
   });
   return prefix;
+}, getFileExtension:function(fileName) {
+  if (typeof fileName !== "string") {
+    return "";
+  }
+  return fileName.split(".").pop().toLowerCase();
+}, getFileName:function(fileName) {
+  if (typeof fileName !== "string") {
+    return "";
+  }
+  var parts = fileName.split(".");
+  parts.pop();
+  return parts.join(".").split("/").pop();
+}, crc32:function(str) {
+  var crcTable = function makeCRCTable() {
+    var c = 0;
+    var crcTable = new Uint32Array(256);
+    for (var n = 0;n < 256;n++) {
+      c = n;
+      for (var k = 0;k < 8;k++) {
+        c = c & 1 ? 3988292384 ^ c >>> 1 : c >>> 1;
+      }
+      crcTable[n] = c;
+    }
+    return crcTable;
+  }();
+  this.crc32 = function(str) {
+    var crc = 0 ^ -1;
+    for (var i = 0;i < str.length;i++) {
+      crc = crc >>> 8 ^ crcTable[(crc ^ str.charCodeAt(i)) & 255];
+    }
+    return(crc ^ -1) >>> 0;
+  };
+  return this.crc32(str);
 }, isIE:function() {
   return/msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent);
 }};
@@ -365,7 +398,7 @@ function BinaryRequest(method, url, args, data, cb) {
     console.error("responseType arrayBuffer not supported!");
   }
   xhr.onreadystatechange = function onreadystatechange() {
-    if (xhr.readyState == 4) {
+    if (xhr.readyState === 4) {
       invokeAlways();
     }
   };
@@ -378,7 +411,7 @@ function BinaryRequest(method, url, args, data, cb) {
   };
   xhr.send(data);
   this.always = function(cb) {
-    if (xhr.readyState == 4) {
+    if (xhr.readyState === 4) {
       cb();
     }
     alwaysCallbacks.push(cb);
@@ -490,11 +523,11 @@ SyncReader.prototype = {refill:function() {
   }
   var toHex = JSSMS.Utils.toHex;
   var writtenVal = this.pop();
-  if (val == writtenVal) {
+  if (val === writtenVal) {
     console.log(name, toHex(val), toHex(writtenVal));
   } else {
     console.log("%c" + name, "color: red;", toHex(val), toHex(writtenVal));
-    if (name == "pc") {
+    if (name === "pc") {
       debugger;
       return false;
     }
@@ -600,7 +633,7 @@ JSSMS.Z80 = function(sms) {
     this.recompiler = new Recompiler(this);
   }
   if (ENABLE_SERVER_LOGGER) {
-    if (SYNC_MODE == WRITE_MODE) {
+    if (SYNC_MODE === WRITE_MODE) {
       this.syncServer = new SyncWriter;
     } else {
       this.syncServer = new SyncReader;
@@ -1571,7 +1604,7 @@ JSSMS.Z80.prototype = {reset:function() {
     this.pc = this.interruptVector === 0 || this.interruptVector === 255 ? 56 : this.interruptVector;
     this.tstates -= 13;
   } else {
-    if (this.im == 1) {
+    if (this.im === 1) {
       this.pc = 56;
       this.tstates -= 13;
     } else {
@@ -4214,7 +4247,7 @@ JSSMS.Z80.prototype = {reset:function() {
   if ((flags & F_HALFCARRY) !== 0 || (a_copy & 15) > 9) {
     correction |= 6;
   }
-  if (carry == 1 || (a_copy > 159 || a_copy > 143 && (a_copy & 15) > 9)) {
+  if (carry === 1 || a_copy > 159 || a_copy > 143 && (a_copy & 15) > 9) {
     correction |= 96;
     carry_copy = 1;
   }
@@ -4329,27 +4362,27 @@ JSSMS.Z80.prototype = {reset:function() {
   }
 }, decBC:function() {
   this.c = this.c - 1 & 255;
-  if (this.c == 255) {
+  if (this.c === 255) {
     this.b = this.b - 1 & 255;
   }
 }, decDE:function() {
   this.e = this.e - 1 & 255;
-  if (this.e == 255) {
+  if (this.e === 255) {
     this.d = this.d - 1 & 255;
   }
 }, decHL:function() {
   this.l = this.l - 1 & 255;
-  if (this.l == 255) {
+  if (this.l === 255) {
     this.h = this.h - 1 & 255;
   }
 }, decIXHIXL:function() {
   this.ixL = this.ixL - 1 & 255;
-  if (this.ixL == 255) {
+  if (this.ixL === 255) {
     this.ixH = this.ixH - 1 & 255;
   }
 }, decIYHIYL:function() {
   this.iyL = this.iyL - 1 & 255;
-  if (this.iyL == 255) {
+  if (this.iyL === 255) {
     this.iyH = this.iyH - 1 & 255;
   }
 }, inc8:function(value) {
@@ -4688,11 +4721,11 @@ JSSMS.Z80.prototype = {reset:function() {
             return this.rom[this.frameReg[1]].getUint8(address - 16384);
           } else {
             if (address < 49152) {
-              if ((this.frameReg[3] & 12) == 8) {
+              if ((this.frameReg[3] & 12) === 8) {
                 this.useSRAM = true;
                 return this.sram.getUint8(address - 32768);
               } else {
-                if ((this.frameReg[3] & 12) == 12) {
+                if ((this.frameReg[3] & 12) === 12) {
                   this.useSRAM = true;
                   return this.sram.getUint8(address - 16384);
                 } else {
@@ -4743,11 +4776,11 @@ JSSMS.Z80.prototype = {reset:function() {
             return this.rom[this.frameReg[1]][address - 16384];
           } else {
             if (address < 49152) {
-              if ((this.frameReg[3] & 12) == 8) {
+              if ((this.frameReg[3] & 12) === 8) {
                 this.useSRAM = true;
                 return this.sram[address - 32768];
               } else {
-                if ((this.frameReg[3] & 12) == 12) {
+                if ((this.frameReg[3] & 12) === 12) {
                   this.useSRAM = true;
                   return this.sram[address - 16384];
                 } else {
@@ -4800,11 +4833,11 @@ JSSMS.Z80.prototype = {reset:function() {
             return this.rom[this.frameReg[1]].getUint16(address - 16384, LITTLE_ENDIAN);
           } else {
             if (address < 49152) {
-              if ((this.frameReg[3] & 12) == 8) {
+              if ((this.frameReg[3] & 12) === 8) {
                 this.useSRAM = true;
                 return this.sram[address - 32768];
               } else {
-                if ((this.frameReg[3] & 12) == 12) {
+                if ((this.frameReg[3] & 12) === 12) {
                   this.useSRAM = true;
                   return this.sram[address - 16384];
                 } else {
@@ -4855,11 +4888,11 @@ JSSMS.Z80.prototype = {reset:function() {
             return this.rom[this.frameReg[1]][address++ - 16384] | this.rom[this.frameReg[1]][address - 16384] << 8;
           } else {
             if (address < 49152) {
-              if ((this.frameReg[3] & 12) == 8) {
+              if ((this.frameReg[3] & 12) === 8) {
                 this.useSRAM = true;
                 return this.sram[address++ - 32768] | this.sram[address - 32768] << 8;
               } else {
-                if ((this.frameReg[3] & 12) == 12) {
+                if ((this.frameReg[3] & 12) === 12) {
                   this.useSRAM = true;
                   return this.sram[address++ - 16384] | this.sram[address - 16384] << 8;
                 } else {
@@ -5074,7 +5107,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       pageNumber++;
       pageBreakPoint = pageNumber * PAGE_SIZE;
     }
-    if (tree[i].isJumpTarget || (prevNextAddress != tree[i].address || breakNeeded)) {
+    if (tree[i].isJumpTarget || prevNextAddress !== tree[i].address || breakNeeded) {
       insertTStates();
       if (prevNextAddress && !breakNeeded) {
         code.push("this.pc = " + toHex(prevNextAddress) + ";");
@@ -5083,7 +5116,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code.push("" + toHex(tree[i].address) + ": function(temp, location) {");
     }
     code.push("// " + tree[i].label);
-    breakNeeded = tree[i].code.substr(-7) == "return;";
+    breakNeeded = tree[i].code.substr(-7) === "return;";
     tstates += getTotalTStates(tree[i].opcodes);
     if (/return;/.test(tree[i].code) || /this\.tstates/.test(tree[i].code)) {
       insertTStates();
@@ -5108,7 +5141,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       case 221:
       ;
       case 253:
-        if (opcodes.length == 2) {
+        if (opcodes.length === 2) {
           tstates = OP_DD_STATES[opcodes[1]];
         } else {
           tstates = OP_INDEX_CB_STATES[opcodes[2]];
@@ -5215,7 +5248,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 16:
       target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "DJNZ (" + toHex(target) + ")";
-      code = "this.b = this.b - 0x01 & 0xFF;" + "if (this.b != 0x00) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "this.b = this.b - 0x01 & 0xFF;" + "if (this.b !== 0x00) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address++;
       break;
     case 17:
@@ -5289,7 +5322,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 32:
       target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "JR NZ,(" + toHex(target) + ")";
-      code = "if (!((this.f & F_ZERO) != 0x00)) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if (!((this.f & F_ZERO) !== 0x00)) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address++;
       break;
     case 33:
@@ -5330,7 +5363,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 40:
       target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "JR Z,(" + toHex(target) + ")";
-      code = "if ((this.f & F_ZERO) != 0x00) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_ZERO) !== 0x00) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address++;
       break;
     case 41:
@@ -5368,7 +5401,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 48:
       target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "JR NC,(" + toHex(target) + ")";
-      code = "if (!((this.f & F_CARRY) != 0x00)) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if (!((this.f & F_CARRY) !== 0x00)) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address++;
       break;
     case 49:
@@ -5408,7 +5441,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 56:
       target = address + this.signExtend(this.readRom8bit(address) + 1);
       inst = "JR C,(" + toHex(target) + ")";
-      code = "if ((this.f & F_CARRY) != 0x00) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_CARRY) !== 0x00) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address++;
       break;
     case 57:
@@ -6003,7 +6036,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 200:
       inst = "RET Z";
-      code = "if ((this.f & F_ZERO) != 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
+      code = "if ((this.f & F_ZERO) !== 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
       break;
     case 201:
       inst = "RET";
@@ -6013,7 +6046,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 202:
       target = this.readRom16bit(address);
       inst = "JP Z,(" + toHex(target) + ")";
-      code = "if ((this.f & F_ZERO) != 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_ZERO) !== 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 203:
@@ -6026,7 +6059,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 204:
       target = this.readRom16bit(address);
       inst = "CALL Z (" + toHex(target) + ")";
-      code = "if ((this.f & F_ZERO) != 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_ZERO) !== 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 205:
@@ -6089,7 +6122,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 216:
       inst = "RET C";
-      code = "if ((this.f & F_CARRY) != 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
+      code = "if ((this.f & F_CARRY) !== 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
       break;
     case 217:
       inst = "EXX";
@@ -6098,7 +6131,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 218:
       target = this.readRom16bit(address);
       inst = "JP C,(" + toHex(target) + ")";
-      code = "if ((this.f & F_CARRY) != 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_CARRY) !== 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 219:
@@ -6110,7 +6143,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 220:
       target = this.readRom16bit(address);
       inst = "CALL C (" + toHex(target) + ")";
-      code = "if ((this.f & F_CARRY) != 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_CARRY) !== 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 221:
@@ -6172,7 +6205,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 232:
       inst = "RET PE";
-      code = "if ((this.f & F_PARITY) != 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
+      code = "if ((this.f & F_PARITY) !== 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
       break;
     case 233:
       inst = "JP (HL)";
@@ -6182,7 +6215,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 234:
       target = this.readRom16bit(address);
       inst = "JP PE,(" + toHex(target) + ")";
-      code = "if ((this.f & F_PARITY) != 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_PARITY) !== 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 235:
@@ -6192,7 +6225,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 236:
       target = this.readRom16bit(address);
       inst = "CALL PE (" + toHex(target) + ")";
-      code = "if ((this.f & F_PARITY) != 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_PARITY) !== 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 237:
@@ -6255,7 +6288,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 248:
       inst = "RET M";
-      code = "if ((this.f & F_SIGN) != 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
+      code = "if ((this.f & F_SIGN) !== 0x00) {" + "this.tstates -= 0x06;" + "this.pc = this.readMemWord(this.sp);" + "this.sp += 0x02;" + "return;" + "}";
       break;
     case 249:
       inst = "LD SP,HL";
@@ -6264,7 +6297,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 250:
       target = this.readRom16bit(address);
       inst = "JP M,(" + toHex(target) + ")";
-      code = "if ((this.f & F_SIGN) != 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_SIGN) !== 0x00) {" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 251:
@@ -6274,7 +6307,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 252:
       target = this.readRom16bit(address);
       inst = "CALL M (" + toHex(target) + ")";
-      code = "if ((this.f & F_SIGN) != 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+      code = "if ((this.f & F_SIGN) !== 0x00) {" + "this.tstates -= 0x07;" + "this.push1(" + toHex(address + 2) + ");" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       address += 2;
       break;
     case 253:
@@ -7521,7 +7554,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       break;
     case 170:
       inst = "IND";
-      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if ((temp & 0x80) != 0x00) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if ((temp & 0x80) !== 0x00) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
       break;
     case 171:
       inst = "OUTD";
@@ -7532,9 +7565,9 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();" + "this.incHL();" + "this.decBC();";
       if (ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
-        code += "if (this.getBC() != 0x00) {" + "this.tstates -= 0x05;" + "this.f |= F_PARITY;" + "return;" + "} else {";
+        code += "if (this.getBC() !== 0x00) {" + "this.tstates -= 0x05;" + "this.f |= F_PARITY;" + "return;" + "} else {";
       } else {
-        code += "for (;this.getBC() != 0x00; this.f |= F_PARITY, this.tstates -= 5) {" + "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "}" + "if (!(this.getBC() != 0x00)) {";
+        code += "for (;this.getBC() !== 0x00; this.f |= F_PARITY, this.tstates -= 5) {" + "this.writeMem(this.getDE(), this.readMem(this.getHL()));" + "this.incDE();this.incHL();this.decBC();" + "}" + "if (!(this.getBC() !== 0x00)) {";
       }
       code += "this.f &= ~ F_PARITY;" + "}" + "this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
       break;
@@ -7543,27 +7576,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       code = "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);";
       if (ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
-        code += "if ((temp & F_PARITY) != 0x00 && (this.f & F_ZERO) === 0x00) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
+        code += "if ((temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00) {" + "this.tstates -= 0x05;" + "this.pc = " + toHex(target) + ";" + "return;" + "}";
       } else {
-        code += "for (;(temp & F_PARITY) != 0x00 && (this.f & F_ZERO) === 0x00; this.tstates -= 5) {" + "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);" + "}";
+        code += "for (;(temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00; this.tstates -= 5) {" + "temp = (this.f & F_CARRY) | F_NEGATIVE;" + "this.cp_a(this.readMem(this.getHL()));" + "this.incHL();" + "this.decBC();" + "temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);" + "}";
       }
       code += "this.f = (this.f & 0xF8) | temp;";
       break;
     case 178:
       target = address - 2;
       inst = "INIR";
-      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "if (this.b != 0x00) {" + "this.tstates -= 0x05;" + "return;" + "}" + "if ((temp & 0x80) === 0x80) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "if (this.b !== 0x00) {" + "this.tstates -= 0x05;" + "return;" + "}" + "if ((temp & 0x80) === 0x80) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
       break;
     case 179:
       inst = "OTIR";
       code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();";
       if (ACCURATE_INTERRUPT_EMULATION) {
         target = address - 2;
-        code += "if (this.b != 0x00) {" + "this.tstates -= 0x05;" + "return;" + "}";
+        code += "if (this.b !== 0x00) {" + "this.tstates -= 0x05;" + "return;" + "}";
       } else {
-        code += "for (;this.b != 0x00; this.tstates -= 5) {" + "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "}";
+        code += "for (;this.b !== 0x00; this.tstates -= 5) {" + "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.incHL();" + "}";
       }
-      code += "if (this.l + temp > 0xFF) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) != 0x00) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
+      code += "if (this.l + temp > 0xFF) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) !== 0x00) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
       break;
     case 184:
       inst = "LDDR";
@@ -7574,12 +7607,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
     case 186:
       target = address - 2;
       inst = "INDR";
-      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0x00) {" + "this.tstates -= 0x05;" + "return;" + "}" + "if ((temp & 0x80) != 0x00) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
+      code = "temp = this.port.in_(this.c);" + "this.writeMem(this.getHL(), temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b !== 0x00) {" + "this.tstates -= 0x05;" + "return;" + "}" + "if ((temp & 0x80) !== 0x00) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
       break;
     case 187:
       target = address - 2;
       inst = "OTDR";
-      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b != 0x00) {" + "this.tstates -= 0x05;" + "return;" + "}" + "if (this.l + temp > 0xFF) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) != 0x00) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
+      code = "temp = this.readMem(this.getHL());" + "this.port.out(this.c, temp);" + "this.b = this.dec8(this.b);" + "this.decHL();" + "if (this.b !== 0x00) {" + "this.tstates -= 0x05;" + "return;" + "}" + "if (this.l + temp > 0xFF) {" + "this.f |= F_CARRY; this.f |= F_HALFCARRY;" + "} else {" + "this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;" + "}" + "if ((temp & 0x80) !== 0x00) {" + "this.f |= F_NEGATIVE;" + "} else {" + "this.f &= ~ F_NEGATIVE;" + "}";
       break;
   }
   return{opcode:opcode, opcodes:opcodesArray, inst:inst, code:code, address:currAddr, nextAddress:address, target:target};
@@ -8616,7 +8649,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
   switch(port & 193) {
     case 1:
       if (LIGHTGUN) {
-        return "var value = this.a;" + "this.port.oldTH = (this.port.getTH(PORT_A) != 0x00 || this.port.getTH(PORT_B) != 0x00);" + "this.port.writePort(PORT_A, value);" + "this.port.writePort(PORT_B, value >> 2);" + "if (!this.port.oldTH && (this.port.getTH(PORT_A) != 0x00 || this.port.getTH(PORT_B) != 0x00)) {" + "this.port.hCounter = this.port.getHCount();" + "}";
+        return "var value = this.a;" + "this.port.oldTH = (this.port.getTH(PORT_A) !== 0x00 || this.port.getTH(PORT_B) !== 0x00);" + "this.port.writePort(PORT_A, value);" + "this.port.writePort(PORT_B, value >> 2);" + "if (!this.port.oldTH && (this.port.getTH(PORT_A) !== 0x00 || this.port.getTH(PORT_B) !== 0x00)) {" + "this.port.hCounter = this.port.getHCount();" + "}";
       } else {
         var code = "var value = this.a;" + "this.port.ioPorts[0] = (value & 0x20) << 1;" + "this.port.ioPorts[1] = (value & 0x80);";
         if (this.port.europe === 0) {
@@ -8670,7 +8703,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function() {
       return "this.a = this.port.keyboard.controller1;";
     case 193:
       if (LIGHTGUN) {
-        return "if (this.port.keyboard.lightgunClick)" + "this.port.lightPhaserSync();" + "this.a = (this.port.keyboard.controller2 & 0x3F) | (this.port.getTH(PORT_A) != 0x00 ? 0x40 : 0x00) | (this.port.getTH(PORT_B) != 0x00 ? 0x80 : 0x00);";
+        return "if (this.port.keyboard.lightgunClick)" + "this.port.lightPhaserSync();" + "this.a = (this.port.keyboard.controller2 & 0x3F) | (this.port.getTH(PORT_A) !== 0x00 ? 0x40 : 0x00) | (this.port.getTH(PORT_B) !== 0x00 ? 0x80 : 0x00);";
       } else {
         return "this.a = (this.port.keyboard.controller2 & 0x3F) | this.port.ioPorts[0] | this.port.ioPorts[1];";
       }
@@ -8854,7 +8887,7 @@ JSSMS.SN76489.prototype = {init:function(clockSpeed, sampleRate) {
     this.reg[(i << 1) + 1] = 15;
     this.freqCounter[i] = 0;
     this.freqPolarity[i] = 1;
-    if (i != 3) {
+    if (i !== 3) {
       this.freqPos[i] = NO_ANTIALIAS;
     }
   }
@@ -8863,7 +8896,7 @@ JSSMS.SN76489.prototype = {init:function(clockSpeed, sampleRate) {
     this.regLatch = value >> 4 & 7;
     this.reg[this.regLatch] = this.reg[this.regLatch] & 1008 | value & 15;
   } else {
-    if (this.regLatch === 0 || (this.regLatch == 2 || this.regLatch == 4)) {
+    if (this.regLatch === 0 || this.regLatch === 2 || this.regLatch === 4) {
       this.reg[this.regLatch] = this.reg[this.regLatch] & 15 | (value & 63) << 4;
     } else {
       this.reg[this.regLatch] = value & 15;
@@ -8890,7 +8923,7 @@ JSSMS.SN76489.prototype = {init:function(clockSpeed, sampleRate) {
   var i = 0;
   for (;sample < samplesToGenerate;sample++) {
     for (i = 0;i < 3;i++) {
-      if (this.freqPos[i] != NO_ANTIALIAS) {
+      if (this.freqPos[i] !== NO_ANTIALIAS) {
         this.outputChannel[i] = PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPos[i] >> SCALE;
       } else {
         this.outputChannel[i] = PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPolarity[i];
@@ -8913,7 +8946,7 @@ JSSMS.SN76489.prototype = {init:function(clockSpeed, sampleRate) {
     this.freqCounter[0] -= clockCycles;
     this.freqCounter[1] -= clockCycles;
     this.freqCounter[2] -= clockCycles;
-    if (this.noiseFreq == 128) {
+    if (this.noiseFreq === 128) {
       this.freqCounter[3] = this.freqCounter[2];
     } else {
       this.freqCounter[3] -= clockCycles;
@@ -8936,10 +8969,10 @@ JSSMS.SN76489.prototype = {init:function(clockSpeed, sampleRate) {
     }
     if (this.freqCounter[3] <= 0) {
       this.freqPolarity[3] = -this.freqPolarity[3];
-      if (this.noiseFreq != 128) {
+      if (this.noiseFreq !== 128) {
         this.freqCounter[3] += this.noiseFreq * (clockCycles / this.noiseFreq + 1);
       }
-      if (this.freqPolarity[3] == 1) {
+      if (this.freqPolarity[3] === 1) {
         var feedback = 0;
         if ((this.reg[6] & 4) !== 0) {
           feedback = (this.noiseShiftReg & FEEDBACK_PATTERN) !== 0 && (this.noiseShiftReg & FEEDBACK_PATTERN ^ FEEDBACK_PATTERN) !== 0 ? 1 : 0;
@@ -9057,7 +9090,7 @@ JSSMS.Vdp.prototype = {reset:function() {
   this.sat = (this.vdpreg[5] & ~1 & ~128) << 7;
   this.isSatDirty = true;
 }, getVCount:function() {
-  if (this.videoMode == NTSC) {
+  if (this.videoMode === NTSC) {
     if (this.line > 218) {
       return this.line - 6;
     }
@@ -9085,7 +9118,7 @@ JSSMS.Vdp.prototype = {reset:function() {
     if (this.operation === 0) {
       this.readBuffer = this.VRAM[this.location++ & 16383] & 255;
     } else {
-      if (this.operation == 2) {
+      if (this.operation === 2) {
         var reg = value & 15;
         switch(reg) {
           case 0:
@@ -9097,7 +9130,7 @@ JSSMS.Vdp.prototype = {reset:function() {
             if ((this.status & STATUS_VINT) !== 0 && (this.commandByte & 32) !== 0) {
               this.main.cpu.interruptLine = true;
             }
-            if ((this.commandByte & 3) != (this.vdpreg[reg] & 3)) {
+            if ((this.commandByte & 3) !== (this.vdpreg[reg] & 3)) {
               this.isSatDirty = true;
             }
             break;
@@ -9107,7 +9140,7 @@ JSSMS.Vdp.prototype = {reset:function() {
           case 5:
             var old = this.sat;
             this.sat = (this.commandByte & ~1 & ~128) << 7;
-            if (old != this.sat) {
+            if (old !== this.sat) {
               this.isSatDirty = true;
             }
             break;
@@ -9131,21 +9164,17 @@ JSSMS.Vdp.prototype = {reset:function() {
     ;
     case 2:
       var address = this.location & 16383;
-      if (value != (this.VRAM[address] & 255)) {
-        if (address >= this.sat && address < this.sat + 64) {
+      if (value !== (this.VRAM[address] & 255)) {
+        if (address >= this.sat && address < this.sat + 64 || address >= this.sat + 128 && address < this.sat + 256) {
           this.isSatDirty = true;
         } else {
-          if (address >= this.sat + 128 && address < this.sat + 256) {
-            this.isSatDirty = true;
-          } else {
-            var tileIndex = address >> 5;
-            this.isTileDirty[tileIndex] = 1;
-            if (tileIndex < this.minDirty) {
-              this.minDirty = tileIndex;
-            }
-            if (tileIndex > this.maxDirty) {
-              this.maxDirty = tileIndex;
-            }
+          var tileIndex = address >> 5;
+          this.isTileDirty[tileIndex] = 1;
+          if (tileIndex < this.minDirty) {
+            this.minDirty = tileIndex;
+          }
+          if (tileIndex > this.maxDirty) {
+            this.maxDirty = tileIndex;
           }
         }
         this.VRAM[address] = value;
@@ -9159,7 +9188,7 @@ JSSMS.Vdp.prototype = {reset:function() {
         this.CRAM[temp + 2] = this.main_JAVA_B[value];
       } else {
         temp = ((this.location & 63) >> 1) * 3;
-        if ((this.location & 1) === 0) {
+        if (!(this.location & 1)) {
           this.CRAM[temp] = this.GG_JAVA_R[value];
           this.CRAM[temp + 1] = this.GG_JAVA_G[value];
         } else {
@@ -9174,7 +9203,7 @@ JSSMS.Vdp.prototype = {reset:function() {
   this.location++;
 }, interrupts:function(lineno) {
   if (lineno <= 192) {
-    if (!ACCURATE_INTERRUPT_EMULATION && lineno == 192) {
+    if (!ACCURATE_INTERRUPT_EMULATION && lineno === 192) {
       this.status |= STATUS_VINT;
     }
     if (this.counter === 0) {
@@ -9188,31 +9217,29 @@ JSSMS.Vdp.prototype = {reset:function() {
     }
   } else {
     this.counter = this.vdpreg[10];
-    if ((this.status & STATUS_VINT) !== 0 && ((this.vdpreg[1] & 32) !== 0 && lineno < 224)) {
+    if ((this.status & STATUS_VINT) !== 0 && (this.vdpreg[1] & 32) !== 0 && lineno < 224) {
       this.main.cpu.interruptLine = true;
     }
-    if (ACCURATE && lineno == this.main.no_of_scanlines - 1) {
+    if (ACCURATE && lineno === this.main.no_of_scanlines - 1) {
       this.vScrollLatch = this.vdpreg[9];
     }
   }
 }, setVBlankFlag:function() {
   this.status |= STATUS_VINT;
 }, drawLine:function(lineno) {
-  var i = 0;
-  var temp = 0;
-  var temp2 = 0;
-  if (this.main.is_gg) {
-    if (lineno < GG_Y_OFFSET || lineno >= GG_Y_OFFSET + GG_HEIGHT) {
-      return;
-    }
+  var x = 0;
+  var location = 0;
+  var colour = 0;
+  if (this.main.is_gg && (lineno < GG_Y_OFFSET || lineno >= GG_Y_OFFSET + GG_HEIGHT)) {
+    return;
   }
   if (VDP_SPRITE_COLLISIONS) {
-    for (i = 0;i < SMS_WIDTH;i++) {
-      this.spriteCol[i] = false;
+    for (x = 0;x < SMS_WIDTH;x++) {
+      this.spriteCol[x] = false;
     }
   }
   if ((this.vdpreg[1] & 64) !== 0) {
-    if (this.maxDirty != -1) {
+    if (this.maxDirty !== -1) {
       this.decodeTiles();
     }
     this.drawBg(lineno);
@@ -9222,14 +9249,13 @@ JSSMS.Vdp.prototype = {reset:function() {
     if (this.lineSprites[lineno][SPRITE_COUNT] !== 0) {
       this.drawSprite(lineno);
     }
-    if (this.main.is_sms && (this.vdpreg[0] & 32) !== 0) {
-      var location = lineno << 8;
-      temp = location * 4;
-      temp2 = ((this.vdpreg[7] & 15) + 16) * 3;
-      for (i = 0;i < 8;i++) {
-        this.display[temp + i] = this.CRAM[temp2];
-        this.display[temp + i + 1] = this.CRAM[temp2 + 1];
-        this.display[temp + i + 2] = this.CRAM[temp2 + 2];
+    if (this.main.is_sms && this.vdpreg[0] & 32) {
+      location = (lineno << 8) * 4;
+      colour = ((this.vdpreg[7] & 15) + 16) * 3;
+      for (x = location;x < location + 8 * 4;x = x + 4) {
+        this.display[x] = this.CRAM[colour];
+        this.display[x + 1] = this.CRAM[colour + 1];
+        this.display[x + 2] = this.CRAM[colour + 2];
       }
     }
   } else {
@@ -9260,15 +9286,17 @@ JSSMS.Vdp.prototype = {reset:function() {
     var sx = (tx << 3) + (hscroll & 7);
     var pixY = (secondbyte & 4) === 0 ? tile_y : (7 << 3) - tile_y;
     var tile = this.tiles[(this.VRAM[tile_props] & 255) + ((secondbyte & 1) << 8)];
-    if ((secondbyte & 2) === 0) {
+    if (!(secondbyte & 2)) {
       for (pixX = 0;pixX < 8 && sx < SMS_WIDTH;pixX++, sx++) {
         colour = tile[pixX + pixY];
         temp = (sx + row_precal) * 4;
         temp2 = (colour + pal) * 3;
         this.bgPriority[sx] = (secondbyte & 16) !== 0 && colour !== 0;
-        this.display[temp] = this.CRAM[temp2];
-        this.display[temp + 1] = this.CRAM[temp2 + 1];
-        this.display[temp + 2] = this.CRAM[temp2 + 2];
+        if (sx >= this.h_start * 8 && sx < this.h_end * 8) {
+          this.display[temp] = this.CRAM[temp2];
+          this.display[temp + 1] = this.CRAM[temp2 + 1];
+          this.display[temp + 2] = this.CRAM[temp2 + 2];
+        }
       }
     } else {
       for (pixX = 7;pixX >= 0 && sx < SMS_WIDTH;pixX--, sx++) {
@@ -9276,13 +9304,15 @@ JSSMS.Vdp.prototype = {reset:function() {
         temp = (sx + row_precal) * 4;
         temp2 = (colour + pal) * 3;
         this.bgPriority[sx] = (secondbyte & 16) !== 0 && colour !== 0;
-        this.display[temp] = this.CRAM[temp2];
-        this.display[temp + 1] = this.CRAM[temp2 + 1];
-        this.display[temp + 2] = this.CRAM[temp2 + 2];
+        if (sx >= this.h_start * 8 && sx < this.h_end * 8) {
+          this.display[temp] = this.CRAM[temp2];
+          this.display[temp + 1] = this.CRAM[temp2 + 1];
+          this.display[temp + 2] = this.CRAM[temp2 + 2];
+        }
       }
     }
     tile_column++;
-    if (lock !== 0 && tx == 23) {
+    if (lock !== 0 && tx === 23) {
       tile_row = lineno >> 3;
       tile_y = (lineno & 7) << 3;
     }
@@ -9312,10 +9342,10 @@ JSSMS.Vdp.prototype = {reset:function() {
       x = 0;
     }
     var offset = pix + ((tileRow & 7) << 3);
-    if (zoomed === 0) {
-      for (;pix < 8 && x < SMS_WIDTH;pix++, x++) {
+    if (!zoomed) {
+      for (;pix < 8 && x < this.h_end * 8;pix++, x++) {
         colour = tile[offset++];
-        if (colour !== 0 && !this.bgPriority[x]) {
+        if (x >= this.h_start * 8 && colour !== 0 && !this.bgPriority[x]) {
           temp = (x + row_precal) * 4;
           temp2 = (colour + 16) * 3;
           this.display[temp] = this.CRAM[temp2];
@@ -9331,9 +9361,9 @@ JSSMS.Vdp.prototype = {reset:function() {
         }
       }
     } else {
-      for (;pix < 8 && x < SMS_WIDTH;pix++, x += 2) {
+      for (;pix < 8 && x < this.h_end * 8;pix++, x += 2) {
         colour = tile[offset++];
-        if (colour !== 0 && !this.bgPriority[x]) {
+        if (x >= this.h_start * 8 && colour !== 0 && !this.bgPriority[x]) {
           temp = (x + row_precal) * 4;
           temp2 = (colour + 16) * 3;
           this.display[temp] = this.CRAM[temp2];
@@ -9347,7 +9377,7 @@ JSSMS.Vdp.prototype = {reset:function() {
             }
           }
         }
-        if (colour !== 0 && !this.bgPriority[x + 1]) {
+        if (x + 1 >= this.h_start * 8 && colour !== 0 && !this.bgPriority[x + 1]) {
           temp = (x + row_precal + 1) * 4;
           temp2 = (colour + 16) * 3;
           this.display[temp] = this.CRAM[temp2];
@@ -9368,13 +9398,13 @@ JSSMS.Vdp.prototype = {reset:function() {
     this.status |= STATUS_OVERFLOW;
   }
 }, drawBGColour:function(lineno) {
-  var row_precal = lineno << 8;
-  var length = (row_precal + SMS_WIDTH * 4) * 4;
-  var temp = ((this.vdpreg[7] & 15) + 16) * 3;
-  for (row_precal = row_precal * 4;row_precal < length;row_precal = row_precal + 4) {
-    this.display[row_precal] = this.CRAM[temp];
-    this.display[row_precal + 1] = this.CRAM[temp + 1];
-    this.display[row_precal + 2] = this.CRAM[temp + 2];
+  var x = 0;
+  var location = (lineno << 8) * 4;
+  var colour = ((this.vdpreg[7] & 15) + 16) * 3;
+  for (x = location + this.h_start * 8 * 4;x < location + this.h_end * 8 * 4;x = x + 4) {
+    this.display[x] = this.CRAM[colour];
+    this.display[x + 1] = this.CRAM[colour + 1];
+    this.display[x + 2] = this.CRAM[colour + 2];
   }
 }, decodeTiles:function() {
   for (var i = this.minDirty;i <= this.maxDirty;i++) {
@@ -9416,12 +9446,12 @@ JSSMS.Vdp.prototype = {reset:function() {
     this.lineSprites[i][SPRITE_COUNT] = 0;
   }
   var height = (this.vdpreg[1] & 2) === 0 ? 8 : 16;
-  if ((this.vdpreg[1] & 1) == 1) {
+  if ((this.vdpreg[1] & 1) === 1) {
     height <<= 1;
   }
   for (var spriteno = 0;spriteno < 64;spriteno++) {
     var y = this.VRAM[this.sat + spriteno] & 255;
-    if (y == 208) {
+    if (y === 208) {
       return;
     }
     y++;
@@ -9510,7 +9540,7 @@ if (window["$"]) {
     var parent = this;
     var UI = function(sms) {
       this.main = sms;
-      if (Object.prototype.toString.call(window["operamini"]) == "[object OperaMini]") {
+      if (Object.prototype.toString.call(window["operamini"]) === "[object OperaMini]") {
         $(parent).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser can\'t run this emulator. Try the latest version of Firefox, Google Chrome, Opera or Safari!</div>');
         return;
       }
@@ -9536,7 +9566,7 @@ if (window["$"]) {
         };
       }
       this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + " moz-opaque></canvas>");
-      this.canvasContext = this.screen[0].getContext("2d");
+      this.canvasContext = this.screen[0].getContext("2d", {"alpha":false});
       this.canvasContext["webkitImageSmoothingEnabled"] = false;
       this.canvasContext["mozImageSmoothingEnabled"] = false;
       this.canvasContext["imageSmoothingEnabled"] = false;
@@ -9703,7 +9733,7 @@ if (window["$"]) {
         return xhr;
       }, complete:function(xhr, status) {
         var data;
-        if (status == "error") {
+        if (status === "error") {
           self.updateStatus("The selected ROM file could not be loaded.");
           return;
         }
@@ -9754,7 +9784,7 @@ if (window["$"]) {
       var num = 0;
       for (;num < 16 && i <= length;i++) {
         if (instructions[i]) {
-          html += "<div" + (instructions[i].address == currentAddress ? ' class="current"' : "") + ">" + instructions[i].hexAddress + (instructions[i].isJumpTarget ? ":" : " ") + "<code>" + instructions[i].inst + "</code></div>";
+          html += "<div" + (instructions[i].address === currentAddress ? ' class="current"' : "") + ">" + instructions[i].hexAddress + (instructions[i].isJumpTarget ? ":" : " ") + "<code>" + instructions[i].inst + "</code></div>";
           num++;
         }
       }
@@ -9889,12 +9919,12 @@ JSSMS.Ports.prototype = {reset:function() {
   var dy = this.keyboard.lightgunY - this.vdp.line;
   if (dy > -this.Y_RANGE && dy < this.Y_RANGE && (dx > -this.X_RANGE && dx < this.X_RANGE)) {
     this.setTH(PORT_A, false);
-    if (oldTH != this.getTH(PORT_A)) {
+    if (oldTH !== this.getTH(PORT_A)) {
       this.hCounter = 20 + (this.keyboard.lightgunX >> 1);
     }
   } else {
     this.setTH(PORT_A, true);
-    if (oldTH != this.getTH(PORT_A)) {
+    if (oldTH !== this.getTH(PORT_A)) {
       this.hCounter = hc;
     }
   }
@@ -9924,7 +9954,7 @@ var Bytecode = function() {
     }
     return "";
   }, get label() {
-    var name = this.name ? this.name.replace(/(nn|n|PC\+e|d)/, toHex(this.target || (this.operand || 0))) : "";
+    var name = this.name ? this.name.replace(/(nn|n|PC\+e|d)/, toHex(this.target || this.operand || 0)) : "";
     return toHex(this.address + this.page * PAGE_SIZE) + " " + this.hexOpcode + " " + name;
   }};
   return Bytecode;
@@ -9971,10 +10001,10 @@ var Parser = function() {
         }
         var bytecode = new Bytecode(currentAddress, currentPage);
         this.bytecodes[currentPage][currentAddress] = disassemble(bytecode, this.stream);
-        if (this.bytecodes[currentPage][currentAddress].nextAddress !== null && (this.bytecodes[currentPage][currentAddress].nextAddress >= pageStart && this.bytecodes[currentPage][currentAddress].nextAddress <= pageEnd)) {
+        if (this.bytecodes[currentPage][currentAddress].nextAddress !== null && this.bytecodes[currentPage][currentAddress].nextAddress >= pageStart && this.bytecodes[currentPage][currentAddress].nextAddress <= pageEnd) {
           this.addAddress(this.bytecodes[currentPage][currentAddress].nextAddress);
         }
-        if (this.bytecodes[currentPage][currentAddress].target !== null && (this.bytecodes[currentPage][currentAddress].target >= pageStart && this.bytecodes[currentPage][currentAddress].target <= pageEnd)) {
+        if (this.bytecodes[currentPage][currentAddress].target !== null && this.bytecodes[currentPage][currentAddress].target >= pageStart && this.bytecodes[currentPage][currentAddress].target <= pageEnd) {
           this.addAddress(this.bytecodes[currentPage][currentAddress].target);
         }
       }
@@ -10042,7 +10072,7 @@ var Parser = function() {
       branch.push(bytecode);
       startingBytecode = false;
       absoluteAddress = address + romPage * 16384;
-    } while (address !== null && (absoluteAddress >= pageStart && (absoluteAddress < pageEnd && !bytecode.isFunctionEnder)));
+    } while (address !== null && absoluteAddress >= pageStart && absoluteAddress < pageEnd && !bytecode.isFunctionEnder);
     return branch;
   }, writeGraphViz:function() {
     JSSMS.Utils.console.time("DOT generation");
@@ -11231,7 +11261,7 @@ var n = {IfStatement:function(test, consequent, alternate) {
 }, Identifier:function(name) {
   return{"type":"Identifier", "name":name};
 }, Literal:function(value) {
-  if (typeof value == "number") {
+  if (typeof value === "number") {
     return{"type":"Literal", "value":value, "raw":DEBUG ? JSSMS.Utils.toHex(value) : "" + value};
   } else {
     return{"type":"Literal", "value":value, "raw":"" + value};
@@ -11264,7 +11294,7 @@ var n = {IfStatement:function(test, consequent, alternate) {
   return n.Literal(BIT_TABLE[bitNumber]);
 }};
 var o = {SET16:function(register1, register2, value) {
-  if (value.type == "Literal") {
+  if (value.type === "Literal") {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.BinaryExpression(">>", value, n.Literal(8)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register2), n.BinaryExpression("&", value, n.Literal(255))))];
   } else {
     return[n.VariableDeclaration("val", value), n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.BinaryExpression(">>", n.Identifier("val"), n.Literal(8)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register2), n.BinaryExpression("&", n.Identifier("val"), n.Literal(255))))];
@@ -11284,12 +11314,12 @@ var o = {SET16:function(register1, register2, value) {
       return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), n.Literal(value)));
     };
   }
-  if (dstRegister1 == "i" && dstRegister2 === undefined) {
+  if (dstRegister1 === "i" && dstRegister2 === undefined) {
     return function() {
       return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), n.Register("i"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register(srcRegister))), n.ConditionalExpression(n.Identifier("iff2"), n.Literal(F_PARITY), n.Literal(0)))))];
     };
   }
-  if (dstRegister1 == "r" && dstRegister2 === undefined) {
+  if (dstRegister1 === "r" && dstRegister2 === undefined) {
     return function() {
       return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), REFRESH_EMULATION ? n.Register("r") : n.CallExpression("JSSMS.Utils.rndInt", n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register(srcRegister))), n.ConditionalExpression(n.Identifier("iff2"), n.Literal(F_PARITY), n.Literal(0)))))];
     };
@@ -11299,7 +11329,7 @@ var o = {SET16:function(register1, register2, value) {
       return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), n.Register(dstRegister1)));
     };
   }
-  if (dstRegister1 == "n" && dstRegister2 == "n") {
+  if (dstRegister1 === "n" && dstRegister2 === "n") {
     return function(value) {
       return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(srcRegister), o.READ_MEM8(n.Literal(value))));
     };
@@ -11318,7 +11348,7 @@ var o = {SET16:function(register1, register2, value) {
       return o.SET16(srcRegister1, srcRegister2, n.Literal(value));
     };
   }
-  if (dstRegister1 == "n" && dstRegister2 == "n") {
+  if (dstRegister1 === "n" && dstRegister2 === "n") {
     return function(value) {
       return o.SET16(srcRegister1, srcRegister2, o.READ_MEM16(n.Literal(value)));
     };
@@ -11330,12 +11360,12 @@ var o = {SET16:function(register1, register2, value) {
       return n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + (srcRegister1 + srcRegister2).toUpperCase()), n.Literal(value)]));
     };
   }
-  if (srcRegister1 == "n" && (srcRegister2 == "n" && dstRegister2 === undefined)) {
+  if (srcRegister1 === "n" && srcRegister2 === "n" && dstRegister2 === undefined) {
     return function(value) {
       return n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal(value), n.Register(dstRegister1)]));
     };
   }
-  if (srcRegister1 == "n" && srcRegister2 == "n") {
+  if (srcRegister1 === "n" && srcRegister2 === "n") {
     return function(value) {
       return[n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal(value), n.Register(dstRegister2)])), n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal(value + 1), n.Register(dstRegister1)]))];
     };
@@ -11370,7 +11400,7 @@ var o = {SET16:function(register1, register2, value) {
       return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.CallExpression("inc8", n.Register(register1))));
     };
   }
-  if (register1 == "s" && register2 == "p") {
+  if (register1 === "s" && register2 === "p") {
     return function() {
       return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1))));
     };
@@ -11381,7 +11411,7 @@ var o = {SET16:function(register1, register2, value) {
   }
 }, INC16:function(register1, register2) {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register2), n.BinaryExpression("&", n.BinaryExpression("+", n.Register(register2), n.Literal(1)), n.Literal(255)))), n.IfStatement(n.BinaryExpression("==", n.Register(register2), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.BinaryExpression("&", n.BinaryExpression("+", n.Register(register1), n.Literal(1)), n.Literal(255))))]))];
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register2), n.BinaryExpression("&", n.BinaryExpression("+", n.Register(register2), n.Literal(1)), n.Literal(255)))), n.IfStatement(n.BinaryExpression("===", n.Register(register2), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.BinaryExpression("&", n.BinaryExpression("+", n.Register(register1), n.Literal(1)), n.Literal(255))))]))];
   };
 }, DEC8:function(register1, register2) {
   if (register2 === undefined) {
@@ -11389,7 +11419,7 @@ var o = {SET16:function(register1, register2, value) {
       return n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.CallExpression("dec8", n.Register(register1))));
     };
   }
-  if (register1 == "s" && register2 == "p") {
+  if (register1 === "s" && register2 === "p") {
     return function() {
       return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), n.BinaryExpression("-", n.Identifier("sp"), n.Literal(1))));
     };
@@ -11400,7 +11430,7 @@ var o = {SET16:function(register1, register2, value) {
   }
 }, DEC16:function(register1, register2) {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register2), n.BinaryExpression("&", n.BinaryExpression("-", n.Register(register2), n.Literal(1)), n.Literal(255)))), n.IfStatement(n.BinaryExpression("==", n.Register(register2), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.BinaryExpression("&", n.BinaryExpression("-", n.Register(register1), n.Literal(1)), n.Literal(255))))]))];
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register2), n.BinaryExpression("&", n.BinaryExpression("-", n.Register(register2), n.Literal(1)), n.Literal(255)))), n.IfStatement(n.BinaryExpression("===", n.Register(register2), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Register(register1), n.BinaryExpression("&", n.BinaryExpression("-", n.Register(register1), n.Literal(1)), n.Literal(255))))]))];
   };
 }, ADD16:function(register1, register2, register3, register4) {
   if (register4 === undefined) {
@@ -11510,12 +11540,12 @@ var o = {SET16:function(register1, register2, value) {
       return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Literal(value))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))];
     };
   }
-  if (register1 != "a" && register2 === undefined) {
+  if (register1 !== "a" && register2 === undefined) {
     return function() {
       return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Register(register1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))];
     };
   }
-  if (register1 == "a" && register2 === undefined) {
+  if (register1 === "a" && register2 === undefined) {
     return function() {
       return n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))));
     };
@@ -11530,12 +11560,12 @@ var o = {SET16:function(register1, register2, value) {
       return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), n.Literal(value))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
     };
   }
-  if (register1 != "a" && register2 === undefined) {
+  if (register1 !== "a" && register2 === undefined) {
     return function() {
       return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), n.Register(register1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
     };
   }
-  if (register1 == "a" && register2 === undefined) {
+  if (register1 === "a" && register2 === undefined) {
     return function() {
       return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register("a"), n.Literal(0))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Literal(0))))];
     };
@@ -11550,12 +11580,12 @@ var o = {SET16:function(register1, register2, value) {
       return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), n.Literal(value))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
     };
   }
-  if (register1 != "a" && register2 === undefined) {
+  if (register1 !== "a" && register2 === undefined) {
     return function() {
       return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), n.Register(register1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
     };
   }
-  if (register1 == "a" && register2 === undefined) {
+  if (register1 === "a" && register2 === undefined) {
     return function() {
       return n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))));
     };
@@ -11593,23 +11623,23 @@ var o = {SET16:function(register1, register2, value) {
   };
 }, DJNZ:function() {
   return function(value, target) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register("b"), n.BinaryExpression("&", n.BinaryExpression("-", n.Register("b"), n.Literal(1)), n.Literal(255)))), o.JR(n.BinaryExpression("!=", n.Register("b"), n.Literal(0)))(undefined, target)];
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register("b"), n.BinaryExpression("&", n.BinaryExpression("-", n.Register("b"), n.Literal(1)), n.Literal(255)))), o.JR(n.BinaryExpression("!==", n.Register("b"), n.Literal(0)))(undefined, target)];
   };
 }, JRNZ:function() {
   return function(value, target) {
-    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0))))(undefined, target);
+    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!==", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0))))(undefined, target);
   };
 }, JRZ:function() {
   return function(value, target) {
-    return o.JR(n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0)))(undefined, target);
+    return o.JR(n.BinaryExpression("!==", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0)))(undefined, target);
   };
 }, JRNC:function() {
   return function(value, target) {
-    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(0))))(undefined, target);
+    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!==", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(0))))(undefined, target);
   };
 }, JRC:function() {
   return function(value, target) {
-    return o.JR(n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(0)))(undefined, target);
+    return o.JR(n.BinaryExpression("!==", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(0)))(undefined, target);
   };
 }, RET:function(operator, bitMask) {
   if (operator === undefined && bitMask === undefined) {
@@ -11627,7 +11657,7 @@ var o = {SET16:function(register1, register2, value) {
       return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal(target)))];
     };
   }
-  if (operator == "h" && bitMask == "l") {
+  if (operator === "h" && bitMask === "l") {
     return function(value, target, nextAddress) {
       return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.CallExpression("get" + ("h" + "l").toUpperCase())))];
     };
@@ -11710,7 +11740,7 @@ var o = {SET16:function(register1, register2, value) {
       return n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", n.Register(register1), n.Bit(bit))));
     };
   } else {
-    if (register1 == "h" && register2 == "l") {
+    if (register1 === "h" && register2 === "l") {
       return function() {
         return n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())), n.Bit(bit))));
       };
@@ -11726,7 +11756,7 @@ var o = {SET16:function(register1, register2, value) {
       return n.ExpressionStatement(n.AssignmentExpression("&=", n.Register(register1), n.UnaryExpression("~", n.Bit(bit))));
     };
   } else {
-    if (register1 == "h" && register2 == "l") {
+    if (register1 === "h" && register2 === "l") {
       return function() {
         return n.ExpressionStatement(n.CallExpression("writeMem", n.CallExpression("get" + (register1 + register2).toUpperCase()), n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())), n.UnaryExpression("~", n.Bit(bit)))));
       };
@@ -11742,7 +11772,7 @@ var o = {SET16:function(register1, register2, value) {
       return n.ExpressionStatement(n.AssignmentExpression("|=", n.Register(register1), n.Bit(bit)));
     };
   } else {
-    if (register1 == "h" && register2 == "l") {
+    if (register1 === "h" && register2 === "l") {
       return function() {
         return n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + (register1 + register2).toUpperCase()), n.BinaryExpression("|", o.READ_MEM8(n.CallExpression("get" + (register1 + register2).toUpperCase())), n.Bit(bit))]));
       };
@@ -11820,7 +11850,7 @@ var o = {SET16:function(register1, register2, value) {
       valueAST = n.VariableDeclaration("value", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register(register1), n.Literal(8)), n.Register(register2)));
     }
     return[valueAST, n.VariableDeclaration("val", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register("h"), n.Literal(8)), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("+", n.BinaryExpression("+", n.Identifier("val"), n.Identifier("value")), n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", 
-    n.BinaryExpression("|", n.BinaryExpression("&", n.BinaryExpression(">>", n.BinaryExpression("^", n.BinaryExpression("^", n.Identifier("val"), n.Identifier("temp")), n.Identifier("value")), n.Literal(8)), n.Literal(16)), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(16)), n.Literal(1))), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(128))), n.ConditionalExpression(n.BinaryExpression("!=", n.BinaryExpression("&", 
+    n.BinaryExpression("|", n.BinaryExpression("&", n.BinaryExpression(">>", n.BinaryExpression("^", n.BinaryExpression("^", n.Identifier("val"), n.Identifier("temp")), n.Identifier("value")), n.Literal(8)), n.Literal(16)), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(16)), n.Literal(1))), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(128))), n.ConditionalExpression(n.BinaryExpression("!==", n.BinaryExpression("&", 
     n.Identifier("temp"), n.Literal(65535)), n.Literal(0)), n.Literal(0), n.Literal(64))), n.BinaryExpression(">>", n.BinaryExpression("&", n.BinaryExpression("&", n.BinaryExpression("^", n.BinaryExpression("^", n.Identifier("value"), n.Identifier("val")), n.Literal(32768)), n.BinaryExpression("^", n.Identifier("value"), n.Identifier("temp"))), n.Literal(32768)), n.Literal(13))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), n.BinaryExpression("&", n.BinaryExpression(">>", 
     n.Identifier("temp"), n.Literal(8)), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("l"), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(255))))];
   };
@@ -11833,7 +11863,7 @@ var o = {SET16:function(register1, register2, value) {
       valueAST = n.VariableDeclaration("value", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register(register1), n.Literal(8)), n.Register(register2)));
     }
     return[valueAST, n.VariableDeclaration("val", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register("h"), n.Literal(8)), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("-", n.BinaryExpression("-", n.Identifier("val"), n.Identifier("value")), n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", 
-    n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.BinaryExpression(">>", n.BinaryExpression("^", n.BinaryExpression("^", n.Identifier("val"), n.Identifier("temp")), n.Identifier("value")), n.Literal(8)), n.Literal(16)), n.Literal(2)), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(16)), n.Literal(1))), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(128))), n.ConditionalExpression(n.BinaryExpression("!=", 
+    n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.BinaryExpression(">>", n.BinaryExpression("^", n.BinaryExpression("^", n.Identifier("val"), n.Identifier("temp")), n.Identifier("value")), n.Literal(8)), n.Literal(16)), n.Literal(2)), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(16)), n.Literal(1))), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(128))), n.ConditionalExpression(n.BinaryExpression("!==", 
     n.BinaryExpression("&", n.Identifier("temp"), n.Literal(65535)), n.Literal(0)), n.Literal(0), n.Literal(64))), n.BinaryExpression(">>", n.BinaryExpression("&", n.BinaryExpression("&", n.BinaryExpression("^", n.Identifier("value"), n.Identifier("val")), n.BinaryExpression("^", n.Identifier("val"), n.Identifier("temp"))), n.Literal(32768)), n.Literal(13))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), 
     n.Literal(8)), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("l"), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(255))))];
   };
@@ -11851,19 +11881,19 @@ var o = {SET16:function(register1, register2, value) {
   };
 }, INI:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("port.in_", n.Register("c")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("h" + "l").toUpperCase()), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("port.in_", n.Register("c")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("h" + "l").toUpperCase()), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
     n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))];
   };
 }, OUTI:function() {
   return function(value, target, nextAddress) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
-    n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
     n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))];
   };
 }, OUTD:function() {
   return function(value, target, nextAddress) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("decHL")), n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
-    n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
     n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))];
   };
 }, LDI:function() {
@@ -11874,7 +11904,7 @@ var o = {SET16:function(register1, register2, value) {
   };
 }, CPI:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("==", 
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("===", 
     n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Literal(0), n.Literal(F_PARITY)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp"))))];
   };
 }, LDD:function() {
@@ -11887,27 +11917,27 @@ var o = {SET16:function(register1, register2, value) {
   return function(value, target, nextAddress) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), n.Identifier("temp")])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incDE")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), 
     n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", 
-    n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0))))), n.IfStatement(n.BinaryExpression("!=", n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
+    n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0))))), n.IfStatement(n.BinaryExpression("!==", n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
   };
 }, CPIR:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("==", 
-    n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Literal(0), n.Literal(F_PARITY)))), n.IfStatement(n.LogicalExpression("&&", n.BinaryExpression("!=", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_PARITY)), n.Literal(0)), n.BinaryExpression("==", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0))), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("=", 
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("===", 
+    n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Literal(0), n.Literal(F_PARITY)))), n.IfStatement(n.LogicalExpression("&&", n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_PARITY)), n.Literal(0)), n.BinaryExpression("===", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0))), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("=", 
     n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp")))), n.ReturnStatement()])), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp"))))];
   };
 }, OTIR:function() {
   return function(value, target, nextAddress) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
-    n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("!=", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(0)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
-    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE)))))), n.IfStatement(n.BinaryExpression("!=", n.Register("b"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
+    n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(0)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE)))))), n.IfStatement(n.BinaryExpression("!==", n.Register("b"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
   };
 }, LDDR:function() {
   return function(value, target, nextAddress) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), n.Identifier("temp")])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("decDE")), n.ExpressionStatement(n.CallExpression("decHL")), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), 
     n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", 
-    n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0))))), n.IfStatement(n.BinaryExpression("!=", n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
+    n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0))))), n.IfStatement(n.BinaryExpression("!==", n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
   };
-}, LD_RLC:generateIndexCBFunctions("rlc"), LD_RRC:generateIndexCBFunctions("rrc"), LD_RL:generateIndexCBFunctions("rl"), LD_RR:generateIndexCBFunctions("rr"), LD_SLA:generateIndexCBFunctions("sla"), LD_SRA:generateIndexCBFunctions("sra"), LD_SLL:generateIndexCBFunctions("sll"), LD_SRL:generateIndexCBFunctions("srl"), READ_MEM8:function(value) {
+}, "LD_RLC":generateIndexCBFunctions("rlc"), "LD_RRC":generateIndexCBFunctions("rrc"), "LD_RL":generateIndexCBFunctions("rl"), "LD_RR":generateIndexCBFunctions("rr"), "LD_SLA":generateIndexCBFunctions("sla"), "LD_SRA":generateIndexCBFunctions("sra"), "LD_SLL":generateIndexCBFunctions("sll"), "LD_SRL":generateIndexCBFunctions("srl"), READ_MEM8:function(value) {
   return n.CallExpression("readMem", value);
 }, READ_MEM16:function(value) {
   return n.CallExpression("readMemWord", value);
@@ -11942,30 +11972,36 @@ function generateIndexCBFunctions(fn) {
 var opcodeTableDDCB = [];
 var opcodeTableFDCB = [];
 var regs = {"B":["b"], "C":["c"], "D":["d"], "E":["e"], "H":["h"], "L":["l"], "(HL)":["h", "l"], "A":["a"]};
-["RLC", "RRC", "RL", "RR", "SLA", "SRA", "SLL", "SRL"].forEach(function(op) {
-  for (var reg in regs) {
-    opcodeTableCB.push({name:op + " " + reg, ast:o[op].apply(null, regs[reg])});
-    if (reg != "(HL)") {
-      opcodeTableDDCB.push({name:"LD " + reg + "," + op + " (IX)", ast:o["LD_" + op].apply(null, ["ixH", "ixL"].concat(regs[reg]))});
-      opcodeTableFDCB.push({name:"LD " + reg + "," + op + " (IY)", ast:o["LD_" + op].apply(null, ["iyH", "iyL"].concat(regs[reg]))});
+var opcodesList = {RLC:"RLC", RRC:"RRC", RL:"RL", RR:"RR", SLA:"SLA", SRA:"SRA", SLL:"SLL", SRL:"SRL"};
+var op = "";
+var reg = "";
+for (op in opcodesList) {
+  for (reg in regs) {
+    opcodeTableCB.push({name:opcodesList[op] + " " + reg, ast:o[op].apply(null, regs[reg])});
+    if (reg !== "(HL)") {
+      opcodeTableDDCB.push({name:"LD " + reg + "," + opcodesList[op] + " (IX)", ast:o["LD_" + opcodesList[op]].apply(null, ["ixH", "ixL"].concat(regs[reg]))});
+      opcodeTableFDCB.push({name:"LD " + reg + "," + opcodesList[op] + " (IY)", ast:o["LD_" + opcodesList[op]].apply(null, ["iyH", "iyL"].concat(regs[reg]))});
     } else {
-      opcodeTableDDCB.push({name:op + " (IX)", ast:o["LD_" + op]("ixH", "ixL")});
-      opcodeTableFDCB.push({name:op + " (IY)", ast:o["LD_" + op]("iyH", "iyL")});
+      opcodeTableDDCB.push({name:opcodesList[op] + " (IX)", ast:o["LD_" + opcodesList[op]]("ixH", "ixL")});
+      opcodeTableFDCB.push({name:opcodesList[op] + " (IY)", ast:o["LD_" + opcodesList[op]]("iyH", "iyL")});
     }
   }
-});
-["BIT", "RES", "SET"].forEach(function(op) {
-  for (var i = 0;i < 8;i++) {
-    for (var reg in regs) {
-      opcodeTableCB.push({name:op + " " + i + "," + reg, ast:o[op].apply(null, [i].concat(regs[reg]))});
+}
+opcodesList = {BIT:"BIT", RES:"RES", SET:"SET"};
+var i = 0;
+var j = 0;
+for (op in opcodesList) {
+  for (i = 0;i < 8;i++) {
+    for (reg in regs) {
+      opcodeTableCB.push({name:opcodesList[op] + " " + i + "," + reg, ast:o[op].apply(null, [i].concat(regs[reg]))});
     }
-    for (var j = 0;j < 8;j++) {
-      opcodeTableDDCB.push({name:op + " " + i + " (IX)", ast:o[op].apply(null, [i].concat(["ixH", "ixL"]))});
-      opcodeTableFDCB.push({name:op + " " + i + " (IY)", ast:o[op].apply(null, [i].concat(["iyH", "iyL"]))});
+    for (j = 0;j < 8;j++) {
+      opcodeTableDDCB.push({name:opcodesList[op] + " " + i + " (IX)", ast:o[op].apply(null, [i].concat(["ixH", "ixL"]))});
+      opcodeTableFDCB.push({name:opcodesList[op] + " " + i + " (IY)", ast:o[op].apply(null, [i].concat(["iyH", "iyL"]))});
     }
   }
-});
-function generateIndexTable(index) {
+}
+;function generateIndexTable(index) {
   var register = index.substring(1, 2).toLowerCase();
   var registerH = "i" + register + "H";
   var registerL = "i" + register + "L";
@@ -11977,7 +12013,7 @@ function generateIndexTable(index) {
   registerL)}, 116:{name:"LD (" + index + "+d),H", ast:o.LD_X("h", registerH, registerL)}, 117:{name:"LD (" + index + "+d),L", ast:o.LD_X("l", registerH, registerL)}, 118:{name:"LD (" + index + "+d),B", ast:o.LD_X("b", registerH, registerL)}, 119:{name:"LD (" + index + "+d),A", ast:o.LD_X("a", registerH, registerL)}, 126:{name:"LD A,(" + index + "+d)", ast:o.LD8_D("a", registerH, registerL)}, 124:{name:"LD A," + index + "H", ast:o.LD8("a", registerH)}, 125:{name:"LD A," + index + "L", ast:o.LD8("a", 
   registerL)}, 132:{name:"ADD A," + index + "H", ast:o.ADD(registerL)}, 133:{name:"ADD A," + index + "L", ast:o.ADD(registerL)}, 134:{name:"ADD A,(" + index + "+d)", ast:o.ADD_X(registerH, registerL)}, 140:{name:"ADC A," + index + "H", ast:o.ADC(registerL)}, 141:{name:"ADC A," + index + "L", ast:o.ADC(registerL)}, 142:{name:"ADC A,(" + index + "+d)", ast:o.ADC_X(registerH, registerL)}, 148:{name:"SUB A," + index + "H", ast:o.SUB(registerL)}, 149:{name:"SUB A," + index + "L", ast:o.SUB(registerL)}, 
   150:{name:"SUB A,(" + index + "+d)", ast:o.SUB_X(registerH, registerL)}, 156:{name:"SBC A," + index + "H", ast:o.SBC(registerL)}, 157:{name:"SBC A," + index + "L", ast:o.SBC(registerL)}, 158:{name:"SBC A,(" + index + "+d)", ast:o.SBC_X(registerH, registerL)}, 166:{name:"AND A,(" + index + "+d)", ast:o.AND_X(registerH, registerL)}, 174:{name:"XOR A,(" + index + "+d)", ast:o.XOR_X(registerH, registerL)}, 182:{name:"OR A,(" + index + "+d)", ast:o.OR_X(registerH, registerL)}, 190:{name:"CP (" + index + 
-  "+d)", ast:o.CP_X(registerH, registerL)}, 203:index == "IX" ? opcodeTableDDCB : opcodeTableFDCB, 225:{name:"POP " + index, ast:o.POP(registerH, registerL)}, 227:{name:"EX SP,(" + index + ")", ast:o.EX_SP_X(registerH, registerL)}, 229:{name:"PUSH " + index, ast:o.PUSH(registerH, registerL)}, 233:{name:"JP (" + index + ")", ast:o.JP_X(registerH, registerL)}, 249:{name:"LD SP," + index, ast:o.LD_SP(registerH, registerL)}};
+  "+d)", ast:o.CP_X(registerH, registerL)}, 203:index === "IX" ? opcodeTableDDCB : opcodeTableFDCB, 225:{name:"POP " + index, ast:o.POP(registerH, registerL)}, 227:{name:"EX SP,(" + index + ")", ast:o.EX_SP_X(registerH, registerL)}, 229:{name:"PUSH " + index, ast:o.PUSH(registerH, registerL)}, 233:{name:"JP (" + index + ")", ast:o.JP_X(registerH, registerL)}, 249:{name:"LD SP," + index, ast:o.LD_SP(registerH, registerL)}};
 }
 ;var opcodeTableED = {64:{name:"IN B,(C)", ast:o.IN("b", "c")}, 66:{name:"SBC HL,BC", ast:o.SBC16("b", "c")}, 65:{name:"OUT (C),B", ast:o.OUT("c", "b")}, 67:{name:"LD (nn),BC", ast:o.LD_NN("b", "c")}, 68:{name:"NEG", ast:o.NEG()}, 69:{name:"RETN / RETI", ast:o.RETN_RETI()}, 70:{name:"IM 0", ast:o.IM(0)}, 72:{name:"IN C,(C)", ast:o.IN("c", "c")}, 73:{name:"OUT (C),C", ast:o.OUT("c", "c")}, 74:{name:"ADC HL,BC", ast:o.ADC16("b", "c")}, 75:{name:"LD BC,(nn)", ast:o.LD16("b", "c", "n", "n")}, 76:{name:"NEG", 
 ast:o.NEG()}, 77:{name:"RETN / RETI", ast:o.RETN_RETI()}, 78:{name:"IM 0", ast:o.IM(0)}, 79:{name:"LD R,A", ast:o.LD8("r", "a")}, 80:{name:"IN D,(C)", ast:o.IN("d", "c")}, 81:{name:"OUT (C),D", ast:o.OUT("c", "d")}, 82:{name:"SBC HL,DE", ast:o.SBC16("d", "e")}, 83:{name:"LD (nn),DE", ast:o.LD_NN("d", "e")}, 84:{name:"NEG", ast:o.NEG()}, 85:{name:"RETN / RETI", ast:o.RETN_RETI()}, 86:{name:"IM 1", ast:o.IM(1)}, 87:{name:"LD A,I", ast:o.LD8("a", "i")}, 88:{name:"IN E,(C)", ast:o.IN("e", "c")}, 89:{name:"OUT (C),E", 
@@ -12047,7 +12083,7 @@ var Analyzer = function() {
           opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]][bytecode.opcode[2]];
           break;
         default:
-          JSSMS.Utils.console.error("Something went wrong in parsing. Opcode: [" + bytecode.opcode.join(" ") + "]");
+          JSSMS.Utils.console.error("Something went wrong in parsing. Opcode: [" + bytecode.hexOpcode + "]");
       }
       if (opcode && opcode.ast) {
         var ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.nextAddress);
@@ -12090,7 +12126,8 @@ var Analyzer = function() {
   return Analyzer;
 }();
 var Optimizer = function() {
-  var Optimizer = function() {
+  var Optimizer = function(main) {
+    this.main = main;
     this.ast = [];
   };
   Optimizer.prototype = {optimize:function(functions) {
@@ -12099,8 +12136,10 @@ var Optimizer = function() {
       this.localOptimization(i);
     }
   }, localOptimization:function(page) {
+    this.ast[page] = this.ast[page].map(this.portPeephole.bind(this));
     this.ast[page] = this.ast[page].map(this.evaluateBinaryExpressions);
     this.ast[page] = this.ast[page].map(this.inlineRegisters);
+    this.ast[page] = this.ast[page].map(this.evaluateMemberExpressions.bind(this));
   }, evaluateBinaryExpressions:function(fn) {
     return fn.map(function(bytecodes) {
       var ast = bytecodes.ast;
@@ -12108,24 +12147,45 @@ var Optimizer = function() {
         return bytecodes;
       }
       bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
-        if (ast.type == "BinaryExpression" && (ast.left.type == "Literal" && ast.right.type == "Literal")) {
+        if (ast["type"] === "BinaryExpression" && ast["left"]["type"] === "Literal" && ast["right"]["type"] === "Literal") {
           var value = 0;
-          switch(ast.operator) {
+          switch(ast["operator"]) {
             case ">>":
-              value = ast.left.value >> ast.right.value;
+              value = ast["left"]["value"] >> ast["right"]["value"];
               break;
             case "&":
-              value = ast.left.value & ast.right.value;
+              value = ast["left"]["value"] & ast["right"]["value"];
               break;
             default:
-              JSSMS.Utils.console.log("Unimplemented evaluation optimization for operator", ast.operator);
+              JSSMS.Utils.console.log("Unimplemented evaluation optimization for operator", ast["operator"]);
               return ast;
           }
-          ast.type = "Literal";
-          ast.value = value;
-          ast.raw = DEBUG ? JSSMS.Utils.toHex(value) : "" + value;
-          delete ast.right;
-          delete ast.left;
+          ast["type"] = "Literal";
+          ast["value"] = value;
+          ast["raw"] = DEBUG ? JSSMS.Utils.toHex(value) : "" + value;
+          delete ast["right"];
+          delete ast["left"];
+        }
+        return ast;
+      });
+      return bytecodes;
+    });
+  }, evaluateMemberExpressions:function(fn) {
+    var self = this;
+    return fn.map(function(bytecodes) {
+      var ast = bytecodes.ast;
+      if (!ast) {
+        return bytecodes;
+      }
+      bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+        if (ast["type"] === "MemberExpression" && ast["object"]["name"] === "SZP_TABLE" && ast["property"]["type"] === "Literal") {
+          var value = self.main.cpu.SZP_TABLE[ast["property"]["value"]];
+          ast["type"] = "Literal";
+          ast["value"] = value;
+          ast["raw"] = DEBUG ? JSSMS.Utils.toHex(value) : "" + value;
+          delete ast["computed"];
+          delete ast["object"];
+          delete ast["property"];
         }
         return ast;
       });
@@ -12140,36 +12200,158 @@ var Optimizer = function() {
         return bytecodes;
       }
       bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
-        if (ast.type == "AssignmentExpression" && (ast.operator == "=" && (ast.left.type == "Register" && (ast.right.type == "Literal" && (ast.left.name != "a" && ast.left.name != "f"))))) {
-          definedReg[ast.left.name] = true;
-          definedRegValue[ast.left.name] = ast.right;
+        if (ast["type"] === "AssignmentExpression" && ast["operator"] === "=" && ast["left"]["type"] === "Register" && ast["right"]["type"] === "Literal" && ast["left"]["name"] !== "a" && ast["left"]["name"] !== "f") {
+          definedReg[ast["left"]["name"]] = true;
+          definedRegValue[ast["left"]["name"]] = ast["right"];
         }
-        if (ast.type == "AssignmentExpression" && (ast.left.type == "Register" && (ast.right.type != "Literal" && (ast.left.name != "a" && ast.left.name != "f")))) {
-          definedReg[ast.left.name] = false;
-          definedRegValue[ast.left.name] = {};
+        if (ast["type"] === "AssignmentExpression" && ast["left"]["type"] === "Register" && ast["right"]["type"] !== "Literal" && ast["left"]["name"] !== "a" && ast["left"]["name"] !== "f") {
+          definedReg[ast["left"]["name"]] = false;
+          definedRegValue[ast["left"]["name"]] = {};
           return ast;
         }
-        if (ast.type == "CallExpression") {
-          if (ast["arguments"][0] && (ast["arguments"][0].type == "Register" && (definedReg[ast["arguments"][0].name] && (ast["arguments"][0].name != "a" && ast["arguments"][0].name != "f")))) {
-            ast["arguments"][0] = definedRegValue[ast["arguments"][0].name];
+        if (ast["type"] === "CallExpression") {
+          if (ast["arguments"][0] && ast["arguments"][0]["type"] === "Register" && definedReg[ast["arguments"][0]["name"]] && ast["arguments"][0]["name"] !== "a" && ast["arguments"][0]["name"] !== "f") {
+            ast["arguments"][0] = definedRegValue[ast["arguments"][0]["name"]];
           }
-          if (ast["arguments"][1] && (ast["arguments"][1].type == "Register" && (definedReg[ast["arguments"][1].name] && (ast["arguments"][1].name != "a" && ast["arguments"][1].name != "f")))) {
-            ast["arguments"][1] = definedRegValue[ast["arguments"][1].name];
+          if (ast["arguments"][1] && ast["arguments"][1]["type"] === "Register" && definedReg[ast["arguments"][1]["name"]] && ast["arguments"][1]["name"] !== "a" && ast["arguments"][1]["name"] !== "f") {
+            ast["arguments"][1] = definedRegValue[ast["arguments"][1]["name"]];
           }
           return ast;
         }
-        if (ast.type == "MemberExpression" && (ast.property.type == "Register" && (definedReg[ast.property.name] && (ast.property.name != "a" && ast.property.name != "f")))) {
-          ast.property = definedRegValue[ast.property.name];
+        if (ast["type"] === "MemberExpression" && ast["property"]["type"] === "Register" && definedReg[ast["property"]["name"]] && ast["property"]["name"] !== "a" && ast["property"]["name"] !== "f") {
+          ast["property"] = definedRegValue[ast["property"]["name"]];
           return ast;
         }
-        if (ast.type == "BinaryExpression") {
-          if (ast.right.type == "Register" && (definedReg[ast.right.name] && (ast.right.name != "a" && ast.right.name != "f"))) {
-            ast.right = definedRegValue[ast.right.name];
+        if (ast["type"] === "BinaryExpression") {
+          if (ast["right"]["type"] === "Register" && definedReg[ast["right"]["name"]] && ast["right"]["name"] !== "a" && ast["right"]["name"] !== "f") {
+            ast["right"] = definedRegValue[ast["right"]["name"]];
           }
-          if (ast.left.type == "Register" && (definedReg[ast.left.name] && (ast.left.name != "a" && ast.left.name != "f"))) {
-            ast.left = definedRegValue[ast.left.name];
+          if (ast["left"]["type"] === "Register" && definedReg[ast["left"]["name"]] && ast["left"]["name"] !== "a" && ast["left"]["name"] !== "f") {
+            ast["left"] = definedRegValue[ast["left"]["name"]];
           }
           return ast;
+        }
+        return ast;
+      });
+      return bytecodes;
+    });
+  }, portPeephole:function(fn) {
+    var self = this;
+    return fn.map(function(bytecodes) {
+      var ast = bytecodes.ast;
+      if (!ast) {
+        return bytecodes;
+      }
+      bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+        if (ast["type"] === "CallExpression") {
+          if (ast["callee"]["name"] === "port.out") {
+            var value = ast["arguments"][1];
+            switch(ast["arguments"][0]["value"] & 193) {
+              case 1:
+                break;
+              case 128:
+                ast["callee"]["name"] = "vdp.dataWrite";
+                ast["arguments"] = [value];
+                break;
+              case 129:
+                ast["callee"]["name"] = "vdp.controlWrite";
+                ast["arguments"] = [value];
+                break;
+              case 64:
+              ;
+              case 65:
+                if (self.main.soundEnabled) {
+                  ast["callee"]["name"] = "psg.write";
+                  ast["arguments"] = [value];
+                } else {
+                }
+                break;
+            }
+            return ast;
+          } else {
+            if (ast["callee"]["name"] === "port.in_") {
+              var port = ast["arguments"][0]["value"];
+              if (self.main.is_gg && port < 7) {
+                switch(port) {
+                  case 0:
+                    ast["type"] = "BinaryExpression";
+                    ast["operator"] = "|";
+                    ast["left"] = n.BinaryExpression("&", n.Identifier("port.keyboard.ggstart"), n.Literal(191));
+                    ast["right"] = n.Identifier("port.europe");
+                    delete ast["callee"];
+                    delete ast["arguments"];
+                    return ast;
+                  case 1:
+                  ;
+                  case 2:
+                  ;
+                  case 3:
+                  ;
+                  case 4:
+                  ;
+                  case 5:
+                    ast["type"] = "Literal";
+                    ast["value"] = 0;
+                    ast["raw"] = DEBUG ? JSSMS.Utils.toHex(0) : "" + 0;
+                    delete ast["callee"];
+                    delete ast["arguments"];
+                    return ast;
+                  case 6:
+                    ast["type"] = "Literal";
+                    ast["value"] = 255;
+                    ast["raw"] = DEBUG ? JSSMS.Utils.toHex(255) : "" + 255;
+                    delete ast["callee"];
+                    delete ast["arguments"];
+                    return ast;
+                }
+              }
+              switch(port & 193) {
+                case 64:
+                  ast["callee"]["name"] = "vdp.getVCount";
+                  ast["arguments"] = [];
+                  return ast;
+                case 65:
+                  ast["type"] = "Identifier";
+                  ast["name"] = "port.hCounter";
+                  delete ast["callee"];
+                  delete ast["arguments"];
+                  return ast;
+                case 128:
+                  ast["callee"]["name"] = "vdp.dataRead";
+                  ast["arguments"] = [];
+                  return ast;
+                case 129:
+                  ast["callee"]["name"] = "vdp.controlRead";
+                  ast["arguments"] = [];
+                  return ast;
+                case 192:
+                  ast["type"] = "Identifier";
+                  ast["name"] = "main.keyboard.controller1";
+                  delete ast["callee"];
+                  delete ast["arguments"];
+                  return ast;
+                case 193:
+                  if (LIGHTGUN) {
+                    return ast;
+                  } else {
+                    ast["type"] = "BinaryExpression";
+                    ast["operator"] = "|";
+                    ast["left"] = n.BinaryExpression("|", n.BinaryExpression("&", n.Identifier("main.keyboard.controller2"), n.Literal(63)), n.MemberExpression(n.Identifier("port.ioPorts"), n.Literal(0)));
+                    ast["right"] = n.MemberExpression(n.Identifier("port.ioPorts"), n.Literal(1));
+                    delete ast["callee"];
+                    delete ast["arguments"];
+                    return ast;
+                  }
+                  return ast;
+              }
+              ast["type"] = "Literal";
+              ast["value"] = 255;
+              ast["raw"] = DEBUG ? JSSMS.Utils.toHex(255) : "" + 255;
+              delete ast["callee"];
+              delete ast["arguments"];
+              return ast;
+            }
+          }
         }
         return ast;
       });
@@ -12188,7 +12370,7 @@ var Generator = function() {
       case 221:
       ;
       case 253:
-        if (opcodes.length == 2) {
+        if (opcodes.length === 2) {
           return OP_DD_STATES[opcodes[1]];
         }
         return OP_INDEX_CB_STATES[opcodes[2]];
@@ -12200,7 +12382,7 @@ var Generator = function() {
   }
   function convertRegisters(ast) {
     var convertRegistersFunc = function(node) {
-      if (node.type == "Register") {
+      if (node.type === "Register") {
         node.type = "Identifier";
       }
       return node;
@@ -12215,7 +12397,6 @@ var Generator = function() {
       functions[page] = functions[page].map(function(fn) {
         var body = [{"type":"ExpressionStatement", "expression":{"type":"Literal", "value":"use strict", "raw":'"use strict"'}}];
         var name = fn[0].address;
-        var jumpTargetNb = fn[0].jumpTargetNb;
         var tstates = 0;
         fn = fn.map(function(bytecode) {
           if (bytecode.ast === undefined) {
@@ -12248,12 +12429,12 @@ var Generator = function() {
         });
         body = convertRegisters(body);
         body = JSSMS.Utils.traverse(body, function(obj) {
-          if (obj.type && (obj.type == "Identifier" && whitelist.indexOf(obj.name) == -1)) {
+          if (obj.type && obj.type === "Identifier" && whitelist.indexOf(obj.name) === -1) {
             obj.name = "this." + obj.name;
           }
           return obj;
         });
-        return{"type":"Program", "body":[{"type":"FunctionDeclaration", "id":{"type":"Identifier", "name":name}, "params":[{"type":"Identifier", "name":"page"}, {"type":"Identifier", "name":"temp"}, {"type":"Identifier", "name":"location"}], "defaults":[], "body":{"type":"BlockStatement", "body":body}, "rest":null, "generator":false, "expression":false}]};
+        return{"type":"Program", "body":[{"type":"FunctionDeclaration", "id":{"type":"Identifier", "name":"_" + name}, "params":[{"type":"Identifier", "name":"page"}, {"type":"Identifier", "name":"temp"}, {"type":"Identifier", "name":"location"}], "defaults":[], "body":{"type":"BlockStatement", "body":body}, "rest":null, "generator":false, "expression":false}]};
       });
     }
     this.ast = functions;
@@ -12268,7 +12449,7 @@ var Recompiler = function() {
     this.options = {};
     this.parser = {};
     this.analyzer = new Analyzer;
-    this.optimizer = new Optimizer;
+    this.optimizer = new Optimizer(cpu.main);
     this.generator = new Generator;
     this.bytecodes = {};
   };
