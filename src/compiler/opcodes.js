@@ -18,6 +18,7 @@
  */
 
 /* global o, F_CARRY, F_PARITY, F_ZERO, F_SIGN */
+/* exported opcodeTable */
 
 'use strict';
 

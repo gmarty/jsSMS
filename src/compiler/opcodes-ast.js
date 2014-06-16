@@ -18,6 +18,7 @@
  */
 
 /* global F_CARRY, F_NEGATIVE, F_PARITY, F_BIT3, F_HALFCARRY, F_ZERO */
+/* exported n */
 
 'use strict';
 
@@ -379,14 +380,21 @@ var o = {
             n.AssignmentExpression('=', n.Identifier('sp'), n.Literal(value))
         );
       };
-    } else {
-      // sp = getHL();
-      return function() {
+    }
+    if (register1 === 'n' && register2 === 'n') {
+      // sp = readMemWord(readMemWord(pc));
+      return function(value) {
         return n.ExpressionStatement(
-            n.AssignmentExpression('=', n.Identifier('sp'), n.CallExpression('get' + (register1 + register2).toUpperCase()))
+          n.AssignmentExpression('=', n.Identifier('sp'), o.READ_MEM8(n.Literal(value)))
         );
       };
     }
+    // sp = getHL();
+    return function() {
+      return n.ExpressionStatement(
+          n.AssignmentExpression('=', n.Identifier('sp'), n.CallExpression('get' + (register1 + register2).toUpperCase()))
+      );
+    };
   },
   LD_NN: function(register1, register2) {
     if (register2 === undefined) {

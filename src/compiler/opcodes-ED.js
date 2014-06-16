@@ -18,6 +18,7 @@
  */
 
 /* global o */
+/* exported opcodeTableED */
 
 'use strict';
 
@@ -209,6 +210,10 @@ var opcodeTableED = {
   0x7A: {
     name: 'ADC HL,SP',
     ast: o.ADC16('sp')
+  },
+  0x7B: {
+    name: 'LD SP,(nn)',
+    ast: o.LD_SP('n', 'n')
   },
   0x7C: {
     name: 'NEG',
