@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-closure-compiler');
   grunt.loadNpmTasks('grunt-contrib-htmlmin');
@@ -249,7 +251,7 @@ module.exports = function(grunt) {
         options: {
           process: function(src) {
             // Inline JavaScript bootstrap code.
-            return src.replace(/<script src="\.\.\/src\/setup\.js">.+<\/script>/,
+            return src.replace(/<script src=\.\.\/src\/setup\.js>.+<\/script>/,
                 '<script>' + grunt.file.read('alec/min/bootstrap.min.js').trim() + '</script>');
           }
         },
