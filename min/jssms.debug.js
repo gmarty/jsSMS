@@ -71,26 +71,26 @@ JSSMS.prototype = {isRunning:!1, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0
 }, setGG:function $JSSMS$$setGG$() {
   this.is_gg = !0;
   this.is_sms = !1;
-  this.vdp.h_start = 5;
-  this.vdp.h_end = 27;
+  this.vdp.h_start = 6;
+  this.vdp.h_end = 26;
   this.emuWidth = GG_WIDTH;
   this.emuHeight = GG_HEIGHT;
-}, setVideoTiming:function $JSSMS$$setVideoTiming$($i$$3_mode$$) {
+}, setVideoTiming:function $JSSMS$$setVideoTiming$($i$$4_mode$$) {
   var $clockSpeedHz_v$$ = 0;
-  $i$$3_mode$$ == NTSC || this.is_gg ? (this.fps = 60, this.no_of_scanlines = SMS_Y_PIXELS_NTSC, $clockSpeedHz_v$$ = CLOCK_NTSC) : (this.fps = 50, this.no_of_scanlines = SMS_Y_PIXELS_PAL, $clockSpeedHz_v$$ = CLOCK_PAL);
+  $i$$4_mode$$ === NTSC || this.is_gg ? (this.fps = 60, this.no_of_scanlines = SMS_Y_PIXELS_NTSC, $clockSpeedHz_v$$ = CLOCK_NTSC) : (this.fps = 50, this.no_of_scanlines = SMS_Y_PIXELS_PAL, $clockSpeedHz_v$$ = CLOCK_PAL);
   this.cyclesPerLine = Math.round($clockSpeedHz_v$$ / this.fps / this.no_of_scanlines + 1);
-  this.vdp.videoMode = $i$$3_mode$$;
+  this.vdp.videoMode = $i$$4_mode$$;
   if (this.soundEnabled) {
     this.psg.init($clockSpeedHz_v$$, SAMPLE_RATE);
     this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps);
-    if (0 === this.audioBuffer.length || this.audioBuffer.length != this.samplesPerFrame) {
+    if (0 === this.audioBuffer.length || this.audioBuffer.length !== this.samplesPerFrame) {
       this.audioBuffer = Array(this.samplesPerFrame);
     }
-    if (0 === this.samplesPerLine.length || this.samplesPerLine.length != this.no_of_scanlines) {
+    if (0 === this.samplesPerLine.length || this.samplesPerLine.length !== this.no_of_scanlines) {
       this.samplesPerLine = Array(this.no_of_scanlines);
       var $fractional$$ = 0;
-      for ($i$$3_mode$$ = 0;$i$$3_mode$$ < this.no_of_scanlines;$i$$3_mode$$++) {
-        $clockSpeedHz_v$$ = (this.samplesPerFrame << 16) / this.no_of_scanlines + $fractional$$, $fractional$$ = $clockSpeedHz_v$$ - ($clockSpeedHz_v$$ >> 16 << 16), this.samplesPerLine[$i$$3_mode$$] = $clockSpeedHz_v$$ >> 16;
+      for ($i$$4_mode$$ = 0;$i$$4_mode$$ < this.no_of_scanlines;$i$$4_mode$$++) {
+        $clockSpeedHz_v$$ = (this.samplesPerFrame << 16) / this.no_of_scanlines + $fractional$$, $fractional$$ = $clockSpeedHz_v$$ - ($clockSpeedHz_v$$ >> 16 << 16), this.samplesPerLine[$i$$4_mode$$] = $clockSpeedHz_v$$ >> 16;
       }
     }
   }
@@ -113,9 +113,9 @@ JSSMS.prototype = {isRunning:!1, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0
   this.audioBufferOffset += $line_samplesToGenerate$$;
 }, readRomDirectly:function $JSSMS$$readRomDirectly$($data$$, $fileName$$) {
   var $mode$$;
-  $mode$$ = ".gg" == $fileName$$.substr(-3).toLowerCase() ? 2 : 1;
+  $mode$$ = "gg" === JSSMS.Utils.getFileExtension($fileName$$) ? 2 : 1;
   var $size$$ = $data$$.length;
-  1 == $mode$$ ? this.setSMS() : 2 == $mode$$ && this.setGG();
+  1 === $mode$$ ? this.setSMS() : 2 === $mode$$ && this.setGG();
   if ($size$$ <= PAGE_SIZE) {
     return!1;
   }
@@ -210,6 +210,32 @@ JSSMS.Utils = {rndInt:function $JSSMS$Utils$rndInt$($range$$) {
     return $prop$$ in $obj$$ ? ($prefix$$ = $prop$$, !0) : !1;
   });
   return $prefix$$;
+}, getFileExtension:function $JSSMS$Utils$getFileExtension$($fileName$$) {
+  return "string" !== typeof $fileName$$ ? "" : $fileName$$.split(".").pop().toLowerCase();
+}, getFileName:function $JSSMS$Utils$getFileName$($fileName$$) {
+  if ("string" !== typeof $fileName$$) {
+    return "";
+  }
+  $fileName$$ = $fileName$$.split(".");
+  $fileName$$.pop();
+  return $fileName$$.join(".").split("/").pop();
+}, crc32:function $JSSMS$Utils$crc32$($str$$0$$) {
+  var $crcTable$$ = function makeCRCTable() {
+    for (var $c$$ = 0, $crcTable$$ = new Uint32Array(256), $n$$ = 0;256 > $n$$;$n$$++) {
+      for (var $c$$ = $n$$, $k$$ = 0;8 > $k$$;$k$$++) {
+        $c$$ = $c$$ & 1 ? 3988292384 ^ $c$$ >>> 1 : $c$$ >>> 1;
+      }
+      $crcTable$$[$n$$] = $c$$;
+    }
+    return $crcTable$$;
+  }();
+  this.crc32 = function $this$crc32$($str$$) {
+    for (var $crc$$ = -1, $i$$ = 0;$i$$ < $str$$.length;$i$$++) {
+      $crc$$ = $crc$$ >>> 8 ^ $crcTable$$[($crc$$ ^ $str$$.charCodeAt($i$$)) & 255];
+    }
+    return($crc$$ ^ -1) >>> 0;
+  };
+  return this.crc32($str$$0$$);
 }, isIE:function $JSSMS$Utils$isIE$() {
   return/msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent);
 }};
@@ -233,7 +259,7 @@ function BinaryRequest($method$$, $url$$, $args$$, $data$$, $cb$$) {
     console.error("responseType arrayBuffer not supported!");
   }
   $xhr$$.onreadystatechange = function onreadystatechange() {
-    if (4 == $xhr$$.readyState) {
+    if (4 === $xhr$$.readyState) {
       var $i$$;
       for ($i$$ = 0;$i$$ < $alwaysCallbacks$$.length;++$i$$) {
         $alwaysCallbacks$$[$i$$]();
@@ -245,7 +271,7 @@ function BinaryRequest($method$$, $url$$, $args$$, $data$$, $cb$$) {
   };
   $xhr$$.send($data$$);
   this.always = function $this$always$($cb$$) {
-    4 == $xhr$$.readyState && $cb$$();
+    4 === $xhr$$.readyState && $cb$$();
     $alwaysCallbacks$$.push($cb$$);
     return this;
   };
@@ -334,10 +360,10 @@ SyncReader.prototype = {refill:function $SyncReader$$refill$() {
     return!1;
   }
   var $toHex$$ = JSSMS.Utils.toHex, $writtenVal$$ = this.pop();
-  if ($val$$ == $writtenVal$$) {
+  if ($val$$ === $writtenVal$$) {
     console.log($name$$, $toHex$$($val$$), $toHex$$($writtenVal$$));
   } else {
-    if (console.log("%c" + $name$$, "color: red;", $toHex$$($val$$), $toHex$$($writtenVal$$)), "pc" == $name$$) {
+    if (console.log("%c" + $name$$, "color: red;", $toHex$$($val$$), $toHex$$($writtenVal$$)), "pc" === $name$$) {
       debugger;
       return!1;
     }
@@ -387,7 +413,7 @@ JSSMS.Z80 = function $JSSMS$Z80$($sms$$) {
     }
   }
   ENABLE_COMPILER && (this.recompiler = new Recompiler(this));
-  ENABLE_SERVER_LOGGER && (this.syncServer = SYNC_MODE == WRITE_MODE ? new SyncWriter : new SyncReader, this.syncServer.tick(), this.sync = function $this$sync$() {
+  ENABLE_SERVER_LOGGER && (this.syncServer = SYNC_MODE === WRITE_MODE ? new SyncWriter : new SyncReader, this.syncServer.tick(), this.sync = function $this$sync$() {
     this.syncServer.sync16(this.pc, "pc");
   });
 };
@@ -1223,7 +1249,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   this.pc = 102;
   this.tstates -= 11;
 }, interrupt:function $JSSMS$Z80$$interrupt$() {
-  !this.iff1 || ACCURATE_INTERRUPT_EMULATION && this.EI_inst || (this.halt && (this.pc++, this.halt = !1), REFRESH_EMULATION && this.incR(), this.interruptLine = this.iff1 = this.iff2 = !1, this.push(this.pc), 0 === this.im ? (this.pc = 0 === this.interruptVector || 255 === this.interruptVector ? 56 : this.interruptVector, this.tstates -= 13) : 1 == this.im ? (this.pc = 56, this.tstates -= 13) : (this.pc = this.readMemWord((this.i << 8) + this.interruptVector), this.tstates -= 19));
+  !this.iff1 || ACCURATE_INTERRUPT_EMULATION && this.EI_inst || (this.halt && (this.pc++, this.halt = !1), REFRESH_EMULATION && this.incR(), this.interruptLine = this.iff1 = this.iff2 = !1, this.push(this.pc), 0 === this.im ? (this.pc = 0 === this.interruptVector || 255 === this.interruptVector ? 56 : this.interruptVector, this.tstates -= 13) : 1 === this.im ? (this.pc = 56, this.tstates -= 13) : (this.pc = this.readMemWord((this.i << 8) + this.interruptVector), this.tstates -= 19));
 }, jp:function $JSSMS$Z80$$jp$($condition$$) {
   this.pc = $condition$$ ? this.readMemWord(this.pc) : this.pc + 2;
 }, jr:function $JSSMS$Z80$$jr$($condition$$) {
@@ -3714,7 +3740,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   if (0 !== ($flags$$ & F_HALFCARRY) || 9 < ($a_copy$$ & 15)) {
     $correction$$ |= 6;
   }
-  if (1 == $carry$$ || 159 < $a_copy$$ || 143 < $a_copy$$ && 9 < ($a_copy$$ & 15)) {
+  if (1 === $carry$$ || 159 < $a_copy$$ || 143 < $a_copy$$ && 9 < ($a_copy$$ & 15)) {
     $correction$$ |= 96, $carry_copy$$ = 1;
   }
   153 < $a_copy$$ && ($carry_copy$$ = 1);
@@ -3808,19 +3834,19 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   0 === this.iyL && (this.iyH = this.iyH + 1 & 255);
 }, decBC:function $JSSMS$Z80$$decBC$() {
   this.c = this.c - 1 & 255;
-  255 == this.c && (this.b = this.b - 1 & 255);
+  255 === this.c && (this.b = this.b - 1 & 255);
 }, decDE:function $JSSMS$Z80$$decDE$() {
   this.e = this.e - 1 & 255;
-  255 == this.e && (this.d = this.d - 1 & 255);
+  255 === this.e && (this.d = this.d - 1 & 255);
 }, decHL:function $JSSMS$Z80$$decHL$() {
   this.l = this.l - 1 & 255;
-  255 == this.l && (this.h = this.h - 1 & 255);
+  255 === this.l && (this.h = this.h - 1 & 255);
 }, decIXHIXL:function $JSSMS$Z80$$decIXHIXL$() {
   this.ixL = this.ixL - 1 & 255;
-  255 == this.ixL && (this.ixH = this.ixH - 1 & 255);
+  255 === this.ixL && (this.ixH = this.ixH - 1 & 255);
 }, decIYHIYL:function $JSSMS$Z80$$decIYHIYL$() {
   this.iyL = this.iyL - 1 & 255;
-  255 == this.iyL && (this.iyH = this.iyH - 1 & 255);
+  255 === this.iyL && (this.iyH = this.iyH - 1 & 255);
 }, inc8:function $JSSMS$Z80$$inc8$($value$$) {
   $value$$ = $value$$ + 1 & 255;
   this.f = this.f & F_CARRY | this.SZHV_INC_TABLE[$value$$];
@@ -3969,7 +3995,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       return this.rom[this.frameReg[1]].getUint8($address$$ - 16384);
     }
     if (49152 > $address$$) {
-      return 8 == (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram.getUint8($address$$ - 32768)) : 12 == (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram.getUint8($address$$ - 16384)) : this.rom[this.frameReg[2]].getUint8($address$$ - 32768);
+      return 8 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram.getUint8($address$$ - 32768)) : 12 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram.getUint8($address$$ - 16384)) : this.rom[this.frameReg[2]].getUint8($address$$ - 32768);
     }
     if (57344 > $address$$) {
       return this.memWriteMap.getUint8($address$$ - 49152);
@@ -4002,7 +4028,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       return this.rom[this.frameReg[1]][$address$$ - 16384];
     }
     if (49152 > $address$$) {
-      return 8 == (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram[$address$$ - 32768]) : 12 == (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram[$address$$ - 16384]) : this.rom[this.frameReg[2]][$address$$ - 32768];
+      return 8 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram[$address$$ - 32768]) : 12 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram[$address$$ - 16384]) : this.rom[this.frameReg[2]][$address$$ - 32768];
     }
     if (57344 > $address$$) {
       return this.memWriteMap[$address$$ - 49152];
@@ -4037,7 +4063,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       return this.rom[this.frameReg[1]].getUint16($address$$ - 16384, LITTLE_ENDIAN);
     }
     if (49152 > $address$$) {
-      return 8 == (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram[$address$$ - 32768]) : 12 == (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram[$address$$ - 16384]) : this.rom[this.frameReg[2]].getUint16($address$$ - 32768, LITTLE_ENDIAN);
+      return 8 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram[$address$$ - 32768]) : 12 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram[$address$$ - 16384]) : this.rom[this.frameReg[2]].getUint16($address$$ - 32768, LITTLE_ENDIAN);
     }
     if (57344 > $address$$) {
       return this.memWriteMap.getUint16($address$$ - 49152, LITTLE_ENDIAN);
@@ -4070,7 +4096,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       return this.rom[this.frameReg[1]][$address$$++ - 16384] | this.rom[this.frameReg[1]][$address$$ - 16384] << 8;
     }
     if (49152 > $address$$) {
-      return 8 == (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram[$address$$++ - 32768] | this.sram[$address$$ - 32768] << 8) : 12 == (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram[$address$$++ - 16384] | this.sram[$address$$ - 16384] << 8) : this.rom[this.frameReg[2]][$address$$++ - 32768] | this.rom[this.frameReg[2]][$address$$ - 32768] << 8;
+      return 8 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram[$address$$++ - 32768] | this.sram[$address$$ - 32768] << 8) : 12 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, this.sram[$address$$++ - 16384] | this.sram[$address$$ - 16384] << 8) : this.rom[this.frameReg[2]][$address$$++ - 32768] | this.rom[this.frameReg[2]][$address$$ - 32768] << 8;
     }
     if (57344 > $address$$) {
       return this.memWriteMap[$address$$++ - 49152] | this.memWriteMap[$address$$ - 49152] << 8;
@@ -4201,7 +4227,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       case 221:
       ;
       case 253:
-        $tstates$$ = 2 == $opcodes$$.length ? OP_DD_STATES[$opcodes$$[1]] : OP_INDEX_CB_STATES[$opcodes$$[2]];
+        $tstates$$ = 2 === $opcodes$$.length ? OP_DD_STATES[$opcodes$$[1]] : OP_INDEX_CB_STATES[$opcodes$$[2]];
         break;
       case 237:
         $tstates$$ = OP_ED_STATES[$opcodes$$[1]];
@@ -4219,11 +4245,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
   for (var $tree$$ = this.instructions, $toHex$$ = JSSMS.Utils.toHex, $tstates$$ = 0, $prevAddress$$ = 0, $prevNextAddress$$ = 0, $breakNeeded$$ = !1, $pageBreakPoint$$ = 1024, $pageNumber$$ = 0, $i$$ = 0, $length$$ = 0, $code$$ = ['"": {', '"": function() {', 'throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'], $i$$ = 0, $length$$ = $tree$$.length;$i$$ < $length$$;$i$$++) {
     if ($tree$$[$i$$]) {
       $prevAddress$$ <= $pageBreakPoint$$ && $tree$$[$i$$].address >= $pageBreakPoint$$ && ($code$$.push("this.pc = " + $toHex$$($tree$$[$i$$].address) + ";"), $code$$.push("}"), $code$$.push("},"), $code$$.push("" + $pageNumber$$ + ": {"), $code$$.push('"": function() {'), $code$$.push('throw "Bad address: " + JSSMS.Utils.toHex(this.pc);'), $breakNeeded$$ = !0, $pageNumber$$++, $pageBreakPoint$$ = $pageNumber$$ * PAGE_SIZE);
-      if ($tree$$[$i$$].isJumpTarget || $prevNextAddress$$ != $tree$$[$i$$].address || $breakNeeded$$) {
+      if ($tree$$[$i$$].isJumpTarget || $prevNextAddress$$ !== $tree$$[$i$$].address || $breakNeeded$$) {
         $insertTStates$$(), $prevNextAddress$$ && !$breakNeeded$$ && $code$$.push("this.pc = " + $toHex$$($prevNextAddress$$) + ";"), $code$$.push("},"), $code$$.push("" + $toHex$$($tree$$[$i$$].address) + ": function(temp, location) {");
       }
       $code$$.push("// " + $tree$$[$i$$].label);
-      $breakNeeded$$ = "return;" == $tree$$[$i$$].code.substr(-7);
+      $breakNeeded$$ = "return;" === $tree$$[$i$$].code.substr(-7);
       $tstates$$ += $getTotalTStates$$($tree$$[$i$$].opcodes);
       (/return;/.test($tree$$[$i$$].code) || /this\.tstates/.test($tree$$[$i$$].code)) && $insertTStates$$();
       "" !== $tree$$[$i$$].code && $code$$.push($tree$$[$i$$].code);
@@ -4314,7 +4340,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 16:
       $target$$ = $address$$ + this.signExtend(this.readRom8bit($address$$) + 1);
       $inst$$ = "DJNZ (" + $toHex$$($target$$) + ")";
-      $code$$ = "this.b = this.b - 0x01 & 0xFF;if (this.b != 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
+      $code$$ = "this.b = this.b - 0x01 & 0xFF;if (this.b !== 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
       $address$$++;
       break;
     case 17:
@@ -4388,7 +4414,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 32:
       $target$$ = $address$$ + this.signExtend(this.readRom8bit($address$$) + 1);
       $inst$$ = "JR NZ,(" + $toHex$$($target$$) + ")";
-      $code$$ = "if (!((this.f & F_ZERO) != 0x00)) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
+      $code$$ = "if (!((this.f & F_ZERO) !== 0x00)) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
       $address$$++;
       break;
     case 33:
@@ -4429,7 +4455,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 40:
       $target$$ = $address$$ + this.signExtend(this.readRom8bit($address$$) + 1);
       $inst$$ = "JR Z,(" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_ZERO) != 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
+      $code$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
       $address$$++;
       break;
     case 41:
@@ -4467,7 +4493,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 48:
       $target$$ = $address$$ + this.signExtend(this.readRom8bit($address$$) + 1);
       $inst$$ = "JR NC,(" + $toHex$$($target$$) + ")";
-      $code$$ = "if (!((this.f & F_CARRY) != 0x00)) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
+      $code$$ = "if (!((this.f & F_CARRY) !== 0x00)) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
       $address$$++;
       break;
     case 49:
@@ -4507,7 +4533,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 56:
       $target$$ = $address$$ + this.signExtend(this.readRom8bit($address$$) + 1);
       $inst$$ = "JR C,(" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_CARRY) != 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
+      $code$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
       $address$$++;
       break;
     case 57:
@@ -5098,7 +5124,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 200:
       $inst$$ = "RET Z";
-      $code$$ = "if ((this.f & F_ZERO) != 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
       break;
     case 201:
       $inst$$ = "RET";
@@ -5108,7 +5134,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 202:
       $target$$ = this.readRom16bit($address$$);
       $inst$$ = "JP Z,(" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_ZERO) != 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
+      $code$$ = "if ((this.f & F_ZERO) !== 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
       $address$$ += 2;
       break;
     case 203:
@@ -5121,7 +5147,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 204:
       $target$$ = this.readRom16bit($address$$);
       $inst$$ = "CALL Z (" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_ZERO) != 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
+      $code$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
       $address$$ += 2;
       break;
     case 205:
@@ -5184,7 +5210,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 216:
       $inst$$ = "RET C";
-      $code$$ = "if ((this.f & F_CARRY) != 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
       break;
     case 217:
       $inst$$ = "EXX";
@@ -5193,7 +5219,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 218:
       $target$$ = this.readRom16bit($address$$);
       $inst$$ = "JP C,(" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_CARRY) != 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
+      $code$$ = "if ((this.f & F_CARRY) !== 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
       $address$$ += 2;
       break;
     case 219:
@@ -5205,7 +5231,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 220:
       $target$$ = this.readRom16bit($address$$);
       $inst$$ = "CALL C (" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_CARRY) != 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
+      $code$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
       $address$$ += 2;
       break;
     case 221:
@@ -5267,7 +5293,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 232:
       $inst$$ = "RET PE";
-      $code$$ = "if ((this.f & F_PARITY) != 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$ = "if ((this.f & F_PARITY) !== 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
       break;
     case 233:
       $inst$$ = "JP (HL)";
@@ -5277,7 +5303,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 234:
       $target$$ = this.readRom16bit($address$$);
       $inst$$ = "JP PE,(" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_PARITY) != 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
+      $code$$ = "if ((this.f & F_PARITY) !== 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
       $address$$ += 2;
       break;
     case 235:
@@ -5287,7 +5313,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 236:
       $target$$ = this.readRom16bit($address$$);
       $inst$$ = "CALL PE (" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_PARITY) != 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
+      $code$$ = "if ((this.f & F_PARITY) !== 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
       $address$$ += 2;
       break;
     case 237:
@@ -5350,7 +5376,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 248:
       $inst$$ = "RET M";
-      $code$$ = "if ((this.f & F_SIGN) != 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$ = "if ((this.f & F_SIGN) !== 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
       break;
     case 249:
       $inst$$ = "LD SP,HL";
@@ -5359,7 +5385,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 250:
       $target$$ = this.readRom16bit($address$$);
       $inst$$ = "JP M,(" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_SIGN) != 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
+      $code$$ = "if ((this.f & F_SIGN) !== 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
       $address$$ += 2;
       break;
     case 251:
@@ -5369,7 +5395,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 252:
       $target$$ = this.readRom16bit($address$$);
       $inst$$ = "CALL M (" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_SIGN) != 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
+      $code$$ = "if ((this.f & F_SIGN) !== 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
       $address$$ += 2;
       break;
     case 253:
@@ -6595,7 +6621,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 170:
       $inst$$ = "IND";
-      $code$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if ((temp & 0x80) != 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 171:
       $inst$$ = "OUTD";
@@ -6604,25 +6630,25 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 176:
       $inst$$ = "LDIR";
       $code$$ = "this.writeMem(this.getDE(), this.readMem(this.getHL()));this.incDE();this.incHL();this.decBC();";
-      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if (this.getBC() != 0x00) {this.tstates -= 0x05;this.f |= F_PARITY;return;} else {") : $code$$ += "for (;this.getBC() != 0x00; this.f |= F_PARITY, this.tstates -= 5) {this.writeMem(this.getDE(), this.readMem(this.getHL()));this.incDE();this.incHL();this.decBC();}if (!(this.getBC() != 0x00)) {";
+      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if (this.getBC() !== 0x00) {this.tstates -= 0x05;this.f |= F_PARITY;return;} else {") : $code$$ += "for (;this.getBC() !== 0x00; this.f |= F_PARITY, this.tstates -= 5) {this.writeMem(this.getDE(), this.readMem(this.getHL()));this.incDE();this.incHL();this.decBC();}if (!(this.getBC() !== 0x00)) {";
       $code$$ += "this.f &= ~ F_PARITY;}this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
       break;
     case 177:
       $inst$$ = "CPIR";
       $code$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.readMem(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);";
-      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if ((temp & F_PARITY) != 0x00 && (this.f & F_ZERO) === 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}") : $code$$ += "for (;(temp & F_PARITY) != 0x00 && (this.f & F_ZERO) === 0x00; this.tstates -= 5) {temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.readMem(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);}";
+      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if ((temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}") : $code$$ += "for (;(temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00; this.tstates -= 5) {temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.readMem(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);}";
       $code$$ += "this.f = (this.f & 0xF8) | temp;";
       break;
     case 178:
       $target$$ = $address$$ - 2;
       $inst$$ = "INIR";
-      $code$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if (this.b != 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 179:
       $inst$$ = "OTIR";
       $code$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();";
-      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if (this.b != 0x00) {this.tstates -= 0x05;return;}") : $code$$ += "for (;this.b != 0x00; this.tstates -= 5) {temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();}";
-      $code$$ += "if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) != 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if (this.b !== 0x00) {this.tstates -= 0x05;return;}") : $code$$ += "for (;this.b !== 0x00; this.tstates -= 5) {temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();}";
+      $code$$ += "if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 184:
       $inst$$ = "LDDR";
@@ -6633,10 +6659,10 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 186:
       $target$$ = $address$$ - 2;
       $inst$$ = "INDR";
-      $code$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if (this.b != 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) != 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 187:
-      $target$$ = $address$$ - 2, $inst$$ = "OTDR", $code$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.decHL();if (this.b != 0x00) {this.tstates -= 0x05;return;}if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) != 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $target$$ = $address$$ - 2, $inst$$ = "OTDR", $code$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
   }
   return{opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$, target:$target$$};
 }, getIndex:function $JSSMS$Debugger$$getIndex$($index$$, $address$$) {
@@ -7644,7 +7670,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
   switch($code$$ & 193) {
     case 1:
       if (LIGHTGUN) {
-        return "var value = this.a;this.port.oldTH = (this.port.getTH(PORT_A) != 0x00 || this.port.getTH(PORT_B) != 0x00);this.port.writePort(PORT_A, value);this.port.writePort(PORT_B, value >> 2);if (!this.port.oldTH && (this.port.getTH(PORT_A) != 0x00 || this.port.getTH(PORT_B) != 0x00)) {this.port.hCounter = this.port.getHCount();}";
+        return "var value = this.a;this.port.oldTH = (this.port.getTH(PORT_A) !== 0x00 || this.port.getTH(PORT_B) !== 0x00);this.port.writePort(PORT_A, value);this.port.writePort(PORT_B, value >> 2);if (!this.port.oldTH && (this.port.getTH(PORT_A) !== 0x00 || this.port.getTH(PORT_B) !== 0x00)) {this.port.hCounter = this.port.getHCount();}";
       }
       $code$$ = "var value = this.a;this.port.ioPorts[0] = (value & 0x20) << 1;this.port.ioPorts[1] = (value & 0x80);";
       0 === this.port.europe && ($code$$ += "this.port.ioPorts[0] = ~this.port.ioPorts[0];this.port.ioPorts[1] = ~this.port.ioPorts[1];");
@@ -7693,7 +7719,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 192:
       return "this.a = this.port.keyboard.controller1;";
     case 193:
-      return LIGHTGUN ? "if (this.port.keyboard.lightgunClick)this.port.lightPhaserSync();this.a = (this.port.keyboard.controller2 & 0x3F) | (this.port.getTH(PORT_A) != 0x00 ? 0x40 : 0x00) | (this.port.getTH(PORT_B) != 0x00 ? 0x80 : 0x00);" : "this.a = (this.port.keyboard.controller2 & 0x3F) | this.port.ioPorts[0] | this.port.ioPorts[1];";
+      return LIGHTGUN ? "if (this.port.keyboard.lightgunClick)this.port.lightPhaserSync();this.a = (this.port.keyboard.controller2 & 0x3F) | (this.port.getTH(PORT_A) !== 0x00 ? 0x40 : 0x00) | (this.port.getTH(PORT_B) !== 0x00 ? 0x80 : 0x00);" : "this.a = (this.port.keyboard.controller2 & 0x3F) | this.port.ioPorts[0] | this.port.ioPorts[1];";
   }
   return "this.a = 0xFF;";
 }};
@@ -7833,10 +7859,10 @@ JSSMS.SN76489.prototype = {init:function $JSSMS$SN76489$$init$($clockSpeed$$, $s
   this.noiseFreq = 16;
   this.noiseShiftReg = SHIFT_RESET;
   for (var $i$$ = 0;4 > $i$$;$i$$++) {
-    this.reg[$i$$ << 1] = 1, this.reg[($i$$ << 1) + 1] = 15, this.freqCounter[$i$$] = 0, this.freqPolarity[$i$$] = 1, 3 != $i$$ && (this.freqPos[$i$$] = NO_ANTIALIAS);
+    this.reg[$i$$ << 1] = 1, this.reg[($i$$ << 1) + 1] = 15, this.freqCounter[$i$$] = 0, this.freqPolarity[$i$$] = 1, 3 !== $i$$ && (this.freqPos[$i$$] = NO_ANTIALIAS);
   }
 }, write:function $JSSMS$SN76489$$write$($value$$) {
-  0 !== ($value$$ & 128) ? (this.regLatch = $value$$ >> 4 & 7, this.reg[this.regLatch] = this.reg[this.regLatch] & 1008 | $value$$ & 15) : this.reg[this.regLatch] = 0 === this.regLatch || 2 == this.regLatch || 4 == this.regLatch ? this.reg[this.regLatch] & 15 | ($value$$ & 63) << 4 : $value$$ & 15;
+  0 !== ($value$$ & 128) ? (this.regLatch = $value$$ >> 4 & 7, this.reg[this.regLatch] = this.reg[this.regLatch] & 1008 | $value$$ & 15) : this.reg[this.regLatch] = 0 === this.regLatch || 2 === this.regLatch || 4 === this.regLatch ? this.reg[this.regLatch] & 15 | ($value$$ & 63) << 4 : $value$$ & 15;
   switch(this.regLatch) {
     case 0:
     ;
@@ -7851,7 +7877,7 @@ JSSMS.SN76489.prototype = {init:function $JSSMS$SN76489$$init$($clockSpeed$$, $s
 }, update:function $JSSMS$SN76489$$update$($offset$$, $samplesToGenerate$$) {
   for (var $buffer$$ = [], $sample$$ = 0, $feedback_i$$ = 0;$sample$$ < $samplesToGenerate$$;$sample$$++) {
     for ($feedback_i$$ = 0;3 > $feedback_i$$;$feedback_i$$++) {
-      this.outputChannel[$feedback_i$$] = this.freqPos[$feedback_i$$] != NO_ANTIALIAS ? PSG_VOLUME[this.reg[($feedback_i$$ << 1) + 1]] * this.freqPos[$feedback_i$$] >> SCALE : PSG_VOLUME[this.reg[($feedback_i$$ << 1) + 1]] * this.freqPolarity[$feedback_i$$];
+      this.outputChannel[$feedback_i$$] = this.freqPos[$feedback_i$$] !== NO_ANTIALIAS ? PSG_VOLUME[this.reg[($feedback_i$$ << 1) + 1]] * this.freqPos[$feedback_i$$] >> SCALE : PSG_VOLUME[this.reg[($feedback_i$$ << 1) + 1]] * this.freqPolarity[$feedback_i$$];
     }
     this.outputChannel[3] = PSG_VOLUME[this.reg[7]] * (this.noiseShiftReg & 1) << 1;
     $feedback_i$$ = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
@@ -7863,7 +7889,7 @@ JSSMS.SN76489.prototype = {init:function $JSSMS$SN76489$$init$($clockSpeed$$, $s
     this.freqCounter[0] -= $clockCycles$$;
     this.freqCounter[1] -= $clockCycles$$;
     this.freqCounter[2] -= $clockCycles$$;
-    this.freqCounter[3] = 128 == this.noiseFreq ? this.freqCounter[2] : this.freqCounter[3] - $clockCycles$$;
+    this.freqCounter[3] = 128 === this.noiseFreq ? this.freqCounter[2] : this.freqCounter[3] - $clockCycles$$;
     for ($feedback_i$$ = 0;3 > $feedback_i$$;$feedback_i$$++) {
       var $counter$$ = this.freqCounter[$feedback_i$$];
       if (0 >= $counter$$) {
@@ -7874,7 +7900,7 @@ JSSMS.SN76489.prototype = {init:function $JSSMS$SN76489$$init$($clockSpeed$$, $s
         this.freqPos[$feedback_i$$] = NO_ANTIALIAS;
       }
     }
-    0 >= this.freqCounter[3] && (this.freqPolarity[3] = -this.freqPolarity[3], 128 != this.noiseFreq && (this.freqCounter[3] += this.noiseFreq * ($clockCycles$$ / this.noiseFreq + 1)), 1 == this.freqPolarity[3] && ($feedback_i$$ = 0, $feedback_i$$ = 0 !== (this.reg[6] & 4) ? 0 !== (this.noiseShiftReg & FEEDBACK_PATTERN) && 0 !== (this.noiseShiftReg & FEEDBACK_PATTERN ^ FEEDBACK_PATTERN) ? 1 : 0 : this.noiseShiftReg & 1, this.noiseShiftReg = this.noiseShiftReg >> 1 | $feedback_i$$ << 15));
+    0 >= this.freqCounter[3] && (this.freqPolarity[3] = -this.freqPolarity[3], 128 !== this.noiseFreq && (this.freqCounter[3] += this.noiseFreq * ($clockCycles$$ / this.noiseFreq + 1)), 1 === this.freqPolarity[3] && ($feedback_i$$ = 0, $feedback_i$$ = 0 !== (this.reg[6] & 4) ? 0 !== (this.noiseShiftReg & FEEDBACK_PATTERN) && 0 !== (this.noiseShiftReg & FEEDBACK_PATTERN ^ FEEDBACK_PATTERN) ? 1 : 0 : this.noiseShiftReg & 1, this.noiseShiftReg = this.noiseShiftReg >> 1 | $feedback_i$$ << 15));
   }
   return $buffer$$;
 }};
@@ -7943,7 +7969,7 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
   this.sat = (this.vdpreg[5] & -130) << 7;
   this.isSatDirty = !0;
 }, getVCount:function $JSSMS$Vdp$$getVCount$() {
-  if (this.videoMode == NTSC) {
+  if (this.videoMode === NTSC) {
     if (218 < this.line) {
       return this.line - 6;
     }
@@ -7959,22 +7985,22 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
   this.status = 0;
   this.main.cpu.interruptLine = !1;
   return $statuscopy$$;
-}, controlWrite:function $JSSMS$Vdp$$controlWrite$($reg$$1_value$$) {
+}, controlWrite:function $JSSMS$Vdp$$controlWrite$($reg$$2_value$$) {
   if (this.firstByte) {
-    this.firstByte = !1, this.commandByte = $reg$$1_value$$, this.location = this.location & 16128 | $reg$$1_value$$;
+    this.firstByte = !1, this.commandByte = $reg$$2_value$$, this.location = this.location & 16128 | $reg$$2_value$$;
   } else {
-    if (this.firstByte = !0, this.operation = $reg$$1_value$$ >> 6 & 3, this.location = this.commandByte | $reg$$1_value$$ << 8, 0 === this.operation) {
+    if (this.firstByte = !0, this.operation = $reg$$2_value$$ >> 6 & 3, this.location = this.commandByte | $reg$$2_value$$ << 8, 0 === this.operation) {
       this.readBuffer = this.VRAM[this.location++ & 16383] & 255;
     } else {
-      if (2 == this.operation) {
-        $reg$$1_value$$ &= 15;
-        switch($reg$$1_value$$) {
+      if (2 === this.operation) {
+        $reg$$2_value$$ &= 15;
+        switch($reg$$2_value$$) {
           case 0:
             ACCURATE_INTERRUPT_EMULATION && 0 !== (this.status & STATUS_HINT) && (this.main.cpu.interruptLine = 0 !== (this.commandByte & 16));
             break;
           case 1:
             0 !== (this.status & STATUS_VINT) && 0 !== (this.commandByte & 32) && (this.main.cpu.interruptLine = !0);
-            (this.commandByte & 3) != (this.vdpreg[$reg$$1_value$$] & 3) && (this.isSatDirty = !0);
+            (this.commandByte & 3) !== (this.vdpreg[$reg$$2_value$$] & 3) && (this.isSatDirty = !0);
             break;
           case 2:
             this.bgt = (this.commandByte & 14) << 10;
@@ -7982,9 +8008,9 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
           case 5:
             var $old$$ = this.sat;
             this.sat = (this.commandByte & -130) << 7;
-            $old$$ != this.sat && (this.isSatDirty = !0);
+            $old$$ !== this.sat && (this.isSatDirty = !0);
         }
-        this.vdpreg[$reg$$1_value$$] = this.commandByte;
+        this.vdpreg[$reg$$2_value$$] = this.commandByte;
       }
     }
   }
@@ -8003,45 +8029,41 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
     ;
     case 2:
       $address$$15_temp$$ = this.location & 16383;
-      if ($value$$ != (this.VRAM[$address$$15_temp$$] & 255)) {
-        if ($address$$15_temp$$ >= this.sat && $address$$15_temp$$ < this.sat + 64) {
+      if ($value$$ !== (this.VRAM[$address$$15_temp$$] & 255)) {
+        if ($address$$15_temp$$ >= this.sat && $address$$15_temp$$ < this.sat + 64 || $address$$15_temp$$ >= this.sat + 128 && $address$$15_temp$$ < this.sat + 256) {
           this.isSatDirty = !0;
         } else {
-          if ($address$$15_temp$$ >= this.sat + 128 && $address$$15_temp$$ < this.sat + 256) {
-            this.isSatDirty = !0;
-          } else {
-            var $tileIndex$$ = $address$$15_temp$$ >> 5;
-            this.isTileDirty[$tileIndex$$] = 1;
-            $tileIndex$$ < this.minDirty && (this.minDirty = $tileIndex$$);
-            $tileIndex$$ > this.maxDirty && (this.maxDirty = $tileIndex$$);
-          }
+          var $tileIndex$$ = $address$$15_temp$$ >> 5;
+          this.isTileDirty[$tileIndex$$] = 1;
+          $tileIndex$$ < this.minDirty && (this.minDirty = $tileIndex$$);
+          $tileIndex$$ > this.maxDirty && (this.maxDirty = $tileIndex$$);
         }
         this.VRAM[$address$$15_temp$$] = $value$$;
       }
       break;
     case 3:
-      this.main.is_sms ? ($address$$15_temp$$ = 3 * (this.location & 31), this.CRAM[$address$$15_temp$$] = this.main_JAVA_R[$value$$], this.CRAM[$address$$15_temp$$ + 1] = this.main_JAVA_G[$value$$], this.CRAM[$address$$15_temp$$ + 2] = this.main_JAVA_B[$value$$]) : ($address$$15_temp$$ = 3 * ((this.location & 63) >> 1), 0 === (this.location & 1) ? (this.CRAM[$address$$15_temp$$] = this.GG_JAVA_R[$value$$], this.CRAM[$address$$15_temp$$ + 1] = this.GG_JAVA_G[$value$$]) : this.CRAM[$address$$15_temp$$ + 
-      2] = this.GG_JAVA_B[$value$$]);
+      this.main.is_sms ? ($address$$15_temp$$ = 3 * (this.location & 31), this.CRAM[$address$$15_temp$$] = this.main_JAVA_R[$value$$], this.CRAM[$address$$15_temp$$ + 1] = this.main_JAVA_G[$value$$], this.CRAM[$address$$15_temp$$ + 2] = this.main_JAVA_B[$value$$]) : ($address$$15_temp$$ = 3 * ((this.location & 63) >> 1), this.location & 1 ? this.CRAM[$address$$15_temp$$ + 2] = this.GG_JAVA_B[$value$$] : (this.CRAM[$address$$15_temp$$] = this.GG_JAVA_R[$value$$], this.CRAM[$address$$15_temp$$ + 1] = 
+      this.GG_JAVA_G[$value$$]));
   }
   ACCURATE && (this.readBuffer = $value$$);
   this.location++;
 }, interrupts:function $JSSMS$Vdp$$interrupts$($lineno$$) {
-  192 >= $lineno$$ ? (ACCURATE_INTERRUPT_EMULATION || 192 != $lineno$$ || (this.status |= STATUS_VINT), 0 === this.counter ? (this.counter = this.vdpreg[10], this.status |= STATUS_HINT) : this.counter--, 0 !== (this.status & STATUS_HINT) && 0 !== (this.vdpreg[0] & 16) && (this.main.cpu.interruptLine = !0)) : (this.counter = this.vdpreg[10], 0 !== (this.status & STATUS_VINT) && 0 !== (this.vdpreg[1] & 32) && 224 > $lineno$$ && (this.main.cpu.interruptLine = !0), ACCURATE && $lineno$$ == this.main.no_of_scanlines - 
+  192 >= $lineno$$ ? (ACCURATE_INTERRUPT_EMULATION || 192 !== $lineno$$ || (this.status |= STATUS_VINT), 0 === this.counter ? (this.counter = this.vdpreg[10], this.status |= STATUS_HINT) : this.counter--, 0 !== (this.status & STATUS_HINT) && 0 !== (this.vdpreg[0] & 16) && (this.main.cpu.interruptLine = !0)) : (this.counter = this.vdpreg[10], 0 !== (this.status & STATUS_VINT) && 0 !== (this.vdpreg[1] & 32) && 224 > $lineno$$ && (this.main.cpu.interruptLine = !0), ACCURATE && $lineno$$ === this.main.no_of_scanlines - 
   1 && (this.vScrollLatch = this.vdpreg[9]));
 }, setVBlankFlag:function $JSSMS$Vdp$$setVBlankFlag$() {
   this.status |= STATUS_VINT;
 }, drawLine:function $JSSMS$Vdp$$drawLine$($lineno$$) {
-  var $i$$ = 0, $temp$$ = 0, $temp2$$ = 0;
+  var $x$$ = 0, $location$$ = 0, $colour$$ = 0;
   if (!this.main.is_gg || !($lineno$$ < GG_Y_OFFSET || $lineno$$ >= GG_Y_OFFSET + GG_HEIGHT)) {
     if (VDP_SPRITE_COLLISIONS) {
-      for ($i$$ = 0;$i$$ < SMS_WIDTH;$i$$++) {
-        this.spriteCol[$i$$] = !1;
+      for ($x$$ = 0;$x$$ < SMS_WIDTH;$x$$++) {
+        this.spriteCol[$x$$] = !1;
       }
     }
     if (0 !== (this.vdpreg[1] & 64)) {
-      if (-1 != this.maxDirty && this.decodeTiles(), this.drawBg($lineno$$), this.isSatDirty && this.decodeSat(), 0 !== this.lineSprites[$lineno$$][SPRITE_COUNT] && this.drawSprite($lineno$$), this.main.is_sms && 0 !== (this.vdpreg[0] & 32)) {
-        for ($temp$$ = 4 * ($lineno$$ << 8), $temp2$$ = 3 * ((this.vdpreg[7] & 15) + 16), $i$$ = 0;8 > $i$$;$i$$++) {
-          this.display[$temp$$ + $i$$] = this.CRAM[$temp2$$], this.display[$temp$$ + $i$$ + 1] = this.CRAM[$temp2$$ + 1], this.display[$temp$$ + $i$$ + 2] = this.CRAM[$temp2$$ + 2];
+      if (-1 !== this.maxDirty && this.decodeTiles(), this.drawBg($lineno$$), this.isSatDirty && this.decodeSat(), 0 !== this.lineSprites[$lineno$$][SPRITE_COUNT] && this.drawSprite($lineno$$), this.main.is_sms && this.vdpreg[0] & 32) {
+        for ($location$$ = 4 * ($lineno$$ << 8), $colour$$ = 3 * ((this.vdpreg[7] & 15) + 16), $x$$ = $location$$;$x$$ < $location$$ + 32;$x$$ += 4) {
+          this.display[$x$$] = this.CRAM[$colour$$], this.display[$x$$ + 1] = this.CRAM[$colour$$ + 1], this.display[$x$$ + 2] = this.CRAM[$colour$$ + 2];
         }
       }
     } else {
@@ -8055,43 +8077,43 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
   27 < $tile_row$$ && ($tile_row$$ -= 28);
   for (var $tile_y_vscroll$$ = ($lineno$$ + ($tile_y_vscroll$$ & 7) & 7) << 3, $row_precal$$ = $lineno$$ << 8, $tx$$ = this.h_start;$tx$$ < this.h_end;$tx$$++) {
     var $pixX_tile_props$$ = this.bgt + (($tile_column$$ & 31) << 1) + ($tile_row$$ << 6), $secondbyte$$ = this.VRAM[$pixX_tile_props$$ + 1], $pal$$ = ($secondbyte$$ & 8) << 1, $sx$$ = ($tx$$ << 3) + ($hscroll$$ & 7), $pixY$$ = 0 === ($secondbyte$$ & 4) ? $tile_y_vscroll$$ : 56 - $tile_y_vscroll$$, $tile$$ = this.tiles[(this.VRAM[$pixX_tile_props$$] & 255) + (($secondbyte$$ & 1) << 8)];
-    if (0 === ($secondbyte$$ & 2)) {
-      for ($pixX_tile_props$$ = 0;8 > $pixX_tile_props$$ && $sx$$ < SMS_WIDTH;$pixX_tile_props$$++, $sx$$++) {
-        $colour$$ = $tile$$[$pixX_tile_props$$ + $pixY$$], $temp$$ = 4 * ($sx$$ + $row_precal$$), $temp2$$ = 3 * ($colour$$ + $pal$$), this.bgPriority[$sx$$] = 0 !== ($secondbyte$$ & 16) && 0 !== $colour$$, this.display[$temp$$] = this.CRAM[$temp2$$], this.display[$temp$$ + 1] = this.CRAM[$temp2$$ + 1], this.display[$temp$$ + 2] = this.CRAM[$temp2$$ + 2];
+    if ($secondbyte$$ & 2) {
+      for ($pixX_tile_props$$ = 7;0 <= $pixX_tile_props$$ && $sx$$ < SMS_WIDTH;$pixX_tile_props$$--, $sx$$++) {
+        $colour$$ = $tile$$[$pixX_tile_props$$ + $pixY$$], $temp$$ = 4 * ($sx$$ + $row_precal$$), $temp2$$ = 3 * ($colour$$ + $pal$$), this.bgPriority[$sx$$] = 0 !== ($secondbyte$$ & 16) && 0 !== $colour$$, $sx$$ >= 8 * this.h_start && $sx$$ < 8 * this.h_end && (this.display[$temp$$] = this.CRAM[$temp2$$], this.display[$temp$$ + 1] = this.CRAM[$temp2$$ + 1], this.display[$temp$$ + 2] = this.CRAM[$temp2$$ + 2]);
       }
     } else {
-      for ($pixX_tile_props$$ = 7;0 <= $pixX_tile_props$$ && $sx$$ < SMS_WIDTH;$pixX_tile_props$$--, $sx$$++) {
-        $colour$$ = $tile$$[$pixX_tile_props$$ + $pixY$$], $temp$$ = 4 * ($sx$$ + $row_precal$$), $temp2$$ = 3 * ($colour$$ + $pal$$), this.bgPriority[$sx$$] = 0 !== ($secondbyte$$ & 16) && 0 !== $colour$$, this.display[$temp$$] = this.CRAM[$temp2$$], this.display[$temp$$ + 1] = this.CRAM[$temp2$$ + 1], this.display[$temp$$ + 2] = this.CRAM[$temp2$$ + 2];
+      for ($pixX_tile_props$$ = 0;8 > $pixX_tile_props$$ && $sx$$ < SMS_WIDTH;$pixX_tile_props$$++, $sx$$++) {
+        $colour$$ = $tile$$[$pixX_tile_props$$ + $pixY$$], $temp$$ = 4 * ($sx$$ + $row_precal$$), $temp2$$ = 3 * ($colour$$ + $pal$$), this.bgPriority[$sx$$] = 0 !== ($secondbyte$$ & 16) && 0 !== $colour$$, $sx$$ >= 8 * this.h_start && $sx$$ < 8 * this.h_end && (this.display[$temp$$] = this.CRAM[$temp2$$], this.display[$temp$$ + 1] = this.CRAM[$temp2$$ + 1], this.display[$temp$$ + 2] = this.CRAM[$temp2$$ + 2]);
       }
     }
     $tile_column$$++;
-    0 !== $lock$$ && 23 == $tx$$ && ($tile_row$$ = $lineno$$ >> 3, $tile_y_vscroll$$ = ($lineno$$ & 7) << 3);
+    0 !== $lock$$ && 23 === $tx$$ && ($tile_row$$ = $lineno$$ >> 3, $tile_y_vscroll$$ = ($lineno$$ & 7) << 3);
   }
 }, drawSprite:function $JSSMS$Vdp$$drawSprite$($lineno$$) {
   for (var $colour$$ = 0, $temp$$ = 0, $temp2$$ = 0, $i$$ = 0, $sprites$$ = this.lineSprites[$lineno$$], $count$$ = Math.min(SPRITES_PER_LINE, $sprites$$[SPRITE_COUNT]), $zoomed$$ = this.vdpreg[1] & 1, $row_precal$$ = $lineno$$ << 8, $off$$ = 3 * $count$$;$i$$ < $count$$;$i$$++) {
-    var $n$$4_tile$$ = $sprites$$[$off$$--] | (this.vdpreg[6] & 4) << 6, $pix_y$$ = $sprites$$[$off$$--], $x$$ = $sprites$$[$off$$--] - (this.vdpreg[0] & 8), $colour$$ = $lineno$$ - $pix_y$$ >> $zoomed$$;
-    0 !== (this.vdpreg[1] & 2) && ($n$$4_tile$$ &= -2);
-    $n$$4_tile$$ = this.tiles[$n$$4_tile$$ + (($colour$$ & 8) >> 3)];
+    var $n$$5_tile$$ = $sprites$$[$off$$--] | (this.vdpreg[6] & 4) << 6, $pix_y$$ = $sprites$$[$off$$--], $x$$ = $sprites$$[$off$$--] - (this.vdpreg[0] & 8), $colour$$ = $lineno$$ - $pix_y$$ >> $zoomed$$;
+    0 !== (this.vdpreg[1] & 2) && ($n$$5_tile$$ &= -2);
+    $n$$5_tile$$ = this.tiles[$n$$5_tile$$ + (($colour$$ & 8) >> 3)];
     $pix_y$$ = 0;
     0 > $x$$ && ($pix_y$$ = -$x$$, $x$$ = 0);
     var $offset$$ = $pix_y$$ + (($colour$$ & 7) << 3);
-    if (0 === $zoomed$$) {
-      for (;8 > $pix_y$$ && $x$$ < SMS_WIDTH;$pix_y$$++, $x$$++) {
-        $colour$$ = $n$$4_tile$$[$offset$$++], 0 === $colour$$ || this.bgPriority[$x$$] || ($temp$$ = 4 * ($x$$ + $row_precal$$), $temp2$$ = 3 * ($colour$$ + 16), this.display[$temp$$] = this.CRAM[$temp2$$], this.display[$temp$$ + 1] = this.CRAM[$temp2$$ + 1], this.display[$temp$$ + 2] = this.CRAM[$temp2$$ + 2], VDP_SPRITE_COLLISIONS && (this.spriteCol[$x$$] ? this.status |= STATUS_COLLISION : this.spriteCol[$x$$] = !0));
+    if ($zoomed$$) {
+      for (;8 > $pix_y$$ && $x$$ < 8 * this.h_end;$pix_y$$++, $x$$ += 2) {
+        $colour$$ = $n$$5_tile$$[$offset$$++], $x$$ >= 8 * this.h_start && 0 !== $colour$$ && !this.bgPriority[$x$$] && ($temp$$ = 4 * ($x$$ + $row_precal$$), $temp2$$ = 3 * ($colour$$ + 16), this.display[$temp$$] = this.CRAM[$temp2$$], this.display[$temp$$ + 1] = this.CRAM[$temp2$$ + 1], this.display[$temp$$ + 2] = this.CRAM[$temp2$$ + 2], VDP_SPRITE_COLLISIONS && (this.spriteCol[$x$$] ? this.status |= STATUS_COLLISION : this.spriteCol[$x$$] = !0)), $x$$ + 1 >= 8 * this.h_start && 0 !== $colour$$ && 
+        !this.bgPriority[$x$$ + 1] && ($temp$$ = 4 * ($x$$ + $row_precal$$ + 1), $temp2$$ = 3 * ($colour$$ + 16), this.display[$temp$$] = this.CRAM[$temp2$$], this.display[$temp$$ + 1] = this.CRAM[$temp2$$ + 1], this.display[$temp$$ + 2] = this.CRAM[$temp2$$ + 2], VDP_SPRITE_COLLISIONS && (this.spriteCol[$x$$ + 1] ? this.status |= STATUS_COLLISION : this.spriteCol[$x$$ + 1] = !0));
       }
     } else {
-      for (;8 > $pix_y$$ && $x$$ < SMS_WIDTH;$pix_y$$++, $x$$ += 2) {
-        $colour$$ = $n$$4_tile$$[$offset$$++], 0 === $colour$$ || this.bgPriority[$x$$] || ($temp$$ = 4 * ($x$$ + $row_precal$$), $temp2$$ = 3 * ($colour$$ + 16), this.display[$temp$$] = this.CRAM[$temp2$$], this.display[$temp$$ + 1] = this.CRAM[$temp2$$ + 1], this.display[$temp$$ + 2] = this.CRAM[$temp2$$ + 2], VDP_SPRITE_COLLISIONS && (this.spriteCol[$x$$] ? this.status |= STATUS_COLLISION : this.spriteCol[$x$$] = !0)), 0 === $colour$$ || this.bgPriority[$x$$ + 1] || ($temp$$ = 4 * ($x$$ + $row_precal$$ + 
-        1), $temp2$$ = 3 * ($colour$$ + 16), this.display[$temp$$] = this.CRAM[$temp2$$], this.display[$temp$$ + 1] = this.CRAM[$temp2$$ + 1], this.display[$temp$$ + 2] = this.CRAM[$temp2$$ + 2], VDP_SPRITE_COLLISIONS && (this.spriteCol[$x$$ + 1] ? this.status |= STATUS_COLLISION : this.spriteCol[$x$$ + 1] = !0));
+      for (;8 > $pix_y$$ && $x$$ < 8 * this.h_end;$pix_y$$++, $x$$++) {
+        $colour$$ = $n$$5_tile$$[$offset$$++], $x$$ >= 8 * this.h_start && 0 !== $colour$$ && !this.bgPriority[$x$$] && ($temp$$ = 4 * ($x$$ + $row_precal$$), $temp2$$ = 3 * ($colour$$ + 16), this.display[$temp$$] = this.CRAM[$temp2$$], this.display[$temp$$ + 1] = this.CRAM[$temp2$$ + 1], this.display[$temp$$ + 2] = this.CRAM[$temp2$$ + 2], VDP_SPRITE_COLLISIONS && (this.spriteCol[$x$$] ? this.status |= STATUS_COLLISION : this.spriteCol[$x$$] = !0));
       }
     }
   }
   $sprites$$[SPRITE_COUNT] >= SPRITES_PER_LINE && (this.status |= STATUS_OVERFLOW);
-}, drawBGColour:function $JSSMS$Vdp$$drawBGColour$($lineno$$4_row_precal$$) {
-  $lineno$$4_row_precal$$ <<= 8;
-  var $length$$ = 4 * ($lineno$$4_row_precal$$ + 4 * SMS_WIDTH), $temp$$ = 3 * ((this.vdpreg[7] & 15) + 16);
-  for ($lineno$$4_row_precal$$ *= 4;$lineno$$4_row_precal$$ < $length$$;$lineno$$4_row_precal$$ += 4) {
-    this.display[$lineno$$4_row_precal$$] = this.CRAM[$temp$$], this.display[$lineno$$4_row_precal$$ + 1] = this.CRAM[$temp$$ + 1], this.display[$lineno$$4_row_precal$$ + 2] = this.CRAM[$temp$$ + 2];
+}, drawBGColour:function $JSSMS$Vdp$$drawBGColour$($lineno$$4_location$$) {
+  var $x$$ = 0;
+  $lineno$$4_location$$ = 4 * ($lineno$$4_location$$ << 8);
+  for (var $colour$$ = 3 * ((this.vdpreg[7] & 15) + 16), $x$$ = $lineno$$4_location$$ + 32 * this.h_start;$x$$ < $lineno$$4_location$$ + 32 * this.h_end;$x$$ += 4) {
+    this.display[$x$$] = this.CRAM[$colour$$], this.display[$x$$ + 1] = this.CRAM[$colour$$ + 1], this.display[$x$$ + 2] = this.CRAM[$colour$$ + 2];
   }
 }, decodeTiles:function $JSSMS$Vdp$$decodeTiles$() {
   for (var $i$$ = this.minDirty;$i$$ <= this.maxDirty;$i$$++) {
@@ -8117,10 +8139,10 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
     this.lineSprites[$height$$11_i$$][SPRITE_COUNT] = 0;
   }
   $height$$11_i$$ = 0 === (this.vdpreg[1] & 2) ? 8 : 16;
-  1 == (this.vdpreg[1] & 1) && ($height$$11_i$$ <<= 1);
+  1 === (this.vdpreg[1] & 1) && ($height$$11_i$$ <<= 1);
   for (var $spriteno$$ = 0;64 > $spriteno$$;$spriteno$$++) {
     var $y$$ = this.VRAM[this.sat + $spriteno$$] & 255;
-    if (208 == $y$$) {
+    if (208 === $y$$) {
       break;
     }
     $y$$++;
@@ -8207,7 +8229,7 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
       };
     }
     this.main = $root$$2_sms$$;
-    if ("[object OperaMini]" == Object.prototype.toString.call(window.operamini)) {
+    if ("[object OperaMini]" === Object.prototype.toString.call(window.operamini)) {
       $($parent$$).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser can\'t run this emulator. Try the latest version of Firefox, Google Chrome, Opera or Safari!</div>');
     } else {
       var $self$$ = this;
@@ -8227,7 +8249,7 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
         };
       }
       this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + " moz-opaque></canvas>");
-      this.canvasContext = this.screen[0].getContext("2d");
+      this.canvasContext = this.screen[0].getContext("2d", {alpha:!1});
       this.canvasContext.webkitImageSmoothingEnabled = !1;
       this.canvasContext.mozImageSmoothingEnabled = !1;
       this.canvasContext.imageSmoothingEnabled = !1;
@@ -8323,7 +8345,7 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
       return $self$$.xhr = $xhr$$;
     }, complete:function($xhr$$, $status$$) {
       var $data$$;
-      "error" == $status$$ ? $self$$.updateStatus("The selected ROM file could not be loaded.") : ($data$$ = $xhr$$.responseText, $self$$.main.stop(), $self$$.main.readRomDirectly($data$$, $self$$.romSelect.val()), $self$$.main.reset(), $self$$.main.vdp.forceFullRedraw(), $self$$.enable());
+      "error" === $status$$ ? $self$$.updateStatus("The selected ROM file could not be loaded.") : ($data$$ = $xhr$$.responseText, $self$$.main.stop(), $self$$.main.readRomDirectly($data$$, $self$$.romSelect.val()), $self$$.main.reset(), $self$$.main.vdp.forceFullRedraw(), $self$$.enable());
     }});
   }, enable:function $$UI$$$$enable$() {
     this.buttons.start.removeAttr("disabled");
@@ -8343,7 +8365,7 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
     };
   }(), updateDisassembly:function $$UI$$$$updateDisassembly$($currentAddress$$) {
     for (var $instructions$$ = this.main.cpu.instructions, $length$$ = $instructions$$.length, $html$$ = "", $i$$ = 8 > $currentAddress$$ ? 0 : $currentAddress$$ - 8, $num$$ = 0;16 > $num$$ && $i$$ <= $length$$;$i$$++) {
-      $instructions$$[$i$$] && ($html$$ += "<div" + ($instructions$$[$i$$].address == $currentAddress$$ ? ' class="current"' : "") + ">" + $instructions$$[$i$$].hexAddress + ($instructions$$[$i$$].isJumpTarget ? ":" : " ") + "<code>" + $instructions$$[$i$$].inst + "</code></div>", $num$$++);
+      $instructions$$[$i$$] && ($html$$ += "<div" + ($instructions$$[$i$$].address === $currentAddress$$ ? ' class="current"' : "") + ">" + $instructions$$[$i$$].hexAddress + ($instructions$$[$i$$].isJumpTarget ? ":" : " ") + "<code>" + $instructions$$[$i$$].inst + "</code></div>", $num$$++);
     }
     this.dissambler.html($html$$);
   }};
@@ -8429,7 +8451,7 @@ JSSMS.Ports.prototype = {reset:function $JSSMS$Ports$$reset$() {
   return $v$$ & 255;
 }, X_RANGE:48, Y_RANGE:4, lightPhaserSync:function $JSSMS$Ports$$lightPhaserSync$() {
   var $oldTH$$ = this.getTH(PORT_A), $hc$$ = this.getHCount(), $dx$$ = this.keyboard.lightgunX - ($hc$$ << 1), $dy$$ = this.keyboard.lightgunY - this.vdp.line;
-  $dy$$ > -this.Y_RANGE && $dy$$ < this.Y_RANGE && $dx$$ > -this.X_RANGE && $dx$$ < this.X_RANGE ? (this.setTH(PORT_A, !1), $oldTH$$ != this.getTH(PORT_A) && (this.hCounter = 20 + (this.keyboard.lightgunX >> 1))) : (this.setTH(PORT_A, !0), $oldTH$$ != this.getTH(PORT_A) && (this.hCounter = $hc$$));
+  $dy$$ > -this.Y_RANGE && $dy$$ < this.Y_RANGE && $dx$$ > -this.X_RANGE && $dx$$ < this.X_RANGE ? (this.setTH(PORT_A, !1), $oldTH$$ !== this.getTH(PORT_A) && (this.hCounter = 20 + (this.keyboard.lightgunX >> 1))) : (this.setTH(PORT_A, !0), $oldTH$$ !== this.getTH(PORT_A) && (this.hCounter = $hc$$));
 }, setDomestic:function $JSSMS$Ports$$setDomestic$($value$$) {
   this.europe = $value$$ ? 64 : 0;
 }, isDomestic:function $JSSMS$Ports$$isDomestic$() {
@@ -9608,7 +9630,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
 }, Identifier:function($name$$) {
   return{type:"Identifier", name:$name$$};
 }, Literal:function($value$$) {
-  return "number" == typeof $value$$ ? {type:"Literal", value:$value$$, raw:DEBUG ? JSSMS.Utils.toHex($value$$) : "" + $value$$} : {type:"Literal", value:$value$$, raw:"" + $value$$};
+  return "number" === typeof $value$$ ? {type:"Literal", value:$value$$, raw:DEBUG ? JSSMS.Utils.toHex($value$$) : "" + $value$$} : {type:"Literal", value:$value$$, raw:"" + $value$$};
 }, CallExpression:function($callee$$, $args$$) {
   void 0 === $args$$ && ($args$$ = []);
   Array.isArray($args$$) || ($args$$ = [$args$$]);
@@ -9632,7 +9654,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
 }, Bit:function($bitNumber$$) {
   return n.Literal(BIT_TABLE[$bitNumber$$]);
 }}, o = {SET16:function($register1$$, $register2$$, $value$$) {
-  return "Literal" == $value$$.type ? [n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.BinaryExpression(">>", $value$$, n.Literal(8)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register2$$), n.BinaryExpression("&", $value$$, n.Literal(255))))] : [n.VariableDeclaration("val", $value$$), n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.BinaryExpression(">>", n.Identifier("val"), n.Literal(8)))), n.ExpressionStatement(n.AssignmentExpression("=", 
+  return "Literal" === $value$$.type ? [n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.BinaryExpression(">>", $value$$, n.Literal(8)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register2$$), n.BinaryExpression("&", $value$$, n.Literal(255))))] : [n.VariableDeclaration("val", $value$$), n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.BinaryExpression(">>", n.Identifier("val"), n.Literal(8)))), n.ExpressionStatement(n.AssignmentExpression("=", 
   n.Register($register2$$), n.BinaryExpression("&", n.Identifier("val"), n.Literal(255))))];
 }, EX:function($register1$$, $register2$$) {
   return SUPPORT_DESTRUCTURING ? [n.ExpressionStatement(n.AssignmentExpression("=", n.ArrayExpression([n.Register($register1$$), n.Register($register2$$)]), n.ArrayExpression([n.Register($register2$$), n.Register($register1$$)])))] : [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register($register1$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.Register($register2$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register2$$), 
@@ -9643,14 +9665,14 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
 }, LD8:function($srcRegister$$, $dstRegister1$$, $dstRegister2$$) {
   return void 0 === $dstRegister1$$ && void 0 === $dstRegister2$$ ? function($value$$) {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Register($srcRegister$$), n.Literal($value$$)));
-  } : "i" == $dstRegister1$$ && void 0 === $dstRegister2$$ ? function() {
+  } : "i" === $dstRegister1$$ && void 0 === $dstRegister2$$ ? function() {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register($srcRegister$$), n.Register("i"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register($srcRegister$$))), n.ConditionalExpression(n.Identifier("iff2"), n.Literal(F_PARITY), n.Literal(0)))))];
-  } : "r" == $dstRegister1$$ && void 0 === $dstRegister2$$ ? function() {
+  } : "r" === $dstRegister1$$ && void 0 === $dstRegister2$$ ? function() {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register($srcRegister$$), REFRESH_EMULATION ? n.Register("r") : n.CallExpression("JSSMS.Utils.rndInt", n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register($srcRegister$$))), n.ConditionalExpression(n.Identifier("iff2"), n.Literal(F_PARITY), 
     n.Literal(0)))))];
   } : void 0 === $dstRegister2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Register($srcRegister$$), n.Register($dstRegister1$$)));
-  } : "n" == $dstRegister1$$ && "n" == $dstRegister2$$ ? function($value$$) {
+  } : "n" === $dstRegister1$$ && "n" === $dstRegister2$$ ? function($value$$) {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Register($srcRegister$$), o.READ_MEM8(n.Literal($value$$))));
   } : function() {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Register($srcRegister$$), o.READ_MEM8(n.CallExpression("get" + ($dstRegister1$$ + $dstRegister2$$).toUpperCase()))));
@@ -9665,7 +9687,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
       return o.SET16($srcRegister1$$, $srcRegister2$$, n.Literal($value$$));
     };
   }
-  if ("n" == $dstRegister1$$ && "n" == $dstRegister2$$) {
+  if ("n" === $dstRegister1$$ && "n" === $dstRegister2$$) {
     return function($value$$) {
       return o.SET16($srcRegister1$$, $srcRegister2$$, o.READ_MEM16(n.Literal($value$$)));
     };
@@ -9674,9 +9696,9 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
 }, LD_WRITE_MEM:function($srcRegister1$$, $srcRegister2$$, $dstRegister1$$, $dstRegister2$$) {
   return void 0 === $dstRegister1$$ && void 0 === $dstRegister2$$ ? function($value$$) {
     return n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ($srcRegister1$$ + $srcRegister2$$).toUpperCase()), n.Literal($value$$)]));
-  } : "n" == $srcRegister1$$ && "n" == $srcRegister2$$ && void 0 === $dstRegister2$$ ? function($value$$) {
+  } : "n" === $srcRegister1$$ && "n" === $srcRegister2$$ && void 0 === $dstRegister2$$ ? function($value$$) {
     return n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal($value$$), n.Register($dstRegister1$$)]));
-  } : "n" == $srcRegister1$$ && "n" == $srcRegister2$$ ? function($value$$) {
+  } : "n" === $srcRegister1$$ && "n" === $srcRegister2$$ ? function($value$$) {
     return[n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal($value$$), n.Register($dstRegister2$$)])), n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal($value$$ + 1), n.Register($dstRegister1$$)]))];
   } : function() {
     return n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ($srcRegister1$$ + $srcRegister2$$).toUpperCase()), n.Register($dstRegister1$$)]));
@@ -9696,26 +9718,26 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
 }, INC8:function($register1$$, $register2$$) {
   return void 0 === $register2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.CallExpression("inc8", n.Register($register1$$))));
-  } : "s" == $register1$$ && "p" == $register2$$ ? function() {
+  } : "s" === $register1$$ && "p" === $register2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1))));
   } : function() {
     return n.ExpressionStatement(n.CallExpression("incMem", n.CallExpression("getHL")));
   };
 }, INC16:function($register1$$, $register2$$) {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register2$$), n.BinaryExpression("&", n.BinaryExpression("+", n.Register($register2$$), n.Literal(1)), n.Literal(255)))), n.IfStatement(n.BinaryExpression("==", n.Register($register2$$), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.BinaryExpression("&", n.BinaryExpression("+", n.Register($register1$$), n.Literal(1)), n.Literal(255))))]))];
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register2$$), n.BinaryExpression("&", n.BinaryExpression("+", n.Register($register2$$), n.Literal(1)), n.Literal(255)))), n.IfStatement(n.BinaryExpression("===", n.Register($register2$$), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.BinaryExpression("&", n.BinaryExpression("+", n.Register($register1$$), n.Literal(1)), n.Literal(255))))]))];
   };
 }, DEC8:function($register1$$, $register2$$) {
   return void 0 === $register2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.CallExpression("dec8", n.Register($register1$$))));
-  } : "s" == $register1$$ && "p" == $register2$$ ? function() {
+  } : "s" === $register1$$ && "p" === $register2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), n.BinaryExpression("-", n.Identifier("sp"), n.Literal(1))));
   } : function() {
     return n.ExpressionStatement(n.CallExpression("decMem", n.CallExpression("getHL")));
   };
 }, DEC16:function($register1$$, $register2$$) {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register2$$), n.BinaryExpression("&", n.BinaryExpression("-", n.Register($register2$$), n.Literal(1)), n.Literal(255)))), n.IfStatement(n.BinaryExpression("==", n.Register($register2$$), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.BinaryExpression("&", n.BinaryExpression("-", n.Register($register1$$), n.Literal(1)), n.Literal(255))))]))];
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register2$$), n.BinaryExpression("&", n.BinaryExpression("-", n.Register($register2$$), n.Literal(1)), n.Literal(255)))), n.IfStatement(n.BinaryExpression("===", n.Register($register2$$), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.BinaryExpression("&", n.BinaryExpression("-", n.Register($register1$$), n.Literal(1)), n.Literal(255))))]))];
   };
 }, ADD16:function($register1$$, $register2$$, $register3$$, $register4$$) {
   return void 0 === $register4$$ ? function() {
@@ -9790,9 +9812,9 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
 }, AND:function($register1$$, $register2$$) {
   return void 0 === $register1$$ && void 0 === $register2$$ ? function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Literal($value$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))];
-  } : "a" != $register1$$ && void 0 === $register2$$ ? function() {
+  } : "a" !== $register1$$ && void 0 === $register2$$ ? function() {
     return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Register($register1$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))];
-  } : "a" == $register1$$ && void 0 === $register2$$ ? function() {
+  } : "a" === $register1$$ && void 0 === $register2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))));
   } : function() {
     return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))];
@@ -9800,9 +9822,9 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
 }, XOR:function($register1$$, $register2$$) {
   return void 0 === $register1$$ && void 0 === $register2$$ ? function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), n.Literal($value$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
-  } : "a" != $register1$$ && void 0 === $register2$$ ? function() {
+  } : "a" !== $register1$$ && void 0 === $register2$$ ? function() {
     return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), n.Register($register1$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
-  } : "a" == $register1$$ && void 0 === $register2$$ ? function() {
+  } : "a" === $register1$$ && void 0 === $register2$$ ? function() {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register("a"), n.Literal(0))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Literal(0))))];
   } : function() {
     return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
@@ -9810,9 +9832,9 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
 }, OR:function($register1$$, $register2$$) {
   return void 0 === $register1$$ && void 0 === $register2$$ ? function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), n.Literal($value$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
-  } : "a" != $register1$$ && void 0 === $register2$$ ? function() {
+  } : "a" !== $register1$$ && void 0 === $register2$$ ? function() {
     return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), n.Register($register1$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
-  } : "a" == $register1$$ && void 0 === $register2$$ ? function() {
+  } : "a" === $register1$$ && void 0 === $register2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))));
   } : function() {
     return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
@@ -9839,23 +9861,23 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, DJNZ:function() {
   return function($value$$, $target$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register("b"), n.BinaryExpression("&", n.BinaryExpression("-", n.Register("b"), n.Literal(1)), n.Literal(255)))), o.JR(n.BinaryExpression("!=", n.Register("b"), n.Literal(0)))(void 0, $target$$)];
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register("b"), n.BinaryExpression("&", n.BinaryExpression("-", n.Register("b"), n.Literal(1)), n.Literal(255)))), o.JR(n.BinaryExpression("!==", n.Register("b"), n.Literal(0)))(void 0, $target$$)];
   };
 }, JRNZ:function() {
   return function($value$$, $target$$) {
-    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0))))(void 0, $target$$);
+    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!==", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0))))(void 0, $target$$);
   };
 }, JRZ:function() {
   return function($value$$, $target$$) {
-    return o.JR(n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0)))(void 0, $target$$);
+    return o.JR(n.BinaryExpression("!==", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0)))(void 0, $target$$);
   };
 }, JRNC:function() {
   return function($value$$, $target$$) {
-    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(0))))(void 0, $target$$);
+    return o.JR(n.UnaryExpression("!", n.BinaryExpression("!==", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(0))))(void 0, $target$$);
   };
 }, JRC:function() {
   return function($value$$, $target$$) {
-    return o.JR(n.BinaryExpression("!=", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(0)))(void 0, $target$$);
+    return o.JR(n.BinaryExpression("!==", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(0)))(void 0, $target$$);
   };
 }, RET:function($operator$$, $bitMask$$) {
   return void 0 === $operator$$ && void 0 === $bitMask$$ ? function() {
@@ -9866,7 +9888,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
 }, JP:function($operator$$, $bitMask$$) {
   return void 0 === $operator$$ && void 0 === $bitMask$$ ? function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($target$$)))];
-  } : "h" == $operator$$ && "l" == $bitMask$$ ? function($value$$, $target$$, $nextAddress$$) {
+  } : "h" === $operator$$ && "l" === $bitMask$$ ? function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.CallExpression("getHL")))];
   } : function($value$$, $target$$) {
     return n.IfStatement(n.BinaryExpression($operator$$, n.BinaryExpression("&", n.Register("f"), n.Literal($bitMask$$)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($target$$))), n.ReturnStatement()]));
@@ -9928,7 +9950,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
 }, RLC:generateCBFunctions("rlc"), RRC:generateCBFunctions("rrc"), RL:generateCBFunctions("rl"), RR:generateCBFunctions("rr"), SLA:generateCBFunctions("sla"), SRA:generateCBFunctions("sra"), SLL:generateCBFunctions("sll"), SRL:generateCBFunctions("srl"), BIT:function($bit$$, $register1$$, $register2$$) {
   return void 0 === $register2$$ ? function() {
     return n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", n.Register($register1$$), n.Bit($bit$$))));
-  } : "h" == $register1$$ && "l" == $register2$$ ? function() {
+  } : "h" === $register1$$ && "l" === $register2$$ ? function() {
     return n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())), n.Bit($bit$$))));
   } : function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.Bit($bit$$))))];
@@ -9936,7 +9958,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
 }, RES:function($bit$$, $register1$$, $register2$$) {
   return void 0 === $register2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("&=", n.Register($register1$$), n.UnaryExpression("~", n.Bit($bit$$))));
-  } : "h" == $register1$$ && "l" == $register2$$ ? function() {
+  } : "h" === $register1$$ && "l" === $register2$$ ? function() {
     return n.ExpressionStatement(n.CallExpression("writeMem", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())), n.UnaryExpression("~", n.Bit($bit$$)))));
   } : function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.UnaryExpression("~", n.Bit($bit$$)))]))];
@@ -9944,7 +9966,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
 }, SET:function($bit$$, $register1$$, $register2$$) {
   return void 0 === $register2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("|=", n.Register($register1$$), n.Bit($bit$$)));
-  } : "h" == $register1$$ && "l" == $register2$$ ? function() {
+  } : "h" === $register1$$ && "l" === $register2$$ ? function() {
     return n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.BinaryExpression("|", o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())), n.Bit($bit$$))]));
   } : function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.BinaryExpression("|", o.READ_MEM8(n.Identifier("location")), n.Bit($bit$$))]))];
@@ -10008,14 +10030,14 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   return function($value$$, $target$$, $nextAddress$$) {
     return[void 0 === $register2$$ ? n.VariableDeclaration("value", n.Identifier($register1$$)) : n.VariableDeclaration("value", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register($register1$$), n.Literal(8)), n.Register($register2$$))), n.VariableDeclaration("val", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register("h"), n.Literal(8)), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("+", n.BinaryExpression("+", n.Identifier("val"), 
     n.Identifier("value")), n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.BinaryExpression(">>", n.BinaryExpression("^", n.BinaryExpression("^", n.Identifier("val"), n.Identifier("temp")), n.Identifier("value")), n.Literal(8)), n.Literal(16)), n.BinaryExpression("&", n.BinaryExpression(">>", 
-    n.Identifier("temp"), n.Literal(16)), n.Literal(1))), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(128))), n.ConditionalExpression(n.BinaryExpression("!=", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(65535)), n.Literal(0)), n.Literal(0), n.Literal(64))), n.BinaryExpression(">>", n.BinaryExpression("&", n.BinaryExpression("&", n.BinaryExpression("^", n.BinaryExpression("^", n.Identifier("value"), n.Identifier("val")), n.Literal(32768)), 
+    n.Identifier("temp"), n.Literal(16)), n.Literal(1))), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(128))), n.ConditionalExpression(n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(65535)), n.Literal(0)), n.Literal(0), n.Literal(64))), n.BinaryExpression(">>", n.BinaryExpression("&", n.BinaryExpression("&", n.BinaryExpression("^", n.BinaryExpression("^", n.Identifier("value"), n.Identifier("val")), n.Literal(32768)), 
     n.BinaryExpression("^", n.Identifier("value"), n.Identifier("temp"))), n.Literal(32768)), n.Literal(13))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("l"), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(255))))];
   };
 }, SBC16:function($register1$$, $register2$$) {
   return function($value$$, $target$$, $nextAddress$$) {
     return[void 0 === $register2$$ ? n.VariableDeclaration("value", n.Identifier($register1$$)) : n.VariableDeclaration("value", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register($register1$$), n.Literal(8)), n.Register($register2$$))), n.VariableDeclaration("val", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register("h"), n.Literal(8)), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("-", n.BinaryExpression("-", n.Identifier("val"), 
     n.Identifier("value")), n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.BinaryExpression(">>", n.BinaryExpression("^", n.BinaryExpression("^", n.Identifier("val"), n.Identifier("temp")), n.Identifier("value")), n.Literal(8)), n.Literal(16)), n.Literal(2)), n.BinaryExpression("&", 
-    n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(16)), n.Literal(1))), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(128))), n.ConditionalExpression(n.BinaryExpression("!=", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(65535)), n.Literal(0)), n.Literal(0), n.Literal(64))), n.BinaryExpression(">>", n.BinaryExpression("&", n.BinaryExpression("&", n.BinaryExpression("^", n.Identifier("value"), n.Identifier("val")), n.BinaryExpression("^", 
+    n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(16)), n.Literal(1))), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(128))), n.ConditionalExpression(n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(65535)), n.Literal(0)), n.Literal(0), n.Literal(64))), n.BinaryExpression(">>", n.BinaryExpression("&", n.BinaryExpression("&", n.BinaryExpression("^", n.Identifier("value"), n.Identifier("val")), n.BinaryExpression("^", 
     n.Identifier("val"), n.Identifier("temp"))), n.Literal(32768)), n.Literal(13))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("l"), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(255))))];
   };
 }, NEG:function() {
@@ -10032,19 +10054,19 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, INI:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("port.in_", n.Register("c")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("getHL"), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("port.in_", n.Register("c")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("getHL"), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
     n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))];
   };
 }, OUTI:function() {
   return function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), 
-    n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
     n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))];
   };
 }, OUTD:function() {
   return function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("decHL")), n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), 
-    n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
     n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))];
   };
 }, LDI:function() {
@@ -10055,7 +10077,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, CPI:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("getHL"))])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("==", 
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("getHL"))])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("===", 
     n.CallExpression("getBC"), n.Literal(0)), n.Literal(0), n.Literal(F_PARITY)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp"))))];
   };
 }, LDD:function() {
@@ -10068,25 +10090,25 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   return function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("getDE"), n.Identifier("temp")])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incDE")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), 
     n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("getBC"), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), 
-    n.Literal(0))))), n.IfStatement(n.BinaryExpression("!=", n.CallExpression("getBC"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
+    n.Literal(0))))), n.IfStatement(n.BinaryExpression("!==", n.CallExpression("getBC"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
   };
 }, CPIR:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("getHL"))])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("==", 
-    n.CallExpression("getBC"), n.Literal(0)), n.Literal(0), n.Literal(F_PARITY)))), n.IfStatement(n.LogicalExpression("&&", n.BinaryExpression("!=", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_PARITY)), n.Literal(0)), n.BinaryExpression("==", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0))), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), 
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("getHL"))])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("===", 
+    n.CallExpression("getBC"), n.Literal(0)), n.Literal(0), n.Literal(F_PARITY)))), n.IfStatement(n.LogicalExpression("&&", n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_PARITY)), n.Literal(0)), n.BinaryExpression("===", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0))), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), 
     n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp")))), n.ReturnStatement()])), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp"))))];
   };
 }, OTIR:function() {
   return function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), 
-    n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("!=", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(0)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
-    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE)))))), n.IfStatement(n.BinaryExpression("!=", n.Register("b"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
+    n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(0)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE)))))), n.IfStatement(n.BinaryExpression("!==", n.Register("b"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
   };
 }, LDDR:function() {
   return function($value$$, $target$$, $nextAddress$$) {
     return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("getDE"), n.Identifier("temp")])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("decDE")), n.ExpressionStatement(n.CallExpression("decHL")), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), 
     n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("getBC"), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), 
-    n.Literal(0))))), n.IfStatement(n.BinaryExpression("!=", n.CallExpression("getBC"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
+    n.Literal(0))))), n.IfStatement(n.BinaryExpression("!==", n.CallExpression("getBC"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
   };
 }, LD_RLC:generateIndexCBFunctions("rlc"), LD_RRC:generateIndexCBFunctions("rrc"), LD_RL:generateIndexCBFunctions("rl"), LD_RR:generateIndexCBFunctions("rr"), LD_SLA:generateIndexCBFunctions("sla"), LD_SRA:generateIndexCBFunctions("sra"), LD_SLL:generateIndexCBFunctions("sll"), LD_SRL:generateIndexCBFunctions("srl"), READ_MEM8:function($value$$) {
   return n.CallExpression("readMem", $value$$);
@@ -10111,24 +10133,25 @@ function generateIndexCBFunctions($fn$$) {
     };
   };
 }
-;var opcodeTableCB = [], opcodeTableDDCB = [], opcodeTableFDCB = [], regs = {B:["b"], C:["c"], D:["d"], E:["e"], H:["h"], L:["l"], "(HL)":["h", "l"], A:["a"]};
-"RLC RRC RL RR SLA SRA SLL SRL".split(" ").forEach(function($op$$) {
-  for (var $reg$$ in regs) {
-    opcodeTableCB.push({name:$op$$ + " " + $reg$$, ast:o[$op$$].apply(null, regs[$reg$$])}), "(HL)" != $reg$$ ? (opcodeTableDDCB.push({name:"LD " + $reg$$ + "," + $op$$ + " (IX)", ast:o["LD_" + $op$$].apply(null, ["ixH", "ixL"].concat(regs[$reg$$]))}), opcodeTableFDCB.push({name:"LD " + $reg$$ + "," + $op$$ + " (IY)", ast:o["LD_" + $op$$].apply(null, ["iyH", "iyL"].concat(regs[$reg$$]))})) : (opcodeTableDDCB.push({name:$op$$ + " (IX)", ast:o["LD_" + $op$$]("ixH", "ixL")}), opcodeTableFDCB.push({name:$op$$ + 
-    " (IY)", ast:o["LD_" + $op$$]("iyH", "iyL")}));
+;var opcodeTableCB = [], opcodeTableDDCB = [], opcodeTableFDCB = [], regs = {B:["b"], C:["c"], D:["d"], E:["e"], H:["h"], L:["l"], "(HL)":["h", "l"], A:["a"]}, opcodesList = {RLC:"RLC", RRC:"RRC", RL:"RL", RR:"RR", SLA:"SLA", SRA:"SRA", SLL:"SLL", SRL:"SRL"}, op = "", reg = "";
+for (op in opcodesList) {
+  for (reg in regs) {
+    opcodeTableCB.push({name:opcodesList[op] + " " + reg, ast:o[op].apply(null, regs[reg])}), "(HL)" !== reg ? (opcodeTableDDCB.push({name:"LD " + reg + "," + opcodesList[op] + " (IX)", ast:o["LD_" + opcodesList[op]].apply(null, ["ixH", "ixL"].concat(regs[reg]))}), opcodeTableFDCB.push({name:"LD " + reg + "," + opcodesList[op] + " (IY)", ast:o["LD_" + opcodesList[op]].apply(null, ["iyH", "iyL"].concat(regs[reg]))})) : (opcodeTableDDCB.push({name:opcodesList[op] + " (IX)", ast:o["LD_" + opcodesList[op]]("ixH", 
+    "ixL")}), opcodeTableFDCB.push({name:opcodesList[op] + " (IY)", ast:o["LD_" + opcodesList[op]]("iyH", "iyL")}));
   }
-});
-["BIT", "RES", "SET"].forEach(function($op$$) {
-  for (var $i$$ = 0;8 > $i$$;$i$$++) {
-    for (var $reg$$ in regs) {
-      opcodeTableCB.push({name:$op$$ + " " + $i$$ + "," + $reg$$, ast:o[$op$$].apply(null, [$i$$].concat(regs[$reg$$]))});
+}
+var opcodesList = {BIT:"BIT", RES:"RES", SET:"SET"}, i = 0, j = 0;
+for (op in opcodesList) {
+  for (i = 0;8 > i;i++) {
+    for (reg in regs) {
+      opcodeTableCB.push({name:opcodesList[op] + " " + i + "," + reg, ast:o[op].apply(null, [i].concat(regs[reg]))});
     }
-    for (var $j$$ = 0;8 > $j$$;$j$$++) {
-      opcodeTableDDCB.push({name:$op$$ + " " + $i$$ + " (IX)", ast:o[$op$$].apply(null, [$i$$].concat(["ixH", "ixL"]))}), opcodeTableFDCB.push({name:$op$$ + " " + $i$$ + " (IY)", ast:o[$op$$].apply(null, [$i$$].concat(["iyH", "iyL"]))});
+    for (j = 0;8 > j;j++) {
+      opcodeTableDDCB.push({name:opcodesList[op] + " " + i + " (IX)", ast:o[op].apply(null, [i].concat(["ixH", "ixL"]))}), opcodeTableFDCB.push({name:opcodesList[op] + " " + i + " (IY)", ast:o[op].apply(null, [i].concat(["iyH", "iyL"]))});
     }
   }
-});
-function generateIndexTable($index$$) {
+}
+;function generateIndexTable($index$$) {
   var $register_registerL$$ = $index$$.substring(1, 2).toLowerCase(), $registerH$$ = "i" + $register_registerL$$ + "H", $register_registerL$$ = "i" + $register_registerL$$ + "L";
   return{9:{name:"ADD " + $index$$ + ",BC", ast:o.ADD16($registerH$$, $register_registerL$$, "b", "c")}, 25:{name:"ADD " + $index$$ + ",DE", ast:o.ADD16($registerH$$, $register_registerL$$, "d", "e")}, 33:{name:"LD " + $index$$ + ",nn", ast:o.LD16($registerH$$, $register_registerL$$)}, 34:{name:"LD (nn)," + $index$$, ast:o.LD_NN($registerH$$, $register_registerL$$)}, 35:{name:"INC " + $index$$, ast:o.INC16($registerH$$, $register_registerL$$)}, 42:{name:"LD " + $index$$ + ",(nn)", ast:o.LD16($registerH$$, 
   $register_registerL$$, "n", "n")}, 43:{name:"DEC " + $index$$, ast:o.DEC16($registerH$$, $register_registerL$$)}, 52:{name:"INC (" + $index$$ + "+d)", ast:o.INC_X($registerH$$, $register_registerL$$)}, 53:{name:"DEC (" + $index$$ + "+d)", ast:o.DEC_X($registerH$$, $register_registerL$$)}, 54:{name:"LD (" + $index$$ + "+d),n", ast:o.LD_X($registerH$$, $register_registerL$$)}, 57:{name:"ADD " + $index$$ + ",SP", ast:o.ADD16($registerH$$, $register_registerL$$, "sp")}, 70:{name:"LD B,(" + $index$$ + 
@@ -10139,7 +10162,7 @@ function generateIndexTable($index$$) {
   $index$$ + "+d),E", ast:o.LD_X("e", $registerH$$, $register_registerL$$)}, 116:{name:"LD (" + $index$$ + "+d),H", ast:o.LD_X("h", $registerH$$, $register_registerL$$)}, 117:{name:"LD (" + $index$$ + "+d),L", ast:o.LD_X("l", $registerH$$, $register_registerL$$)}, 118:{name:"LD (" + $index$$ + "+d),B", ast:o.LD_X("b", $registerH$$, $register_registerL$$)}, 119:{name:"LD (" + $index$$ + "+d),A", ast:o.LD_X("a", $registerH$$, $register_registerL$$)}, 126:{name:"LD A,(" + $index$$ + "+d)", ast:o.LD8_D("a", 
   $registerH$$, $register_registerL$$)}, 124:{name:"LD A," + $index$$ + "H", ast:o.LD8("a", $registerH$$)}, 125:{name:"LD A," + $index$$ + "L", ast:o.LD8("a", $register_registerL$$)}, 132:{name:"ADD A," + $index$$ + "H", ast:o.ADD($register_registerL$$)}, 133:{name:"ADD A," + $index$$ + "L", ast:o.ADD($register_registerL$$)}, 134:{name:"ADD A,(" + $index$$ + "+d)", ast:o.ADD_X($registerH$$, $register_registerL$$)}, 140:{name:"ADC A," + $index$$ + "H", ast:o.ADC($register_registerL$$)}, 141:{name:"ADC A," + 
   $index$$ + "L", ast:o.ADC($register_registerL$$)}, 142:{name:"ADC A,(" + $index$$ + "+d)", ast:o.ADC_X($registerH$$, $register_registerL$$)}, 148:{name:"SUB A," + $index$$ + "H", ast:o.SUB($register_registerL$$)}, 149:{name:"SUB A," + $index$$ + "L", ast:o.SUB($register_registerL$$)}, 150:{name:"SUB A,(" + $index$$ + "+d)", ast:o.SUB_X($registerH$$, $register_registerL$$)}, 156:{name:"SBC A," + $index$$ + "H", ast:o.SBC($register_registerL$$)}, 157:{name:"SBC A," + $index$$ + "L", ast:o.SBC($register_registerL$$)}, 
-  158:{name:"SBC A,(" + $index$$ + "+d)", ast:o.SBC_X($registerH$$, $register_registerL$$)}, 166:{name:"AND A,(" + $index$$ + "+d)", ast:o.AND_X($registerH$$, $register_registerL$$)}, 174:{name:"XOR A,(" + $index$$ + "+d)", ast:o.XOR_X($registerH$$, $register_registerL$$)}, 182:{name:"OR A,(" + $index$$ + "+d)", ast:o.OR_X($registerH$$, $register_registerL$$)}, 190:{name:"CP (" + $index$$ + "+d)", ast:o.CP_X($registerH$$, $register_registerL$$)}, 203:"IX" == $index$$ ? opcodeTableDDCB : opcodeTableFDCB, 
+  158:{name:"SBC A,(" + $index$$ + "+d)", ast:o.SBC_X($registerH$$, $register_registerL$$)}, 166:{name:"AND A,(" + $index$$ + "+d)", ast:o.AND_X($registerH$$, $register_registerL$$)}, 174:{name:"XOR A,(" + $index$$ + "+d)", ast:o.XOR_X($registerH$$, $register_registerL$$)}, 182:{name:"OR A,(" + $index$$ + "+d)", ast:o.OR_X($registerH$$, $register_registerL$$)}, 190:{name:"CP (" + $index$$ + "+d)", ast:o.CP_X($registerH$$, $register_registerL$$)}, 203:"IX" === $index$$ ? opcodeTableDDCB : opcodeTableFDCB, 
   225:{name:"POP " + $index$$, ast:o.POP($registerH$$, $register_registerL$$)}, 227:{name:"EX SP,(" + $index$$ + ")", ast:o.EX_SP_X($registerH$$, $register_registerL$$)}, 229:{name:"PUSH " + $index$$, ast:o.PUSH($registerH$$, $register_registerL$$)}, 233:{name:"JP (" + $index$$ + ")", ast:o.JP_X($registerH$$, $register_registerL$$)}, 249:{name:"LD SP," + $index$$, ast:o.LD_SP($registerH$$, $register_registerL$$)}};
 }
 ;var opcodeTableED = {64:{name:"IN B,(C)", ast:o.IN("b", "c")}, 66:{name:"SBC HL,BC", ast:o.SBC16("b", "c")}, 65:{name:"OUT (C),B", ast:o.OUT("c", "b")}, 67:{name:"LD (nn),BC", ast:o.LD_NN("b", "c")}, 68:{name:"NEG", ast:o.NEG()}, 69:{name:"RETN / RETI", ast:o.RETN_RETI()}, 70:{name:"IM 0", ast:o.IM(0)}, 72:{name:"IN C,(C)", ast:o.IN("c", "c")}, 73:{name:"OUT (C),C", ast:o.OUT("c", "c")}, 74:{name:"ADC HL,BC", ast:o.ADC16("b", "c")}, 75:{name:"LD BC,(nn)", ast:o.LD16("b", "c", "n", "n")}, 76:{name:"NEG", 
@@ -10209,7 +10232,7 @@ var Analyzer = function() {
           $i$$36_opcode$$ = opcodeTable[$bytecode$$.opcode[0]][$bytecode$$.opcode[1]][$bytecode$$.opcode[2]];
           break;
         default:
-          JSSMS.Utils.console.error("Something went wrong in parsing. Opcode: [" + $bytecode$$.opcode.join(" ") + "]");
+          JSSMS.Utils.console.error("Something went wrong in parsing. Opcode: [" + $bytecode$$.hexOpcode + "]");
       }
       if ($i$$36_opcode$$ && $i$$36_opcode$$.ast) {
         var $ast$$ = $i$$36_opcode$$.ast($bytecode$$.operand, $bytecode$$.target, $bytecode$$.nextAddress);
@@ -10236,7 +10259,8 @@ var Analyzer = function() {
   return $Analyzer$$;
 }();
 var Optimizer = function() {
-  var $Optimizer$$ = function $$Optimizer$$$() {
+  var $Optimizer$$ = function $$Optimizer$$$($main$$) {
+    this.main = $main$$;
     this.ast = [];
   };
   $Optimizer$$.prototype = {optimize:function $$Optimizer$$$$optimize$($functions_i$$) {
@@ -10245,8 +10269,10 @@ var Optimizer = function() {
       this.localOptimization($functions_i$$);
     }
   }, localOptimization:function $$Optimizer$$$$localOptimization$($page$$) {
+    this.ast[$page$$] = this.ast[$page$$].map(this.portPeephole.bind(this));
     this.ast[$page$$] = this.ast[$page$$].map(this.evaluateBinaryExpressions);
     this.ast[$page$$] = this.ast[$page$$].map(this.inlineRegisters);
+    this.ast[$page$$] = this.ast[$page$$].map(this.evaluateMemberExpressions.bind(this));
   }, evaluateBinaryExpressions:function $$Optimizer$$$$evaluateBinaryExpressions$($fn$$) {
     return $fn$$.map(function($bytecodes$$) {
       var $ast$$0$$ = $bytecodes$$.ast;
@@ -10254,7 +10280,7 @@ var Optimizer = function() {
         return $bytecodes$$;
       }
       $bytecodes$$.ast = JSSMS.Utils.traverse($ast$$0$$, function($ast$$) {
-        if ("BinaryExpression" == $ast$$.type && "Literal" == $ast$$.left.type && "Literal" == $ast$$.right.type) {
+        if ("BinaryExpression" === $ast$$.type && "Literal" === $ast$$.left.type && "Literal" === $ast$$.right.type) {
           var $value$$ = 0;
           switch($ast$$.operator) {
             case ">>":
@@ -10276,6 +10302,27 @@ var Optimizer = function() {
       });
       return $bytecodes$$;
     });
+  }, evaluateMemberExpressions:function $$Optimizer$$$$evaluateMemberExpressions$($fn$$) {
+    var $self$$ = this;
+    return $fn$$.map(function($bytecodes$$) {
+      var $ast$$0$$ = $bytecodes$$.ast;
+      if (!$ast$$0$$) {
+        return $bytecodes$$;
+      }
+      $bytecodes$$.ast = JSSMS.Utils.traverse($ast$$0$$, function($ast$$) {
+        if ("MemberExpression" === $ast$$.type && "SZP_TABLE" === $ast$$.object.name && "Literal" === $ast$$.property.type) {
+          var $value$$ = $self$$.main.cpu.SZP_TABLE[$ast$$.property.value];
+          $ast$$.type = "Literal";
+          $ast$$.value = $value$$;
+          $ast$$.raw = DEBUG ? JSSMS.Utils.toHex($value$$) : "" + $value$$;
+          delete $ast$$.computed;
+          delete $ast$$.object;
+          delete $ast$$.property;
+        }
+        return $ast$$;
+      });
+      return $bytecodes$$;
+    });
   }, inlineRegisters:function $$Optimizer$$$$inlineRegisters$($fn$$) {
     var $definedReg$$ = {b:!1, c:!1, d:!1, e:!1, h:!1, l:!1}, $definedRegValue$$ = {b:{}, c:{}, d:{}, e:{}, h:{}, l:{}};
     return $fn$$.map(function($bytecodes$$) {
@@ -10284,18 +10331,90 @@ var Optimizer = function() {
         return $bytecodes$$;
       }
       $bytecodes$$.ast = JSSMS.Utils.traverse($ast$$0$$, function($ast$$) {
-        "AssignmentExpression" == $ast$$.type && "=" == $ast$$.operator && "Register" == $ast$$.left.type && "Literal" == $ast$$.right.type && "a" != $ast$$.left.name && "f" != $ast$$.left.name && ($definedReg$$[$ast$$.left.name] = !0, $definedRegValue$$[$ast$$.left.name] = $ast$$.right);
-        if ("AssignmentExpression" == $ast$$.type && "Register" == $ast$$.left.type && "Literal" != $ast$$.right.type && "a" != $ast$$.left.name && "f" != $ast$$.left.name) {
+        "AssignmentExpression" === $ast$$.type && "=" === $ast$$.operator && "Register" === $ast$$.left.type && "Literal" === $ast$$.right.type && "a" !== $ast$$.left.name && "f" !== $ast$$.left.name && ($definedReg$$[$ast$$.left.name] = !0, $definedRegValue$$[$ast$$.left.name] = $ast$$.right);
+        if ("AssignmentExpression" === $ast$$.type && "Register" === $ast$$.left.type && "Literal" !== $ast$$.right.type && "a" !== $ast$$.left.name && "f" !== $ast$$.left.name) {
           return $definedReg$$[$ast$$.left.name] = !1, $definedRegValue$$[$ast$$.left.name] = {}, $ast$$;
         }
-        if ("CallExpression" == $ast$$.type) {
-          return $ast$$.arguments[0] && "Register" == $ast$$.arguments[0].type && $definedReg$$[$ast$$.arguments[0].name] && "a" != $ast$$.arguments[0].name && "f" != $ast$$.arguments[0].name && ($ast$$.arguments[0] = $definedRegValue$$[$ast$$.arguments[0].name]), $ast$$.arguments[1] && "Register" == $ast$$.arguments[1].type && $definedReg$$[$ast$$.arguments[1].name] && "a" != $ast$$.arguments[1].name && "f" != $ast$$.arguments[1].name && ($ast$$.arguments[1] = $definedRegValue$$[$ast$$.arguments[1].name]), 
+        if ("CallExpression" === $ast$$.type) {
+          return $ast$$.arguments[0] && "Register" === $ast$$.arguments[0].type && $definedReg$$[$ast$$.arguments[0].name] && "a" !== $ast$$.arguments[0].name && "f" !== $ast$$.arguments[0].name && ($ast$$.arguments[0] = $definedRegValue$$[$ast$$.arguments[0].name]), $ast$$.arguments[1] && "Register" === $ast$$.arguments[1].type && $definedReg$$[$ast$$.arguments[1].name] && "a" !== $ast$$.arguments[1].name && "f" !== $ast$$.arguments[1].name && ($ast$$.arguments[1] = $definedRegValue$$[$ast$$.arguments[1].name]), 
           $ast$$;
         }
-        if ("MemberExpression" == $ast$$.type && "Register" == $ast$$.property.type && $definedReg$$[$ast$$.property.name] && "a" != $ast$$.property.name && "f" != $ast$$.property.name) {
+        if ("MemberExpression" === $ast$$.type && "Register" === $ast$$.property.type && $definedReg$$[$ast$$.property.name] && "a" !== $ast$$.property.name && "f" !== $ast$$.property.name) {
           return $ast$$.property = $definedRegValue$$[$ast$$.property.name], $ast$$;
         }
-        "BinaryExpression" == $ast$$.type && ("Register" == $ast$$.right.type && $definedReg$$[$ast$$.right.name] && "a" != $ast$$.right.name && "f" != $ast$$.right.name && ($ast$$.right = $definedRegValue$$[$ast$$.right.name]), "Register" == $ast$$.left.type && $definedReg$$[$ast$$.left.name] && "a" != $ast$$.left.name && "f" != $ast$$.left.name && ($ast$$.left = $definedRegValue$$[$ast$$.left.name]));
+        "BinaryExpression" === $ast$$.type && ("Register" === $ast$$.right.type && $definedReg$$[$ast$$.right.name] && "a" !== $ast$$.right.name && "f" !== $ast$$.right.name && ($ast$$.right = $definedRegValue$$[$ast$$.right.name]), "Register" === $ast$$.left.type && $definedReg$$[$ast$$.left.name] && "a" !== $ast$$.left.name && "f" !== $ast$$.left.name && ($ast$$.left = $definedRegValue$$[$ast$$.left.name]));
+        return $ast$$;
+      });
+      return $bytecodes$$;
+    });
+  }, portPeephole:function $$Optimizer$$$$portPeephole$($fn$$) {
+    var $self$$ = this;
+    return $fn$$.map(function($bytecodes$$) {
+      var $ast$$0$$ = $bytecodes$$.ast;
+      if (!$ast$$0$$) {
+        return $bytecodes$$;
+      }
+      $bytecodes$$.ast = JSSMS.Utils.traverse($ast$$0$$, function($ast$$) {
+        if ("CallExpression" === $ast$$.type) {
+          if ("port.out" === $ast$$.callee.name) {
+            var $port$$4_value$$ = $ast$$.arguments[1];
+            switch($ast$$.arguments[0].value & 193) {
+              case 128:
+                $ast$$.callee.name = "vdp.dataWrite";
+                $ast$$.arguments = [$port$$4_value$$];
+                break;
+              case 129:
+                $ast$$.callee.name = "vdp.controlWrite";
+                $ast$$.arguments = [$port$$4_value$$];
+                break;
+              case 64:
+              ;
+              case 65:
+                $self$$.main.soundEnabled && ($ast$$.callee.name = "psg.write", $ast$$.arguments = [$port$$4_value$$]);
+            }
+          } else {
+            if ("port.in_" === $ast$$.callee.name) {
+              $port$$4_value$$ = $ast$$.arguments[0].value;
+              if ($self$$.main.is_gg && 7 > $port$$4_value$$) {
+                switch($port$$4_value$$) {
+                  case 0:
+                    return $ast$$.type = "BinaryExpression", $ast$$.operator = "|", $ast$$.left = n.BinaryExpression("&", n.Identifier("port.keyboard.ggstart"), n.Literal(191)), $ast$$.right = n.Identifier("port.europe"), delete $ast$$.callee, delete $ast$$.arguments, $ast$$;
+                  case 1:
+                  ;
+                  case 2:
+                  ;
+                  case 3:
+                  ;
+                  case 4:
+                  ;
+                  case 5:
+                    return $ast$$.type = "Literal", $ast$$.value = 0, $ast$$.raw = DEBUG ? JSSMS.Utils.toHex(0) : "0", delete $ast$$.callee, delete $ast$$.arguments, $ast$$;
+                  case 6:
+                    return $ast$$.type = "Literal", $ast$$.value = 255, $ast$$.raw = DEBUG ? JSSMS.Utils.toHex(255) : "255", delete $ast$$.callee, delete $ast$$.arguments, $ast$$;
+                }
+              }
+              switch($port$$4_value$$ & 193) {
+                case 64:
+                  return $ast$$.callee.name = "vdp.getVCount", $ast$$.arguments = [], $ast$$;
+                case 65:
+                  return $ast$$.type = "Identifier", $ast$$.name = "port.hCounter", delete $ast$$.callee, delete $ast$$.arguments, $ast$$;
+                case 128:
+                  return $ast$$.callee.name = "vdp.dataRead", $ast$$.arguments = [], $ast$$;
+                case 129:
+                  return $ast$$.callee.name = "vdp.controlRead", $ast$$.arguments = [], $ast$$;
+                case 192:
+                  return $ast$$.type = "Identifier", $ast$$.name = "main.keyboard.controller1", delete $ast$$.callee, delete $ast$$.arguments, $ast$$;
+                case 193:
+                  return LIGHTGUN || ($ast$$.type = "BinaryExpression", $ast$$.operator = "|", $ast$$.left = n.BinaryExpression("|", n.BinaryExpression("&", n.Identifier("main.keyboard.controller2"), n.Literal(63)), n.MemberExpression(n.Identifier("port.ioPorts"), n.Literal(0))), $ast$$.right = n.MemberExpression(n.Identifier("port.ioPorts"), n.Literal(1)), delete $ast$$.callee, delete $ast$$.arguments), $ast$$;
+              }
+              $ast$$.type = "Literal";
+              $ast$$.value = 255;
+              $ast$$.raw = DEBUG ? JSSMS.Utils.toHex(255) : "255";
+              delete $ast$$.callee;
+              delete $ast$$.arguments;
+            }
+          }
+        }
         return $ast$$;
       });
       return $bytecodes$$;
@@ -10311,7 +10430,7 @@ var Generator = function() {
       case 221:
       ;
       case 253:
-        return 2 == $opcodes$$.length ? OP_DD_STATES[$opcodes$$[1]] : OP_INDEX_CB_STATES[$opcodes$$[2]];
+        return 2 === $opcodes$$.length ? OP_DD_STATES[$opcodes$$[1]] : OP_INDEX_CB_STATES[$opcodes$$[2]];
       case 237:
         return OP_ED_STATES[$opcodes$$[1]];
       default:
@@ -10320,7 +10439,7 @@ var Generator = function() {
   }
   function $convertRegisters$$($ast$$) {
     return JSSMS.Utils.traverse($ast$$, function($node$$) {
-      "Register" == $node$$.type && ($node$$.type = "Identifier");
+      "Register" === $node$$.type && ($node$$.type = "Identifier");
       return $node$$;
     });
   }
@@ -10351,10 +10470,10 @@ var Generator = function() {
         });
         $body$$ = $convertRegisters$$($body$$);
         $body$$ = JSSMS.Utils.traverse($body$$, function($obj$$) {
-          $obj$$.type && "Identifier" == $obj$$.type && -1 == $whitelist$$.indexOf($obj$$.name) && ($obj$$.name = "this." + $obj$$.name);
+          $obj$$.type && "Identifier" === $obj$$.type && -1 === $whitelist$$.indexOf($obj$$.name) && ($obj$$.name = "this." + $obj$$.name);
           return $obj$$;
         });
-        return{type:"Program", body:[{type:"FunctionDeclaration", id:{type:"Identifier", name:$name$$}, params:[{type:"Identifier", name:"page"}, {type:"Identifier", name:"temp"}, {type:"Identifier", name:"location"}], defaults:[], body:{type:"BlockStatement", body:$body$$}, rest:null, generator:!1, expression:!1}]};
+        return{type:"Program", body:[{type:"FunctionDeclaration", id:{type:"Identifier", name:"_" + $name$$}, params:[{type:"Identifier", name:"page"}, {type:"Identifier", name:"temp"}, {type:"Identifier", name:"location"}], defaults:[], body:{type:"BlockStatement", body:$body$$}, rest:null, generator:!1, expression:!1}]};
       });
     }
     this.ast = $functions$$;
@@ -10368,7 +10487,7 @@ var Recompiler = function() {
     this.options = {};
     this.parser = {};
     this.analyzer = new Analyzer;
-    this.optimizer = new Optimizer;
+    this.optimizer = new Optimizer($cpu$$.main);
     this.generator = new Generator;
     this.bytecodes = {};
   };

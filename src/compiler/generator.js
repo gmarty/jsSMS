@@ -18,6 +18,7 @@
  */
 
 /* global n */
+/* exported Generator */
 
 'use strict';
 
@@ -277,7 +278,7 @@ var Generator = (function() {
                     'type': 'FunctionDeclaration',
                     'id': {
                       'type': 'Identifier',
-                      'name': name // Name of the function
+                      'name': '_' + name // Name of the function
                     },
                     'params': [
                       {
