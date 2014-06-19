@@ -1,4 +1,4 @@
-TODO
+TODO.md
 jssms.min.html
 JavaGear_ME_v0.97s
 *.gz
@@ -10,3 +10,4 @@ node_modules/
 .idea/
 min/static/
 static/
+sync.bin
