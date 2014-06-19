@@ -95,7 +95,7 @@ if (window['$']) {
       // Screen
       this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + ' moz-opaque></canvas>');
       this.canvasContext = this.screen[0].getContext('2d', {
-        'alpha': false // See http://my.opera.com/ODIN/blog/opera-19-released
+        'alpha': false // See http://wiki.whatwg.org/wiki/CanvasOpaque
       });
 
       // Nearest-neighbour rendering for scaling pixel-art.
@@ -427,6 +427,10 @@ if (window['$']) {
        * @param {Array.<number>} buffer
        */
       writeAudio: function(buffer) {
+        var source = this.main.audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(this.main.audioContext.destination);
+        source.start();
       },
 
 

@@ -84,6 +84,13 @@ function JSSMS(opts) {
 
   this.ui.updateStatus('Ready to load a ROM.');
 
+  if (this.soundEnabled) {
+    // @todo Move to psg.js.
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    this.audioContext = new AudioContext();
+    this.audioBuffer = this.audioContext.createBuffer(1, 1, SAMPLE_RATE);
+  }
+
   // Exposing ui publicly after minification.
   this['ui'] = this.ui;
 }
@@ -164,15 +171,21 @@ JSSMS.prototype = {
    * Sound enabled.
    * @type {boolean}
    */
-  soundEnabled: false,
+  soundEnabled: true,
+
+
+  /**
+   * Audio context.
+   * @type {AudioContext}
+   */
+  audioContext: null,
 
 
   /**
    * Audio buffer.
-   * Should be a Float32Array.
-   * @type {Array.<number>}
+   * @type {AudioBuffer}
    */
-  audioBuffer: [],
+  audioBuffer: null,
 
 
   /**
@@ -405,8 +418,8 @@ JSSMS.prototype = {
 
       this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps);
 
-      if (this.audioBuffer.length === 0 || this.audioBuffer.length !== this.samplesPerFrame) {
-        this.audioBuffer = new Array(this.samplesPerFrame);
+      if (this.audioBuffer.length !== this.samplesPerFrame) {
+        this.audioBuffer = this.audioContext.createBuffer(1, this.samplesPerFrame, SAMPLE_RATE);
       }
 
       if (this.samplesPerLine.length === 0 || this.samplesPerLine.length !== this.no_of_scanlines) {
@@ -467,7 +480,7 @@ JSSMS.prototype = {
     }
 
     var samplesToGenerate = this.samplesPerLine[line];
-    this.audioBuffer = this.psg.update(this.audioBufferOffset, samplesToGenerate);
+    this.psg.update(this.audioBuffer, this.audioBufferOffset, samplesToGenerate);
     this.audioBufferOffset += samplesToGenerate;
   },
 

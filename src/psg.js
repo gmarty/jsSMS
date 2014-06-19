@@ -256,12 +256,13 @@ JSSMS.SN76489.prototype = {
 
 
   /**
+   * @param {AudioBuffer} audioBuffer
    * @param {number} offset
    * @param {number} samplesToGenerate
    * @return {Array}
    */
-  update: function(offset, samplesToGenerate) {
-    var buffer = [];
+  update: function(audioBuffer, offset, samplesToGenerate) {
+    var buffer = audioBuffer.getChannelData(0);
     var sample = 0;
     var i = 0;
 
@@ -280,6 +281,8 @@ JSSMS.SN76489.prototype = {
 
       // Output sound to buffer
       var output = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
+
+      output /= HI_BOUNDARY;
 
       // Check boundaries
       if (output > HI_BOUNDARY) {
@@ -381,7 +384,5 @@ JSSMS.SN76489.prototype = {
         }
       }
     } // end for loop
-
-    return buffer;
   }
 };
