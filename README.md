@@ -1,6 +1,6 @@
 # jsSMS
 
-jsSMS is an emulator for Sega Master System & Game Gear ROMs written in JavaScript and designed to be fast on mobile browsers.
+jsSMS is a dynamic recompiling emulator for Sega Master System & Game Gear ROMs written in JavaScript and designed to be fast on mobile browsers.
 
 ## Code
 
@@ -13,13 +13,12 @@ The code then evolved from a basic interpreter to a complex recompiler able to r
 
 The recompilation code is located in `src/compiler` folder as well as technical insights.
 
-## Related info
+## Related talk
 
 [Video of the talk about JSSMS](http://bit.ly/18n5yHj) I gave at Reject.js 2013. There are also the [slides in HTML](http://gmarty.github.io/jsSMS/Reject.JS-2013-Slides/).
 
 ## Current state
 
-* Sound is supported on the outdated [dynamicaudio](https://github.com/gmarty/jsSMS/tree/dynamicaudio) branch.
 * Though state save and load functions are ported, there are not used and should be more JavaScript friendly (using JSON for example, see JSNES for an example of implementation).
 * Lightgun is not yet supported.
 * The recompiler is not compatible with Closure Compiler in advanced optimizations mode and will likely never be.
@@ -37,8 +36,10 @@ If you are looking for another SMS emulator in JavaScript, go to [Miracle](http:
 
 ## License
 
-jsSMS - A Sega Master System/Game Gear emulator in JavaScript
-Copyright (C) 2012-2013 Guillaume Cedric Marty (https://github.com/gmarty)
+jsSMS - A dynamic recompiling emulator for Sega Master System & Game Gear written in JavaScript
+
+Copyright (C) 2012-2014 Guillaume Cedric Marty (https://github.com/gmarty)
+
 Based on JavaGear Copyright (c) 2002-2008 Chris White
 
 This program is free software: you can redistribute it and/or modify

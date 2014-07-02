@@ -1,8 +1,8 @@
 {
   "name": "jsSMS",
   "version": "0.0.1",
-  "author": "G. Cedric Marty",
-  "description": "A Sega Master System/Game Gear emulator in JavaScript",
+  "author": "G. C. Marty",
+  "description": "JavaScript Sega Master System &amp; Game Gear dynamic recompiling emulator",
   "bin": {
     "jssms": "./bin/jssms"
   },
@@ -24,10 +24,13 @@
   },
   "keywords": [
     "SMS",
+    "Master System",
     "Sega Master System",
     "GG",
     "Game Gear",
+    "Sega Game Gear",
     "emulator",
+    "dynamic recompilation",
     "Alec"
   ],
   "license": "GNU GPL"
