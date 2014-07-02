@@ -507,10 +507,6 @@ JSSMS.prototype = {
       this.setGG();
     }
 
-    if (size <= PAGE_SIZE) {
-      return false;
-    }
-
     pages = this.loadROM(data, size);
 
     if (pages === null) {
@@ -536,15 +532,9 @@ JSSMS.prototype = {
    * @return {Array.<Array.<number>>}
    */
   loadROM: function(data, size) {
-    // Strip 512 Byte File Headers
-    if ((size % 1024) !== 0) {
-      data = data.substr(512); // skip 512 bytes
-      size -= 512;
-    }
-
     // Calculate number of pages from file size and create array appropriately
     var i, j;
-    var number_of_pages = Math.round(size / PAGE_SIZE);
+    var number_of_pages = Math.ceil(size / PAGE_SIZE);
     var pages = new Array(number_of_pages);
 
     for (i = 0; i < number_of_pages; i++) {
