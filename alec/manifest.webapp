@@ -26,6 +26,7 @@
   "appcache_path": "/jsSMS/alec/manifest.appcache",
   "locales": {
     "fr": {
+      "name": "Alec Émulateur de Sega",
       "description": "Émulateur de Sega Master System et Game Gear",
       "permissions": {
         "desktop-notification": {
@@ -34,6 +35,7 @@
       }
     },
     "ja": {
+      "name": "Alec セガのエミュレータ",
       "description": "セガ マスターシステム・ゲームギアのエミュレータ"
     }
   }
