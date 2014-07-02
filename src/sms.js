@@ -497,14 +497,14 @@ JSSMS.prototype = {
    */
   readRomDirectly: function(data, fileName) {
     var pages;
-    var mode = JSSMS.Utils.getFileExtension(fileName) === 'gg' ? 2 : 1;
+    var extension = JSSMS.Utils.getFileExtension(fileName);
     var size = data.length;
 
-    // Toggle SMS / GG emulation mode
-    if (mode === 1) {
-      this.setSMS();
-    } else if (mode === 2) {
+    // Toggle SMS / GG emulation.
+    if (extension === 'gg') {
       this.setGG();
+    } else {
+      this.setSMS();
     }
 
     pages = this.loadROM(data, size);
