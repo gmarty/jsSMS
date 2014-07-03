@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 'use strict';var DEBUG = false;
 var ENABLE_DEBUGGER = false;
-var ENABLE_COMPILER = true;
+var ENABLE_COMPILER = false;
 var WRITE_MODE = 0;
 var READ_MODE = 1;
 var ENABLE_SERVER_LOGGER = false;
@@ -64,9 +64,14 @@ function JSSMS(opts) {
   this.ports = new JSSMS.Ports(this);
   this.cpu = new JSSMS.Z80(this);
   this.ui.updateStatus("Ready to load a ROM.");
+  if (this.soundEnabled) {
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    this.audioContext = new AudioContext;
+    this.audioBuffer = this.audioContext.createBuffer(1, 1, SAMPLE_RATE);
+  }
   this["ui"] = this.ui;
 }
-JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0, throttle:true, fps:0, frameskip_counter:0, pause_button:false, is_sms:true, is_gg:false, soundEnabled:false, audioBuffer:[], audioBufferOffset:0, samplesPerFrame:0, samplesPerLine:[], emuWidth:0, emuHeight:0, fpsFrameCount:0, z80Time:0, drawTime:0, z80TimeCounter:0, drawTimeCounter:0, frameCount:0, romData:"", romFileName:"", lineno:0, reset:function() {
+JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0, throttle:true, fps:0, frameskip_counter:0, pause_button:false, is_sms:true, is_gg:false, soundEnabled:true, audioContext:null, audioBuffer:null, audioBufferOffset:0, samplesPerFrame:0, samplesPerLine:[], emuWidth:0, emuHeight:0, fpsFrameCount:0, z80Time:0, drawTime:0, z80TimeCounter:0, drawTimeCounter:0, frameCount:0, romData:"", romFileName:"", lineno:0, reset:function() {
   this.setVideoTiming(this.vdp.videoMode);
   this.frameCount = 0;
   this.frameskip_counter = this.frameSkip;
@@ -137,8 +142,8 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   if (this.soundEnabled) {
     this.psg.init(clockSpeedHz, SAMPLE_RATE);
     this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps);
-    if (this.audioBuffer.length === 0 || this.audioBuffer.length !== this.samplesPerFrame) {
-      this.audioBuffer = new Array(this.samplesPerFrame);
+    if (this.audioBuffer.length !== this.samplesPerFrame) {
+      this.audioBuffer = this.audioContext.createBuffer(1, this.samplesPerFrame, SAMPLE_RATE);
     }
     if (this.samplesPerLine.length === 0 || this.samplesPerLine.length !== this.no_of_scanlines) {
       this.samplesPerLine = new Array(this.no_of_scanlines);
@@ -168,21 +173,16 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
     this.audioBufferOffset = 0;
   }
   var samplesToGenerate = this.samplesPerLine[line];
-  this.audioBuffer = this.psg.update(this.audioBufferOffset, samplesToGenerate);
+  this.psg.update(this.audioBuffer, this.audioBufferOffset, samplesToGenerate);
   this.audioBufferOffset += samplesToGenerate;
 }, readRomDirectly:function(data, fileName) {
   var pages;
-  var mode = JSSMS.Utils.getFileExtension(fileName) === "gg" ? 2 : 1;
+  var extension = JSSMS.Utils.getFileExtension(fileName);
   var size = data.length;
-  if (mode === 1) {
-    this.setSMS();
+  if (extension === "gg") {
+    this.setGG();
   } else {
-    if (mode === 2) {
-      this.setGG();
-    }
-  }
-  if (size <= PAGE_SIZE) {
-    return false;
+    this.setSMS();
   }
   pages = this.loadROM(data, size);
   if (pages === null) {
@@ -193,12 +193,8 @@ JSSMS.prototype = {isRunning:false, cyclesPerLine:0, no_of_scanlines:0, frameSki
   this.romFileName = fileName;
   return true;
 }, loadROM:function(data, size) {
-  if (size % 1024 !== 0) {
-    data = data.substr(512);
-    size -= 512;
-  }
   var i, j;
-  var number_of_pages = Math.round(size / PAGE_SIZE);
+  var number_of_pages = Math.ceil(size / PAGE_SIZE);
   var pages = new Array(number_of_pages);
   for (i = 0;i < number_of_pages;i++) {
     pages[i] = JSSMS.Utils.Array(PAGE_SIZE);
@@ -8917,8 +8913,8 @@ JSSMS.SN76489.prototype = {init:function(clockSpeed, sampleRate) {
       this.noiseShiftReg = SHIFT_RESET;
       break;
   }
-}, update:function(offset, samplesToGenerate) {
-  var buffer = [];
+}, update:function(audioBuffer, offset, samplesToGenerate) {
+  var buffer = audioBuffer.getChannelData(0);
   var sample = 0;
   var i = 0;
   for (;sample < samplesToGenerate;sample++) {
@@ -8931,6 +8927,7 @@ JSSMS.SN76489.prototype = {init:function(clockSpeed, sampleRate) {
     }
     this.outputChannel[3] = PSG_VOLUME[this.reg[7]] * (this.noiseShiftReg & 1) << 1;
     var output = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
+    output /= HI_BOUNDARY;
     if (output > HI_BOUNDARY) {
       output = HI_BOUNDARY;
     } else {
@@ -8983,7 +8980,6 @@ JSSMS.SN76489.prototype = {init:function(clockSpeed, sampleRate) {
       }
     }
   }
-  return buffer;
 }};
 var NTSC = 0;
 var PAL = 1;
@@ -9761,6 +9757,10 @@ if (window["$"]) {
     }, updateStatus:function(s) {
       this.log.text(s);
     }, writeAudio:function(buffer) {
+      var source = this.main.audioContext.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.main.audioContext.destination);
+      source.start();
     }, writeFrame:function() {
       var hiddenPrefix = JSSMS.Utils.getPrefix(["hidden", "mozHidden", "webkitHidden", "msHidden"]);
       if (hiddenPrefix) {
@@ -11379,11 +11379,15 @@ var o = {SET16:function(register1, register2, value) {
     return function(value) {
       return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), n.Literal(value)));
     };
-  } else {
-    return function() {
-      return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), n.CallExpression("get" + (register1 + register2).toUpperCase())));
+  }
+  if (register1 === "n" && register2 === "n") {
+    return function(value) {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), o.READ_MEM8(n.Literal(value))));
     };
   }
+  return function() {
+    return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), n.CallExpression("get" + (register1 + register2).toUpperCase())));
+  };
 }, LD_NN:function(register1, register2) {
   if (register2 === undefined) {
     return function(value) {
@@ -11881,61 +11885,61 @@ var o = {SET16:function(register1, register2, value) {
   };
 }, INI:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("port.in_", n.Register("c")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("h" + "l").toUpperCase()), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
-    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))];
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("port.in_", n.Register("c")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("h" + "l").toUpperCase()), n.Identifier("temp")])), o.DEC8("b")()], o.INC16("h", "l")(), [n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
+    n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))]);
   };
 }, OUTI:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
-    n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
-    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))];
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")()], o.INC16("h", "l")(), [n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), 
+    n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))]);
   };
 }, OUTD:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("decHL")), n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
-    n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
-    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))];
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")()], o.DEC16("h", "l")(), [n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), 
+    n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))]);
   };
 }, LDI:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), n.Identifier("temp")])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incDE")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), 
-    n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", 
-    n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0)))))];
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.INC16("d", "e")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), 
+    n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), 
+    n.Literal(0)))))]);
   };
 }, CPI:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("===", 
-    n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Literal(0), n.Literal(F_PARITY)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp"))))];
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))]))], o.DEC16("b", "c")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("===", n.CallExpression("get" + 
+    ("b" + "c").toUpperCase()), n.Literal(0)), n.Literal(0), n.Literal(F_PARITY)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp"))))]);
   };
 }, LDD:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), n.Identifier("temp")])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("decDE")), n.ExpressionStatement(n.CallExpression("decHL")), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), 
-    n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", 
-    n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0)))))];
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.DEC16("d", "e")(), o.DEC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), 
+    n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), 
+    n.Literal(0)))))]);
   };
 }, LDIR:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), n.Identifier("temp")])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incDE")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), 
-    n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", 
-    n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0))))), n.IfStatement(n.BinaryExpression("!==", n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.INC16("d", "e")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), 
+    n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), 
+    n.Literal(0))))), n.IfStatement(n.BinaryExpression("!==", n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))]);
   };
 }, CPIR:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("incHL")), n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("===", 
-    n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.Literal(0), n.Literal(F_PARITY)))), n.IfStatement(n.LogicalExpression("&&", n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_PARITY)), n.Literal(0)), n.BinaryExpression("===", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0))), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("=", 
-    n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp")))), n.ReturnStatement()])), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp"))))];
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))]))], o.DEC16("b", "c")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("===", n.CallExpression("get" + 
+    ("b" + "c").toUpperCase()), n.Literal(0)), n.Literal(0), n.Literal(F_PARITY)))), n.IfStatement(n.LogicalExpression("&&", n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_PARITY)), n.Literal(0)), n.BinaryExpression("===", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0))), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), 
+    n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp")))), n.ReturnStatement()])), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp"))))]);
   };
 }, OTIR:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")(), n.ExpressionStatement(n.CallExpression("incHL")), n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
-    n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(0)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
-    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE)))))), n.IfStatement(n.BinaryExpression("!==", n.Register("b"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")()], o.INC16("h", "l")(), [n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), 
+    n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(0)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE)))))), n.IfStatement(n.BinaryExpression("!==", n.Register("b"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))]);
   };
 }, LDDR:function() {
   return function(value, target, nextAddress) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), n.Identifier("temp")])), n.ExpressionStatement(n.CallExpression("decBC")), n.ExpressionStatement(n.CallExpression("decDE")), n.ExpressionStatement(n.CallExpression("decHL")), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), 
-    n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", 
-    n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0))))), n.IfStatement(n.BinaryExpression("!==", n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))];
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ("d" + "e").toUpperCase()), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.DEC16("d", "e")(), o.DEC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), 
+    n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), 
+    n.Literal(0))))), n.IfStatement(n.BinaryExpression("!==", n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))]);
   };
 }, "LD_RLC":generateIndexCBFunctions("rlc"), "LD_RRC":generateIndexCBFunctions("rrc"), "LD_RL":generateIndexCBFunctions("rl"), "LD_RR":generateIndexCBFunctions("rr"), "LD_SLA":generateIndexCBFunctions("sla"), "LD_SRA":generateIndexCBFunctions("sra"), "LD_SLL":generateIndexCBFunctions("sll"), "LD_SRL":generateIndexCBFunctions("srl"), READ_MEM8:function(value) {
   return n.CallExpression("readMem", value);
@@ -12018,8 +12022,8 @@ for (op in opcodesList) {
 ;var opcodeTableED = {64:{name:"IN B,(C)", ast:o.IN("b", "c")}, 66:{name:"SBC HL,BC", ast:o.SBC16("b", "c")}, 65:{name:"OUT (C),B", ast:o.OUT("c", "b")}, 67:{name:"LD (nn),BC", ast:o.LD_NN("b", "c")}, 68:{name:"NEG", ast:o.NEG()}, 69:{name:"RETN / RETI", ast:o.RETN_RETI()}, 70:{name:"IM 0", ast:o.IM(0)}, 72:{name:"IN C,(C)", ast:o.IN("c", "c")}, 73:{name:"OUT (C),C", ast:o.OUT("c", "c")}, 74:{name:"ADC HL,BC", ast:o.ADC16("b", "c")}, 75:{name:"LD BC,(nn)", ast:o.LD16("b", "c", "n", "n")}, 76:{name:"NEG", 
 ast:o.NEG()}, 77:{name:"RETN / RETI", ast:o.RETN_RETI()}, 78:{name:"IM 0", ast:o.IM(0)}, 79:{name:"LD R,A", ast:o.LD8("r", "a")}, 80:{name:"IN D,(C)", ast:o.IN("d", "c")}, 81:{name:"OUT (C),D", ast:o.OUT("c", "d")}, 82:{name:"SBC HL,DE", ast:o.SBC16("d", "e")}, 83:{name:"LD (nn),DE", ast:o.LD_NN("d", "e")}, 84:{name:"NEG", ast:o.NEG()}, 85:{name:"RETN / RETI", ast:o.RETN_RETI()}, 86:{name:"IM 1", ast:o.IM(1)}, 87:{name:"LD A,I", ast:o.LD8("a", "i")}, 88:{name:"IN E,(C)", ast:o.IN("e", "c")}, 89:{name:"OUT (C),E", 
 ast:o.OUT("c", "e")}, 90:{name:"ADC HL,DE", ast:o.ADC16("d", "e")}, 91:{name:"LD DE,(nn)", ast:o.LD16("d", "e", "n", "n")}, 92:{name:"NEG", ast:o.NEG()}, 95:{name:"LD A,R", ast:o.LD8("a", "r")}, 96:{name:"IN H,(C)", ast:o.IN("h", "c")}, 97:{name:"OUT (C),H", ast:o.OUT("c", "h")}, 98:{name:"SBC HL,HL", ast:o.SBC16("h", "l")}, 99:{name:"LD (nn),HL", ast:o.LD_NN("h", "l")}, 100:{name:"NEG", ast:o.NEG()}, 102:{name:"IM 0", ast:o.IM(0)}, 104:{name:"IN L,(C)", ast:o.IN("l", "c")}, 105:{name:"OUT (C),L", 
-ast:o.OUT("c", "l")}, 106:{name:"ADC HL,HL", ast:o.ADC16("h", "l")}, 107:{name:"LD HL,(nn)", ast:o.LD16("h", "l", "n", "n")}, 108:{name:"NEG", ast:o.NEG()}, 110:{name:"IM 0", ast:o.IM(0)}, 115:{name:"LD (nn),SP", ast:o.LD_NN("sp")}, 116:{name:"NEG", ast:o.NEG()}, 118:{name:"IM 1", ast:o.IM(1)}, 120:{name:"IN A,(C)", ast:o.IN("a", "c")}, 121:{name:"OUT (C),A", ast:o.OUT("c", "a")}, 122:{name:"ADC HL,SP", ast:o.ADC16("sp")}, 124:{name:"NEG", ast:o.NEG()}, 160:{name:"LDI", ast:o.LDI()}, 161:{name:"CPI", 
-ast:o.CPI()}, 162:{name:"INI", ast:o.INI()}, 163:{name:"OUTI", ast:o.OUTI()}, 168:{name:"LDD", ast:o.LDD()}, 171:{name:"OUTD", ast:o.OUTD()}, 176:{name:"LDIR", ast:o.LDIR()}, 177:{name:"CPIR", ast:o.CPIR()}, 179:{name:"OTIR", ast:o.OTIR()}, 184:{name:"LDDR", ast:o.LDDR()}};
+ast:o.OUT("c", "l")}, 106:{name:"ADC HL,HL", ast:o.ADC16("h", "l")}, 107:{name:"LD HL,(nn)", ast:o.LD16("h", "l", "n", "n")}, 108:{name:"NEG", ast:o.NEG()}, 110:{name:"IM 0", ast:o.IM(0)}, 115:{name:"LD (nn),SP", ast:o.LD_NN("sp")}, 116:{name:"NEG", ast:o.NEG()}, 118:{name:"IM 1", ast:o.IM(1)}, 120:{name:"IN A,(C)", ast:o.IN("a", "c")}, 121:{name:"OUT (C),A", ast:o.OUT("c", "a")}, 122:{name:"ADC HL,SP", ast:o.ADC16("sp")}, 123:{name:"LD SP,(nn)", ast:o.LD_SP("n", "n")}, 124:{name:"NEG", ast:o.NEG()}, 
+160:{name:"LDI", ast:o.LDI()}, 161:{name:"CPI", ast:o.CPI()}, 162:{name:"INI", ast:o.INI()}, 163:{name:"OUTI", ast:o.OUTI()}, 168:{name:"LDD", ast:o.LDD()}, 171:{name:"OUTD", ast:o.OUTD()}, 176:{name:"LDIR", ast:o.LDIR()}, 177:{name:"CPIR", ast:o.CPIR()}, 179:{name:"OTIR", ast:o.OTIR()}, 184:{name:"LDDR", ast:o.LDDR()}};
 var opcodeTable = [{name:"NOP", ast:o.NOOP()}, {name:"LD BC,nn", ast:o.LD16("b", "c")}, {name:"LD (BC),A", ast:o.LD_WRITE_MEM("b", "c", "a")}, {name:"INC BC", ast:o.INC16("b", "c")}, {name:"INC B", ast:o.INC8("b")}, {name:"DEC B", ast:o.DEC8("b")}, {name:"LD B,n", ast:o.LD8("b")}, {name:"RLCA", ast:o.RLCA()}, {name:"EX AF AF'", ast:o.EX_AF()}, {name:"ADD HL,BC", ast:o.ADD16("h", "l", "b", "c")}, {name:"LD A,(BC)", ast:o.LD8("a", "b", "c")}, {name:"DEC BC", ast:o.DEC16("b", "c")}, {name:"INC C", ast:o.INC8("c")}, 
 {name:"DEC C", ast:o.DEC8("c")}, {name:"LD C,n", ast:o.LD8("c")}, {name:"RRCA", ast:o.RRCA()}, {name:"DJNZ (PC+e)", ast:o.DJNZ()}, {name:"LD DE,nn", ast:o.LD16("d", "e")}, {name:"LD (DE),A", ast:o.LD_WRITE_MEM("d", "e", "a")}, {name:"INC DE", ast:o.INC16("d", "e")}, {name:"INC D", ast:o.INC8("d")}, {name:"DEC D", ast:o.DEC8("d")}, {name:"LD D,n", ast:o.LD8("d")}, {name:"RLA", ast:o.RLA()}, {name:"JR (PC+e)", ast:o.JP()}, {name:"ADD HL,DE", ast:o.ADD16("h", "l", "d", "e")}, {name:"LD A,(DE)", ast:o.LD8("a", 
 "d", "e")}, {name:"DEC DE", ast:o.DEC16("d", "e")}, {name:"INC E", ast:o.INC8("e")}, {name:"DEC E", ast:o.DEC8("e")}, {name:"LD E,n", ast:o.LD8("e")}, {name:"RRA", ast:o.RRA()}, {name:"JR NZ,(PC+e)", ast:o.JRNZ()}, {name:"LD HL,nn", ast:o.LD16("h", "l")}, {name:"LD (nn),HL", ast:o.LD_NN("h", "l")}, {name:"INC HL", ast:o.INC16("h", "l")}, {name:"INC H", ast:o.INC8("h")}, {name:"DEC H", ast:o.DEC8("h")}, {name:"LD H,n", ast:o.LD8("h")}, {name:"DAA", ast:o.DAA()}, {name:"JR Z,(PC+e)", ast:o.JRZ()}, 
