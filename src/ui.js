@@ -260,6 +260,33 @@ if (window['$']) {
           .mouseup(mouseUp);
       }
 
+      startButton
+        .on('mousedown touchstart', function(evt) {
+            if (self.main.is_sms) {
+              self.main.pause_button = true;       // Pause
+            } else {
+              self.main.keyboard.ggstart &= ~0x80; // Start
+            }
+            evt.preventDefault();
+          })
+        .on('mouseup touchend', function(evt) {
+            if (!self.main.is_sms) {
+              self.main.keyboard.ggstart |= 0x80;  // Start
+            }
+            evt.preventDefault();
+          });
+
+      // Keyboard
+      $(document)
+        .bind('keydown', function(evt) {
+          self.main.keyboard.keydown(evt);
+          //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
+        })
+        .bind('keyup', function(evt) {
+          self.main.keyboard.keyup(evt);
+          //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
+        });
+
       // Append buttons to controls div.
       for (i in this.buttons) {
         this.buttons[i].appendTo(controls);
@@ -278,33 +305,6 @@ if (window['$']) {
       if (roms !== undefined) {
         this.setRoms(roms);
       }
-
-      // Keyboard
-      $(document)
-        .bind('keydown', function(evt) {
-            self.main.keyboard.keydown(evt);
-            //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
-          })
-        .bind('keyup', function(evt) {
-            self.main.keyboard.keyup(evt);
-            //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
-          });
-
-      startButton
-        .on('mousedown touchstart', function(evt) {
-            if (self.main.is_sms) {
-              self.main.pause_button = true;       // Pause
-            } else {
-              self.main.keyboard.ggstart &= ~0x80; // Start
-            }
-            evt.preventDefault();
-          })
-        .on('mouseup touchend', function(evt) {
-            if (!self.main.is_sms) {
-              self.main.keyboard.ggstart |= 0x80;  // Start
-            }
-            evt.preventDefault();
-          });
     };
 
     UI.prototype = {

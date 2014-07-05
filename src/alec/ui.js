@@ -65,7 +65,7 @@ if (window['$']) {
        */
       //var fullscreenSupport = JSSMS.Utils.getPrefix(['fullscreenEnabled', 'mozFullScreenEnabled']);
 
-      var requestAnimationFramePrefix = JSSMS.Utils.getPrefix(['requestAnimationFrame', 'mozRequestAnimationFrame'], window);
+      var requestAnimationFramePrefix = JSSMS.Utils.getPrefix(['requestAnimationFrame', 'msRequestAnimationFrame', 'mozRequestAnimationFrame', 'webkitRequestAnimationFrame'], window);
 
       var i;
 
@@ -74,10 +74,11 @@ if (window['$']) {
       // Screen
       this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + ' moz-opaque></canvas>');
       this.canvasContext = this.screen[0].getContext('2d', {
-        'alpha': false // See http://my.opera.com/ODIN/blog/opera-19-released
+        'alpha': false // See http://wiki.whatwg.org/wiki/CanvasOpaque
       });
 
       // Nearest-neighbour rendering for scaling pixel-art.
+      this.canvasContext['webkitImageSmoothingEnabled'] = false;
       this.canvasContext['mozImageSmoothingEnabled'] = false;
       this.canvasContext['imageSmoothingEnabled'] = false;
 
@@ -85,30 +86,12 @@ if (window['$']) {
 
       // Gamepad
       this.gamepad = {
-        u: {
-          e: $('.up', gamepadContainer),
-          k: KEY_UP
-        },
-        r: {
-          e: $('.right', gamepadContainer),
-          k: KEY_RIGHT
-        },
-        d: {
-          e: $('.down', gamepadContainer),
-          k: KEY_DOWN
-        },
-        l: {
-          e: $('.left', gamepadContainer),
-          k: KEY_LEFT
-        },
-        1: {
-          e: $('.fire1', gamepadContainer),
-          k: KEY_FIRE1
-        },
-        2: {
-          e: $('.fire2', gamepadContainer),
-          k: KEY_FIRE2
-        }
+        up: KEY_UP,
+        right: KEY_RIGHT,
+        down: KEY_DOWN,
+        left: KEY_LEFT,
+        fire1: KEY_FIRE1,
+        fire2: KEY_FIRE2
       };
       var startButton = $('.start', gamepadContainer);
 
@@ -206,45 +189,50 @@ if (window['$']) {
             }
           });
 
-      this.screen.appendTo(screenContainer);
-      gamepadContainer.appendTo(screenContainer);
-      screenContainer.appendTo(root);
-      controls.appendTo(root);
-      root.appendTo($(parent));
+      // Software buttons - touch
+      gamepadContainer.on('touchstart touchmove', function(evt) {
+        self.main.keyboard.controller1 = 0xFF;
 
-      if (roms !== undefined) {
-        this.setRoms(roms);
-      }
+        var changedTouches = evt.originalEvent.changedTouches;
 
-      // Keyboard
-      $(document)
-        .bind('keydown', function(evt) {
-            self.main.keyboard.keydown(evt);
-            //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
-          })
-        .bind('keyup', function(evt) {
-            self.main.keyboard.keyup(evt);
-            //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
-          });
+        for (var i = 0; i < changedTouches.length; i++) {
+          var target = document.elementFromPoint(changedTouches[i].clientX, changedTouches[i].clientY);
+          var className = target.className;
 
-      function touchStart(key) {
-        return function(evt) {
+          if (className === 'gamepad' || !className) {
+            continue;
+          }
+
+          var key = self.gamepad[className];
           self.main.keyboard.controller1 &= ~key;
-          evt.preventDefault();
-        };
+        }
+
+        evt.preventDefault();
+      });
+
+      gamepadContainer.on('touchend', function(evt) {
+        self.main.keyboard.controller1 = 0xFF;
+      });
+
+      // Software buttons - click
+      function mouseDown(evt) {
+        var className = this.className;
+        var key = self.gamepad[className];
+        self.main.keyboard.controller1 &= ~key;
+        evt.preventDefault();
       }
 
-      function touchEnd(key) {
-        return function(evt) {
-          self.main.keyboard.controller1 |= key;
-          evt.preventDefault();
-        };
+      function mouseUp(evt) {
+        var className = this.className;
+        var key = self.gamepad[className];
+        self.main.keyboard.controller1 |= key;
+        evt.preventDefault();
       }
 
       for (i in this.gamepad) {
-        this.gamepad[i].e
-          .on('mousedown touchstart', touchStart(this.gamepad[i].k))
-          .on('mouseup touchend', touchEnd(this.gamepad[i].k));
+        $('.' + i, gamepadContainer)
+          .mousedown(mouseDown)
+          .mouseup(mouseUp);
       }
 
       startButton
@@ -262,6 +250,27 @@ if (window['$']) {
             }
             evt.preventDefault();
           });
+
+      // Keyboard
+      $(document)
+        .bind('keydown', function(evt) {
+          self.main.keyboard.keydown(evt);
+          //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
+        })
+        .bind('keyup', function(evt) {
+          self.main.keyboard.keyup(evt);
+          //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
+        });
+
+      this.screen.appendTo(screenContainer);
+      gamepadContainer.appendTo(screenContainer);
+      screenContainer.appendTo(root);
+      controls.appendTo(root);
+      root.appendTo($(parent));
+
+      if (roms !== undefined) {
+        this.setRoms(roms);
+      }
     };
 
     UI.prototype = {
@@ -379,6 +388,10 @@ if (window['$']) {
        * @param {Array.<number>} buffer
        */
       writeAudio: function(buffer) {
+        var source = this.main.audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(this.main.audioContext.destination);
+        source.start();
       },
 
 
@@ -391,7 +404,7 @@ if (window['$']) {
          * Contains the visibility API prefix or false if not supported.
          * @type {string|boolean}
          */
-        var hiddenPrefix = JSSMS.Utils.getPrefix(['hidden', 'mozHidden']);
+        var hiddenPrefix = JSSMS.Utils.getPrefix(['hidden', 'mozHidden', 'webkitHidden', 'msHidden']);
 
         if (hiddenPrefix) {
           // If browser supports visibility API and this page is hidden, we exit.
