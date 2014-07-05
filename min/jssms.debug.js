@@ -8207,17 +8207,13 @@ JSSMS.DummyUI = function $JSSMS$DummyUI$($sms$$) {
 };
 window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
   var $parent$$ = this, $UI$$ = function $$UI$$$($root$$2_sms$$) {
-    function $touchStart$$($key$$) {
-      return function($evt$$) {
-        $self$$.main.keyboard.controller1 &= ~$key$$;
-        $evt$$.preventDefault();
-      };
+    function $mouseDown$$($evt$$) {
+      $self$$.main.keyboard.controller1 &= ~$self$$.gamepad[this.className];
+      $evt$$.preventDefault();
     }
-    function $touchEnd$$($key$$) {
-      return function($evt$$) {
-        $self$$.main.keyboard.controller1 |= $key$$;
-        $evt$$.preventDefault();
-      };
+    function $mouseUp$$($evt$$) {
+      $self$$.main.keyboard.controller1 |= $self$$.gamepad[this.className];
+      $evt$$.preventDefault();
     }
     this.main = $root$$2_sms$$;
     if ("[object OperaMini]" === Object.prototype.toString.call(window.operamini)) {
@@ -8226,7 +8222,7 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
       var $self$$ = this;
       $root$$2_sms$$ = $("<div></div>");
       var $screenContainer$$ = $('<div id="screen"></div>'), $gamepadContainer$$ = $('<div class="gamepad"><div class="direction"><div class="up"></div><div class="right"></div><div class="left"></div><div class="down"></div></div><div class="buttons"><div class="start"></div><div class="fire1"></div><div class="fire2"></div></div></div>'), $controls$$ = $('<div id="controls"></div>'), $fullscreenSupport$$ = JSSMS.Utils.getPrefix(["fullscreenEnabled", "mozFullScreenEnabled", "webkitCancelFullScreen"]), 
-      $requestAnimationFramePrefix_startButton$$ = JSSMS.Utils.getPrefix(["requestAnimationFrame", "msRequestAnimationFrame", "mozRequestAnimationFrame", "webkitRequestAnimationFrame"], window), $i$$;
+      $requestAnimationFramePrefix_startButton$$ = JSSMS.Utils.getPrefix(["requestAnimationFrame", "msRequestAnimationFrame", "mozRequestAnimationFrame", "webkitRequestAnimationFrame"], window), $i$$0$$;
       if ($requestAnimationFramePrefix_startButton$$) {
         this.requestAnimationFrame = window[$requestAnimationFramePrefix_startButton$$].bind(window);
       } else {
@@ -8246,7 +8242,7 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
       this.canvasContext.imageSmoothingEnabled = !1;
       if (this.canvasContext.getImageData) {
         this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
-        this.gamepad = {u:{e:$(".up", $gamepadContainer$$), k:KEY_UP}, r:{e:$(".right", $gamepadContainer$$), k:KEY_RIGHT}, d:{e:$(".down", $gamepadContainer$$), k:KEY_DOWN}, l:{e:$(".left", $gamepadContainer$$), k:KEY_LEFT}, 1:{e:$(".fire1", $gamepadContainer$$), k:KEY_FIRE1}, 2:{e:$(".fire2", $gamepadContainer$$), k:KEY_FIRE2}};
+        this.gamepad = {up:KEY_UP, right:KEY_RIGHT, down:KEY_DOWN, left:KEY_LEFT, fire1:KEY_FIRE1, fire2:KEY_FIRE2};
         $requestAnimationFramePrefix_startButton$$ = $(".start", $gamepadContainer$$);
         this.romContainer = $('<div id="romSelector"></div>');
         this.romSelect = $("<select></select>").change(function() {
@@ -8274,8 +8270,34 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
           }), $self$$.buttons.zoom.attr("value", "Zoom in")) : ($self$$.screen.animate({width:2 * SMS_WIDTH + "px", height:2 * SMS_HEIGHT + "px"}), $self$$.buttons.zoom.attr("value", "Zoom out"));
           $self$$.zoomed = !$self$$.zoomed;
         }));
-        for ($i$$ in this.buttons) {
-          this.buttons[$i$$].appendTo($controls$$);
+        $gamepadContainer$$.on("touchstart touchmove", function($evt$$) {
+          $self$$.main.keyboard.controller1 = 255;
+          for (var $changedTouches$$ = $evt$$.originalEvent.changedTouches, $i$$ = 0;$i$$ < $changedTouches$$.length;$i$$++) {
+            var $className$$ = document.elementFromPoint($changedTouches$$[$i$$].clientX, $changedTouches$$[$i$$].clientY).className;
+            "gamepad" !== $className$$ && $className$$ && ($self$$.main.keyboard.controller1 &= ~$self$$.gamepad[$className$$]);
+          }
+          $evt$$.preventDefault();
+        });
+        $gamepadContainer$$.on("touchend", function($evt$$) {
+          $self$$.main.keyboard.controller1 = 255;
+        });
+        for ($i$$0$$ in this.gamepad) {
+          $("." + $i$$0$$, $gamepadContainer$$).mousedown($mouseDown$$).mouseup($mouseUp$$);
+        }
+        $requestAnimationFramePrefix_startButton$$.on("mousedown touchstart", function($evt$$) {
+          $self$$.main.is_sms ? $self$$.main.pause_button = !0 : $self$$.main.keyboard.ggstart &= -129;
+          $evt$$.preventDefault();
+        }).on("mouseup touchend", function($evt$$) {
+          $self$$.main.is_sms || ($self$$.main.keyboard.ggstart |= 128);
+          $evt$$.preventDefault();
+        });
+        $(document).bind("keydown", function($evt$$) {
+          $self$$.main.keyboard.keydown($evt$$);
+        }).bind("keyup", function($evt$$) {
+          $self$$.main.keyboard.keyup($evt$$);
+        });
+        for ($i$$0$$ in this.buttons) {
+          this.buttons[$i$$0$$].appendTo($controls$$);
         }
         this.log = $('<div id="status"></div>');
         this.screen.appendTo($screenContainer$$);
@@ -8286,21 +8308,6 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
         this.log.appendTo($root$$2_sms$$);
         $root$$2_sms$$.appendTo($($parent$$));
         void 0 !== $roms$$ && this.setRoms($roms$$);
-        $(document).bind("keydown", function($evt$$) {
-          $self$$.main.keyboard.keydown($evt$$);
-        }).bind("keyup", function($evt$$) {
-          $self$$.main.keyboard.keyup($evt$$);
-        });
-        for ($i$$ in this.gamepad) {
-          this.gamepad[$i$$].e.on("mousedown touchstart", $touchStart$$(this.gamepad[$i$$].k)).on("mouseup touchend", $touchEnd$$(this.gamepad[$i$$].k));
-        }
-        $requestAnimationFramePrefix_startButton$$.on("mousedown touchstart", function($evt$$) {
-          $self$$.main.is_sms ? $self$$.main.pause_button = !0 : $self$$.main.keyboard.ggstart &= -129;
-          $evt$$.preventDefault();
-        }).on("mouseup touchend", function($evt$$) {
-          $self$$.main.is_sms || ($self$$.main.keyboard.ggstart |= 128);
-          $evt$$.preventDefault();
-        });
       } else {
         $($parent$$).html('<div class="alert alert-error"><strong>Oh no!</strong> Your browser doesn\'t support writing pixels directly to the <code>&lt;canvas&gt;</code> tag. Try the latest version of Firefox, Google Chrome, Opera or Safari!</div>');
       }
@@ -8475,7 +8482,7 @@ var Parser = function() {
   function $disassemble$$($bytecode$$, $stream$$) {
     $stream$$.page = $bytecode$$.page;
     $stream$$.seek($bytecode$$.address + 16384 * $stream$$.page);
-    var $opcode$$13_opcode$$inline_11_opcode$$ = $stream$$.getUint8(), $operand$$3_operand$$ = null, $target$$48_target$$ = null, $isFunctionEnder_isFunctionEnder$$ = !1, $canEnd_canEnd$$ = !1;
+    var $opcode$$13_opcode$$inline_11_opcode$$ = $stream$$.getUint8(), $operand$$3_operand$$ = null, $target$$49_target$$ = null, $isFunctionEnder_isFunctionEnder$$ = !1, $canEnd_canEnd$$ = !1;
     $bytecode$$.opcode.push($opcode$$13_opcode$$inline_11_opcode$$);
     switch($opcode$$13_opcode$$inline_11_opcode$$) {
       case 0:
@@ -8514,7 +8521,7 @@ var Parser = function() {
       case 15:
         break;
       case 16:
-        $target$$48_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$49_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 17:
@@ -8534,7 +8541,7 @@ var Parser = function() {
       case 23:
         break;
       case 24:
-        $target$$48_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$49_target$$ = $stream$$.position + $stream$$.getInt8();
         $stream$$.seek(null);
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
@@ -8554,7 +8561,7 @@ var Parser = function() {
       case 31:
         break;
       case 32:
-        $target$$48_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$49_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 33:
@@ -8575,7 +8582,7 @@ var Parser = function() {
       case 39:
         break;
       case 40:
-        $target$$48_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$49_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 41:
@@ -8595,7 +8602,7 @@ var Parser = function() {
       case 47:
         break;
       case 48:
-        $target$$48_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$49_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 49:
@@ -8616,7 +8623,7 @@ var Parser = function() {
       case 55:
         break;
       case 56:
-        $target$$48_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$49_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 57:
@@ -8898,16 +8905,16 @@ var Parser = function() {
       case 193:
         break;
       case 194:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 195:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $stream$$.seek(null);
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 196:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 197:
@@ -8916,7 +8923,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 199:
-        $target$$48_target$$ = 0;
+        $target$$49_target$$ = 0;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 200:
@@ -8927,24 +8934,24 @@ var Parser = function() {
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 202:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 203:
         return $opcode$$13_opcode$$inline_11_opcode$$ = $stream$$.getUint8(), $bytecode$$.opcode.push($opcode$$13_opcode$$inline_11_opcode$$), $bytecode$$.nextAddress = $stream$$.position, $bytecode$$;
       case 204:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 205:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 206:
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 207:
-        $target$$48_target$$ = 8;
+        $target$$49_target$$ = 8;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 208:
@@ -8953,14 +8960,14 @@ var Parser = function() {
       case 209:
         break;
       case 210:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 211:
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 212:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 213:
@@ -8969,7 +8976,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 215:
-        $target$$48_target$$ = 16;
+        $target$$49_target$$ = 16;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 216:
@@ -8978,14 +8985,14 @@ var Parser = function() {
       case 217:
         break;
       case 218:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 219:
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 220:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 221:
@@ -8994,7 +9001,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 223:
-        $target$$48_target$$ = 24;
+        $target$$49_target$$ = 24;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 224:
@@ -9003,13 +9010,13 @@ var Parser = function() {
       case 225:
         break;
       case 226:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 227:
         break;
       case 228:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 229:
@@ -9018,7 +9025,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 231:
-        $target$$48_target$$ = 32;
+        $target$$49_target$$ = 32;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 232:
@@ -9029,18 +9036,18 @@ var Parser = function() {
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 234:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 235:
         break;
       case 236:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 237:
         $opcode$$13_opcode$$inline_11_opcode$$ = $stream$$.getUint8();
-        $target$$48_target$$ = $operand$$3_operand$$ = null;
+        $target$$49_target$$ = $operand$$3_operand$$ = null;
         $canEnd_canEnd$$ = $isFunctionEnder_isFunctionEnder$$ = !1;
         $bytecode$$.opcode.push($opcode$$13_opcode$$inline_11_opcode$$);
         switch($opcode$$13_opcode$$inline_11_opcode$$) {
@@ -9189,19 +9196,19 @@ var Parser = function() {
           case 171:
             break;
           case 176:
-            $target$$48_target$$ = $stream$$.position - 2;
+            $target$$49_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 177:
-            $target$$48_target$$ = $stream$$.position - 2;
+            $target$$49_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 178:
-            $target$$48_target$$ = $stream$$.position - 2;
+            $target$$49_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 179:
-            $target$$48_target$$ = $stream$$.position - 2;
+            $target$$49_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 184:
@@ -9209,11 +9216,11 @@ var Parser = function() {
           case 185:
             break;
           case 186:
-            $target$$48_target$$ = $stream$$.position - 2;
+            $target$$49_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 187:
-            $target$$48_target$$ = $stream$$.position - 2;
+            $target$$49_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           default:
@@ -9221,7 +9228,7 @@ var Parser = function() {
         }
         $bytecode$$.nextAddress = $stream$$.position;
         $bytecode$$.operand = $operand$$3_operand$$;
-        $bytecode$$.target = $target$$48_target$$;
+        $bytecode$$.target = $target$$49_target$$;
         $bytecode$$.isFunctionEnder = $isFunctionEnder_isFunctionEnder$$;
         $bytecode$$.canEnd = $canEnd_canEnd$$;
         return $bytecode$$;
@@ -9229,7 +9236,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 239:
-        $target$$48_target$$ = 40;
+        $target$$49_target$$ = 40;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 240:
@@ -9238,13 +9245,13 @@ var Parser = function() {
       case 241:
         break;
       case 242:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 243:
         break;
       case 244:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 245:
@@ -9253,7 +9260,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 247:
-        $target$$48_target$$ = 48;
+        $target$$49_target$$ = 48;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 248:
@@ -9262,13 +9269,13 @@ var Parser = function() {
       case 249:
         break;
       case 250:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 251:
         break;
       case 252:
-        $target$$48_target$$ = $stream$$.getUint16();
+        $target$$49_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 253:
@@ -9277,7 +9284,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 255:
-        $target$$48_target$$ = 56;
+        $target$$49_target$$ = 56;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       default:
@@ -9285,7 +9292,7 @@ var Parser = function() {
     }
     $bytecode$$.nextAddress = $stream$$.position;
     $bytecode$$.operand = $operand$$3_operand$$;
-    $bytecode$$.target = $target$$48_target$$;
+    $bytecode$$.target = $target$$49_target$$;
     $bytecode$$.isFunctionEnder = $isFunctionEnder_isFunctionEnder$$;
     $bytecode$$.canEnd = $canEnd_canEnd$$;
     return $bytecode$$;
@@ -10215,27 +10222,27 @@ var Analyzer = function() {
   }, normalizeBytecode:function $$Analyzer$$$$normalizeBytecode$($page$$) {
     var $self$$ = this;
     this.bytecodes[$page$$] = this.bytecodes[$page$$].map(function($bytecode$$) {
-      var $i$$36_opcode$$;
+      var $i$$37_opcode$$;
       switch($bytecode$$.opcode.length) {
         case 1:
-          $i$$36_opcode$$ = opcodeTable[$bytecode$$.opcode[0]];
+          $i$$37_opcode$$ = opcodeTable[$bytecode$$.opcode[0]];
           break;
         case 2:
-          $i$$36_opcode$$ = opcodeTable[$bytecode$$.opcode[0]][$bytecode$$.opcode[1]];
+          $i$$37_opcode$$ = opcodeTable[$bytecode$$.opcode[0]][$bytecode$$.opcode[1]];
           break;
         case 3:
-          $i$$36_opcode$$ = opcodeTable[$bytecode$$.opcode[0]][$bytecode$$.opcode[1]][$bytecode$$.opcode[2]];
+          $i$$37_opcode$$ = opcodeTable[$bytecode$$.opcode[0]][$bytecode$$.opcode[1]][$bytecode$$.opcode[2]];
           break;
         default:
           JSSMS.Utils.console.error("Something went wrong in parsing. Opcode: [" + $bytecode$$.hexOpcode + "]");
       }
-      if ($i$$36_opcode$$ && $i$$36_opcode$$.ast) {
-        var $ast$$ = $i$$36_opcode$$.ast($bytecode$$.operand, $bytecode$$.target, $bytecode$$.nextAddress);
+      if ($i$$37_opcode$$ && $i$$37_opcode$$.ast) {
+        var $ast$$ = $i$$37_opcode$$.ast($bytecode$$.operand, $bytecode$$.target, $bytecode$$.nextAddress);
         Array.isArray($ast$$) || void 0 === $ast$$ || ($ast$$ = [$ast$$]);
         $bytecode$$.ast = $ast$$;
-        DEBUG && ($bytecode$$.name = $i$$36_opcode$$.name, $i$$36_opcode$$.opcode && ($bytecode$$.opcode = $i$$36_opcode$$.opcode($bytecode$$.operand, $bytecode$$.target, $bytecode$$.nextAddress)));
+        DEBUG && ($bytecode$$.name = $i$$37_opcode$$.name, $i$$37_opcode$$.opcode && ($bytecode$$.opcode = $i$$37_opcode$$.opcode($bytecode$$.operand, $bytecode$$.target, $bytecode$$.nextAddress)));
       } else {
-        $i$$36_opcode$$ = $bytecode$$.hexOpcode, $self$$.missingOpcodes[$i$$36_opcode$$] = void 0 !== $self$$.missingOpcodes[$i$$36_opcode$$] ? $self$$.missingOpcodes[$i$$36_opcode$$] + 1 : 1;
+        $i$$37_opcode$$ = $bytecode$$.hexOpcode, $self$$.missingOpcodes[$i$$37_opcode$$] = void 0 !== $self$$.missingOpcodes[$i$$37_opcode$$] ? $self$$.missingOpcodes[$i$$37_opcode$$] + 1 : 1;
       }
       return $bytecode$$;
     });

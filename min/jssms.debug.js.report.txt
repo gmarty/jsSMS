@@ -730,15 +730,15 @@ src/sms.js:186: WARNING - Bad type annotation. Unknown type AudioBuffer
    * @type {AudioBuffer}
             ^
 
-src/ui.js:430: WARNING - Property createBufferSource never defined on this.main.audioContext
+src/ui.js:438: WARNING - Property createBufferSource never defined on this.main.audioContext
         var source = this.main.audioContext.createBufferSource();
                      ^
 
-src/ui.js:432: WARNING - Property connect never defined on source
+src/ui.js:440: WARNING - Property connect never defined on source
         source.connect(this.main.audioContext.destination);
         ^
 
-src/ui.js:432: WARNING - Property destination never defined on this.main.audioContext
+src/ui.js:440: WARNING - Property destination never defined on this.main.audioContext
         source.connect(this.main.audioContext.destination);
                        ^
 
