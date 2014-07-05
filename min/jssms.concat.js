@@ -9571,7 +9571,7 @@ if (window["$"]) {
         return;
       }
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
-      this.gamepad = {u:{e:$(".up", gamepadContainer), k:KEY_UP}, r:{e:$(".right", gamepadContainer), k:KEY_RIGHT}, d:{e:$(".down", gamepadContainer), k:KEY_DOWN}, l:{e:$(".left", gamepadContainer), k:KEY_LEFT}, 1:{e:$(".fire1", gamepadContainer), k:KEY_FIRE1}, 2:{e:$(".fire2", gamepadContainer), k:KEY_FIRE2}};
+      this.gamepad = {up:KEY_UP, right:KEY_RIGHT, down:KEY_DOWN, left:KEY_LEFT, fire1:KEY_FIRE1, fire2:KEY_FIRE2};
       var startButton = $(".start", gamepadContainer);
       this.romContainer = $('<div id="romSelector"></div>');
       this.romSelect = $("<select></select>").change(function() {
@@ -9643,39 +9643,37 @@ if (window["$"]) {
           self.zoomed = !self.zoomed;
         });
       }
-      for (i in this.buttons) {
-        this.buttons[i].appendTo(controls);
-      }
-      this.log = $('<div id="status"></div>');
-      this.screen.appendTo(screenContainer);
-      gamepadContainer.appendTo(screenContainer);
-      screenContainer.appendTo(root);
-      this.romContainer.appendTo(root);
-      controls.appendTo(root);
-      this.log.appendTo(root);
-      root.appendTo($(parent));
-      if (roms !== undefined) {
-        this.setRoms(roms);
-      }
-      $(document).bind("keydown", function(evt) {
-        self.main.keyboard.keydown(evt);
-      }).bind("keyup", function(evt) {
-        self.main.keyboard.keyup(evt);
-      });
-      function touchStart(key) {
-        return function(evt) {
+      gamepadContainer.on("touchstart touchmove", function(evt) {
+        self.main.keyboard.controller1 = 255;
+        var changedTouches = evt.originalEvent.changedTouches;
+        for (var i = 0;i < changedTouches.length;i++) {
+          var target = document.elementFromPoint(changedTouches[i].clientX, changedTouches[i].clientY);
+          var className = target.className;
+          if (className === "gamepad" || !className) {
+            continue;
+          }
+          var key = self.gamepad[className];
           self.main.keyboard.controller1 &= ~key;
-          evt.preventDefault();
-        };
+        }
+        evt.preventDefault();
+      });
+      gamepadContainer.on("touchend", function(evt) {
+        self.main.keyboard.controller1 = 255;
+      });
+      function mouseDown(evt) {
+        var className = this.className;
+        var key = self.gamepad[className];
+        self.main.keyboard.controller1 &= ~key;
+        evt.preventDefault();
       }
-      function touchEnd(key) {
-        return function(evt) {
-          self.main.keyboard.controller1 |= key;
-          evt.preventDefault();
-        };
+      function mouseUp(evt) {
+        var className = this.className;
+        var key = self.gamepad[className];
+        self.main.keyboard.controller1 |= key;
+        evt.preventDefault();
       }
       for (i in this.gamepad) {
-        this.gamepad[i].e.on("mousedown touchstart", touchStart(this.gamepad[i].k)).on("mouseup touchend", touchEnd(this.gamepad[i].k));
+        $("." + i, gamepadContainer).mousedown(mouseDown).mouseup(mouseUp);
       }
       startButton.on("mousedown touchstart", function(evt) {
         if (self.main.is_sms) {
@@ -9690,6 +9688,25 @@ if (window["$"]) {
         }
         evt.preventDefault();
       });
+      $(document).bind("keydown", function(evt) {
+        self.main.keyboard.keydown(evt);
+      }).bind("keyup", function(evt) {
+        self.main.keyboard.keyup(evt);
+      });
+      for (i in this.buttons) {
+        this.buttons[i].appendTo(controls);
+      }
+      this.log = $('<div id="status"></div>');
+      this.screen.appendTo(screenContainer);
+      gamepadContainer.appendTo(screenContainer);
+      screenContainer.appendTo(root);
+      this.romContainer.appendTo(root);
+      controls.appendTo(root);
+      this.log.appendTo(root);
+      root.appendTo($(parent));
+      if (roms !== undefined) {
+        this.setRoms(roms);
+      }
     };
     UI.prototype = {reset:function() {
       this.screen[0].width = SMS_WIDTH;
