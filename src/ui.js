@@ -112,30 +112,12 @@ if (window['$']) {
 
       // Gamepad
       this.gamepad = {
-        u: {
-          e: $('.up', gamepadContainer),
-          k: KEY_UP
-        },
-        r: {
-          e: $('.right', gamepadContainer),
-          k: KEY_RIGHT
-        },
-        d: {
-          e: $('.down', gamepadContainer),
-          k: KEY_DOWN
-        },
-        l: {
-          e: $('.left', gamepadContainer),
-          k: KEY_LEFT
-        },
-        1: {
-          e: $('.fire1', gamepadContainer),
-          k: KEY_FIRE1
-        },
-        2: {
-          e: $('.fire2', gamepadContainer),
-          k: KEY_FIRE2
-        }
+        up: KEY_UP,
+        right: KEY_RIGHT,
+        down: KEY_DOWN,
+        left: KEY_LEFT,
+        fire1: KEY_FIRE1,
+        fire2: KEY_FIRE2
       };
       var startButton = $('.start', gamepadContainer);
 
@@ -232,6 +214,52 @@ if (window['$']) {
             });
       }
 
+      // Software buttons - touch
+      gamepadContainer.on('touchstart touchmove', function(evt) {
+        self.main.keyboard.controller1 = 0xFF;
+
+        var changedTouches = evt.originalEvent.changedTouches;
+
+        for (var i = 0; i < changedTouches.length; i++) {
+          var target = document.elementFromPoint(changedTouches[i].clientX, changedTouches[i].clientY);
+          var className = target.className;
+
+          if (className === 'gamepad' || !className) {
+            continue;
+          }
+
+          var key = self.gamepad[className];
+          self.main.keyboard.controller1 &= ~key;
+        }
+
+        evt.preventDefault();
+      });
+
+      gamepadContainer.on('touchend', function(evt) {
+        self.main.keyboard.controller1 = 0xFF;
+      });
+
+      // Software buttons - click
+      function mouseDown(evt) {
+        var className = this.className;
+        var key = self.gamepad[className];
+        self.main.keyboard.controller1 &= ~key;
+        evt.preventDefault();
+      }
+
+      function mouseUp(evt) {
+        var className = this.className;
+        var key = self.gamepad[className];
+        self.main.keyboard.controller1 |= key;
+        evt.preventDefault();
+      }
+
+      for (i in this.gamepad) {
+        $('.' + i, gamepadContainer)
+          .mousedown(mouseDown)
+          .mouseup(mouseUp);
+      }
+
       // Append buttons to controls div.
       for (i in this.buttons) {
         this.buttons[i].appendTo(controls);
@@ -261,26 +289,6 @@ if (window['$']) {
             self.main.keyboard.keyup(evt);
             //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
           });
-
-      function touchStart(key) {
-        return function(evt) {
-          self.main.keyboard.controller1 &= ~key;
-          evt.preventDefault();
-        };
-      }
-
-      function touchEnd(key) {
-        return function(evt) {
-          self.main.keyboard.controller1 |= key;
-          evt.preventDefault();
-        };
-      }
-
-      for (i in this.gamepad) {
-        this.gamepad[i].e
-          .on('mousedown touchstart', touchStart(this.gamepad[i].k))
-          .on('mouseup touchend', touchEnd(this.gamepad[i].k));
-      }
 
       startButton
         .on('mousedown touchstart', function(evt) {
