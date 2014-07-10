@@ -53,10 +53,8 @@ if (window['$']) {
       var self = this;
 
       // Create UI
-      var root = $('<div></div>');
       var screenContainer = $('<div id="screen"></div>');
       var gamepadContainer = $('<div class="gamepad"><div class="direction"><div class="up"></div><div class="right"></div><div class="left"></div><div class="down"></div></div><div class="buttons"><div class="start"></div><div class="fire1"></div><div class="fire2"></div></div></div>');
-      var controls = $('<div id="controls"></div>');
 
       // General settings
       /**
@@ -264,9 +262,7 @@ if (window['$']) {
 
       this.screen.appendTo(screenContainer);
       gamepadContainer.appendTo(screenContainer);
-      screenContainer.appendTo(root);
-      controls.appendTo(root);
-      root.appendTo($(parent));
+      screenContainer.appendTo($(parent));
 
       if (roms !== undefined) {
         this.setRoms(roms);
