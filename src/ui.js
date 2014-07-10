@@ -34,6 +34,8 @@ JSSMS.DummyUI = function(sms) {
   };
   this.updateStatus = function() {
   };
+  this.writeAudio = function() {
+  };
   this.writeFrame = function() {
   };
   this.updateDisassembly = function() {

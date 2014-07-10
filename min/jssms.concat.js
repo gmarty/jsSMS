@@ -842,7 +842,7 @@ JSSMS.Z80.prototype = {reset:function() {
       this.rla_a();
       break;
     case 24:
-      this.pc += this.signExtend(this.d_() + 1);
+      this.pc += this.getInt8(this.pc);
       break;
     case 25:
       this.setHL(this.add16(this.getHL(), this.getDE()));
@@ -1616,16 +1616,11 @@ JSSMS.Z80.prototype = {reset:function() {
   }
 }, jr:function(condition) {
   if (condition) {
-    this.pc += this.signExtend(this.d_() + 1);
+    this.pc += this.getInt8(this.pc);
     this.tstates -= 5;
   } else {
     this.pc++;
   }
-}, signExtend:function(d) {
-  if (d >= 128) {
-    d = d - 256;
-  }
-  return d;
 }, call:function(condition) {
   if (condition) {
     this.push(this.pc + 2);
@@ -4608,7 +4603,7 @@ JSSMS.Z80.prototype = {reset:function() {
   return this.getUint8(this.pc);
 }, setUint8:function() {
   if (SUPPORT_DATAVIEW) {
-    return function writeMem(address, value) {
+    return function setUint8(address, value) {
       if (address <= 65535) {
         this.memWriteMap.setUint8(address & 8191, value);
         if (address === 65532) {
@@ -4631,7 +4626,7 @@ JSSMS.Z80.prototype = {reset:function() {
       }
     };
   } else {
-    return function writeMem(address, value) {
+    return function setUint8(address, value) {
       if (address <= 65535) {
         this.memWriteMap[address & 8191] = value;
         if (address === 65532) {
@@ -4656,7 +4651,7 @@ JSSMS.Z80.prototype = {reset:function() {
   }
 }(), setUint16:function() {
   if (SUPPORT_DATAVIEW) {
-    return function writeMemWord(address, value) {
+    return function setUint16(address, value) {
       if (address < 65532) {
         this.memWriteMap.setUint16(address & 8191, value, LITTLE_ENDIAN);
       } else {
@@ -4679,7 +4674,7 @@ JSSMS.Z80.prototype = {reset:function() {
       }
     };
   } else {
-    return function writeMemWord(address, value) {
+    return function setUint16(address, value) {
       if (address < 65532) {
         address &= 8191;
         this.memWriteMap[address++] = value & 255;
@@ -4706,7 +4701,7 @@ JSSMS.Z80.prototype = {reset:function() {
   }
 }(), getUint8:function() {
   if (SUPPORT_DATAVIEW) {
-    return function readMem(address) {
+    return function getUint8(address) {
       if (address < 1024) {
         return this.rom[0].getUint8(address);
       } else {
@@ -4761,7 +4756,7 @@ JSSMS.Z80.prototype = {reset:function() {
       return 0;
     };
   } else {
-    return function readMem(address) {
+    return function getUint8(address) {
       if (address < 1024) {
         return this.rom[0][address];
       } else {
@@ -4818,7 +4813,7 @@ JSSMS.Z80.prototype = {reset:function() {
   }
 }(), getUint16:function() {
   if (SUPPORT_DATAVIEW) {
-    return function readMemWord(address) {
+    return function getUint16(address) {
       if (address < 1024) {
         return this.rom[0].getUint16(address, LITTLE_ENDIAN);
       } else {
@@ -4873,7 +4868,7 @@ JSSMS.Z80.prototype = {reset:function() {
       return 0;
     };
   } else {
-    return function readMemWord(address) {
+    return function getUint16(address) {
       if (address < 1024) {
         return this.rom[0][address++] | this.rom[0][address] << 8;
       } else {
@@ -4926,6 +4921,124 @@ JSSMS.Z80.prototype = {reset:function() {
         }
       }
       return 0;
+    };
+  }
+}(), getInt8:function() {
+  if (SUPPORT_DATAVIEW) {
+    return function getInt8(address) {
+      var value = 0;
+      if (address < 1024) {
+        value = this.rom[0].getInt8(address);
+      } else {
+        if (address < 16384) {
+          value = this.rom[this.frameReg[0]].getInt8(address);
+        } else {
+          if (address < 32768) {
+            value = this.rom[this.frameReg[1]].getInt8(address - 16384);
+          } else {
+            if (address < 49152) {
+              if ((this.frameReg[3] & 12) === 8) {
+                this.useSRAM = true;
+                value = this.sram.getInt8(address - 32768);
+              } else {
+                if ((this.frameReg[3] & 12) === 12) {
+                  this.useSRAM = true;
+                  value = this.sram.getInt8(address - 16384);
+                } else {
+                  value = this.rom[this.frameReg[2]].getInt8(address - 32768);
+                }
+              }
+            } else {
+              if (address < 57344) {
+                value = this.memWriteMap.getInt8(address - 49152);
+              } else {
+                if (address < 65532) {
+                  value = this.memWriteMap.getInt8(address - 57344);
+                } else {
+                  if (address === 65532) {
+                    return this.frameReg[3];
+                  } else {
+                    if (address === 65533) {
+                      return this.frameReg[0];
+                    } else {
+                      if (address === 65534) {
+                        return this.frameReg[1];
+                      } else {
+                        if (address === 65535) {
+                          return this.frameReg[2];
+                        } else {
+                          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      return value + 1;
+    };
+  } else {
+    return function getInt8(address) {
+      var value = 0;
+      if (address < 1024) {
+        value = this.rom[0][address];
+      } else {
+        if (address < 16384) {
+          value = this.rom[this.frameReg[0]][address];
+        } else {
+          if (address < 32768) {
+            value = this.rom[this.frameReg[1]][address - 16384];
+          } else {
+            if (address < 49152) {
+              if ((this.frameReg[3] & 12) === 8) {
+                this.useSRAM = true;
+                value = this.sram[address - 32768];
+              } else {
+                if ((this.frameReg[3] & 12) === 12) {
+                  this.useSRAM = true;
+                  value = this.sram[address - 16384];
+                } else {
+                  value = this.rom[this.frameReg[2]][address - 32768];
+                }
+              }
+            } else {
+              if (address < 57344) {
+                value = this.memWriteMap[address - 49152];
+              } else {
+                if (address < 65532) {
+                  value = this.memWriteMap[address - 57344];
+                } else {
+                  if (address === 65532) {
+                    return this.frameReg[3];
+                  } else {
+                    if (address === 65533) {
+                      return this.frameReg[0];
+                    } else {
+                      if (address === 65534) {
+                        return this.frameReg[1];
+                      } else {
+                        if (address === 65535) {
+                          return this.frameReg[2];
+                        } else {
+                          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      value += 1;
+      if (value >= 128) {
+        value = value - 256;
+      }
+      return value;
     };
   }
 }(), hasUsedSRAM:function() {
@@ -9522,6 +9635,8 @@ JSSMS.DummyUI = function(sms) {
   this.reset = function() {
   };
   this.updateStatus = function() {
+  };
+  this.writeAudio = function() {
   };
   this.writeFrame = function() {
   };

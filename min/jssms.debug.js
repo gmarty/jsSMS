@@ -521,7 +521,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.rla_a();
       break;
     case 24:
-      this.pc += this.signExtend(this.d_() + 1);
+      this.pc += this.getInt8(this.pc);
       break;
     case 25:
       this.setHL(this.add16(this.getHL(), this.getDE()));
@@ -1243,10 +1243,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
 }, jp:function $JSSMS$Z80$$jp$($condition$$) {
   this.pc = $condition$$ ? this.getUint16(this.pc) : this.pc + 2;
 }, jr:function $JSSMS$Z80$$jr$($condition$$) {
-  $condition$$ ? (this.pc += this.signExtend(this.d_() + 1), this.tstates -= 5) : this.pc++;
-}, signExtend:function $JSSMS$Z80$$signExtend$($d$$) {
-  128 <= $d$$ && ($d$$ -= 256);
-  return $d$$;
+  $condition$$ ? (this.pc += this.getInt8(this.pc), this.tstates -= 5) : this.pc++;
 }, call:function $JSSMS$Z80$$call$($condition$$) {
   $condition$$ ? (this.push(this.pc + 2), this.pc = this.getUint16(this.pc), this.tstates -= 7) : this.pc += 2;
 }, ret:function $JSSMS$Z80$$ret$($condition$$) {
@@ -3961,20 +3958,20 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
 }, d_:function $JSSMS$Z80$$d_$() {
   return this.getUint8(this.pc);
 }, setUint8:function() {
-  return SUPPORT_DATAVIEW ? function writeMem($address$$, $value$$) {
+  return SUPPORT_DATAVIEW ? function setUint8($address$$, $value$$) {
     65535 >= $address$$ ? (this.memWriteMap.setUint8($address$$ & 8191, $value$$), 65532 === $address$$ ? this.frameReg[3] = $value$$ : 65533 === $address$$ ? this.frameReg[0] = $value$$ & this.romPageMask : 65534 === $address$$ ? this.frameReg[1] = $value$$ & this.romPageMask : 65535 === $address$$ && (this.frameReg[2] = $value$$ & this.romPageMask)) : JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
-  } : function writeMem($address$$, $value$$) {
+  } : function setUint8($address$$, $value$$) {
     65535 >= $address$$ ? (this.memWriteMap[$address$$ & 8191] = $value$$, 65532 === $address$$ ? this.frameReg[3] = $value$$ : 65533 === $address$$ ? this.frameReg[0] = $value$$ & this.romPageMask : 65534 === $address$$ ? this.frameReg[1] = $value$$ & this.romPageMask : 65535 === $address$$ && (this.frameReg[2] = $value$$ & this.romPageMask)) : JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
   };
 }(), setUint16:function() {
-  return SUPPORT_DATAVIEW ? function writeMemWord($address$$, $value$$) {
+  return SUPPORT_DATAVIEW ? function setUint16($address$$, $value$$) {
     65532 > $address$$ ? this.memWriteMap.setUint16($address$$ & 8191, $value$$, LITTLE_ENDIAN) : 65532 === $address$$ ? (this.frameReg[3] = $value$$ & 255, this.frameReg[0] = $value$$ >> 8 & this.romPageMask) : 65533 === $address$$ ? (this.frameReg[0] = $value$$ & 255 & this.romPageMask, this.frameReg[1] = $value$$ >> 8 & this.romPageMask) : 65534 === $address$$ ? (this.frameReg[1] = $value$$ & 255 & this.romPageMask, this.frameReg[2] = $value$$ >> 8 & this.romPageMask) : JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
-  } : function writeMemWord($address$$, $value$$) {
+  } : function setUint16($address$$, $value$$) {
     65532 > $address$$ ? ($address$$ &= 8191, this.memWriteMap[$address$$++] = $value$$ & 255, this.memWriteMap[$address$$] = $value$$ >> 8) : 65532 === $address$$ ? (this.frameReg[3] = $value$$ & 255, this.frameReg[0] = $value$$ >> 8 & this.romPageMask) : 65533 === $address$$ ? (this.frameReg[0] = $value$$ & 255 & this.romPageMask, this.frameReg[1] = $value$$ >> 8 & this.romPageMask) : 65534 === $address$$ ? (this.frameReg[1] = $value$$ & 255 & this.romPageMask, this.frameReg[2] = $value$$ >> 8 & 
     this.romPageMask) : JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
   };
 }(), getUint8:function() {
-  return SUPPORT_DATAVIEW ? function readMem($address$$) {
+  return SUPPORT_DATAVIEW ? function getUint8($address$$) {
     if (1024 > $address$$) {
       return this.rom[0].getUint8($address$$);
     }
@@ -4007,7 +4004,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     }
     JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
     return 0;
-  } : function readMem($address$$) {
+  } : function getUint8($address$$) {
     if (1024 > $address$$) {
       return this.rom[0][$address$$];
     }
@@ -4042,7 +4039,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     return 0;
   };
 }(), getUint16:function() {
-  return SUPPORT_DATAVIEW ? function readMemWord($address$$) {
+  return SUPPORT_DATAVIEW ? function getUint16($address$$) {
     if (1024 > $address$$) {
       return this.rom[0].getUint16($address$$, LITTLE_ENDIAN);
     }
@@ -4075,7 +4072,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     }
     JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
     return 0;
-  } : function readMemWord($address$$) {
+  } : function getUint16($address$$) {
     if (1024 > $address$$) {
       return this.rom[0][$address$$++] | this.rom[0][$address$$] << 8;
     }
@@ -4108,6 +4105,90 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     }
     JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
     return 0;
+  };
+}(), getInt8:function() {
+  return SUPPORT_DATAVIEW ? function getInt8($address$$) {
+    var $value$$ = 0;
+    if (1024 > $address$$) {
+      $value$$ = this.rom[0].getInt8($address$$);
+    } else {
+      if (16384 > $address$$) {
+        $value$$ = this.rom[this.frameReg[0]].getInt8($address$$);
+      } else {
+        if (32768 > $address$$) {
+          $value$$ = this.rom[this.frameReg[1]].getInt8($address$$ - 16384);
+        } else {
+          if (49152 > $address$$) {
+            8 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, $value$$ = this.sram.getInt8($address$$ - 32768)) : 12 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, $value$$ = this.sram.getInt8($address$$ - 16384)) : $value$$ = this.rom[this.frameReg[2]].getInt8($address$$ - 32768);
+          } else {
+            if (57344 > $address$$) {
+              $value$$ = this.memWriteMap.getInt8($address$$ - 49152);
+            } else {
+              if (65532 > $address$$) {
+                $value$$ = this.memWriteMap.getInt8($address$$ - 57344);
+              } else {
+                if (65532 === $address$$) {
+                  return this.frameReg[3];
+                }
+                if (65533 === $address$$) {
+                  return this.frameReg[0];
+                }
+                if (65534 === $address$$) {
+                  return this.frameReg[1];
+                }
+                if (65535 === $address$$) {
+                  return this.frameReg[2];
+                }
+                JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
+              }
+            }
+          }
+        }
+      }
+    }
+    return $value$$ + 1;
+  } : function getInt8($address$$) {
+    var $value$$ = 0;
+    if (1024 > $address$$) {
+      $value$$ = this.rom[0][$address$$];
+    } else {
+      if (16384 > $address$$) {
+        $value$$ = this.rom[this.frameReg[0]][$address$$];
+      } else {
+        if (32768 > $address$$) {
+          $value$$ = this.rom[this.frameReg[1]][$address$$ - 16384];
+        } else {
+          if (49152 > $address$$) {
+            8 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, $value$$ = this.sram[$address$$ - 32768]) : 12 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, $value$$ = this.sram[$address$$ - 16384]) : $value$$ = this.rom[this.frameReg[2]][$address$$ - 32768];
+          } else {
+            if (57344 > $address$$) {
+              $value$$ = this.memWriteMap[$address$$ - 49152];
+            } else {
+              if (65532 > $address$$) {
+                $value$$ = this.memWriteMap[$address$$ - 57344];
+              } else {
+                if (65532 === $address$$) {
+                  return this.frameReg[3];
+                }
+                if (65533 === $address$$) {
+                  return this.frameReg[0];
+                }
+                if (65534 === $address$$) {
+                  return this.frameReg[1];
+                }
+                if (65535 === $address$$) {
+                  return this.frameReg[2];
+                }
+                JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
+              }
+            }
+          }
+        }
+      }
+    }
+    $value$$ += 1;
+    128 <= $value$$ && ($value$$ -= 256);
+    return $value$$;
   };
 }(), hasUsedSRAM:function $JSSMS$Z80$$hasUsedSRAM$() {
   return this.useSRAM;
@@ -8014,7 +8095,7 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
   this.readBuffer = this.VRAM[this.location++ & 16383] & 255;
   return $value$$;
 }, dataWrite:function $JSSMS$Vdp$$dataWrite$($value$$) {
-  var $address$$15_temp$$ = 0;
+  var $address$$17_temp$$ = 0;
   this.firstByte = !0;
   switch(this.operation) {
     case 0:
@@ -8022,21 +8103,21 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
     case 1:
     ;
     case 2:
-      $address$$15_temp$$ = this.location & 16383;
-      if ($value$$ !== (this.VRAM[$address$$15_temp$$] & 255)) {
-        if ($address$$15_temp$$ >= this.sat && $address$$15_temp$$ < this.sat + 64 || $address$$15_temp$$ >= this.sat + 128 && $address$$15_temp$$ < this.sat + 256) {
+      $address$$17_temp$$ = this.location & 16383;
+      if ($value$$ !== (this.VRAM[$address$$17_temp$$] & 255)) {
+        if ($address$$17_temp$$ >= this.sat && $address$$17_temp$$ < this.sat + 64 || $address$$17_temp$$ >= this.sat + 128 && $address$$17_temp$$ < this.sat + 256) {
           this.isSatDirty = !0;
         } else {
-          var $tileIndex$$ = $address$$15_temp$$ >> 5;
+          var $tileIndex$$ = $address$$17_temp$$ >> 5;
           this.isTileDirty[$tileIndex$$] = 1;
           $tileIndex$$ < this.minDirty && (this.minDirty = $tileIndex$$);
           $tileIndex$$ > this.maxDirty && (this.maxDirty = $tileIndex$$);
         }
-        this.VRAM[$address$$15_temp$$] = $value$$;
+        this.VRAM[$address$$17_temp$$] = $value$$;
       }
       break;
     case 3:
-      this.main.is_sms ? ($address$$15_temp$$ = 3 * (this.location & 31), this.CRAM[$address$$15_temp$$] = this.main_JAVA_R[$value$$], this.CRAM[$address$$15_temp$$ + 1] = this.main_JAVA_G[$value$$], this.CRAM[$address$$15_temp$$ + 2] = this.main_JAVA_B[$value$$]) : ($address$$15_temp$$ = 3 * ((this.location & 63) >> 1), this.location & 1 ? this.CRAM[$address$$15_temp$$ + 2] = this.GG_JAVA_B[$value$$] : (this.CRAM[$address$$15_temp$$] = this.GG_JAVA_R[$value$$], this.CRAM[$address$$15_temp$$ + 1] = 
+      this.main.is_sms ? ($address$$17_temp$$ = 3 * (this.location & 31), this.CRAM[$address$$17_temp$$] = this.main_JAVA_R[$value$$], this.CRAM[$address$$17_temp$$ + 1] = this.main_JAVA_G[$value$$], this.CRAM[$address$$17_temp$$ + 2] = this.main_JAVA_B[$value$$]) : ($address$$17_temp$$ = 3 * ((this.location & 63) >> 1), this.location & 1 ? this.CRAM[$address$$17_temp$$ + 2] = this.GG_JAVA_B[$value$$] : (this.CRAM[$address$$17_temp$$] = this.GG_JAVA_R[$value$$], this.CRAM[$address$$17_temp$$ + 1] = 
       this.GG_JAVA_G[$value$$]));
   }
   ACCURATE && (this.readBuffer = $value$$);
@@ -8201,6 +8282,8 @@ JSSMS.DummyUI = function $JSSMS$DummyUI$($sms$$) {
   this.reset = function $this$reset$() {
   };
   this.updateStatus = function $this$updateStatus$() {
+  };
+  this.writeAudio = function $this$writeAudio$() {
   };
   this.writeFrame = function $this$writeFrame$() {
   };
@@ -10532,10 +10615,10 @@ var Recompiler = function() {
       DEBUG && ($fn$$.body[0].id.name = "_" + $toHex$$($fn$$.body[0].id.name));
       $self$$.cpu.branches[$romPage$$][$address$$ % 16384] = (new Function("return " + $self$$.generateCodeFromAst($fn$$)))();
     });
-  }, parseFromAddress:function $$Recompiler$$$$parseFromAddress$($address$$25_obj$$, $romPage$$, $memPage$$) {
-    $address$$25_obj$$ = {address:$address$$25_obj$$, romPage:$romPage$$, memPage:$memPage$$};
-    this.parser.entryPoints.push($address$$25_obj$$);
-    this.bytecodes = this.parser.parseFromAddress($address$$25_obj$$);
+  }, parseFromAddress:function $$Recompiler$$$$parseFromAddress$($address$$27_obj$$, $romPage$$, $memPage$$) {
+    $address$$27_obj$$ = {address:$address$$27_obj$$, romPage:$romPage$$, memPage:$memPage$$};
+    this.parser.entryPoints.push($address$$27_obj$$);
+    this.bytecodes = this.parser.parseFromAddress($address$$27_obj$$);
     return this;
   }, analyzeFromAddress:function $$Recompiler$$$$analyzeFromAddress$() {
     this.analyzer.analyzeFromAddress(this.bytecodes);
