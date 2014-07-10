@@ -60,22 +60,6 @@ var PSG_VOLUME = [
 
 
 /**
- * Samples high boundary.
- * Values are clamped between LO_BOUNDARY and HI_BOUNDARY.
- * @const
- */
-var HI_BOUNDARY = 0x7F;
-
-
-/**
- * Samples low boundary.
- * @const
- */
-var LO_BOUNDARY = -0x80;
-
-
-
-/**
  * @constructor
  * @param {JSSMS} sms
  */
@@ -176,11 +160,11 @@ JSSMS.SN76489.prototype = {
 
       // Set Amplitudes Positive
       this.freqPolarity[i] = 1;
+    }
 
-      // Do not use intermediate positions
-      if (i !== 3) {
-        this.freqPos[i] = NO_ANTIALIAS;
-      }
+    // Do not use intermediate positions
+    for (i = 0; i < 3; i++) {
+      this.freqPos[i] = NO_ANTIALIAS;
     }
   },
 
@@ -282,13 +266,13 @@ JSSMS.SN76489.prototype = {
       // Output sound to buffer
       var output = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
 
-      output /= HI_BOUNDARY;
+      output /= 0x80;
 
       // Check boundaries
-      if (output > HI_BOUNDARY) {
-        output = HI_BOUNDARY;
-      } else if (output < LO_BOUNDARY) {
-        output = LO_BOUNDARY;
+      if (output > 1) {
+        output = 1;
+      } else if (output < -1) {
+        output = -1;
       }
 
       buffer[offset + sample] = output;
