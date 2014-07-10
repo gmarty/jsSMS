@@ -642,7 +642,7 @@ JSSMS.Z80.prototype = {
       case 0x15: this.d = this.dec8(this.d); break;                                      // DEC D
       case 0x16: this.d = this.getUint8(this.pc++); break;                              // LD D,n
       case 0x17: this.rla_a(); break;                                          // RLA
-      case 0x18: this.pc += this.signExtend(this.d_() + 1); break;                                      // JR (PC+e)
+      case 0x18: this.pc += this.getInt8(this.pc); break;                                      // JR (PC+e)
       case 0x19: this.setHL(this.add16(this.getHL(), this.getDE())); break;                   // ADD HL,DE
       case 0x1A: this.a = this.getUint8(this.getDE()); break;                             // LD A,(DE)
       case 0x1B: this.decDE(); break;                                          // DEC DE
@@ -988,25 +988,11 @@ JSSMS.Z80.prototype = {
    */
   jr: function(condition) {
     if (condition) {
-      this.pc += this.signExtend(this.d_() + 1);
+      this.pc += this.getInt8(this.pc);
       this.tstates -= 5;
     } else {
       this.pc++;
     }
-  },
-
-
-  /**
-   * Sign extend.
-   *
-   * @param {number} d
-   * @return {number}
-   */
-  signExtend: function(d) {
-    if (d >= 128) {
-      d = d - 256;
-    }
-    return d;
   },
 
 
@@ -3452,7 +3438,7 @@ JSSMS.Z80.prototype = {
 
 
   /**
-   * Write a signed value to a memory location.
+   * Write an unsigned 8-bit integer to the specified address.
    */
   setUint8: function() {
     if (SUPPORT_DATAVIEW) {
@@ -3460,7 +3446,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address Memory address.
        * @param {number} value Value to write.
        */
-      return function writeMem(address, value) {
+      return function setUint8(address, value) {
         if (address <= 0xFFFF) {
           this.memWriteMap.setUint8(address & 0x1FFF, value);
           if (address === 0xFFFC) {
@@ -3481,7 +3467,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address Memory address.
        * @param {number} value Value to write.
        */
-      return function writeMem(address, value) {
+      return function setUint8(address, value) {
         if (address <= 0xFFFF) {
           this.memWriteMap[address & 0x1FFF] = value;
           if (address === 0xFFFC) {
@@ -3502,7 +3488,7 @@ JSSMS.Z80.prototype = {
 
 
   /**
-   * Write a word (two bytes) to a memory location.
+   * Write an unsigned 16-bit integer to the specified address.
    */
   setUint16: function() {
     if (SUPPORT_DATAVIEW) {
@@ -3510,7 +3496,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address Memory address.
        * @param {number} value Value to write.
        */
-      return function writeMemWord(address, value) {
+      return function setUint16(address, value) {
         if (address < 0xFFFC) {
           this.memWriteMap.setUint16(address & 0x1FFF, value, LITTLE_ENDIAN);
         } else if (address === 0xFFFC) {
@@ -3531,7 +3517,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address Memory address.
        * @param {number} value Value to write.
        */
-      return function writeMemWord(address, value) {
+      return function setUint16(address, value) {
         if (address < 0xFFFC) {
           address &= 0x1FFF;
           this.memWriteMap[address++] = value & 0xFF;
@@ -3554,7 +3540,7 @@ JSSMS.Z80.prototype = {
 
 
   /**
-   * Read a signed value from next memory location.
+   * Read an unsigned 8-bit integer from the specified address.
    */
   getUint8: function() {
     if (SUPPORT_DATAVIEW) {
@@ -3562,7 +3548,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address
        * @return {number} Value from memory location.
        */
-      return function readMem(address) {
+      return function getUint8(address) {
         if (address < 0x0400) {
           return this.rom[0].getUint8(address);
         } else if (address < 0x4000) {
@@ -3605,7 +3591,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address
        * @return {number} Value from memory location.
        */
-      return function readMem(address) {
+      return function getUint8(address) {
         if (address < 0x0400) {
           return this.rom[0][address];
         } else if (address < 0x4000) {
@@ -3648,7 +3634,7 @@ JSSMS.Z80.prototype = {
 
 
   /**
-   * Read a word (two bytes) from a memory location.
+   * Read an unsigned 16-bit integer from the specified address.
    */
   getUint16: function() {
     if (SUPPORT_DATAVIEW) {
@@ -3656,7 +3642,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address
        * @return {number} Value from memory location.
        */
-      return function readMemWord(address) {
+      return function getUint16(address) {
         if (address < 0x0400) {
           return this.rom[0].getUint16(address, LITTLE_ENDIAN);
         } else if (address < 0x4000) {
@@ -3699,7 +3685,7 @@ JSSMS.Z80.prototype = {
        * @param {number} address
        * @return {number} Value from memory location.
        */
-      return function readMemWord(address) {
+      return function getUint16(address) {
         if (address < 0x0400) {
           return this.rom[0][address++] | this.rom[0][address] << 8;
         } else if (address < 0x4000) {
@@ -3736,6 +3722,106 @@ JSSMS.Z80.prototype = {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
         }
         return 0x00;
+      };
+    }
+  }(),
+
+
+  /**
+   * Read a signed 8-bit integer from the specified address.
+   */
+  getInt8: function() {
+    if (SUPPORT_DATAVIEW) {
+      /**
+       * @param {number} address
+       * @return {number} Value from memory location.
+       */
+      return function getInt8(address) {
+        var value = 0x00;
+        if (address < 0x0400) {
+          value = this.rom[0].getInt8(address);
+        } else if (address < 0x4000) {
+          value = this.rom[this.frameReg[0]].getInt8(address);
+        } else if (address < 0x8000) {
+          value = this.rom[this.frameReg[1]].getInt8(address - 0x4000);
+        } else if (address < 0xC000) {
+          if ((this.frameReg[3] & 12) === 8) {
+            this.useSRAM = true;
+            value = this.sram.getInt8(address - 0x8000);
+          } else if ((this.frameReg[3] & 12) === 12) {
+            this.useSRAM = true;
+            value = this.sram.getInt8(address - 0x4000);
+          } else {
+            value = this.rom[this.frameReg[2]].getInt8(address - 0x8000);
+          }
+        } else if (address < 0xE000) {
+          value = this.memWriteMap.getInt8(address - 0xC000);
+        } else if (address < 0xFFFC) {
+          value = this.memWriteMap.getInt8(address - 0xE000);
+        } else if (address === 0xFFFC) {
+          // 0xFFFC: RAM/ROM select register
+          return this.frameReg[3];
+        } else if (address === 0xFFFD) {
+          // 0xFFFD: Page 0 ROM Bank
+          return this.frameReg[0];
+        } else if (address === 0xFFFE) {
+          // 0xFFFE: Page 1 ROM Bank
+          return this.frameReg[1];
+        } else if (address === 0xFFFF) {
+          // 0xFFFF: Page 2 ROM Bank
+          return this.frameReg[2];
+        } else {
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+        }
+        return value + 1;
+      };
+    } else {
+      /**
+       * @param {number} address
+       * @return {number} Value from memory location.
+       */
+      return function getInt8(address) {
+        var value = 0x00;
+        if (address < 0x0400) {
+          value = this.rom[0][address];
+        } else if (address < 0x4000) {
+          value = this.rom[this.frameReg[0]][address];
+        } else if (address < 0x8000) {
+          value = this.rom[this.frameReg[1]][address - 0x4000];
+        } else if (address < 0xC000) {
+          if ((this.frameReg[3] & 12) === 8) {
+            this.useSRAM = true;
+            value = this.sram[address - 0x8000];
+          } else if ((this.frameReg[3] & 12) === 12) {
+            this.useSRAM = true;
+            value = this.sram[address - 0x4000];
+          } else {
+            value = this.rom[this.frameReg[2]][address - 0x8000];
+          }
+        } else if (address < 0xE000) {
+          value = this.memWriteMap[address - 0xC000];
+        } else if (address < 0xFFFC) {
+          value = this.memWriteMap[address - 0xE000];
+        } else if (address === 0xFFFC) {
+          // 0xFFFC: RAM/ROM select register
+          return this.frameReg[3];
+        } else if (address === 0xFFFD) {
+          // 0xFFFD: Page 0 ROM Bank
+          return this.frameReg[0];
+        } else if (address === 0xFFFE) {
+          // 0xFFFE: Page 1 ROM Bank
+          return this.frameReg[1];
+        } else if (address === 0xFFFF) {
+          // 0xFFFF: Page 2 ROM Bank
+          return this.frameReg[2];
+        } else {
+          JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
+        }
+        value += 1;
+        if (value >= 128) {
+          value = value - 256;
+        }
+        return value;
       };
     }
   }(),
