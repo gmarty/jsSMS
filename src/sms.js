@@ -55,8 +55,7 @@ function JSSMS(opts) {
    * @dict
    */
   this.opts = {
-    'ui': JSSMS.DummyUI,
-    'swfPath': 'lib/'
+    'ui': JSSMS.DummyUI
   };
   if (opts !== undefined) {
     var key;
@@ -414,7 +413,7 @@ JSSMS.prototype = {
 
     // Setup appropriate sound buffer
     if (this.soundEnabled) {
-      this.psg.init(clockSpeedHz, SAMPLE_RATE);
+      this.psg.init(clockSpeedHz);
 
       this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps);
 

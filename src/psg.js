@@ -136,12 +136,11 @@ JSSMS.SN76489.prototype = {
    * Init SN76496 to Default Values.
    *
    * @param {number} clockSpeed Clock Speed (Hz).
-   * @param {number} sampleRate Sample Rate (Hz).
    */
-  init: function(clockSpeed, sampleRate) {
+  init: function(clockSpeed) {
     // Master clock divided by 16 to get internal clock
     // e.g. 3579545 / 16 / 44100 = 5
-    this.clock = (clockSpeed << SCALE) / 16 / sampleRate;
+    this.clock = (clockSpeed << SCALE) / 16 / SAMPLE_RATE;
 
     this.clockFrac = 0;
     this.regLatch = 0;
@@ -176,7 +175,7 @@ JSSMS.SN76489.prototype = {
    */
   write: function(value) {
     // If bit 7 is 1 then the byte is a LATCH/DATA byte.
-    //    %1cctdddd
+    //  %1cctdddd
     //    |||````-- Data
     //    ||`------ Type
     //    ``------- Channel
@@ -193,7 +192,7 @@ JSSMS.SN76489.prototype = {
     }
 
     // If bit 7 is 0 then the byte is a DATA byte.
-    //    %0-DDDDDD
+    //  %0-DDDDDD
     //    |``````-- Data
     //    `-------- Unused
 
