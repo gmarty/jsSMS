@@ -171,13 +171,13 @@ var Optimizer = (function() {
      * This pass replaces references to defined registers with their respective values:
      * ```
      * b = 0x03;
-     * writeMem(0xFFFE, b);
+     * setUint8(0xFFFE, b);
      * ```
      *
      * Is optimized into:
      * ```
      * b = 0x03;
-     * writeMem(0xFFFE, 0x03);
+     * setUint8(0xFFFE, 0x03);
      * ```
      *
      * It has many flaws and can be optimized:

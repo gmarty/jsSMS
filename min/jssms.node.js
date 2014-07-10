@@ -4229,7 +4229,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$inline_157_operand$$2$$ = $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $inst$$inline_157_operand$$2$$ + ")," + $index$$47$$;
-      $code$$7_code$$inline_158$$ = "this.writeMem(" + $inst$$inline_157_operand$$2$$ + ", this." + $index$$47$$.toLowerCase() + "L);this.writeMem(" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$ + 1) + ", this." + $index$$47$$.toLowerCase() + "H);";
+      $code$$7_code$$inline_158$$ = "this.setUint8(" + $inst$$inline_157_operand$$2$$ + ", this." + $index$$47$$.toLowerCase() + "L);this.setUint8(" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$ + 1) + ", this." + $index$$47$$.toLowerCase() + "H);";
       $address$$11_address$$inline_151$$ += 2;
       break;
     case 35:
@@ -4252,7 +4252,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 42:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD " + $index$$47$$ + " (" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.ixL = this.readMem(" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");this.ixH = this.readMem(" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$ + 1) + ");";
+      $code$$7_code$$inline_158$$ = "this.ixL = this.getUint8(" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");this.ixH = this.getUint8(" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$ + 1) + ");";
       $address$$11_address$$inline_151$$ += 2;
       break;
     case 43:
@@ -4285,7 +4285,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$inline_157_operand$$2$$ = $opcode$$inline_155_toHex$$4$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$ + 1));
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")," + $inst$$inline_157_operand$$2$$;
-      $code$$7_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", " + $inst$$inline_157_operand$$2$$ + ");";
+      $code$$7_code$$inline_158$$ = "this.setUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", " + $inst$$inline_157_operand$$2$$ + ");";
       $address$$11_address$$inline_151$$ += 2;
       break;
     case 57:
@@ -4301,7 +4301,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 70:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD B,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.b = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
+      $code$$7_code$$inline_158$$ = "this.b = this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 76:
@@ -4313,7 +4313,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 78:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD C,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.c = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
+      $code$$7_code$$inline_158$$ = "this.c = this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 84:
@@ -4325,7 +4325,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 86:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD D,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.d = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
+      $code$$7_code$$inline_158$$ = "this.d = this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 92:
@@ -4337,7 +4337,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 94:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD E,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.e = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
+      $code$$7_code$$inline_158$$ = "this.e = this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 96:
@@ -4361,7 +4361,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 102:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD H,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.h = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
+      $code$$7_code$$inline_158$$ = "this.h = this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 103:
@@ -4389,7 +4389,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 110:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD L,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.l = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
+      $code$$7_code$$inline_158$$ = "this.l = this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 111:
@@ -4399,43 +4399,43 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 112:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "),B";
-      $code$$7_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.b);";
+      $code$$7_code$$inline_158$$ = "this.setUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.b);";
       $address$$11_address$$inline_151$$++;
       break;
     case 113:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "),C";
-      $code$$7_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.c);";
+      $code$$7_code$$inline_158$$ = "this.setUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.c);";
       $address$$11_address$$inline_151$$++;
       break;
     case 114:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "),D";
-      $code$$7_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.d);";
+      $code$$7_code$$inline_158$$ = "this.setUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.d);";
       $address$$11_address$$inline_151$$++;
       break;
     case 115:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "),E";
-      $code$$7_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.e);";
+      $code$$7_code$$inline_158$$ = "this.setUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.e);";
       $address$$11_address$$inline_151$$++;
       break;
     case 116:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "),H";
-      $code$$7_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.h);";
+      $code$$7_code$$inline_158$$ = "this.setUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.h);";
       $address$$11_address$$inline_151$$++;
       break;
     case 117:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "),L";
-      $code$$7_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.l);";
+      $code$$7_code$$inline_158$$ = "this.setUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.l);";
       $address$$11_address$$inline_151$$++;
       break;
     case 119:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "),A";
-      $code$$7_code$$inline_158$$ = "this.writeMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.a);";
+      $code$$7_code$$inline_158$$ = "this.setUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ", this.a);";
       $address$$11_address$$inline_151$$++;
       break;
     case 124:
@@ -4447,7 +4447,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 126:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "LD A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.a = this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
+      $code$$7_code$$inline_158$$ = "this.a = this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ");";
       $address$$11_address$$inline_151$$++;
       break;
     case 132:
@@ -4459,7 +4459,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 134:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "ADD A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.add_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "));";
+      $code$$7_code$$inline_158$$ = "this.add_a(this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "));";
       $address$$11_address$$inline_151$$++;
       break;
     case 140:
@@ -4471,7 +4471,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 142:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "ADC A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.adc_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "));";
+      $code$$7_code$$inline_158$$ = "this.adc_a(this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "));";
       $address$$11_address$$inline_151$$++;
       break;
     case 148:
@@ -4483,7 +4483,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 150:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "SUB A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.sub_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "));";
+      $code$$7_code$$inline_158$$ = "this.sub_a(this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "));";
       $address$$11_address$$inline_151$$++;
       break;
     case 156:
@@ -4495,7 +4495,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 158:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "SBC A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.sbc_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "));";
+      $code$$7_code$$inline_158$$ = "this.sbc_a(this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "));";
       $address$$11_address$$inline_151$$++;
       break;
     case 164:
@@ -4509,7 +4509,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 166:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "AND A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.f = this.SZP_TABLE[this.a &= this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")] | F_HALFCARRY;";
+      $code$$7_code$$inline_158$$ = "this.f = this.SZP_TABLE[this.a &= this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")] | F_HALFCARRY;";
       $address$$11_address$$inline_151$$++;
       break;
     case 172:
@@ -4523,7 +4523,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 174:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "XOR A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.f = this.SZP_TABLE[this.a ^= this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")];";
+      $code$$7_code$$inline_158$$ = "this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")];";
       $address$$11_address$$inline_151$$++;
       break;
     case 180:
@@ -4537,7 +4537,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 182:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "OR A,(" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.f = this.SZP_TABLE[this.a |= this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")];";
+      $code$$7_code$$inline_158$$ = "this.f = this.SZP_TABLE[this.a |= this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")];";
       $address$$11_address$$inline_151$$++;
       break;
     case 188:
@@ -4551,7 +4551,7 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
     case 190:
       $location$$25_offset$$16$$ = $JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_getIndex$self_opcodesArray$$inline_156$$, $address$$11_address$$inline_151$$);
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "CP (" + $index$$47$$ + "+" + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + ")";
-      $code$$7_code$$inline_158$$ = "this.cp_a(this.readMem(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "));";
+      $code$$7_code$$inline_158$$ = "this.cp_a(this.getUint8(this.get" + $index$$47$$ + "() + " + $opcode$$inline_155_toHex$$4$$($location$$25_offset$$16$$) + "));";
       $address$$11_address$$inline_151$$++;
       break;
     case 203:
@@ -4565,15 +4565,15 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       switch($opcode$$inline_155_toHex$$4$$) {
         case 0:
           $inst$$inline_157_operand$$2$$ = "LD B,RLC (" + $index$$47$$ + ")";
-          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.b = this.rlc(this.readMem(location)); this.writeMem(location, this.b);";
+          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.b = this.rlc(this.getUint8(location)); this.setUint8(location, this.b);";
           break;
         case 1:
           $inst$$inline_157_operand$$2$$ = "LD C,RLC (" + $index$$47$$ + ")";
-          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.c = this.rlc(this.readMem(location)); this.writeMem(location, this.c);";
+          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.c = this.rlc(this.getUint8(location)); this.setUint8(location, this.c);";
           break;
         case 2:
           $inst$$inline_157_operand$$2$$ = "LD D,RLC (" + $index$$47$$ + ")";
-          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.d = this.rlc(this.readMem(location)); this.writeMem(location, this.d);";
+          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.d = this.rlc(this.getUint8(location)); this.setUint8(location, this.d);";
           break;
         case 3:
           $inst$$inline_157_operand$$2$$ = "LD E,RLC (" + $index$$47$$ + ")";
@@ -4586,11 +4586,11 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
           break;
         case 6:
           $inst$$inline_157_operand$$2$$ = "RLC (" + $index$$47$$ + ")";
-          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.writeMem(location, this.rlc(this.readMem(location)));";
+          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.setUint8(location, this.rlc(this.getUint8(location)));";
           break;
         case 7:
           $inst$$inline_157_operand$$2$$ = "LD A,RLC (" + $index$$47$$ + ")";
-          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.a = this.rlc(this.readMem(location)); this.writeMem(location, this.a);";
+          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.a = this.rlc(this.getUint8(location)); this.setUint8(location, this.a);";
           break;
         case 8:
           $inst$$inline_157_operand$$2$$ = "LD B,RRC (" + $index$$47$$ + ")";
@@ -4657,14 +4657,14 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
           break;
         case 29:
           $inst$$inline_157_operand$$2$$ = "LD L,RR (" + $index$$47$$ + ")";
-          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.l = this.rr(this.readMem(location)); this.writeMem(location, this.l);";
+          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.l = this.rr(this.getUint8(location)); this.setUint8(location, this.l);";
           break;
         case 30:
           $inst$$inline_157_operand$$2$$ = "RR (" + $index$$47$$ + ")";
           break;
         case 31:
           $inst$$inline_157_operand$$2$$ = "LD A,RR (" + $index$$47$$ + ")";
-          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.a = this.rr(this.readMem(location)); this.writeMem(location, this.a);";
+          $code$$7_code$$inline_158$$ = $inst$$3_location$$inline_154_toHex$$inline_152$$ + "this.a = this.rr(this.getUint8(location)); this.setUint8(location, this.a);";
           break;
         case 32:
           $inst$$inline_157_operand$$2$$ = "LD B,SLA (" + $index$$47$$ + ")";
@@ -5176,11 +5176,11 @@ function $JSCompiler_StaticMethods_getIndex$$($JSCompiler_StaticMethods_getIndex
       break;
     case 225:
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "POP " + $index$$47$$;
-      $code$$7_code$$inline_158$$ = "this.set" + $index$$47$$ + "(this.readMemWord(this.sp)); this.sp += 0x02;";
+      $code$$7_code$$inline_158$$ = "this.set" + $index$$47$$ + "(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 227:
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "EX SP,(" + $index$$47$$ + ")";
-      $code$$7_code$$inline_158$$ = "temp = this.get" + $index$$47$$ + "();this.set" + $index$$47$$ + "(this.readMemWord(this.sp));this.writeMem(this.sp, temp & 0xFF);this.writeMem(this.sp + 1, temp >> 8);";
+      $code$$7_code$$inline_158$$ = "temp = this.get" + $index$$47$$ + "();this.set" + $index$$47$$ + "(this.getUint16(this.sp));this.setUint8(this.sp, temp & 0xFF);this.setUint8(this.sp + 1, temp >> 8);";
       break;
     case 229:
       $inst$$3_location$$inline_154_toHex$$inline_152$$ = "PUSH " + $index$$47$$;
@@ -5214,7 +5214,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 2:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (BC),A";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(this.getBC(), this.a);";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setUint8(this.getBC(), this.a);";
       break;
     case 3:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "INC BC";
@@ -5248,7 +5248,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 10:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD A,(BC)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.a = this.readMem(this.getBC());";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.a = this.getUint8(this.getBC());";
       break;
     case 11:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "DEC BC";
@@ -5286,7 +5286,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 18:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (DE),A";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(this.getDE(), this.a);";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setUint8(this.getDE(), this.a);";
       break;
     case 19:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "INC DE";
@@ -5322,7 +5322,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 26:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD A,(DE)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.a = this.readMem(this.getDE());";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.a = this.getUint8(this.getDE());";
       break;
     case 27:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "DEC DE";
@@ -5362,7 +5362,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       $currAddr$$inline_165_currAddr$$inline_174_location$$23$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
       $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($currAddr$$inline_165_currAddr$$inline_174_location$$23$$);
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + "),HL";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ", this.l);this.writeMem(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($currAddr$$inline_165_currAddr$$inline_174_location$$23$$ + 1) + ", this.h);";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setUint8(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ", this.l);this.setUint8(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($currAddr$$inline_165_currAddr$$inline_174_location$$23$$ + 1) + ", this.h);";
       $address$$8$$ += 2;
       break;
     case 35:
@@ -5400,7 +5400,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
     case 42:
       $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD HL,(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ")";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setHL(this.readMemWord(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + "));";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setHL(this.getUint16(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + "));";
       $address$$8$$ += 2;
       break;
     case 43:
@@ -5440,7 +5440,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
     case 50:
       $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + "),A";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ", this.a);";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setUint8(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ", this.a);";
       $address$$8$$ += 2;
       break;
     case 51:
@@ -5458,7 +5458,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
     case 54:
       $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom8bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (HL)," + $_inst_inst$$inline_164_inst$$inline_173_operand$$;
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(this.getHL(), " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setUint8(this.getHL(), " + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
       $address$$8$$++;
       break;
     case 55:
@@ -5478,7 +5478,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
     case 58:
       $_inst_inst$$inline_164_inst$$inline_173_operand$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$));
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD A,(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ")";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.a = this.readMem(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.a = this.getUint8(" + $_inst_inst$$inline_164_inst$$inline_173_operand$$ + ");";
       $address$$8$$ += 2;
       break;
     case 59:
@@ -5529,7 +5529,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 70:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD B,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.b = this.readMem(this.getHL());";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.b = this.getUint8(this.getHL());";
       break;
     case 71:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD B,A";
@@ -5561,7 +5561,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 78:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD C,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.c = this.readMem(this.getHL());";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.c = this.getUint8(this.getHL());";
       break;
     case 79:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD C,A";
@@ -5593,7 +5593,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 86:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD D,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.d = this.readMem(this.getHL());";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.d = this.getUint8(this.getHL());";
       break;
     case 87:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD D,A";
@@ -5625,7 +5625,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 94:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD E,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.e = this.readMem(this.getHL());";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.e = this.getUint8(this.getHL());";
       break;
     case 95:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD E,A";
@@ -5657,7 +5657,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 102:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD H,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.h = this.readMem(this.getHL());";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.h = this.getUint8(this.getHL());";
       break;
     case 103:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD H,A";
@@ -5689,7 +5689,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 110:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD L,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.l = this.readMem(this.getHL());";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.l = this.getUint8(this.getHL());";
       break;
     case 111:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD L,A";
@@ -5697,27 +5697,27 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 112:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (HL),B";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(this.getHL(), this.b);";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setUint8(this.getHL(), this.b);";
       break;
     case 113:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (HL),C";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(this.getHL(), this.c);";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setUint8(this.getHL(), this.c);";
       break;
     case 114:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (HL),D";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(this.getHL(), this.d);";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setUint8(this.getHL(), this.d);";
       break;
     case 115:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (HL),E";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(this.getHL(), this.e);";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setUint8(this.getHL(), this.e);";
       break;
     case 116:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (HL),H";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(this.getHL(), this.h);";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setUint8(this.getHL(), this.h);";
       break;
     case 117:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (HL),L";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(this.getHL(), this.l);";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setUint8(this.getHL(), this.l);";
       break;
     case 118:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "HALT";
@@ -5725,7 +5725,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 119:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD (HL),A";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.writeMem(this.getHL(), this.a);";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setUint8(this.getHL(), this.a);";
       break;
     case 120:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD A,B";
@@ -5753,7 +5753,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 126:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD A,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.a = this.readMem(this.getHL());";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.a = this.getUint8(this.getHL());";
       break;
     case 127:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD A,A";
@@ -5785,7 +5785,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 134:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "ADD A,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.add_a(this.readMem(this.getHL()));";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.add_a(this.getUint8(this.getHL()));";
       break;
     case 135:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "ADD A,A";
@@ -5817,7 +5817,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 142:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "ADC A,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.adc_a(this.readMem(this.getHL()));";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.adc_a(this.getUint8(this.getHL()));";
       break;
     case 143:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "ADC A,A";
@@ -5849,7 +5849,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 150:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "SUB A,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.sub_a(this.readMem(this.getHL()));";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.sub_a(this.getUint8(this.getHL()));";
       break;
     case 151:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "SUB A,A";
@@ -5881,7 +5881,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 158:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "SBC A,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.sbc_a(this.readMem(this.getHL()));";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.sbc_a(this.getUint8(this.getHL()));";
       break;
     case 159:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "SBC A,A";
@@ -5913,7 +5913,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 166:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "AND A,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.f = this.SZP_TABLE[this.a &= this.readMem(this.getHL())] | F_HALFCARRY;";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.f = this.SZP_TABLE[this.a &= this.getUint8(this.getHL())] | F_HALFCARRY;";
       break;
     case 167:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "AND A,A";
@@ -5945,7 +5945,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 174:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "XOR A,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getHL())];";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.getHL())];";
       break;
     case 175:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "XOR A,A";
@@ -5977,7 +5977,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 182:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "OR A,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.f = this.SZP_TABLE[this.a |= this.readMem(this.getHL())];";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.f = this.SZP_TABLE[this.a |= this.getUint8(this.getHL())];";
       break;
     case 183:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "OR A,A";
@@ -6009,7 +6009,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 190:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "CP A,(HL)";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.cp_a(this.readMem(this.getHL()));";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.cp_a(this.getUint8(this.getHL()));";
       break;
     case 191:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "CP A,A";
@@ -6017,11 +6017,11 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 192:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET NZ";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) === 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) === 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 193:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "POP BC";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setBC(this.readMemWord(this.sp)); this.sp += 0x02;";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setBC(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 194:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
@@ -6058,11 +6058,11 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 200:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET Z";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 201:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.pc = this.readMemWord(this.sp); this.sp += 0x02; return;";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.pc = this.getUint16(this.sp); this.sp += 0x02; return;";
       $address$$8$$ = null;
       break;
     case 202:
@@ -6102,7 +6102,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 6:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RLC (HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.rlc(this.readMem(this.getHL())));";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.rlc(this.getUint8(this.getHL())));";
           break;
         case 7:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RLC A";
@@ -6134,7 +6134,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 14:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RRC (HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.rrc(this.readMem(this.getHL())));";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.rrc(this.getUint8(this.getHL())));";
           break;
         case 15:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RRC A";
@@ -6166,7 +6166,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 22:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RL (HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.rl(this.readMem(this.getHL())));";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.rl(this.getUint8(this.getHL())));";
           break;
         case 23:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RL A";
@@ -6198,7 +6198,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 30:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RR (HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.rr(this.readMem(this.getHL())));";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.rr(this.getUint8(this.getHL())));";
           break;
         case 31:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RR A";
@@ -6230,7 +6230,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 38:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SLA (HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.sla(this.readMem(this.getHL())));";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.sla(this.getUint8(this.getHL())));";
           break;
         case 39:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SLA A";
@@ -6262,7 +6262,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 46:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SRA (HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.sra(this.readMem(this.getHL())));";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.sra(this.getUint8(this.getHL())));";
           break;
         case 47:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SRA A";
@@ -6294,7 +6294,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 54:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SLL (HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.sll(this.readMem(this.getHL())));";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.sll(this.getUint8(this.getHL())));";
           break;
         case 55:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SLL A";
@@ -6326,7 +6326,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 62:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SRL (HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.srl(this.readMem(this.getHL())));";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.srl(this.getUint8(this.getHL())));";
           break;
         case 63:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SRL A";
@@ -6358,7 +6358,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 70:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 0,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.bit(this.readMem(this.getHL()) & BIT_0);";
+          $code$$inline_166_target$$inline_175$$ = "this.bit(this.getUint8(this.getHL()) & BIT_0);";
           break;
         case 71:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 0,A";
@@ -6390,7 +6390,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 78:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 1,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.bit(this.readMem(this.getHL()) & BIT_1);";
+          $code$$inline_166_target$$inline_175$$ = "this.bit(this.getUint8(this.getHL()) & BIT_1);";
           break;
         case 79:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 1,A";
@@ -6422,7 +6422,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 86:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 2,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.bit(this.readMem(this.getHL()) & BIT_2);";
+          $code$$inline_166_target$$inline_175$$ = "this.bit(this.getUint8(this.getHL()) & BIT_2);";
           break;
         case 87:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 2,A";
@@ -6454,7 +6454,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 94:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 3,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.bit(this.readMem(this.getHL()) & BIT_3);";
+          $code$$inline_166_target$$inline_175$$ = "this.bit(this.getUint8(this.getHL()) & BIT_3);";
           break;
         case 95:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 3,A";
@@ -6486,7 +6486,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 102:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 4,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.bit(this.readMem(this.getHL()) & BIT_4);";
+          $code$$inline_166_target$$inline_175$$ = "this.bit(this.getUint8(this.getHL()) & BIT_4);";
           break;
         case 103:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 4,A";
@@ -6518,7 +6518,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 110:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 5,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.bit(this.readMem(this.getHL()) & BIT_5);";
+          $code$$inline_166_target$$inline_175$$ = "this.bit(this.getUint8(this.getHL()) & BIT_5);";
           break;
         case 111:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 5,A";
@@ -6550,7 +6550,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 118:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 6,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.bit(this.readMem(this.getHL()) & BIT_6);";
+          $code$$inline_166_target$$inline_175$$ = "this.bit(this.getUint8(this.getHL()) & BIT_6);";
           break;
         case 119:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 6,A";
@@ -6582,7 +6582,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 126:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 7,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.bit(this.readMem(this.getHL()) & BIT_7);";
+          $code$$inline_166_target$$inline_175$$ = "this.bit(this.getUint8(this.getHL()) & BIT_7);";
           break;
         case 127:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "BIT 7,A";
@@ -6614,7 +6614,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 134:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 0,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_0);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_0);";
           break;
         case 135:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 0,A";
@@ -6640,7 +6640,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 142:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 1,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_1);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_1);";
           break;
         case 143:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 1,A";
@@ -6665,7 +6665,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 150:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 2,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_2);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_2);";
           break;
         case 151:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 2,A";
@@ -6690,7 +6690,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 158:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 3,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_3);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_3);";
           break;
         case 159:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 3,A";
@@ -6716,7 +6716,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 166:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 4,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_4);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_4);";
           break;
         case 167:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 4,A";
@@ -6742,7 +6742,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 174:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 5,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_5);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_5);";
           break;
         case 175:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 5,A";
@@ -6767,7 +6767,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 182:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 6,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_6);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_6);";
           break;
         case 183:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 6,A";
@@ -6799,7 +6799,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 190:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 7,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_7);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_7);";
           break;
         case 191:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RES 7,A";
@@ -6831,7 +6831,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 198:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 0,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_0);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_0);";
           break;
         case 199:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 0,A";
@@ -6857,7 +6857,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 206:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 1,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_1);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_1);";
           break;
         case 207:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 1,A";
@@ -6882,7 +6882,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 214:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 2,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_2)";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_2)";
           break;
         case 215:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 2,A";
@@ -6907,7 +6907,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 222:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 3,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_3);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_3);";
           break;
         case 223:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 3,A";
@@ -6932,7 +6932,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 230:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 4,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_4);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_4);";
           break;
         case 231:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 4,A";
@@ -6958,7 +6958,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 238:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 5,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_5);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_5);";
           break;
         case 239:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 5,A";
@@ -6990,7 +6990,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 246:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 6,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_6);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_6);";
           break;
         case 247:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 6,A";
@@ -7022,7 +7022,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 254:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 7,(HL)";
-          $code$$inline_166_target$$inline_175$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_7);";
+          $code$$inline_166_target$$inline_175$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_7);";
           break;
         case 255:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "SET 7,A", $code$$inline_166_target$$inline_175$$ = "this.a |= BIT_7;";
@@ -7058,11 +7058,11 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 208:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET NC";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) === 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) === 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 209:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "POP DE";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setDE(this.readMemWord(this.sp)); this.sp += 0x02;";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setDE(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 210:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
@@ -7099,7 +7099,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 216:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET C";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 217:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "EXX";
@@ -7143,11 +7143,11 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 224:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET PO";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_PARITY) === 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_PARITY) === 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 225:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "POP HL";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setHL(this.readMemWord(this.sp)); this.sp += 0x02;";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setHL(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 226:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
@@ -7157,7 +7157,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 227:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "EX (SP),HL";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "temp = this.h;this.h = this.readMem(this.sp + 0x01);this.writeMem(this.sp + 0x01, temp);temp = this.l;this.l = this.readMem(this.sp);this.writeMem(this.sp, temp);";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "temp = this.h;this.h = this.getUint8(this.sp + 0x01);this.setUint8(this.sp + 0x01, temp);temp = this.l;this.l = this.getUint8(this.sp);this.setUint8(this.sp, temp);";
       break;
     case 228:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
@@ -7182,7 +7182,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 232:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET PE";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_PARITY) !== 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_PARITY) !== 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 233:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "JP (HL)";
@@ -7226,7 +7226,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           $location$$inline_178$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
           $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$);
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD (" + $operand$$inline_177$$ + "),BC";
-          $code$$inline_176$$ = "this.writeMem(" + $operand$$inline_177$$ + ", this.c);this.writeMem(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.b);";
+          $code$$inline_176$$ = "this.setUint8(" + $operand$$inline_177$$ + ", this.c);this.setUint8(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.b);";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
           break;
         case 68:
@@ -7263,7 +7263,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
         ;
         case 125:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RETN / RETI";
-          $code$$inline_176$$ = "this.pc = this.readMemWord(this.sp);this.sp += 0x02;this.iff1 = this.iff2;return;";
+          $code$$inline_176$$ = "this.pc = this.getUint16(this.sp);this.sp += 0x02;this.iff1 = this.iff2;return;";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = null;
           break;
         case 70:
@@ -7295,7 +7295,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
         case 75:
           $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$));
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD BC,(" + $operand$$inline_177$$ + ")";
-          $code$$inline_176$$ = "this.setBC(this.readMemWord(" + $operand$$inline_177$$ + "));";
+          $code$$inline_176$$ = "this.setBC(this.getUint16(" + $operand$$inline_177$$ + "));";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
           break;
         case 79:
@@ -7318,7 +7318,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           $location$$inline_178$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
           $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$);
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD (" + $operand$$inline_177$$ + "),DE";
-          $code$$inline_176$$ = "this.writeMem(" + $operand$$inline_177$$ + ", this.e);this.writeMem(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.d);";
+          $code$$inline_176$$ = "this.setUint8(" + $operand$$inline_177$$ + ", this.e);this.setUint8(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.d);";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
           break;
         case 86:
@@ -7346,7 +7346,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
         case 91:
           $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$));
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD DE,(" + $operand$$inline_177$$ + ")";
-          $code$$inline_176$$ = "this.setDE(this.readMemWord(" + $operand$$inline_177$$ + "));";
+          $code$$inline_176$$ = "this.setDE(this.getUint16(" + $operand$$inline_177$$ + "));";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
           break;
         case 95:
@@ -7369,12 +7369,12 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           $location$$inline_178$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
           $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$);
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD (" + $operand$$inline_177$$ + "),HL";
-          $code$$inline_176$$ = "this.writeMem(" + $operand$$inline_177$$ + ", this.l);this.writeMem(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.h);";
+          $code$$inline_176$$ = "this.setUint8(" + $operand$$inline_177$$ + ", this.l);this.setUint8(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.h);";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
           break;
         case 103:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RRD";
-          $code$$inline_176$$ = "var location = this.getHL();temp = this.readMem(location);this.writeMem(location, (temp >> 4) | ((this.a & 0x0F) << 4));this.a = (this.a & 0xF0) | (temp & 0x0F);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
+          $code$$inline_176$$ = "var location = this.getHL();temp = this.getUint8(location);this.setUint8(location, (temp >> 4) | ((this.a & 0x0F) << 4));this.a = (this.a & 0xF0) | (temp & 0x0F);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
           break;
         case 104:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "IN L,(C)";
@@ -7391,12 +7391,12 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
         case 107:
           $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$));
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD HL,(" + $operand$$inline_177$$ + ")";
-          $code$$inline_176$$ = "this.setHL(this.readMemWord(" + $operand$$inline_177$$ + "));";
+          $code$$inline_176$$ = "this.setHL(this.getUint16(" + $operand$$inline_177$$ + "));";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
           break;
         case 111:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "RLD";
-          $code$$inline_176$$ = "var location = this.getHL();temp = this.readMem(location);this.writeMem(location, (temp & 0x0F) << 4 | (this.a & 0x0F));this.a = (this.a & 0xF0) | (temp >> 4);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
+          $code$$inline_176$$ = "var location = this.getHL();temp = this.getUint8(location);this.setUint8(location, (temp & 0x0F) << 4 | (this.a & 0x0F));this.a = (this.a & 0xF0) | (temp >> 4);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
           break;
         case 113:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "OUT (C),0";
@@ -7410,7 +7410,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           $location$$inline_178$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$);
           $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$);
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD (" + $operand$$inline_177$$ + "),SP";
-          $code$$inline_176$$ = "this.writeMem(" + $operand$$inline_177$$ + ", this.sp & 0xFF);this.writeMem(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.sp >> 8);";
+          $code$$inline_176$$ = "this.setUint8(" + $operand$$inline_177$$ + ", this.sp & 0xFF);this.setUint8(" + $address$$inline_161_toHex$$2_toHex$$inline_170$$($location$$inline_178$$ + 1) + ", this.sp >> 8);";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
           break;
         case 120:
@@ -7428,24 +7428,24 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
         case 123:
           $operand$$inline_177$$ = $address$$inline_161_toHex$$2_toHex$$inline_170$$($JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$inline_169_hexOpcodes$$inline_184_target$$46$$));
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LD SP,(" + $operand$$inline_177$$ + ")";
-          $code$$inline_176$$ = "this.sp = this.readMemWord(" + $operand$$inline_177$$ + ");";
+          $code$$inline_176$$ = "this.sp = this.getUint16(" + $operand$$inline_177$$ + ");";
           $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ += 2;
           break;
         case 160:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LDI";
-          $code$$inline_176$$ = "temp = this.readMem(this.getHL());this.writeMem(this.getDE(), temp);this.decBC();this.incDE();this.incHL();temp = (temp + this.a) & 0xFF;this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);";
+          $code$$inline_176$$ = "temp = this.getUint8(this.getHL());this.setUint8(this.getDE(), temp);this.decBC();this.incDE();this.incHL();temp = (temp + this.a) & 0xFF;this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);";
           break;
         case 161:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "CPI";
-          $code$$inline_176$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.readMem(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);this.f = (this.f & 0xF8) | temp;";
+          $code$$inline_176$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.getUint8(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);this.f = (this.f & 0xF8) | temp;";
           break;
         case 162:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "INI";
-          $code$$inline_176$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+          $code$$inline_176$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
           break;
         case 163:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "OUTI";
-          $code$$inline_176$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.incHL();this.b = this.dec8(this.b);if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+          $code$$inline_176$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.incHL();this.b = this.dec8(this.b);if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
           break;
         case 168:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LDD";
@@ -7455,32 +7455,32 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
           break;
         case 170:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "IND";
-          $code$$inline_176$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+          $code$$inline_176$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
           break;
         case 171:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "OUTD";
-          $code$$inline_176$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.decHL();this.b = this.dec8(this.b);if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+          $code$$inline_176$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.decHL();this.b = this.dec8(this.b);if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
           break;
         case 176:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "LDIR";
           $code$$inline_166_target$$inline_175$$ = $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ - 2;
-          $code$$inline_176$$ = "this.writeMem(this.getDE(), this.readMem(this.getHL()));this.incDE();this.incHL();this.decBC();if (this.getBC() !== 0x00) {this.tstates -= 0x05;this.f |= F_PARITY;return;} else {this.f &= ~ F_PARITY;}this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
+          $code$$inline_176$$ = "this.setUint8(this.getDE(), this.getUint8(this.getHL()));this.incDE();this.incHL();this.decBC();if (this.getBC() !== 0x00) {this.tstates -= 0x05;this.f |= F_PARITY;return;} else {this.f &= ~ F_PARITY;}this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
           break;
         case 177:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "CPIR";
           $code$$inline_166_target$$inline_175$$ = $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ - 2;
-          $code$$inline_176$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.readMem(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);" + ("if ((temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($code$$inline_166_target$$inline_175$$) + ";return;}");
+          $code$$inline_176$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.getUint8(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);" + ("if ((temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00) {this.tstates -= 0x05;this.pc = " + $address$$inline_161_toHex$$2_toHex$$inline_170$$($code$$inline_166_target$$inline_175$$) + ";return;}");
           $code$$inline_176$$ += "this.f = (this.f & 0xF8) | temp;";
           break;
         case 178:
           $code$$inline_166_target$$inline_175$$ = $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ - 2;
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "INIR";
-          $code$$inline_176$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+          $code$$inline_176$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
           break;
         case 179:
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "OTIR";
           $code$$inline_166_target$$inline_175$$ = $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ - 2;
-          $code$$inline_176$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}";
+          $code$$inline_176$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}";
           $code$$inline_176$$ += "if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
           break;
         case 184:
@@ -7492,10 +7492,10 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
         case 186:
           $code$$inline_166_target$$inline_175$$ = $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ - 2;
           $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "INDR";
-          $code$$inline_176$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+          $code$$inline_176$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
           break;
         case 187:
-          $code$$inline_166_target$$inline_175$$ = $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ - 2, $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "OTDR", $code$$inline_176$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+          $code$$inline_166_target$$inline_175$$ = $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ - 2, $_inst_inst$$inline_164_inst$$inline_173_operand$$ = "OTDR", $code$$inline_176$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       }
       $_inst_inst$$inline_164_inst$$inline_173_operand$$ = {$opcode$:$inst_opcode$$inline_162_opcode$$inline_171$$, $opcodes$:$code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$, $inst$:$_inst_inst$$inline_164_inst$$inline_173_operand$$, code:$code$$inline_176$$, $address$:$currAddr$$inline_165_currAddr$$inline_174_location$$23$$, $nextAddress$:$address$$inline_169_hexOpcodes$$inline_184_target$$46$$, target:$code$$inline_166_target$$inline_175$$};
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $_inst_inst$$inline_164_inst$$inline_173_operand$$.target;
@@ -7517,11 +7517,11 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 240:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET P";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_SIGN) === 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_SIGN) === 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 241:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "POP AF";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setAF(this.readMemWord(this.sp)); this.sp += 0x02;";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "this.setAF(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 242:
       $address$$inline_169_hexOpcodes$$inline_184_target$$46$$ = $JSCompiler_StaticMethods_readRom16bit$$($JSCompiler_StaticMethods_disassemble$self$$, $address$$8$$);
@@ -7556,7 +7556,7 @@ function $JSCompiler_StaticMethods_disassemble$$($JSCompiler_StaticMethods_disas
       break;
     case 248:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "RET M";
-      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_SIGN) !== 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$4_opcodesArray$$inline_163_opcodesArray$$inline_172$$ = "if ((this.f & F_SIGN) !== 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 249:
       $inst_opcode$$inline_162_opcode$$inline_171$$ = "LD SP,HL";
@@ -9215,13 +9215,13 @@ var $o$$ = {$SET16$:function($register1$$, $register2$$, $value$$90$$) {
   $JSSMS$Utils$$.console.error("Wrong parameters number");
 }, $LD_WRITE_MEM$:function($srcRegister1$$1$$, $srcRegister2$$1$$, $dstRegister1$$3$$, $dstRegister2$$3$$) {
   return void 0 === $dstRegister1$$3$$ && void 0 === $dstRegister2$$3$$ ? function($value$$96$$) {
-    return $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$CallExpression$$("get" + ($srcRegister1$$1$$ + $srcRegister2$$1$$).toUpperCase()), $n$Literal$$($value$$96$$)]));
+    return $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$CallExpression$$("get" + ($srcRegister1$$1$$ + $srcRegister2$$1$$).toUpperCase()), $n$Literal$$($value$$96$$)]));
   } : "n" === $srcRegister1$$1$$ && "n" === $srcRegister2$$1$$ && void 0 === $dstRegister2$$3$$ ? function($value$$97$$) {
-    return $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$Literal$$($value$$97$$), $n$Register$$($dstRegister1$$3$$)]));
+    return $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$Literal$$($value$$97$$), $n$Register$$($dstRegister1$$3$$)]));
   } : "n" === $srcRegister1$$1$$ && "n" === $srcRegister2$$1$$ ? function($value$$98$$) {
-    return[$n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$Literal$$($value$$98$$), $n$Register$$($dstRegister2$$3$$)])), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$Literal$$($value$$98$$ + 1), $n$Register$$($dstRegister1$$3$$)]))];
+    return[$n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$Literal$$($value$$98$$), $n$Register$$($dstRegister2$$3$$)])), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$Literal$$($value$$98$$ + 1), $n$Register$$($dstRegister1$$3$$)]))];
   } : function() {
-    return $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$CallExpression$$("get" + ($srcRegister1$$1$$ + $srcRegister2$$1$$).toUpperCase()), $n$Register$$($dstRegister1$$3$$)]));
+    return $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$CallExpression$$("get" + ($srcRegister1$$1$$ + $srcRegister2$$1$$).toUpperCase()), $n$Register$$($dstRegister1$$3$$)]));
   };
 }, $LD_SP$:function($register1$$2$$, $register2$$2$$) {
   return void 0 === $register1$$2$$ && void 0 === $register2$$2$$ ? function($value$$99$$) {
@@ -9231,9 +9231,9 @@ var $o$$ = {$SET16$:function($register1$$, $register2$$, $value$$90$$) {
   };
 }, $LD_NN$:function($register1$$3$$, $register2$$3$$) {
   return void 0 === $register2$$3$$ ? function($value$$100$$) {
-    return[$n$ExpressionStatement$$($n$CallExpression$$("writeMem", $n$Literal$$($value$$100$$))), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", $n$Literal$$($value$$100$$ + 1)))];
+    return[$n$ExpressionStatement$$($n$CallExpression$$("setUint8", $n$Literal$$($value$$100$$))), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", $n$Literal$$($value$$100$$ + 1)))];
   } : function($value$$101$$) {
-    return[$n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$Literal$$($value$$101$$), $n$Register$$($register2$$3$$)])), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$Literal$$($value$$101$$ + 1), $n$Register$$($register1$$3$$)]))];
+    return[$n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$Literal$$($value$$101$$), $n$Register$$($register2$$3$$)])), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$Literal$$($value$$101$$ + 1), $n$Register$$($register1$$3$$)]))];
   };
 }, $INC8$:function($register1$$4$$, $register2$$4$$) {
   return void 0 === $register2$$4$$ ? function() {
@@ -9461,8 +9461,8 @@ var $o$$ = {$SET16$:function($register1$$, $register2$$, $value$$90$$) {
   };
 }, $EX_SP_HL$:function() {
   return function() {
-    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $n$Register$$("h"))), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Register$$("h"), $o$$.$READ_MEM8$($n$BinaryExpression$$("+", $n$Identifier$$("sp"), $n$Literal$$(1))))), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$BinaryExpression$$("+", $n$Identifier$$("sp"), $n$Literal$$(1)), $n$Identifier$$("temp")])), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), 
-    $n$Register$$("l"))), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Register$$("l"), $o$$.$READ_MEM8$($n$Identifier$$("sp")))), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$Identifier$$("sp"), $n$Identifier$$("temp")]))];
+    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $n$Register$$("h"))), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Register$$("h"), $o$$.$READ_MEM8$($n$BinaryExpression$$("+", $n$Identifier$$("sp"), $n$Literal$$(1))))), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$BinaryExpression$$("+", $n$Identifier$$("sp"), $n$Literal$$(1)), $n$Identifier$$("temp")])), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"),
+    $n$Register$$("l"))), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Register$$("l"), $o$$.$READ_MEM8$($n$Identifier$$("sp")))), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$Identifier$$("sp"), $n$Identifier$$("temp")]))];
   };
 }, $HALT$:function() {
   return function($ret_value$$126$$, $target$$71$$, $nextAddress$$14$$) {
@@ -9482,23 +9482,23 @@ var $o$$ = {$SET16$:function($register1$$, $register2$$, $value$$90$$) {
   return void 0 === $register2$$22$$ ? function() {
     return $n$ExpressionStatement$$($n$AssignmentExpression$$("&=", $n$Register$$($register1$$22$$), $n$UnaryExpression$$("~", $n$Bit$$($bit$$2$$))));
   } : "h" === $register1$$22$$ && "l" === $register2$$22$$ ? function() {
-    return $n$ExpressionStatement$$($n$CallExpression$$("writeMem", $n$CallExpression$$("get" + ($register1$$22$$ + $register2$$22$$).toUpperCase()), $n$BinaryExpression$$("&", $o$$.$READ_MEM8$($n$CallExpression$$("get" + ($register1$$22$$ + $register2$$22$$).toUpperCase())), $n$UnaryExpression$$("~", $n$Bit$$($bit$$2$$)))));
+    return $n$ExpressionStatement$$($n$CallExpression$$("setUint8", $n$CallExpression$$("get" + ($register1$$22$$ + $register2$$22$$).toUpperCase()), $n$BinaryExpression$$("&", $o$$.$READ_MEM8$($n$CallExpression$$("get" + ($register1$$22$$ + $register2$$22$$).toUpperCase())), $n$UnaryExpression$$("~", $n$Bit$$($bit$$2$$)))));
   } : function($value$$128$$) {
-    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("location"), $n$BinaryExpression$$("&", $n$BinaryExpression$$("+", $n$CallExpression$$("get" + ($register1$$22$$ + $register2$$22$$).toUpperCase()), $n$Literal$$($value$$128$$)), $n$Literal$$(65535)))), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$Identifier$$("location"), $n$BinaryExpression$$("&", $o$$.$READ_MEM8$($n$Identifier$$("location")), $n$UnaryExpression$$("~", $n$Bit$$($bit$$2$$)))]))];
+    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("location"), $n$BinaryExpression$$("&", $n$BinaryExpression$$("+", $n$CallExpression$$("get" + ($register1$$22$$ + $register2$$22$$).toUpperCase()), $n$Literal$$($value$$128$$)), $n$Literal$$(65535)))), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$Identifier$$("location"), $n$BinaryExpression$$("&", $o$$.$READ_MEM8$($n$Identifier$$("location")), $n$UnaryExpression$$("~", $n$Bit$$($bit$$2$$)))]))];
   };
 }, $SET$:function($bit$$3$$, $register1$$23$$, $register2$$23$$) {
   return void 0 === $register2$$23$$ ? function() {
     return $n$ExpressionStatement$$($n$AssignmentExpression$$("|=", $n$Register$$($register1$$23$$), $n$Bit$$($bit$$3$$)));
   } : "h" === $register1$$23$$ && "l" === $register2$$23$$ ? function() {
-    return $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$CallExpression$$("get" + ($register1$$23$$ + $register2$$23$$).toUpperCase()), $n$BinaryExpression$$("|", $o$$.$READ_MEM8$($n$CallExpression$$("get" + ($register1$$23$$ + $register2$$23$$).toUpperCase())), $n$Bit$$($bit$$3$$))]));
+    return $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$CallExpression$$("get" + ($register1$$23$$ + $register2$$23$$).toUpperCase()), $n$BinaryExpression$$("|", $o$$.$READ_MEM8$($n$CallExpression$$("get" + ($register1$$23$$ + $register2$$23$$).toUpperCase())), $n$Bit$$($bit$$3$$))]));
   } : function($value$$129$$) {
-    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("location"), $n$BinaryExpression$$("&", $n$BinaryExpression$$("+", $n$CallExpression$$("get" + ($register1$$23$$ + $register2$$23$$).toUpperCase()), $n$Literal$$($value$$129$$)), $n$Literal$$(65535)))), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$Identifier$$("location"), $n$BinaryExpression$$("|", $o$$.$READ_MEM8$($n$Identifier$$("location")), $n$Bit$$($bit$$3$$))]))];
+    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("location"), $n$BinaryExpression$$("&", $n$BinaryExpression$$("+", $n$CallExpression$$("get" + ($register1$$23$$ + $register2$$23$$).toUpperCase()), $n$Literal$$($value$$129$$)), $n$Literal$$(65535)))), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$Identifier$$("location"), $n$BinaryExpression$$("|", $o$$.$READ_MEM8$($n$Identifier$$("location")), $n$Bit$$($bit$$3$$))]))];
   };
 }, $LD_X$:function($register1$$24$$, $register2$$24$$, $register3$$1$$) {
   return void 0 === $register3$$1$$ ? function($value$$130$$) {
-    return[$n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$BinaryExpression$$("+", $n$CallExpression$$("get" + ($register1$$24$$ + $register2$$24$$).toUpperCase()), $n$Literal$$($value$$130$$ & 255)), $n$Literal$$($value$$130$$ >> 8)]))];
+    return[$n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$BinaryExpression$$("+", $n$CallExpression$$("get" + ($register1$$24$$ + $register2$$24$$).toUpperCase()), $n$Literal$$($value$$130$$ & 255)), $n$Literal$$($value$$130$$ >> 8)]))];
   } : function($value$$131$$) {
-    return[$n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$BinaryExpression$$("+", $n$CallExpression$$("get" + ($register2$$24$$ + $register3$$1$$).toUpperCase()), $n$Literal$$($value$$131$$)), $n$Register$$($register1$$24$$)]))];
+    return[$n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$BinaryExpression$$("+", $n$CallExpression$$("get" + ($register2$$24$$ + $register3$$1$$).toUpperCase()), $n$Literal$$($value$$131$$)), $n$Register$$($register1$$24$$)]))];
   };
 }, $INC_X$:function($register1$$25$$, $register2$$25$$) {
   return function($value$$132$$) {
@@ -9542,7 +9542,7 @@ var $o$$ = {$SET16$:function($register1$$, $register2$$, $value$$90$$) {
   };
 }, $EX_SP_X$:function($register1$$35$$, $register2$$35$$) {
   return function() {
-    return[].concat($n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $n$CallExpression$$("get" + ($register1$$35$$ + $register2$$35$$).toUpperCase()))), $o$$.$SET16$($register1$$35$$, $register2$$35$$, $o$$.$READ_MEM16$($n$Identifier$$("sp"))), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$Identifier$$("sp"), $n$BinaryExpression$$("&", $n$Identifier$$("temp"), $n$Literal$$(255))])), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$BinaryExpression$$("+", 
+    return[].concat($n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $n$CallExpression$$("get" + ($register1$$35$$ + $register2$$35$$).toUpperCase()))), $o$$.$SET16$($register1$$35$$, $register2$$35$$, $o$$.$READ_MEM16$($n$Identifier$$("sp"))), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$Identifier$$("sp"), $n$BinaryExpression$$("&", $n$Identifier$$("temp"), $n$Literal$$(255))])), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$BinaryExpression$$("+",
     $n$Identifier$$("sp"), $n$Literal$$(1)), $n$BinaryExpression$$(">>", $n$Identifier$$("sp"), $n$Literal$$(8))])));
   };
 }, $JP_X$:function($register1$$36$$, $register2$$36$$) {
@@ -9579,7 +9579,7 @@ var $o$$ = {$SET16$:function($register1$$, $register2$$, $value$$90$$) {
   };
 }, $INI$:function() {
   return function() {
-    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $n$CallExpression$$("port.in_", $n$Register$$("c")))), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$CallExpression$$("getHL"), $n$Identifier$$("temp")])), $o$$.$DEC8$("b")(), $n$ExpressionStatement$$($n$CallExpression$$("incHL")), $n$IfStatement$$($n$BinaryExpression$$("===", $n$BinaryExpression$$("&", $n$Identifier$$("temp"), $n$Literal$$(128)), $n$Literal$$(128)), $n$BlockStatement$$($n$ExpressionStatement$$($n$AssignmentExpression$$("|=", 
+    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $n$CallExpression$$("port.in_", $n$Register$$("c")))), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$CallExpression$$("getHL"), $n$Identifier$$("temp")])), $o$$.$DEC8$("b")(), $n$ExpressionStatement$$($n$CallExpression$$("incHL")), $n$IfStatement$$($n$BinaryExpression$$("===", $n$BinaryExpression$$("&", $n$Identifier$$("temp"), $n$Literal$$(128)), $n$Literal$$(128)), $n$BlockStatement$$($n$ExpressionStatement$$($n$AssignmentExpression$$("|=",
     $n$Register$$("f"), $n$Literal$$(2)))), $n$BlockStatement$$($n$ExpressionStatement$$($n$AssignmentExpression$$("&=", $n$Register$$("f"), $n$UnaryExpression$$("~", $n$Literal$$(2))))))];
   };
 }, $OUTI$:function() {
@@ -9596,7 +9596,7 @@ var $o$$ = {$SET16$:function($register1$$, $register2$$, $value$$90$$) {
   };
 }, $LDI$:function() {
   return function() {
-    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $o$$.$READ_MEM8$($n$CallExpression$$("getHL")))), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$CallExpression$$("getDE"), $n$Identifier$$("temp")])), $n$ExpressionStatement$$($n$CallExpression$$("decBC")), $n$ExpressionStatement$$($n$CallExpression$$("incDE")), $n$ExpressionStatement$$($n$CallExpression$$("incHL")), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), 
+    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $o$$.$READ_MEM8$($n$CallExpression$$("getHL")))), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$CallExpression$$("getDE"), $n$Identifier$$("temp")])), $n$ExpressionStatement$$($n$CallExpression$$("decBC")), $n$ExpressionStatement$$($n$CallExpression$$("incDE")), $n$ExpressionStatement$$($n$CallExpression$$("incHL")), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"),
     $n$BinaryExpression$$("&", $n$BinaryExpression$$("+", $n$Identifier$$("temp"), $n$Register$$("a")), $n$Literal$$(255)))), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Register$$("f"), $n$BinaryExpression$$("|", $n$BinaryExpression$$("|", $n$BinaryExpression$$("|", $n$BinaryExpression$$("&", $n$Register$$("f"), $n$Literal$$(193)), $n$ConditionalExpression$$($n$CallExpression$$("getBC"), $n$Literal$$(4), $n$Literal$$(0))), $n$BinaryExpression$$("&", $n$Identifier$$("temp"), $n$Literal$$(8))), 
     $n$ConditionalExpression$$($n$BinaryExpression$$("&", $n$Identifier$$("temp"), $n$Literal$$(2)), $n$Literal$$(32), $n$Literal$$(0)))))];
   };
@@ -9607,13 +9607,13 @@ var $o$$ = {$SET16$:function($register1$$, $register2$$, $value$$90$$) {
   };
 }, $LDD$:function() {
   return function() {
-    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $o$$.$READ_MEM8$($n$CallExpression$$("getHL")))), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$CallExpression$$("getDE"), $n$Identifier$$("temp")])), $n$ExpressionStatement$$($n$CallExpression$$("decBC")), $n$ExpressionStatement$$($n$CallExpression$$("decDE")), $n$ExpressionStatement$$($n$CallExpression$$("decHL")), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), 
+    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $o$$.$READ_MEM8$($n$CallExpression$$("getHL")))), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$CallExpression$$("getDE"), $n$Identifier$$("temp")])), $n$ExpressionStatement$$($n$CallExpression$$("decBC")), $n$ExpressionStatement$$($n$CallExpression$$("decDE")), $n$ExpressionStatement$$($n$CallExpression$$("decHL")), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"),
     $n$BinaryExpression$$("&", $n$BinaryExpression$$("+", $n$Identifier$$("temp"), $n$Register$$("a")), $n$Literal$$(255)))), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Register$$("f"), $n$BinaryExpression$$("|", $n$BinaryExpression$$("|", $n$BinaryExpression$$("|", $n$BinaryExpression$$("&", $n$Register$$("f"), $n$Literal$$(193)), $n$ConditionalExpression$$($n$CallExpression$$("getBC"), $n$Literal$$(4), $n$Literal$$(0))), $n$BinaryExpression$$("&", $n$Identifier$$("temp"), $n$Literal$$(8))), 
     $n$ConditionalExpression$$($n$BinaryExpression$$("&", $n$Identifier$$("temp"), $n$Literal$$(2)), $n$Literal$$(32), $n$Literal$$(0)))))];
   };
 }, $LDIR$:function() {
   return function() {
-    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $o$$.$READ_MEM8$($n$CallExpression$$("getHL")))), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$CallExpression$$("getDE"), $n$Identifier$$("temp")])), $n$ExpressionStatement$$($n$CallExpression$$("decBC")), $n$ExpressionStatement$$($n$CallExpression$$("incDE")), $n$ExpressionStatement$$($n$CallExpression$$("incHL")), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), 
+    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $o$$.$READ_MEM8$($n$CallExpression$$("getHL")))), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$CallExpression$$("getDE"), $n$Identifier$$("temp")])), $n$ExpressionStatement$$($n$CallExpression$$("decBC")), $n$ExpressionStatement$$($n$CallExpression$$("incDE")), $n$ExpressionStatement$$($n$CallExpression$$("incHL")), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"),
     $n$BinaryExpression$$("&", $n$BinaryExpression$$("+", $n$Identifier$$("temp"), $n$Register$$("a")), $n$Literal$$(255)))), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Register$$("f"), $n$BinaryExpression$$("|", $n$BinaryExpression$$("|", $n$BinaryExpression$$("|", $n$BinaryExpression$$("&", $n$Register$$("f"), $n$Literal$$(193)), $n$ConditionalExpression$$($n$CallExpression$$("getBC"), $n$Literal$$(4), $n$Literal$$(0))), $n$BinaryExpression$$("&", $n$Identifier$$("temp"), $n$Literal$$(8))), 
     $n$ConditionalExpression$$($n$BinaryExpression$$("&", $n$Identifier$$("temp"), $n$Literal$$(2)), $n$Literal$$(32), $n$Literal$$(0))))), $n$IfStatement$$($n$BinaryExpression$$("!==", $n$CallExpression$$("getBC"), $n$Literal$$(0)), $n$BlockStatement$$([$n$ExpressionStatement$$($n$AssignmentExpression$$("-=", $n$Identifier$$("tstates"), $n$Literal$$(5))), $n$ReturnStatement$$()]))];
   };
@@ -9633,30 +9633,30 @@ var $o$$ = {$SET16$:function($register1$$, $register2$$, $value$$90$$) {
   };
 }, $LDDR$:function() {
   return function() {
-    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $o$$.$READ_MEM8$($n$CallExpression$$("getHL")))), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$CallExpression$$("getDE"), $n$Identifier$$("temp")])), $n$ExpressionStatement$$($n$CallExpression$$("decBC")), $n$ExpressionStatement$$($n$CallExpression$$("decDE")), $n$ExpressionStatement$$($n$CallExpression$$("decHL")), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), 
+    return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"), $o$$.$READ_MEM8$($n$CallExpression$$("getHL")))), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$CallExpression$$("getDE"), $n$Identifier$$("temp")])), $n$ExpressionStatement$$($n$CallExpression$$("decBC")), $n$ExpressionStatement$$($n$CallExpression$$("decDE")), $n$ExpressionStatement$$($n$CallExpression$$("decHL")), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("temp"),
     $n$BinaryExpression$$("&", $n$BinaryExpression$$("+", $n$Identifier$$("temp"), $n$Register$$("a")), $n$Literal$$(255)))), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Register$$("f"), $n$BinaryExpression$$("|", $n$BinaryExpression$$("|", $n$BinaryExpression$$("|", $n$BinaryExpression$$("&", $n$Register$$("f"), $n$Literal$$(193)), $n$ConditionalExpression$$($n$CallExpression$$("getBC"), $n$Literal$$(4), $n$Literal$$(0))), $n$BinaryExpression$$("&", $n$Identifier$$("temp"), $n$Literal$$(8))), 
     $n$ConditionalExpression$$($n$BinaryExpression$$("&", $n$Identifier$$("temp"), $n$Literal$$(2)), $n$Literal$$(32), $n$Literal$$(0))))), $n$IfStatement$$($n$BinaryExpression$$("!==", $n$CallExpression$$("getBC"), $n$Literal$$(0)), $n$BlockStatement$$([$n$ExpressionStatement$$($n$AssignmentExpression$$("-=", $n$Identifier$$("tstates"), $n$Literal$$(5))), $n$ReturnStatement$$()]))];
   };
 }, LD_RLC:$generateIndexCBFunctions$$("rlc"), LD_RRC:$generateIndexCBFunctions$$("rrc"), LD_RL:$generateIndexCBFunctions$$("rl"), LD_RR:$generateIndexCBFunctions$$("rr"), LD_SLA:$generateIndexCBFunctions$$("sla"), LD_SRA:$generateIndexCBFunctions$$("sra"), LD_SLL:$generateIndexCBFunctions$$("sll"), LD_SRL:$generateIndexCBFunctions$$("srl"), $READ_MEM8$:function($value$$156$$) {
-  return $n$CallExpression$$("readMem", $value$$156$$);
+  return $n$CallExpression$$("getUint8", $value$$156$$);
 }, $READ_MEM16$:function($value$$157$$) {
-  return $n$CallExpression$$("readMemWord", $value$$157$$);
+  return $n$CallExpression$$("getUint16", $value$$157$$);
 }};
 function $generateCBFunctions$$($fn$$3$$) {
   return function($register1$$39$$, $register2$$39$$) {
     return void 0 === $register2$$39$$ ? function() {
       return $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Register$$($register1$$39$$), $n$CallExpression$$($fn$$3$$, $n$Register$$($register1$$39$$))));
     } : function() {
-      return $n$ExpressionStatement$$($n$CallExpression$$("writeMem", $n$CallExpression$$("get" + ($register1$$39$$ + $register2$$39$$).toUpperCase()), $n$CallExpression$$($fn$$3$$, $o$$.$READ_MEM8$($n$CallExpression$$("get" + ($register1$$39$$ + $register2$$39$$).toUpperCase())))));
+      return $n$ExpressionStatement$$($n$CallExpression$$("setUint8", $n$CallExpression$$("get" + ($register1$$39$$ + $register2$$39$$).toUpperCase()), $n$CallExpression$$($fn$$3$$, $o$$.$READ_MEM8$($n$CallExpression$$("get" + ($register1$$39$$ + $register2$$39$$).toUpperCase())))));
     };
   };
 }
 function $generateIndexCBFunctions$$($fn$$4$$) {
   return function($register1$$40$$, $register2$$40$$, $register3$$2$$) {
     return void 0 === $register3$$2$$ ? function($value$$158$$) {
-      return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("location"), $n$BinaryExpression$$("&", $n$BinaryExpression$$("+", $n$CallExpression$$("get" + ($register1$$40$$ + $register2$$40$$).toUpperCase()), $n$Literal$$($value$$158$$)), $n$Literal$$(65535)))), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", [$n$Identifier$$("location"), $n$CallExpression$$($fn$$4$$, $o$$.$READ_MEM8$($n$Identifier$$("location")))]))];
+      return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("location"), $n$BinaryExpression$$("&", $n$BinaryExpression$$("+", $n$CallExpression$$("get" + ($register1$$40$$ + $register2$$40$$).toUpperCase()), $n$Literal$$($value$$158$$)), $n$Literal$$(65535)))), $n$ExpressionStatement$$($n$CallExpression$$("setUint8", [$n$Identifier$$("location"), $n$CallExpression$$($fn$$4$$, $o$$.$READ_MEM8$($n$Identifier$$("location")))]))];
     } : function($value$$159$$) {
-      return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("location"), $n$BinaryExpression$$("&", $n$BinaryExpression$$("+", $n$CallExpression$$("get" + ($register1$$40$$ + $register2$$40$$).toUpperCase()), $n$Literal$$($value$$159$$)), $n$Literal$$(65535)))), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Register$$($register3$$2$$), $n$CallExpression$$($fn$$4$$, $o$$.$READ_MEM8$($n$Identifier$$("location"))))), $n$ExpressionStatement$$($n$CallExpression$$("writeMem", 
+      return[$n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Identifier$$("location"), $n$BinaryExpression$$("&", $n$BinaryExpression$$("+", $n$CallExpression$$("get" + ($register1$$40$$ + $register2$$40$$).toUpperCase()), $n$Literal$$($value$$159$$)), $n$Literal$$(65535)))), $n$ExpressionStatement$$($n$AssignmentExpression$$("=", $n$Register$$($register3$$2$$), $n$CallExpression$$($fn$$4$$, $o$$.$READ_MEM8$($n$Identifier$$("location"))))), $n$ExpressionStatement$$($n$CallExpression$$("setUint8",
       [$n$Identifier$$("location"), $n$Register$$($register3$$2$$)]))];
     };
   };

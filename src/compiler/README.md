@@ -57,7 +57,7 @@ Then, the next addressed in the stack is popped and processed.
 
 Parsing stops when the stack is empty.
 
-The parser returns an sparse array of opcodes objects including optional operands and jump targets.
+The parser returns a sparse array of opcodes objects including optional operands and jump targets.
 
 (TODO) In debug mode, each parsed address in the binary is marked as being instruction or data.
 
