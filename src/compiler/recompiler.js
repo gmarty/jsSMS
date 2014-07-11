@@ -60,9 +60,7 @@ var Recompiler = (function() {
       var self = this;
 
       this.options.entryPoints = [
-        {address: 0x00, romPage: 0, memPage: 0},
-        {address: 0x38, romPage: 0, memPage: 0},
-        {address: 0x66, romPage: 0, memPage: 0}
+        {address: 0x00, romPage: 0, memPage: 0}
       ];
 
       if (this.rom.length <= 2) {
@@ -84,9 +82,6 @@ var Recompiler = (function() {
       for (var page = 0; page < this.rom.length; page++) {
         fns[page].forEach(function(fn) {
           var funcName = fn.body[0].id.name;
-          if (DEBUG) {
-            fn.body[0].id.name = '_' + toHex(funcName);
-          }
           self.cpu.branches[page][funcName] = new Function('return ' + self.generateCodeFromAst(fn))();
         });
       }
@@ -137,9 +132,6 @@ var Recompiler = (function() {
 
       // Attach generated code to an attach point in Z80 instance.
       fns[0].forEach(function(fn) {
-        if (DEBUG) {
-          fn.body[0].id.name = '_' + toHex(fn.body[0].id.name);
-        }
         self.cpu.branches[romPage][address % 0x4000] = new Function('return ' + self.generateCodeFromAst(fn))();
       });
     },

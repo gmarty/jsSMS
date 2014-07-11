@@ -278,7 +278,8 @@ var Generator = (function() {
                     'type': 'FunctionDeclaration',
                     'id': {
                       'type': 'Identifier',
-                      'name': '_' + name // Name of the function
+                      // Name of the function (i.e. starting index).
+                      'name': DEBUG ? '_' + toHex(name) : '_' + name
                     },
                     'params': [
                       {
