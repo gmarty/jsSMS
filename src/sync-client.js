@@ -24,6 +24,12 @@
 /**
  * This file is heavily inspired by n64.js.
  */
+
+
+/** @const */ var LOG_LENGTH = 100;
+
+
+
 /**
  * @todo Use jQuery here.
  * @constructor
@@ -186,6 +192,8 @@ function SyncReader() {
   this.curRequest = null;
   this.oos = false;
   this.nextBuffer = null;
+
+  this.log = Array(LOG_LENGTH);
 }
 
 SyncReader.prototype = {
@@ -260,8 +268,13 @@ SyncReader.prototype = {
     var toHex = JSSMS.Utils.toHex;
     var writtenVal = this.pop();
     if (val === writtenVal) {
-      console.log(name, toHex(val), toHex(writtenVal));
+      this.log.shift();
+      this.log.push([name, toHex(val), toHex(writtenVal)]);
     } else {
+      this.log.forEach(function(log) {
+        console.log.apply(console, log);
+      });
+
       console.log('%c' + name, 'color: red;', toHex(val), toHex(writtenVal));
       if (name === 'pc') {
         debugger;

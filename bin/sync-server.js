@@ -118,6 +118,9 @@ function serveFile(request, response) {
     case '.png':
       contentType = 'image/png';
       break;
+    case '.woff':
+      contentType = 'application/x-font-woff';
+      break;
     case '.sms':
     case '.gg':
       contentType = 'application/octet-stream'; // as per RFC 2046.
