@@ -329,9 +329,15 @@ var Optimizer = (function() {
         bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
           if (ast['type'] === 'CallExpression') {
             if (ast['callee']['name'] === 'port.out') {
+              var port = ast['arguments'][0]['value'];
               var value = ast['arguments'][1];
 
-              switch (ast['arguments'][0]['value'] & 0xC1) {
+              if (self.main.is_gg && port < 0x07) {
+                ast['callee']['name'] = 'nop';
+                return undefined;
+              }
+
+              switch (port & 0xC1) {
                 case 0x01:
                   // @todo
                   break;

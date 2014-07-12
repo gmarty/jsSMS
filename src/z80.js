@@ -3165,6 +3165,13 @@ JSSMS.Z80.prototype = {
   },
 
 
+  /**
+   * Do noting.
+   */
+  nop: function() {
+  },
+
+
   // FLAG REGISTER
   /**
    * Generate flag tables.
