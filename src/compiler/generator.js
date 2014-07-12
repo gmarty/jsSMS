@@ -107,6 +107,18 @@ var Generator = (function() {
                       bytecode.ast = [];
                     }
 
+                    if (REFRESH_EMULATION) {
+                      // Sync server.
+                      var refreshEmulationStmt = {
+                        'type': 'ExpressionStatement',
+                        'expression': {
+                          'type': 'CallExpression',
+                          'callee': n.Identifier('incR'),
+                          'arguments': []
+                        }
+                      };
+                    }
+
                     if (ENABLE_SERVER_LOGGER) {
                       // Sync server.
                       var syncServerStmt = {
@@ -143,6 +155,10 @@ var Generator = (function() {
                     ];
 
                     tstates = 0;
+
+                    if (REFRESH_EMULATION) {
+                      decreaseTStateStmt = [].concat(refreshEmulationStmt, decreaseTStateStmt);
+                    }
 
                     if (ENABLE_SERVER_LOGGER) {
                       decreaseTStateStmt = [].concat(syncServerStmt, decreaseTStateStmt);

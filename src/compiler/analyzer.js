@@ -105,6 +105,18 @@ var Analyzer = (function() {
                 ast = [ast];
               }
 
+              if (bytecode.opcode.length > 1 && REFRESH_EMULATION) {
+                // Sync server.
+                ast = [].concat({
+                  'type': 'ExpressionStatement',
+                  'expression': {
+                    'type': 'CallExpression',
+                    'callee': n.Identifier('incR'),
+                    'arguments': []
+                  }
+                }, ast);
+              }
+
               bytecode.ast = ast;
 
               if (DEBUG) {
