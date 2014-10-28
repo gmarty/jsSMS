@@ -258,5 +258,9 @@ var opcodeTableED = {
   0xB8: {
     name: 'LDDR',
     ast: o.LDDR()
+  },
+  0xBB: {
+    name: 'OTDR',
+    ast: o.OTDR()
   }
 };

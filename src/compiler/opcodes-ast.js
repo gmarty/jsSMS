@@ -2259,6 +2259,68 @@ var o = {
       );
     };
   },
+  OTDR: function() {
+    return function(value, target, nextAddress) {
+      // temp = getUint8(getHL());
+      // port.out(c, temp);
+      // b = dec8(b);
+      // decHL();
+      // if ((l + temp) > 255) {
+      //   f |= F_CARRY;
+      //   f |= F_HALFCARRY;
+      // } else {
+      //   f &= ~F_CARRY;
+      //   f &= ~F_HALFCARRY;
+      // }
+      // if ((temp & 0x80) !== 0) {
+      //   f |= F_NEGATIVE;
+      // } else {
+      //   f &= ~F_NEGATIVE;
+      // }
+      // if (b !== 0) {
+      //   tstates -= 5;
+      //   return;
+      // }
+
+      return [].concat(
+        [
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), o.READ_MEM8(n.CallExpression('get' + ('h' + 'l').toUpperCase())))),
+          n.ExpressionStatement(n.CallExpression('port.out', [n.Register('c'), n.Identifier('temp')])),
+          o.DEC8('b')()
+        ],
+        o.DEC16('h', 'l')(),
+        [
+          n.IfStatement(
+            n.BinaryExpression('>', n.BinaryExpression('+', n.Register('l'), n.Identifier('temp')), n.Literal(255)),
+            n.BlockStatement([
+              n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Literal(F_CARRY))),
+              n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Literal(F_HALFCARRY)))
+            ]),
+            n.BlockStatement([
+              n.ExpressionStatement(n.AssignmentExpression('&=', n.Register('f'), n.UnaryExpression('~', n.Literal(F_CARRY)))),
+              n.ExpressionStatement(n.AssignmentExpression('&=', n.Register('f'), n.UnaryExpression('~', n.Literal(F_HALFCARRY))))
+            ])
+          ),
+          n.IfStatement(
+            n.BinaryExpression('!==', n.BinaryExpression('&', n.Identifier('temp'), n.Literal(0x80)), n.Literal(0)),
+            n.BlockStatement(
+              n.ExpressionStatement(n.AssignmentExpression('|=', n.Register('f'), n.Literal(F_NEGATIVE)))
+            ),
+            n.BlockStatement(
+              n.ExpressionStatement(n.AssignmentExpression('&=', n.Register('f'), n.UnaryExpression('~', n.Literal(F_NEGATIVE))))
+            )
+          ),
+          n.IfStatement(
+            n.BinaryExpression('!==', n.Register('b'), n.Literal(0)),
+            n.BlockStatement([
+              n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
+              n.ReturnStatement()
+            ])
+          )
+        ]
+      );
+    };
+  },
   // DD/FD CB prefixed opcodes.
   'LD_RLC': generateIndexCBFunctions('rlc'),
   'LD_RRC': generateIndexCBFunctions('rrc'),
