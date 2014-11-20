@@ -66,7 +66,7 @@
 /**
  * @const
  */
-var OP_STATES = [
+var OP_STATES = new JSSMS.Utils.Uint8Array([
   /*         0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
   /* 0x00 */ 4, 10, 7, 6, 4, 4, 7, 4, 4, 11, 7, 6, 4, 4, 7, 4,
   /* 0x10 */ 8, 10, 7, 6, 4, 4, 7, 4, 12, 11, 7, 6, 4, 4, 7, 4,
@@ -84,13 +84,13 @@ var OP_STATES = [
   /* 0xD0 */ 5, 10, 10, 11, 10, 11, 7, 11, 5, 4, 10, 11, 10, 0, 7, 11,
   /* 0xE0 */ 5, 10, 10, 19, 10, 11, 7, 11, 5, 4, 10, 4, 10, 0, 7, 11,
   /* 0xF0 */ 5, 10, 10, 4, 10, 11, 7, 11, 5, 6, 10, 4, 10, 0, 7, 11
-];
+]);
 
 
 /**
  * @const
  */
-var OP_CB_STATES = [
+var OP_CB_STATES = new JSSMS.Utils.Uint8Array([
   /*         0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
   /* 0x00 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
   /* 0x10 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
@@ -108,13 +108,13 @@ var OP_CB_STATES = [
   /* 0xD0 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
   /* 0xE0 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
   /* 0xF0 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8
-];
+]);
 
 
 /**
  * @const
  */
-var OP_DD_STATES = [
+var OP_DD_STATES = new JSSMS.Utils.Uint8Array([
   /*         0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
   /* 0x00 */ 4, 4, 4, 4, 4, 4, 4, 4, 4, 15, 4, 4, 4, 4, 4, 4,
   /* 0x10 */ 4, 4, 4, 4, 4, 4, 4, 4, 4, 15, 4, 4, 4, 4, 4, 4,
@@ -132,13 +132,13 @@ var OP_DD_STATES = [
   /* 0xD0 */ 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
   /* 0xE0 */ 4, 14, 4, 23, 4, 15, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4,
   /* 0xF0 */ 4, 4, 4, 4, 4, 4, 4, 4, 4, 10, 4, 4, 4, 4, 4, 4
-];
+]);
 
 
 /**
  * @const
  */
-var OP_INDEX_CB_STATES = [
+var OP_INDEX_CB_STATES = new JSSMS.Utils.Uint8Array([
   /*        0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F */
   /* x00 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
   /* x10 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
@@ -156,13 +156,13 @@ var OP_INDEX_CB_STATES = [
   /* xD0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
   /* xE0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
   /* xF0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23
-];
+]);
 
 
 /**
  * @const
  */
-var OP_ED_STATES = [
+var OP_ED_STATES = new JSSMS.Utils.Uint8Array([
   /*         0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
   /* 0x00 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
   /* 0x10 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
@@ -180,7 +180,7 @@ var OP_ED_STATES = [
   /* 0xD0 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
   /* 0xE0 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
   /* 0xF0 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
-];
+]);
 
 
 
@@ -342,28 +342,28 @@ JSSMS.Z80 = function(sms) {
 
   // Precalculated tables for speed purposes
   /** Pre-calculated result for DAA instruction. */
-  this.DAA_TABLE = new Array(0x800);
+  this.DAA_TABLE = new JSSMS.Utils.Uint16Array(0x800);
 
   /** Sign, Zero table. */
-  this.SZ_TABLE = new Array(256);
+  this.SZ_TABLE = new JSSMS.Utils.Uint8Array(256);
 
   /** Sign, Zero, Parity table. */
-  this.SZP_TABLE = new Array(256);
+  this.SZP_TABLE = new JSSMS.Utils.Uint8Array(256);
 
   /** Flag lookup table for inc8 instruction. */
-  this.SZHV_INC_TABLE = new Array(256);
+  this.SZHV_INC_TABLE = new JSSMS.Utils.Uint8Array(256);
 
   /** Flag lookup table for dec8 instruction. */
-  this.SZHV_DEC_TABLE = new Array(256);
+  this.SZHV_DEC_TABLE = new JSSMS.Utils.Uint8Array(256);
 
   /** Flag lookup table for add/adc instruction. */
-  this.SZHVC_ADD_TABLE = new Array(2 * 256 * 256);
+  this.SZHVC_ADD_TABLE = new JSSMS.Utils.Uint8Array(2 * 256 * 256);
 
   /** Flag lookup table for dec/sbc instruction. */
-  this.SZHVC_SUB_TABLE = new Array(2 * 256 * 256);
+  this.SZHVC_SUB_TABLE = new JSSMS.Utils.Uint8Array(2 * 256 * 256);
 
   /** Flag lookup table for bit instruction. */
-  this.SZ_BIT_TABLE = new Array(256);
+  this.SZ_BIT_TABLE = new JSSMS.Utils.Uint8Array(256);
 
   // Generate flag lookups
   this.generateFlagTables();
@@ -2479,7 +2479,7 @@ JSSMS.Z80.prototype = {
       // -- EDB1 CPIR ------------------------------
       case 0xB1:
         temp = (this.f & F_CARRY) | F_NEGATIVE;
-        this.cp_a(this.getUint8(this.getHL())); // sets zero flag for us
+        this.cp_a(this.getUint8(this.getHL())); // sets zero flag
         this.decBC();
         this.incHL();
 
@@ -2570,7 +2570,7 @@ JSSMS.Z80.prototype = {
       // -- EDB9 CPDR ------------------------------------
       case 0xB9:
         temp = (this.f & F_CARRY) | F_NEGATIVE;
-        this.cp_a(this.getUint8(this.getHL())); // sets zero flag for us
+        this.cp_a(this.getUint8(this.getHL())); // sets zero flag
         this.decBC();
         this.decHL();
 
