@@ -37,16 +37,16 @@ a, input, button {
   height: 192px;
   width: 256px;
   margin: auto;
+  border: 1px solid #000;
 }
 #screen canvas {
   background: #000;
   margin: auto;
   display: block;
-  image-rendering: -moz-crisp-edges;          /* FF 6.0+ */
-  image-rendering: -o-crisp-edges;            /* Opera */
-  image-rendering: -webkit-optimize-contrast; /* Webkit (Safari now, Chrome soon) */
-  image-rendering: crisp-edges;
-  -ms-interpolation-mode: nearest-neighbor;   /* IE */
+  image-rendering: -moz-crisp-edges;          /* FF 6+ */
+  image-rendering: -webkit-optimize-contrast; /* Webkit */
+  image-rendering: pixelated;                 /* Blink */
+  -ms-interpolation-mode: nearest-neighbor;   /* IE 7+ */
 }
 #screen:-webkit-full-screen {
   height: 100%;
@@ -149,7 +149,7 @@ code {
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
 <script>if(!window.$)document.write('<script src="lib/jquery.min.js"><\/script>')</script>
 <script src="https://www.google.com/jsapi"></script>
-<script>google.load('visualization','1',{packages:['corechart']})</script>
+<script>typeof google !== 'undefined' && google.load('visualization','1',{packages:['corechart']})</script>
 </head>
 <body>
 <div class="container">
@@ -177,7 +177,7 @@ code {
     </div>
   </div>
   <footer>
-    <p>© 2012-2013 Guillaume Marty (<a href="https://github.com/gmarty">https://github.com/gmarty</a>)</p>
+    <p>© 2014 Guillaume Marty (<a href="https://github.com/gmarty">https://github.com/gmarty</a>)</p>
   </footer>
 </div>
 <a href="http://github.com/gmarty/jsSMS"><img style="position: absolute; top: 0; right: 0; border: 0;" src="//s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork jsSMS on GitHub"></a>
@@ -213,7 +213,7 @@ var romData;
 var launchBtn = $('#launchBtn');
 
 var romPath = 'rom/homebrew/blockhead.sms';
-var FRAME_NB = 10;
+var FRAME_NB = 100;
 
 launchBtn.click(function() {
   launchBtn.attr('disabled', true);
