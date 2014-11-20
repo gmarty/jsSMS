@@ -503,25 +503,14 @@ JSSMS.Z80.prototype = {
       this.branches[0][this.pc].call(this, 0);
 
       return;
-    } else if (this.pc < 0x4000) {
-      if (!this.branches[this.frameReg[0]][this.pc]) {
-        this.recompiler.recompileFromAddress(this.pc, this.frameReg[0], 0);
-      }
-      this.branches[this.frameReg[0]][this.pc].call(this, 0);
-
-      return;
-    } else if (this.pc < 0x8000) {
-      if (!this.branches[this.frameReg[1]][(this.pc - 0x4000)]) {
-        this.recompiler.recompileFromAddress(this.pc, this.frameReg[1], 1);
-      }
-      this.branches[this.frameReg[1]][this.pc - 0x4000].call(this, 1);
-
-      return;
     } else if (this.pc < 0xC000) {
-      if (!this.branches[this.frameReg[2]][(this.pc - 0x8000)]) {
-        this.recompiler.recompileFromAddress(this.pc, this.frameReg[2], 2);
+      var frameId = this.pc % 0x4000;
+      var frameReg = Math.floor(this.pc / 0x4000);
+
+      if (!this.branches[this.frameReg[frameReg]][frameId]) {
+        this.recompiler.recompileFromAddress(this.pc, this.frameReg[frameReg], frameReg);
       }
-      this.branches[this.frameReg[2]][this.pc - 0x8000].call(this, 2);
+      this.branches[this.frameReg[frameReg]][frameId].call(this, frameReg);
 
       return;
     }
