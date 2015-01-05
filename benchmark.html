@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Benchmarking jsSMS - JavaScript Sega Master System &amp; Game Gear dynamic recompiling emulator</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
 <link rel="stylesheet" href="css/bootstrap.min.css">
 <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
 <style>
@@ -43,11 +43,10 @@ a, input, button {
   background: #000;
   margin: auto;
   display: block;
-  image-rendering: -moz-crisp-edges;          /* FF 6.0+ */
-  image-rendering: -o-crisp-edges;            /* Opera */
-  image-rendering: -webkit-optimize-contrast; /* Webkit (Safari now, Chrome soon) */
-  image-rendering: crisp-edges;
-  -ms-interpolation-mode: nearest-neighbor;   /* IE */
+  image-rendering: -moz-crisp-edges;          /* FF 6+ */
+  image-rendering: -webkit-optimize-contrast; /* Webkit */
+  image-rendering: pixelated;                 /* Blink */
+  -ms-interpolation-mode: nearest-neighbor;   /* IE 7+ */
 }
 #screen:-webkit-full-screen {
   height: 100%;
@@ -178,7 +177,7 @@ code {
     </div>
   </div>
   <footer>
-    <p>© 2012-2013 Guillaume Marty (<a href="https://github.com/gmarty">https://github.com/gmarty</a>)</p>
+    <p>© 2014 Guillaume Marty (<a href="https://github.com/gmarty">https://github.com/gmarty</a>)</p>
   </footer>
 </div>
 <a href="http://github.com/gmarty/jsSMS"><img style="position: absolute; top: 0; right: 0; border: 0;" src="//s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork jsSMS on GitHub"></a>
