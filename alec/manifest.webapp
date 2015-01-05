@@ -1,5 +1,5 @@
 {
-  "version": "0.0.11",
+  "version": "0.0.12",
   "name": "Alec Sega emulator",
   "launch_path": "/jsSMS/alec/index.html",
   "description": "Emulator for Sega Master System &amp; Game Gear",
@@ -14,7 +14,7 @@
   },
   "developer": {
     "name": "G.C. Marty",
-    "url": "https://github.com/gmarty"
+    "url": "http://gu.illau.me/"
   },
   "installs_allowed_from": ["*"],
   "default_locale": "en",

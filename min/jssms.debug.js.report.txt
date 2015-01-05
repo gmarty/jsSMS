@@ -670,11 +670,35 @@ src/compiler/recompiler.js:143: WARNING - Property generateCodeFromAst never def
         self.cpu.branches[romPage][address % 0x4000] = new Function('return ' + self.generateCodeFromAst(fn))();
                                                                                 ^
 
+src/debugger.js:396: WARNING - Property signExtend never defined on JSSMS.Debugger
+        target = address + this.signExtend(this.readRom8bit(address) + 1);
+                           ^
+
+src/debugger.js:439: WARNING - Property signExtend never defined on JSSMS.Debugger
+        target = address + this.signExtend(this.readRom8bit(address) + 1);
+                           ^
+
 src/debugger.js:442: WARNING - assignment
 found   : null
 required: number
         address = null;
         ^
+
+src/debugger.js:475: WARNING - Property signExtend never defined on JSSMS.Debugger
+        target = address + this.signExtend(this.readRom8bit(address) + 1);
+                           ^
+
+src/debugger.js:521: WARNING - Property signExtend never defined on JSSMS.Debugger
+        target = address + this.signExtend(this.readRom8bit(address) + 1);
+                           ^
+
+src/debugger.js:563: WARNING - Property signExtend never defined on JSSMS.Debugger
+        target = address + this.signExtend(this.readRom8bit(address) + 1);
+                           ^
+
+src/debugger.js:607: WARNING - Property signExtend never defined on JSSMS.Debugger
+        target = address + this.signExtend(this.readRom8bit(address) + 1);
+                           ^
 
 src/debugger.js:1192: WARNING - assignment
 found   : null
@@ -706,39 +730,39 @@ required: number
         address = null;
         ^
 
-src/psg.js:259: WARNING - Bad type annotation. Unknown type AudioBuffer
+src/psg.js:242: WARNING - Bad type annotation. Unknown type AudioBuffer
    * @param {AudioBuffer} audioBuffer
              ^
 
-src/psg.js:264: WARNING - Missing return statement. Function expected to return (Array|null).
+src/psg.js:247: WARNING - Missing return statement. Function expected to return (Array|null).
   update: function(audioBuffer, offset, samplesToGenerate) {
           ^
 
-src/sms.js:89: WARNING - Property AudioContext never defined on Window
+src/sms.js:88: WARNING - Property AudioContext never defined on Window
     var AudioContext = window.AudioContext || window.webkitAudioContext;
                        ^
 
-src/sms.js:89: WARNING - Property webkitAudioContext never defined on Window
+src/sms.js:88: WARNING - Property webkitAudioContext never defined on Window
     var AudioContext = window.AudioContext || window.webkitAudioContext;
                                               ^
 
-src/sms.js:179: WARNING - Bad type annotation. Unknown type AudioContext
+src/sms.js:178: WARNING - Bad type annotation. Unknown type AudioContext
    * @type {AudioContext}
             ^
 
-src/sms.js:186: WARNING - Bad type annotation. Unknown type AudioBuffer
+src/sms.js:185: WARNING - Bad type annotation. Unknown type AudioBuffer
    * @type {AudioBuffer}
             ^
 
-src/ui.js:438: WARNING - Property createBufferSource never defined on this.main.audioContext
+src/ui.js:440: WARNING - Property createBufferSource never defined on this.main.audioContext
         var source = this.main.audioContext.createBufferSource();
                      ^
 
-src/ui.js:440: WARNING - Property connect never defined on source
+src/ui.js:442: WARNING - Property connect never defined on source
         source.connect(this.main.audioContext.destination);
         ^
 
-src/ui.js:440: WARNING - Property destination never defined on this.main.audioContext
+src/ui.js:442: WARNING - Property destination never defined on this.main.audioContext
         source.connect(this.main.audioContext.destination);
                        ^
 
@@ -780,8 +804,8 @@ src/z80.js:522: WARNING - Property recompileFromAddress never defined on Recompi
         this.recompiler.recompileFromAddress(this.pc, this.frameReg[2], 2);
         ^
 
-src/z80.js:3435: WARNING - Property setRom never defined on Recompiler
+src/z80.js:3421: WARNING - Property setRom never defined on Recompiler
         this.recompiler.setRom(this.rom);
         ^
 
-0 error(s), 193 warning(s), 85.6% typed
+0 error(s), 199 warning(s), 85.3% typed

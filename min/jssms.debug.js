@@ -16,11 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-'use strict';var DEBUG = !1, ENABLE_DEBUGGER = !0, ENABLE_COMPILER = !1, WRITE_MODE = 0, READ_MODE = 1, ENABLE_SERVER_LOGGER = !1, SYNC_MODE = READ_MODE, ACCURATE = !1, LITTLE_ENDIAN = !0, FORCE_TYPED_ARRAYS = !1, SUPPORT_TYPED_ARRAYS = FORCE_TYPED_ARRAYS || "Uint8Array" in window, FORCE_DATAVIEW = !1, SUPPORT_DATAVIEW = FORCE_DATAVIEW || "ArrayBuffer" in window && "DataView" in window, FORCE_DESTRUCTURING = !1, SUPPORT_DESTRUCTURING = !1, SAMPLE_RATE = 44100, DEBUG_TIMING = DEBUG, REFRESH_EMULATION = 
+'use strict';var DEBUG = !1, ENABLE_DEBUGGER = !0, ENABLE_COMPILER = !0, WRITE_MODE = 0, READ_MODE = 1, ENABLE_SERVER_LOGGER = !1, SYNC_MODE = READ_MODE, ACCURATE = !1, LITTLE_ENDIAN = !0, FORCE_TYPED_ARRAYS = !1, SUPPORT_TYPED_ARRAYS = FORCE_TYPED_ARRAYS || "Uint8Array" in window, FORCE_DATAVIEW = !1, SUPPORT_DATAVIEW = FORCE_DATAVIEW || "ArrayBuffer" in window && "DataView" in window, FORCE_DESTRUCTURING = !1, SUPPORT_DESTRUCTURING = !1, SAMPLE_RATE = 44100, DEBUG_TIMING = DEBUG, REFRESH_EMULATION = 
 !1, ACCURATE_INTERRUPT_EMULATION = !1, LIGHTGUN = !1, VDP_SPRITE_COLLISIONS = ACCURATE, PAGE_SIZE = 16384;
 var fpsInterval = 500, CLOCK_NTSC = 3579545, CLOCK_PAL = 3546893;
 function JSSMS($opts$$) {
-  this.opts = {ui:JSSMS.DummyUI, swfPath:"lib/"};
+  this.opts = {ui:JSSMS.DummyUI};
   if (void 0 !== $opts$$) {
     for (var $key$$ in this.opts) {
       void 0 !== $opts$$[$key$$] && (this.opts[$key$$] = $opts$$[$key$$]);
@@ -81,7 +81,7 @@ JSSMS.prototype = {isRunning:!1, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0
   $i$$4_mode$$ === NTSC || this.is_gg ? (this.fps = 60, this.no_of_scanlines = SMS_Y_PIXELS_NTSC, $clockSpeedHz_v$$ = CLOCK_NTSC) : (this.fps = 50, this.no_of_scanlines = SMS_Y_PIXELS_PAL, $clockSpeedHz_v$$ = CLOCK_PAL);
   this.cyclesPerLine = Math.round($clockSpeedHz_v$$ / this.fps / this.no_of_scanlines + 1);
   this.vdp.videoMode = $i$$4_mode$$;
-  if (this.soundEnabled && (this.psg.init($clockSpeedHz_v$$, SAMPLE_RATE), this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps), this.audioBuffer.length !== this.samplesPerFrame && (this.audioBuffer = this.audioContext.createBuffer(1, this.samplesPerFrame, SAMPLE_RATE)), 0 === this.samplesPerLine.length || this.samplesPerLine.length !== this.no_of_scanlines)) {
+  if (this.soundEnabled && (this.psg.init($clockSpeedHz_v$$), this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps), this.audioBuffer.length !== this.samplesPerFrame && (this.audioBuffer = this.audioContext.createBuffer(1, this.samplesPerFrame, SAMPLE_RATE)), 0 === this.samplesPerLine.length || this.samplesPerLine.length !== this.no_of_scanlines)) {
     this.samplesPerLine = Array(this.no_of_scanlines);
     var $fractional$$ = 0;
     for ($i$$4_mode$$ = 0;$i$$4_mode$$ < this.no_of_scanlines;$i$$4_mode$$++) {
@@ -443,17 +443,17 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   this.main.pause_button && (this.nmi(), this.main.pause_button = !1);
   this.main.doRepaint();
 }, branches:[Object.create(null), Object.create(null), Object.create(null)], interpret:function $JSSMS$Z80$$interpret$() {
-  var $opcode_temp$$ = 0, $opcode_temp$$ = this.readMem(this.pc++);
+  var $opcode_temp$$ = 0, $opcode_temp$$ = this.getUint8(this.pc++);
   ACCURATE_INTERRUPT_EMULATION && (this.EI_inst = !1);
   this.tstates -= OP_STATES[$opcode_temp$$];
   REFRESH_EMULATION && this.incR();
   switch($opcode_temp$$) {
     case 1:
-      this.setBC(this.readMemWord(this.pc++));
+      this.setBC(this.getUint16(this.pc++));
       this.pc++;
       break;
     case 2:
-      this.writeMem(this.getBC(), this.a);
+      this.setUint8(this.getBC(), this.a);
       break;
     case 3:
       this.incBC();
@@ -465,7 +465,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.b = this.dec8(this.b);
       break;
     case 6:
-      this.b = this.readMem(this.pc++);
+      this.b = this.getUint8(this.pc++);
       break;
     case 7:
       this.rlca_a();
@@ -477,7 +477,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.setHL(this.add16(this.getHL(), this.getBC()));
       break;
     case 10:
-      this.a = this.readMem(this.getBC());
+      this.a = this.getUint8(this.getBC());
       break;
     case 11:
       this.decBC();
@@ -489,7 +489,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.c = this.dec8(this.c);
       break;
     case 14:
-      this.c = this.readMem(this.pc++);
+      this.c = this.getUint8(this.pc++);
       break;
     case 15:
       this.rrca_a();
@@ -499,11 +499,11 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.jr(0 !== this.b);
       break;
     case 17:
-      this.setDE(this.readMemWord(this.pc++));
+      this.setDE(this.getUint16(this.pc++));
       this.pc++;
       break;
     case 18:
-      this.writeMem(this.getDE(), this.a);
+      this.setUint8(this.getDE(), this.a);
       break;
     case 19:
       this.incDE();
@@ -515,19 +515,19 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.d = this.dec8(this.d);
       break;
     case 22:
-      this.d = this.readMem(this.pc++);
+      this.d = this.getUint8(this.pc++);
       break;
     case 23:
       this.rla_a();
       break;
     case 24:
-      this.pc += this.signExtend(this.d_() + 1);
+      this.pc += this.getInt8(this.pc);
       break;
     case 25:
       this.setHL(this.add16(this.getHL(), this.getDE()));
       break;
     case 26:
-      this.a = this.readMem(this.getDE());
+      this.a = this.getUint8(this.getDE());
       break;
     case 27:
       this.decDE();
@@ -539,7 +539,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.e = this.dec8(this.e);
       break;
     case 30:
-      this.e = this.readMem(this.pc++);
+      this.e = this.getUint8(this.pc++);
       break;
     case 31:
       this.rra_a();
@@ -548,11 +548,11 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.jr(0 === (this.f & F_ZERO));
       break;
     case 33:
-      this.setHL(this.readMemWord(this.pc++));
+      this.setHL(this.getUint16(this.pc++));
       this.pc++;
       break;
     case 34:
-      this.writeMemWord(this.readMemWord(this.pc++), this.getHL());
+      this.setUint16(this.getUint16(this.pc++), this.getHL());
       this.pc++;
       break;
     case 35:
@@ -565,7 +565,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.h = this.dec8(this.h);
       break;
     case 38:
-      this.h = this.readMem(this.pc++);
+      this.h = this.getUint8(this.pc++);
       break;
     case 39:
       this.daa();
@@ -577,7 +577,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.setHL(this.add16(this.getHL(), this.getHL()));
       break;
     case 42:
-      this.setHL(this.readMemWord(this.readMemWord(this.pc++)));
+      this.setHL(this.getUint16(this.getUint16(this.pc++)));
       this.pc++;
       break;
     case 43:
@@ -590,7 +590,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l = this.dec8(this.l);
       break;
     case 46:
-      this.l = this.readMem(this.pc++);
+      this.l = this.getUint8(this.pc++);
       break;
     case 47:
       this.cpl_a();
@@ -599,11 +599,11 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.jr(0 === (this.f & F_CARRY));
       break;
     case 49:
-      this.sp = this.readMemWord(this.pc++);
+      this.sp = this.getUint16(this.pc++);
       this.pc++;
       break;
     case 50:
-      this.writeMem(this.readMemWord(this.pc++), this.a);
+      this.setUint8(this.getUint16(this.pc++), this.a);
       this.pc++;
       break;
     case 51:
@@ -616,7 +616,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.decMem(this.getHL());
       break;
     case 54:
-      this.writeMem(this.getHL(), this.readMem(this.pc++));
+      this.setUint8(this.getHL(), this.getUint8(this.pc++));
       break;
     case 55:
       this.f |= F_CARRY;
@@ -630,7 +630,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.setHL(this.add16(this.getHL(), this.sp));
       break;
     case 58:
-      this.a = this.readMem(this.readMemWord(this.pc++));
+      this.a = this.getUint8(this.getUint16(this.pc++));
       this.pc++;
       break;
     case 59:
@@ -643,7 +643,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.a = this.dec8(this.a);
       break;
     case 62:
-      this.a = this.readMem(this.pc++);
+      this.a = this.getUint8(this.pc++);
       break;
     case 63:
       this.ccf();
@@ -664,7 +664,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.b = this.l;
       break;
     case 70:
-      this.b = this.readMem(this.getHL());
+      this.b = this.getUint8(this.getHL());
       break;
     case 71:
       this.b = this.a;
@@ -685,7 +685,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.c = this.l;
       break;
     case 78:
-      this.c = this.readMem(this.getHL());
+      this.c = this.getUint8(this.getHL());
       break;
     case 79:
       this.c = this.a;
@@ -706,7 +706,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.d = this.l;
       break;
     case 86:
-      this.d = this.readMem(this.getHL());
+      this.d = this.getUint8(this.getHL());
       break;
     case 87:
       this.d = this.a;
@@ -727,7 +727,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.e = this.l;
       break;
     case 94:
-      this.e = this.readMem(this.getHL());
+      this.e = this.getUint8(this.getHL());
       break;
     case 95:
       this.e = this.a;
@@ -748,7 +748,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.h = this.l;
       break;
     case 102:
-      this.h = this.readMem(this.getHL());
+      this.h = this.getUint8(this.getHL());
       break;
     case 103:
       this.h = this.a;
@@ -769,28 +769,28 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l = this.h;
       break;
     case 110:
-      this.l = this.readMem(this.getHL());
+      this.l = this.getUint8(this.getHL());
       break;
     case 111:
       this.l = this.a;
       break;
     case 112:
-      this.writeMem(this.getHL(), this.b);
+      this.setUint8(this.getHL(), this.b);
       break;
     case 113:
-      this.writeMem(this.getHL(), this.c);
+      this.setUint8(this.getHL(), this.c);
       break;
     case 114:
-      this.writeMem(this.getHL(), this.d);
+      this.setUint8(this.getHL(), this.d);
       break;
     case 115:
-      this.writeMem(this.getHL(), this.e);
+      this.setUint8(this.getHL(), this.e);
       break;
     case 116:
-      this.writeMem(this.getHL(), this.h);
+      this.setUint8(this.getHL(), this.h);
       break;
     case 117:
-      this.writeMem(this.getHL(), this.l);
+      this.setUint8(this.getHL(), this.l);
       break;
     case 118:
       HALT_SPEEDUP && (this.tstates = 0);
@@ -798,7 +798,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc--;
       break;
     case 119:
-      this.writeMem(this.getHL(), this.a);
+      this.setUint8(this.getHL(), this.a);
       break;
     case 120:
       this.a = this.b;
@@ -819,7 +819,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.a = this.l;
       break;
     case 126:
-      this.a = this.readMem(this.getHL());
+      this.a = this.getUint8(this.getHL());
       break;
     case 128:
       this.add_a(this.b);
@@ -840,7 +840,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.add_a(this.l);
       break;
     case 134:
-      this.add_a(this.readMem(this.getHL()));
+      this.add_a(this.getUint8(this.getHL()));
       break;
     case 135:
       this.add_a(this.a);
@@ -864,7 +864,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.adc_a(this.l);
       break;
     case 142:
-      this.adc_a(this.readMem(this.getHL()));
+      this.adc_a(this.getUint8(this.getHL()));
       break;
     case 143:
       this.adc_a(this.a);
@@ -888,7 +888,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.sub_a(this.l);
       break;
     case 150:
-      this.sub_a(this.readMem(this.getHL()));
+      this.sub_a(this.getUint8(this.getHL()));
       break;
     case 151:
       this.sub_a(this.a);
@@ -912,7 +912,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.sbc_a(this.l);
       break;
     case 158:
-      this.sbc_a(this.readMem(this.getHL()));
+      this.sbc_a(this.getUint8(this.getHL()));
       break;
     case 159:
       this.sbc_a(this.a);
@@ -936,7 +936,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a &= this.l] | F_HALFCARRY;
       break;
     case 166:
-      this.f = this.SZP_TABLE[this.a &= this.readMem(this.getHL())] | F_HALFCARRY;
+      this.f = this.SZP_TABLE[this.a &= this.getUint8(this.getHL())] | F_HALFCARRY;
       break;
     case 167:
       this.f = this.SZP_TABLE[this.a] | F_HALFCARRY;
@@ -960,7 +960,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a ^= this.l];
       break;
     case 174:
-      this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getHL())];
+      this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.getHL())];
       break;
     case 175:
       this.f = this.SZP_TABLE[this.a = 0];
@@ -984,7 +984,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a |= this.l];
       break;
     case 182:
-      this.f = this.SZP_TABLE[this.a |= this.readMem(this.getHL())];
+      this.f = this.SZP_TABLE[this.a |= this.getUint8(this.getHL())];
       break;
     case 183:
       this.f = this.SZP_TABLE[this.a];
@@ -1008,7 +1008,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.cp_a(this.l);
       break;
     case 190:
-      this.cp_a(this.readMem(this.getHL()));
+      this.cp_a(this.getUint8(this.getHL()));
       break;
     case 191:
       this.cp_a(this.a);
@@ -1017,14 +1017,14 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.ret(0 === (this.f & F_ZERO));
       break;
     case 193:
-      this.setBC(this.readMemWord(this.sp));
+      this.setBC(this.getUint16(this.sp));
       this.sp += 2;
       break;
     case 194:
       this.jp(0 === (this.f & F_ZERO));
       break;
     case 195:
-      this.pc = this.readMemWord(this.pc);
+      this.pc = this.getUint16(this.pc);
       break;
     case 196:
       this.call(0 === (this.f & F_ZERO));
@@ -1033,7 +1033,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.push(this.getBC());
       break;
     case 198:
-      this.add_a(this.readMem(this.pc++));
+      this.add_a(this.getUint8(this.pc++));
       break;
     case 199:
       this.push(this.pc);
@@ -1043,24 +1043,24 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.ret(0 !== (this.f & F_ZERO));
       break;
     case 201:
-      this.pc = this.readMemWord(this.sp);
+      this.pc = this.getUint16(this.sp);
       this.sp += 2;
       break;
     case 202:
       this.jp(0 !== (this.f & F_ZERO));
       break;
     case 203:
-      this.doCB(this.readMem(this.pc++));
+      this.doCB(this.getUint8(this.pc++));
       break;
     case 204:
       this.call(0 !== (this.f & F_ZERO));
       break;
     case 205:
       this.push(this.pc + 2);
-      this.pc = this.readMemWord(this.pc);
+      this.pc = this.getUint16(this.pc);
       break;
     case 206:
-      this.adc_a(this.readMem(this.pc++));
+      this.adc_a(this.getUint8(this.pc++));
       break;
     case 207:
       this.push(this.pc);
@@ -1070,14 +1070,14 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.ret(0 === (this.f & F_CARRY));
       break;
     case 209:
-      this.setDE(this.readMemWord(this.sp));
+      this.setDE(this.getUint16(this.sp));
       this.sp += 2;
       break;
     case 210:
       this.jp(0 === (this.f & F_CARRY));
       break;
     case 211:
-      this.port.out(this.readMem(this.pc++), this.a);
+      this.port.out(this.getUint8(this.pc++), this.a);
       break;
     case 212:
       this.call(0 === (this.f & F_CARRY));
@@ -1086,7 +1086,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.push(this.getDE());
       break;
     case 214:
-      this.sub_a(this.readMem(this.pc++));
+      this.sub_a(this.getUint8(this.pc++));
       break;
     case 215:
       this.push(this.pc);
@@ -1104,16 +1104,16 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.jp(0 !== (this.f & F_CARRY));
       break;
     case 219:
-      this.a = this.port.in_(this.readMem(this.pc++));
+      this.a = this.port.in_(this.getUint8(this.pc++));
       break;
     case 220:
       this.call(0 !== (this.f & F_CARRY));
       break;
     case 221:
-      this.doIndexOpIX(this.readMem(this.pc++));
+      this.doIndexOpIX(this.getUint8(this.pc++));
       break;
     case 222:
-      this.sbc_a(this.readMem(this.pc++));
+      this.sbc_a(this.getUint8(this.pc++));
       break;
     case 223:
       this.push(this.pc);
@@ -1123,7 +1123,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.ret(0 === (this.f & F_PARITY));
       break;
     case 225:
-      this.setHL(this.readMemWord(this.sp));
+      this.setHL(this.getUint16(this.sp));
       this.sp += 2;
       break;
     case 226:
@@ -1131,8 +1131,8 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       break;
     case 227:
       $opcode_temp$$ = this.getHL();
-      this.setHL(this.readMemWord(this.sp));
-      this.writeMemWord(this.sp, $opcode_temp$$);
+      this.setHL(this.getUint16(this.sp));
+      this.setUint16(this.sp, $opcode_temp$$);
       break;
     case 228:
       this.call(0 === (this.f & F_PARITY));
@@ -1141,7 +1141,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.push(this.getHL());
       break;
     case 230:
-      this.f = this.SZP_TABLE[this.a &= this.readMem(this.pc++)] | F_HALFCARRY;
+      this.f = this.SZP_TABLE[this.a &= this.getUint8(this.pc++)] | F_HALFCARRY;
       break;
     case 231:
       this.push(this.pc);
@@ -1168,10 +1168,10 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.call(0 !== (this.f & F_PARITY));
       break;
     case 237:
-      this.doED(this.readMem(this.pc));
+      this.doED(this.getUint8(this.pc));
       break;
     case 238:
-      this.f = this.SZP_TABLE[this.a ^= this.readMem(this.pc++)];
+      this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.pc++)];
       break;
     case 239:
       this.push(this.pc);
@@ -1181,7 +1181,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.ret(0 === (this.f & F_SIGN));
       break;
     case 241:
-      this.setAF(this.readMemWord(this.sp));
+      this.setAF(this.getUint16(this.sp));
       this.sp += 2;
       break;
     case 242:
@@ -1198,7 +1198,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.push(this.getAF());
       break;
     case 246:
-      this.f = this.SZP_TABLE[this.a |= this.readMem(this.pc++)];
+      this.f = this.SZP_TABLE[this.a |= this.getUint8(this.pc++)];
       break;
     case 247:
       this.push(this.pc);
@@ -1220,10 +1220,10 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.call(0 !== (this.f & F_SIGN));
       break;
     case 253:
-      this.doIndexOpIY(this.readMem(this.pc++));
+      this.doIndexOpIY(this.getUint8(this.pc++));
       break;
     case 254:
-      this.cp_a(this.readMem(this.pc++));
+      this.cp_a(this.getUint8(this.pc++));
       break;
     case 255:
       this.push(this.pc), this.pc = 56;
@@ -1239,28 +1239,25 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   this.pc = 102;
   this.tstates -= 11;
 }, interrupt:function $JSSMS$Z80$$interrupt$() {
-  !this.iff1 || ACCURATE_INTERRUPT_EMULATION && this.EI_inst || (this.halt && (this.pc++, this.halt = !1), REFRESH_EMULATION && this.incR(), this.interruptLine = this.iff1 = this.iff2 = !1, this.push(this.pc), 0 === this.im ? (this.pc = 0 === this.interruptVector || 255 === this.interruptVector ? 56 : this.interruptVector, this.tstates -= 13) : 1 === this.im ? (this.pc = 56, this.tstates -= 13) : (this.pc = this.readMemWord((this.i << 8) + this.interruptVector), this.tstates -= 19));
+  !this.iff1 || ACCURATE_INTERRUPT_EMULATION && this.EI_inst || (this.halt && (this.pc++, this.halt = !1), REFRESH_EMULATION && this.incR(), this.interruptLine = this.iff1 = this.iff2 = !1, this.push(this.pc), 0 === this.im ? (this.pc = 0 === this.interruptVector || 255 === this.interruptVector ? 56 : this.interruptVector, this.tstates -= 13) : 1 === this.im ? (this.pc = 56, this.tstates -= 13) : (this.pc = this.getUint16((this.i << 8) + this.interruptVector), this.tstates -= 19));
 }, jp:function $JSSMS$Z80$$jp$($condition$$) {
-  this.pc = $condition$$ ? this.readMemWord(this.pc) : this.pc + 2;
+  this.pc = $condition$$ ? this.getUint16(this.pc) : this.pc + 2;
 }, jr:function $JSSMS$Z80$$jr$($condition$$) {
-  $condition$$ ? (this.pc += this.signExtend(this.d_() + 1), this.tstates -= 5) : this.pc++;
-}, signExtend:function $JSSMS$Z80$$signExtend$($d$$) {
-  128 <= $d$$ && ($d$$ -= 256);
-  return $d$$;
+  $condition$$ ? (this.pc += this.getInt8(this.pc), this.tstates -= 5) : this.pc++;
 }, call:function $JSSMS$Z80$$call$($condition$$) {
-  $condition$$ ? (this.push(this.pc + 2), this.pc = this.readMemWord(this.pc), this.tstates -= 7) : this.pc += 2;
+  $condition$$ ? (this.push(this.pc + 2), this.pc = this.getUint16(this.pc), this.tstates -= 7) : this.pc += 2;
 }, ret:function $JSSMS$Z80$$ret$($condition$$) {
-  $condition$$ && (this.pc = this.readMemWord(this.sp), this.sp += 2, this.tstates -= 6);
+  $condition$$ && (this.pc = this.getUint16(this.sp), this.sp += 2, this.tstates -= 6);
 }, push:function $JSSMS$Z80$$push$($value$$) {
   this.sp -= 2;
-  this.writeMemWord(this.sp, $value$$);
+  this.setUint16(this.sp, $value$$);
 }, pushUint8:function $JSSMS$Z80$$pushUint8$($hi$$, $lo$$) {
   this.sp -= 2;
-  this.writeMemWord(this.sp, $hi$$ << 8 | $lo$$);
+  this.setUint16(this.sp, $hi$$ << 8 | $lo$$);
 }, incMem:function $JSSMS$Z80$$incMem$($offset$$) {
-  this.writeMem($offset$$, this.inc8(this.readMem($offset$$)));
+  this.setUint8($offset$$, this.inc8(this.getUint8($offset$$)));
 }, decMem:function $JSSMS$Z80$$decMem$($offset$$) {
-  this.writeMem($offset$$, this.dec8(this.readMem($offset$$)));
+  this.setUint8($offset$$, this.dec8(this.getUint8($offset$$)));
 }, ccf:function $JSSMS$Z80$$ccf$() {
   0 !== (this.f & F_CARRY) ? (this.f &= ~F_CARRY, this.f |= F_HALFCARRY) : (this.f |= F_CARRY, this.f &= ~F_HALFCARRY);
   this.f &= ~F_NEGATIVE;
@@ -1291,7 +1288,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l = this.rlc(this.l);
       break;
     case 6:
-      this.writeMem(this.getHL(), this.rlc(this.readMem(this.getHL())));
+      this.setUint8(this.getHL(), this.rlc(this.getUint8(this.getHL())));
       break;
     case 7:
       this.a = this.rlc(this.a);
@@ -1315,7 +1312,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l = this.rrc(this.l);
       break;
     case 14:
-      this.writeMem(this.getHL(), this.rrc(this.readMem(this.getHL())));
+      this.setUint8(this.getHL(), this.rrc(this.getUint8(this.getHL())));
       break;
     case 15:
       this.a = this.rrc(this.a);
@@ -1339,7 +1336,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l = this.rl(this.l);
       break;
     case 22:
-      this.writeMem(this.getHL(), this.rl(this.readMem(this.getHL())));
+      this.setUint8(this.getHL(), this.rl(this.getUint8(this.getHL())));
       break;
     case 23:
       this.a = this.rl(this.a);
@@ -1363,7 +1360,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l = this.rr(this.l);
       break;
     case 30:
-      this.writeMem(this.getHL(), this.rr(this.readMem(this.getHL())));
+      this.setUint8(this.getHL(), this.rr(this.getUint8(this.getHL())));
       break;
     case 31:
       this.a = this.rr(this.a);
@@ -1387,7 +1384,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l = this.sla(this.l);
       break;
     case 38:
-      this.writeMem(this.getHL(), this.sla(this.readMem(this.getHL())));
+      this.setUint8(this.getHL(), this.sla(this.getUint8(this.getHL())));
       break;
     case 39:
       this.a = this.sla(this.a);
@@ -1411,7 +1408,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l = this.sra(this.l);
       break;
     case 46:
-      this.writeMem(this.getHL(), this.sra(this.readMem(this.getHL())));
+      this.setUint8(this.getHL(), this.sra(this.getUint8(this.getHL())));
       break;
     case 47:
       this.a = this.sra(this.a);
@@ -1435,7 +1432,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l = this.sll(this.l);
       break;
     case 54:
-      this.writeMem(this.getHL(), this.sll(this.readMem(this.getHL())));
+      this.setUint8(this.getHL(), this.sll(this.getUint8(this.getHL())));
       break;
     case 55:
       this.a = this.sll(this.a);
@@ -1459,7 +1456,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l = this.srl(this.l);
       break;
     case 62:
-      this.writeMem(this.getHL(), this.srl(this.readMem(this.getHL())));
+      this.setUint8(this.getHL(), this.srl(this.getUint8(this.getHL())));
       break;
     case 63:
       this.a = this.srl(this.a);
@@ -1483,7 +1480,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.bit(this.l & BIT_0);
       break;
     case 70:
-      this.bit(this.readMem(this.getHL()) & BIT_0);
+      this.bit(this.getUint8(this.getHL()) & BIT_0);
       break;
     case 71:
       this.bit(this.a & BIT_0);
@@ -1507,7 +1504,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.bit(this.l & BIT_1);
       break;
     case 78:
-      this.bit(this.readMem(this.getHL()) & BIT_1);
+      this.bit(this.getUint8(this.getHL()) & BIT_1);
       break;
     case 79:
       this.bit(this.a & BIT_1);
@@ -1531,7 +1528,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.bit(this.l & BIT_2);
       break;
     case 86:
-      this.bit(this.readMem(this.getHL()) & BIT_2);
+      this.bit(this.getUint8(this.getHL()) & BIT_2);
       break;
     case 87:
       this.bit(this.a & BIT_2);
@@ -1555,7 +1552,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.bit(this.l & BIT_3);
       break;
     case 94:
-      this.bit(this.readMem(this.getHL()) & BIT_3);
+      this.bit(this.getUint8(this.getHL()) & BIT_3);
       break;
     case 95:
       this.bit(this.a & BIT_3);
@@ -1579,7 +1576,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.bit(this.l & BIT_4);
       break;
     case 102:
-      this.bit(this.readMem(this.getHL()) & BIT_4);
+      this.bit(this.getUint8(this.getHL()) & BIT_4);
       break;
     case 103:
       this.bit(this.a & BIT_4);
@@ -1603,7 +1600,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.bit(this.l & BIT_5);
       break;
     case 110:
-      this.bit(this.readMem(this.getHL()) & BIT_5);
+      this.bit(this.getUint8(this.getHL()) & BIT_5);
       break;
     case 111:
       this.bit(this.a & BIT_5);
@@ -1627,7 +1624,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.bit(this.l & BIT_6);
       break;
     case 118:
-      this.bit(this.readMem(this.getHL()) & BIT_6);
+      this.bit(this.getUint8(this.getHL()) & BIT_6);
       break;
     case 119:
       this.bit(this.a & BIT_6);
@@ -1651,7 +1648,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.bit(this.l & BIT_7);
       break;
     case 126:
-      this.bit(this.readMem(this.getHL()) & BIT_7);
+      this.bit(this.getUint8(this.getHL()) & BIT_7);
       break;
     case 127:
       this.bit(this.a & BIT_7);
@@ -1675,7 +1672,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l &= ~BIT_0;
       break;
     case 134:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_0);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_0);
       break;
     case 135:
       this.a &= ~BIT_0;
@@ -1699,7 +1696,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l &= ~BIT_1;
       break;
     case 142:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_1);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_1);
       break;
     case 143:
       this.a &= ~BIT_1;
@@ -1723,7 +1720,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l &= ~BIT_2;
       break;
     case 150:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_2);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_2);
       break;
     case 151:
       this.a &= ~BIT_2;
@@ -1747,7 +1744,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l &= ~BIT_3;
       break;
     case 158:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_3);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_3);
       break;
     case 159:
       this.a &= ~BIT_3;
@@ -1771,7 +1768,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l &= ~BIT_4;
       break;
     case 166:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_4);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_4);
       break;
     case 167:
       this.a &= ~BIT_4;
@@ -1795,7 +1792,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l &= ~BIT_5;
       break;
     case 174:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_5);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_5);
       break;
     case 175:
       this.a &= ~BIT_5;
@@ -1819,7 +1816,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l &= ~BIT_6;
       break;
     case 182:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_6);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_6);
       break;
     case 183:
       this.a &= ~BIT_6;
@@ -1843,7 +1840,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l &= ~BIT_7;
       break;
     case 190:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_7);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_7);
       break;
     case 191:
       this.a &= ~BIT_7;
@@ -1867,7 +1864,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l |= BIT_0;
       break;
     case 198:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_0);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_0);
       break;
     case 199:
       this.a |= BIT_0;
@@ -1891,7 +1888,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l |= BIT_1;
       break;
     case 206:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_1);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_1);
       break;
     case 207:
       this.a |= BIT_1;
@@ -1915,7 +1912,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l |= BIT_2;
       break;
     case 214:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_2);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_2);
       break;
     case 215:
       this.a |= BIT_2;
@@ -1939,7 +1936,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l |= BIT_3;
       break;
     case 222:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_3);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_3);
       break;
     case 223:
       this.a |= BIT_3;
@@ -1963,7 +1960,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l |= BIT_4;
       break;
     case 230:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_4);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_4);
       break;
     case 231:
       this.a |= BIT_4;
@@ -1987,7 +1984,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l |= BIT_5;
       break;
     case 238:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_5);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_5);
       break;
     case 239:
       this.a |= BIT_5;
@@ -2011,7 +2008,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l |= BIT_6;
       break;
     case 246:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_6);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_6);
       break;
     case 247:
       this.a |= BIT_6;
@@ -2035,7 +2032,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.l |= BIT_7;
       break;
     case 254:
-      this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_7);
+      this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_7);
       break;
     case 255:
       this.a |= BIT_7;
@@ -2097,11 +2094,11 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.setIXHIXL(this.add16(this.getIXHIXL(), this.getDE()));
       break;
     case 33:
-      this.setIXHIXL(this.readMemWord(this.pc++));
+      this.setIXHIXL(this.getUint16(this.pc++));
       this.pc++;
       break;
     case 34:
-      this.writeMemWord(this.readMemWord(this.pc++), this.getIXHIXL());
+      this.setUint16(this.getUint16(this.pc++), this.getIXHIXL());
       this.pc++;
       break;
     case 35:
@@ -2114,13 +2111,13 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.ixH = this.dec8(this.ixH);
       break;
     case 38:
-      this.ixH = this.readMem(this.pc++);
+      this.ixH = this.getUint8(this.pc++);
       break;
     case 41:
       this.setIXHIXL(this.add16(this.getIXHIXL(), this.getIXHIXL()));
       break;
     case 42:
-      this.setIXHIXL(this.readMemWord(this.readMemWord(this.pc++)));
+      this.setIXHIXL(this.getUint16(this.getUint16(this.pc++)));
       this.pc++;
       break;
     case 43:
@@ -2133,7 +2130,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.ixL = this.dec8(this.ixL);
       break;
     case 46:
-      this.ixL = this.readMem(this.pc++);
+      this.ixL = this.getUint8(this.pc++);
       break;
     case 52:
       this.incMem(this.getIXHIXL() + this.d_());
@@ -2144,7 +2141,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc++;
       break;
     case 54:
-      this.writeMem(this.getIXHIXL() + this.d_(), this.readMem(++this.pc));
+      this.setUint8(this.getIXHIXL() + this.d_(), this.getUint8(++this.pc));
       this.pc++;
       break;
     case 57:
@@ -2157,7 +2154,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.b = this.ixL;
       break;
     case 70:
-      this.b = this.readMem(this.getIXHIXL() + this.d_());
+      this.b = this.getUint8(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 76:
@@ -2167,7 +2164,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.c = this.ixL;
       break;
     case 78:
-      this.c = this.readMem(this.getIXHIXL() + this.d_());
+      this.c = this.getUint8(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 84:
@@ -2177,7 +2174,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.d = this.ixL;
       break;
     case 86:
-      this.d = this.readMem(this.getIXHIXL() + this.d_());
+      this.d = this.getUint8(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 92:
@@ -2187,7 +2184,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.e = this.ixL;
       break;
     case 94:
-      this.e = this.readMem(this.getIXHIXL() + this.d_());
+      this.e = this.getUint8(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 96:
@@ -2208,7 +2205,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.ixH = this.ixL;
       break;
     case 102:
-      this.h = this.readMem(this.getIXHIXL() + this.d_());
+      this.h = this.getUint8(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 103:
@@ -2232,38 +2229,38 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 109:
       break;
     case 110:
-      this.l = this.readMem(this.getIXHIXL() + this.d_());
+      this.l = this.getUint8(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 111:
       this.ixL = this.a;
       break;
     case 112:
-      this.writeMem(this.getIXHIXL() + this.d_(), this.b);
+      this.setUint8(this.getIXHIXL() + this.d_(), this.b);
       this.pc++;
       break;
     case 113:
-      this.writeMem(this.getIXHIXL() + this.d_(), this.c);
+      this.setUint8(this.getIXHIXL() + this.d_(), this.c);
       this.pc++;
       break;
     case 114:
-      this.writeMem(this.getIXHIXL() + this.d_(), this.d);
+      this.setUint8(this.getIXHIXL() + this.d_(), this.d);
       this.pc++;
       break;
     case 115:
-      this.writeMem(this.getIXHIXL() + this.d_(), this.e);
+      this.setUint8(this.getIXHIXL() + this.d_(), this.e);
       this.pc++;
       break;
     case 116:
-      this.writeMem(this.getIXHIXL() + this.d_(), this.h);
+      this.setUint8(this.getIXHIXL() + this.d_(), this.h);
       this.pc++;
       break;
     case 117:
-      this.writeMem(this.getIXHIXL() + this.d_(), this.l);
+      this.setUint8(this.getIXHIXL() + this.d_(), this.l);
       this.pc++;
       break;
     case 119:
-      this.writeMem(this.getIXHIXL() + this.d_(), this.a);
+      this.setUint8(this.getIXHIXL() + this.d_(), this.a);
       this.pc++;
       break;
     case 124:
@@ -2273,7 +2270,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.a = this.ixL;
       break;
     case 126:
-      this.a = this.readMem(this.getIXHIXL() + this.d_());
+      this.a = this.getUint8(this.getIXHIXL() + this.d_());
       this.pc++;
       break;
     case 132:
@@ -2283,7 +2280,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.add_a(this.ixL);
       break;
     case 134:
-      this.add_a(this.readMem(this.getIXHIXL() + this.d_()));
+      this.add_a(this.getUint8(this.getIXHIXL() + this.d_()));
       this.pc++;
       break;
     case 140:
@@ -2293,7 +2290,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.adc_a(this.ixL);
       break;
     case 142:
-      this.adc_a(this.readMem(this.getIXHIXL() + this.d_()));
+      this.adc_a(this.getUint8(this.getIXHIXL() + this.d_()));
       this.pc++;
       break;
     case 148:
@@ -2303,7 +2300,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.sub_a(this.ixL);
       break;
     case 150:
-      this.sub_a(this.readMem(this.getIXHIXL() + this.d_()));
+      this.sub_a(this.getUint8(this.getIXHIXL() + this.d_()));
       this.pc++;
       break;
     case 156:
@@ -2313,7 +2310,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.sbc_a(this.ixL);
       break;
     case 158:
-      this.sbc_a(this.readMem(this.getIXHIXL() + this.d_()));
+      this.sbc_a(this.getUint8(this.getIXHIXL() + this.d_()));
       this.pc++;
       break;
     case 164:
@@ -2323,7 +2320,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a &= this.ixL] | F_HALFCARRY;
       break;
     case 166:
-      this.f = this.SZP_TABLE[this.a &= this.readMem(this.getIXHIXL() + this.d_())] | F_HALFCARRY;
+      this.f = this.SZP_TABLE[this.a &= this.getUint8(this.getIXHIXL() + this.d_())] | F_HALFCARRY;
       this.pc++;
       break;
     case 172:
@@ -2333,7 +2330,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a ^= this.ixL];
       break;
     case 174:
-      this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIXHIXL() + this.d_())];
+      this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.getIXHIXL() + this.d_())];
       this.pc++;
       break;
     case 180:
@@ -2343,7 +2340,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a |= this.ixL];
       break;
     case 182:
-      this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIXHIXL() + this.d_())];
+      this.f = this.SZP_TABLE[this.a |= this.getUint8(this.getIXHIXL() + this.d_())];
       this.pc++;
       break;
     case 188:
@@ -2353,20 +2350,20 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.cp_a(this.ixL);
       break;
     case 190:
-      this.cp_a(this.readMem(this.getIXHIXL() + this.d_()));
+      this.cp_a(this.getUint8(this.getIXHIXL() + this.d_()));
       this.pc++;
       break;
     case 203:
       this.doIndexCB(this.getIXHIXL());
       break;
     case 225:
-      this.setIXHIXL(this.readMemWord(this.sp));
+      this.setIXHIXL(this.getUint16(this.sp));
       this.sp += 2;
       break;
     case 227:
       $temp$$ = this.getIXHIXL();
-      this.setIXHIXL(this.readMemWord(this.sp));
-      this.writeMemWord(this.sp, $temp$$);
+      this.setIXHIXL(this.getUint16(this.sp));
+      this.setUint16(this.sp, $temp$$);
       break;
     case 229:
       this.push(this.getIXHIXL());
@@ -2391,11 +2388,11 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.setIYHIYL(this.add16(this.getIYHIYL(), this.getDE()));
       break;
     case 33:
-      this.setIYHIYL(this.readMemWord(this.pc++));
+      this.setIYHIYL(this.getUint16(this.pc++));
       this.pc++;
       break;
     case 34:
-      this.writeMemWord(this.readMemWord(this.pc++), this.getIYHIYL());
+      this.setUint16(this.getUint16(this.pc++), this.getIYHIYL());
       this.pc++;
       break;
     case 35:
@@ -2408,13 +2405,13 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.iyH = this.dec8(this.iyH);
       break;
     case 38:
-      this.iyH = this.readMem(this.pc++);
+      this.iyH = this.getUint8(this.pc++);
       break;
     case 41:
       this.setIYHIYL(this.add16(this.getIYHIYL(), this.getIYHIYL()));
       break;
     case 42:
-      this.setIYHIYL(this.readMemWord(this.readMemWord(this.pc++)));
+      this.setIYHIYL(this.getUint16(this.getUint16(this.pc++)));
       this.pc++;
       break;
     case 43:
@@ -2427,7 +2424,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.iyL = this.dec8(this.iyL);
       break;
     case 46:
-      this.iyL = this.readMem(this.pc++);
+      this.iyL = this.getUint8(this.pc++);
       break;
     case 52:
       this.incMem(this.getIYHIYL() + this.d_());
@@ -2438,7 +2435,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc++;
       break;
     case 54:
-      this.writeMem(this.getIYHIYL() + this.d_(), this.readMem(++this.pc));
+      this.setUint8(this.getIYHIYL() + this.d_(), this.getUint8(++this.pc));
       this.pc++;
       break;
     case 57:
@@ -2451,7 +2448,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.b = this.iyL;
       break;
     case 70:
-      this.b = this.readMem(this.getIYHIYL() + this.d_());
+      this.b = this.getUint8(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 76:
@@ -2461,7 +2458,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.c = this.iyL;
       break;
     case 78:
-      this.c = this.readMem(this.getIYHIYL() + this.d_());
+      this.c = this.getUint8(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 84:
@@ -2471,7 +2468,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.d = this.iyL;
       break;
     case 86:
-      this.d = this.readMem(this.getIYHIYL() + this.d_());
+      this.d = this.getUint8(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 92:
@@ -2481,7 +2478,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.e = this.iyL;
       break;
     case 94:
-      this.e = this.readMem(this.getIYHIYL() + this.d_());
+      this.e = this.getUint8(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 96:
@@ -2502,7 +2499,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.iyH = this.iyL;
       break;
     case 102:
-      this.h = this.readMem(this.getIYHIYL() + this.d_());
+      this.h = this.getUint8(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 103:
@@ -2526,38 +2523,38 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 109:
       break;
     case 110:
-      this.l = this.readMem(this.getIYHIYL() + this.d_());
+      this.l = this.getUint8(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 111:
       this.iyL = this.a;
       break;
     case 112:
-      this.writeMem(this.getIYHIYL() + this.d_(), this.b);
+      this.setUint8(this.getIYHIYL() + this.d_(), this.b);
       this.pc++;
       break;
     case 113:
-      this.writeMem(this.getIYHIYL() + this.d_(), this.c);
+      this.setUint8(this.getIYHIYL() + this.d_(), this.c);
       this.pc++;
       break;
     case 114:
-      this.writeMem(this.getIYHIYL() + this.d_(), this.d);
+      this.setUint8(this.getIYHIYL() + this.d_(), this.d);
       this.pc++;
       break;
     case 115:
-      this.writeMem(this.getIYHIYL() + this.d_(), this.e);
+      this.setUint8(this.getIYHIYL() + this.d_(), this.e);
       this.pc++;
       break;
     case 116:
-      this.writeMem(this.getIYHIYL() + this.d_(), this.h);
+      this.setUint8(this.getIYHIYL() + this.d_(), this.h);
       this.pc++;
       break;
     case 117:
-      this.writeMem(this.getIYHIYL() + this.d_(), this.l);
+      this.setUint8(this.getIYHIYL() + this.d_(), this.l);
       this.pc++;
       break;
     case 119:
-      this.writeMem(this.getIYHIYL() + this.d_(), this.a);
+      this.setUint8(this.getIYHIYL() + this.d_(), this.a);
       this.pc++;
       break;
     case 124:
@@ -2567,7 +2564,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.a = this.iyL;
       break;
     case 126:
-      this.a = this.readMem(this.getIYHIYL() + this.d_());
+      this.a = this.getUint8(this.getIYHIYL() + this.d_());
       this.pc++;
       break;
     case 132:
@@ -2577,7 +2574,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.add_a(this.iyL);
       break;
     case 134:
-      this.add_a(this.readMem(this.getIYHIYL() + this.d_()));
+      this.add_a(this.getUint8(this.getIYHIYL() + this.d_()));
       this.pc++;
       break;
     case 140:
@@ -2587,7 +2584,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.adc_a(this.iyL);
       break;
     case 142:
-      this.adc_a(this.readMem(this.getIYHIYL() + this.d_()));
+      this.adc_a(this.getUint8(this.getIYHIYL() + this.d_()));
       this.pc++;
       break;
     case 148:
@@ -2597,7 +2594,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.sub_a(this.iyL);
       break;
     case 150:
-      this.sub_a(this.readMem(this.getIYHIYL() + this.d_()));
+      this.sub_a(this.getUint8(this.getIYHIYL() + this.d_()));
       this.pc++;
       break;
     case 156:
@@ -2607,7 +2604,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.sbc_a(this.iyL);
       break;
     case 158:
-      this.sbc_a(this.readMem(this.getIYHIYL() + this.d_()));
+      this.sbc_a(this.getUint8(this.getIYHIYL() + this.d_()));
       this.pc++;
       break;
     case 164:
@@ -2617,7 +2614,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a &= this.iyL] | F_HALFCARRY;
       break;
     case 166:
-      this.f = this.SZP_TABLE[this.a &= this.readMem(this.getIYHIYL() + this.d_())] | F_HALFCARRY;
+      this.f = this.SZP_TABLE[this.a &= this.getUint8(this.getIYHIYL() + this.d_())] | F_HALFCARRY;
       this.pc++;
       break;
     case 172:
@@ -2627,7 +2624,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a ^= this.iyL];
       break;
     case 174:
-      this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getIYHIYL() + this.d_())];
+      this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.getIYHIYL() + this.d_())];
       this.pc++;
       break;
     case 180:
@@ -2637,7 +2634,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = this.SZP_TABLE[this.a |= this.iyL];
       break;
     case 182:
-      this.f = this.SZP_TABLE[this.a |= this.readMem(this.getIYHIYL() + this.d_())];
+      this.f = this.SZP_TABLE[this.a |= this.getUint8(this.getIYHIYL() + this.d_())];
       this.pc++;
       break;
     case 188:
@@ -2647,20 +2644,20 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.cp_a(this.iyL);
       break;
     case 190:
-      this.cp_a(this.readMem(this.getIYHIYL() + this.d_()));
+      this.cp_a(this.getUint8(this.getIYHIYL() + this.d_()));
       this.pc++;
       break;
     case 203:
       this.doIndexCB(this.getIYHIYL());
       break;
     case 225:
-      this.setIYHIYL(this.readMemWord(this.sp));
+      this.setIYHIYL(this.getUint16(this.sp));
       this.sp += 2;
       break;
     case 227:
       $opcode$$3_temp$$ = this.getIYHIYL();
-      this.setIYHIYL(this.readMemWord(this.sp));
-      this.writeMemWord(this.sp, $opcode$$3_temp$$);
+      this.setIYHIYL(this.getUint16(this.sp));
+      this.setUint16(this.sp, $opcode$$3_temp$$);
       break;
     case 229:
       this.push(this.getIYHIYL());
@@ -2675,257 +2672,257 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       JSSMS.Utils.console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex($opcode$$3_temp$$)), this.pc--;
   }
 }, doIndexCB:function $JSSMS$Z80$$doIndexCB$($index$$46_location$$) {
-  $index$$46_location$$ = $index$$46_location$$ + this.readMem(this.pc) & 65535;
-  var $opcode$$ = this.readMem(++this.pc);
+  $index$$46_location$$ = $index$$46_location$$ + this.getUint8(this.pc) & 65535;
+  var $opcode$$ = this.getUint8(++this.pc);
   this.tstates -= OP_INDEX_CB_STATES[$opcode$$];
   switch($opcode$$) {
     case 0:
-      this.b = this.rlc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.b);
+      this.b = this.rlc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.b);
       break;
     case 1:
-      this.c = this.rlc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.c);
+      this.c = this.rlc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.c);
       break;
     case 2:
-      this.d = this.rlc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.d);
+      this.d = this.rlc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.d);
       break;
     case 3:
-      this.e = this.rlc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.e);
+      this.e = this.rlc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.e);
       break;
     case 4:
-      this.h = this.rlc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.h);
+      this.h = this.rlc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.h);
       break;
     case 5:
-      this.l = this.rlc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.l);
+      this.l = this.rlc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.l);
       break;
     case 6:
-      this.writeMem($index$$46_location$$, this.rlc(this.readMem($index$$46_location$$)));
+      this.setUint8($index$$46_location$$, this.rlc(this.getUint8($index$$46_location$$)));
       break;
     case 7:
-      this.a = this.rlc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.a);
+      this.a = this.rlc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.a);
       break;
     case 8:
-      this.b = this.rrc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.b);
+      this.b = this.rrc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.b);
       break;
     case 9:
-      this.c = this.rrc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.c);
+      this.c = this.rrc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.c);
       break;
     case 10:
-      this.d = this.rrc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.d);
+      this.d = this.rrc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.d);
       break;
     case 11:
-      this.e = this.rrc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.e);
+      this.e = this.rrc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.e);
       break;
     case 12:
-      this.h = this.rrc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.h);
+      this.h = this.rrc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.h);
       break;
     case 13:
-      this.l = this.rrc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.l);
+      this.l = this.rrc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.l);
       break;
     case 14:
-      this.writeMem($index$$46_location$$, this.rrc(this.readMem($index$$46_location$$)));
+      this.setUint8($index$$46_location$$, this.rrc(this.getUint8($index$$46_location$$)));
       break;
     case 15:
-      this.a = this.rrc(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.a);
+      this.a = this.rrc(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.a);
       break;
     case 16:
-      this.b = this.rl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.b);
+      this.b = this.rl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.b);
       break;
     case 17:
-      this.c = this.rl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.c);
+      this.c = this.rl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.c);
       break;
     case 18:
-      this.d = this.rl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.d);
+      this.d = this.rl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.d);
       break;
     case 19:
-      this.e = this.rl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.e);
+      this.e = this.rl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.e);
       break;
     case 20:
-      this.h = this.rl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.h);
+      this.h = this.rl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.h);
       break;
     case 21:
-      this.l = this.rl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.l);
+      this.l = this.rl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.l);
       break;
     case 22:
-      this.writeMem($index$$46_location$$, this.rl(this.readMem($index$$46_location$$)));
+      this.setUint8($index$$46_location$$, this.rl(this.getUint8($index$$46_location$$)));
       break;
     case 23:
-      this.a = this.rl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.a);
+      this.a = this.rl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.a);
       break;
     case 24:
-      this.b = this.rr(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.b);
+      this.b = this.rr(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.b);
       break;
     case 25:
-      this.c = this.rr(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.c);
+      this.c = this.rr(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.c);
       break;
     case 26:
-      this.d = this.rr(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.d);
+      this.d = this.rr(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.d);
       break;
     case 27:
-      this.e = this.rr(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.e);
+      this.e = this.rr(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.e);
       break;
     case 28:
-      this.h = this.rr(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.h);
+      this.h = this.rr(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.h);
       break;
     case 29:
-      this.l = this.rr(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.l);
+      this.l = this.rr(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.l);
       break;
     case 30:
-      this.writeMem($index$$46_location$$, this.rr(this.readMem($index$$46_location$$)));
+      this.setUint8($index$$46_location$$, this.rr(this.getUint8($index$$46_location$$)));
       break;
     case 31:
-      this.a = this.rr(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.a);
+      this.a = this.rr(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.a);
       break;
     case 32:
-      this.b = this.sla(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.b);
+      this.b = this.sla(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.b);
       break;
     case 33:
-      this.c = this.sla(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.c);
+      this.c = this.sla(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.c);
       break;
     case 34:
-      this.d = this.sla(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.d);
+      this.d = this.sla(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.d);
       break;
     case 35:
-      this.e = this.sla(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.e);
+      this.e = this.sla(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.e);
       break;
     case 36:
-      this.h = this.sla(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.h);
+      this.h = this.sla(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.h);
       break;
     case 37:
-      this.l = this.sla(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.l);
+      this.l = this.sla(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.l);
       break;
     case 38:
-      this.writeMem($index$$46_location$$, this.sla(this.readMem($index$$46_location$$)));
+      this.setUint8($index$$46_location$$, this.sla(this.getUint8($index$$46_location$$)));
       break;
     case 39:
-      this.a = this.sla(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.a);
+      this.a = this.sla(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.a);
       break;
     case 40:
-      this.b = this.sra(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.b);
+      this.b = this.sra(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.b);
       break;
     case 41:
-      this.c = this.sra(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.c);
+      this.c = this.sra(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.c);
       break;
     case 42:
-      this.d = this.sra(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.d);
+      this.d = this.sra(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.d);
       break;
     case 43:
-      this.e = this.sra(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.e);
+      this.e = this.sra(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.e);
       break;
     case 44:
-      this.h = this.sra(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.h);
+      this.h = this.sra(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.h);
       break;
     case 45:
-      this.l = this.sra(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.l);
+      this.l = this.sra(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.l);
       break;
     case 46:
-      this.writeMem($index$$46_location$$, this.sra(this.readMem($index$$46_location$$)));
+      this.setUint8($index$$46_location$$, this.sra(this.getUint8($index$$46_location$$)));
       break;
     case 47:
-      this.a = this.sra(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.a);
+      this.a = this.sra(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.a);
       break;
     case 48:
-      this.b = this.sll(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.b);
+      this.b = this.sll(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.b);
       break;
     case 49:
-      this.c = this.sll(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.c);
+      this.c = this.sll(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.c);
       break;
     case 50:
-      this.d = this.sll(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.d);
+      this.d = this.sll(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.d);
       break;
     case 51:
-      this.e = this.sll(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.e);
+      this.e = this.sll(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.e);
       break;
     case 52:
-      this.h = this.sll(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.h);
+      this.h = this.sll(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.h);
       break;
     case 53:
-      this.l = this.sll(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.l);
+      this.l = this.sll(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.l);
       break;
     case 54:
-      this.writeMem($index$$46_location$$, this.sll(this.readMem($index$$46_location$$)));
+      this.setUint8($index$$46_location$$, this.sll(this.getUint8($index$$46_location$$)));
       break;
     case 55:
-      this.a = this.sll(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.a);
+      this.a = this.sll(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.a);
       break;
     case 56:
-      this.b = this.srl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.b);
+      this.b = this.srl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.b);
       break;
     case 57:
-      this.c = this.srl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.c);
+      this.c = this.srl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.c);
       break;
     case 58:
-      this.d = this.srl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.d);
+      this.d = this.srl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.d);
       break;
     case 59:
-      this.e = this.srl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.e);
+      this.e = this.srl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.e);
       break;
     case 60:
-      this.h = this.srl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.h);
+      this.h = this.srl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.h);
       break;
     case 61:
-      this.l = this.srl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.l);
+      this.l = this.srl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.l);
       break;
     case 62:
-      this.writeMem($index$$46_location$$, this.srl(this.readMem($index$$46_location$$)));
+      this.setUint8($index$$46_location$$, this.srl(this.getUint8($index$$46_location$$)));
       break;
     case 63:
-      this.a = this.srl(this.readMem($index$$46_location$$));
-      this.writeMem($index$$46_location$$, this.a);
+      this.a = this.srl(this.getUint8($index$$46_location$$));
+      this.setUint8($index$$46_location$$, this.a);
       break;
     case 64:
     ;
@@ -2942,7 +2939,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 70:
     ;
     case 71:
-      this.bit(this.readMem($index$$46_location$$) & BIT_0);
+      this.bit(this.getUint8($index$$46_location$$) & BIT_0);
       break;
     case 72:
     ;
@@ -2959,7 +2956,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 78:
     ;
     case 79:
-      this.bit(this.readMem($index$$46_location$$) & BIT_1);
+      this.bit(this.getUint8($index$$46_location$$) & BIT_1);
       break;
     case 80:
     ;
@@ -2976,7 +2973,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 86:
     ;
     case 87:
-      this.bit(this.readMem($index$$46_location$$) & BIT_2);
+      this.bit(this.getUint8($index$$46_location$$) & BIT_2);
       break;
     case 88:
     ;
@@ -2993,7 +2990,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 94:
     ;
     case 95:
-      this.bit(this.readMem($index$$46_location$$) & BIT_3);
+      this.bit(this.getUint8($index$$46_location$$) & BIT_3);
       break;
     case 96:
     ;
@@ -3010,7 +3007,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 102:
     ;
     case 103:
-      this.bit(this.readMem($index$$46_location$$) & BIT_4);
+      this.bit(this.getUint8($index$$46_location$$) & BIT_4);
       break;
     case 104:
     ;
@@ -3027,7 +3024,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 110:
     ;
     case 111:
-      this.bit(this.readMem($index$$46_location$$) & BIT_5);
+      this.bit(this.getUint8($index$$46_location$$) & BIT_5);
       break;
     case 112:
     ;
@@ -3044,7 +3041,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 118:
     ;
     case 119:
-      this.bit(this.readMem($index$$46_location$$) & BIT_6);
+      this.bit(this.getUint8($index$$46_location$$) & BIT_6);
       break;
     case 120:
     ;
@@ -3061,7 +3058,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 126:
     ;
     case 127:
-      this.bit(this.readMem($index$$46_location$$) & BIT_7);
+      this.bit(this.getUint8($index$$46_location$$) & BIT_7);
       break;
     case 128:
     ;
@@ -3078,7 +3075,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 134:
     ;
     case 135:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) & ~BIT_0);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) & ~BIT_0);
       break;
     case 136:
     ;
@@ -3095,7 +3092,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 142:
     ;
     case 143:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) & ~BIT_1);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) & ~BIT_1);
       break;
     case 144:
     ;
@@ -3112,7 +3109,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 150:
     ;
     case 151:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) & ~BIT_2);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) & ~BIT_2);
       break;
     case 152:
     ;
@@ -3129,7 +3126,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 158:
     ;
     case 159:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) & ~BIT_3);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) & ~BIT_3);
       break;
     case 160:
     ;
@@ -3146,7 +3143,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 166:
     ;
     case 167:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) & ~BIT_4);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) & ~BIT_4);
       break;
     case 168:
     ;
@@ -3163,7 +3160,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 174:
     ;
     case 175:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) & ~BIT_5);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) & ~BIT_5);
       break;
     case 176:
     ;
@@ -3180,7 +3177,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 182:
     ;
     case 183:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) & ~BIT_6);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) & ~BIT_6);
       break;
     case 184:
     ;
@@ -3197,7 +3194,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 190:
     ;
     case 191:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) & ~BIT_7);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) & ~BIT_7);
       break;
     case 192:
     ;
@@ -3214,7 +3211,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 198:
     ;
     case 199:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) | BIT_0);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) | BIT_0);
       break;
     case 200:
     ;
@@ -3231,7 +3228,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 206:
     ;
     case 207:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) | BIT_1);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) | BIT_1);
       break;
     case 208:
     ;
@@ -3248,7 +3245,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 214:
     ;
     case 215:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) | BIT_2);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) | BIT_2);
       break;
     case 216:
     ;
@@ -3265,7 +3262,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 222:
     ;
     case 223:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) | BIT_3);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) | BIT_3);
       break;
     case 224:
     ;
@@ -3282,7 +3279,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 230:
     ;
     case 231:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) | BIT_4);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) | BIT_4);
       break;
     case 232:
     ;
@@ -3299,7 +3296,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 238:
     ;
     case 239:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) | BIT_5);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) | BIT_5);
       break;
     case 240:
     ;
@@ -3316,7 +3313,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 246:
     ;
     case 247:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) | BIT_6);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) | BIT_6);
       break;
     case 248:
     ;
@@ -3333,7 +3330,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 254:
     ;
     case 255:
-      this.writeMem($index$$46_location$$, this.readMem($index$$46_location$$) | BIT_7);
+      this.setUint8($index$$46_location$$, this.getUint8($index$$46_location$$) | BIT_7);
       break;
     default:
       JSSMS.Utils.console.log("Unimplemented DDCB/FDCB Opcode: " + JSSMS.Utils.toHex($opcode$$));
@@ -3358,7 +3355,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc++;
       break;
     case 67:
-      this.writeMemWord(this.readMemWord(++this.pc), this.getBC());
+      this.setUint16(this.getUint16(++this.pc), this.getBC());
       this.pc += 2;
       break;
     case 68:
@@ -3396,7 +3393,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 117:
     ;
     case 125:
-      this.pc = this.readMemWord(this.sp);
+      this.pc = this.getUint16(this.sp);
       this.sp += 2;
       this.iff1 = this.iff2;
       break;
@@ -3428,7 +3425,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc++;
       break;
     case 75:
-      this.setBC(this.readMemWord(this.readMemWord(++this.pc)));
+      this.setBC(this.getUint16(this.getUint16(++this.pc)));
       this.pc += 2;
       break;
     case 79:
@@ -3449,7 +3446,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc++;
       break;
     case 83:
-      this.writeMemWord(this.readMemWord(++this.pc), this.getDE());
+      this.setUint16(this.getUint16(++this.pc), this.getDE());
       this.pc += 2;
       break;
     case 86:
@@ -3477,7 +3474,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc++;
       break;
     case 91:
-      this.setDE(this.readMemWord(this.readMemWord(++this.pc)));
+      this.setDE(this.getUint16(this.getUint16(++this.pc)));
       this.pc += 2;
       break;
     case 95:
@@ -3499,13 +3496,13 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc++;
       break;
     case 99:
-      this.writeMemWord(this.readMemWord(++this.pc), this.getHL());
+      this.setUint16(this.getUint16(++this.pc), this.getHL());
       this.pc += 2;
       break;
     case 103:
       $location$$ = this.getHL();
-      $temp$$ = this.readMem($location$$);
-      this.writeMem($location$$, $temp$$ >> 4 | (this.a & 15) << 4);
+      $temp$$ = this.getUint8($location$$);
+      this.setUint8($location$$, $temp$$ >> 4 | (this.a & 15) << 4);
       this.a = this.a & 240 | $temp$$ & 15;
       this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];
       this.pc++;
@@ -3524,13 +3521,13 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc++;
       break;
     case 107:
-      this.setHL(this.readMemWord(this.readMemWord(++this.pc)));
+      this.setHL(this.getUint16(this.getUint16(++this.pc)));
       this.pc += 2;
       break;
     case 111:
       $location$$ = this.getHL();
-      $temp$$ = this.readMem($location$$);
-      this.writeMem($location$$, ($temp$$ & 15) << 4 | this.a & 15);
+      $temp$$ = this.getUint8($location$$);
+      this.setUint8($location$$, ($temp$$ & 15) << 4 | this.a & 15);
       this.a = this.a & 240 | $temp$$ >> 4;
       this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];
       this.pc++;
@@ -3544,7 +3541,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc++;
       break;
     case 115:
-      this.writeMemWord(this.readMemWord(++this.pc), this.sp);
+      this.setUint16(this.getUint16(++this.pc), this.sp);
       this.pc += 2;
       break;
     case 120:
@@ -3561,12 +3558,12 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc++;
       break;
     case 123:
-      this.sp = this.readMemWord(this.readMemWord(++this.pc));
+      this.sp = this.getUint16(this.getUint16(++this.pc));
       this.pc += 2;
       break;
     case 160:
-      $temp$$ = this.readMem(this.getHL());
-      this.writeMem(this.getDE(), $temp$$);
+      $temp$$ = this.getUint8(this.getHL());
+      this.setUint8(this.getDE(), $temp$$);
       this.decBC();
       this.incDE();
       this.incHL();
@@ -3576,7 +3573,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       break;
     case 161:
       $temp$$ = this.f & F_CARRY | F_NEGATIVE;
-      this.cp_a(this.readMem(this.getHL()));
+      this.cp_a(this.getUint8(this.getHL()));
       this.decBC();
       this.incHL();
       $temp$$ |= 0 === this.getBC() ? 0 : F_PARITY;
@@ -3585,14 +3582,14 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       break;
     case 162:
       $temp$$ = this.port.in_(this.c);
-      this.writeMem(this.getHL(), $temp$$);
+      this.setUint8(this.getHL(), $temp$$);
       this.b = this.dec8(this.b);
       this.incHL();
       this.f = 128 === ($temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
       this.pc++;
       break;
     case 163:
-      $temp$$ = this.readMem(this.getHL());
+      $temp$$ = this.getUint8(this.getHL());
       this.port.out(this.c, $temp$$);
       this.b = this.dec8(this.b);
       this.incHL();
@@ -3601,8 +3598,8 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc++;
       break;
     case 168:
-      $temp$$ = this.readMem(this.getHL());
-      this.writeMem(this.getDE(), $temp$$);
+      $temp$$ = this.getUint8(this.getHL());
+      this.setUint8(this.getDE(), $temp$$);
       this.decBC();
       this.decDE();
       this.decHL();
@@ -3612,7 +3609,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       break;
     case 169:
       $temp$$ = this.f & F_CARRY | F_NEGATIVE;
-      this.cp_a(this.readMem(this.getHL()));
+      this.cp_a(this.getUint8(this.getHL()));
       this.decBC();
       this.decHL();
       $temp$$ |= 0 === this.getBC() ? 0 : F_PARITY;
@@ -3621,14 +3618,14 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       break;
     case 170:
       $temp$$ = this.port.in_(this.c);
-      this.writeMem(this.getHL(), $temp$$);
+      this.setUint8(this.getHL(), $temp$$);
       this.b = this.dec8(this.b);
       this.decHL();
       this.f = 0 !== ($temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
       this.pc++;
       break;
     case 171:
-      $temp$$ = this.readMem(this.getHL());
+      $temp$$ = this.getUint8(this.getHL());
       this.port.out(this.c, $temp$$);
       this.b = this.dec8(this.b);
       this.decHL();
@@ -3637,8 +3634,8 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc++;
       break;
     case 176:
-      $temp$$ = this.readMem(this.getHL());
-      this.writeMem(this.getDE(), $temp$$);
+      $temp$$ = this.getUint8(this.getHL());
+      this.setUint8(this.getDE(), $temp$$);
       this.decBC();
       this.incDE();
       this.incHL();
@@ -3648,7 +3645,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       break;
     case 177:
       $temp$$ = this.f & F_CARRY | F_NEGATIVE;
-      this.cp_a(this.readMem(this.getHL()));
+      this.cp_a(this.getUint8(this.getHL()));
       this.decBC();
       this.incHL();
       $temp$$ |= 0 === this.getBC() ? 0 : F_PARITY;
@@ -3657,14 +3654,14 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       break;
     case 178:
       $temp$$ = this.port.in_(this.c);
-      this.writeMem(this.getHL(), $temp$$);
+      this.setUint8(this.getHL(), $temp$$);
       this.b = this.dec8(this.b);
       this.incHL();
       0 !== this.b ? (this.tstates -= 5, this.pc--) : this.pc++;
       this.f = 128 === ($temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
       break;
     case 179:
-      $temp$$ = this.readMem(this.getHL());
+      $temp$$ = this.getUint8(this.getHL());
       this.port.out(this.c, $temp$$);
       this.b = this.dec8(this.b);
       this.incHL();
@@ -3673,8 +3670,8 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.f = 0 !== ($temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
       break;
     case 184:
-      $temp$$ = this.readMem(this.getHL());
-      this.writeMem(this.getDE(), $temp$$);
+      $temp$$ = this.getUint8(this.getHL());
+      this.setUint8(this.getDE(), $temp$$);
       this.decBC();
       this.decDE();
       this.decHL();
@@ -3684,7 +3681,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       break;
     case 185:
       $temp$$ = this.f & F_CARRY | F_NEGATIVE;
-      this.cp_a(this.readMem(this.getHL()));
+      this.cp_a(this.getUint8(this.getHL()));
       this.decBC();
       this.decHL();
       $temp$$ |= 0 === this.getBC() ? 0 : F_PARITY;
@@ -3693,14 +3690,14 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       break;
     case 186:
       $temp$$ = this.port.in_(this.c);
-      this.writeMem(this.getHL(), $temp$$);
+      this.setUint8(this.getHL(), $temp$$);
       this.b = this.dec8(this.b);
       this.decHL();
       0 !== this.b ? (this.tstates -= 5, this.pc--) : this.pc++;
       this.f = 0 !== ($temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
       break;
     case 187:
-      $temp$$ = this.readMem(this.getHL());
+      $temp$$ = this.getUint8(this.getHL());
       this.port.out(this.c, $temp$$);
       this.b = this.dec8(this.b);
       this.decHL();
@@ -3959,22 +3956,22 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     this.romPageMask = this.number_of_pages = 0;
   }
 }, d_:function $JSSMS$Z80$$d_$() {
-  return this.readMem(this.pc);
-}, writeMem:function() {
-  return SUPPORT_DATAVIEW ? function writeMem($address$$, $value$$) {
+  return this.getUint8(this.pc);
+}, setUint8:function() {
+  return SUPPORT_DATAVIEW ? function setUint8($address$$, $value$$) {
     65535 >= $address$$ ? (this.memWriteMap.setUint8($address$$ & 8191, $value$$), 65532 === $address$$ ? this.frameReg[3] = $value$$ : 65533 === $address$$ ? this.frameReg[0] = $value$$ & this.romPageMask : 65534 === $address$$ ? this.frameReg[1] = $value$$ & this.romPageMask : 65535 === $address$$ && (this.frameReg[2] = $value$$ & this.romPageMask)) : JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
-  } : function writeMem($address$$, $value$$) {
+  } : function setUint8($address$$, $value$$) {
     65535 >= $address$$ ? (this.memWriteMap[$address$$ & 8191] = $value$$, 65532 === $address$$ ? this.frameReg[3] = $value$$ : 65533 === $address$$ ? this.frameReg[0] = $value$$ & this.romPageMask : 65534 === $address$$ ? this.frameReg[1] = $value$$ & this.romPageMask : 65535 === $address$$ && (this.frameReg[2] = $value$$ & this.romPageMask)) : JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
   };
-}(), writeMemWord:function() {
-  return SUPPORT_DATAVIEW ? function writeMemWord($address$$, $value$$) {
+}(), setUint16:function() {
+  return SUPPORT_DATAVIEW ? function setUint16($address$$, $value$$) {
     65532 > $address$$ ? this.memWriteMap.setUint16($address$$ & 8191, $value$$, LITTLE_ENDIAN) : 65532 === $address$$ ? (this.frameReg[3] = $value$$ & 255, this.frameReg[0] = $value$$ >> 8 & this.romPageMask) : 65533 === $address$$ ? (this.frameReg[0] = $value$$ & 255 & this.romPageMask, this.frameReg[1] = $value$$ >> 8 & this.romPageMask) : 65534 === $address$$ ? (this.frameReg[1] = $value$$ & 255 & this.romPageMask, this.frameReg[2] = $value$$ >> 8 & this.romPageMask) : JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
-  } : function writeMemWord($address$$, $value$$) {
+  } : function setUint16($address$$, $value$$) {
     65532 > $address$$ ? ($address$$ &= 8191, this.memWriteMap[$address$$++] = $value$$ & 255, this.memWriteMap[$address$$] = $value$$ >> 8) : 65532 === $address$$ ? (this.frameReg[3] = $value$$ & 255, this.frameReg[0] = $value$$ >> 8 & this.romPageMask) : 65533 === $address$$ ? (this.frameReg[0] = $value$$ & 255 & this.romPageMask, this.frameReg[1] = $value$$ >> 8 & this.romPageMask) : 65534 === $address$$ ? (this.frameReg[1] = $value$$ & 255 & this.romPageMask, this.frameReg[2] = $value$$ >> 8 & 
     this.romPageMask) : JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
   };
-}(), readMem:function() {
-  return SUPPORT_DATAVIEW ? function readMem($address$$) {
+}(), getUint8:function() {
+  return SUPPORT_DATAVIEW ? function getUint8($address$$) {
     if (1024 > $address$$) {
       return this.rom[0].getUint8($address$$);
     }
@@ -4007,7 +4004,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     }
     JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
     return 0;
-  } : function readMem($address$$) {
+  } : function getUint8($address$$) {
     if (1024 > $address$$) {
       return this.rom[0][$address$$];
     }
@@ -4041,8 +4038,8 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
     return 0;
   };
-}(), readMemWord:function() {
-  return SUPPORT_DATAVIEW ? function readMemWord($address$$) {
+}(), getUint16:function() {
+  return SUPPORT_DATAVIEW ? function getUint16($address$$) {
     if (1024 > $address$$) {
       return this.rom[0].getUint16($address$$, LITTLE_ENDIAN);
     }
@@ -4075,7 +4072,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     }
     JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
     return 0;
-  } : function readMemWord($address$$) {
+  } : function getUint16($address$$) {
     if (1024 > $address$$) {
       return this.rom[0][$address$$++] | this.rom[0][$address$$] << 8;
     }
@@ -4108,6 +4105,90 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     }
     JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
     return 0;
+  };
+}(), getInt8:function() {
+  return SUPPORT_DATAVIEW ? function getInt8($address$$) {
+    var $value$$ = 0;
+    if (1024 > $address$$) {
+      $value$$ = this.rom[0].getInt8($address$$);
+    } else {
+      if (16384 > $address$$) {
+        $value$$ = this.rom[this.frameReg[0]].getInt8($address$$);
+      } else {
+        if (32768 > $address$$) {
+          $value$$ = this.rom[this.frameReg[1]].getInt8($address$$ - 16384);
+        } else {
+          if (49152 > $address$$) {
+            8 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, $value$$ = this.sram.getInt8($address$$ - 32768)) : 12 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, $value$$ = this.sram.getInt8($address$$ - 16384)) : $value$$ = this.rom[this.frameReg[2]].getInt8($address$$ - 32768);
+          } else {
+            if (57344 > $address$$) {
+              $value$$ = this.memWriteMap.getInt8($address$$ - 49152);
+            } else {
+              if (65532 > $address$$) {
+                $value$$ = this.memWriteMap.getInt8($address$$ - 57344);
+              } else {
+                if (65532 === $address$$) {
+                  return this.frameReg[3];
+                }
+                if (65533 === $address$$) {
+                  return this.frameReg[0];
+                }
+                if (65534 === $address$$) {
+                  return this.frameReg[1];
+                }
+                if (65535 === $address$$) {
+                  return this.frameReg[2];
+                }
+                JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
+              }
+            }
+          }
+        }
+      }
+    }
+    return $value$$ + 1;
+  } : function getInt8($address$$) {
+    var $value$$ = 0;
+    if (1024 > $address$$) {
+      $value$$ = this.rom[0][$address$$];
+    } else {
+      if (16384 > $address$$) {
+        $value$$ = this.rom[this.frameReg[0]][$address$$];
+      } else {
+        if (32768 > $address$$) {
+          $value$$ = this.rom[this.frameReg[1]][$address$$ - 16384];
+        } else {
+          if (49152 > $address$$) {
+            8 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, $value$$ = this.sram[$address$$ - 32768]) : 12 === (this.frameReg[3] & 12) ? (this.useSRAM = !0, $value$$ = this.sram[$address$$ - 16384]) : $value$$ = this.rom[this.frameReg[2]][$address$$ - 32768];
+          } else {
+            if (57344 > $address$$) {
+              $value$$ = this.memWriteMap[$address$$ - 49152];
+            } else {
+              if (65532 > $address$$) {
+                $value$$ = this.memWriteMap[$address$$ - 57344];
+              } else {
+                if (65532 === $address$$) {
+                  return this.frameReg[3];
+                }
+                if (65533 === $address$$) {
+                  return this.frameReg[0];
+                }
+                if (65534 === $address$$) {
+                  return this.frameReg[1];
+                }
+                if (65535 === $address$$) {
+                  return this.frameReg[2];
+                }
+                JSSMS.Utils.console.error(JSSMS.Utils.toHex($address$$));
+              }
+            }
+          }
+        }
+      }
+    }
+    $value$$ += 1;
+    128 <= $value$$ && ($value$$ -= 256);
+    return $value$$;
   };
 }(), hasUsedSRAM:function $JSSMS$Z80$$hasUsedSRAM$() {
   return this.useSRAM;
@@ -4269,7 +4350,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 2:
       $inst$$ = "LD (BC),A";
-      $code$$ = "this.writeMem(this.getBC(), this.a);";
+      $code$$ = "this.setUint8(this.getBC(), this.a);";
       break;
     case 3:
       $inst$$ = "INC BC";
@@ -4303,7 +4384,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 10:
       $inst$$ = "LD A,(BC)";
-      $code$$ = "this.a = this.readMem(this.getBC());";
+      $code$$ = "this.a = this.getUint8(this.getBC());";
       break;
     case 11:
       $inst$$ = "DEC BC";
@@ -4341,7 +4422,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 18:
       $inst$$ = "LD (DE),A";
-      $code$$ = "this.writeMem(this.getDE(), this.a);";
+      $code$$ = "this.setUint8(this.getDE(), this.a);";
       break;
     case 19:
       $inst$$ = "INC DE";
@@ -4377,7 +4458,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 26:
       $inst$$ = "LD A,(DE)";
-      $code$$ = "this.a = this.readMem(this.getDE());";
+      $code$$ = "this.a = this.getUint8(this.getDE());";
       break;
     case 27:
       $inst$$ = "DEC DE";
@@ -4417,7 +4498,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $location$$ = this.readRom16bit($address$$);
       $_inst_operand$$ = $toHex$$($location$$);
       $inst$$ = "LD (" + $_inst_operand$$ + "),HL";
-      $code$$ = "this.writeMem(" + $_inst_operand$$ + ", this.l);this.writeMem(" + $toHex$$($location$$ + 1) + ", this.h);";
+      $code$$ = "this.setUint8(" + $_inst_operand$$ + ", this.l);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.h);";
       $address$$ += 2;
       break;
     case 35:
@@ -4455,7 +4536,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 42:
       $_inst_operand$$ = $toHex$$(this.readRom16bit($address$$));
       $inst$$ = "LD HL,(" + $_inst_operand$$ + ")";
-      $code$$ = "this.setHL(this.readMemWord(" + $_inst_operand$$ + "));";
+      $code$$ = "this.setHL(this.getUint16(" + $_inst_operand$$ + "));";
       $address$$ += 2;
       break;
     case 43:
@@ -4495,7 +4576,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 50:
       $_inst_operand$$ = $toHex$$(this.readRom16bit($address$$));
       $inst$$ = "LD (" + $_inst_operand$$ + "),A";
-      $code$$ = "this.writeMem(" + $_inst_operand$$ + ", this.a);";
+      $code$$ = "this.setUint8(" + $_inst_operand$$ + ", this.a);";
       $address$$ += 2;
       break;
     case 51:
@@ -4513,7 +4594,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 54:
       $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
       $inst$$ = "LD (HL)," + $_inst_operand$$;
-      $code$$ = "this.writeMem(this.getHL(), " + $_inst_operand$$ + ");";
+      $code$$ = "this.setUint8(this.getHL(), " + $_inst_operand$$ + ");";
       $address$$++;
       break;
     case 55:
@@ -4533,7 +4614,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 58:
       $_inst_operand$$ = $toHex$$(this.readRom16bit($address$$));
       $inst$$ = "LD A,(" + $_inst_operand$$ + ")";
-      $code$$ = "this.a = this.readMem(" + $_inst_operand$$ + ");";
+      $code$$ = "this.a = this.getUint8(" + $_inst_operand$$ + ");";
       $address$$ += 2;
       break;
     case 59:
@@ -4584,7 +4665,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 70:
       $inst$$ = "LD B,(HL)";
-      $code$$ = "this.b = this.readMem(this.getHL());";
+      $code$$ = "this.b = this.getUint8(this.getHL());";
       break;
     case 71:
       $inst$$ = "LD B,A";
@@ -4616,7 +4697,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 78:
       $inst$$ = "LD C,(HL)";
-      $code$$ = "this.c = this.readMem(this.getHL());";
+      $code$$ = "this.c = this.getUint8(this.getHL());";
       break;
     case 79:
       $inst$$ = "LD C,A";
@@ -4648,7 +4729,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 86:
       $inst$$ = "LD D,(HL)";
-      $code$$ = "this.d = this.readMem(this.getHL());";
+      $code$$ = "this.d = this.getUint8(this.getHL());";
       break;
     case 87:
       $inst$$ = "LD D,A";
@@ -4680,7 +4761,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 94:
       $inst$$ = "LD E,(HL)";
-      $code$$ = "this.e = this.readMem(this.getHL());";
+      $code$$ = "this.e = this.getUint8(this.getHL());";
       break;
     case 95:
       $inst$$ = "LD E,A";
@@ -4712,7 +4793,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 102:
       $inst$$ = "LD H,(HL)";
-      $code$$ = "this.h = this.readMem(this.getHL());";
+      $code$$ = "this.h = this.getUint8(this.getHL());";
       break;
     case 103:
       $inst$$ = "LD H,A";
@@ -4744,7 +4825,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 110:
       $inst$$ = "LD L,(HL)";
-      $code$$ = "this.l = this.readMem(this.getHL());";
+      $code$$ = "this.l = this.getUint8(this.getHL());";
       break;
     case 111:
       $inst$$ = "LD L,A";
@@ -4752,27 +4833,27 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 112:
       $inst$$ = "LD (HL),B";
-      $code$$ = "this.writeMem(this.getHL(), this.b);";
+      $code$$ = "this.setUint8(this.getHL(), this.b);";
       break;
     case 113:
       $inst$$ = "LD (HL),C";
-      $code$$ = "this.writeMem(this.getHL(), this.c);";
+      $code$$ = "this.setUint8(this.getHL(), this.c);";
       break;
     case 114:
       $inst$$ = "LD (HL),D";
-      $code$$ = "this.writeMem(this.getHL(), this.d);";
+      $code$$ = "this.setUint8(this.getHL(), this.d);";
       break;
     case 115:
       $inst$$ = "LD (HL),E";
-      $code$$ = "this.writeMem(this.getHL(), this.e);";
+      $code$$ = "this.setUint8(this.getHL(), this.e);";
       break;
     case 116:
       $inst$$ = "LD (HL),H";
-      $code$$ = "this.writeMem(this.getHL(), this.h);";
+      $code$$ = "this.setUint8(this.getHL(), this.h);";
       break;
     case 117:
       $inst$$ = "LD (HL),L";
-      $code$$ = "this.writeMem(this.getHL(), this.l);";
+      $code$$ = "this.setUint8(this.getHL(), this.l);";
       break;
     case 118:
       $inst$$ = "HALT";
@@ -4781,7 +4862,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 119:
       $inst$$ = "LD (HL),A";
-      $code$$ = "this.writeMem(this.getHL(), this.a);";
+      $code$$ = "this.setUint8(this.getHL(), this.a);";
       break;
     case 120:
       $inst$$ = "LD A,B";
@@ -4809,7 +4890,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 126:
       $inst$$ = "LD A,(HL)";
-      $code$$ = "this.a = this.readMem(this.getHL());";
+      $code$$ = "this.a = this.getUint8(this.getHL());";
       break;
     case 127:
       $inst$$ = "LD A,A";
@@ -4841,7 +4922,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 134:
       $inst$$ = "ADD A,(HL)";
-      $code$$ = "this.add_a(this.readMem(this.getHL()));";
+      $code$$ = "this.add_a(this.getUint8(this.getHL()));";
       break;
     case 135:
       $inst$$ = "ADD A,A";
@@ -4873,7 +4954,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 142:
       $inst$$ = "ADC A,(HL)";
-      $code$$ = "this.adc_a(this.readMem(this.getHL()));";
+      $code$$ = "this.adc_a(this.getUint8(this.getHL()));";
       break;
     case 143:
       $inst$$ = "ADC A,A";
@@ -4905,7 +4986,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 150:
       $inst$$ = "SUB A,(HL)";
-      $code$$ = "this.sub_a(this.readMem(this.getHL()));";
+      $code$$ = "this.sub_a(this.getUint8(this.getHL()));";
       break;
     case 151:
       $inst$$ = "SUB A,A";
@@ -4937,7 +5018,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 158:
       $inst$$ = "SBC A,(HL)";
-      $code$$ = "this.sbc_a(this.readMem(this.getHL()));";
+      $code$$ = "this.sbc_a(this.getUint8(this.getHL()));";
       break;
     case 159:
       $inst$$ = "SBC A,A";
@@ -4969,7 +5050,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 166:
       $inst$$ = "AND A,(HL)";
-      $code$$ = "this.f = this.SZP_TABLE[this.a &= this.readMem(this.getHL())] | F_HALFCARRY;";
+      $code$$ = "this.f = this.SZP_TABLE[this.a &= this.getUint8(this.getHL())] | F_HALFCARRY;";
       break;
     case 167:
       $inst$$ = "AND A,A";
@@ -5001,7 +5082,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 174:
       $inst$$ = "XOR A,(HL)";
-      $code$$ = "this.f = this.SZP_TABLE[this.a ^= this.readMem(this.getHL())];";
+      $code$$ = "this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.getHL())];";
       break;
     case 175:
       $inst$$ = "XOR A,A";
@@ -5033,7 +5114,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 182:
       $inst$$ = "OR A,(HL)";
-      $code$$ = "this.f = this.SZP_TABLE[this.a |= this.readMem(this.getHL())];";
+      $code$$ = "this.f = this.SZP_TABLE[this.a |= this.getUint8(this.getHL())];";
       break;
     case 183:
       $inst$$ = "OR A,A";
@@ -5065,7 +5146,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 190:
       $inst$$ = "CP A,(HL)";
-      $code$$ = "this.cp_a(this.readMem(this.getHL()));";
+      $code$$ = "this.cp_a(this.getUint8(this.getHL()));";
       break;
     case 191:
       $inst$$ = "CP A,A";
@@ -5073,11 +5154,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 192:
       $inst$$ = "RET NZ";
-      $code$$ = "if ((this.f & F_ZERO) === 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$ = "if ((this.f & F_ZERO) === 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 193:
       $inst$$ = "POP BC";
-      $code$$ = "this.setBC(this.readMemWord(this.sp)); this.sp += 0x02;";
+      $code$$ = "this.setBC(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 194:
       $target$$ = this.readRom16bit($address$$);
@@ -5114,11 +5195,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 200:
       $inst$$ = "RET Z";
-      $code$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 201:
       $inst$$ = "RET";
-      $code$$ = "this.pc = this.readMemWord(this.sp); this.sp += 0x02; return;";
+      $code$$ = "this.pc = this.getUint16(this.sp); this.sp += 0x02; return;";
       $address$$ = null;
       break;
     case 202:
@@ -5159,11 +5240,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 208:
       $inst$$ = "RET NC";
-      $code$$ = "if ((this.f & F_CARRY) === 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$ = "if ((this.f & F_CARRY) === 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 209:
       $inst$$ = "POP DE";
-      $code$$ = "this.setDE(this.readMemWord(this.sp)); this.sp += 0x02;";
+      $code$$ = "this.setDE(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 210:
       $target$$ = this.readRom16bit($address$$);
@@ -5200,7 +5281,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 216:
       $inst$$ = "RET C";
-      $code$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 217:
       $inst$$ = "EXX";
@@ -5244,11 +5325,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 224:
       $inst$$ = "RET PO";
-      $code$$ = "if ((this.f & F_PARITY) === 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$ = "if ((this.f & F_PARITY) === 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 225:
       $inst$$ = "POP HL";
-      $code$$ = "this.setHL(this.readMemWord(this.sp)); this.sp += 0x02;";
+      $code$$ = "this.setHL(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 226:
       $target$$ = this.readRom16bit($address$$);
@@ -5258,7 +5339,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 227:
       $inst$$ = "EX (SP),HL";
-      $code$$ = "temp = this.h;this.h = this.readMem(this.sp + 0x01);this.writeMem(this.sp + 0x01, temp);temp = this.l;this.l = this.readMem(this.sp);this.writeMem(this.sp, temp);";
+      $code$$ = "temp = this.h;this.h = this.getUint8(this.sp + 0x01);this.setUint8(this.sp + 0x01, temp);temp = this.l;this.l = this.getUint8(this.sp);this.setUint8(this.sp, temp);";
       break;
     case 228:
       $target$$ = this.readRom16bit($address$$);
@@ -5283,7 +5364,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 232:
       $inst$$ = "RET PE";
-      $code$$ = "if ((this.f & F_PARITY) !== 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$ = "if ((this.f & F_PARITY) !== 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 233:
       $inst$$ = "JP (HL)";
@@ -5327,11 +5408,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 240:
       $inst$$ = "RET P";
-      $code$$ = "if ((this.f & F_SIGN) === 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$ = "if ((this.f & F_SIGN) === 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 241:
       $inst$$ = "POP AF";
-      $code$$ = "this.setAF(this.readMemWord(this.sp)); this.sp += 0x02;";
+      $code$$ = "this.setAF(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 242:
       $target$$ = this.readRom16bit($address$$);
@@ -5366,7 +5447,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 248:
       $inst$$ = "RET M";
-      $code$$ = "if ((this.f & F_SIGN) !== 0x00) {this.tstates -= 0x06;this.pc = this.readMemWord(this.sp);this.sp += 0x02;return;}";
+      $code$$ = "if ((this.f & F_SIGN) !== 0x00) {this.tstates -= 0x06;this.pc = this.getUint16(this.sp);this.sp += 0x02;return;}";
       break;
     case 249:
       $inst$$ = "LD SP,HL";
@@ -5435,7 +5516,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 6:
       $inst$$ = "RLC (HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.rlc(this.readMem(this.getHL())));";
+      $code$$ = "this.setUint8(this.getHL(), this.rlc(this.getUint8(this.getHL())));";
       break;
     case 7:
       $inst$$ = "RLC A";
@@ -5467,7 +5548,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 14:
       $inst$$ = "RRC (HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.rrc(this.readMem(this.getHL())));";
+      $code$$ = "this.setUint8(this.getHL(), this.rrc(this.getUint8(this.getHL())));";
       break;
     case 15:
       $inst$$ = "RRC A";
@@ -5499,7 +5580,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 22:
       $inst$$ = "RL (HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.rl(this.readMem(this.getHL())));";
+      $code$$ = "this.setUint8(this.getHL(), this.rl(this.getUint8(this.getHL())));";
       break;
     case 23:
       $inst$$ = "RL A";
@@ -5531,7 +5612,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 30:
       $inst$$ = "RR (HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.rr(this.readMem(this.getHL())));";
+      $code$$ = "this.setUint8(this.getHL(), this.rr(this.getUint8(this.getHL())));";
       break;
     case 31:
       $inst$$ = "RR A";
@@ -5563,7 +5644,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 38:
       $inst$$ = "SLA (HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.sla(this.readMem(this.getHL())));";
+      $code$$ = "this.setUint8(this.getHL(), this.sla(this.getUint8(this.getHL())));";
       break;
     case 39:
       $inst$$ = "SLA A";
@@ -5595,7 +5676,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 46:
       $inst$$ = "SRA (HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.sra(this.readMem(this.getHL())));";
+      $code$$ = "this.setUint8(this.getHL(), this.sra(this.getUint8(this.getHL())));";
       break;
     case 47:
       $inst$$ = "SRA A";
@@ -5627,7 +5708,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 54:
       $inst$$ = "SLL (HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.sll(this.readMem(this.getHL())));";
+      $code$$ = "this.setUint8(this.getHL(), this.sll(this.getUint8(this.getHL())));";
       break;
     case 55:
       $inst$$ = "SLL A";
@@ -5659,7 +5740,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 62:
       $inst$$ = "SRL (HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.srl(this.readMem(this.getHL())));";
+      $code$$ = "this.setUint8(this.getHL(), this.srl(this.getUint8(this.getHL())));";
       break;
     case 63:
       $inst$$ = "SRL A";
@@ -5691,7 +5772,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 70:
       $inst$$ = "BIT 0,(HL)";
-      $code$$ = "this.bit(this.readMem(this.getHL()) & BIT_0);";
+      $code$$ = "this.bit(this.getUint8(this.getHL()) & BIT_0);";
       break;
     case 71:
       $inst$$ = "BIT 0,A";
@@ -5723,7 +5804,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 78:
       $inst$$ = "BIT 1,(HL)";
-      $code$$ = "this.bit(this.readMem(this.getHL()) & BIT_1);";
+      $code$$ = "this.bit(this.getUint8(this.getHL()) & BIT_1);";
       break;
     case 79:
       $inst$$ = "BIT 1,A";
@@ -5755,7 +5836,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 86:
       $inst$$ = "BIT 2,(HL)";
-      $code$$ = "this.bit(this.readMem(this.getHL()) & BIT_2);";
+      $code$$ = "this.bit(this.getUint8(this.getHL()) & BIT_2);";
       break;
     case 87:
       $inst$$ = "BIT 2,A";
@@ -5787,7 +5868,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 94:
       $inst$$ = "BIT 3,(HL)";
-      $code$$ = "this.bit(this.readMem(this.getHL()) & BIT_3);";
+      $code$$ = "this.bit(this.getUint8(this.getHL()) & BIT_3);";
       break;
     case 95:
       $inst$$ = "BIT 3,A";
@@ -5819,7 +5900,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 102:
       $inst$$ = "BIT 4,(HL)";
-      $code$$ = "this.bit(this.readMem(this.getHL()) & BIT_4);";
+      $code$$ = "this.bit(this.getUint8(this.getHL()) & BIT_4);";
       break;
     case 103:
       $inst$$ = "BIT 4,A";
@@ -5851,7 +5932,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 110:
       $inst$$ = "BIT 5,(HL)";
-      $code$$ = "this.bit(this.readMem(this.getHL()) & BIT_5);";
+      $code$$ = "this.bit(this.getUint8(this.getHL()) & BIT_5);";
       break;
     case 111:
       $inst$$ = "BIT 5,A";
@@ -5883,7 +5964,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 118:
       $inst$$ = "BIT 6,(HL)";
-      $code$$ = "this.bit(this.readMem(this.getHL()) & BIT_6);";
+      $code$$ = "this.bit(this.getUint8(this.getHL()) & BIT_6);";
       break;
     case 119:
       $inst$$ = "BIT 6,A";
@@ -5915,7 +5996,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 126:
       $inst$$ = "BIT 7,(HL)";
-      $code$$ = "this.bit(this.readMem(this.getHL()) & BIT_7);";
+      $code$$ = "this.bit(this.getUint8(this.getHL()) & BIT_7);";
       break;
     case 127:
       $inst$$ = "BIT 7,A";
@@ -5947,7 +6028,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 134:
       $inst$$ = "RES 0,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_0);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_0);";
       break;
     case 135:
       $inst$$ = "RES 0,A";
@@ -5973,7 +6054,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 142:
       $inst$$ = "RES 1,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_1);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_1);";
       break;
     case 143:
       $inst$$ = "RES 1,A";
@@ -5998,7 +6079,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 150:
       $inst$$ = "RES 2,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_2);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_2);";
       break;
     case 151:
       $inst$$ = "RES 2,A";
@@ -6023,7 +6104,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 158:
       $inst$$ = "RES 3,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_3);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_3);";
       break;
     case 159:
       $inst$$ = "RES 3,A";
@@ -6049,7 +6130,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 166:
       $inst$$ = "RES 4,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_4);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_4);";
       break;
     case 167:
       $inst$$ = "RES 4,A";
@@ -6075,7 +6156,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 174:
       $inst$$ = "RES 5,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_5);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_5);";
       break;
     case 175:
       $inst$$ = "RES 5,A";
@@ -6100,7 +6181,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 182:
       $inst$$ = "RES 6,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_6);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_6);";
       break;
     case 183:
       $inst$$ = "RES 6,A";
@@ -6132,7 +6213,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 190:
       $inst$$ = "RES 7,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) & ~BIT_7);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_7);";
       break;
     case 191:
       $inst$$ = "RES 7,A";
@@ -6164,7 +6245,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 198:
       $inst$$ = "SET 0,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_0);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_0);";
       break;
     case 199:
       $inst$$ = "SET 0,A";
@@ -6190,7 +6271,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 206:
       $inst$$ = "SET 1,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_1);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_1);";
       break;
     case 207:
       $inst$$ = "SET 1,A";
@@ -6215,7 +6296,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 214:
       $inst$$ = "SET 2,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_2)";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_2)";
       break;
     case 215:
       $inst$$ = "SET 2,A";
@@ -6240,7 +6321,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 222:
       $inst$$ = "SET 3,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_3);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_3);";
       break;
     case 223:
       $inst$$ = "SET 3,A";
@@ -6265,7 +6346,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 230:
       $inst$$ = "SET 4,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_4);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_4);";
       break;
     case 231:
       $inst$$ = "SET 4,A";
@@ -6291,7 +6372,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 238:
       $inst$$ = "SET 5,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_5);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_5);";
       break;
     case 239:
       $inst$$ = "SET 5,A";
@@ -6323,7 +6404,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 246:
       $inst$$ = "SET 6,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_6);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_6);";
       break;
     case 247:
       $inst$$ = "SET 6,A";
@@ -6355,7 +6436,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 254:
       $inst$$ = "SET 7,(HL)";
-      $code$$ = "this.writeMem(this.getHL(), this.readMem(this.getHL()) | BIT_7);";
+      $code$$ = "this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_7);";
       break;
     case 255:
       $inst$$ = "SET 7,A", $code$$ = "this.a |= BIT_7;";
@@ -6381,7 +6462,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $location$$ = this.readRom16bit($address$$);
       $operand$$ = $toHex$$($location$$);
       $inst$$ = "LD (" + $operand$$ + "),BC";
-      $code$$ = "this.writeMem(" + $operand$$ + ", this.c);this.writeMem(" + $toHex$$($location$$ + 1) + ", this.b);";
+      $code$$ = "this.setUint8(" + $operand$$ + ", this.c);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.b);";
       $address$$ += 2;
       break;
     case 68:
@@ -6418,7 +6499,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     ;
     case 125:
       $inst$$ = "RETN / RETI";
-      $code$$ = "this.pc = this.readMemWord(this.sp);this.sp += 0x02;this.iff1 = this.iff2;return;";
+      $code$$ = "this.pc = this.getUint16(this.sp);this.sp += 0x02;this.iff1 = this.iff2;return;";
       $address$$ = null;
       break;
     case 70:
@@ -6450,7 +6531,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 75:
       $operand$$ = $toHex$$(this.readRom16bit($address$$));
       $inst$$ = "LD BC,(" + $operand$$ + ")";
-      $code$$ = "this.setBC(this.readMemWord(" + $operand$$ + "));";
+      $code$$ = "this.setBC(this.getUint16(" + $operand$$ + "));";
       $address$$ += 2;
       break;
     case 79:
@@ -6473,7 +6554,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $location$$ = this.readRom16bit($address$$);
       $operand$$ = $toHex$$($location$$);
       $inst$$ = "LD (" + $operand$$ + "),DE";
-      $code$$ = "this.writeMem(" + $operand$$ + ", this.e);this.writeMem(" + $toHex$$($location$$ + 1) + ", this.d);";
+      $code$$ = "this.setUint8(" + $operand$$ + ", this.e);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.d);";
       $address$$ += 2;
       break;
     case 86:
@@ -6501,7 +6582,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 91:
       $operand$$ = $toHex$$(this.readRom16bit($address$$));
       $inst$$ = "LD DE,(" + $operand$$ + ")";
-      $code$$ = "this.setDE(this.readMemWord(" + $operand$$ + "));";
+      $code$$ = "this.setDE(this.getUint16(" + $operand$$ + "));";
       $address$$ += 2;
       break;
     case 95:
@@ -6525,12 +6606,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $location$$ = this.readRom16bit($address$$);
       $operand$$ = $toHex$$($location$$);
       $inst$$ = "LD (" + $operand$$ + "),HL";
-      $code$$ = "this.writeMem(" + $operand$$ + ", this.l);this.writeMem(" + $toHex$$($location$$ + 1) + ", this.h);";
+      $code$$ = "this.setUint8(" + $operand$$ + ", this.l);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.h);";
       $address$$ += 2;
       break;
     case 103:
       $inst$$ = "RRD";
-      $code$$ = "var location = this.getHL();temp = this.readMem(location);this.writeMem(location, (temp >> 4) | ((this.a & 0x0F) << 4));this.a = (this.a & 0xF0) | (temp & 0x0F);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
+      $code$$ = "var location = this.getHL();temp = this.getUint8(location);this.setUint8(location, (temp >> 4) | ((this.a & 0x0F) << 4));this.a = (this.a & 0xF0) | (temp & 0x0F);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
       break;
     case 104:
       $inst$$ = "IN L,(C)";
@@ -6547,12 +6628,12 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 107:
       $operand$$ = $toHex$$(this.readRom16bit($address$$));
       $inst$$ = "LD HL,(" + $operand$$ + ")";
-      $code$$ = "this.setHL(this.readMemWord(" + $operand$$ + "));";
+      $code$$ = "this.setHL(this.getUint16(" + $operand$$ + "));";
       $address$$ += 2;
       break;
     case 111:
       $inst$$ = "RLD";
-      $code$$ = "var location = this.getHL();temp = this.readMem(location);this.writeMem(location, (temp & 0x0F) << 4 | (this.a & 0x0F));this.a = (this.a & 0xF0) | (temp >> 4);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
+      $code$$ = "var location = this.getHL();temp = this.getUint8(location);this.setUint8(location, (temp & 0x0F) << 4 | (this.a & 0x0F));this.a = (this.a & 0xF0) | (temp >> 4);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
       break;
     case 113:
       $inst$$ = "OUT (C),0";
@@ -6566,7 +6647,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $location$$ = this.readRom16bit($address$$);
       $operand$$ = $toHex$$($location$$);
       $inst$$ = "LD (" + $operand$$ + "),SP";
-      $code$$ = "this.writeMem(" + $operand$$ + ", this.sp & 0xFF);this.writeMem(" + $toHex$$($location$$ + 1) + ", this.sp >> 8);";
+      $code$$ = "this.setUint8(" + $operand$$ + ", this.sp & 0xFF);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.sp >> 8);";
       $address$$ += 2;
       break;
     case 120:
@@ -6584,24 +6665,24 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 123:
       $operand$$ = $toHex$$(this.readRom16bit($address$$));
       $inst$$ = "LD SP,(" + $operand$$ + ")";
-      $code$$ = "this.sp = this.readMemWord(" + $operand$$ + ");";
+      $code$$ = "this.sp = this.getUint16(" + $operand$$ + ");";
       $address$$ += 2;
       break;
     case 160:
       $inst$$ = "LDI";
-      $code$$ = "temp = this.readMem(this.getHL());this.writeMem(this.getDE(), temp);this.decBC();this.incDE();this.incHL();temp = (temp + this.a) & 0xFF;this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);";
+      $code$$ = "temp = this.getUint8(this.getHL());this.setUint8(this.getDE(), temp);this.decBC();this.incDE();this.incHL();temp = (temp + this.a) & 0xFF;this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);";
       break;
     case 161:
       $inst$$ = "CPI";
-      $code$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.readMem(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);this.f = (this.f & 0xF8) | temp;";
+      $code$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.getUint8(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);this.f = (this.f & 0xF8) | temp;";
       break;
     case 162:
       $inst$$ = "INI";
-      $code$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 163:
       $inst$$ = "OUTI";
-      $code$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.incHL();this.b = this.dec8(this.b);if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.incHL();this.b = this.dec8(this.b);if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 168:
       $inst$$ = "LDD";
@@ -6611,33 +6692,33 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 170:
       $inst$$ = "IND";
-      $code$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 171:
       $inst$$ = "OUTD";
-      $code$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.decHL();this.b = this.dec8(this.b);if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.decHL();this.b = this.dec8(this.b);if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 176:
       $inst$$ = "LDIR";
-      $code$$ = "this.writeMem(this.getDE(), this.readMem(this.getHL()));this.incDE();this.incHL();this.decBC();";
-      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if (this.getBC() !== 0x00) {this.tstates -= 0x05;this.f |= F_PARITY;return;} else {") : $code$$ += "for (;this.getBC() !== 0x00; this.f |= F_PARITY, this.tstates -= 5) {this.writeMem(this.getDE(), this.readMem(this.getHL()));this.incDE();this.incHL();this.decBC();}if (!(this.getBC() !== 0x00)) {";
+      $code$$ = "this.setUint8(this.getDE(), this.getUint8(this.getHL()));this.incDE();this.incHL();this.decBC();";
+      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if (this.getBC() !== 0x00) {this.tstates -= 0x05;this.f |= F_PARITY;return;} else {") : $code$$ += "for (;this.getBC() !== 0x00; this.f |= F_PARITY, this.tstates -= 5) {this.setUint8(this.getDE(), this.getUint8(this.getHL()));this.incDE();this.incHL();this.decBC();}if (!(this.getBC() !== 0x00)) {";
       $code$$ += "this.f &= ~ F_PARITY;}this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
       break;
     case 177:
       $inst$$ = "CPIR";
-      $code$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.readMem(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);";
-      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if ((temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}") : $code$$ += "for (;(temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00; this.tstates -= 5) {temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.readMem(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);}";
+      $code$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.getUint8(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);";
+      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if ((temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}") : $code$$ += "for (;(temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00; this.tstates -= 5) {temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.getUint8(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);}";
       $code$$ += "this.f = (this.f & 0xF8) | temp;";
       break;
     case 178:
       $target$$ = $address$$ - 2;
       $inst$$ = "INIR";
-      $code$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 179:
       $inst$$ = "OTIR";
-      $code$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();";
-      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if (this.b !== 0x00) {this.tstates -= 0x05;return;}") : $code$$ += "for (;this.b !== 0x00; this.tstates -= 5) {temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();}";
+      $code$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();";
+      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if (this.b !== 0x00) {this.tstates -= 0x05;return;}") : $code$$ += "for (;this.b !== 0x00; this.tstates -= 5) {temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();}";
       $code$$ += "if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 184:
@@ -6649,10 +6730,10 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 186:
       $target$$ = $address$$ - 2;
       $inst$$ = "INDR";
-      $code$$ = "temp = this.port.in_(this.c);this.writeMem(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 187:
-      $target$$ = $address$$ - 2, $inst$$ = "OTDR", $code$$ = "temp = this.readMem(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $target$$ = $address$$ - 2, $inst$$ = "OTDR", $code$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
   }
   return{opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$, target:$target$$};
 }, getIndex:function $JSSMS$Debugger$$getIndex$($index$$, $address$$) {
@@ -6679,7 +6760,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $location$$25_offset$$ = this.readRom16bit($address$$);
       $_inst$$1_operand$$ = $toHex$$($location$$25_offset$$);
       $inst$$ = "LD (" + $_inst$$1_operand$$ + ")," + $index$$;
-      $code$$ = "this.writeMem(" + $_inst$$1_operand$$ + ", this." + $index$$.toLowerCase() + "L);this.writeMem(" + $toHex$$($location$$25_offset$$ + 1) + ", this." + $index$$.toLowerCase() + "H);";
+      $code$$ = "this.setUint8(" + $_inst$$1_operand$$ + ", this." + $index$$.toLowerCase() + "L);this.setUint8(" + $toHex$$($location$$25_offset$$ + 1) + ", this." + $index$$.toLowerCase() + "H);";
       $address$$ += 2;
       break;
     case 35:
@@ -6702,7 +6783,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 42:
       $location$$25_offset$$ = this.readRom16bit($address$$);
       $inst$$ = "LD " + $index$$ + " (" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.ixL = this.readMem(" + $toHex$$($location$$25_offset$$) + ");this.ixH = this.readMem(" + $toHex$$($location$$25_offset$$ + 1) + ");";
+      $code$$ = "this.ixL = this.getUint8(" + $toHex$$($location$$25_offset$$) + ");this.ixH = this.getUint8(" + $toHex$$($location$$25_offset$$ + 1) + ");";
       $address$$ += 2;
       break;
     case 43:
@@ -6735,7 +6816,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $_inst$$1_operand$$ = $toHex$$(this.readRom8bit($address$$ + 1));
       $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")," + $_inst$$1_operand$$;
-      $code$$ = "this.writeMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", " + $_inst$$1_operand$$ + ");";
+      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", " + $_inst$$1_operand$$ + ");";
       $address$$ += 2;
       break;
     case 57:
@@ -6751,7 +6832,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 70:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD B,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.b = this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $code$$ = "this.b = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 76:
@@ -6763,7 +6844,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 78:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD C,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.c = this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $code$$ = "this.c = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 84:
@@ -6775,7 +6856,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 86:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD D,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.d = this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $code$$ = "this.d = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 92:
@@ -6787,7 +6868,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 94:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD E,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.e = this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $code$$ = "this.e = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 96:
@@ -6811,7 +6892,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 102:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD H,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.h = this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $code$$ = "this.h = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 103:
@@ -6839,7 +6920,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 110:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD L,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.l = this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $code$$ = "this.l = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 111:
@@ -6849,43 +6930,43 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 112:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),B";
-      $code$$ = "this.writeMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.b);";
+      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.b);";
       $address$$++;
       break;
     case 113:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),C";
-      $code$$ = "this.writeMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.c);";
+      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.c);";
       $address$$++;
       break;
     case 114:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),D";
-      $code$$ = "this.writeMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.d);";
+      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.d);";
       $address$$++;
       break;
     case 115:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),E";
-      $code$$ = "this.writeMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.e);";
+      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.e);";
       $address$$++;
       break;
     case 116:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),H";
-      $code$$ = "this.writeMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.h);";
+      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.h);";
       $address$$++;
       break;
     case 117:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),L";
-      $code$$ = "this.writeMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.l);";
+      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.l);";
       $address$$++;
       break;
     case 119:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),A";
-      $code$$ = "this.writeMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.a);";
+      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.a);";
       $address$$++;
       break;
     case 124:
@@ -6897,7 +6978,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 126:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "LD A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.a = this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $code$$ = "this.a = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 132:
@@ -6909,7 +6990,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 134:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "ADD A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.add_a(this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
+      $code$$ = "this.add_a(this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
       $address$$++;
       break;
     case 140:
@@ -6921,7 +7002,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 142:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "ADC A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.adc_a(this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
+      $code$$ = "this.adc_a(this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
       $address$$++;
       break;
     case 148:
@@ -6933,7 +7014,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 150:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "SUB A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.sub_a(this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
+      $code$$ = "this.sub_a(this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
       $address$$++;
       break;
     case 156:
@@ -6945,7 +7026,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 158:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "SBC A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.sbc_a(this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
+      $code$$ = "this.sbc_a(this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
       $address$$++;
       break;
     case 164:
@@ -6959,7 +7040,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 166:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "AND A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.f = this.SZP_TABLE[this.a &= this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ")] | F_HALFCARRY;";
+      $code$$ = "this.f = this.SZP_TABLE[this.a &= this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ")] | F_HALFCARRY;";
       $address$$++;
       break;
     case 172:
@@ -6973,7 +7054,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 174:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "XOR A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.f = this.SZP_TABLE[this.a ^= this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ")];";
+      $code$$ = "this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ")];";
       $address$$++;
       break;
     case 180:
@@ -6987,7 +7068,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 182:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "OR A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.f = this.SZP_TABLE[this.a |= this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ")];";
+      $code$$ = "this.f = this.SZP_TABLE[this.a |= this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ")];";
       $address$$++;
       break;
     case 188:
@@ -7001,7 +7082,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 190:
       $location$$25_offset$$ = this.readRom8bit($address$$);
       $inst$$ = "CP (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.cp_a(this.readMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
+      $code$$ = "this.cp_a(this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
       $address$$++;
       break;
     case 203:
@@ -7013,11 +7094,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 225:
       $inst$$ = "POP " + $index$$;
-      $code$$ = "this.set" + $index$$ + "(this.readMemWord(this.sp)); this.sp += 0x02;";
+      $code$$ = "this.set" + $index$$ + "(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 227:
       $inst$$ = "EX SP,(" + $index$$ + ")";
-      $code$$ = "temp = this.get" + $index$$ + "();this.set" + $index$$ + "(this.readMemWord(this.sp));this.writeMem(this.sp, temp & 0xFF);this.writeMem(this.sp + 1, temp >> 8);";
+      $code$$ = "temp = this.get" + $index$$ + "();this.set" + $index$$ + "(this.getUint16(this.sp));this.setUint8(this.sp, temp & 0xFF);this.setUint8(this.sp + 1, temp >> 8);";
       break;
     case 229:
       $inst$$ = "PUSH " + $index$$;
@@ -7038,15 +7119,15 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
   switch($opcode$$) {
     case 0:
       $inst$$ = "LD B,RLC (" + $index$$ + ")";
-      $code$$ = $location$$26_toHex$$ + "this.b = this.rlc(this.readMem(location)); this.writeMem(location, this.b);";
+      $code$$ = $location$$26_toHex$$ + "this.b = this.rlc(this.getUint8(location)); this.setUint8(location, this.b);";
       break;
     case 1:
       $inst$$ = "LD C,RLC (" + $index$$ + ")";
-      $code$$ = $location$$26_toHex$$ + "this.c = this.rlc(this.readMem(location)); this.writeMem(location, this.c);";
+      $code$$ = $location$$26_toHex$$ + "this.c = this.rlc(this.getUint8(location)); this.setUint8(location, this.c);";
       break;
     case 2:
       $inst$$ = "LD D,RLC (" + $index$$ + ")";
-      $code$$ = $location$$26_toHex$$ + "this.d = this.rlc(this.readMem(location)); this.writeMem(location, this.d);";
+      $code$$ = $location$$26_toHex$$ + "this.d = this.rlc(this.getUint8(location)); this.setUint8(location, this.d);";
       break;
     case 3:
       $inst$$ = "LD E,RLC (" + $index$$ + ")";
@@ -7059,11 +7140,11 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 6:
       $inst$$ = "RLC (" + $index$$ + ")";
-      $code$$ = $location$$26_toHex$$ + "this.writeMem(location, this.rlc(this.readMem(location)));";
+      $code$$ = $location$$26_toHex$$ + "this.setUint8(location, this.rlc(this.getUint8(location)));";
       break;
     case 7:
       $inst$$ = "LD A,RLC (" + $index$$ + ")";
-      $code$$ = $location$$26_toHex$$ + "this.a = this.rlc(this.readMem(location)); this.writeMem(location, this.a);";
+      $code$$ = $location$$26_toHex$$ + "this.a = this.rlc(this.getUint8(location)); this.setUint8(location, this.a);";
       break;
     case 8:
       $inst$$ = "LD B,RRC (" + $index$$ + ")";
@@ -7130,14 +7211,14 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 29:
       $inst$$ = "LD L,RR (" + $index$$ + ")";
-      $code$$ = $location$$26_toHex$$ + "this.l = this.rr(this.readMem(location)); this.writeMem(location, this.l);";
+      $code$$ = $location$$26_toHex$$ + "this.l = this.rr(this.getUint8(location)); this.setUint8(location, this.l);";
       break;
     case 30:
       $inst$$ = "RR (" + $index$$ + ")";
       break;
     case 31:
       $inst$$ = "LD A,RR (" + $index$$ + ")";
-      $code$$ = $location$$26_toHex$$ + "this.a = this.rr(this.readMem(location)); this.writeMem(location, this.a);";
+      $code$$ = $location$$26_toHex$$ + "this.a = this.rr(this.getUint8(location)); this.setUint8(location, this.a);";
       break;
     case 32:
       $inst$$ = "LD B,SLA (" + $index$$ + ")";
@@ -7830,7 +7911,7 @@ JSSMS.Keyboard.prototype = {reset:function $JSSMS$Keyboard$$reset$() {
   }
   $evt$$.preventDefault();
 }};
-var SCALE = 8, NO_ANTIALIAS = Number.MIN_VALUE, SHIFT_RESET = 32768, FEEDBACK_PATTERN = 9, PSG_VOLUME = [25, 20, 16, 13, 10, 8, 6, 5, 4, 3, 3, 2, 2, 1, 1, 0], HI_BOUNDARY = 127, LO_BOUNDARY = -128;
+var SCALE = 8, NO_ANTIALIAS = Number.MIN_VALUE, SHIFT_RESET = 32768, FEEDBACK_PATTERN = 9, PSG_VOLUME = [25, 20, 16, 13, 10, 8, 6, 5, 4, 3, 3, 2, 2, 1, 1, 0];
 JSSMS.SN76489 = function $JSSMS$SN76489$($sms$$) {
   this.main = $sms$$;
   this.clockFrac = this.clock = 0;
@@ -7843,13 +7924,16 @@ JSSMS.SN76489 = function $JSSMS$SN76489$($sms$$) {
   this.noiseShiftReg = SHIFT_RESET;
   this.outputChannel = Array(4);
 };
-JSSMS.SN76489.prototype = {init:function $JSSMS$SN76489$$init$($clockSpeed$$, $sampleRate$$) {
-  this.clock = ($clockSpeed$$ << SCALE) / 16 / $sampleRate$$;
+JSSMS.SN76489.prototype = {init:function $JSSMS$SN76489$$init$($clockSpeed_i$$) {
+  this.clock = ($clockSpeed_i$$ << SCALE) / 16 / SAMPLE_RATE;
   this.regLatch = this.clockFrac = 0;
   this.noiseFreq = 16;
   this.noiseShiftReg = SHIFT_RESET;
-  for (var $i$$ = 0;4 > $i$$;$i$$++) {
-    this.reg[$i$$ << 1] = 1, this.reg[($i$$ << 1) + 1] = 15, this.freqCounter[$i$$] = 0, this.freqPolarity[$i$$] = 1, 3 !== $i$$ && (this.freqPos[$i$$] = NO_ANTIALIAS);
+  for ($clockSpeed_i$$ = 0;4 > $clockSpeed_i$$;$clockSpeed_i$$++) {
+    this.reg[$clockSpeed_i$$ << 1] = 1, this.reg[($clockSpeed_i$$ << 1) + 1] = 15, this.freqCounter[$clockSpeed_i$$] = 0, this.freqPolarity[$clockSpeed_i$$] = 1;
+  }
+  for ($clockSpeed_i$$ = 0;3 > $clockSpeed_i$$;$clockSpeed_i$$++) {
+    this.freqPos[$clockSpeed_i$$] = NO_ANTIALIAS;
   }
 }, write:function $JSSMS$SN76489$$write$($value$$) {
   0 !== ($value$$ & 128) ? (this.regLatch = $value$$ >> 4 & 7, this.reg[this.regLatch] = this.reg[this.regLatch] & 1008 | $value$$ & 15) : this.reg[this.regLatch] = 0 === this.regLatch || 2 === this.regLatch || 4 === this.regLatch ? this.reg[this.regLatch] & 15 | ($value$$ & 63) << 4 : $value$$ & 15;
@@ -7872,8 +7956,8 @@ JSSMS.SN76489.prototype = {init:function $JSSMS$SN76489$$init$($clockSpeed$$, $s
     }
     this.outputChannel[3] = PSG_VOLUME[this.reg[7]] * (this.noiseShiftReg & 1) << 1;
     $feedback_i$$ = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
-    $feedback_i$$ /= HI_BOUNDARY;
-    $feedback_i$$ > HI_BOUNDARY ? $feedback_i$$ = HI_BOUNDARY : $feedback_i$$ < LO_BOUNDARY && ($feedback_i$$ = LO_BOUNDARY);
+    $feedback_i$$ /= 128;
+    1 < $feedback_i$$ ? $feedback_i$$ = 1 : -1 > $feedback_i$$ && ($feedback_i$$ = -1);
     $audioBuffer_buffer$$[$offset$$ + $sample$$] = $feedback_i$$;
     this.clockFrac += this.clock;
     var $clockCycles$$ = this.clockFrac >> SCALE, $clockCyclesScaled$$ = $clockCycles$$ << SCALE;
@@ -8011,7 +8095,7 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
   this.readBuffer = this.VRAM[this.location++ & 16383] & 255;
   return $value$$;
 }, dataWrite:function $JSSMS$Vdp$$dataWrite$($value$$) {
-  var $address$$15_temp$$ = 0;
+  var $address$$17_temp$$ = 0;
   this.firstByte = !0;
   switch(this.operation) {
     case 0:
@@ -8019,21 +8103,21 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
     case 1:
     ;
     case 2:
-      $address$$15_temp$$ = this.location & 16383;
-      if ($value$$ !== (this.VRAM[$address$$15_temp$$] & 255)) {
-        if ($address$$15_temp$$ >= this.sat && $address$$15_temp$$ < this.sat + 64 || $address$$15_temp$$ >= this.sat + 128 && $address$$15_temp$$ < this.sat + 256) {
+      $address$$17_temp$$ = this.location & 16383;
+      if ($value$$ !== (this.VRAM[$address$$17_temp$$] & 255)) {
+        if ($address$$17_temp$$ >= this.sat && $address$$17_temp$$ < this.sat + 64 || $address$$17_temp$$ >= this.sat + 128 && $address$$17_temp$$ < this.sat + 256) {
           this.isSatDirty = !0;
         } else {
-          var $tileIndex$$ = $address$$15_temp$$ >> 5;
+          var $tileIndex$$ = $address$$17_temp$$ >> 5;
           this.isTileDirty[$tileIndex$$] = 1;
           $tileIndex$$ < this.minDirty && (this.minDirty = $tileIndex$$);
           $tileIndex$$ > this.maxDirty && (this.maxDirty = $tileIndex$$);
         }
-        this.VRAM[$address$$15_temp$$] = $value$$;
+        this.VRAM[$address$$17_temp$$] = $value$$;
       }
       break;
     case 3:
-      this.main.is_sms ? ($address$$15_temp$$ = 3 * (this.location & 31), this.CRAM[$address$$15_temp$$] = this.main_JAVA_R[$value$$], this.CRAM[$address$$15_temp$$ + 1] = this.main_JAVA_G[$value$$], this.CRAM[$address$$15_temp$$ + 2] = this.main_JAVA_B[$value$$]) : ($address$$15_temp$$ = 3 * ((this.location & 63) >> 1), this.location & 1 ? this.CRAM[$address$$15_temp$$ + 2] = this.GG_JAVA_B[$value$$] : (this.CRAM[$address$$15_temp$$] = this.GG_JAVA_R[$value$$], this.CRAM[$address$$15_temp$$ + 1] = 
+      this.main.is_sms ? ($address$$17_temp$$ = 3 * (this.location & 31), this.CRAM[$address$$17_temp$$] = this.main_JAVA_R[$value$$], this.CRAM[$address$$17_temp$$ + 1] = this.main_JAVA_G[$value$$], this.CRAM[$address$$17_temp$$ + 2] = this.main_JAVA_B[$value$$]) : ($address$$17_temp$$ = 3 * ((this.location & 63) >> 1), this.location & 1 ? this.CRAM[$address$$17_temp$$ + 2] = this.GG_JAVA_B[$value$$] : (this.CRAM[$address$$17_temp$$] = this.GG_JAVA_R[$value$$], this.CRAM[$address$$17_temp$$ + 1] = 
       this.GG_JAVA_G[$value$$]));
   }
   ACCURATE && (this.readBuffer = $value$$);
@@ -8198,6 +8282,8 @@ JSSMS.DummyUI = function $JSSMS$DummyUI$($sms$$) {
   this.reset = function $this$reset$() {
   };
   this.updateStatus = function $this$updateStatus$() {
+  };
+  this.writeAudio = function $this$writeAudio$() {
   };
   this.writeFrame = function $this$writeFrame$() {
   };
@@ -9697,13 +9783,13 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   JSSMS.Utils.console.error("Wrong parameters number");
 }, LD_WRITE_MEM:function($srcRegister1$$, $srcRegister2$$, $dstRegister1$$, $dstRegister2$$) {
   return void 0 === $dstRegister1$$ && void 0 === $dstRegister2$$ ? function($value$$) {
-    return n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ($srcRegister1$$ + $srcRegister2$$).toUpperCase()), n.Literal($value$$)]));
+    return n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("get" + ($srcRegister1$$ + $srcRegister2$$).toUpperCase()), n.Literal($value$$)]));
   } : "n" === $srcRegister1$$ && "n" === $srcRegister2$$ && void 0 === $dstRegister2$$ ? function($value$$) {
-    return n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal($value$$), n.Register($dstRegister1$$)]));
+    return n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$), n.Register($dstRegister1$$)]));
   } : "n" === $srcRegister1$$ && "n" === $srcRegister2$$ ? function($value$$) {
-    return[n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal($value$$), n.Register($dstRegister2$$)])), n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal($value$$ + 1), n.Register($dstRegister1$$)]))];
+    return[n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$), n.Register($dstRegister2$$)])), n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$ + 1), n.Register($dstRegister1$$)]))];
   } : function() {
-    return n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ($srcRegister1$$ + $srcRegister2$$).toUpperCase()), n.Register($dstRegister1$$)]));
+    return n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("get" + ($srcRegister1$$ + $srcRegister2$$).toUpperCase()), n.Register($dstRegister1$$)]));
   };
 }, LD_SP:function($register1$$, $register2$$) {
   return void 0 === $register1$$ && void 0 === $register2$$ ? function($value$$) {
@@ -9715,9 +9801,9 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, LD_NN:function($register1$$, $register2$$) {
   return void 0 === $register2$$ ? function($value$$) {
-    return[n.ExpressionStatement(n.CallExpression("writeMem", n.Literal($value$$), n.BinaryExpression("&", n.Identifier($register1$$), n.Literal(255)))), n.ExpressionStatement(n.CallExpression("writeMem", n.Literal($value$$ + 1), n.BinaryExpression(">>", n.Identifier($register1$$), n.Literal(8))))];
+    return[n.ExpressionStatement(n.CallExpression("setUint8", n.Literal($value$$), n.BinaryExpression("&", n.Identifier($register1$$), n.Literal(255)))), n.ExpressionStatement(n.CallExpression("setUint8", n.Literal($value$$ + 1), n.BinaryExpression(">>", n.Identifier($register1$$), n.Literal(8))))];
   } : function($value$$) {
-    return[n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal($value$$), n.Register($register2$$)])), n.ExpressionStatement(n.CallExpression("writeMem", [n.Literal($value$$ + 1), n.Register($register1$$)]))];
+    return[n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$), n.Register($register2$$)])), n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$ + 1), n.Register($register1$$)]))];
   };
 }, INC8:function($register1$$, $register2$$) {
   return void 0 === $register2$$ ? function() {
@@ -9942,8 +10028,8 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, EX_SP_HL:function() {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("h"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), o.READ_MEM8(n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1))))), n.ExpressionStatement(n.CallExpression("writeMem", [n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1)), n.Identifier("temp")])), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", 
-    n.Register("l"), o.READ_MEM8(n.Identifier("sp")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("sp"), n.Identifier("temp")]))];
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("h"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), o.READ_MEM8(n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1))))), n.ExpressionStatement(n.CallExpression("setUint8", [n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1)), n.Identifier("temp")])), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", 
+    n.Register("l"), o.READ_MEM8(n.Identifier("sp")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("sp"), n.Identifier("temp")]))];
   };
 }, HALT:function() {
   return function($ret_value$$, $target$$, $nextAddress$$) {
@@ -9963,23 +10049,23 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   return void 0 === $register2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("&=", n.Register($register1$$), n.UnaryExpression("~", n.Bit($bit$$))));
   } : "h" === $register1$$ && "l" === $register2$$ ? function() {
-    return n.ExpressionStatement(n.CallExpression("writeMem", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())), n.UnaryExpression("~", n.Bit($bit$$)))));
+    return n.ExpressionStatement(n.CallExpression("setUint8", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())), n.UnaryExpression("~", n.Bit($bit$$)))));
   } : function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.UnaryExpression("~", n.Bit($bit$$)))]))];
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.UnaryExpression("~", n.Bit($bit$$)))]))];
   };
 }, SET:function($bit$$, $register1$$, $register2$$) {
   return void 0 === $register2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("|=", n.Register($register1$$), n.Bit($bit$$)));
   } : "h" === $register1$$ && "l" === $register2$$ ? function() {
-    return n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.BinaryExpression("|", o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())), n.Bit($bit$$))]));
+    return n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.BinaryExpression("|", o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())), n.Bit($bit$$))]));
   } : function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.BinaryExpression("|", o.READ_MEM8(n.Identifier("location")), n.Bit($bit$$))]))];
+    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.BinaryExpression("|", o.READ_MEM8(n.Identifier("location")), n.Bit($bit$$))]))];
   };
 }, LD_X:function($register1$$, $register2$$, $register3$$) {
   return void 0 === $register3$$ ? function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.CallExpression("writeMem", [n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$ & 255)), n.Literal($value$$ >> 8)]))];
+    return[n.ExpressionStatement(n.CallExpression("setUint8", [n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$ & 255)), n.Literal($value$$ >> 8)]))];
   } : function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.CallExpression("writeMem", [n.BinaryExpression("+", n.CallExpression("get" + ($register2$$ + $register3$$).toUpperCase()), n.Literal($value$$)), n.Register($register1$$)]))];
+    return[n.ExpressionStatement(n.CallExpression("setUint8", [n.BinaryExpression("+", n.CallExpression("get" + ($register2$$ + $register3$$).toUpperCase()), n.Literal($value$$)), n.Register($register1$$)]))];
   };
 }, INC_X:function($register1$$, $register2$$) {
   return function($value$$, $target$$, $nextAddress$$) {
@@ -10023,7 +10109,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, EX_SP_X:function($register1$$, $register2$$) {
   return function() {
-    return[].concat(n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()))), o.SET16($register1$$, $register2$$, o.READ_MEM16(n.Identifier("sp"))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("sp"), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(255))])), n.ExpressionStatement(n.CallExpression("writeMem", [n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1)), n.BinaryExpression(">>", 
+    return[].concat(n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()))), o.SET16($register1$$, $register2$$, o.READ_MEM16(n.Identifier("sp"))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("sp"), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(255))])), n.ExpressionStatement(n.CallExpression("setUint8", [n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1)), n.BinaryExpression(">>", 
     n.Identifier("sp"), n.Literal(8))])));
   };
 }, JP_X:function($register1$$, $register2$$) {
@@ -10058,7 +10144,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, INI:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("port.in_", n.Register("c")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("getHL"), n.Identifier("temp")])), o.DEC8("b")()], o.INC16("h", "l")(), [n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_NEGATIVE)))), 
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("port.in_", n.Register("c")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getHL"), n.Identifier("temp")])), o.DEC8("b")()], o.INC16("h", "l")(), [n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_NEGATIVE)))), 
     n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))]);
   };
 }, OUTI:function() {
@@ -10075,7 +10161,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, LDI:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.INC16("d", "e")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.INC16("d", "e")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
     n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("getBC"), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0)))))]);
   };
 }, CPI:function() {
@@ -10085,12 +10171,12 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, LDD:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.DEC16("d", "e")(), o.DEC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.DEC16("d", "e")(), o.DEC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
     n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("getBC"), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0)))))]);
   };
 }, LDIR:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.INC16("d", "e")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.INC16("d", "e")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
     n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("getBC"), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0))))), n.IfStatement(n.BinaryExpression("!==", n.CallExpression("getBC"), n.Literal(0)), 
     n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))]);
   };
@@ -10108,30 +10194,30 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, LDDR:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("writeMem", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.DEC16("d", "e")(), o.DEC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.DEC16("d", "e")(), o.DEC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
     n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("getBC"), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0))))), n.IfStatement(n.BinaryExpression("!==", n.CallExpression("getBC"), n.Literal(0)), 
     n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))]);
   };
 }, LD_RLC:generateIndexCBFunctions("rlc"), LD_RRC:generateIndexCBFunctions("rrc"), LD_RL:generateIndexCBFunctions("rl"), LD_RR:generateIndexCBFunctions("rr"), LD_SLA:generateIndexCBFunctions("sla"), LD_SRA:generateIndexCBFunctions("sra"), LD_SLL:generateIndexCBFunctions("sll"), LD_SRL:generateIndexCBFunctions("srl"), READ_MEM8:function($value$$) {
-  return n.CallExpression("readMem", $value$$);
+  return n.CallExpression("getUint8", $value$$);
 }, READ_MEM16:function($value$$) {
-  return n.CallExpression("readMemWord", $value$$);
+  return n.CallExpression("getUint16", $value$$);
 }};
 function generateCBFunctions($fn$$) {
   return function($register1$$, $register2$$) {
     return void 0 === $register2$$ ? function() {
       return n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.CallExpression($fn$$, n.Register($register1$$))));
     } : function() {
-      return n.ExpressionStatement(n.CallExpression("writeMem", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.CallExpression($fn$$, o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())))));
+      return n.ExpressionStatement(n.CallExpression("setUint8", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.CallExpression($fn$$, o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())))));
     };
   };
 }
 function generateIndexCBFunctions($fn$$) {
   return function($register1$$, $register2$$, $register3$$) {
     return void 0 === $register3$$ ? function($value$$, $target$$, $nextAddress$$) {
-      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.CallExpression($fn$$, o.READ_MEM8(n.Identifier("location")))]))];
+      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.CallExpression($fn$$, o.READ_MEM8(n.Identifier("location")))]))];
     } : function($value$$, $target$$, $nextAddress$$) {
-      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register3$$), n.CallExpression($fn$$, o.READ_MEM8(n.Identifier("location"))))), n.ExpressionStatement(n.CallExpression("writeMem", [n.Identifier("location"), n.Register($register3$$)]))];
+      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register3$$), n.CallExpression($fn$$, o.READ_MEM8(n.Identifier("location"))))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.Register($register3$$)]))];
     };
   };
 }
@@ -10529,10 +10615,10 @@ var Recompiler = function() {
       DEBUG && ($fn$$.body[0].id.name = "_" + $toHex$$($fn$$.body[0].id.name));
       $self$$.cpu.branches[$romPage$$][$address$$ % 16384] = (new Function("return " + $self$$.generateCodeFromAst($fn$$)))();
     });
-  }, parseFromAddress:function $$Recompiler$$$$parseFromAddress$($address$$25_obj$$, $romPage$$, $memPage$$) {
-    $address$$25_obj$$ = {address:$address$$25_obj$$, romPage:$romPage$$, memPage:$memPage$$};
-    this.parser.entryPoints.push($address$$25_obj$$);
-    this.bytecodes = this.parser.parseFromAddress($address$$25_obj$$);
+  }, parseFromAddress:function $$Recompiler$$$$parseFromAddress$($address$$27_obj$$, $romPage$$, $memPage$$) {
+    $address$$27_obj$$ = {address:$address$$27_obj$$, romPage:$romPage$$, memPage:$memPage$$};
+    this.parser.entryPoints.push($address$$27_obj$$);
+    this.bytecodes = this.parser.parseFromAddress($address$$27_obj$$);
     return this;
   }, analyzeFromAddress:function $$Recompiler$$$$analyzeFromAddress$() {
     this.analyzer.analyzeFromAddress(this.bytecodes);
