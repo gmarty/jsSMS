@@ -1121,6 +1121,11 @@ var Parser = (function() {
         JSSMS.Utils.console.error('Unexpected opcode', '0xED ' + toHex(opcode));
     }
 
+    if (bytecode.address >= 0x3FFF) {
+      isFunctionEnder = true;
+      bytecode.changePage = true;
+    }
+
     bytecode.nextAddress = stream.position;
     bytecode.operand = operand;
     bytecode.target = target;
@@ -1432,6 +1437,9 @@ var Parser = (function() {
       if (SUPPORT_DATAVIEW) {
         value = this.rom[page].getUint8(address);
         this.pos++;
+        if ((address & 0x3FFF) >= 0x3FFF) {
+          this.page++;
+        }
         return value;
       } else {
         value = this.rom[page][address] & 0xFF;
@@ -1454,6 +1462,9 @@ var Parser = (function() {
       if (SUPPORT_DATAVIEW) {
         value = this.rom[page].getInt8(address);
         this.pos++;
+        if ((address & 0x3FFF) >= 0x3FFF) {
+          this.page++;
+        }
         return value + 1;
       } else {
         value = this.rom[page][address] & 0xFF;

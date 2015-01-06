@@ -167,8 +167,28 @@ var Generator = (function() {
                     bytecode.ast = [].concat(decreaseTStateStmt, bytecode.ast);
                     //}
 
+                  // Increment `page` statement.
+                  if (bytecode.changePage) {
+                      // page++;
+                      var updatePageStmt = {
+                        'type': 'ExpressionStatement',
+                        'expression': {
+                          'type': 'UpdateExpression',
+                          'operator': '++',
+                          'argument': {
+                            'type': 'Identifier',
+                            'name': 'page'
+                          },
+                          'prefix': false
+                        }
+                      };
+
+                      bytecode.ast.push(updatePageStmt);
+                    }
+
                     // Update `this.pc` statement.
                     if ((ENABLE_SERVER_LOGGER || bytecode.isFunctionEnder) && bytecode.nextAddress !== null) {
+                      // this.pc = |nextAddress| + page * 0x4000;
                       var nextAddress = bytecode.nextAddress % 0x4000;
                       var updatePcStmt = {
                         'type': 'ExpressionStatement',

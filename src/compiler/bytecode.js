@@ -46,6 +46,7 @@ var Bytecode = (function() {
     this.target = null;
     this.isFunctionEnder = false;
     this.canEnd = false;
+    this.changePage = false;
     this.isJumpTarget = false;
     this.jumpTargetNb = 0; // Number of bytecodes targeting there.
     this.ast = null;
