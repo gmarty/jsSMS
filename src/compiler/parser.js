@@ -1432,12 +1432,12 @@ var Parser = (function() {
     getUint8: function() {
       var value = 0;
       var page = this.page;
-      var address = (this.pos) & 0x3FFF;
+      var address = this.pos & 0x3FFF;
 
       if (SUPPORT_DATAVIEW) {
         value = this.rom[page].getUint8(address);
         this.pos++;
-        if ((address & 0x3FFF) >= 0x3FFF) {
+        if (address >= 0x3FFF) {
           this.page++;
         }
         return value;
@@ -1457,12 +1457,12 @@ var Parser = (function() {
     getInt8: function() {
       var value = 0;
       var page = this.page;
-      var address = (this.pos) & 0x3FFF;
+      var address = this.pos & 0x3FFF;
 
       if (SUPPORT_DATAVIEW) {
         value = this.rom[page].getInt8(address);
         this.pos++;
-        if ((address & 0x3FFF) >= 0x3FFF) {
+        if (address >= 0x3FFF) {
           this.page++;
         }
         return value + 1;
@@ -1485,10 +1485,10 @@ var Parser = (function() {
     getUint16: function() {
       var value = 0;
       var page = this.page;
-      var address = (this.pos) & 0x3FFF;
+      var address = this.pos & 0x3FFF;
 
       if (SUPPORT_DATAVIEW) {
-        if ((address & 0x3FFF) < 0x3FFF) {
+        if (address < 0x3FFF) {
           value = this.rom[page].getUint16(address, LITTLE_ENDIAN);
           this.pos += 2;
           return value;

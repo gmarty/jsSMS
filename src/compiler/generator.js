@@ -164,11 +164,8 @@ var Generator = (function() {
                       decreaseTStateStmt = [].concat(syncServerStmt, decreaseTStateStmt);
                     }
 
-                    bytecode.ast = [].concat(decreaseTStateStmt, bytecode.ast);
-                    //}
-
-                  // Increment `page` statement.
-                  if (bytecode.changePage) {
+                    // Increment `page` statement.
+                    if (bytecode.changePage) {
                       // page++;
                       var updatePageStmt = {
                         'type': 'ExpressionStatement',
@@ -183,8 +180,11 @@ var Generator = (function() {
                         }
                       };
 
-                      bytecode.ast.push(updatePageStmt);
+                      bytecode.ast = [].concat(updatePageStmt, bytecode.ast);
                     }
+
+                    bytecode.ast = [].concat(decreaseTStateStmt, bytecode.ast);
+                    //}
 
                     // Update `this.pc` statement.
                     if ((ENABLE_SERVER_LOGGER || bytecode.isFunctionEnder) && bytecode.nextAddress !== null) {
