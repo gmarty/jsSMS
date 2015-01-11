@@ -241,10 +241,16 @@ JSSMS.Utils = {
    * @return {string} A hex representation of the input.
    */
   toHex: function(dec) {
-    var hex = (dec).toString(16).toUpperCase();
+    var minus = dec < 0;
+    var hex = Math.abs(dec).toString(16).toUpperCase();
     if (hex.length % 2) {
       hex = '0' + hex;
     }
+
+    if (minus) {
+      return '-0x' + hex;
+    }
+
     return '0x' + hex;
   },
 
