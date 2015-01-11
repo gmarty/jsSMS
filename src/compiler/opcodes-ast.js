@@ -385,7 +385,7 @@ var o = {
       // sp = getUint16(getUint16(pc));
       return function(value) {
         return n.ExpressionStatement(
-          n.AssignmentExpression('=', n.Identifier('sp'), o.READ_MEM8(n.Literal(value)))
+          n.AssignmentExpression('=', n.Identifier('sp'), o.READ_MEM16(n.Literal(value)))
         );
       };
     }
@@ -750,9 +750,9 @@ var o = {
       };
     } else {
       return function() {
+        // a &= getUint8(getHL());
+        // f = SZP_TABLE[a] | F_HALFCARRY;
         return [
-          // a &= getUint8(getHL());
-          // f = SZP_TABLE[a] | F_HALFCARRY;
           n.ExpressionStatement(
               n.AssignmentExpression('&=', n.Register('a'), o.READ_MEM8(n.CallExpression('get' + (register1 + register2).toUpperCase())))
           ),
