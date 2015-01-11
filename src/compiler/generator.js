@@ -315,7 +315,7 @@ var Generator = (function() {
                     'id': {
                       'type': 'Identifier',
                       // Name of the function (i.e. starting index).
-                      'name': DEBUG ? '_' + toHex(name) : '_' + name
+                      'name': '_' + name
                     },
                     'params': [
                       {

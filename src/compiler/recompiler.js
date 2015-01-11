@@ -132,7 +132,7 @@ var Recompiler = (function() {
 
       // Attach generated code to an attach point in Z80 instance.
       fns[0].forEach(function(fn) {
-        self.cpu.branches[romPage][address % 0x4000] = new Function('return ' + self.generateCodeFromAst(fn))();
+        self.cpu.branches[romPage]['_' + (address % 0x4000)] = new Function('return ' + self.generateCodeFromAst(fn))();
       });
     },
 

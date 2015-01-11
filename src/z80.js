@@ -497,20 +497,20 @@ JSSMS.Z80.prototype = {
 
   recompile: function() {
     if (this.pc < 0x0400) {
-      if (!this.branches[0][this.pc]) {
+      if (!this.branches[0]['_' + this.pc]) {
         this.recompiler.recompileFromAddress(this.pc, 0, 0);
       }
-      this.branches[0][this.pc].call(this, 0);
+      this.branches[0]['_' + this.pc].call(this, 0);
 
       return;
     } else if (this.pc < 0xC000) {
       var frameId = this.pc % 0x4000;
       var frameReg = Math.floor(this.pc / 0x4000);
 
-      if (!this.branches[this.frameReg[frameReg]][frameId]) {
+      if (!this.branches[this.frameReg[frameReg]]['_' + frameId]) {
         this.recompiler.recompileFromAddress(this.pc, this.frameReg[frameReg], frameReg);
       }
-      this.branches[this.frameReg[frameReg]][frameId].call(this, frameReg);
+      this.branches[this.frameReg[frameReg]]['_' + frameId].call(this, frameReg);
 
       return;
     }
