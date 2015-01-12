@@ -936,10 +936,21 @@ var o = {
     };
   },
   JR: function(test) {
-    return function(value, target) {
+    if (test === undefined) {
+      return function(value, target, nextAddress) {
+        // pc = (target % 0x4000) + (page * 0x4000);
+        return n.ExpressionStatement(
+          n.AssignmentExpression('=', n.Identifier('pc'), n.BinaryExpression('+',
+          n.Literal((target) % 0x4000), n.BinaryExpression('*',
+            n.Identifier('page'), n.Literal(0x4000)
+          )))
+        );
+      };
+    }
+    return function(value, target, nextAddress) {
       // if (test) {
       //   tstates -= 5;
-      //   pc = target + (page * 0x4000);
+      //   pc = (target % 0x4000) + (page * 0x4000);
       //   return;
       // }
       return n.IfStatement(
@@ -947,8 +958,8 @@ var o = {
           n.BlockStatement([
             n.ExpressionStatement(n.AssignmentExpression('-=', n.Identifier('tstates'), n.Literal(5))),
             n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('pc'), n.BinaryExpression('+',
-                n.Literal(target % 0x4000), n.BinaryExpression('*',
-                n.Identifier('page'), n.Literal(0x4000)
+                n.Literal((target) % 0x4000), n.BinaryExpression('*',
+                  n.Identifier('page'), n.Literal(0x4000)
                 )))),
             n.ReturnStatement()
           ])
@@ -960,7 +971,7 @@ var o = {
       // b = (b - 1) & 0xFF;
       // if (b !== 0) {
       //   tstates -= 5;
-      //   pc = target;
+      //   pc = (target % 0x4000) + (page * 0x4000);
       //   return;
       // }
       return [

@@ -146,7 +146,7 @@ var opcodeTable = [
   //0x18
   {
     name: 'JR (PC+e)',
-    ast: o.JP()
+    ast: o.JR()
   },
   //0x19
   {
