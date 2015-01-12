@@ -20,14 +20,12 @@
 'use strict';
 
 
-
 /**
  * This file is heavily inspired by n64.js.
  */
 
 
 /** @const */ var LOG_LENGTH = 100;
-
 
 
 /**
@@ -92,7 +90,6 @@ function BinaryRequest(method, url, args, data, cb) {
 }
 
 
-
 /**
  * @constructor
  */
@@ -135,12 +132,15 @@ SyncWriter.prototype = {
       this.buffers.splice(0, 1);
       var bytes = buffer.length * 2;
 
-      this.curRequest = new BinaryRequest('POST', '/wsynclog', {o: this.fileOffset, l: bytes}, buffer, function() {
+      this.curRequest = new BinaryRequest('POST', '/wsynclog', {
+        o: this.fileOffset,
+        l: bytes
+      }, buffer, function() {
         self.fileOffset += bytes;
       })
         .always(function() {
-            self.curRequest = null;
-          });
+          self.curRequest = null;
+        });
     }
 
     return this.buffers.length === 0;
@@ -179,7 +179,6 @@ SyncWriter.prototype = {
 };
 
 
-
 /**
  * @constructor
  */
@@ -193,7 +192,7 @@ function SyncReader() {
   this.oos = false;
   this.nextBuffer = null;
 
-  this.log = Array(LOG_LENGTH);
+  this.log = new Array(LOG_LENGTH);
 }
 
 SyncReader.prototype = {
@@ -212,13 +211,16 @@ SyncReader.prototype = {
     if (!this.nextBuffer && !this.curRequest) {
       var self = this;
 
-      this.curRequest = new BinaryRequest('GET', '/rsynclog', {o: this.fileOffset, l: this.kBufferLength}, undefined, function(result) {
+      this.curRequest = new BinaryRequest('GET', '/rsynclog', {
+        o: this.fileOffset,
+        l: this.kBufferLength
+      }, undefined, function(result) {
         self.nextBuffer = new Uint16Array(result);
         self.fileOffset += result.byteLength;
       })
         .always(function() {
-            self.curRequest = null;
-          });
+          self.curRequest = null;
+        });
 
       return false;
     }
@@ -262,11 +264,12 @@ SyncReader.prototype = {
    */
   sync16: function(val, name) {
     if (this.oos) {
-      return false;
+      return;
     }
 
     var toHex = JSSMS.Utils.toHex;
     var writtenVal = this.pop();
+
     if (val === writtenVal) {
       this.log.shift();
       this.log.push([name, toHex(val), toHex(writtenVal)]);
@@ -274,17 +277,16 @@ SyncReader.prototype = {
       this.log.forEach(function(log) {
         console.log.apply(console, log);
       });
+      this.log = new Array(LOG_LENGTH); // Flushing the log
 
       console.log('%c' + name, 'color: red;', toHex(val), toHex(writtenVal));
+
       if (name === 'pc') {
         debugger;
         // Flag that we're out of sync so that we don't keep spamming errors.
         //this.oos = true;
-        return false;
       }
     }
-
-    return true;
   },
 
 
