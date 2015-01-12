@@ -31,34 +31,6 @@ var url = require('url');
 
 var sync_fd = fs.openSync('./sync.bin', 'a+');
 
-http.createServer(function(request, response) {
-  var parsed = url.parse(request.url, true);
-
-  if (parsed.pathname == '/wsynclog') {
-    if (request.method == 'POST') {
-      writeSyncLog(parsed.query.o, parsed.query.l, request, response);
-    } else {
-      response.writeHead(500);
-      response.end();
-    }
-    return;
-  }
-
-  if (parsed.pathname == '/rsynclog') {
-    readSyncLog(parsed.query.o, parsed.query.l, request, response);
-    return;
-  }
-
-  serveFile(request, response);
-}).listen(8124);
-
-console.log('Server running at http://127.0.0.1:8124/');
-
-process.on('SIGINT', function() {
-  console.log('Got ctrl-c - exiting');
-  process.exit();
-});
-
 function writeSyncLog(offset, length, request, response) {
   offset = parseInt(offset, 10) || 0;
   length = parseInt(length, 10) || 1024;
@@ -80,7 +52,7 @@ function writeSyncLog(offset, length, request, response) {
 
     fs.writeSync(sync_fd, buffer, 0, dataLen, offset);
     //fs.truncateSync(sync_fd, offset + dataLen);
-    response.writeHead(200, { 'Content-Type': 'text/plain' });
+    response.writeHead(200, {'Content-Type': 'text/plain'});
     response.end('OK', 'utf-8');
   });
 }
@@ -92,15 +64,15 @@ function readSyncLog(offset, length, request, response) {
   var buffer = new Buffer(length);
 
   fs.readSync(sync_fd, buffer, 0, length, offset);
-  response.writeHead(200, { 'Content-Type': 'application/octet-stream' });
+  response.writeHead(200, {'Content-Type': 'application/octet-stream'});
   response.end(buffer, 'utf-8');
 }
 
 function serveFile(request, response) {
-  var filePath = unescape('.' + request.url);
+  var filePath = decodeURI('.' + request.url);
   var contentType = '';
 
-  if (filePath == './') {
+  if (filePath === './') {
     // index.html is the default resource served.
     filePath = './index.html';
   }
@@ -139,7 +111,7 @@ function serveFile(request, response) {
           response.writeHead(500);
           response.end();
         } else {
-          response.writeHead(200, { 'Content-Type': contentType });
+          response.writeHead(200, {'Content-Type': contentType});
           response.end(content, 'utf-8');
         }
       });
@@ -149,3 +121,31 @@ function serveFile(request, response) {
     }
   });
 }
+
+http.createServer(function(request, response) {
+  var parsed = url.parse(request.url, true);
+
+  if (parsed.pathname === '/wsynclog') {
+    if (request.method === 'POST') {
+      writeSyncLog(parsed.query.o, parsed.query.l, request, response);
+    } else {
+      response.writeHead(500);
+      response.end();
+    }
+    return;
+  }
+
+  if (parsed.pathname === '/rsynclog') {
+    readSyncLog(parsed.query.o, parsed.query.l, request, response);
+    return;
+  }
+
+  serveFile(request, response);
+}).listen(8124);
+
+console.log('Server running at http://127.0.0.1:8124/');
+
+process.on('SIGINT', function() {
+  console.log('Got ctrl-c - exiting');
+  process.exit();
+});
