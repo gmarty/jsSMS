@@ -1967,6 +1967,112 @@ var o = {
       );
     };
   },
+  RRD: function() {
+    return function(value, target, nextAddress) {
+      // location = getHL();
+      // temp = getUint8(location);
+      // setUint8(location, (temp >> 4) | ((a & 0x0F) << 4));
+      // a = (a & 0xF0) | (temp & 0x0F);
+      // f = (f & F_CARRY) | SZP_TABLE[a];
+
+      return [].concat(
+        [
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('location'), n.CallExpression('get' + ('h' + 'l').toUpperCase()))),
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), o.READ_MEM8(n.Identifier('location')))),
+          n.ExpressionStatement(
+            n.CallExpression('setUint8', [
+              n.Identifier('location'),
+              n.BinaryExpression('|',
+                n.BinaryExpression('>>',
+                  n.Identifier('temp'),
+                  n.Literal(4)
+                ),
+                n.BinaryExpression('<<',
+                  n.BinaryExpression('&',
+                    n.Register('a'),
+                    n.Literal(0x0F)
+                  ),
+                  n.Literal(4)
+                )
+              )
+            ])
+          ),
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Register('a'),
+            n.BinaryExpression('|',
+              n.BinaryExpression('&',
+                n.Register('a'),
+                n.Literal(0xF0)
+              ),
+              n.BinaryExpression('&',
+                n.Identifier('temp'),
+                n.Literal(0x0F)
+              )
+            ))),
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Register('f'),
+            n.BinaryExpression('|',
+              n.BinaryExpression('&',
+                n.Identifier('f'),
+                n.Literal(F_CARRY)
+              ),
+              n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a'))
+            )))
+        ]
+      );
+    };
+  },
+  RLD: function() {
+    return function(value, target, nextAddress) {
+      // location = getHL();
+      // temp = getUint8(location);
+      // setUint8(location, (temp & 0x0F) << 4 | (a & 0x0F));
+      // a = (a & 0xF0) | (temp >> 4);
+      // f = (f & F_CARRY) | SZP_TABLE[a];
+
+      return [].concat(
+        [
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('location'), n.CallExpression('get' + ('h' + 'l').toUpperCase()))),
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Identifier('temp'), o.READ_MEM8(n.Identifier('location')))),
+          n.ExpressionStatement(
+            n.CallExpression('setUint8', [
+              n.Identifier('location'),
+              n.BinaryExpression('|',
+                n.BinaryExpression('<<',
+                  n.BinaryExpression('&',
+                    n.Identifier('temp'),
+                    n.Literal(0x0F)
+                  ),
+                  n.Literal(4)
+                ),
+                n.BinaryExpression('&',
+                  n.Register('a'),
+                  n.Literal(0x0F)
+                )
+              )
+            ])
+          ),
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Register('a'),
+            n.BinaryExpression('|',
+              n.BinaryExpression('&',
+                n.Register('a'),
+                n.Literal(0xF0)
+              ),
+              n.BinaryExpression('>>',
+                n.Identifier('temp'),
+                n.Literal(4)
+              )
+            ))),
+          n.ExpressionStatement(n.AssignmentExpression('=', n.Register('f'),
+            n.BinaryExpression('|',
+              n.BinaryExpression('&',
+                n.Identifier('f'),
+                n.Literal(F_CARRY)
+              ),
+              n.MemberExpression(n.Identifier('SZP_TABLE'), n.Register('a'))
+            )))
+        ]
+      );
+    };
+  },
   CPI: function() {
     return function(value, target, nextAddress) {
       // temp = (f & F_CARRY) | F_NEGATIVE;

@@ -163,6 +163,10 @@ var opcodeTableED = {
     name: 'IM 0',
     ast: o.IM(0)
   },
+  0x67: {
+    name: 'RRD',
+    ast: o.RRD()
+  },
   0x68: {
     name: 'IN L,(C)',
     ast: o.IN('l', 'c')
@@ -186,6 +190,10 @@ var opcodeTableED = {
   0x6E: {
     name: 'IM 0',
     ast: o.IM(0)
+  },
+  0x6F: {
+    name: 'RLD',
+    ast: o.RLD()
   },
   0x73: {
     name: 'LD (nn),SP',
