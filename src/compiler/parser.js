@@ -1500,7 +1500,7 @@ var Parser = (function() {
         }
       } else {
         value = (this.rom[page][address] & 0xFF) |
-            ((this.rom[++page][address] & 0xFF) << 8);
+            ((this.rom[page][address + 1] & 0xFF) << 8);
         this.pos += 2;
         return value;
       }
