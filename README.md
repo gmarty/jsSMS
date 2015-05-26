@@ -38,7 +38,7 @@ If you are looking for another SMS emulator in JavaScript, go to [Miracle](http:
 
 jsSMS - A dynamic recompiling emulator for Sega Master System & Game Gear written in JavaScript
 
-Copyright (C) 2012-2014 Guillaume Cedric Marty (https://github.com/gmarty)
+Copyright (C) 2015 Guillaume Cedric Marty (https://github.com/gmarty)
 
 Based on JavaGear Copyright (c) 2002-2008 Chris White
 
