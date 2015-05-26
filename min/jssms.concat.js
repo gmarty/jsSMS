@@ -244,6 +244,12 @@ JSSMS.Utils = {rndInt:function(range) {
   } else {
     return Array;
   }
+}(), Uint16Array:function() {
+  if (SUPPORT_TYPED_ARRAYS) {
+    return Uint16Array;
+  } else {
+    return Array;
+  }
 }(), Array:function() {
   if (SUPPORT_DATAVIEW) {
     return function(length) {
@@ -311,9 +317,13 @@ JSSMS.Utils = {rndInt:function(range) {
     };
   }
 }(), toHex:function(dec) {
-  var hex = dec.toString(16).toUpperCase();
+  var minus = dec < 0;
+  var hex = Math.abs(dec).toString(16).toUpperCase();
   if (hex.length % 2) {
     hex = "0" + hex;
+  }
+  if (minus) {
+    return "-0x" + hex;
   }
   return "0x" + hex;
 }, getPrefix:function(arr, obj) {
@@ -365,6 +375,7 @@ JSSMS.Utils = {rndInt:function(range) {
 }, isIE:function() {
   return/msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent);
 }};
+var LOG_LENGTH = 100;
 function BinaryRequest(method, url, args, data, cb) {
   method = method || "GET";
   var alwaysCallbacks = [];
@@ -474,6 +485,7 @@ function SyncReader() {
   this.curRequest = null;
   this.oos = false;
   this.nextBuffer = null;
+  this.log = new Array(LOG_LENGTH);
 }
 SyncReader.prototype = {refill:function() {
   if (!this.syncBuffer || this.syncBufferIdx >= this.syncBuffer.length) {
@@ -515,20 +527,23 @@ SyncReader.prototype = {refill:function() {
   return-1;
 }, sync16:function(val, name) {
   if (this.oos) {
-    return false;
+    return;
   }
   var toHex = JSSMS.Utils.toHex;
   var writtenVal = this.pop();
   if (val === writtenVal) {
-    console.log(name, toHex(val), toHex(writtenVal));
+    this.log.shift();
+    this.log.push([name, toHex(val), toHex(writtenVal)]);
   } else {
+    this.log.forEach(function(log) {
+      console.log.apply(console, log);
+    });
+    this.log = new Array(LOG_LENGTH);
     console.log("%c" + name, "color: red;", toHex(val), toHex(writtenVal));
     if (name === "pc") {
       debugger;
-      return false;
     }
   }
-  return true;
 }, reflect16:function(val) {
   if (this.oos) {
     return val;
@@ -553,17 +568,17 @@ var BIT_4 = 16;
 var BIT_5 = 32;
 var BIT_6 = 64;
 var BIT_7 = 128;
-var OP_STATES = [4, 10, 7, 6, 4, 4, 7, 4, 4, 11, 7, 6, 4, 4, 7, 4, 8, 10, 7, 6, 4, 4, 7, 4, 12, 11, 7, 6, 4, 4, 7, 4, 7, 10, 16, 6, 4, 4, 7, 4, 7, 11, 16, 6, 4, 4, 7, 4, 7, 10, 13, 6, 11, 11, 10, 4, 7, 11, 13, 6, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 7, 7, 7, 7, 7, 7, 4, 7, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 
-4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 5, 10, 10, 10, 10, 11, 7, 11, 5, 10, 10, 0, 10, 17, 7, 11, 5, 10, 10, 11, 10, 11, 7, 11, 5, 4, 10, 11, 10, 0, 7, 11, 5, 10, 10, 19, 10, 11, 7, 11, 5, 4, 10, 4, 10, 0, 7, 11, 5, 10, 10, 4, 10, 11, 7, 11, 5, 6, 10, 4, 10, 0, 7, 11];
-var OP_CB_STATES = [8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 
-8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8];
-var OP_DD_STATES = [4, 4, 4, 4, 4, 4, 4, 4, 4, 15, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 15, 4, 4, 4, 4, 4, 4, 4, 14, 20, 10, 8, 8, 11, 4, 4, 15, 20, 10, 8, 8, 11, 4, 4, 4, 4, 4, 23, 23, 19, 4, 4, 15, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 8, 8, 8, 8, 8, 8, 19, 8, 8, 8, 8, 8, 8, 8, 19, 8, 19, 19, 19, 19, 19, 19, 4, 19, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 
-4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 14, 4, 23, 4, 15, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 10, 4, 4, 4, 4, 4, 4];
-var OP_INDEX_CB_STATES = [23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 
-20, 20, 20, 20, 20, 20, 20, 20, 20, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 
-23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23];
-var OP_ED_STATES = [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 18, 12, 12, 15, 20, 8, 14, 8, 18, 8, 12, 15, 20, 8, 14, 8, 8, 12, 12, 15, 20, 8, 14, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
-8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8];
+var OP_STATES = new JSSMS.Utils.Uint8Array([4, 10, 7, 6, 4, 4, 7, 4, 4, 11, 7, 6, 4, 4, 7, 4, 8, 10, 7, 6, 4, 4, 7, 4, 12, 11, 7, 6, 4, 4, 7, 4, 7, 10, 16, 6, 4, 4, 7, 4, 7, 11, 16, 6, 4, 4, 7, 4, 7, 10, 13, 6, 11, 11, 10, 4, 7, 11, 13, 6, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 7, 7, 7, 7, 7, 7, 4, 7, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 
+4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4, 5, 10, 10, 10, 10, 11, 7, 11, 5, 10, 10, 0, 10, 17, 7, 11, 5, 10, 10, 11, 10, 11, 7, 11, 5, 4, 10, 11, 10, 0, 7, 11, 5, 10, 10, 19, 10, 11, 7, 11, 5, 4, 10, 4, 10, 0, 7, 11, 5, 10, 10, 4, 10, 11, 7, 11, 5, 6, 10, 4, 10, 0, 7, 11]);
+var OP_CB_STATES = new JSSMS.Utils.Uint8Array([8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 
+8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8]);
+var OP_DD_STATES = new JSSMS.Utils.Uint8Array([4, 4, 4, 4, 4, 4, 4, 4, 4, 15, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 15, 4, 4, 4, 4, 4, 4, 4, 14, 20, 10, 8, 8, 11, 4, 4, 15, 20, 10, 8, 8, 11, 4, 4, 4, 4, 4, 23, 23, 19, 4, 4, 15, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 8, 8, 8, 8, 8, 8, 19, 8, 8, 8, 8, 8, 8, 8, 19, 8, 19, 19, 19, 19, 19, 19, 4, 19, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 
+19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 14, 4, 23, 4, 15, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 10, 4, 4, 4, 4, 4, 4]);
+var OP_INDEX_CB_STATES = new JSSMS.Utils.Uint8Array([23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 
+20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 
+23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23]);
+var OP_ED_STATES = new JSSMS.Utils.Uint8Array([8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 18, 12, 12, 15, 20, 8, 14, 8, 18, 8, 12, 15, 20, 8, 14, 8, 8, 12, 12, 15, 20, 8, 14, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 
+8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]);
 JSSMS.Z80 = function(sms) {
   this.main = sms;
   this.vdp = sms.vdp;
@@ -609,14 +624,14 @@ JSSMS.Z80 = function(sms) {
   this.romPageMask = 0;
   this.number_of_pages = 0;
   this.memWriteMap = JSSMS.Utils.Array(8192);
-  this.DAA_TABLE = new Array(2048);
-  this.SZ_TABLE = new Array(256);
-  this.SZP_TABLE = new Array(256);
-  this.SZHV_INC_TABLE = new Array(256);
-  this.SZHV_DEC_TABLE = new Array(256);
-  this.SZHVC_ADD_TABLE = new Array(2 * 256 * 256);
-  this.SZHVC_SUB_TABLE = new Array(2 * 256 * 256);
-  this.SZ_BIT_TABLE = new Array(256);
+  this.DAA_TABLE = new JSSMS.Utils.Uint16Array(2048);
+  this.SZ_TABLE = new JSSMS.Utils.Uint8Array(256);
+  this.SZP_TABLE = new JSSMS.Utils.Uint8Array(256);
+  this.SZHV_INC_TABLE = new JSSMS.Utils.Uint8Array(256);
+  this.SZHV_DEC_TABLE = new JSSMS.Utils.Uint8Array(256);
+  this.SZHVC_ADD_TABLE = new JSSMS.Utils.Uint8Array(2 * 256 * 256);
+  this.SZHVC_SUB_TABLE = new JSSMS.Utils.Uint8Array(2 * 256 * 256);
+  this.SZ_BIT_TABLE = new JSSMS.Utils.Uint8Array(256);
   this.generateFlagTables();
   this.generateDAATable();
   this.generateMemory();
@@ -696,34 +711,20 @@ JSSMS.Z80.prototype = {reset:function() {
   }
 }, recompile:function() {
   if (this.pc < 1024) {
-    if (!this.branches[0][this.pc]) {
+    if (!this.branches[0]["_" + this.pc]) {
       this.recompiler.recompileFromAddress(this.pc, 0, 0);
     }
-    this.branches[0][this.pc].call(this, 0);
+    this.branches[0]["_" + this.pc].call(this, 0);
     return;
   } else {
-    if (this.pc < 16384) {
-      if (!this.branches[this.frameReg[0]][this.pc]) {
-        this.recompiler.recompileFromAddress(this.pc, this.frameReg[0], 0);
+    if (this.pc < 49152) {
+      var frameId = this.pc % 16384;
+      var frameReg = Math.floor(this.pc / 16384);
+      if (!this.branches[this.frameReg[frameReg]]["_" + frameId]) {
+        this.recompiler.recompileFromAddress(this.pc, this.frameReg[frameReg], frameReg);
       }
-      this.branches[this.frameReg[0]][this.pc].call(this, 0);
+      this.branches[this.frameReg[frameReg]]["_" + frameId].call(this, frameReg);
       return;
-    } else {
-      if (this.pc < 32768) {
-        if (!this.branches[this.frameReg[1]][this.pc - 16384]) {
-          this.recompiler.recompileFromAddress(this.pc, this.frameReg[1], 1);
-        }
-        this.branches[this.frameReg[1]][this.pc - 16384].call(this, 1);
-        return;
-      } else {
-        if (this.pc < 49152) {
-          if (!this.branches[this.frameReg[2]][this.pc - 32768]) {
-            this.recompiler.recompileFromAddress(this.pc, this.frameReg[2], 2);
-          }
-          this.branches[this.frameReg[2]][this.pc - 32768].call(this, 2);
-          return;
-        }
-      }
     }
   }
   this.interpret();
@@ -4430,6 +4431,7 @@ JSSMS.Z80.prototype = {reset:function() {
   this.l = result & 255;
 }, incR:function() {
   this.r = this.r & 128 | this.r + 1 & 127;
+}, nop:function() {
 }, generateFlagTables:function() {
   var i, sf, zf, yf, xf, pf;
   var padd, padc, psub, psbc;
@@ -9684,7 +9686,7 @@ if (window["$"]) {
         return;
       }
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
-      this.gamepad = {up:KEY_UP, right:KEY_RIGHT, down:KEY_DOWN, left:KEY_LEFT, fire1:KEY_FIRE1, fire2:KEY_FIRE2};
+      this.gamepad = {up:KEY_UP, down:KEY_DOWN, left:KEY_LEFT, right:KEY_RIGHT, fire1:KEY_FIRE1, fire2:KEY_FIRE2};
       var startButton = $(".start", gamepadContainer);
       this.romContainer = $('<div id="romSelector"></div>');
       this.romSelect = $("<select></select>").change(function() {
@@ -9762,7 +9764,7 @@ if (window["$"]) {
         for (var i = 0;i < changedTouches.length;i++) {
           var target = document.elementFromPoint(changedTouches[i].clientX, changedTouches[i].clientY);
           var className = target.className;
-          if (className === "gamepad" || !className) {
+          if (!className || !self.gamepad[className]) {
             continue;
           }
           var key = self.gamepad[className];
@@ -10074,6 +10076,7 @@ var Bytecode = function() {
     this.target = null;
     this.isFunctionEnder = false;
     this.canEnd = false;
+    this.changePage = false;
     this.isJumpTarget = false;
     this.jumpTargetNb = 0;
     this.ast = null;
@@ -11070,6 +11073,10 @@ var Parser = function() {
       default:
         JSSMS.Utils.console.error("Unexpected opcode", "0xED " + toHex(opcode));
     }
+    if (bytecode.address >= 16383) {
+      isFunctionEnder = true;
+      bytecode.changePage = true;
+    }
     bytecode.nextAddress = stream.position;
     bytecode.operand = operand;
     bytecode.target = target;
@@ -11321,6 +11328,9 @@ var Parser = function() {
     if (SUPPORT_DATAVIEW) {
       value = this.rom[page].getUint8(address);
       this.pos++;
+      if (address >= 16383) {
+        this.page++;
+      }
       return value;
     } else {
       value = this.rom[page][address] & 255;
@@ -11334,6 +11344,9 @@ var Parser = function() {
     if (SUPPORT_DATAVIEW) {
       value = this.rom[page].getInt8(address);
       this.pos++;
+      if (address >= 16383) {
+        this.page++;
+      }
       return value + 1;
     } else {
       value = this.rom[page][address] & 255;
@@ -11348,7 +11361,7 @@ var Parser = function() {
     var page = this.page;
     var address = this.pos & 16383;
     if (SUPPORT_DATAVIEW) {
-      if ((address & 16383) < 16383) {
+      if (address < 16383) {
         value = this.rom[page].getUint16(address, LITTLE_ENDIAN);
         this.pos += 2;
         return value;
@@ -11358,7 +11371,7 @@ var Parser = function() {
         return value;
       }
     } else {
-      value = this.rom[page][address] & 255 | (this.rom[++page][address] & 255) << 8;
+      value = this.rom[page][address] & 255 | (this.rom[page][address + 1] & 255) << 8;
       this.pos += 2;
       return value;
     }
@@ -11512,7 +11525,7 @@ var o = {SET16:function(register1, register2, value) {
   }
   if (register1 === "n" && register2 === "n") {
     return function(value) {
-      return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), o.READ_MEM8(n.Literal(value))));
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("sp"), o.READ_MEM16(n.Literal(value))));
     };
   }
   return function() {
@@ -11752,7 +11765,12 @@ var o = {SET16:function(register1, register2, value) {
     return n.ExpressionStatement(n.CallExpression("pushUint8", [n.Register(register1), n.Register(register2)]));
   };
 }, JR:function(test) {
-  return function(value, target) {
+  if (test === undefined) {
+    return function(value, target, nextAddress) {
+      return n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.BinaryExpression("+", n.Literal(target % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384)))));
+    };
+  }
+  return function(value, target, nextAddress) {
     return n.IfStatement(test, n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.BinaryExpression("+", n.Literal(target % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ReturnStatement()]));
   };
 }, DJNZ:function() {
@@ -12036,6 +12054,16 @@ var o = {SET16:function(register1, register2, value) {
     n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), 
     n.Literal(0)))))]);
   };
+}, RRD:function() {
+  return function(value, target, nextAddress) {
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.CallExpression("get" + ("h" + "l").toUpperCase()))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.Identifier("location")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.BinaryExpression("|", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(4)), n.BinaryExpression("<<", n.BinaryExpression("&", n.Register("a"), n.Literal(15)), 
+    n.Literal(4)))])), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("a"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("a"), n.Literal(240)), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(15))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Identifier("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")))))]);
+  };
+}, RLD:function() {
+  return function(value, target, nextAddress) {
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.CallExpression("get" + ("h" + "l").toUpperCase()))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.Identifier("location")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.BinaryExpression("|", n.BinaryExpression("<<", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(15)), n.Literal(4)), n.BinaryExpression("&", n.Register("a"), 
+    n.Literal(15)))])), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("a"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("a"), n.Literal(240)), n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(4))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Identifier("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")))))]);
+  };
 }, CPI:function() {
   return function(value, target, nextAddress) {
     return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase()))]))], o.DEC16("b", "c")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("===", n.CallExpression("get" + 
@@ -12070,6 +12098,12 @@ var o = {SET16:function(register1, register2, value) {
     return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("get" + ("d" + "e").toUpperCase()), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.DEC16("d", "e")(), o.DEC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), 
     n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), 
     n.Literal(0))))), n.IfStatement(n.BinaryExpression("!==", n.CallExpression("get" + ("b" + "c").toUpperCase()), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))]);
+  };
+}, OTDR:function() {
+  return function(value, target, nextAddress) {
+    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("get" + ("h" + "l").toUpperCase())))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")()], o.DEC16("h", "l")(), [n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), 
+    n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(0)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", 
+    n.Register("f"), n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE)))))), n.IfStatement(n.BinaryExpression("!==", n.Register("b"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))]);
   };
 }, "LD_RLC":generateIndexCBFunctions("rlc"), "LD_RRC":generateIndexCBFunctions("rrc"), "LD_RL":generateIndexCBFunctions("rl"), "LD_RR":generateIndexCBFunctions("rr"), "LD_SLA":generateIndexCBFunctions("sla"), "LD_SRA":generateIndexCBFunctions("sra"), "LD_SLL":generateIndexCBFunctions("sll"), "LD_SRL":generateIndexCBFunctions("srl"), READ_MEM8:function(value) {
   return n.CallExpression("getUint8", value);
@@ -12151,11 +12185,11 @@ for (op in opcodesList) {
 }
 ;var opcodeTableED = {64:{name:"IN B,(C)", ast:o.IN("b", "c")}, 66:{name:"SBC HL,BC", ast:o.SBC16("b", "c")}, 65:{name:"OUT (C),B", ast:o.OUT("c", "b")}, 67:{name:"LD (nn),BC", ast:o.LD_NN("b", "c")}, 68:{name:"NEG", ast:o.NEG()}, 69:{name:"RETN / RETI", ast:o.RETN_RETI()}, 70:{name:"IM 0", ast:o.IM(0)}, 72:{name:"IN C,(C)", ast:o.IN("c", "c")}, 73:{name:"OUT (C),C", ast:o.OUT("c", "c")}, 74:{name:"ADC HL,BC", ast:o.ADC16("b", "c")}, 75:{name:"LD BC,(nn)", ast:o.LD16("b", "c", "n", "n")}, 76:{name:"NEG", 
 ast:o.NEG()}, 77:{name:"RETN / RETI", ast:o.RETN_RETI()}, 78:{name:"IM 0", ast:o.IM(0)}, 79:{name:"LD R,A", ast:o.LD8("r", "a")}, 80:{name:"IN D,(C)", ast:o.IN("d", "c")}, 81:{name:"OUT (C),D", ast:o.OUT("c", "d")}, 82:{name:"SBC HL,DE", ast:o.SBC16("d", "e")}, 83:{name:"LD (nn),DE", ast:o.LD_NN("d", "e")}, 84:{name:"NEG", ast:o.NEG()}, 85:{name:"RETN / RETI", ast:o.RETN_RETI()}, 86:{name:"IM 1", ast:o.IM(1)}, 87:{name:"LD A,I", ast:o.LD8("a", "i")}, 88:{name:"IN E,(C)", ast:o.IN("e", "c")}, 89:{name:"OUT (C),E", 
-ast:o.OUT("c", "e")}, 90:{name:"ADC HL,DE", ast:o.ADC16("d", "e")}, 91:{name:"LD DE,(nn)", ast:o.LD16("d", "e", "n", "n")}, 92:{name:"NEG", ast:o.NEG()}, 95:{name:"LD A,R", ast:o.LD8("a", "r")}, 96:{name:"IN H,(C)", ast:o.IN("h", "c")}, 97:{name:"OUT (C),H", ast:o.OUT("c", "h")}, 98:{name:"SBC HL,HL", ast:o.SBC16("h", "l")}, 99:{name:"LD (nn),HL", ast:o.LD_NN("h", "l")}, 100:{name:"NEG", ast:o.NEG()}, 102:{name:"IM 0", ast:o.IM(0)}, 104:{name:"IN L,(C)", ast:o.IN("l", "c")}, 105:{name:"OUT (C),L", 
-ast:o.OUT("c", "l")}, 106:{name:"ADC HL,HL", ast:o.ADC16("h", "l")}, 107:{name:"LD HL,(nn)", ast:o.LD16("h", "l", "n", "n")}, 108:{name:"NEG", ast:o.NEG()}, 110:{name:"IM 0", ast:o.IM(0)}, 115:{name:"LD (nn),SP", ast:o.LD_NN("sp")}, 116:{name:"NEG", ast:o.NEG()}, 118:{name:"IM 1", ast:o.IM(1)}, 120:{name:"IN A,(C)", ast:o.IN("a", "c")}, 121:{name:"OUT (C),A", ast:o.OUT("c", "a")}, 122:{name:"ADC HL,SP", ast:o.ADC16("sp")}, 123:{name:"LD SP,(nn)", ast:o.LD_SP("n", "n")}, 124:{name:"NEG", ast:o.NEG()}, 
-160:{name:"LDI", ast:o.LDI()}, 161:{name:"CPI", ast:o.CPI()}, 162:{name:"INI", ast:o.INI()}, 163:{name:"OUTI", ast:o.OUTI()}, 168:{name:"LDD", ast:o.LDD()}, 171:{name:"OUTD", ast:o.OUTD()}, 176:{name:"LDIR", ast:o.LDIR()}, 177:{name:"CPIR", ast:o.CPIR()}, 179:{name:"OTIR", ast:o.OTIR()}, 184:{name:"LDDR", ast:o.LDDR()}};
+ast:o.OUT("c", "e")}, 90:{name:"ADC HL,DE", ast:o.ADC16("d", "e")}, 91:{name:"LD DE,(nn)", ast:o.LD16("d", "e", "n", "n")}, 92:{name:"NEG", ast:o.NEG()}, 95:{name:"LD A,R", ast:o.LD8("a", "r")}, 96:{name:"IN H,(C)", ast:o.IN("h", "c")}, 97:{name:"OUT (C),H", ast:o.OUT("c", "h")}, 98:{name:"SBC HL,HL", ast:o.SBC16("h", "l")}, 99:{name:"LD (nn),HL", ast:o.LD_NN("h", "l")}, 100:{name:"NEG", ast:o.NEG()}, 102:{name:"IM 0", ast:o.IM(0)}, 103:{name:"RRD", ast:o.RRD()}, 104:{name:"IN L,(C)", ast:o.IN("l", 
+"c")}, 105:{name:"OUT (C),L", ast:o.OUT("c", "l")}, 106:{name:"ADC HL,HL", ast:o.ADC16("h", "l")}, 107:{name:"LD HL,(nn)", ast:o.LD16("h", "l", "n", "n")}, 108:{name:"NEG", ast:o.NEG()}, 110:{name:"IM 0", ast:o.IM(0)}, 111:{name:"RLD", ast:o.RLD()}, 115:{name:"LD (nn),SP", ast:o.LD_NN("sp")}, 116:{name:"NEG", ast:o.NEG()}, 118:{name:"IM 1", ast:o.IM(1)}, 120:{name:"IN A,(C)", ast:o.IN("a", "c")}, 121:{name:"OUT (C),A", ast:o.OUT("c", "a")}, 122:{name:"ADC HL,SP", ast:o.ADC16("sp")}, 123:{name:"LD SP,(nn)", 
+ast:o.LD_SP("n", "n")}, 124:{name:"NEG", ast:o.NEG()}, 160:{name:"LDI", ast:o.LDI()}, 161:{name:"CPI", ast:o.CPI()}, 162:{name:"INI", ast:o.INI()}, 163:{name:"OUTI", ast:o.OUTI()}, 168:{name:"LDD", ast:o.LDD()}, 171:{name:"OUTD", ast:o.OUTD()}, 176:{name:"LDIR", ast:o.LDIR()}, 177:{name:"CPIR", ast:o.CPIR()}, 179:{name:"OTIR", ast:o.OTIR()}, 184:{name:"LDDR", ast:o.LDDR()}, 187:{name:"OTDR", ast:o.OTDR()}};
 var opcodeTable = [{name:"NOP", ast:o.NOOP()}, {name:"LD BC,nn", ast:o.LD16("b", "c")}, {name:"LD (BC),A", ast:o.LD_WRITE_MEM("b", "c", "a")}, {name:"INC BC", ast:o.INC16("b", "c")}, {name:"INC B", ast:o.INC8("b")}, {name:"DEC B", ast:o.DEC8("b")}, {name:"LD B,n", ast:o.LD8("b")}, {name:"RLCA", ast:o.RLCA()}, {name:"EX AF AF'", ast:o.EX_AF()}, {name:"ADD HL,BC", ast:o.ADD16("h", "l", "b", "c")}, {name:"LD A,(BC)", ast:o.LD8("a", "b", "c")}, {name:"DEC BC", ast:o.DEC16("b", "c")}, {name:"INC C", ast:o.INC8("c")}, 
-{name:"DEC C", ast:o.DEC8("c")}, {name:"LD C,n", ast:o.LD8("c")}, {name:"RRCA", ast:o.RRCA()}, {name:"DJNZ (PC+e)", ast:o.DJNZ()}, {name:"LD DE,nn", ast:o.LD16("d", "e")}, {name:"LD (DE),A", ast:o.LD_WRITE_MEM("d", "e", "a")}, {name:"INC DE", ast:o.INC16("d", "e")}, {name:"INC D", ast:o.INC8("d")}, {name:"DEC D", ast:o.DEC8("d")}, {name:"LD D,n", ast:o.LD8("d")}, {name:"RLA", ast:o.RLA()}, {name:"JR (PC+e)", ast:o.JP()}, {name:"ADD HL,DE", ast:o.ADD16("h", "l", "d", "e")}, {name:"LD A,(DE)", ast:o.LD8("a", 
+{name:"DEC C", ast:o.DEC8("c")}, {name:"LD C,n", ast:o.LD8("c")}, {name:"RRCA", ast:o.RRCA()}, {name:"DJNZ (PC+e)", ast:o.DJNZ()}, {name:"LD DE,nn", ast:o.LD16("d", "e")}, {name:"LD (DE),A", ast:o.LD_WRITE_MEM("d", "e", "a")}, {name:"INC DE", ast:o.INC16("d", "e")}, {name:"INC D", ast:o.INC8("d")}, {name:"DEC D", ast:o.DEC8("d")}, {name:"LD D,n", ast:o.LD8("d")}, {name:"RLA", ast:o.RLA()}, {name:"JR (PC+e)", ast:o.JR()}, {name:"ADD HL,DE", ast:o.ADD16("h", "l", "d", "e")}, {name:"LD A,(DE)", ast:o.LD8("a", 
 "d", "e")}, {name:"DEC DE", ast:o.DEC16("d", "e")}, {name:"INC E", ast:o.INC8("e")}, {name:"DEC E", ast:o.DEC8("e")}, {name:"LD E,n", ast:o.LD8("e")}, {name:"RRA", ast:o.RRA()}, {name:"JR NZ,(PC+e)", ast:o.JRNZ()}, {name:"LD HL,nn", ast:o.LD16("h", "l")}, {name:"LD (nn),HL", ast:o.LD_NN("h", "l")}, {name:"INC HL", ast:o.INC16("h", "l")}, {name:"INC H", ast:o.INC8("h")}, {name:"DEC H", ast:o.DEC8("h")}, {name:"LD H,n", ast:o.LD8("h")}, {name:"DAA", ast:o.DAA()}, {name:"JR Z,(PC+e)", ast:o.JRZ()}, 
 {name:"ADD HL,HL", ast:o.ADD16("h", "l", "h", "l")}, {name:"LD HL,(nn)", ast:o.LD16("h", "l", "n", "n")}, {name:"DEC HL", ast:o.DEC16("h", "l")}, {name:"INC L", ast:o.INC8("l")}, {name:"DEC L", ast:o.DEC8("l")}, {name:"LD L,n", ast:o.LD8("l")}, {name:"CPL", ast:o.CPL()}, {name:"JR NC,(PC+e)", ast:o.JRNC()}, {name:"LD SP,nn", ast:o.LD_SP()}, {name:"LD (nn),A", ast:o.LD_WRITE_MEM("n", "n", "a")}, {name:"INC SP", ast:o.INC8("s", "p")}, {name:"INC (HL)", ast:o.INC8("h", "l")}, {name:"DEC (HL)", ast:o.DEC8("h", 
 "l")}, {name:"LD (HL),n", ast:o.LD_WRITE_MEM("h", "l")}, {name:"SCF", ast:o.SCF()}, {name:"JR C,(PC+e)", ast:o.JRC()}, {name:"ADD HL,SP", ast:o.ADD16("h", "l", "sp")}, {name:"LD A,(nn)", ast:o.LD8("a", "n", "n")}, {name:"DEC SP", ast:o.DEC8("s", "p")}, {name:"INC A", ast:o.INC8("a")}, {name:"DEC A", ast:o.DEC8("a")}, {name:"LD A,n", ast:o.LD8("a")}, {name:"CCF", ast:o.CCF()}, {name:"LD B,B", ast:o.NOOP()}, {name:"LD B,C", ast:o.LD8("b", "c")}, {name:"LD B,D", ast:o.LD8("b", "d")}, {name:"LD B,E", 
@@ -12168,11 +12202,11 @@ ast:o.LD8("d", "b")}, {name:"LD D,C", ast:o.LD8("d", "c")}, {name:"LD D,D", ast:
 ast:o.SUB("c")}, {name:"SUB A,D", ast:o.SUB("d")}, {name:"SUB A,E", ast:o.SUB("e")}, {name:"SUB A,H", ast:o.SUB("h")}, {name:"SUB A,L", ast:o.SUB("l")}, {name:"SUB A,(HL)", ast:o.SUB("h", "l")}, {name:"SUB A,A", ast:o.SUB("a")}, {name:"SBC A,B", ast:o.SBC("b")}, {name:"SBC A,C", ast:o.SBC("c")}, {name:"SBC A,D", ast:o.SBC("d")}, {name:"SBC A,E", ast:o.SBC("e")}, {name:"SBC A,H", ast:o.SBC("h")}, {name:"SBC A,L", ast:o.SBC("l")}, {name:"SBC A,(HL)", ast:o.SBC("h", "l")}, {name:"SBC A,A", ast:o.SBC("a")}, 
 {name:"AND A,B", ast:o.AND("b")}, {name:"AND A,C", ast:o.AND("c")}, {name:"AND A,D", ast:o.AND("d")}, {name:"AND A,E", ast:o.AND("e")}, {name:"AND A,H", ast:o.AND("h")}, {name:"AND A,L", ast:o.AND("l")}, {name:"AND A,(HL)", ast:o.AND("h", "l")}, {name:"AND A,A", ast:o.AND("a")}, {name:"XOR A,B", ast:o.XOR("b")}, {name:"XOR A,C", ast:o.XOR("c")}, {name:"XOR A,D", ast:o.XOR("d")}, {name:"XOR A,E", ast:o.XOR("e")}, {name:"XOR A,H", ast:o.XOR("h")}, {name:"XOR A,L", ast:o.XOR("l")}, {name:"XOR A,(HL)", 
 ast:o.XOR("h", "l")}, {name:"XOR A,A", ast:o.XOR("a")}, {name:"OR A,B", ast:o.OR("b")}, {name:"OR A,C", ast:o.OR("c")}, {name:"OR A,D", ast:o.OR("d")}, {name:"OR A,E", ast:o.OR("e")}, {name:"OR A,H", ast:o.OR("h")}, {name:"OR A,L", ast:o.OR("l")}, {name:"OR A,(HL)", ast:o.OR("h", "l")}, {name:"OR A,A", ast:o.OR("a")}, {name:"CP A,B", ast:o.CP("b")}, {name:"CP A,C", ast:o.CP("c")}, {name:"CP A,D", ast:o.CP("d")}, {name:"CP A,E", ast:o.CP("e")}, {name:"CP A,H", ast:o.CP("h")}, {name:"CP A,L", ast:o.CP("l")}, 
-{name:"CP A,(HL)", ast:o.CP("h", "l")}, {name:"CP A,A", ast:o.CP("a")}, {name:"RET NZ", ast:o.RET("==", F_ZERO)}, {name:"POP BC", ast:o.POP("b", "c")}, {name:"JP NZ,(nn)", ast:o.JP("==", F_ZERO)}, {name:"JP (nn)", ast:o.JP()}, {name:"CALL NZ (nn)", ast:o.CALL("==", F_ZERO)}, {name:"PUSH BC", ast:o.PUSH("b", "c")}, {name:"ADD A,n", ast:o.ADD()}, {name:"RST 0x00", ast:o.RST(0)}, {name:"RET Z", ast:o.RET("!=", F_ZERO)}, {name:"RET", ast:o.RET()}, {name:"JP Z,(nn)", ast:o.JP("!=", F_ZERO)}, opcodeTableCB, 
-{name:"CALL Z (nn)", ast:o.CALL("!=", F_ZERO)}, {name:"CALL (nn)", ast:o.CALL()}, {name:"ADC A,n", ast:o.ADC()}, {name:"RST 0x08", ast:o.RST(8)}, {name:"RET NC", ast:o.RET("==", F_CARRY)}, {name:"POP DE", ast:o.POP("d", "e")}, {name:"JP NC,(nn)", ast:o.JP("==", F_CARRY)}, {name:"OUT (n),A", ast:o.OUT("a")}, {name:"CALL NC (nn)", ast:o.CALL("==", F_CARRY)}, {name:"PUSH DE", ast:o.PUSH("d", "e")}, {name:"SUB n", ast:o.SUB()}, {name:"RST 0x10", ast:o.RST(16)}, {name:"RET C", ast:o.RET("!=", F_CARRY)}, 
-{name:"EXX", ast:o.EXX()}, {name:"JP C,(nn)", ast:o.JP("!=", F_CARRY)}, {name:"IN A,(n)", ast:o.IN("a")}, {name:"CALL C (nn)", ast:o.CALL("!=", F_CARRY)}, generateIndexTable("IX"), {name:"SBC A,n", ast:o.SBC()}, {name:"RST 0x18", ast:o.RST(24)}, {name:"RET PO", ast:o.RET("==", F_PARITY)}, {name:"POP HL", ast:o.POP("h", "l")}, {name:"JP PO,(nn)", ast:o.JP("==", F_PARITY)}, {name:"EX (SP),HL", ast:o.EX_SP_HL()}, {name:"CALL PO (nn)", ast:o.CALL("==", F_PARITY)}, {name:"PUSH HL", ast:o.PUSH("h", "l")}, 
-{name:"AND (n)", ast:o.AND()}, {name:"RST 0x20", ast:o.RST(32)}, {name:"RET PE", ast:o.RET("!=", F_PARITY)}, {name:"JP (HL)", ast:o.JP("h", "l")}, {name:"JP PE,(nn)", ast:o.JP("!=", F_PARITY)}, {name:"EX DE,HL", ast:o.EX_DE_HL()}, {name:"CALL PE (nn)", ast:o.CALL("!=", F_PARITY)}, opcodeTableED, {name:"XOR n", ast:o.XOR()}, {name:"RST 0x28", ast:o.RST(40)}, {name:"RET P", ast:o.RET("==", F_SIGN)}, {name:"POP AF", ast:o.POP("a", "f")}, {name:"JP P,(nn)", ast:o.JP("==", F_SIGN)}, {name:"DI", ast:o.DI()}, 
-{name:"CALL P (nn)", ast:o.CALL("==", F_SIGN)}, {name:"PUSH AF", ast:o.PUSH("a", "f")}, {name:"OR n", ast:o.OR()}, {name:"RST 0x30", ast:o.RST(48)}, {name:"RET M", ast:o.RET("!=", F_SIGN)}, {name:"LD SP,HL", ast:o.LD_SP("h", "l")}, {name:"JP M,(nn)", ast:o.JP("!=", F_SIGN)}, {name:"EI", ast:o.EI()}, {name:"CALL M (nn)", ast:o.CALL("!=", F_SIGN)}, generateIndexTable("IY"), {name:"CP n", ast:o.CP()}, {name:"RST 0x38", ast:o.RST(56)}];
+{name:"CP A,(HL)", ast:o.CP("h", "l")}, {name:"CP A,A", ast:o.CP("a")}, {name:"RET NZ", ast:o.RET("===", F_ZERO)}, {name:"POP BC", ast:o.POP("b", "c")}, {name:"JP NZ,(nn)", ast:o.JP("===", F_ZERO)}, {name:"JP (nn)", ast:o.JP()}, {name:"CALL NZ (nn)", ast:o.CALL("===", F_ZERO)}, {name:"PUSH BC", ast:o.PUSH("b", "c")}, {name:"ADD A,n", ast:o.ADD()}, {name:"RST 0x00", ast:o.RST(0)}, {name:"RET Z", ast:o.RET("!==", F_ZERO)}, {name:"RET", ast:o.RET()}, {name:"JP Z,(nn)", ast:o.JP("!==", F_ZERO)}, opcodeTableCB, 
+{name:"CALL Z (nn)", ast:o.CALL("!==", F_ZERO)}, {name:"CALL (nn)", ast:o.CALL()}, {name:"ADC A,n", ast:o.ADC()}, {name:"RST 0x08", ast:o.RST(8)}, {name:"RET NC", ast:o.RET("===", F_CARRY)}, {name:"POP DE", ast:o.POP("d", "e")}, {name:"JP NC,(nn)", ast:o.JP("===", F_CARRY)}, {name:"OUT (n),A", ast:o.OUT("a")}, {name:"CALL NC (nn)", ast:o.CALL("===", F_CARRY)}, {name:"PUSH DE", ast:o.PUSH("d", "e")}, {name:"SUB n", ast:o.SUB()}, {name:"RST 0x10", ast:o.RST(16)}, {name:"RET C", ast:o.RET("!==", F_CARRY)}, 
+{name:"EXX", ast:o.EXX()}, {name:"JP C,(nn)", ast:o.JP("!==", F_CARRY)}, {name:"IN A,(n)", ast:o.IN("a")}, {name:"CALL C (nn)", ast:o.CALL("!==", F_CARRY)}, generateIndexTable("IX"), {name:"SBC A,n", ast:o.SBC()}, {name:"RST 0x18", ast:o.RST(24)}, {name:"RET PO", ast:o.RET("===", F_PARITY)}, {name:"POP HL", ast:o.POP("h", "l")}, {name:"JP PO,(nn)", ast:o.JP("===", F_PARITY)}, {name:"EX (SP),HL", ast:o.EX_SP_HL()}, {name:"CALL PO (nn)", ast:o.CALL("===", F_PARITY)}, {name:"PUSH HL", ast:o.PUSH("h", 
+"l")}, {name:"AND (n)", ast:o.AND()}, {name:"RST 0x20", ast:o.RST(32)}, {name:"RET PE", ast:o.RET("!==", F_PARITY)}, {name:"JP (HL)", ast:o.JP("h", "l")}, {name:"JP PE,(nn)", ast:o.JP("!==", F_PARITY)}, {name:"EX DE,HL", ast:o.EX_DE_HL()}, {name:"CALL PE (nn)", ast:o.CALL("!==", F_PARITY)}, opcodeTableED, {name:"XOR n", ast:o.XOR()}, {name:"RST 0x28", ast:o.RST(40)}, {name:"RET P", ast:o.RET("===", F_SIGN)}, {name:"POP AF", ast:o.POP("a", "f")}, {name:"JP P,(nn)", ast:o.JP("===", F_SIGN)}, {name:"DI", 
+ast:o.DI()}, {name:"CALL P (nn)", ast:o.CALL("===", F_SIGN)}, {name:"PUSH AF", ast:o.PUSH("a", "f")}, {name:"OR n", ast:o.OR()}, {name:"RST 0x30", ast:o.RST(48)}, {name:"RET M", ast:o.RET("!==", F_SIGN)}, {name:"LD SP,HL", ast:o.LD_SP("h", "l")}, {name:"JP M,(nn)", ast:o.JP("!==", F_SIGN)}, {name:"EI", ast:o.EI()}, {name:"CALL M (nn)", ast:o.CALL("!==", F_SIGN)}, generateIndexTable("IY"), {name:"CP n", ast:o.CP()}, {name:"RST 0x38", ast:o.RST(56)}];
 var Analyzer = function() {
   var Analyzer = function() {
     this.bytecodes = {};
@@ -12223,6 +12257,9 @@ var Analyzer = function() {
         var ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.nextAddress);
         if (!Array.isArray(ast) && ast !== undefined) {
           ast = [ast];
+        }
+        if (bytecode.opcode.length > 1 && REFRESH_EMULATION) {
+          ast = [].concat({"type":"ExpressionStatement", "expression":{"type":"CallExpression", "callee":n.Identifier("incR"), "arguments":[]}}, ast);
         }
         bytecode.ast = ast;
         if (DEBUG) {
@@ -12379,8 +12416,13 @@ var Optimizer = function() {
       bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
         if (ast["type"] === "CallExpression") {
           if (ast["callee"]["name"] === "port.out") {
+            var port = ast["arguments"][0]["value"];
             var value = ast["arguments"][1];
-            switch(ast["arguments"][0]["value"] & 193) {
+            if (self.main.is_gg && port < 7) {
+              ast["callee"]["name"] = "nop";
+              return undefined;
+            }
+            switch(port & 193) {
               case 1:
                 break;
               case 128:
@@ -12536,14 +12578,24 @@ var Generator = function() {
           if (bytecode.ast === undefined) {
             bytecode.ast = [];
           }
+          if (REFRESH_EMULATION) {
+            var refreshEmulationStmt = {"type":"ExpressionStatement", "expression":{"type":"CallExpression", "callee":n.Identifier("incR"), "arguments":[]}}
+          }
           if (ENABLE_SERVER_LOGGER) {
             var syncServerStmt = {"type":"ExpressionStatement", "expression":{"type":"CallExpression", "callee":n.Identifier("sync"), "arguments":[]}}
           }
           tstates += getTotalTStates(bytecode.opcode);
           var decreaseTStateStmt = [{"type":"ExpressionStatement", "expression":{"type":"AssignmentExpression", "operator":"-=", "left":{"type":"Identifier", "name":"tstates"}, "right":{"type":"Literal", "value":tstates, "raw":DEBUG ? toHex(tstates) : "" + tstates}}}];
           tstates = 0;
+          if (REFRESH_EMULATION) {
+            decreaseTStateStmt = [].concat(refreshEmulationStmt, decreaseTStateStmt);
+          }
           if (ENABLE_SERVER_LOGGER) {
             decreaseTStateStmt = [].concat(syncServerStmt, decreaseTStateStmt);
+          }
+          if (bytecode.changePage) {
+            var updatePageStmt = {"type":"ExpressionStatement", "expression":{"type":"UpdateExpression", "operator":"++", "argument":{"type":"Identifier", "name":"page"}, "prefix":false}};
+            bytecode.ast = [].concat(updatePageStmt, bytecode.ast);
           }
           bytecode.ast = [].concat(decreaseTStateStmt, bytecode.ast);
           if ((ENABLE_SERVER_LOGGER || bytecode.isFunctionEnder) && bytecode.nextAddress !== null) {
@@ -12576,7 +12628,6 @@ var Generator = function() {
   return Generator;
 }();
 var Recompiler = function() {
-  var toHex = JSSMS.Utils.toHex;
   var Recompiler = function(cpu) {
     this.cpu = cpu;
     this.rom = [];
@@ -12592,7 +12643,7 @@ var Recompiler = function() {
     this.parser = new Parser(rom, this.cpu.frameReg);
   }, reset:function() {
     var self = this;
-    this.options.entryPoints = [{address:0, romPage:0, memPage:0}, {address:56, romPage:0, memPage:0}, {address:102, romPage:0, memPage:0}];
+    this.options.entryPoints = [{address:0, romPage:0, memPage:0}];
     if (this.rom.length <= 2) {
       JSSMS.Utils.console.log("Parsing full ROM");
     } else {
@@ -12603,9 +12654,6 @@ var Recompiler = function() {
     for (var page = 0;page < this.rom.length;page++) {
       fns[page].forEach(function(fn) {
         var funcName = fn.body[0].id.name;
-        if (DEBUG) {
-          fn.body[0].id.name = "_" + toHex(funcName);
-        }
         self.cpu.branches[page][funcName] = (new Function("return " + self.generateCodeFromAst(fn)))();
       });
     }
@@ -12629,10 +12677,7 @@ var Recompiler = function() {
     var self = this;
     var fns = this.parseFromAddress(address, romPage, memPage).analyzeFromAddress().optimize().generate();
     fns[0].forEach(function(fn) {
-      if (DEBUG) {
-        fn.body[0].id.name = "_" + toHex(fn.body[0].id.name);
-      }
-      self.cpu.branches[romPage][address % 16384] = (new Function("return " + self.generateCodeFromAst(fn)))();
+      self.cpu.branches[romPage]["_" + address % 16384] = (new Function("return " + self.generateCodeFromAst(fn)))();
     });
   }, parseFromAddress:function(address, romPage, memPage) {
     var obj = {address:address, romPage:romPage, memPage:memPage};

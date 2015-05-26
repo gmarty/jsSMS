@@ -28,8 +28,6 @@
  * @constructor
  */
 var Recompiler = (function() {
-  var toHex = JSSMS.Utils.toHex;
-
   var Recompiler = function(cpu) {
     this.cpu = cpu;
     this.rom = [];
@@ -159,9 +157,11 @@ var Recompiler = (function() {
         renumber: true,
         hexadecimal: true,
         parse: DEBUG ? window['esprima']['parse'] : function(c) {
-          return {'type': 'Program',
+          return {
+            'type': 'Program',
             'body': [
-              {'type': 'ExpressionStatement',
+              {
+                'type': 'ExpressionStatement',
                 'expression': {
                   'type': 'Literal',
                   'value': c,
