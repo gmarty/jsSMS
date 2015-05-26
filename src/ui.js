@@ -115,9 +115,9 @@ if (window['$']) {
       // Gamepad
       this.gamepad = {
         up: KEY_UP,
-        right: KEY_RIGHT,
         down: KEY_DOWN,
         left: KEY_LEFT,
+        right: KEY_RIGHT,
         fire1: KEY_FIRE1,
         fire2: KEY_FIRE2
       };
@@ -226,7 +226,7 @@ if (window['$']) {
           var target = document.elementFromPoint(changedTouches[i].clientX, changedTouches[i].clientY);
           var className = target.className;
 
-          if (className === 'gamepad' || !className) {
+          if (!className || !self.gamepad[className]) {
             continue;
           }
 
