@@ -139,23 +139,23 @@ var OP_DD_STATES = new JSSMS.Utils.Uint8Array([
  * @const
  */
 var OP_INDEX_CB_STATES = new JSSMS.Utils.Uint8Array([
-  /*        0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F */
-  /* x00 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* x10 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* x20 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* x30 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* x40 */ 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-  /* x50 */ 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-  /* x60 */ 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-  /* x70 */ 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-  /* x80 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* x90 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* xA0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* xB0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* xC0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* xD0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* xE0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* xF0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23
+  /*         0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F */
+  /* 0x00 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+  /* 0x10 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+  /* 0x20 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+  /* 0x30 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+  /* 0x40 */ 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+  /* 0x50 */ 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+  /* 0x60 */ 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+  /* 0x70 */ 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+  /* 0x80 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+  /* 0x90 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+  /* 0xA0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+  /* 0xB0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+  /* 0xC0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+  /* 0xD0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+  /* 0xE0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
+  /* 0xF0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23
 ]);
 
 
@@ -345,25 +345,25 @@ JSSMS.Z80 = function(sms) {
   this.DAA_TABLE = new JSSMS.Utils.Uint16Array(0x800);
 
   /** Sign, Zero table. */
-  this.SZ_TABLE = new JSSMS.Utils.Uint8Array(256);
+  this.SZ_TABLE = new JSSMS.Utils.Uint8Array(0x100);
 
   /** Sign, Zero, Parity table. */
-  this.SZP_TABLE = new JSSMS.Utils.Uint8Array(256);
+  this.SZP_TABLE = new JSSMS.Utils.Uint8Array(0x100);
 
   /** Flag lookup table for inc8 instruction. */
-  this.SZHV_INC_TABLE = new JSSMS.Utils.Uint8Array(256);
+  this.SZHV_INC_TABLE = new JSSMS.Utils.Uint8Array(0x100);
 
   /** Flag lookup table for dec8 instruction. */
-  this.SZHV_DEC_TABLE = new JSSMS.Utils.Uint8Array(256);
+  this.SZHV_DEC_TABLE = new JSSMS.Utils.Uint8Array(0x100);
 
   /** Flag lookup table for add/adc instruction. */
-  this.SZHVC_ADD_TABLE = new JSSMS.Utils.Uint8Array(2 * 256 * 256);
+  this.SZHVC_ADD_TABLE = new JSSMS.Utils.Uint8Array(2 * 0x100 * 0x100);
 
   /** Flag lookup table for dec/sbc instruction. */
-  this.SZHVC_SUB_TABLE = new JSSMS.Utils.Uint8Array(2 * 256 * 256);
+  this.SZHVC_SUB_TABLE = new JSSMS.Utils.Uint8Array(2 * 0x100 * 0x100);
 
   /** Flag lookup table for bit instruction. */
-  this.SZ_BIT_TABLE = new JSSMS.Utils.Uint8Array(256);
+  this.SZ_BIT_TABLE = new JSSMS.Utils.Uint8Array(0x100);
 
   // Generate flag lookups
   this.generateFlagTables();
