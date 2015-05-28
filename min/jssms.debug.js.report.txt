@@ -1,18 +1,18 @@
 src/compiler/analyzer.js:47: WARNING - Property normalizeBytecode never defined on Analyzer
         this.normalizeBytecode(i);
-        ^
+             ^
 
 src/compiler/analyzer.js:48: WARNING - Property restructure never defined on Analyzer
         this.restructure(i);
-        ^
+             ^
 
 src/compiler/analyzer.js:64: WARNING - Property normalizeBytecode never defined on Analyzer
       this.normalizeBytecode(0);
-      ^
+           ^
 
-src/compiler/bytecode.js:70: WARNING - Property hexOpcode never defined on Bytecode
+src/compiler/bytecode.js:71: WARNING - Property hexOpcode never defined on Bytecode
           this.hexOpcode + ' ' +
-          ^
+               ^
 
 src/compiler/opcodes-ED.js:84: WARNING - Function o.LD8: called with 2 argument(s). Function requires at least 3 argument(s) and no more than 3 argument(s).
     ast: o.LD8('r', 'a')
@@ -26,11 +26,11 @@ src/compiler/opcodes-ED.js:140: WARNING - Function o.LD8: called with 2 argument
     ast: o.LD8('a', 'r')
          ^
 
-src/compiler/opcodes-ED.js:192: WARNING - Function o.LD_NN: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+src/compiler/opcodes-ED.js:200: WARNING - Function o.LD_NN: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
     ast: o.LD_NN('sp')
          ^
 
-src/compiler/opcodes-ED.js:212: WARNING - Function o.ADC16: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
+src/compiler/opcodes-ED.js:220: WARNING - Function o.ADC16: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
     ast: o.ADC16('sp')
          ^
 
@@ -86,8 +86,8 @@ src/compiler/opcodes.js:139: WARNING - Function o.LD8: called with 1 argument(s)
     ast: o.LD8('d')
          ^
 
-src/compiler/opcodes.js:149: WARNING - Function o.JP: called with 0 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
-    ast: o.JP()
+src/compiler/opcodes.js:149: WARNING - Function o.JR: called with 0 argument(s). Function requires at least 1 argument(s) and no more than 1 argument(s).
+    ast: o.JR()
          ^
 
 src/compiler/opcodes.js:169: WARNING - Function o.INC8: called with 1 argument(s). Function requires at least 2 argument(s) and no more than 2 argument(s).
@@ -630,53 +630,53 @@ src/compiler/opcodes.js:1287: WARNING - Function o.CP: called with 0 argument(s)
     ast: o.CP()
          ^
 
-src/compiler/optimizer.js:47: WARNING - Property localOptimization never defined on Optimizer
+src/compiler/optimizer.js:48: WARNING - Property localOptimization never defined on Optimizer
         this.localOptimization(i);
-        ^
+             ^
 
-src/compiler/optimizer.js:58: WARNING - Property portPeephole never defined on Optimizer
+src/compiler/optimizer.js:59: WARNING - Property portPeephole never defined on Optimizer
       this.ast[page] = this.ast[page].map(this.portPeephole.bind(this));
-                                          ^
+                                               ^
 
-src/compiler/optimizer.js:59: WARNING - Property evaluateBinaryExpressions never defined on Optimizer
+src/compiler/optimizer.js:60: WARNING - Property evaluateBinaryExpressions never defined on Optimizer
       this.ast[page] = this.ast[page].map(this.evaluateBinaryExpressions);
-                                          ^
+                                               ^
 
-src/compiler/optimizer.js:60: WARNING - Property inlineRegisters never defined on Optimizer
+src/compiler/optimizer.js:61: WARNING - Property inlineRegisters never defined on Optimizer
       this.ast[page] = this.ast[page].map(this.inlineRegisters);
-                                          ^
+                                               ^
 
-src/compiler/optimizer.js:61: WARNING - Property evaluateMemberExpressions never defined on Optimizer
+src/compiler/optimizer.js:62: WARNING - Property evaluateMemberExpressions never defined on Optimizer
       this.ast[page] = this.ast[page].map(this.evaluateMemberExpressions.bind(this));
-                                          ^
+                                               ^
 
-src/compiler/optimizer.js:501: WARNING - unreachable code
+src/compiler/optimizer.js:508: WARNING - unreachable code
                   return ast;
                   ^
 
-src/compiler/recompiler.js:77: WARNING - Property parse never defined on Recompiler
-      var fns = this
-                ^
+src/compiler/recompiler.js:74: WARNING - Property parse never defined on Recompiler
+        .parse()
+         ^
 
-src/compiler/recompiler.js:90: WARNING - Property generateCodeFromAst never defined on Recompiler
+src/compiler/recompiler.js:83: WARNING - Property generateCodeFromAst never defined on Recompiler
           self.cpu.branches[page][funcName] = new Function('return ' + self.generateCodeFromAst(fn))();
-                                                                       ^
+                                                                            ^
 
-src/compiler/recompiler.js:132: WARNING - Property parseFromAddress never defined on Recompiler
-      var fns = this
-                ^
+src/compiler/recompiler.js:126: WARNING - Property parseFromAddress never defined on Recompiler
+        .parseFromAddress(address, romPage, memPage)
+         ^
 
-src/compiler/recompiler.js:143: WARNING - Property generateCodeFromAst never defined on Recompiler
-        self.cpu.branches[romPage][address % 0x4000] = new Function('return ' + self.generateCodeFromAst(fn))();
-                                                                                ^
+src/compiler/recompiler.js:133: WARNING - Property generateCodeFromAst never defined on Recompiler
+        self.cpu.branches[romPage]['_' + (address % 0x4000)] = new Function('return ' + self.generateCodeFromAst(fn))();
+                                                                                             ^
 
 src/debugger.js:396: WARNING - Property signExtend never defined on JSSMS.Debugger
         target = address + this.signExtend(this.readRom8bit(address) + 1);
-                           ^
+                                ^
 
 src/debugger.js:439: WARNING - Property signExtend never defined on JSSMS.Debugger
         target = address + this.signExtend(this.readRom8bit(address) + 1);
-                           ^
+                                ^
 
 src/debugger.js:442: WARNING - assignment
 found   : null
@@ -686,19 +686,19 @@ required: number
 
 src/debugger.js:475: WARNING - Property signExtend never defined on JSSMS.Debugger
         target = address + this.signExtend(this.readRom8bit(address) + 1);
-                           ^
+                                ^
 
 src/debugger.js:521: WARNING - Property signExtend never defined on JSSMS.Debugger
         target = address + this.signExtend(this.readRom8bit(address) + 1);
-                           ^
+                                ^
 
 src/debugger.js:563: WARNING - Property signExtend never defined on JSSMS.Debugger
         target = address + this.signExtend(this.readRom8bit(address) + 1);
-                           ^
+                                ^
 
 src/debugger.js:607: WARNING - Property signExtend never defined on JSSMS.Debugger
         target = address + this.signExtend(this.readRom8bit(address) + 1);
-                           ^
+                                ^
 
 src/debugger.js:1192: WARNING - assignment
 found   : null
@@ -730,82 +730,120 @@ required: number
         address = null;
         ^
 
-src/psg.js:242: WARNING - Bad type annotation. Unknown type AudioBuffer
-   * @param {AudioBuffer} audioBuffer
-             ^
-
 src/psg.js:247: WARNING - Missing return statement. Function expected to return (Array|null).
   update: function(audioBuffer, offset, samplesToGenerate) {
           ^
 
-src/sms.js:88: WARNING - Property AudioContext never defined on Window
-    var AudioContext = window.AudioContext || window.webkitAudioContext;
-                       ^
-
-src/sms.js:88: WARNING - Property webkitAudioContext never defined on Window
-    var AudioContext = window.AudioContext || window.webkitAudioContext;
-                                              ^
-
-src/sms.js:178: WARNING - Bad type annotation. Unknown type AudioContext
-   * @type {AudioContext}
-            ^
-
-src/sms.js:185: WARNING - Bad type annotation. Unknown type AudioBuffer
-   * @type {AudioBuffer}
-            ^
-
-src/ui.js:440: WARNING - Property createBufferSource never defined on this.main.audioContext
-        var source = this.main.audioContext.createBufferSource();
-                     ^
-
-src/ui.js:442: WARNING - Property connect never defined on source
-        source.connect(this.main.audioContext.destination);
-        ^
-
-src/ui.js:442: WARNING - Property destination never defined on this.main.audioContext
-        source.connect(this.main.audioContext.destination);
-                       ^
-
 src/utils.js:25: WARNING - assignment to property console of Window
-found   : {error: function (...[*]): ?, log: function (...[*]): ?}
+found   : {error: function (): undefined, log: function (): undefined}
 required: Console
     window.console = {
     ^
 
-src/utils.js:35: WARNING - "function (this:Console, ...[*]): ?" must be called with a "this" type
+src/utils.js:35: WARNING - "function (this:Console, ...*): ?" must be called with a "this" type
         return fn(msg);
                ^
 
-src/utils.js:40: WARNING - "function (this:Console, ...[*]): ?" must be called with a "this" type
+src/utils.js:40: WARNING - "function (this:Console, ...*): ?" must be called with a "this" type
         return fn(msg);
                ^
 
-src/utils.js:318: WARNING - dangerous use of the global this object
+src/utils.js:64: WARNING - Misplaced function annotation.
+    if (SUPPORT_TYPED_ARRAYS) {
+    ^
+
+src/utils.js:71: WARNING - Misplaced function annotation.
+      return Array;
+      ^
+
+src/utils.js:81: WARNING - Misplaced function annotation.
+    if (SUPPORT_TYPED_ARRAYS) {
+    ^
+
+src/utils.js:88: WARNING - Misplaced function annotation.
+      return Array;
+      ^
+
+src/utils.js:103: WARNING - Misplaced function annotation.
+      return function(length) {
+      ^
+
+src/utils.js:111: WARNING - Misplaced function annotation.
+      return Array;
+      ^
+
+src/utils.js:129: WARNING - Misplaced function annotation.
+      return function(src, srcPos, dest, destPos, length) {
+      ^
+
+src/utils.js:142: WARNING - Misplaced function annotation.
+      return function(src, srcPos, dest, destPos, length) {
+      ^
+
+src/utils.js:341: WARNING - dangerous use of the global this object
     this.crc32 = function(str) {
     ^
 
-src/utils.js:328: WARNING - dangerous use of the global this object
+src/utils.js:351: WARNING - dangerous use of the global this object
     return this.crc32(str);
            ^
 
 src/z80.js:501: WARNING - Property recompileFromAddress never defined on Recompiler
         this.recompiler.recompileFromAddress(this.pc, 0, 0);
-        ^
+                        ^
 
-src/z80.js:508: WARNING - Property recompileFromAddress never defined on Recompiler
-        this.recompiler.recompileFromAddress(this.pc, this.frameReg[0], 0);
-        ^
+src/z80.js:511: WARNING - Property recompileFromAddress never defined on Recompiler
+        this.recompiler.recompileFromAddress(this.pc, this.frameReg[frameReg], frameReg);
+                        ^
 
-src/z80.js:515: WARNING - Property recompileFromAddress never defined on Recompiler
-        this.recompiler.recompileFromAddress(this.pc, this.frameReg[1], 1);
-        ^
+src/z80.js:570: WARNING - actual parameter 1 of JSSMS.prototype.audioOutput does not match formal parameter
+found   : (AudioBuffer|null)
+required: (Array<number>|null)
+      this.main.audioOutput(this.main.audioBuffer);
+                            ^
 
-src/z80.js:522: WARNING - Property recompileFromAddress never defined on Recompiler
-        this.recompiler.recompileFromAddress(this.pc, this.frameReg[2], 2);
-        ^
-
-src/z80.js:3421: WARNING - Property setRom never defined on Recompiler
+src/z80.js:3417: WARNING - Property setRom never defined on Recompiler
         this.recompiler.setRom(this.rom);
-        ^
+                        ^
 
-0 error(s), 199 warning(s), 85.3% typed
+src/z80.js:3445: WARNING - Misplaced function annotation.
+      return function setUint8(address, value) {
+      ^
+
+src/z80.js:3466: WARNING - Misplaced function annotation.
+      return function setUint8(address, value) {
+      ^
+
+src/z80.js:3495: WARNING - Misplaced function annotation.
+      return function setUint16(address, value) {
+      ^
+
+src/z80.js:3516: WARNING - Misplaced function annotation.
+      return function setUint16(address, value) {
+      ^
+
+src/z80.js:3547: WARNING - Misplaced function annotation.
+      return function getUint8(address) {
+      ^
+
+src/z80.js:3590: WARNING - Misplaced function annotation.
+      return function getUint8(address) {
+      ^
+
+src/z80.js:3641: WARNING - Misplaced function annotation.
+      return function getUint16(address) {
+      ^
+
+src/z80.js:3684: WARNING - Misplaced function annotation.
+      return function getUint16(address) {
+      ^
+
+src/z80.js:3735: WARNING - Misplaced function annotation.
+      return function getInt8(address) {
+      ^
+
+src/z80.js:3779: WARNING - Misplaced function annotation.
+      return function getInt8(address) {
+      ^
+
+0 error(s), 208 warning(s), 84.6% typed
