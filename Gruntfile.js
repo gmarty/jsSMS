@@ -37,9 +37,7 @@ module.exports = function(grunt) {
       '<%= grunt.task.current.nameArgs == "closure-compiler:node" ? "src/node/build/exports.js" : "src/build/exports.js" %>' // Required for targets using `output_wrapper`.
     ],
     externs: [
-      '<%= closurePath %>/contrib/externs/webkit_console.js',
-      '<%= closurePath %>/contrib/externs/jquery-1.7.js',
-      '<%= closurePath %>/contrib/html5.js'
+      '<%= closurePath %>/contrib/externs/jquery-1.9.js'
     ],
 
     'closure-compiler': {
@@ -49,8 +47,9 @@ module.exports = function(grunt) {
         jsOutputFile: 'min/jssms.min.js',
         options: {
           externs: '<%= externs %>',
-          compilation_level: 'SIMPLE_OPTIMIZATIONS',
+          compilation_level: 'SIMPLE',
           language_in: 'ECMASCRIPT5_STRICT',
+          language_out: 'ECMASCRIPT5_STRICT',
           use_types_for_optimization: null,
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
@@ -72,8 +71,9 @@ module.exports = function(grunt) {
         jsOutputFile: 'min/jssms.debug.js',
         options: {
           externs: '<%= externs %>',
-          compilation_level: 'SIMPLE_OPTIMIZATIONS',
+          compilation_level: 'SIMPLE',
           language_in: 'ECMASCRIPT5_STRICT',
+          language_out: 'ECMASCRIPT5_STRICT',
           use_types_for_optimization: null,
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
@@ -97,6 +97,7 @@ module.exports = function(grunt) {
         options: {
           compilation_level: 'WHITESPACE_ONLY',
           language_in: 'ECMASCRIPT5_STRICT',
+          language_out: 'ECMASCRIPT5_STRICT',
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
           debug: true,
@@ -135,6 +136,7 @@ module.exports = function(grunt) {
           externs: '<%= externs %>',
           compilation_level: 'SIMPLE_OPTIMIZATIONS',
           language_in: 'ECMASCRIPT5_STRICT',
+          language_out: 'ECMASCRIPT5_STRICT',
           use_types_for_optimization: null,
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
@@ -162,12 +164,12 @@ module.exports = function(grunt) {
         jsOutputFile: 'alec/min/bootstrap.min.js',
         options: {
           externs: [
-            '<%= closurePath %>/contrib/externs/webkit_console.js',
-            '<%= closurePath %>/contrib/externs/jquery-1.7.js',
+            '<%= closurePath %>/contrib/externs/jquery-1.9.js',
             'src/build/externs/jssms.js'
           ],
           compilation_level: 'ADVANCED_OPTIMIZATIONS',
           language_in: 'ECMASCRIPT5_STRICT',
+          language_out: 'ECMASCRIPT5_STRICT',
           use_types_for_optimization: null,
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
@@ -184,18 +186,13 @@ module.exports = function(grunt) {
         js: '<%= js %>',
         jsOutputFile: 'min/jssms.node.js',
         options: {
-          externs: [
-            'node_modules/closurecompiler-externs/core.js',
-            '<%= closurePath %>/contrib/externs/webkit_console.js',
-            '<%= closurePath %>/contrib/html5.js',
-            '<%= closurePath %>/contrib/externs/jquery-1.7.js'
-          ],
           compilation_level: 'ADVANCED_OPTIMIZATIONS',
           language_in: 'ECMASCRIPT5_STRICT',
+          language_out: 'ECMASCRIPT5_STRICT',
           use_types_for_optimization: null,
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
-          output_wrapper: '(function(window){%output%})(global);',
+          output_wrapper: '(function(window){%output%module.exports=JSSMS\n})(global);',
           define: [
             //'"DEBUG=true"',
             '"ENABLE_DEBUGGER=true"',
@@ -252,7 +249,7 @@ module.exports = function(grunt) {
           process: function(src) {
             // Inline JavaScript bootstrap code.
             return src.replace(/<script src=\.\.\/src\/setup\.js>.+<\/script>/,
-                '<script>' + grunt.file.read('alec/min/bootstrap.min.js').trim() + '</script>');
+              '<script>' + grunt.file.read('alec/min/bootstrap.min.js').trim() + '</script>');
           }
         },
         files: {

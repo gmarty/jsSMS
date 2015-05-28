@@ -112,12 +112,12 @@ JSSMS.prototype = {isRunning:!1, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0
   "gg" === $extension_pages$$ ? this.setGG() : this.setSMS();
   $extension_pages$$ = this.loadROM($data$$, $size$$);
   if (null === $extension_pages$$) {
-    return!1;
+    return !1;
   }
   this.cpu.resetMemory($extension_pages$$);
   this.romData = $data$$;
   this.romFileName = $fileName$$;
-  return!0;
+  return !0;
 }, loadROM:function $JSSMS$$loadROM$($data$$, $size$$) {
   var $i$$, $j$$, $number_of_pages$$ = Math.ceil($size$$ / PAGE_SIZE), $pages$$ = Array($number_of_pages$$);
   for ($i$$ = 0;$i$$ < $number_of_pages$$;$i$$++) {
@@ -189,7 +189,7 @@ JSSMS.Utils = {rndInt:function $JSSMS$Utils$rndInt$($range$$) {
   return $object$$;
 }, getTimestamp:function() {
   return window.performance && window.performance.now ? window.performance.now.bind(window.performance) : function() {
-    return(new Date).getTime();
+    return (new Date).getTime();
   };
 }(), toHex:function $JSSMS$Utils$toHex$($dec_hex$$) {
   var $minus$$ = 0 > $dec_hex$$;
@@ -226,11 +226,11 @@ JSSMS.Utils = {rndInt:function $JSSMS$Utils$rndInt$($range$$) {
     for (var $crc$$ = -1, $i$$ = 0;$i$$ < $str$$.length;$i$$++) {
       $crc$$ = $crc$$ >>> 8 ^ $crcTable$$[($crc$$ ^ $str$$.charCodeAt($i$$)) & 255];
     }
-    return($crc$$ ^ -1) >>> 0;
+    return ($crc$$ ^ -1) >>> 0;
   };
   return this.crc32($str$$0$$);
 }, isIE:function $JSSMS$Utils$isIE$() {
-  return/msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent);
+  return /msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent);
 }};
 var LOG_LENGTH = 100;
 function BinaryRequest($method$$, $url$$, $args$$, $data$$, $cb$$0$$) {
@@ -334,9 +334,9 @@ SyncReader.prototype = {refill:function $SyncReader$$refill$() {
     })).always(function() {
       $self$$.curRequest = null;
     });
-    return!1;
+    return !1;
   }
-  return!0;
+  return !0;
 }, getAvailableBytes:function $SyncReader$$getAvailableBytes$() {
   var $ops$$ = 0;
   this.syncBuffer && ($ops$$ += this.syncBuffer.length - this.syncBufferIdx);
@@ -349,7 +349,7 @@ SyncReader.prototype = {refill:function $SyncReader$$refill$() {
     this.syncBufferIdx++;
     return $r$$;
   }
-  return-1;
+  return -1;
 }, sync16:function $SyncReader$$sync16$($val$$, $name$$) {
   if (!this.oos) {
     var $toHex$$ = JSSMS.Utils.toHex, $writtenVal$$ = this.pop();
@@ -450,7 +450,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   }
   this.tstates += this.main.cyclesPerLine;
   this.totalCycles = this.main.cyclesPerLine;
-  return!1;
+  return !1;
 }, eof:function $JSSMS$Z80$$eof$() {
   this.main.soundEnabled && this.main.audioOutput(this.main.audioBuffer);
   this.main.pause_button && (this.nmi(), this.main.pause_button = !1);
@@ -6455,7 +6455,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 255:
       $inst$$ = "SET 7,A", $code$$ = "this.a |= BIT_7;";
   }
-  return{opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$};
+  return {opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$};
 }, getED:function $JSSMS$Debugger$$getED$($address$$) {
   var $toHex$$ = JSSMS.Utils.toHex, $opcode$$ = this.readRom8bit($address$$), $opcodesArray$$ = [$opcode$$], $inst$$ = "Unimplemented 0xED prefixed opcode", $currAddr$$ = $address$$, $target$$ = null, $code$$ = 'throw "Unimplemented 0xED prefixed opcode";', $operand$$ = "", $location$$ = 0;
   $address$$++;
@@ -6749,7 +6749,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 187:
       $target$$ = $address$$ - 2, $inst$$ = "OTDR", $code$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
   }
-  return{opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$, target:$target$$};
+  return {opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$, target:$target$$};
 }, getIndex:function $JSSMS$Debugger$$getIndex$($index$$, $address$$) {
   var $toHex$$ = JSSMS.Utils.toHex, $opcode$$ = this.readRom8bit($address$$), $opcodesArray$$ = [$opcode$$], $inst$$ = "Unimplemented 0xDD or 0xFD prefixed opcode", $currAddr$$ = $address$$, $code$$ = 'throw "Unimplemented 0xDD or 0xFD prefixed opcode";', $_inst$$1_operand$$ = "", $location$$25_offset$$ = 0;
   $address$$++;
@@ -7126,7 +7126,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 249:
       $inst$$ = "LD SP," + $index$$, $code$$ = "this.sp = this.get" + $index$$ + "();";
   }
-  return{opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$};
+  return {opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$};
 }, getIndexCB:function $JSSMS$Debugger$$getIndexCB$($index$$, $address$$) {
   var $location$$26_toHex$$ = JSSMS.Utils.toHex, $currAddr$$ = $address$$, $location$$26_toHex$$ = "location = this.get" + $index$$ + "() + " + $location$$26_toHex$$(this.readRom8bit($address$$++)) + " & 0xFFFF;", $opcode$$ = this.readRom8bit($address$$), $opcodesArray$$ = [$opcode$$], $inst$$ = "Unimplemented 0xDDCB or 0xFDCB prefixed opcode", $code$$ = 'throw "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";';
   $address$$++;
@@ -7739,7 +7739,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $inst$$ = "SET 7,(" + $index$$ + ")";
   }
   $address$$++;
-  return{opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$};
+  return {opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$};
 }, getIndexOpIX:function $JSSMS$Debugger$$getIndexOpIX$($opcode$$) {
   return this.getIndex("IX", $opcode$$);
 }, getIndexOpIY:function $JSSMS$Debugger$$getIndexOpIY$($opcode$$) {
@@ -7964,15 +7964,15 @@ JSSMS.SN76489.prototype = {init:function $JSSMS$SN76489$$init$($clockSpeed_i$$) 
   }
 }, update:function $JSSMS$SN76489$$update$($audioBuffer_buffer$$, $offset$$, $samplesToGenerate$$) {
   $audioBuffer_buffer$$ = $audioBuffer_buffer$$.getChannelData(0);
-  for (var $sample$$ = 0, $feedback_i$$ = 0;$sample$$ < $samplesToGenerate$$;$sample$$++) {
-    for ($feedback_i$$ = 0;3 > $feedback_i$$;$feedback_i$$++) {
-      this.outputChannel[$feedback_i$$] = this.freqPos[$feedback_i$$] !== NO_ANTIALIAS ? PSG_VOLUME[this.reg[($feedback_i$$ << 1) + 1]] * this.freqPos[$feedback_i$$] >> SCALE : PSG_VOLUME[this.reg[($feedback_i$$ << 1) + 1]] * this.freqPolarity[$feedback_i$$];
+  for (var $sample$$ = 0, $feedback_i$$19_output$$ = 0;$sample$$ < $samplesToGenerate$$;$sample$$++) {
+    for ($feedback_i$$19_output$$ = 0;3 > $feedback_i$$19_output$$;$feedback_i$$19_output$$++) {
+      this.outputChannel[$feedback_i$$19_output$$] = this.freqPos[$feedback_i$$19_output$$] !== NO_ANTIALIAS ? PSG_VOLUME[this.reg[($feedback_i$$19_output$$ << 1) + 1]] * this.freqPos[$feedback_i$$19_output$$] >> SCALE : PSG_VOLUME[this.reg[($feedback_i$$19_output$$ << 1) + 1]] * this.freqPolarity[$feedback_i$$19_output$$];
     }
     this.outputChannel[3] = PSG_VOLUME[this.reg[7]] * (this.noiseShiftReg & 1) << 1;
-    $feedback_i$$ = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
-    $feedback_i$$ /= 128;
-    1 < $feedback_i$$ ? $feedback_i$$ = 1 : -1 > $feedback_i$$ && ($feedback_i$$ = -1);
-    $audioBuffer_buffer$$[$offset$$ + $sample$$] = $feedback_i$$;
+    $feedback_i$$19_output$$ = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
+    $feedback_i$$19_output$$ /= 128;
+    1 < $feedback_i$$19_output$$ ? $feedback_i$$19_output$$ = 1 : -1 > $feedback_i$$19_output$$ && ($feedback_i$$19_output$$ = -1);
+    $audioBuffer_buffer$$[$offset$$ + $sample$$] = $feedback_i$$19_output$$;
     this.clockFrac += this.clock;
     var $clockCycles$$ = this.clockFrac >> SCALE, $clockCyclesScaled$$ = $clockCycles$$ << SCALE;
     this.clockFrac -= $clockCyclesScaled$$;
@@ -7980,17 +7980,18 @@ JSSMS.SN76489.prototype = {init:function $JSSMS$SN76489$$init$($clockSpeed_i$$) 
     this.freqCounter[1] -= $clockCycles$$;
     this.freqCounter[2] -= $clockCycles$$;
     this.freqCounter[3] = 128 === this.noiseFreq ? this.freqCounter[2] : this.freqCounter[3] - $clockCycles$$;
-    for ($feedback_i$$ = 0;3 > $feedback_i$$;$feedback_i$$++) {
-      var $counter$$ = this.freqCounter[$feedback_i$$];
+    for ($feedback_i$$19_output$$ = 0;3 > $feedback_i$$19_output$$;$feedback_i$$19_output$$++) {
+      var $counter$$ = this.freqCounter[$feedback_i$$19_output$$];
       if (0 >= $counter$$) {
-        var $tone$$ = this.reg[$feedback_i$$ << 1];
-        6 < $tone$$ ? (this.freqPos[$feedback_i$$] = ($clockCyclesScaled$$ - this.clockFrac + (2 << SCALE) * $counter$$ << SCALE) * this.freqPolarity[$feedback_i$$] / ($clockCyclesScaled$$ + this.clockFrac), this.freqPolarity[$feedback_i$$] = -this.freqPolarity[$feedback_i$$]) : (this.freqPolarity[$feedback_i$$] = 1, this.freqPos[$feedback_i$$] = NO_ANTIALIAS);
-        this.freqCounter[$feedback_i$$] += $tone$$ * ($clockCycles$$ / $tone$$ + 1);
+        var $tone$$ = this.reg[$feedback_i$$19_output$$ << 1];
+        6 < $tone$$ ? (this.freqPos[$feedback_i$$19_output$$] = ($clockCyclesScaled$$ - this.clockFrac + (2 << SCALE) * $counter$$ << SCALE) * this.freqPolarity[$feedback_i$$19_output$$] / ($clockCyclesScaled$$ + this.clockFrac), this.freqPolarity[$feedback_i$$19_output$$] = -this.freqPolarity[$feedback_i$$19_output$$]) : (this.freqPolarity[$feedback_i$$19_output$$] = 1, this.freqPos[$feedback_i$$19_output$$] = NO_ANTIALIAS);
+        this.freqCounter[$feedback_i$$19_output$$] += $tone$$ * ($clockCycles$$ / $tone$$ + 1);
       } else {
-        this.freqPos[$feedback_i$$] = NO_ANTIALIAS;
+        this.freqPos[$feedback_i$$19_output$$] = NO_ANTIALIAS;
       }
     }
-    0 >= this.freqCounter[3] && (this.freqPolarity[3] = -this.freqPolarity[3], 128 !== this.noiseFreq && (this.freqCounter[3] += this.noiseFreq * ($clockCycles$$ / this.noiseFreq + 1)), 1 === this.freqPolarity[3] && ($feedback_i$$ = 0, $feedback_i$$ = 0 !== (this.reg[6] & 4) ? 0 !== (this.noiseShiftReg & FEEDBACK_PATTERN) && 0 !== (this.noiseShiftReg & FEEDBACK_PATTERN ^ FEEDBACK_PATTERN) ? 1 : 0 : this.noiseShiftReg & 1, this.noiseShiftReg = this.noiseShiftReg >> 1 | $feedback_i$$ << 15));
+    0 >= this.freqCounter[3] && (this.freqPolarity[3] = -this.freqPolarity[3], 128 !== this.noiseFreq && (this.freqCounter[3] += this.noiseFreq * ($clockCycles$$ / this.noiseFreq + 1)), 1 === this.freqPolarity[3] && ($feedback_i$$19_output$$ = 0, $feedback_i$$19_output$$ = 0 !== (this.reg[6] & 4) ? 0 !== (this.noiseShiftReg & FEEDBACK_PATTERN) && 0 !== (this.noiseShiftReg & FEEDBACK_PATTERN ^ FEEDBACK_PATTERN) ? 1 : 0 : this.noiseShiftReg & 1, this.noiseShiftReg = this.noiseShiftReg >> 1 | $feedback_i$$19_output$$ << 
+    15));
   }
 }};
 var NTSC = 0, PAL = 1, SMS_X_PIXELS = 342, SMS_Y_PIXELS_NTSC = 262, SMS_Y_PIXELS_PAL = 313, SMS_WIDTH = 256, SMS_HEIGHT = 192, GG_WIDTH = 160, GG_HEIGHT = 144, GG_X_OFFSET = 48, GG_Y_OFFSET = 24, STATUS_VINT = 128, STATUS_OVERFLOW = 64, STATUS_COLLISION = 32, STATUS_HINT = 4, BGT_LENGTH = 1792, SPRITES_PER_LINE = 8, SPRITE_COUNT = 0, SPRITE_X = 1, SPRITE_Y = 2, SPRITE_N = 3, TOTAL_TILES = 512, TILE_SIZE = 8;
@@ -8582,7 +8583,7 @@ var Parser = function() {
   function $disassemble$$($bytecode$$, $stream$$) {
     $stream$$.page = $bytecode$$.page;
     $stream$$.seek($bytecode$$.address + 16384 * $stream$$.page);
-    var $opcode$$13_opcode$$inline_11_opcode$$ = $stream$$.getUint8(), $operand$$3_operand$$ = null, $target$$49_target$$ = null, $isFunctionEnder_isFunctionEnder$$ = !1, $canEnd_canEnd$$ = !1;
+    var $opcode$$13_opcode$$inline_11_opcode$$ = $stream$$.getUint8(), $operand$$3_operand$$ = null, $target$$51_target$$ = null, $isFunctionEnder_isFunctionEnder$$ = !1, $canEnd_canEnd$$ = !1;
     $bytecode$$.opcode.push($opcode$$13_opcode$$inline_11_opcode$$);
     switch($opcode$$13_opcode$$inline_11_opcode$$) {
       case 0:
@@ -8621,7 +8622,7 @@ var Parser = function() {
       case 15:
         break;
       case 16:
-        $target$$49_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$51_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 17:
@@ -8641,7 +8642,7 @@ var Parser = function() {
       case 23:
         break;
       case 24:
-        $target$$49_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$51_target$$ = $stream$$.position + $stream$$.getInt8();
         $stream$$.seek(null);
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
@@ -8661,7 +8662,7 @@ var Parser = function() {
       case 31:
         break;
       case 32:
-        $target$$49_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$51_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 33:
@@ -8682,7 +8683,7 @@ var Parser = function() {
       case 39:
         break;
       case 40:
-        $target$$49_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$51_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 41:
@@ -8702,7 +8703,7 @@ var Parser = function() {
       case 47:
         break;
       case 48:
-        $target$$49_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$51_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 49:
@@ -8723,7 +8724,7 @@ var Parser = function() {
       case 55:
         break;
       case 56:
-        $target$$49_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$51_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 57:
@@ -9005,16 +9006,16 @@ var Parser = function() {
       case 193:
         break;
       case 194:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 195:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $stream$$.seek(null);
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 196:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 197:
@@ -9023,7 +9024,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 199:
-        $target$$49_target$$ = 0;
+        $target$$51_target$$ = 0;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 200:
@@ -9034,24 +9035,24 @@ var Parser = function() {
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 202:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 203:
         return $opcode$$13_opcode$$inline_11_opcode$$ = $stream$$.getUint8(), $bytecode$$.opcode.push($opcode$$13_opcode$$inline_11_opcode$$), $bytecode$$.nextAddress = $stream$$.position, $bytecode$$;
       case 204:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 205:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 206:
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 207:
-        $target$$49_target$$ = 8;
+        $target$$51_target$$ = 8;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 208:
@@ -9060,14 +9061,14 @@ var Parser = function() {
       case 209:
         break;
       case 210:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 211:
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 212:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 213:
@@ -9076,7 +9077,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 215:
-        $target$$49_target$$ = 16;
+        $target$$51_target$$ = 16;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 216:
@@ -9085,14 +9086,14 @@ var Parser = function() {
       case 217:
         break;
       case 218:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 219:
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 220:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 221:
@@ -9101,7 +9102,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 223:
-        $target$$49_target$$ = 24;
+        $target$$51_target$$ = 24;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 224:
@@ -9110,13 +9111,13 @@ var Parser = function() {
       case 225:
         break;
       case 226:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 227:
         break;
       case 228:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 229:
@@ -9125,7 +9126,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 231:
-        $target$$49_target$$ = 32;
+        $target$$51_target$$ = 32;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 232:
@@ -9136,18 +9137,18 @@ var Parser = function() {
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 234:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 235:
         break;
       case 236:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 237:
         $opcode$$13_opcode$$inline_11_opcode$$ = $stream$$.getUint8();
-        $target$$49_target$$ = $operand$$3_operand$$ = null;
+        $target$$51_target$$ = $operand$$3_operand$$ = null;
         $canEnd_canEnd$$ = $isFunctionEnder_isFunctionEnder$$ = !1;
         $bytecode$$.opcode.push($opcode$$13_opcode$$inline_11_opcode$$);
         switch($opcode$$13_opcode$$inline_11_opcode$$) {
@@ -9296,19 +9297,19 @@ var Parser = function() {
           case 171:
             break;
           case 176:
-            $target$$49_target$$ = $stream$$.position - 2;
+            $target$$51_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 177:
-            $target$$49_target$$ = $stream$$.position - 2;
+            $target$$51_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 178:
-            $target$$49_target$$ = $stream$$.position - 2;
+            $target$$51_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 179:
-            $target$$49_target$$ = $stream$$.position - 2;
+            $target$$51_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 184:
@@ -9316,11 +9317,11 @@ var Parser = function() {
           case 185:
             break;
           case 186:
-            $target$$49_target$$ = $stream$$.position - 2;
+            $target$$51_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 187:
-            $target$$49_target$$ = $stream$$.position - 2;
+            $target$$51_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           default:
@@ -9329,7 +9330,7 @@ var Parser = function() {
         16383 <= $bytecode$$.address && ($isFunctionEnder_isFunctionEnder$$ = !0, $bytecode$$.changePage = !0);
         $bytecode$$.nextAddress = $stream$$.position;
         $bytecode$$.operand = $operand$$3_operand$$;
-        $bytecode$$.target = $target$$49_target$$;
+        $bytecode$$.target = $target$$51_target$$;
         $bytecode$$.isFunctionEnder = $isFunctionEnder_isFunctionEnder$$;
         $bytecode$$.canEnd = $canEnd_canEnd$$;
         return $bytecode$$;
@@ -9337,7 +9338,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 239:
-        $target$$49_target$$ = 40;
+        $target$$51_target$$ = 40;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 240:
@@ -9346,13 +9347,13 @@ var Parser = function() {
       case 241:
         break;
       case 242:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 243:
         break;
       case 244:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 245:
@@ -9361,7 +9362,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 247:
-        $target$$49_target$$ = 48;
+        $target$$51_target$$ = 48;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 248:
@@ -9370,13 +9371,13 @@ var Parser = function() {
       case 249:
         break;
       case 250:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 251:
         break;
       case 252:
-        $target$$49_target$$ = $stream$$.getUint16();
+        $target$$51_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 253:
@@ -9385,7 +9386,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 255:
-        $target$$49_target$$ = 56;
+        $target$$51_target$$ = 56;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       default:
@@ -9393,7 +9394,7 @@ var Parser = function() {
     }
     $bytecode$$.nextAddress = $stream$$.position;
     $bytecode$$.operand = $operand$$3_operand$$;
-    $bytecode$$.target = $target$$49_target$$;
+    $bytecode$$.target = $target$$51_target$$;
     $bytecode$$.isFunctionEnder = $isFunctionEnder_isFunctionEnder$$;
     $bytecode$$.canEnd = $canEnd_canEnd$$;
     return $bytecode$$;
@@ -9664,20 +9665,20 @@ var Parser = function() {
       }
     }
     JSSMS.Utils.console.timeEnd("Parsing");
-  }, parseFromAddress:function $$parser$$$$parseFromAddress$($obj$$38_romPage$$) {
-    var $address$$ = $obj$$38_romPage$$.address % 16384;
-    $obj$$38_romPage$$ = $obj$$38_romPage$$.romPage;
-    var $pageStart$$ = 16384 * $obj$$38_romPage$$, $pageEnd$$ = 16384 * ($obj$$38_romPage$$ + 1), $branch$$ = [], $bytecode$$, $startingBytecode$$ = !0, $absoluteAddress$$ = 0;
-    1024 > $address$$ && 0 === $obj$$38_romPage$$ && ($pageStart$$ = 0, $pageEnd$$ = 1024);
+  }, parseFromAddress:function $$parser$$$$parseFromAddress$($obj$$39_romPage$$) {
+    var $address$$ = $obj$$39_romPage$$.address % 16384;
+    $obj$$39_romPage$$ = $obj$$39_romPage$$.romPage;
+    var $pageStart$$ = 16384 * $obj$$39_romPage$$, $pageEnd$$ = 16384 * ($obj$$39_romPage$$ + 1), $branch$$ = [], $bytecode$$, $startingBytecode$$ = !0, $absoluteAddress$$ = 0;
+    1024 > $address$$ && 0 === $obj$$39_romPage$$ && ($pageStart$$ = 0, $pageEnd$$ = 1024);
     do {
-      this.bytecodes[$obj$$38_romPage$$][$address$$] ? $bytecode$$ = this.bytecodes[$obj$$38_romPage$$][$address$$] : ($bytecode$$ = new Bytecode($address$$, $obj$$38_romPage$$), this.bytecodes[$obj$$38_romPage$$][$address$$] = $disassemble$$($bytecode$$, this.stream));
+      this.bytecodes[$obj$$39_romPage$$][$address$$] ? $bytecode$$ = this.bytecodes[$obj$$39_romPage$$][$address$$] : ($bytecode$$ = new Bytecode($address$$, $obj$$39_romPage$$), this.bytecodes[$obj$$39_romPage$$][$address$$] = $disassemble$$($bytecode$$, this.stream));
       if ($bytecode$$.canEnd && !$startingBytecode$$) {
         break;
       }
       $address$$ = $bytecode$$.nextAddress % 16384;
       $branch$$.push($bytecode$$);
       $startingBytecode$$ = !1;
-      $absoluteAddress$$ = $address$$ + 16384 * $obj$$38_romPage$$;
+      $absoluteAddress$$ = $address$$ + 16384 * $obj$$39_romPage$$;
     } while (null !== $address$$ && $absoluteAddress$$ >= $pageStart$$ && $absoluteAddress$$ < $pageEnd$$ && !$bytecode$$.isFunctionEnder);
     return $branch$$;
   }, writeGraphViz:function $$parser$$$$writeGraphViz$() {
@@ -9717,42 +9718,42 @@ var Parser = function() {
 }();
 var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$, $consequent$$, $alternate$$) {
   void 0 === $alternate$$ && ($alternate$$ = null);
-  return{type:"IfStatement", test:$test$$, consequent:$consequent$$, alternate:$alternate$$};
+  return {type:"IfStatement", test:$test$$, consequent:$consequent$$, alternate:$alternate$$};
 }, BlockStatement:function($body$$) {
   void 0 === $body$$ && ($body$$ = []);
   Array.isArray($body$$) || ($body$$ = [$body$$]);
-  return{type:"BlockStatement", body:$body$$};
+  return {type:"BlockStatement", body:$body$$};
 }, ExpressionStatement:function($expression$$) {
-  return{type:"ExpressionStatement", expression:$expression$$};
+  return {type:"ExpressionStatement", expression:$expression$$};
 }, ReturnStatement:function($argument$$) {
   void 0 === $argument$$ && ($argument$$ = null);
-  return{type:"ReturnStatement", argument:$argument$$};
+  return {type:"ReturnStatement", argument:$argument$$};
 }, VariableDeclaration:function($name$$, $init$$) {
-  return{type:"VariableDeclaration", declarations:[{type:"VariableDeclarator", id:{type:"Identifier", name:$name$$}, init:$init$$}], kind:"var"};
+  return {type:"VariableDeclaration", declarations:[{type:"VariableDeclarator", id:{type:"Identifier", name:$name$$}, init:$init$$}], kind:"var"};
 }, Identifier:function($name$$) {
-  return{type:"Identifier", name:$name$$};
+  return {type:"Identifier", name:$name$$};
 }, Literal:function($value$$) {
   return "number" === typeof $value$$ ? {type:"Literal", value:$value$$, raw:DEBUG ? JSSMS.Utils.toHex($value$$) : "" + $value$$} : {type:"Literal", value:$value$$, raw:"" + $value$$};
 }, CallExpression:function($callee$$, $args$$) {
   void 0 === $args$$ && ($args$$ = []);
   Array.isArray($args$$) || ($args$$ = [$args$$]);
-  return{type:"CallExpression", callee:n.Identifier($callee$$), arguments:$args$$};
+  return {type:"CallExpression", callee:n.Identifier($callee$$), arguments:$args$$};
 }, AssignmentExpression:function($operator$$, $left$$, $right$$) {
-  return{type:"AssignmentExpression", operator:$operator$$, left:$left$$, right:$right$$};
+  return {type:"AssignmentExpression", operator:$operator$$, left:$left$$, right:$right$$};
 }, BinaryExpression:function($operator$$, $left$$, $right$$) {
-  return{type:"BinaryExpression", operator:$operator$$, left:$left$$, right:$right$$};
+  return {type:"BinaryExpression", operator:$operator$$, left:$left$$, right:$right$$};
 }, UnaryExpression:function($operator$$, $argument$$) {
-  return{type:"UnaryExpression", operator:$operator$$, argument:$argument$$};
+  return {type:"UnaryExpression", operator:$operator$$, argument:$argument$$};
 }, MemberExpression:function($object$$, $property$$) {
-  return{type:"MemberExpression", computed:!0, object:$object$$, property:$property$$};
+  return {type:"MemberExpression", computed:!0, object:$object$$, property:$property$$};
 }, ArrayExpression:function($elements$$) {
-  return{type:"ArrayExpression", elements:$elements$$};
+  return {type:"ArrayExpression", elements:$elements$$};
 }, ConditionalExpression:function($test$$, $consequent$$, $alternate$$) {
-  return{type:"ConditionalExpression", test:$test$$, consequent:$consequent$$, alternate:$alternate$$};
+  return {type:"ConditionalExpression", test:$test$$, consequent:$consequent$$, alternate:$alternate$$};
 }, LogicalExpression:function($operator$$, $left$$, $right$$) {
-  return{type:"LogicalExpression", operator:$operator$$, left:$left$$, right:$right$$};
+  return {type:"LogicalExpression", operator:$operator$$, left:$left$$, right:$right$$};
 }, Register:function($name$$) {
-  return{type:"Register", name:$name$$};
+  return {type:"Register", name:$name$$};
 }, Bit:function($bitNumber$$) {
   return n.Literal(BIT_TABLE[$bitNumber$$]);
 }}, o = {SET16:function($register1$$, $register2$$, $value$$) {
@@ -9768,9 +9769,9 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   return void 0 === $dstRegister1$$ && void 0 === $dstRegister2$$ ? function($value$$) {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Register($srcRegister$$), n.Literal($value$$)));
   } : "i" === $dstRegister1$$ && void 0 === $dstRegister2$$ ? function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register($srcRegister$$), n.Register("i"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register($srcRegister$$))), n.ConditionalExpression(n.Identifier("iff2"), n.Literal(F_PARITY), n.Literal(0)))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Register($srcRegister$$), n.Register("i"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register($srcRegister$$))), n.ConditionalExpression(n.Identifier("iff2"), n.Literal(F_PARITY), n.Literal(0)))))];
   } : "r" === $dstRegister1$$ && void 0 === $dstRegister2$$ ? function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register($srcRegister$$), REFRESH_EMULATION ? n.Register("r") : n.CallExpression("JSSMS.Utils.rndInt", n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register($srcRegister$$))), n.ConditionalExpression(n.Identifier("iff2"), n.Literal(F_PARITY), 
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Register($srcRegister$$), REFRESH_EMULATION ? n.Register("r") : n.CallExpression("JSSMS.Utils.rndInt", n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZ_TABLE"), n.Register($srcRegister$$))), n.ConditionalExpression(n.Identifier("iff2"), n.Literal(F_PARITY), 
     n.Literal(0)))))];
   } : void 0 === $dstRegister2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Register($srcRegister$$), n.Register($dstRegister1$$)));
@@ -9801,7 +9802,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   } : "n" === $srcRegister1$$ && "n" === $srcRegister2$$ && void 0 === $dstRegister2$$ ? function($value$$) {
     return n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$), n.Register($dstRegister1$$)]));
   } : "n" === $srcRegister1$$ && "n" === $srcRegister2$$ ? function($value$$) {
-    return[n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$), n.Register($dstRegister2$$)])), n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$ + 1), n.Register($dstRegister1$$)]))];
+    return [n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$), n.Register($dstRegister2$$)])), n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$ + 1), n.Register($dstRegister1$$)]))];
   } : function() {
     return n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("get" + ($srcRegister1$$ + $srcRegister2$$).toUpperCase()), n.Register($dstRegister1$$)]));
   };
@@ -9815,9 +9816,9 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, LD_NN:function($register1$$, $register2$$) {
   return void 0 === $register2$$ ? function($value$$) {
-    return[n.ExpressionStatement(n.CallExpression("setUint8", n.Literal($value$$), n.BinaryExpression("&", n.Identifier($register1$$), n.Literal(255)))), n.ExpressionStatement(n.CallExpression("setUint8", n.Literal($value$$ + 1), n.BinaryExpression(">>", n.Identifier($register1$$), n.Literal(8))))];
+    return [n.ExpressionStatement(n.CallExpression("setUint8", n.Literal($value$$), n.BinaryExpression("&", n.Identifier($register1$$), n.Literal(255)))), n.ExpressionStatement(n.CallExpression("setUint8", n.Literal($value$$ + 1), n.BinaryExpression(">>", n.Identifier($register1$$), n.Literal(8))))];
   } : function($value$$) {
-    return[n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$), n.Register($register2$$)])), n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$ + 1), n.Register($register1$$)]))];
+    return [n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$), n.Register($register2$$)])), n.ExpressionStatement(n.CallExpression("setUint8", [n.Literal($value$$ + 1), n.Register($register1$$)]))];
   };
 }, INC8:function($register1$$, $register2$$) {
   return void 0 === $register2$$ ? function() {
@@ -9829,7 +9830,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, INC16:function($register1$$, $register2$$) {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register2$$), n.BinaryExpression("&", n.BinaryExpression("+", n.Register($register2$$), n.Literal(1)), n.Literal(255)))), n.IfStatement(n.BinaryExpression("===", n.Register($register2$$), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.BinaryExpression("&", n.BinaryExpression("+", n.Register($register1$$), n.Literal(1)), n.Literal(255))))]))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register2$$), n.BinaryExpression("&", n.BinaryExpression("+", n.Register($register2$$), n.Literal(1)), n.Literal(255)))), n.IfStatement(n.BinaryExpression("===", n.Register($register2$$), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.BinaryExpression("&", n.BinaryExpression("+", n.Register($register1$$), n.Literal(1)), n.Literal(255))))]))];
   };
 }, DEC8:function($register1$$, $register2$$) {
   return void 0 === $register2$$ ? function() {
@@ -9841,7 +9842,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, DEC16:function($register1$$, $register2$$) {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register2$$), n.BinaryExpression("&", n.BinaryExpression("-", n.Register($register2$$), n.Literal(1)), n.Literal(255)))), n.IfStatement(n.BinaryExpression("===", n.Register($register2$$), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.BinaryExpression("&", n.BinaryExpression("-", n.Register($register1$$), n.Literal(1)), n.Literal(255))))]))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register2$$), n.BinaryExpression("&", n.BinaryExpression("-", n.Register($register2$$), n.Literal(1)), n.Literal(255)))), n.IfStatement(n.BinaryExpression("===", n.Register($register2$$), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.BinaryExpression("&", n.BinaryExpression("-", n.Register($register1$$), n.Literal(1)), n.Literal(255))))]))];
   };
 }, ADD16:function($register1$$, $register2$$, $register3$$, $register4$$) {
   return void 0 === $register4$$ ? function() {
@@ -9875,7 +9876,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, SCF:function() {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))];
   };
 }, CCF:function() {
   return function() {
@@ -9915,33 +9916,33 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, AND:function($register1$$, $register2$$) {
   return void 0 === $register1$$ && void 0 === $register2$$ ? function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Literal($value$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Literal($value$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))];
   } : "a" !== $register1$$ && void 0 === $register2$$ ? function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Register($register1$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), n.Register($register1$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))];
   } : "a" === $register1$$ && void 0 === $register2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))));
   } : function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))];
   };
 }, XOR:function($register1$$, $register2$$) {
   return void 0 === $register1$$ && void 0 === $register2$$ ? function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), n.Literal($value$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), n.Literal($value$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
   } : "a" !== $register1$$ && void 0 === $register2$$ ? function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), n.Register($register1$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), n.Register($register1$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
   } : "a" === $register1$$ && void 0 === $register2$$ ? function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register("a"), n.Literal(0))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Literal(0))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Register("a"), n.Literal(0))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Literal(0))))];
   } : function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
   };
 }, OR:function($register1$$, $register2$$) {
   return void 0 === $register1$$ && void 0 === $register2$$ ? function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), n.Literal($value$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), n.Literal($value$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
   } : "a" !== $register1$$ && void 0 === $register2$$ ? function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), n.Register($register1$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), n.Register($register1$$))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
   } : "a" === $register1$$ && void 0 === $register2$$ ? function() {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))));
   } : function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
   };
 }, CP:function($register1$$, $register2$$) {
   return void 0 === $register1$$ && void 0 === $register2$$ ? function($value$$) {
@@ -9953,7 +9954,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, POP:function($register1$$, $register2$$) {
   return function() {
-    return[].concat(o.SET16($register1$$, $register2$$, o.READ_MEM16(n.Identifier("sp"))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2))));
+    return [].concat(o.SET16($register1$$, $register2$$, o.READ_MEM16(n.Identifier("sp"))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2))));
   };
 }, PUSH:function($register1$$, $register2$$) {
   return function() {
@@ -9967,7 +9968,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, DJNZ:function() {
   return function($value$$, $target$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register("b"), n.BinaryExpression("&", n.BinaryExpression("-", n.Register("b"), n.Literal(1)), n.Literal(255)))), o.JR(n.BinaryExpression("!==", n.Register("b"), n.Literal(0)))(void 0, $target$$)];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Register("b"), n.BinaryExpression("&", n.BinaryExpression("-", n.Register("b"), n.Literal(1)), n.Literal(255)))), o.JR(n.BinaryExpression("!==", n.Register("b"), n.Literal(0)))(void 0, $target$$)];
   };
 }, JRNZ:function() {
   return function($value$$, $target$$) {
@@ -9987,36 +9988,36 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, RET:function($operator$$, $bitMask$$) {
   return void 0 === $operator$$ && void 0 === $bitMask$$ ? function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2)))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2)))];
   } : function($value$$, $target$$, $nextAddress$$) {
     return n.IfStatement(n.BinaryExpression($operator$$, n.BinaryExpression("&", n.Register("f"), n.Literal($bitMask$$)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(6))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2))), n.ReturnStatement()]));
   };
 }, JP:function($operator$$, $bitMask$$) {
   return void 0 === $operator$$ && void 0 === $bitMask$$ ? function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($target$$)))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($target$$)))];
   } : "h" === $operator$$ && "l" === $bitMask$$ ? function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.CallExpression("getHL")))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.CallExpression("getHL")))];
   } : function($value$$, $target$$) {
     return n.IfStatement(n.BinaryExpression($operator$$, n.BinaryExpression("&", n.Register("f"), n.Literal($bitMask$$)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($target$$))), n.ReturnStatement()]));
   };
 }, CALL:function($operator$$, $bitMask$$) {
   return void 0 === $operator$$ && void 0 === $bitMask$$ ? function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.CallExpression("push", n.BinaryExpression("+", n.Literal($nextAddress$$ % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($target$$))), n.ReturnStatement()];
+    return [n.ExpressionStatement(n.CallExpression("push", n.BinaryExpression("+", n.Literal($nextAddress$$ % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($target$$))), n.ReturnStatement()];
   } : function($value$$, $target$$, $nextAddress$$) {
     return n.IfStatement(n.BinaryExpression($operator$$, n.BinaryExpression("&", n.Register("f"), n.Literal($bitMask$$)), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(7))), n.ExpressionStatement(n.CallExpression("push", n.BinaryExpression("+", n.Literal($nextAddress$$ % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($target$$))), 
     n.ReturnStatement()]));
   };
 }, RST:function($targetAddress$$) {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.CallExpression("push", n.BinaryExpression("+", n.Literal($nextAddress$$ % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($targetAddress$$))), n.ReturnStatement()];
+    return [n.ExpressionStatement(n.CallExpression("push", n.BinaryExpression("+", n.Literal($nextAddress$$ % 16384), n.BinaryExpression("*", n.Identifier("page"), n.Literal(16384))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.Literal($targetAddress$$))), n.ReturnStatement()];
   };
 }, DI:function() {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff1"), n.Literal(!1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff2"), n.Literal(!1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("EI_inst"), n.Literal(!0)))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff1"), n.Literal(!1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff2"), n.Literal(!1))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("EI_inst"), n.Literal(!0)))];
   };
 }, EI:function() {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff1"), n.Literal(!0))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff2"), n.Literal(!0))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("EI_inst"), n.Literal(!0)))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff1"), n.Literal(!0))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff2"), n.Literal(!0))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("EI_inst"), n.Literal(!0)))];
   };
 }, OUT:function($register1$$, $register2$$) {
   return void 0 === $register2$$ ? function($value$$, $target$$, $nextAddress$$) {
@@ -10028,23 +10029,23 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   return void 0 === $register2$$ ? function($value$$, $target$$, $nextAddress$$) {
     return n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.CallExpression("port.in_", n.Literal($value$$))));
   } : function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.CallExpression("port.in_", n.Register($register2$$)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register($register1$$)))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register1$$), n.CallExpression("port.in_", n.Register($register2$$)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register($register1$$)))))];
   };
 }, EX_AF:function() {
   return function() {
-    return[].concat(o.EX("a", "a2"), o.EX("f", "f2"));
+    return [].concat(o.EX("a", "a2"), o.EX("f", "f2"));
   };
 }, EXX:function() {
   return function() {
-    return[].concat(o.EX("b", "b2"), o.EX("c", "c2"), o.EX("d", "d2"), o.EX("e", "e2"), o.EX("h", "h2"), o.EX("l", "l2"));
+    return [].concat(o.EX("b", "b2"), o.EX("c", "c2"), o.EX("d", "d2"), o.EX("e", "e2"), o.EX("h", "h2"), o.EX("l", "l2"));
   };
 }, EX_DE_HL:function() {
   return function() {
-    return[].concat(o.EX("d", "h"), o.EX("e", "l"));
+    return [].concat(o.EX("d", "h"), o.EX("e", "l"));
   };
 }, EX_SP_HL:function() {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("h"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), o.READ_MEM8(n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1))))), n.ExpressionStatement(n.CallExpression("setUint8", [n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1)), n.Identifier("temp")])), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", 
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("h"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), o.READ_MEM8(n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1))))), n.ExpressionStatement(n.CallExpression("setUint8", [n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1)), n.Identifier("temp")])), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", 
     n.Register("l"), o.READ_MEM8(n.Identifier("sp")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("sp"), n.Identifier("temp")]))];
   };
 }, HALT:function() {
@@ -10059,7 +10060,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   } : "h" === $register1$$ && "l" === $register2$$ ? function() {
     return n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())), n.Bit($bit$$))));
   } : function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.Bit($bit$$))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("bit", n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.Bit($bit$$))))];
   };
 }, RES:function($bit$$, $register1$$, $register2$$) {
   return void 0 === $register2$$ ? function() {
@@ -10067,7 +10068,7 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   } : "h" === $register1$$ && "l" === $register2$$ ? function() {
     return n.ExpressionStatement(n.CallExpression("setUint8", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.BinaryExpression("&", o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())), n.UnaryExpression("~", n.Bit($bit$$)))));
   } : function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.UnaryExpression("~", n.Bit($bit$$)))]))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.BinaryExpression("&", o.READ_MEM8(n.Identifier("location")), n.UnaryExpression("~", n.Bit($bit$$)))]))];
   };
 }, SET:function($bit$$, $register1$$, $register2$$) {
   return void 0 === $register2$$ ? function() {
@@ -10075,21 +10076,21 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   } : "h" === $register1$$ && "l" === $register2$$ ? function() {
     return n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.BinaryExpression("|", o.READ_MEM8(n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())), n.Bit($bit$$))]));
   } : function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.BinaryExpression("|", o.READ_MEM8(n.Identifier("location")), n.Bit($bit$$))]))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.BinaryExpression("|", o.READ_MEM8(n.Identifier("location")), n.Bit($bit$$))]))];
   };
 }, LD_X:function($register1$$, $register2$$, $register3$$) {
   return void 0 === $register3$$ ? function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.CallExpression("setUint8", [n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$ & 255)), n.Literal($value$$ >> 8)]))];
+    return [n.ExpressionStatement(n.CallExpression("setUint8", [n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$ & 255)), n.Literal($value$$ >> 8)]))];
   } : function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.CallExpression("setUint8", [n.BinaryExpression("+", n.CallExpression("get" + ($register2$$ + $register3$$).toUpperCase()), n.Literal($value$$)), n.Register($register1$$)]))];
+    return [n.ExpressionStatement(n.CallExpression("setUint8", [n.BinaryExpression("+", n.CallExpression("get" + ($register2$$ + $register3$$).toUpperCase()), n.Literal($value$$)), n.Register($register1$$)]))];
   };
 }, INC_X:function($register1$$, $register2$$) {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.CallExpression("incMem", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$))))];
+    return [n.ExpressionStatement(n.CallExpression("incMem", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$))))];
   };
 }, DEC_X:function($register1$$, $register2$$) {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.CallExpression("decMem", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$))))];
+    return [n.ExpressionStatement(n.CallExpression("decMem", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$))))];
   };
 }, ADD_X:function($register1$$, $register2$$) {
   return function($value$$, $target$$, $nextAddress$$) {
@@ -10109,15 +10110,15 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, AND_X:function($register1$$, $register2$$) {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("a"), o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")), n.Literal(F_HALFCARRY))))];
   };
 }, XOR_X:function($register1$$, $register2$$) {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("^=", n.Register("a"), o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
   };
 }, OR_X:function($register1$$, $register2$$) {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
+    return [n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("a"), o.READ_MEM8(n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a"))))];
   };
 }, CP_X:function($register1$$, $register2$$) {
   return function($value$$) {
@@ -10125,34 +10126,34 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, EX_SP_X:function($register1$$, $register2$$) {
   return function() {
-    return[].concat(n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()))), o.SET16($register1$$, $register2$$, o.READ_MEM16(n.Identifier("sp"))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("sp"), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(255))])), n.ExpressionStatement(n.CallExpression("setUint8", [n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1)), n.BinaryExpression(">>", 
+    return [].concat(n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()))), o.SET16($register1$$, $register2$$, o.READ_MEM16(n.Identifier("sp"))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("sp"), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(255))])), n.ExpressionStatement(n.CallExpression("setUint8", [n.BinaryExpression("+", n.Identifier("sp"), n.Literal(1)), n.BinaryExpression(">>", 
     n.Identifier("sp"), n.Literal(8))])));
   };
 }, JP_X:function($register1$$, $register2$$) {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase())))];
   };
 }, ADC16:function($register1$$, $register2$$) {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[void 0 === $register2$$ ? n.VariableDeclaration("value", n.Identifier($register1$$)) : n.VariableDeclaration("value", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register($register1$$), n.Literal(8)), n.Register($register2$$))), n.VariableDeclaration("val", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register("h"), n.Literal(8)), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("+", n.BinaryExpression("+", n.Identifier("val"), 
+    return [void 0 === $register2$$ ? n.VariableDeclaration("value", n.Identifier($register1$$)) : n.VariableDeclaration("value", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register($register1$$), n.Literal(8)), n.Register($register2$$))), n.VariableDeclaration("val", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register("h"), n.Literal(8)), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("+", n.BinaryExpression("+", n.Identifier("val"), 
     n.Identifier("value")), n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.BinaryExpression(">>", n.BinaryExpression("^", n.BinaryExpression("^", n.Identifier("val"), n.Identifier("temp")), n.Identifier("value")), n.Literal(8)), n.Literal(16)), n.BinaryExpression("&", n.BinaryExpression(">>", 
     n.Identifier("temp"), n.Literal(16)), n.Literal(1))), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(128))), n.ConditionalExpression(n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(65535)), n.Literal(0)), n.Literal(0), n.Literal(64))), n.BinaryExpression(">>", n.BinaryExpression("&", n.BinaryExpression("&", n.BinaryExpression("^", n.BinaryExpression("^", n.Identifier("value"), n.Identifier("val")), n.Literal(32768)), 
     n.BinaryExpression("^", n.Identifier("value"), n.Identifier("temp"))), n.Literal(32768)), n.Literal(13))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("l"), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(255))))];
   };
 }, SBC16:function($register1$$, $register2$$) {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[void 0 === $register2$$ ? n.VariableDeclaration("value", n.Identifier($register1$$)) : n.VariableDeclaration("value", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register($register1$$), n.Literal(8)), n.Register($register2$$))), n.VariableDeclaration("val", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register("h"), n.Literal(8)), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("-", n.BinaryExpression("-", n.Identifier("val"), 
+    return [void 0 === $register2$$ ? n.VariableDeclaration("value", n.Identifier($register1$$)) : n.VariableDeclaration("value", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register($register1$$), n.Literal(8)), n.Register($register2$$))), n.VariableDeclaration("val", n.BinaryExpression("|", n.BinaryExpression("<<", n.Register("h"), n.Literal(8)), n.Register("l"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("-", n.BinaryExpression("-", n.Identifier("val"), 
     n.Identifier("value")), n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.BinaryExpression(">>", n.BinaryExpression("^", n.BinaryExpression("^", n.Identifier("val"), n.Identifier("temp")), n.Identifier("value")), n.Literal(8)), n.Literal(16)), n.Literal(2)), n.BinaryExpression("&", 
     n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(16)), n.Literal(1))), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(128))), n.ConditionalExpression(n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(65535)), n.Literal(0)), n.Literal(0), n.Literal(64))), n.BinaryExpression(">>", n.BinaryExpression("&", n.BinaryExpression("&", n.BinaryExpression("^", n.Identifier("value"), n.Identifier("val")), n.BinaryExpression("^", 
     n.Identifier("val"), n.Identifier("temp"))), n.Literal(32768)), n.Literal(13))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("h"), n.BinaryExpression("&", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(8)), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("l"), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(255))))];
   };
 }, NEG:function() {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("a"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("a"), n.Literal(0))), n.ExpressionStatement(n.CallExpression("sub_a", n.Identifier("temp")))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.Register("a"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("a"), n.Literal(0))), n.ExpressionStatement(n.CallExpression("sub_a", n.Identifier("temp")))];
   };
 }, RETN_RETI:function() {
   return function() {
-    return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff1"), n.Identifier("iff2")))];
+    return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("pc"), o.READ_MEM16(n.Identifier("sp")))), n.ExpressionStatement(n.AssignmentExpression("+=", n.Identifier("sp"), n.Literal(2))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("iff1"), n.Identifier("iff2")))];
   };
 }, IM:function($value$$) {
   return function() {
@@ -10160,73 +10161,73 @@ var BIT_TABLE = [1, 2, 4, 8, 16, 32, 64, 128], n = {IfStatement:function($test$$
   };
 }, INI:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("port.in_", n.Register("c")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getHL"), n.Identifier("temp")])), o.DEC8("b")()], o.INC16("h", "l")(), [n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_NEGATIVE)))), 
+    return [].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.CallExpression("port.in_", n.Register("c")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getHL"), n.Identifier("temp")])), o.DEC8("b")()], o.INC16("h", "l")(), [n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_NEGATIVE)))), 
     n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))]);
   };
 }, OUTI:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")()], o.INC16("h", "l")(), [n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", 
+    return [].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")()], o.INC16("h", "l")(), [n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", 
     n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
     n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))]);
   };
 }, OUTD:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")()], o.DEC16("h", "l")(), [n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", 
+    return [].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")()], o.DEC16("h", "l")(), [n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", 
     n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("===", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(128)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
     n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE))))))]);
   };
 }, LDI:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.INC16("d", "e")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
+    return [].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.INC16("d", "e")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
     n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("getBC"), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0)))))]);
   };
 }, RRD:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.CallExpression("getHL"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.Identifier("location")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.BinaryExpression("|", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(4)), n.BinaryExpression("<<", n.BinaryExpression("&", n.Register("a"), n.Literal(15)), n.Literal(4)))])), 
+    return [].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.CallExpression("getHL"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.Identifier("location")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.BinaryExpression("|", n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(4)), n.BinaryExpression("<<", n.BinaryExpression("&", n.Register("a"), n.Literal(15)), n.Literal(4)))])), 
     n.ExpressionStatement(n.AssignmentExpression("=", n.Register("a"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("a"), n.Literal(240)), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(15))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Identifier("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")))))]);
   };
 }, RLD:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.CallExpression("getHL"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.Identifier("location")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.BinaryExpression("|", n.BinaryExpression("<<", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(15)), n.Literal(4)), n.BinaryExpression("&", n.Register("a"), n.Literal(15)))])), 
+    return [].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.CallExpression("getHL"))), n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.Identifier("location")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.BinaryExpression("|", n.BinaryExpression("<<", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(15)), n.Literal(4)), n.BinaryExpression("&", n.Register("a"), n.Literal(15)))])), 
     n.ExpressionStatement(n.AssignmentExpression("=", n.Register("a"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("a"), n.Literal(240)), n.BinaryExpression(">>", n.Identifier("temp"), n.Literal(4))))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Identifier("f"), n.Literal(F_CARRY)), n.MemberExpression(n.Identifier("SZP_TABLE"), n.Register("a")))))]);
   };
 }, CPI:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("getHL"))]))], o.DEC16("b", "c")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("===", n.CallExpression("getBC"), n.Literal(0)), 
+    return [].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("getHL"))]))], o.DEC16("b", "c")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("===", n.CallExpression("getBC"), n.Literal(0)), 
     n.Literal(0), n.Literal(F_PARITY)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp"))))]);
   };
 }, LDD:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.DEC16("d", "e")(), o.DEC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
+    return [].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.DEC16("d", "e")(), o.DEC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
     n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("getBC"), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0)))))]);
   };
 }, LDIR:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.INC16("d", "e")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
+    return [].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.INC16("d", "e")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
     n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("getBC"), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0))))), n.IfStatement(n.BinaryExpression("!==", n.CallExpression("getBC"), n.Literal(0)), 
     n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))]);
   };
 }, CPIR:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("getHL"))]))], o.DEC16("b", "c")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("===", n.CallExpression("getBC"), n.Literal(0)), 
+    return [].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(F_CARRY)), n.Literal(F_NEGATIVE)))), n.ExpressionStatement(n.CallExpression("cp_a", [o.READ_MEM8(n.CallExpression("getHL"))]))], o.DEC16("b", "c")(), o.INC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("|=", n.Identifier("temp"), n.ConditionalExpression(n.BinaryExpression("===", n.CallExpression("getBC"), n.Literal(0)), 
     n.Literal(0), n.Literal(F_PARITY)))), n.IfStatement(n.LogicalExpression("&&", n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_PARITY)), n.Literal(0)), n.BinaryExpression("===", n.BinaryExpression("&", n.Register("f"), n.Literal(F_ZERO)), n.Literal(0))), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", 
     n.Register("f"), n.Literal(248)), n.Identifier("temp")))), n.ReturnStatement()])), n.ExpressionStatement(n.AssignmentExpression("=", n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(248)), n.Identifier("temp"))))]);
   };
 }, OTIR:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")()], o.INC16("h", "l")(), [n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", 
+    return [].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")()], o.INC16("h", "l")(), [n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", 
     n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(0)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
     n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE)))))), n.IfStatement(n.BinaryExpression("!==", n.Register("b"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))]);
   };
 }, LDDR:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.DEC16("d", "e")(), o.DEC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
+    return [].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("setUint8", [n.CallExpression("getDE"), n.Identifier("temp")]))], o.DEC16("b", "c")(), o.DEC16("d", "e")(), o.DEC16("h", "l")(), [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), n.BinaryExpression("&", n.BinaryExpression("+", n.Identifier("temp"), n.Register("a")), n.Literal(255)))), n.ExpressionStatement(n.AssignmentExpression("=", 
     n.Register("f"), n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("|", n.BinaryExpression("&", n.Register("f"), n.Literal(193)), n.ConditionalExpression(n.CallExpression("getBC"), n.Literal(F_PARITY), n.Literal(0))), n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_BIT3))), n.ConditionalExpression(n.BinaryExpression("&", n.Identifier("temp"), n.Literal(F_NEGATIVE)), n.Literal(32), n.Literal(0))))), n.IfStatement(n.BinaryExpression("!==", n.CallExpression("getBC"), n.Literal(0)), 
     n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))]);
   };
 }, OTDR:function() {
   return function($value$$, $target$$, $nextAddress$$) {
-    return[].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")()], o.DEC16("h", "l")(), [n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", 
+    return [].concat([n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("temp"), o.READ_MEM8(n.CallExpression("getHL")))), n.ExpressionStatement(n.CallExpression("port.out", [n.Register("c"), n.Identifier("temp")])), o.DEC8("b")()], o.DEC16("h", "l")(), [n.IfStatement(n.BinaryExpression(">", n.BinaryExpression("+", n.Register("l"), n.Identifier("temp")), n.Literal(255)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), n.Literal(F_CARRY))), n.ExpressionStatement(n.AssignmentExpression("|=", 
     n.Register("f"), n.Literal(F_HALFCARRY)))]), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_CARRY)))), n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_HALFCARRY))))])), n.IfStatement(n.BinaryExpression("!==", n.BinaryExpression("&", n.Identifier("temp"), n.Literal(128)), n.Literal(0)), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("|=", n.Register("f"), 
     n.Literal(F_NEGATIVE)))), n.BlockStatement(n.ExpressionStatement(n.AssignmentExpression("&=", n.Register("f"), n.UnaryExpression("~", n.Literal(F_NEGATIVE)))))), n.IfStatement(n.BinaryExpression("!==", n.Register("b"), n.Literal(0)), n.BlockStatement([n.ExpressionStatement(n.AssignmentExpression("-=", n.Identifier("tstates"), n.Literal(5))), n.ReturnStatement()]))]);
   };
@@ -10247,9 +10248,9 @@ function generateCBFunctions($fn$$) {
 function generateIndexCBFunctions($fn$$) {
   return function($register1$$, $register2$$, $register3$$) {
     return void 0 === $register3$$ ? function($value$$, $target$$, $nextAddress$$) {
-      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.CallExpression($fn$$, o.READ_MEM8(n.Identifier("location")))]))];
+      return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.CallExpression($fn$$, o.READ_MEM8(n.Identifier("location")))]))];
     } : function($value$$, $target$$, $nextAddress$$) {
-      return[n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register3$$), n.CallExpression($fn$$, o.READ_MEM8(n.Identifier("location"))))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.Register($register3$$)]))];
+      return [n.ExpressionStatement(n.AssignmentExpression("=", n.Identifier("location"), n.BinaryExpression("&", n.BinaryExpression("+", n.CallExpression("get" + ($register1$$ + $register2$$).toUpperCase()), n.Literal($value$$)), n.Literal(65535)))), n.ExpressionStatement(n.AssignmentExpression("=", n.Register($register3$$), n.CallExpression($fn$$, o.READ_MEM8(n.Identifier("location"))))), n.ExpressionStatement(n.CallExpression("setUint8", [n.Identifier("location"), n.Register($register3$$)]))];
     };
   };
 }
@@ -10273,7 +10274,7 @@ for (op in opcodesList) {
 }
 ;function generateIndexTable($index$$) {
   var $register_registerL$$ = $index$$.substring(1, 2).toLowerCase(), $registerH$$ = "i" + $register_registerL$$ + "H", $register_registerL$$ = "i" + $register_registerL$$ + "L";
-  return{9:{name:"ADD " + $index$$ + ",BC", ast:o.ADD16($registerH$$, $register_registerL$$, "b", "c")}, 25:{name:"ADD " + $index$$ + ",DE", ast:o.ADD16($registerH$$, $register_registerL$$, "d", "e")}, 33:{name:"LD " + $index$$ + ",nn", ast:o.LD16($registerH$$, $register_registerL$$)}, 34:{name:"LD (nn)," + $index$$, ast:o.LD_NN($registerH$$, $register_registerL$$)}, 35:{name:"INC " + $index$$, ast:o.INC16($registerH$$, $register_registerL$$)}, 42:{name:"LD " + $index$$ + ",(nn)", ast:o.LD16($registerH$$, 
+  return {9:{name:"ADD " + $index$$ + ",BC", ast:o.ADD16($registerH$$, $register_registerL$$, "b", "c")}, 25:{name:"ADD " + $index$$ + ",DE", ast:o.ADD16($registerH$$, $register_registerL$$, "d", "e")}, 33:{name:"LD " + $index$$ + ",nn", ast:o.LD16($registerH$$, $register_registerL$$)}, 34:{name:"LD (nn)," + $index$$, ast:o.LD_NN($registerH$$, $register_registerL$$)}, 35:{name:"INC " + $index$$, ast:o.INC16($registerH$$, $register_registerL$$)}, 42:{name:"LD " + $index$$ + ",(nn)", ast:o.LD16($registerH$$, 
   $register_registerL$$, "n", "n")}, 43:{name:"DEC " + $index$$, ast:o.DEC16($registerH$$, $register_registerL$$)}, 52:{name:"INC (" + $index$$ + "+d)", ast:o.INC_X($registerH$$, $register_registerL$$)}, 53:{name:"DEC (" + $index$$ + "+d)", ast:o.DEC_X($registerH$$, $register_registerL$$)}, 54:{name:"LD (" + $index$$ + "+d),n", ast:o.LD_X($registerH$$, $register_registerL$$)}, 57:{name:"ADD " + $index$$ + ",SP", ast:o.ADD16($registerH$$, $register_registerL$$, "sp")}, 70:{name:"LD B,(" + $index$$ + 
   "+d)", ast:o.LD8_D("b", $registerH$$, $register_registerL$$)}, 78:{name:"LD C,(" + $index$$ + "+d)", ast:o.LD8_D("c", $registerH$$, $register_registerL$$)}, 84:{name:" LD D," + $index$$ + "H *", ast:o.LD8("d", $registerH$$)}, 86:{name:"LD D,(" + $index$$ + "+d)", ast:o.LD8_D("d", $registerH$$, $register_registerL$$)}, 93:{name:"LD E," + $index$$ + "L *", ast:o.LD8("e", $register_registerL$$)}, 94:{name:"LD E,(" + $index$$ + "+d)", ast:o.LD8_D("e", $registerH$$, $register_registerL$$)}, 96:{name:"LD " + 
   $index$$ + "H,B", ast:o.LD8($registerH$$, "b")}, 97:{name:"LD " + $index$$ + "H,C", ast:o.LD8($registerH$$, "c")}, 98:{name:"LD " + $index$$ + "H,D", ast:o.LD8($registerH$$, "d")}, 99:{name:"LD " + $index$$ + "H,E", ast:o.LD8($registerH$$, "e")}, 100:{name:"LD " + $index$$ + "H," + $index$$ + "H", ast:o.NOOP()}, 101:{name:"LD " + $index$$ + "H," + $index$$ + "L *", ast:o.LD8_D($registerH$$, $register_registerL$$)}, 102:{name:"LD H,(" + $index$$ + "+d)", ast:o.LD8_D("h", $registerH$$, $register_registerL$$)}, 
@@ -10547,7 +10548,7 @@ var Optimizer = function() {
   }};
   return $Optimizer$$;
 }();
-var Generator = function() {
+var CodeGenerator = function() {
   function $getTotalTStates$$($opcodes$$) {
     switch($opcodes$$[0]) {
       case 203:
@@ -10568,10 +10569,10 @@ var Generator = function() {
       return $node$$;
     });
   }
-  var $toHex$$ = JSSMS.Utils.toHex, $whitelist$$ = "page temp location val value JSSMS.Utils.rndInt".split(" "), $Generator$$ = function $$Generator$$$() {
+  var $toHex$$ = JSSMS.Utils.toHex, $whitelist$$ = "page temp location val value JSSMS.Utils.rndInt".split(" "), $CodeGenerator$$ = function $$CodeGenerator$$$() {
     this.ast = [];
   };
-  $Generator$$.prototype = {generate:function $$Generator$$$$generate$($functions$$) {
+  $CodeGenerator$$.prototype = {generate:function $$CodeGenerator$$$$generate$($functions$$) {
     for (var $page$$ = 0;$page$$ < $functions$$.length;$page$$++) {
       $functions$$[$page$$] = $functions$$[$page$$].map(function($fn$$) {
         var $body$$ = [{type:"ExpressionStatement", expression:{type:"Literal", value:"use strict", raw:'"use strict"'}}], $name$$ = $fn$$[0].address, $tstates$$ = 0;
@@ -10603,12 +10604,12 @@ var Generator = function() {
           $obj$$.type && "Identifier" === $obj$$.type && -1 === $whitelist$$.indexOf($obj$$.name) && ($obj$$.name = "this." + $obj$$.name);
           return $obj$$;
         });
-        return{type:"Program", body:[{type:"FunctionDeclaration", id:{type:"Identifier", name:"_" + $name$$}, params:[{type:"Identifier", name:"page"}, {type:"Identifier", name:"temp"}, {type:"Identifier", name:"location"}], defaults:[], body:{type:"BlockStatement", body:$body$$}, rest:null, generator:!1, expression:!1}]};
+        return {type:"Program", body:[{type:"FunctionDeclaration", id:{type:"Identifier", name:"_" + $name$$}, params:[{type:"Identifier", name:"page"}, {type:"Identifier", name:"temp"}, {type:"Identifier", name:"location"}], defaults:[], body:{type:"BlockStatement", body:$body$$}, rest:null, generator:!1, expression:!1}]};
       });
     }
     this.ast = $functions$$;
   }};
-  return $Generator$$;
+  return $CodeGenerator$$;
 }();
 var Recompiler = function() {
   var $Recompiler$$ = function $$Recompiler$$$($cpu$$) {
@@ -10618,7 +10619,7 @@ var Recompiler = function() {
     this.parser = {};
     this.analyzer = new Analyzer;
     this.optimizer = new Optimizer($cpu$$.main);
-    this.generator = new Generator;
+    this.generator = new CodeGenerator;
     this.bytecodes = {};
   };
   $Recompiler$$.prototype = {setRom:function $$Recompiler$$$$setRom$($rom$$) {
@@ -10664,7 +10665,7 @@ var Recompiler = function() {
     return this;
   }, generateCodeFromAst:function $$Recompiler$$$$generateCodeFromAst$($fn$$) {
     return window.escodegen.generate($fn$$, {comment:!0, renumber:!0, hexadecimal:!0, parse:DEBUG ? window.esprima.parse : function($c$$) {
-      return{type:"Program", body:[{type:"ExpressionStatement", expression:{type:"Literal", value:$c$$, raw:$c$$}}]};
+      return {type:"Program", body:[{type:"ExpressionStatement", expression:{type:"Literal", value:$c$$, raw:$c$$}}]};
     }});
   }, dump:function $$Recompiler$$$$dump$() {
     var $output$$ = [], $i$$;

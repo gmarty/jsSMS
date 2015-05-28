@@ -10,4 +10,4 @@ JSSMS['NodeUI'] = JSSMS.NodeUI;
 JSSMS['NodeUI'].prototype['writeGraphViz'] = JSSMS.NodeUI.prototype.writeGraphViz;
 JSSMS['NodeUI'].prototype['writeJavaScript'] = JSSMS.NodeUI.prototype.writeJavaScript;
 
-module.exports = JSSMS;
+window['JSSMS'] = JSSMS;

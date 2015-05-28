@@ -18,7 +18,7 @@
  */
 
 /* global n */
-/* exported Generator */
+/* exported CodeGenerator */
 
 'use strict';
 
@@ -29,7 +29,7 @@
  *
  * @constructor
  */
-var Generator = (function() {
+var CodeGenerator = (function() {
   var toHex = JSSMS.Utils.toHex;
 
   /**
@@ -76,11 +76,11 @@ var Generator = (function() {
     return JSSMS.Utils.traverse(ast, convertRegistersFunc);
   }
 
-  var Generator = function() {
+  var CodeGenerator = function() {
     this.ast = [];
   };
 
-  Generator.prototype = {
+  CodeGenerator.prototype = {
     /**
      * Process bytecodes.
      */
@@ -349,5 +349,5 @@ var Generator = (function() {
     }
   };
 
-  return Generator;
+  return CodeGenerator;
 })();
