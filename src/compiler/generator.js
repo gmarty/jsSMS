@@ -33,14 +33,6 @@ var CodeGenerator = (function() {
   var toHex = JSSMS.Utils.toHex;
 
   /**
-   * These properties shouldn't be prepended with `this`.
-   * @const
-   */
-  var whitelist = [
-    'page', 'temp', 'location', 'val', 'value', 'JSSMS.Utils.rndInt'
-  ];
-
-  /**
    * @param {Array.<number>} opcodes
    * @return {number}
    */
@@ -61,21 +53,6 @@ var CodeGenerator = (function() {
     }
   }
 
-  /**
-   * Replace `Register` type with `Identifier`.
-   */
-  function convertRegisters(ast) {
-    var convertRegistersFunc = function(node) {
-      if (node.type === 'Register') {
-        node.type = 'Identifier';
-      }
-
-      return node;
-    };
-
-    return JSSMS.Utils.traverse(ast, convertRegistersFunc);
-  }
-
   var CodeGenerator = function() {
     this.ast = [];
   };
@@ -88,6 +65,7 @@ var CodeGenerator = (function() {
       for (var page = 0; page < functions.length; page++) {
         functions[page] = functions[page]
           .map(function(fn) {
+              var name = fn[0].address;
               var body = [
                 {
                   'type': 'ExpressionStatement',
@@ -95,10 +73,10 @@ var CodeGenerator = (function() {
                     'type': 'Literal',
                     'value': 'use strict',
                     'raw': '"use strict"'
-                  }
+                  },
+                  '_address': name
                 }
               ];
-              var name = fn[0].address;
               var tstates = 0;
 
               fn = fn
@@ -296,52 +274,7 @@ var CodeGenerator = (function() {
                 body = body.concat(ast);
               });
 
-              // Apply modifications to the AST recursively.
-              body = convertRegisters(body);
-
-              // Append `this` to all identifiers.
-              body = JSSMS.Utils.traverse(body, function(obj) {
-                if (obj.type && obj.type === 'Identifier' && whitelist.indexOf(obj.name) === -1) {
-                  obj.name = 'this.' + obj.name;
-                }
-                return obj;
-              });
-
-              return {
-                'type': 'Program',
-                'body': [
-                  {
-                    'type': 'FunctionDeclaration',
-                    'id': {
-                      'type': 'Identifier',
-                      // Name of the function (i.e. starting index).
-                      'name': '_' + name
-                    },
-                    'params': [
-                      {
-                        'type': 'Identifier',
-                        'name': 'page'
-                      },
-                      {
-                        'type': 'Identifier',
-                        'name': 'temp'
-                      },
-                      {
-                        'type': 'Identifier',
-                        'name': 'location'
-                      }
-                    ],
-                    'defaults': [],
-                    'body': {
-                      'type': 'BlockStatement',
-                      'body': body
-                    },
-                    'rest': null,
-                    'generator': false,
-                    'expression': false
-                  }
-                ]
-              };
+              return body;
             });
       }
 

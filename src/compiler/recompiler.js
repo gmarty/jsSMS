@@ -73,14 +73,19 @@ var Recompiler = (function() {
       var fns = this
         .parse()
         .analyze()
-        .optimize()
-        .generate();
+        .generate()
+        .optimize();
 
       // Attach generated code to an attach point in Z80 instance.
       for (var page = 0; page < this.rom.length; page++) {
-        fns[page].forEach(function(fn) {
-          var funcName = fn.body[0].id.name;
-          self.cpu.branches[page][funcName] = new Function('return ' + self.generateCodeFromAst(fn))();
+        fns[page].forEach(function(body) {
+          var funcName = '_' + body[0]._address;
+
+          body = self.convertRegisters(body);
+          body = self.thisifyIdentifiers(body);
+
+          body = self.wrapFunction(funcName, body);
+          self.cpu.branches[page][funcName] = new Function('return ' + self.generateCodeFromAst(body))();
         });
       }
     },
@@ -105,17 +110,17 @@ var Recompiler = (function() {
     },
 
 
-    optimize: function() {
-      this.optimizer.optimize(this.analyzer.ast);
+    generate: function() {
+      this.generator.generate(this.analyzer.ast);
 
       return this;
     },
 
 
-    generate: function() {
-      this.generator.generate(this.optimizer.ast);
+    optimize: function() {
+      this.optimizer.optimize(this.generator.ast);
 
-      return this.generator.ast;
+      return this.optimizer.ast;
     },
 
 
@@ -125,12 +130,18 @@ var Recompiler = (function() {
       var fns = this
         .parseFromAddress(address, romPage, memPage)
         .analyzeFromAddress()
-        .optimize()
-        .generate();
+        .generate()
+        .optimize();
 
       // Attach generated code to an attach point in Z80 instance.
-      fns[0].forEach(function(fn) {
-        self.cpu.branches[romPage]['_' + (address % 0x4000)] = new Function('return ' + self.generateCodeFromAst(fn))();
+      fns[0].forEach(function(body) {
+        var funcName = '_' + (address % 0x4000);
+
+        body = self.convertRegisters(body);
+        body = self.thisifyIdentifiers(body);
+
+        body = self.wrapFunction(funcName, body);
+        self.cpu.branches[romPage][funcName] = new Function('return ' + self.generateCodeFromAst(body))();
       });
     },
 
@@ -172,6 +183,79 @@ var Recompiler = (function() {
           };
         }
       });
+    },
+
+
+    /**
+     * Append `this` to all identifiers.
+     */
+    thisifyIdentifiers: function(body) {
+      /**
+       * These properties shouldn't be prepended with `this`.
+       * @const
+       */
+      var whitelist = [
+        'page', 'temp', 'location', 'val', 'value', 'JSSMS.Utils.rndInt'
+      ];
+
+      return JSSMS.Utils.traverse(body, function(obj) {
+        if (obj.type && obj.type === 'Identifier' && whitelist.indexOf(obj.name) === -1) {
+          obj.name = 'this.' + obj.name;
+        }
+        return obj;
+      });
+    },
+
+    /**
+     * Replace `Register` type with `Identifier`.
+     */
+    convertRegisters: function(ast) {
+      return JSSMS.Utils.traverse(ast, function(ast) {
+        if (ast.type === 'Register') {
+          ast.type = 'Identifier';
+        }
+
+        return ast;
+      });
+    },
+
+
+    wrapFunction: function(funcName, body) {
+      return {
+        'type': 'Program',
+        'body': [
+          {
+            'type': 'FunctionDeclaration',
+            'id': {
+              'type': 'Identifier',
+              // Name of the function (i.e. starting index).
+              'name': funcName
+            },
+            'params': [
+              {
+                'type': 'Identifier',
+                'name': 'page'
+              },
+              {
+                'type': 'Identifier',
+                'name': 'temp'
+              },
+              {
+                'type': 'Identifier',
+                'name': 'location'
+              }
+            ],
+            'defaults': [],
+            'body': {
+              'type': 'BlockStatement',
+              'body': body
+            },
+            'rest': null,
+            'generator': false,
+            'expression': false
+          }
+        ]
+      };
     },
 
 

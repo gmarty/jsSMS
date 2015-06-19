@@ -18,6 +18,7 @@
  */
 
 /* global n */
+/* exported Optimizer */
 
 'use strict';
 
@@ -38,7 +39,7 @@ var Optimizer = (function() {
 
   Optimizer.prototype = {
     /**
-     * @param {Array.<Array.<Array.<Bytecode>>>} functions
+     * @param {Array.<Array.<Array.<Object>>>} functions
      */
     optimize: function(functions) {
       this.ast = functions;
@@ -59,6 +60,7 @@ var Optimizer = (function() {
       this.ast[page] = this.ast[page].map(this.evaluateBinaryExpressions);
       this.ast[page] = this.ast[page].map(this.inlineRegisters);
       this.ast[page] = this.ast[page].map(this.evaluateMemberExpressions.bind(this));
+      this.ast[page] = this.ast[page].map(this.trimAfterReturn.bind(this));
     },
 
 
@@ -75,18 +77,12 @@ var Optimizer = (function() {
      *
      * The only operators used in the generated code are `>>` and `&`.
      *
-     * @param {Array.<Bytecode>} fn
-     * @return {Array.<Bytecode>}
+     * @param {Array.<Object>} fn
+     * @return {Array.<Object>}
      */
     evaluateBinaryExpressions: function(fn) {
-      return fn.map(function(bytecodes) {
-        var ast = bytecodes.ast;
-
-        if (!ast) {
-          return bytecodes;
-        }
-
-        bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+      return fn.map(function(_ast) {
+        _ast = JSSMS.Utils.traverse(_ast, function(ast) {
           if (ast['type'] === 'BinaryExpression' &&
               ast['left']['type'] === 'Literal' &&
               ast['right']['type'] === 'Literal') {
@@ -115,7 +111,7 @@ var Optimizer = (function() {
           return ast;
         });
 
-        return bytecodes;
+        return _ast;
       });
     },
 
@@ -131,20 +127,14 @@ var Optimizer = (function() {
      * this.f = 0x44;
      * ```
      *
-     * @param {Array.<Bytecode>} fn
-     * @return {Array.<Bytecode>}
+     * @param {Array.<Object>} fn
+     * @return {Array.<Object>}
      */
     evaluateMemberExpressions: function(fn) {
       var self = this;
 
-      return fn.map(function(bytecodes) {
-        var ast = bytecodes.ast;
-
-        if (!ast) {
-          return bytecodes;
-        }
-
-        bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+      return fn.map(function(_ast) {
+        _ast = JSSMS.Utils.traverse(_ast, function(ast) {
           if (ast['type'] === 'MemberExpression' &&
               ast['object']['name'] === 'SZP_TABLE' &&
               ast['property']['type'] === 'Literal') {
@@ -162,7 +152,7 @@ var Optimizer = (function() {
           return ast;
         });
 
-        return bytecodes;
+        return _ast;
       });
     },
 
@@ -189,8 +179,8 @@ var Optimizer = (function() {
      *
      *  Anyway, it is just a dummy example to test the integration in the workflow.
      *
-     * @param {Array.<Bytecode>} fn
-     * @return {Array.<Bytecode>}
+     * @param {Array.<Object>} fn
+     * @return {Array.<Object>}
      */
     inlineRegisters: function(fn) {
       var definedReg = {
@@ -214,14 +204,8 @@ var Optimizer = (function() {
         l: {}
       };
 
-      return fn.map(function(bytecodes) {
-        var ast = bytecodes.ast;
-
-        if (!ast) {
-          return bytecodes;
-        }
-
-        bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+      return fn.map(function(_ast) {
+        _ast = JSSMS.Utils.traverse(_ast, function(ast) {
           // 1st, we tag defined registers.
           if (ast['type'] === 'AssignmentExpression' &&
               ast['operator'] === '=' &&
@@ -293,7 +277,7 @@ var Optimizer = (function() {
           return ast;
         });
 
-        return bytecodes;
+        return _ast;
       });
     },
 
@@ -313,20 +297,14 @@ var Optimizer = (function() {
      * Please note that this is Sega Master System & Game Gear specific. Don't use this pass if you
      * emulate another Z80 system.
      *
-     * @param {Array.<Bytecode>} fn
-     * @return {Array.<Bytecode>}
+     * @param {Array.<Object>} fn
+     * @return {Array.<Object>}
      */
     portPeephole: function(fn) {
       var self = this;
 
-      return fn.map(function(bytecodes) {
-        var ast = bytecodes.ast;
-
-        if (!ast) {
-          return bytecodes;
-        }
-
-        bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+      return fn.map(function(_ast) {
+        _ast = JSSMS.Utils.traverse(_ast, function(ast) {
           if (ast['type'] === 'CallExpression') {
             if (ast['callee']['name'] === 'port.out') {
               var port = ast['arguments'][0]['value'];
@@ -467,8 +445,44 @@ var Optimizer = (function() {
           return ast;
         });
 
-        return bytecodes;
+        return _ast;
       });
+    },
+
+
+    /**
+     * A pass to remove all instructions from a function body located
+     * after a return statement:
+     * ```
+     * this.pc = 1382;
+     * return;
+     * this.pc = 134 + page * 16384;
+     * ```
+     *
+     * Becomes:
+     * ```
+     * this.pc = 1382;
+     * return;
+     * ```
+     *
+     * @param {Array.<Object>} fn
+     * @return {Array.<Object>}
+     */
+    trimAfterReturn: function(fn) {
+      var returnStatementIndex = null;
+
+      fn.some(function(ast, index) {
+        if (ast['type'] === 'ReturnStatement') {
+          returnStatementIndex = index;
+          return true;
+        }
+      });
+
+      if (returnStatementIndex) {
+        fn = fn.slice(0, returnStatementIndex);
+      }
+
+      return fn;
     }
   };
 
