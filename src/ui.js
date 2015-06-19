@@ -114,12 +114,12 @@ if (window['$']) {
 
       // Gamepad
       this.gamepad = {
-        up: KEY_UP,
-        down: KEY_DOWN,
-        left: KEY_LEFT,
-        right: KEY_RIGHT,
-        fire1: KEY_FIRE1,
-        fire2: KEY_FIRE2
+        up: P1_KEY_UP,
+        down: P1_KEY_DOWN,
+        left: P1_KEY_LEFT,
+        right: P1_KEY_RIGHT,
+        fire1: P1_KEY_FIRE1,
+        fire2: P1_KEY_FIRE2
       };
       var startButton = $('.start', gamepadContainer);
 

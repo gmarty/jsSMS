@@ -21,13 +21,22 @@
 
 'use strict';
 
-/** @const */ var KEY_UP = 0x01;
-/** @const */ var KEY_DOWN = 0x02;
-/** @const */ var KEY_LEFT = 0x04;
-/** @const */ var KEY_RIGHT = 0x08;
-/** @const */ var KEY_FIRE1 = 0x10;
-/** @const */ var KEY_FIRE2 = 0x20;
+/** @const */ var P1_KEY_UP = 0x01;
+/** @const */ var P1_KEY_DOWN = 0x02;
+/** @const */ var P1_KEY_LEFT = 0x04;
+/** @const */ var P1_KEY_RIGHT = 0x08;
+/** @const */ var P1_KEY_FIRE1 = 0x10;
+/** @const */ var P1_KEY_FIRE2 = 0x20;
+
+/** @const */ var P2_KEY_UP = 0x40;
+/** @const */ var P2_KEY_DOWN = 0x80;
+/** @const */ var P2_KEY_LEFT = 0x01;
+/** @const */ var P2_KEY_RIGHT = 0x02;
+/** @const */ var P2_KEY_FIRE1 = 0x04;
+/** @const */ var P2_KEY_FIRE2 = 0x08;
+
 /** @const */ var KEY_START = 0x40;
+/** @const */ var GG_KEY_START = 0x80;
 
 
 
@@ -97,29 +106,28 @@ JSSMS.Keyboard.prototype = {
    */
   keydown: function(evt) {
     switch (evt.keyCode) {
-      case 38: this.controller1 &= ~KEY_UP; break;     // Up
-      case 40: this.controller1 &= ~KEY_DOWN; break;   // Down
-      case 37: this.controller1 &= ~KEY_LEFT; break;   // Left
-      case 39: this.controller1 &= ~KEY_RIGHT; break;  // Right
-      case 88: this.controller1 &= ~KEY_FIRE1; break;  // X
-      case 90: this.controller1 &= ~KEY_FIRE2; break;  // Z
+      case 38: this.controller1 &= ~P1_KEY_UP; break;     // Up
+      case 40: this.controller1 &= ~P1_KEY_DOWN; break;   // Down
+      case 37: this.controller1 &= ~P1_KEY_LEFT; break;   // Left
+      case 39: this.controller1 &= ~P1_KEY_RIGHT; break;  // Right
+      case 88: this.controller1 &= ~P1_KEY_FIRE1; break;  // X
+      case 90: this.controller1 &= ~P1_KEY_FIRE2; break;  // Z
       case 13:
-        //this.controller1 &= ~KEY_START;
+        //this.controller1 &= ~P1_KEY_START;
         if (this.main.is_sms) {
           //this.controller2 &= ~0x10; // Reset
           this.main.pause_button = true; // Pause
         } else {
-          this.ggstart &= ~0x80;   // Start
+          this.ggstart &= ~GG_KEY_START;   // Start
         }
         break;  // Enter
 
-      case 104: this.controller2 &= ~KEY_UP; break;    // Num-8
-      case 98: this.controller2 &= ~KEY_DOWN; break;   // Num-2
-      case 100: this.controller2 &= ~KEY_LEFT; break;  // Num-4
-      case 102: this.controller2 &= ~KEY_RIGHT; break; // Num-6
-      case 103: this.controller2 &= ~KEY_FIRE1; break; // Num-7
-      case 105: this.controller2 &= ~KEY_FIRE2; break; // Num-9
-      case 97: this.controller2 &= ~KEY_START; break;  // Num-1
+      case 104: this.controller2 &= ~P2_KEY_UP; break;    // Num-8
+      case 98: this.controller2 &= ~P2_KEY_DOWN; break;   // Num-2
+      case 100: this.controller2 &= ~P2_KEY_LEFT; break;  // Num-4
+      case 102: this.controller2 &= ~P2_KEY_RIGHT; break; // Num-6
+      case 103: this.controller2 &= ~P2_KEY_FIRE1; break; // Num-7
+      case 105: this.controller2 &= ~P2_KEY_FIRE2; break; // Num-9
       default: return; //browser should handle key event
     }
 
@@ -132,28 +140,27 @@ JSSMS.Keyboard.prototype = {
    */
   keyup: function(evt) {
     switch (evt.keyCode) {
-      case 38: this.controller1 |= KEY_UP; break;     // Up
-      case 40: this.controller1 |= KEY_DOWN; break;   // Down
-      case 37: this.controller1 |= KEY_LEFT; break;   // Left
-      case 39: this.controller1 |= KEY_RIGHT; break;  // Right
-      case 88: this.controller1 |= KEY_FIRE1; break;  // X
-      case 90: this.controller1 |= KEY_FIRE2; break;  // Z
+      case 38: this.controller1 |= P1_KEY_UP; break;     // Up
+      case 40: this.controller1 |= P1_KEY_DOWN; break;   // Down
+      case 37: this.controller1 |= P1_KEY_LEFT; break;   // Left
+      case 39: this.controller1 |= P1_KEY_RIGHT; break;  // Right
+      case 88: this.controller1 |= P1_KEY_FIRE1; break;  // X
+      case 90: this.controller1 |= P1_KEY_FIRE2; break;  // Z
       case 13:
-        //this.controller1 |= KEY_START;
+        //this.controller1 |= P1_KEY_START;
         if (!this.main.is_sms) {
           //  controller2 |= 0x10;    // Reset/Start
           //else
-          this.ggstart |= 0x80;    // Start
+          this.ggstart |= GG_KEY_START;    // Start
         }
         break;  // Enter
 
-      case 104: this.controller2 |= KEY_UP; break;    // Num-8
-      case 98: this.controller2 |= KEY_DOWN; break;   // Num-2
-      case 100: this.controller2 |= KEY_LEFT; break;  // Num-4
-      case 102: this.controller2 |= KEY_RIGHT; break; // Num-6
-      case 103: this.controller2 |= KEY_FIRE1; break; // Num-7
-      case 105: this.controller2 |= KEY_FIRE2; break; // Num-9
-      case 97: this.controller2 |= KEY_START; break;  // Num-1
+      case 104: this.controller2 |= P2_KEY_UP; break;    // Num-8
+      case 98: this.controller2 |= P2_KEY_DOWN; break;   // Num-2
+      case 100: this.controller2 |= P2_KEY_LEFT; break;  // Num-4
+      case 102: this.controller2 |= P2_KEY_RIGHT; break; // Num-6
+      case 103: this.controller2 |= P2_KEY_FIRE1; break; // Num-7
+      case 105: this.controller2 |= P2_KEY_FIRE2; break; // Num-9
       default: return; //browser should handle key event
     }
 
