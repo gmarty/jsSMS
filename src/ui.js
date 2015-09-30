@@ -95,7 +95,8 @@ if (window['$']) {
       }
 
       // Screen
-      this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + ' moz-opaque></canvas>');
+      this.screenContainer = screenContainer;
+      this.screen = $('<canvas></canvas>');
       this.canvasContext = this.screen[0].getContext('2d', {
         'alpha': false // See http://wiki.whatwg.org/wiki/CanvasOpaque
       });
@@ -127,94 +128,95 @@ if (window['$']) {
       this.romContainer = $('<div id="romSelector"></div>');
       this.romSelect = $('<select></select>')
         .change(function() {
-            self.loadROM();
-          });
+        self.loadROM();
+      });
 
       // Buttons
       this.buttons = Object.create(null);
 
       this.buttons.start = $('<input type="button" value="Start" class="btn btn-primary" disabled="disabled">')
         .click(function() {
-            if (!self.main.isRunning) {
-              self.main.start();
-              self.buttons.start.attr('value', 'Pause');
-            } else {
-              self.main.stop();
-              self.updateStatus('Paused');
-              self.buttons.start.attr('value', 'Start');
-            }
-          });
+        if (!self.main.isRunning) {
+          self.main.start();
+          self.buttons.start.attr('value', 'Pause');
+        } else {
+          self.main.stop();
+          self.updateStatus('Paused');
+          self.buttons.start.attr('value', 'Start');
+        }
+      });
 
       this.buttons.reset = $('<input type="button" value="Reset" class="btn" disabled="disabled">')
         .click(function() {
-            if (!self.main.reloadRom()) {
-              $(this).attr('disabled', 'disabled');
-              return;
-            }
-            self.main.reset();
-            self.main.vdp.forceFullRedraw();
-            self.main.start();
-          });
+        if (!self.main.reloadRom()) {
+          $(this).attr('disabled', 'disabled');
+          return;
+        }
+        self.main.reset();
+        self.main.vdp.forceFullRedraw();
+        self.main.start();
+      });
 
       if (ENABLE_DEBUGGER) {
         this.dissambler = $('<div id="dissambler"></div>');
         $(parent).after(this.dissambler);
         this.buttons.nextStep = $('<input type="button" value="Next step" class="btn" disabled="disabled">')
           .click(function() {
-              self.main.nextStep();
-            });
+          self.main.nextStep();
+        });
       }
 
       if (this.main.soundEnabled) {
         this.buttons.sound = $('<input type="button" value="Enable sound" class="btn" disabled="disabled">')
           .click(function() {
-              if (self.main.soundEnabled) {
-                self.main.soundEnabled = false;
-                self.buttons.sound.attr('value', 'Enable sound');
-              } else {
-                self.main.soundEnabled = true;
-                self.buttons.sound.attr('value', 'Disable sound');
-              }
-            });
+          if (self.main.soundEnabled) {
+            self.main.soundEnabled = false;
+            self.buttons.sound.attr('value', 'Enable sound');
+          } else {
+            self.main.soundEnabled = true;
+            self.buttons.sound.attr('value', 'Disable sound');
+          }
+        });
       }
 
       if (fullscreenSupport) {
         // @todo Add an exit fullScreen button.
         this.buttons.fullscreen = $('<input type="button" value="Go fullscreen" class="btn">')
           .click(function() {
-              var screen = /** @type {HTMLDivElement} */ (screenContainer[0]);
+          var screen = /** @type {HTMLDivElement} */ (screenContainer[0]);
+          screenContainer.removeAttr('style');
 
-              if (screen.requestFullscreen) {
-                screen.requestFullscreen();
-              } else if (screen.mozRequestFullScreen) {
-                screen.mozRequestFullScreen();
-              } else {
-                screen.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-              }
-            });
-      } else {
-        this.zoomed = false;
-
-        this.buttons.zoom = $('<input type="button" value="Zoom in" class="btn hidden-phone">')
-          .click(function() {
-              if (self.zoomed) {
-                self.screen.animate({
-                  width: SMS_WIDTH + 'px',
-                  height: SMS_HEIGHT + 'px'
-                }, function() {
-                  $(this).removeAttr('style');
-                });
-                self.buttons.zoom.attr('value', 'Zoom in');
-              } else {
-                self.screen.animate({
-                  width: (SMS_WIDTH * 2) + 'px',
-                  height: (SMS_HEIGHT * 2) + 'px'
-                });
-                self.buttons.zoom.attr('value', 'Zoom out');
-              }
-              self.zoomed = !self.zoomed;
-            });
+          if (screen.requestFullscreen) {
+            screen.requestFullscreen();
+          } else if (screen.mozRequestFullScreen) {
+            screen.mozRequestFullScreen();
+          } else {
+            screen.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+          }
+        });
       }
+
+      this.zoomed = false;
+
+      this.buttons.zoom = $('<input type="button" value="Zoom in" class="btn hidden-phone">')
+        .click(function() {
+        if (self.zoomed) {
+          self.screenContainer.animate({
+            width: SMS_WIDTH + 'px',
+            height: SMS_HEIGHT + 'px'
+          }, function() {
+            $(this).removeAttr('style');
+          });
+          self.buttons.zoom.attr('value', 'Zoom in');
+        } else {
+          self.screenContainer.animate({
+            width: (SMS_WIDTH * 2) + 'px',
+            height: (SMS_HEIGHT * 2) + 'px'
+          });
+          self.buttons.zoom.attr('value', 'Zoom out');
+        }
+        self.zoomed = !self.zoomed;
+      });
 
       // Software buttons - touch
       gamepadContainer.on('touchstart touchmove', function(evt) {
@@ -264,30 +266,30 @@ if (window['$']) {
 
       startButton
         .on('mousedown touchstart', function(evt) {
-            if (self.main.is_sms) {
-              self.main.pause_button = true;       // Pause
-            } else {
-              self.main.keyboard.ggstart &= ~0x80; // Start
-            }
-            evt.preventDefault();
-          })
+        if (self.main.is_sms) {
+          self.main.pause_button = true;       // Pause
+        } else {
+          self.main.keyboard.ggstart &= ~0x80; // Start
+        }
+        evt.preventDefault();
+      })
         .on('mouseup touchend', function(evt) {
-            if (!self.main.is_sms) {
-              self.main.keyboard.ggstart |= 0x80;  // Start
-            }
-            evt.preventDefault();
-          });
+        if (!self.main.is_sms) {
+          self.main.keyboard.ggstart |= 0x80;  // Start
+        }
+        evt.preventDefault();
+      });
 
       // Keyboard
       $(document)
         .bind('keydown', function(evt) {
-          self.main.keyboard.keydown(evt);
-          //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
-        })
+        self.main.keyboard.keydown(evt);
+        //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
+      })
         .bind('keyup', function(evt) {
-          self.main.keyboard.keyup(evt);
-          //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
-        });
+        self.main.keyboard.keyup(evt);
+        //console.log(self.main.keyboard.controller1, self.main.keyboard.ggstart);
+      });
 
       // Append buttons to controls div.
       for (i in this.buttons) {
@@ -297,8 +299,9 @@ if (window['$']) {
       this.log = $('<div id="status"></div>');
 
       this.screen.appendTo(screenContainer);
-      gamepadContainer.appendTo(screenContainer);
+
       screenContainer.appendTo(root);
+      gamepadContainer.appendTo(root);
       this.romContainer.appendTo(root);
       controls.appendTo(root);
       this.log.appendTo(root);
@@ -461,7 +464,6 @@ if (window['$']) {
             if (document[hiddenPrefix]) {
               return;
             }
-
             this.canvasContext.putImageData(this.canvasImageData, 0, 0);
           };
         } else {
@@ -487,8 +489,8 @@ if (window['$']) {
         for (; num < 16 && i <= length; i++) {
           if (instructions[i]) {
             html += '<div' + (instructions[i].address === currentAddress ? ' class="current"' : '') + '>' + instructions[i].hexAddress +
-                (instructions[i].isJumpTarget ? ':' : ' ') +
-                '<code>' + instructions[i].inst + '</code></div>';
+              (instructions[i].isJumpTarget ? ':' : ' ') +
+              '<code>' + instructions[i].inst + '</code></div>';
 
             num++;
           }

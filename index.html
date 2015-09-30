@@ -37,9 +37,11 @@ a, input, button {
   height: 192px;
   width: 256px;
   margin: auto;
-  border: 1px solid #000;
 }
 #screen canvas {
+  height: 100%;
+  width: 100%;
+  border: 1px solid #000;
   background: #000;
   margin: auto;
   display: block;
@@ -54,6 +56,8 @@ a, input, button {
 }
 .gamepad {
   height: 80px;
+  width: 260px;
+  margin: auto;
   position: relative;
 }
 div .direction > div,
@@ -108,18 +112,6 @@ footer {
 @media (max-width: 768px) {
   .container {
     margin-top: 0;
-  }
-}
-@media (orientation: portrait) {
-  #screen canvas {
-    height: auto;
-    width: 100%;
-  }
-}
-@media (orientation: landscape) {
-  #screen canvas {
-    height: 100%;
-    width: auto;
   }
 }
 /* Debugger */
@@ -191,12 +183,12 @@ code {
             <td>Num-2</td>
           </tr>
           <tr>
-            <th>Fire 1</th>
+            <th>Button 1</th>
             <td>X</td>
             <td>Num-7</td>
           </tr>
           <tr>
-            <th>Fire 2</th>
+            <th>Button 2</th>
             <td>Z</td>
             <td>Num-9</td>
           </tr>
