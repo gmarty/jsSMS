@@ -179,25 +179,7 @@ if (window['$']) {
         });
       }
 
-      if (fullscreenSupport) {
-        // @todo Add an exit fullScreen button.
-        this.buttons.fullscreen = $('<input type="button" value="Go fullscreen" class="btn">')
-          .click(function() {
-          var screen = /** @type {HTMLDivElement} */ (screenContainer[0]);
-          screenContainer.removeAttr('style');
-
-          if (screen.requestFullscreen) {
-            screen.requestFullscreen();
-          } else if (screen.mozRequestFullScreen) {
-            screen.mozRequestFullScreen();
-          } else {
-            screen.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-          }
-        });
-      }
-
       this.zoomed = false;
-
       this.buttons.zoom = $('<input type="button" value="Zoom in" class="btn hidden-phone">')
         .click(function() {
         if (self.zoomed) {
@@ -217,6 +199,25 @@ if (window['$']) {
         }
         self.zoomed = !self.zoomed;
       });
+
+      if (fullscreenSupport) {
+        // @todo Add an exit fullScreen button.
+        this.buttons.fullscreen = $('<input type="button" value="Go fullscreen" class="btn">')
+          .click(function() {
+          var screen = /** @type {HTMLDivElement} */ (screenContainer[0]);
+          screenContainer.removeAttr('style');
+          self.zoomed = false;
+          self.buttons.zoom.attr('value', 'Zoom in');
+
+          if (screen.requestFullscreen) {
+            screen.requestFullscreen();
+          } else if (screen.mozRequestFullScreen) {
+            screen.mozRequestFullScreen();
+          } else {
+            screen.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+          }
+        });
+      }
 
       // Software buttons - touch
       gamepadContainer.on('touchstart touchmove', function(evt) {
