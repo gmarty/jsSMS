@@ -84,12 +84,12 @@ if (window['$']) {
 
       // Gamepad
       this.gamepad = {
-        up: KEY_UP,
-        right: KEY_RIGHT,
-        down: KEY_DOWN,
-        left: KEY_LEFT,
-        fire1: KEY_FIRE1,
-        fire2: KEY_FIRE2
+        up: P1_KEY_UP,
+        right: P1_KEY_RIGHT,
+        down: P1_KEY_DOWN,
+        left: P1_KEY_LEFT,
+        fire1: P1_KEY_FIRE1,
+        fire2: P1_KEY_FIRE2
       };
       var startButton = $('.start', gamepadContainer);
 
@@ -135,8 +135,8 @@ if (window['$']) {
       // ROM selector
       this.romSelect = $('#romSelector')
         .change(function() {
-            self.loadROM();
-          });
+          self.loadROM();
+        });
 
       // Buttons
       /*this.buttons.start = $('<button class="btn btn-primary" disabled="disabled">Start</button>')
@@ -178,38 +178,47 @@ if (window['$']) {
       // @todo Add an exit fullScreen button.
       $('#fullscreen')
         .click(function() {
-            var screen = /** @type {HTMLDivElement} */ (screenContainer[0]);
+          var screen = /** @type {HTMLDivElement} */ (screenContainer[0]);
 
-            if (screen.requestFullscreen) {
-              screen.requestFullscreen();
-            } else {
-              screen.mozRequestFullScreen();
-            }
-          });
+          if (screen.requestFullscreen) {
+            screen.requestFullscreen();
+          } else {
+            screen.mozRequestFullScreen();
+          }
+        });
 
       // Software buttons - touch
       gamepadContainer.on('touchstart touchmove', function(evt) {
+        evt.preventDefault();
+
         self.main.keyboard.controller1 = 0xFF;
 
-        var changedTouches = evt.originalEvent.changedTouches;
+        var touches = evt.originalEvent.touches;
 
-        for (var i = 0; i < changedTouches.length; i++) {
-          var target = document.elementFromPoint(changedTouches[i].clientX, changedTouches[i].clientY);
+        for (var i = 0; i < touches.length; i++) {
+          var target = document.elementFromPoint(touches[i].clientX, touches[i].clientY);
+
+          if (!target) {
+            continue;
+          }
+
           var className = target.className;
 
-          if (className === 'gamepad' || !className) {
+          if (!className || !self.gamepad[className]) {
             continue;
           }
 
           var key = self.gamepad[className];
           self.main.keyboard.controller1 &= ~key;
         }
-
-        evt.preventDefault();
       });
 
       gamepadContainer.on('touchend', function(evt) {
-        self.main.keyboard.controller1 = 0xFF;
+        evt.preventDefault();
+
+        if (evt.originalEvent.touches.length === 0) {
+          self.main.keyboard.controller1 = 0xFF;
+        }
       });
 
       // Software buttons - click
@@ -235,19 +244,19 @@ if (window['$']) {
 
       startButton
         .on('mousedown touchstart', function(evt) {
-            if (self.main.is_sms) {
-              self.main.pause_button = true;       // Pause
-            } else {
-              self.main.keyboard.ggstart &= ~0x80; // Start
-            }
-            evt.preventDefault();
-          })
+          if (self.main.is_sms) {
+            self.main.pause_button = true;       // Pause
+          } else {
+            self.main.keyboard.ggstart &= ~0x80; // Start
+          }
+          evt.preventDefault();
+        })
         .on('mouseup touchend', function(evt) {
-            if (!self.main.is_sms) {
-              self.main.keyboard.ggstart |= 0x80;  // Start
-            }
-            evt.preventDefault();
-          });
+          if (!self.main.is_sms) {
+            self.main.keyboard.ggstart |= 0x80;  // Start
+          }
+          evt.preventDefault();
+        });
 
       // Keyboard
       $(document)
@@ -434,8 +443,8 @@ if (window['$']) {
         for (; num < 16 && i <= length; i++) {
           if (instructions[i]) {
             html += '<div' + (instructions[i].address === currentAddress ? ' class="current"' : '') + '>' + instructions[i].hexAddress +
-                (instructions[i].isJumpTarget ? ':' : ' ') +
-                '<code>' + instructions[i].inst + '</code></div>';
+              (instructions[i].isJumpTarget ? ':' : ' ') +
+              '<code>' + instructions[i].inst + '</code></div>';
 
             num++;
           }

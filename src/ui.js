@@ -127,103 +127,110 @@ if (window['$']) {
       this.romContainer = $('<div id="romSelector"></div>');
       this.romSelect = $('<select></select>')
         .change(function() {
-            self.loadROM();
-          });
+          self.loadROM();
+        });
 
       // Buttons
       this.buttons = Object.create(null);
 
       this.buttons.start = $('<input type="button" value="Start" class="btn btn-primary" disabled="disabled">')
         .click(function() {
-            if (!self.main.isRunning) {
-              self.main.start();
-              self.buttons.start.attr('value', 'Pause');
-            } else {
-              self.main.stop();
-              self.updateStatus('Paused');
-              self.buttons.start.attr('value', 'Start');
-            }
-          });
+          if (!self.main.isRunning) {
+            self.main.start();
+            self.buttons.start.attr('value', 'Pause');
+          } else {
+            self.main.stop();
+            self.updateStatus('Paused');
+            self.buttons.start.attr('value', 'Start');
+          }
+        });
 
       this.buttons.reset = $('<input type="button" value="Reset" class="btn" disabled="disabled">')
         .click(function() {
-            if (!self.main.reloadRom()) {
-              $(this).attr('disabled', 'disabled');
-              return;
-            }
-            self.main.reset();
-            self.main.vdp.forceFullRedraw();
-            self.main.start();
-          });
+          if (!self.main.reloadRom()) {
+            $(this).attr('disabled', 'disabled');
+            return;
+          }
+          self.main.reset();
+          self.main.vdp.forceFullRedraw();
+          self.main.start();
+        });
 
       if (ENABLE_DEBUGGER) {
         this.dissambler = $('<div id="dissambler"></div>');
         $(parent).after(this.dissambler);
         this.buttons.nextStep = $('<input type="button" value="Next step" class="btn" disabled="disabled">')
           .click(function() {
-              self.main.nextStep();
-            });
+            self.main.nextStep();
+          });
       }
 
       if (this.main.soundEnabled) {
         this.buttons.sound = $('<input type="button" value="Enable sound" class="btn" disabled="disabled">')
           .click(function() {
-              if (self.main.soundEnabled) {
-                self.main.soundEnabled = false;
-                self.buttons.sound.attr('value', 'Enable sound');
-              } else {
-                self.main.soundEnabled = true;
-                self.buttons.sound.attr('value', 'Disable sound');
-              }
-            });
+            if (self.main.soundEnabled) {
+              self.main.soundEnabled = false;
+              self.buttons.sound.attr('value', 'Enable sound');
+            } else {
+              self.main.soundEnabled = true;
+              self.buttons.sound.attr('value', 'Disable sound');
+            }
+          });
       }
 
       if (fullscreenSupport) {
         // @todo Add an exit fullScreen button.
         this.buttons.fullscreen = $('<input type="button" value="Go fullscreen" class="btn">')
           .click(function() {
-              var screen = /** @type {HTMLDivElement} */ (screenContainer[0]);
+            var screen = /** @type {HTMLDivElement} */ (screenContainer[0]);
 
-              if (screen.requestFullscreen) {
-                screen.requestFullscreen();
-              } else if (screen.mozRequestFullScreen) {
-                screen.mozRequestFullScreen();
-              } else {
-                screen.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-              }
-            });
+            if (screen.requestFullscreen) {
+              screen.requestFullscreen();
+            } else if (screen.mozRequestFullScreen) {
+              screen.mozRequestFullScreen();
+            } else {
+              screen.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+            }
+          });
       } else {
         this.zoomed = false;
 
         this.buttons.zoom = $('<input type="button" value="Zoom in" class="btn hidden-phone">')
           .click(function() {
-              if (self.zoomed) {
-                self.screen.animate({
-                  width: SMS_WIDTH + 'px',
-                  height: SMS_HEIGHT + 'px'
-                }, function() {
-                  $(this).removeAttr('style');
-                });
-                self.buttons.zoom.attr('value', 'Zoom in');
-              } else {
-                self.screen.animate({
-                  width: (SMS_WIDTH * 2) + 'px',
-                  height: (SMS_HEIGHT * 2) + 'px'
-                });
-                self.buttons.zoom.attr('value', 'Zoom out');
-              }
-              self.zoomed = !self.zoomed;
-            });
+            if (self.zoomed) {
+              self.screen.animate({
+                width: SMS_WIDTH + 'px',
+                height: SMS_HEIGHT + 'px'
+              }, function() {
+                $(this).removeAttr('style');
+              });
+              self.buttons.zoom.attr('value', 'Zoom in');
+            } else {
+              self.screen.animate({
+                width: (SMS_WIDTH * 2) + 'px',
+                height: (SMS_HEIGHT * 2) + 'px'
+              });
+              self.buttons.zoom.attr('value', 'Zoom out');
+            }
+            self.zoomed = !self.zoomed;
+          });
       }
 
       // Software buttons - touch
       gamepadContainer.on('touchstart touchmove', function(evt) {
+        evt.preventDefault();
+
         self.main.keyboard.controller1 = 0xFF;
 
-        var changedTouches = evt.originalEvent.changedTouches;
+        var touches = evt.originalEvent.touches;
 
-        for (var i = 0; i < changedTouches.length; i++) {
-          var target = document.elementFromPoint(changedTouches[i].clientX, changedTouches[i].clientY);
+        for (var i = 0; i < touches.length; i++) {
+          var target = document.elementFromPoint(touches[i].clientX, touches[i].clientY);
+
+          if (!target) {
+            continue;
+          }
+
           var className = target.className;
 
           if (!className || !self.gamepad[className]) {
@@ -233,12 +240,14 @@ if (window['$']) {
           var key = self.gamepad[className];
           self.main.keyboard.controller1 &= ~key;
         }
-
-        evt.preventDefault();
       });
 
       gamepadContainer.on('touchend', function(evt) {
-        self.main.keyboard.controller1 = 0xFF;
+        evt.preventDefault();
+
+        if (evt.originalEvent.touches.length === 0) {
+          self.main.keyboard.controller1 = 0xFF;
+        }
       });
 
       // Software buttons - click
@@ -264,19 +273,19 @@ if (window['$']) {
 
       startButton
         .on('mousedown touchstart', function(evt) {
-            if (self.main.is_sms) {
-              self.main.pause_button = true;       // Pause
-            } else {
-              self.main.keyboard.ggstart &= ~0x80; // Start
-            }
-            evt.preventDefault();
-          })
+          if (self.main.is_sms) {
+            self.main.pause_button = true;       // Pause
+          } else {
+            self.main.keyboard.ggstart &= ~0x80; // Start
+          }
+          evt.preventDefault();
+        })
         .on('mouseup touchend', function(evt) {
-            if (!self.main.is_sms) {
-              self.main.keyboard.ggstart |= 0x80;  // Start
-            }
-            evt.preventDefault();
-          });
+          if (!self.main.is_sms) {
+            self.main.keyboard.ggstart |= 0x80;  // Start
+          }
+          evt.preventDefault();
+        });
 
       // Keyboard
       $(document)
@@ -487,8 +496,8 @@ if (window['$']) {
         for (; num < 16 && i <= length; i++) {
           if (instructions[i]) {
             html += '<div' + (instructions[i].address === currentAddress ? ' class="current"' : '') + '>' + instructions[i].hexAddress +
-                (instructions[i].isJumpTarget ? ':' : ' ') +
-                '<code>' + instructions[i].inst + '</code></div>';
+              (instructions[i].isJumpTarget ? ':' : ' ') +
+              '<code>' + instructions[i].inst + '</code></div>';
 
             num++;
           }
