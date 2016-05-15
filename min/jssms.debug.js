@@ -77,7 +77,7 @@ JSSMS.prototype = {isRunning:!1, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0
   this.emuWidth = GG_WIDTH;
   this.emuHeight = GG_HEIGHT;
 }, setVideoTiming:function $JSSMS$$setVideoTiming$($i$$4_mode$$) {
-  var $clockSpeedHz_v$$ = 0;
+  var $clockSpeedHz_v$$;
   $i$$4_mode$$ === NTSC || this.is_gg ? (this.fps = 60, this.no_of_scanlines = SMS_Y_PIXELS_NTSC, $clockSpeedHz_v$$ = CLOCK_NTSC) : (this.fps = 50, this.no_of_scanlines = SMS_Y_PIXELS_PAL, $clockSpeedHz_v$$ = CLOCK_PAL);
   this.cyclesPerLine = Math.round($clockSpeedHz_v$$ / this.fps / this.no_of_scanlines + 1);
   this.vdp.videoMode = $i$$4_mode$$;
@@ -118,16 +118,16 @@ JSSMS.prototype = {isRunning:!1, cyclesPerLine:0, no_of_scanlines:0, frameSkip:0
   this.romData = $data$$;
   this.romFileName = $fileName$$;
   return !0;
-}, loadROM:function $JSSMS$$loadROM$($data$$, $size$$) {
-  var $i$$, $j$$, $number_of_pages$$ = Math.ceil($size$$ / PAGE_SIZE), $pages$$ = Array($number_of_pages$$);
-  for ($i$$ = 0;$i$$ < $number_of_pages$$;$i$$++) {
-    if ($pages$$[$i$$] = JSSMS.Utils.Array(PAGE_SIZE), SUPPORT_DATAVIEW) {
+}, loadROM:function $JSSMS$$loadROM$($data$$, $i$$5_size$$) {
+  var $j$$, $number_of_pages$$ = Math.ceil($i$$5_size$$ / PAGE_SIZE), $pages$$ = Array($number_of_pages$$);
+  for ($i$$5_size$$ = 0;$i$$5_size$$ < $number_of_pages$$;$i$$5_size$$++) {
+    if ($pages$$[$i$$5_size$$] = JSSMS.Utils.Array(PAGE_SIZE), SUPPORT_DATAVIEW) {
       for ($j$$ = 0;$j$$ < PAGE_SIZE;$j$$++) {
-        $pages$$[$i$$].setUint8($j$$, $data$$.charCodeAt($i$$ * PAGE_SIZE + $j$$));
+        $pages$$[$i$$5_size$$].setUint8($j$$, $data$$.charCodeAt($i$$5_size$$ * PAGE_SIZE + $j$$));
       }
     } else {
       for ($j$$ = 0;$j$$ < PAGE_SIZE;$j$$++) {
-        $pages$$[$i$$][$j$$] = $data$$.charCodeAt($i$$ * PAGE_SIZE + $j$$) & 255;
+        $pages$$[$i$$5_size$$][$j$$] = $data$$.charCodeAt($i$$5_size$$ * PAGE_SIZE + $j$$) & 255;
       }
     }
   }
@@ -214,8 +214,9 @@ JSSMS.Utils = {rndInt:function $JSSMS$Utils$rndInt$($range$$) {
   return $fileName$$.join(".").split("/").pop();
 }, crc32:function $JSSMS$Utils$crc32$($str$$0$$) {
   var $crcTable$$ = function makeCRCTable() {
-    for (var $c$$ = 0, $crcTable$$ = new Uint32Array(256), $n$$ = 0;256 > $n$$;$n$$++) {
-      for (var $c$$ = $n$$, $k$$ = 0;8 > $k$$;$k$$++) {
+    for (var $c$$, $crcTable$$ = new Uint32Array(256), $n$$ = 0;256 > $n$$;$n$$++) {
+      $c$$ = $n$$;
+      for (var $k$$ = 0;8 > $k$$;$k$$++) {
         $c$$ = $c$$ & 1 ? 3988292384 ^ $c$$ >>> 1 : $c$$ >>> 1;
       }
       $crcTable$$[$n$$] = $c$$;
@@ -407,7 +408,7 @@ JSSMS.Z80 = function $JSSMS$Z80$($sms$$) {
     }
   }
   ENABLE_COMPILER && (this.recompiler = new Recompiler(this));
-  ENABLE_SERVER_LOGGER && (this.syncServer = SYNC_MODE === WRITE_MODE ? new SyncWriter : new SyncReader, this.syncServer.tick(), this.sync = function $this$sync$() {
+  ENABLE_SERVER_LOGGER && (this.syncServer = READ_MODE === WRITE_MODE ? new SyncWriter : new SyncReader, this.syncServer.tick(), this.sync = function $this$sync$() {
     this.syncServer.sync16(this.pc, "pc");
   });
 };
@@ -456,7 +457,8 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   this.main.pause_button && (this.nmi(), this.main.pause_button = !1);
   this.main.doRepaint();
 }, branches:[Object.create(null), Object.create(null), Object.create(null)], interpret:function $JSSMS$Z80$$interpret$() {
-  var $opcode_temp$$ = 0, $opcode_temp$$ = this.getUint8(this.pc++);
+  var $opcode_temp$$;
+  $opcode_temp$$ = this.getUint8(this.pc++);
   ACCURATE_INTERRUPT_EMULATION && (this.EI_inst = !1);
   this.tstates -= OP_STATES[$opcode_temp$$];
   REFRESH_EMULATION && this.incR();
@@ -2095,11 +2097,10 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   return $value$$;
 }, bit:function $JSSMS$Z80$$bit$($mask$$) {
   this.f = this.f & F_CARRY | this.SZ_BIT_TABLE[$mask$$];
-}, doIndexOpIX:function $JSSMS$Z80$$doIndexOpIX$($opcode$$) {
-  var $temp$$ = 0;
-  this.tstates -= OP_DD_STATES[$opcode$$];
+}, doIndexOpIX:function $JSSMS$Z80$$doIndexOpIX$($opcode$$2_temp$$) {
+  this.tstates -= OP_DD_STATES[$opcode$$2_temp$$];
   REFRESH_EMULATION && this.incR();
-  switch($opcode$$) {
+  switch($opcode$$2_temp$$) {
     case 9:
       this.setIXHIXL(this.add16(this.getIXHIXL(), this.getBC()));
       break;
@@ -2374,9 +2375,9 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.sp += 2;
       break;
     case 227:
-      $temp$$ = this.getIXHIXL();
+      $opcode$$2_temp$$ = this.getIXHIXL();
       this.setIXHIXL(this.getUint16(this.sp));
-      this.setUint16(this.sp, $temp$$);
+      this.setUint16(this.sp, $opcode$$2_temp$$);
       break;
     case 229:
       this.push(this.getIXHIXL());
@@ -2388,7 +2389,7 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.sp = this.getIXHIXL();
       break;
     default:
-      JSSMS.Utils.console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex($opcode$$)), this.pc--;
+      JSSMS.Utils.console.log("Unimplemented DD/FD Opcode: " + JSSMS.Utils.toHex($opcode$$2_temp$$)), this.pc--;
   }
 }, doIndexOpIY:function $JSSMS$Z80$$doIndexOpIY$($opcode$$3_temp$$) {
   this.tstates -= OP_DD_STATES[$opcode$$3_temp$$];
@@ -3349,11 +3350,11 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       JSSMS.Utils.console.log("Unimplemented DDCB/FDCB Opcode: " + JSSMS.Utils.toHex($opcode$$));
   }
   this.pc++;
-}, doED:function $JSSMS$Z80$$doED$($opcode$$) {
-  var $temp$$ = 0, $location$$ = 0;
-  this.tstates -= OP_ED_STATES[$opcode$$];
+}, doED:function $JSSMS$Z80$$doED$($opcode$$5_temp$$) {
+  var $location$$;
+  this.tstates -= OP_ED_STATES[$opcode$$5_temp$$];
   REFRESH_EMULATION && this.incR();
-  switch($opcode$$) {
+  switch($opcode$$5_temp$$) {
     case 64:
       this.b = this.port.in_(this.c);
       this.f = this.f & F_CARRY | this.SZP_TABLE[this.b];
@@ -3386,9 +3387,9 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     case 116:
     ;
     case 124:
-      $temp$$ = this.a;
+      $opcode$$5_temp$$ = this.a;
       this.a = 0;
-      this.sub_a($temp$$);
+      this.sub_a($opcode$$5_temp$$);
       this.pc++;
       break;
     case 69:
@@ -3514,9 +3515,9 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       break;
     case 103:
       $location$$ = this.getHL();
-      $temp$$ = this.getUint8($location$$);
-      this.setUint8($location$$, $temp$$ >> 4 | (this.a & 15) << 4);
-      this.a = this.a & 240 | $temp$$ & 15;
+      $opcode$$5_temp$$ = this.getUint8($location$$);
+      this.setUint8($location$$, $opcode$$5_temp$$ >> 4 | (this.a & 15) << 4);
+      this.a = this.a & 240 | $opcode$$5_temp$$ & 15;
       this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];
       this.pc++;
       break;
@@ -3539,9 +3540,9 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       break;
     case 111:
       $location$$ = this.getHL();
-      $temp$$ = this.getUint8($location$$);
-      this.setUint8($location$$, ($temp$$ & 15) << 4 | this.a & 15);
-      this.a = this.a & 240 | $temp$$ >> 4;
+      $opcode$$5_temp$$ = this.getUint8($location$$);
+      this.setUint8($location$$, ($opcode$$5_temp$$ & 15) << 4 | this.a & 15);
+      this.a = this.a & 240 | $opcode$$5_temp$$ >> 4;
       this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];
       this.pc++;
       break;
@@ -3575,151 +3576,151 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
       this.pc += 2;
       break;
     case 160:
-      $temp$$ = this.getUint8(this.getHL());
-      this.setUint8(this.getDE(), $temp$$);
+      $opcode$$5_temp$$ = this.getUint8(this.getHL());
+      this.setUint8(this.getDE(), $opcode$$5_temp$$);
       this.decBC();
       this.incDE();
       this.incHL();
-      $temp$$ = $temp$$ + this.a & 255;
-      this.f = this.f & 193 | (this.getBC() ? F_PARITY : 0) | $temp$$ & 8 | ($temp$$ & 2 ? 32 : 0);
+      $opcode$$5_temp$$ = $opcode$$5_temp$$ + this.a & 255;
+      this.f = this.f & 193 | (this.getBC() ? F_PARITY : 0) | $opcode$$5_temp$$ & 8 | ($opcode$$5_temp$$ & 2 ? 32 : 0);
       this.pc++;
       break;
     case 161:
-      $temp$$ = this.f & F_CARRY | F_NEGATIVE;
+      $opcode$$5_temp$$ = this.f & F_CARRY | F_NEGATIVE;
       this.cp_a(this.getUint8(this.getHL()));
       this.decBC();
       this.incHL();
-      $temp$$ |= 0 === this.getBC() ? 0 : F_PARITY;
-      this.f = this.f & 248 | $temp$$;
+      $opcode$$5_temp$$ |= 0 === this.getBC() ? 0 : F_PARITY;
+      this.f = this.f & 248 | $opcode$$5_temp$$;
       this.pc++;
       break;
     case 162:
-      $temp$$ = this.port.in_(this.c);
-      this.setUint8(this.getHL(), $temp$$);
+      $opcode$$5_temp$$ = this.port.in_(this.c);
+      this.setUint8(this.getHL(), $opcode$$5_temp$$);
       this.b = this.dec8(this.b);
       this.incHL();
-      this.f = 128 === ($temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
+      this.f = 128 === ($opcode$$5_temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
       this.pc++;
       break;
     case 163:
-      $temp$$ = this.getUint8(this.getHL());
-      this.port.out(this.c, $temp$$);
+      $opcode$$5_temp$$ = this.getUint8(this.getHL());
+      this.port.out(this.c, $opcode$$5_temp$$);
       this.b = this.dec8(this.b);
       this.incHL();
-      255 < this.l + $temp$$ ? (this.f |= F_CARRY, this.f |= F_HALFCARRY) : (this.f &= ~F_CARRY, this.f &= ~F_HALFCARRY);
-      this.f = 128 === ($temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
+      255 < this.l + $opcode$$5_temp$$ ? (this.f |= F_CARRY, this.f |= F_HALFCARRY) : (this.f &= ~F_CARRY, this.f &= ~F_HALFCARRY);
+      this.f = 128 === ($opcode$$5_temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
       this.pc++;
       break;
     case 168:
-      $temp$$ = this.getUint8(this.getHL());
-      this.setUint8(this.getDE(), $temp$$);
+      $opcode$$5_temp$$ = this.getUint8(this.getHL());
+      this.setUint8(this.getDE(), $opcode$$5_temp$$);
       this.decBC();
       this.decDE();
       this.decHL();
-      $temp$$ = $temp$$ + this.a & 255;
-      this.f = this.f & 193 | (this.getBC() ? F_PARITY : 0) | $temp$$ & F_BIT3 | ($temp$$ & F_NEGATIVE ? 32 : 0);
+      $opcode$$5_temp$$ = $opcode$$5_temp$$ + this.a & 255;
+      this.f = this.f & 193 | (this.getBC() ? F_PARITY : 0) | $opcode$$5_temp$$ & F_BIT3 | ($opcode$$5_temp$$ & F_NEGATIVE ? 32 : 0);
       this.pc++;
       break;
     case 169:
-      $temp$$ = this.f & F_CARRY | F_NEGATIVE;
+      $opcode$$5_temp$$ = this.f & F_CARRY | F_NEGATIVE;
       this.cp_a(this.getUint8(this.getHL()));
       this.decBC();
       this.decHL();
-      $temp$$ |= 0 === this.getBC() ? 0 : F_PARITY;
-      this.f = this.f & 248 | $temp$$;
+      $opcode$$5_temp$$ |= 0 === this.getBC() ? 0 : F_PARITY;
+      this.f = this.f & 248 | $opcode$$5_temp$$;
       this.pc++;
       break;
     case 170:
-      $temp$$ = this.port.in_(this.c);
-      this.setUint8(this.getHL(), $temp$$);
+      $opcode$$5_temp$$ = this.port.in_(this.c);
+      this.setUint8(this.getHL(), $opcode$$5_temp$$);
       this.b = this.dec8(this.b);
       this.decHL();
-      this.f = 0 !== ($temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
+      this.f = 0 !== ($opcode$$5_temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
       this.pc++;
       break;
     case 171:
-      $temp$$ = this.getUint8(this.getHL());
-      this.port.out(this.c, $temp$$);
+      $opcode$$5_temp$$ = this.getUint8(this.getHL());
+      this.port.out(this.c, $opcode$$5_temp$$);
       this.b = this.dec8(this.b);
       this.decHL();
-      255 < this.l + $temp$$ ? (this.f |= F_CARRY, this.f |= F_HALFCARRY) : (this.f &= ~F_CARRY, this.f &= ~F_HALFCARRY);
-      this.f = 128 === ($temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
+      255 < this.l + $opcode$$5_temp$$ ? (this.f |= F_CARRY, this.f |= F_HALFCARRY) : (this.f &= ~F_CARRY, this.f &= ~F_HALFCARRY);
+      this.f = 128 === ($opcode$$5_temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
       this.pc++;
       break;
     case 176:
-      $temp$$ = this.getUint8(this.getHL());
-      this.setUint8(this.getDE(), $temp$$);
+      $opcode$$5_temp$$ = this.getUint8(this.getHL());
+      this.setUint8(this.getDE(), $opcode$$5_temp$$);
       this.decBC();
       this.incDE();
       this.incHL();
-      $temp$$ = $temp$$ + this.a & 255;
-      this.f = this.f & 193 | (this.getBC() ? F_PARITY : 0) | $temp$$ & 8 | ($temp$$ & 2 ? 32 : 0);
+      $opcode$$5_temp$$ = $opcode$$5_temp$$ + this.a & 255;
+      this.f = this.f & 193 | (this.getBC() ? F_PARITY : 0) | $opcode$$5_temp$$ & 8 | ($opcode$$5_temp$$ & 2 ? 32 : 0);
       0 !== this.getBC() ? (this.tstates -= 5, this.pc--) : this.pc++;
       break;
     case 177:
-      $temp$$ = this.f & F_CARRY | F_NEGATIVE;
+      $opcode$$5_temp$$ = this.f & F_CARRY | F_NEGATIVE;
       this.cp_a(this.getUint8(this.getHL()));
       this.decBC();
       this.incHL();
-      $temp$$ |= 0 === this.getBC() ? 0 : F_PARITY;
-      0 !== ($temp$$ & F_PARITY) && 0 === (this.f & F_ZERO) ? (this.tstates -= 5, this.pc--) : this.pc++;
-      this.f = this.f & 248 | $temp$$;
+      $opcode$$5_temp$$ |= 0 === this.getBC() ? 0 : F_PARITY;
+      0 !== ($opcode$$5_temp$$ & F_PARITY) && 0 === (this.f & F_ZERO) ? (this.tstates -= 5, this.pc--) : this.pc++;
+      this.f = this.f & 248 | $opcode$$5_temp$$;
       break;
     case 178:
-      $temp$$ = this.port.in_(this.c);
-      this.setUint8(this.getHL(), $temp$$);
+      $opcode$$5_temp$$ = this.port.in_(this.c);
+      this.setUint8(this.getHL(), $opcode$$5_temp$$);
       this.b = this.dec8(this.b);
       this.incHL();
       0 !== this.b ? (this.tstates -= 5, this.pc--) : this.pc++;
-      this.f = 128 === ($temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
+      this.f = 128 === ($opcode$$5_temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
       break;
     case 179:
-      $temp$$ = this.getUint8(this.getHL());
-      this.port.out(this.c, $temp$$);
+      $opcode$$5_temp$$ = this.getUint8(this.getHL());
+      this.port.out(this.c, $opcode$$5_temp$$);
       this.b = this.dec8(this.b);
       this.incHL();
       0 !== this.b ? (this.tstates -= 5, this.pc--) : this.pc++;
-      255 < this.l + $temp$$ ? (this.f |= F_CARRY, this.f |= F_HALFCARRY) : (this.f &= ~F_CARRY, this.f &= ~F_HALFCARRY);
-      this.f = 0 !== ($temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
+      255 < this.l + $opcode$$5_temp$$ ? (this.f |= F_CARRY, this.f |= F_HALFCARRY) : (this.f &= ~F_CARRY, this.f &= ~F_HALFCARRY);
+      this.f = 0 !== ($opcode$$5_temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
       break;
     case 184:
-      $temp$$ = this.getUint8(this.getHL());
-      this.setUint8(this.getDE(), $temp$$);
+      $opcode$$5_temp$$ = this.getUint8(this.getHL());
+      this.setUint8(this.getDE(), $opcode$$5_temp$$);
       this.decBC();
       this.decDE();
       this.decHL();
-      $temp$$ = $temp$$ + this.a & 255;
-      this.f = this.f & 193 | (this.getBC() ? F_PARITY : 0) | $temp$$ & F_BIT3 | ($temp$$ & F_NEGATIVE ? 32 : 0);
+      $opcode$$5_temp$$ = $opcode$$5_temp$$ + this.a & 255;
+      this.f = this.f & 193 | (this.getBC() ? F_PARITY : 0) | $opcode$$5_temp$$ & F_BIT3 | ($opcode$$5_temp$$ & F_NEGATIVE ? 32 : 0);
       0 !== this.getBC() ? (this.tstates -= 5, this.pc--) : this.pc++;
       break;
     case 185:
-      $temp$$ = this.f & F_CARRY | F_NEGATIVE;
+      $opcode$$5_temp$$ = this.f & F_CARRY | F_NEGATIVE;
       this.cp_a(this.getUint8(this.getHL()));
       this.decBC();
       this.decHL();
-      $temp$$ |= 0 === this.getBC() ? 0 : F_PARITY;
-      0 !== ($temp$$ & F_PARITY) && 0 === (this.f & F_ZERO) ? (this.tstates -= 5, this.pc--) : this.pc++;
-      this.f = this.f & 248 | $temp$$;
+      $opcode$$5_temp$$ |= 0 === this.getBC() ? 0 : F_PARITY;
+      0 !== ($opcode$$5_temp$$ & F_PARITY) && 0 === (this.f & F_ZERO) ? (this.tstates -= 5, this.pc--) : this.pc++;
+      this.f = this.f & 248 | $opcode$$5_temp$$;
       break;
     case 186:
-      $temp$$ = this.port.in_(this.c);
-      this.setUint8(this.getHL(), $temp$$);
+      $opcode$$5_temp$$ = this.port.in_(this.c);
+      this.setUint8(this.getHL(), $opcode$$5_temp$$);
       this.b = this.dec8(this.b);
       this.decHL();
       0 !== this.b ? (this.tstates -= 5, this.pc--) : this.pc++;
-      this.f = 0 !== ($temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
+      this.f = 0 !== ($opcode$$5_temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
       break;
     case 187:
-      $temp$$ = this.getUint8(this.getHL());
-      this.port.out(this.c, $temp$$);
+      $opcode$$5_temp$$ = this.getUint8(this.getHL());
+      this.port.out(this.c, $opcode$$5_temp$$);
       this.b = this.dec8(this.b);
       this.decHL();
       0 !== this.b ? (this.tstates -= 5, this.pc--) : this.pc++;
-      255 < this.l + $temp$$ ? (this.f |= F_CARRY, this.f |= F_HALFCARRY) : (this.f &= ~F_CARRY, this.f &= ~F_HALFCARRY);
-      this.f = 0 !== ($temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
+      255 < this.l + $opcode$$5_temp$$ ? (this.f |= F_CARRY, this.f |= F_HALFCARRY) : (this.f &= ~F_CARRY, this.f &= ~F_HALFCARRY);
+      this.f = 0 !== ($opcode$$5_temp$$ & 128) ? this.f | F_NEGATIVE : this.f & ~F_NEGATIVE;
       break;
     default:
-      JSSMS.Utils.console.log("Unimplemented ED Opcode: " + JSSMS.Utils.toHex($opcode$$)), this.pc++;
+      JSSMS.Utils.console.log("Unimplemented ED Opcode: " + JSSMS.Utils.toHex($opcode$$5_temp$$)), this.pc++;
   }
 }, generateDAATable:function $JSSMS$Z80$$generateDAATable$() {
   var $i$$, $c$$, $h$$, $n$$;
@@ -3733,17 +3734,18 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
     }
   }
   this.a = this.f = 0;
-}, getDAAResult:function $JSSMS$Z80$$getDAAResult$($value$$, $flags$$) {
-  this.a = $value$$;
+}, getDAAResult:function $JSSMS$Z80$$getDAAResult$($a_copy_value$$, $flags$$) {
+  this.a = $a_copy_value$$;
   this.f = $flags$$;
-  var $a_copy$$ = this.a, $correction$$ = 0, $carry$$ = $flags$$ & F_CARRY, $carry_copy$$ = $carry$$;
-  if (0 !== ($flags$$ & F_HALFCARRY) || 9 < ($a_copy$$ & 15)) {
+  $a_copy_value$$ = this.a;
+  var $correction$$ = 0, $carry$$ = $flags$$ & F_CARRY, $carry_copy$$ = $carry$$;
+  if (0 !== ($flags$$ & F_HALFCARRY) || 9 < ($a_copy_value$$ & 15)) {
     $correction$$ |= 6;
   }
-  if (1 === $carry$$ || 159 < $a_copy$$ || 143 < $a_copy$$ && 9 < ($a_copy$$ & 15)) {
+  if (1 === $carry$$ || 159 < $a_copy_value$$ || 143 < $a_copy_value$$ && 9 < ($a_copy_value$$ & 15)) {
     $correction$$ |= 96, $carry_copy$$ = 1;
   }
-  153 < $a_copy$$ && ($carry_copy$$ = 1);
+  153 < $a_copy_value$$ && ($carry_copy$$ = 1);
   0 !== ($flags$$ & F_NEGATIVE) ? this.sub_a($correction$$) : this.add_a($correction$$);
   $flags$$ = this.f & 254 | $carry_copy$$;
   $flags$$ = this.getParity(this.a) ? $flags$$ & 251 | F_PARITY : $flags$$ & 251;
@@ -3949,20 +3951,19 @@ JSSMS.Z80.prototype = {reset:function $JSSMS$Z80$$reset$() {
   for ($i$$ = 0;4 > $i$$;$i$$++) {
     this.frameReg[$i$$] = $i$$ % 3;
   }
-}, resetMemory:function $JSSMS$Z80$$resetMemory$($pages$$) {
-  var $i$$ = 0;
-  $pages$$ && (this.rom = $pages$$);
+}, resetMemory:function $JSSMS$Z80$$resetMemory$($i$$13_pages$$) {
+  $i$$13_pages$$ && (this.rom = $i$$13_pages$$);
   if (this.rom.length) {
     this.number_of_pages = this.rom.length;
     this.romPageMask = this.number_of_pages - 1;
-    for ($i$$ = 0;3 > $i$$;$i$$++) {
-      this.frameReg[$i$$] = $i$$ % this.number_of_pages;
+    for ($i$$13_pages$$ = 0;3 > $i$$13_pages$$;$i$$13_pages$$++) {
+      this.frameReg[$i$$13_pages$$] = $i$$13_pages$$ % this.number_of_pages;
     }
     this.frameReg[3] = 0;
     if (ENABLE_COMPILER) {
       this.branches = Array(this.number_of_pages);
-      for ($i$$ = 0;$i$$ < this.number_of_pages;$i$$++) {
-        this.branches[$i$$] = Object.create(null);
+      for ($i$$13_pages$$ = 0;$i$$13_pages$$ < this.number_of_pages;$i$$13_pages$$++) {
+        this.branches[$i$$13_pages$$] = Object.create(null);
       }
       this.recompiler.setRom(this.rom);
     }
@@ -4303,24 +4304,23 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
   JSSMS.Utils.console.timeEnd("DOT generation");
   return $content$$;
 }, writeJavaScript:function $JSSMS$Debugger$$writeJavaScript$() {
-  function $getTotalTStates$$($opcodes$$) {
-    var $tstates$$ = 0;
-    switch($opcodes$$[0]) {
+  function $getTotalTStates$$($opcodes_tstates$$) {
+    switch($opcodes_tstates$$[0]) {
       case 203:
-        $tstates$$ = OP_CB_STATES[$opcodes$$[1]];
+        $opcodes_tstates$$ = OP_CB_STATES[$opcodes_tstates$$[1]];
         break;
       case 221:
       ;
       case 253:
-        $tstates$$ = 2 === $opcodes$$.length ? OP_DD_STATES[$opcodes$$[1]] : OP_INDEX_CB_STATES[$opcodes$$[2]];
+        $opcodes_tstates$$ = 2 === $opcodes_tstates$$.length ? OP_DD_STATES[$opcodes_tstates$$[1]] : OP_INDEX_CB_STATES[$opcodes_tstates$$[2]];
         break;
       case 237:
-        $tstates$$ = OP_ED_STATES[$opcodes$$[1]];
+        $opcodes_tstates$$ = OP_ED_STATES[$opcodes_tstates$$[1]];
         break;
       default:
-        $tstates$$ = OP_STATES[$opcodes$$[0]];
+        $opcodes_tstates$$ = OP_STATES[$opcodes_tstates$$[0]];
     }
-    return $tstates$$;
+    return $opcodes_tstates$$;
   }
   function $insertTStates$$() {
     $tstates$$ && $code$$.push("this.tstates -= " + $toHex$$($tstates$$) + ";");
@@ -4347,20 +4347,19 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
   $code$$ = $code$$.join("\n");
   JSSMS.Utils.console.timeEnd("JavaScript generation");
   return $code$$;
-}, disassemble:function $JSSMS$Debugger$$disassemble$($address$$) {
-  var $toHex$$ = JSSMS.Utils.toHex, $opcode$$ = this.readRom8bit($address$$), $opcodesArray$$ = [$opcode$$], $inst$$ = "Unknown Opcode", $currAddr$$ = $address$$, $target$$ = null, $code$$ = 'throw "Unimplemented opcode ' + $toHex$$($opcode$$) + '";', $_inst_operand$$ = "", $location$$ = 0;
-  $address$$++;
-  $_inst_operand$$ = {};
+}, disassemble:function $JSSMS$Debugger$$disassemble$($_inst_address$$) {
+  var $toHex$$ = JSSMS.Utils.toHex, $opcode$$ = this.readRom8bit($_inst_address$$), $opcodesArray$$ = [$opcode$$], $inst$$ = "Unknown Opcode", $currAddr$$ = $_inst_address$$, $target$$ = null, $code$$ = 'throw "Unimplemented opcode ' + $toHex$$($opcode$$) + '";', $location$$;
+  $_inst_address$$++;
   switch($opcode$$) {
     case 0:
       $inst$$ = "NOP";
       $code$$ = "";
       break;
     case 1:
-      $_inst_operand$$ = $toHex$$(this.readRom16bit($address$$));
-      $inst$$ = "LD BC," + $_inst_operand$$;
-      $code$$ = "this.setBC(" + $_inst_operand$$ + ");";
-      $address$$ += 2;
+      $code$$ = $toHex$$(this.readRom16bit($_inst_address$$));
+      $inst$$ = "LD BC," + $code$$;
+      $code$$ = "this.setBC(" + $code$$ + ");";
+      $_inst_address$$ += 2;
       break;
     case 2:
       $inst$$ = "LD (BC),A";
@@ -4379,10 +4378,10 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.b = this.dec8(this.b);";
       break;
     case 6:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "LD B," + $_inst_operand$$;
-      $code$$ = "this.b = " + $_inst_operand$$ + ";";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "LD B," + $code$$;
+      $code$$ = "this.b = " + $code$$ + ";";
+      $_inst_address$$++;
       break;
     case 7:
       $inst$$ = "RLCA";
@@ -4413,26 +4412,26 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.c = this.dec8(this.c);";
       break;
     case 14:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "LD C," + $_inst_operand$$;
-      $code$$ = "this.c = " + $_inst_operand$$ + ";";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "LD C," + $code$$;
+      $code$$ = "this.c = " + $code$$ + ";";
+      $_inst_address$$++;
       break;
     case 15:
       $inst$$ = "RRCA";
       $code$$ = "this.rrca_a();";
       break;
     case 16:
-      $target$$ = $address$$ + this.signExtend(this.readRom8bit($address$$) + 1);
+      $target$$ = $_inst_address$$ + this.signExtend(this.readRom8bit($_inst_address$$) + 1);
       $inst$$ = "DJNZ (" + $toHex$$($target$$) + ")";
       $code$$ = "this.b = this.b - 0x01 & 0xFF;if (this.b !== 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$++;
+      $_inst_address$$++;
       break;
     case 17:
-      $_inst_operand$$ = $toHex$$(this.readRom16bit($address$$));
-      $inst$$ = "LD DE," + $_inst_operand$$;
-      $code$$ = "this.setDE(" + $_inst_operand$$ + ");";
-      $address$$ += 2;
+      $code$$ = $toHex$$(this.readRom16bit($_inst_address$$));
+      $inst$$ = "LD DE," + $code$$;
+      $code$$ = "this.setDE(" + $code$$ + ");";
+      $_inst_address$$ += 2;
       break;
     case 18:
       $inst$$ = "LD (DE),A";
@@ -4451,20 +4450,20 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.d = this.dec8(this.d);";
       break;
     case 22:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "LD D," + $_inst_operand$$;
-      $code$$ = "this.d = " + $_inst_operand$$ + ";";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "LD D," + $code$$;
+      $code$$ = "this.d = " + $code$$ + ";";
+      $_inst_address$$++;
       break;
     case 23:
       $inst$$ = "RLA";
       $code$$ = "this.rla_a();";
       break;
     case 24:
-      $target$$ = $address$$ + this.signExtend(this.readRom8bit($address$$) + 1);
+      $target$$ = $_inst_address$$ + this.signExtend(this.readRom8bit($_inst_address$$) + 1);
       $inst$$ = "JR (" + $toHex$$($target$$) + ")";
       $code$$ = "this.pc = " + $toHex$$($target$$) + "; return;";
-      $address$$ = null;
+      $_inst_address$$ = null;
       break;
     case 25:
       $inst$$ = "ADD HL,DE";
@@ -4487,33 +4486,33 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.e = this.dec8(this.e);";
       break;
     case 30:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "LD E," + $_inst_operand$$;
-      $code$$ = "this.e = " + $_inst_operand$$ + ";";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "LD E," + $code$$;
+      $code$$ = "this.e = " + $code$$ + ";";
+      $_inst_address$$++;
       break;
     case 31:
       $inst$$ = "RRA";
       $code$$ = "this.rra_a();";
       break;
     case 32:
-      $target$$ = $address$$ + this.signExtend(this.readRom8bit($address$$) + 1);
+      $target$$ = $_inst_address$$ + this.signExtend(this.readRom8bit($_inst_address$$) + 1);
       $inst$$ = "JR NZ,(" + $toHex$$($target$$) + ")";
       $code$$ = "if (!((this.f & F_ZERO) !== 0x00)) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$++;
+      $_inst_address$$++;
       break;
     case 33:
-      $_inst_operand$$ = $toHex$$(this.readRom16bit($address$$));
-      $inst$$ = "LD HL," + $_inst_operand$$;
-      $code$$ = "this.setHL(" + $_inst_operand$$ + ");";
-      $address$$ += 2;
+      $code$$ = $toHex$$(this.readRom16bit($_inst_address$$));
+      $inst$$ = "LD HL," + $code$$;
+      $code$$ = "this.setHL(" + $code$$ + ");";
+      $_inst_address$$ += 2;
       break;
     case 34:
-      $location$$ = this.readRom16bit($address$$);
-      $_inst_operand$$ = $toHex$$($location$$);
-      $inst$$ = "LD (" + $_inst_operand$$ + "),HL";
-      $code$$ = "this.setUint8(" + $_inst_operand$$ + ", this.l);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.h);";
-      $address$$ += 2;
+      $location$$ = this.readRom16bit($_inst_address$$);
+      $code$$ = $toHex$$($location$$);
+      $inst$$ = "LD (" + $code$$ + "),HL";
+      $code$$ = "this.setUint8(" + $code$$ + ", this.l);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.h);";
+      $_inst_address$$ += 2;
       break;
     case 35:
       $inst$$ = "INC HL";
@@ -4528,30 +4527,30 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.h = this.dec8(this.h);";
       break;
     case 38:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "LD H," + $_inst_operand$$;
-      $code$$ = "this.h = " + $_inst_operand$$ + ";";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "LD H," + $code$$;
+      $code$$ = "this.h = " + $code$$ + ";";
+      $_inst_address$$++;
       break;
     case 39:
       $inst$$ = "DAA";
       $code$$ = "this.daa();";
       break;
     case 40:
-      $target$$ = $address$$ + this.signExtend(this.readRom8bit($address$$) + 1);
+      $target$$ = $_inst_address$$ + this.signExtend(this.readRom8bit($_inst_address$$) + 1);
       $inst$$ = "JR Z,(" + $toHex$$($target$$) + ")";
       $code$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$++;
+      $_inst_address$$++;
       break;
     case 41:
       $inst$$ = "ADD HL,HL";
       $code$$ = "this.setHL(this.add16(this.getHL(), this.getHL()));";
       break;
     case 42:
-      $_inst_operand$$ = $toHex$$(this.readRom16bit($address$$));
-      $inst$$ = "LD HL,(" + $_inst_operand$$ + ")";
-      $code$$ = "this.setHL(this.getUint16(" + $_inst_operand$$ + "));";
-      $address$$ += 2;
+      $code$$ = $toHex$$(this.readRom16bit($_inst_address$$));
+      $inst$$ = "LD HL,(" + $code$$ + ")";
+      $code$$ = "this.setHL(this.getUint16(" + $code$$ + "));";
+      $_inst_address$$ += 2;
       break;
     case 43:
       $inst$$ = "DEC HL";
@@ -4566,32 +4565,32 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.l = this.dec8(this.l);";
       break;
     case 46:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "LD L," + $_inst_operand$$;
-      $code$$ = "this.l = " + $_inst_operand$$ + ";";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "LD L," + $code$$;
+      $code$$ = "this.l = " + $code$$ + ";";
+      $_inst_address$$++;
       break;
     case 47:
       $inst$$ = "CPL";
       $code$$ = "this.cpl_a();";
       break;
     case 48:
-      $target$$ = $address$$ + this.signExtend(this.readRom8bit($address$$) + 1);
+      $target$$ = $_inst_address$$ + this.signExtend(this.readRom8bit($_inst_address$$) + 1);
       $inst$$ = "JR NC,(" + $toHex$$($target$$) + ")";
       $code$$ = "if (!((this.f & F_CARRY) !== 0x00)) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$++;
+      $_inst_address$$++;
       break;
     case 49:
-      $_inst_operand$$ = $toHex$$(this.readRom16bit($address$$));
-      $inst$$ = "LD SP," + $_inst_operand$$;
-      $code$$ = "this.sp = " + $_inst_operand$$ + ";";
-      $address$$ += 2;
+      $code$$ = $toHex$$(this.readRom16bit($_inst_address$$));
+      $inst$$ = "LD SP," + $code$$;
+      $code$$ = "this.sp = " + $code$$ + ";";
+      $_inst_address$$ += 2;
       break;
     case 50:
-      $_inst_operand$$ = $toHex$$(this.readRom16bit($address$$));
-      $inst$$ = "LD (" + $_inst_operand$$ + "),A";
-      $code$$ = "this.setUint8(" + $_inst_operand$$ + ", this.a);";
-      $address$$ += 2;
+      $code$$ = $toHex$$(this.readRom16bit($_inst_address$$));
+      $inst$$ = "LD (" + $code$$ + "),A";
+      $code$$ = "this.setUint8(" + $code$$ + ", this.a);";
+      $_inst_address$$ += 2;
       break;
     case 51:
       $inst$$ = "INC SP";
@@ -4606,30 +4605,30 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.decMem(this.getHL());";
       break;
     case 54:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "LD (HL)," + $_inst_operand$$;
-      $code$$ = "this.setUint8(this.getHL(), " + $_inst_operand$$ + ");";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "LD (HL)," + $code$$;
+      $code$$ = "this.setUint8(this.getHL(), " + $code$$ + ");";
+      $_inst_address$$++;
       break;
     case 55:
       $inst$$ = "SCF";
       $code$$ = "this.f |= F_CARRY; this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
       break;
     case 56:
-      $target$$ = $address$$ + this.signExtend(this.readRom8bit($address$$) + 1);
+      $target$$ = $_inst_address$$ + this.signExtend(this.readRom8bit($_inst_address$$) + 1);
       $inst$$ = "JR C,(" + $toHex$$($target$$) + ")";
       $code$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$++;
+      $_inst_address$$++;
       break;
     case 57:
       $inst$$ = "ADD HL,SP";
       $code$$ = "this.setHL(this.add16(this.getHL(), this.sp));";
       break;
     case 58:
-      $_inst_operand$$ = $toHex$$(this.readRom16bit($address$$));
-      $inst$$ = "LD A,(" + $_inst_operand$$ + ")";
-      $code$$ = "this.a = this.getUint8(" + $_inst_operand$$ + ");";
-      $address$$ += 2;
+      $code$$ = $toHex$$(this.readRom16bit($_inst_address$$));
+      $inst$$ = "LD A,(" + $code$$ + ")";
+      $code$$ = "this.a = this.getUint8(" + $code$$ + ");";
+      $_inst_address$$ += 2;
       break;
     case 59:
       $inst$$ = "DEC SP";
@@ -4644,10 +4643,10 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.a = this.dec8(this.a);";
       break;
     case 62:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "LD A," + $_inst_operand$$;
-      $code$$ = "this.a = " + $_inst_operand$$ + ";";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "LD A," + $code$$;
+      $code$$ = "this.a = " + $code$$ + ";";
+      $_inst_address$$++;
       break;
     case 63:
       $inst$$ = "CCF";
@@ -4872,7 +4871,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 118:
       $inst$$ = "HALT";
       $code$$ = HALT_SPEEDUP ? "this.tstates = 0x00;" : "";
-      $code$$ += "this.halt = true; this.pc = " + $toHex$$($address$$ - 1) + "; return;";
+      $code$$ += "this.halt = true; this.pc = " + $toHex$$($_inst_address$$ - 1) + "; return;";
       break;
     case 119:
       $inst$$ = "LD (HL),A";
@@ -5175,37 +5174,37 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.setBC(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 194:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "JP NZ,(" + $toHex$$($target$$) + ")";
       $code$$ = "if ((this.f & F_ZERO) === 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $_inst_address$$ += 2;
       break;
     case 195:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "JP (" + $toHex$$($target$$) + ")";
       $code$$ = "this.pc = " + $toHex$$($target$$) + "; return;";
-      $address$$ = null;
+      $_inst_address$$ = null;
       break;
     case 196:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "CALL NZ (" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_ZERO) === 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $code$$ = "if ((this.f & F_ZERO) === 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($_inst_address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
+      $_inst_address$$ += 2;
       break;
     case 197:
       $inst$$ = "PUSH BC";
       $code$$ = "this.push2(this.b, this.c);";
       break;
     case 198:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "ADD A," + $_inst_operand$$;
-      $code$$ = "this.add_a(" + $_inst_operand$$ + ");";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "ADD A," + $code$$;
+      $code$$ = "this.add_a(" + $code$$ + ");";
+      $_inst_address$$++;
       break;
     case 199:
       $target$$ = 0;
       $inst$$ = "RST " + $toHex$$($target$$);
-      $code$$ = "this.push1(" + $toHex$$($address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
+      $code$$ = "this.push1(" + $toHex$$($_inst_address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
       break;
     case 200:
       $inst$$ = "RET Z";
@@ -5214,43 +5213,43 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 201:
       $inst$$ = "RET";
       $code$$ = "this.pc = this.getUint16(this.sp); this.sp += 0x02; return;";
-      $address$$ = null;
+      $_inst_address$$ = null;
       break;
     case 202:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "JP Z,(" + $toHex$$($target$$) + ")";
       $code$$ = "if ((this.f & F_ZERO) !== 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $_inst_address$$ += 2;
       break;
     case 203:
-      $_inst_operand$$ = this.getCB($address$$);
-      $inst$$ = $_inst_operand$$.inst;
-      $code$$ = $_inst_operand$$.code;
-      $opcodesArray$$ = $opcodesArray$$.concat($_inst_operand$$.opcodes);
-      $address$$ = $_inst_operand$$.nextAddress;
+      $_inst_address$$ = this.getCB($_inst_address$$);
+      $inst$$ = $_inst_address$$.inst;
+      $code$$ = $_inst_address$$.code;
+      $opcodesArray$$ = $opcodesArray$$.concat($_inst_address$$.opcodes);
+      $_inst_address$$ = $_inst_address$$.nextAddress;
       break;
     case 204:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "CALL Z (" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $code$$ = "if ((this.f & F_ZERO) !== 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($_inst_address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
+      $_inst_address$$ += 2;
       break;
     case 205:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "CALL (" + $toHex$$($target$$) + ")";
-      $code$$ = "this.push1(" + $toHex$$($address$$ + 2) + "); this.pc = " + $toHex$$($target$$) + "; return;";
-      $address$$ += 2;
+      $code$$ = "this.push1(" + $toHex$$($_inst_address$$ + 2) + "); this.pc = " + $toHex$$($target$$) + "; return;";
+      $_inst_address$$ += 2;
       break;
     case 206:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "ADC ," + $_inst_operand$$;
-      $code$$ = "this.adc_a(" + $_inst_operand$$ + ");";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "ADC ," + $code$$;
+      $code$$ = "this.adc_a(" + $code$$ + ");";
+      $_inst_address$$++;
       break;
     case 207:
       $target$$ = 8;
       $inst$$ = "RST " + $toHex$$($target$$);
-      $code$$ = "this.push1(" + $toHex$$($address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
+      $code$$ = "this.push1(" + $toHex$$($_inst_address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
       break;
     case 208:
       $inst$$ = "RET NC";
@@ -5261,37 +5260,37 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.setDE(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 210:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "JP NC,(" + $toHex$$($target$$) + ")";
       $code$$ = "if ((this.f & F_CARRY) === 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $_inst_address$$ += 2;
       break;
     case 211:
-      $_inst_operand$$ = this.readRom8bit($address$$);
-      $inst$$ = "OUT (" + $toHex$$($_inst_operand$$) + "),A";
-      $code$$ = this.peepholePortOut($_inst_operand$$);
-      $address$$++;
+      $code$$ = this.readRom8bit($_inst_address$$);
+      $inst$$ = "OUT (" + $toHex$$($code$$) + "),A";
+      $code$$ = this.peepholePortOut($code$$);
+      $_inst_address$$++;
       break;
     case 212:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "CALL NC (" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_CARRY) === 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $code$$ = "if ((this.f & F_CARRY) === 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($_inst_address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
+      $_inst_address$$ += 2;
       break;
     case 213:
       $inst$$ = "PUSH DE";
       $code$$ = "this.push2(this.d, this.e);";
       break;
     case 214:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "SUB " + $_inst_operand$$;
-      $code$$ = "this.sub_a(" + $_inst_operand$$ + ");";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "SUB " + $code$$;
+      $code$$ = "this.sub_a(" + $code$$ + ");";
+      $_inst_address$$++;
       break;
     case 215:
       $target$$ = 16;
       $inst$$ = "RST " + $toHex$$($target$$);
-      $code$$ = "this.push1(" + $toHex$$($address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
+      $code$$ = "this.push1(" + $toHex$$($_inst_address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
       break;
     case 216:
       $inst$$ = "RET C";
@@ -5302,40 +5301,40 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.exBC(); this.exDE(); this.exHL();";
       break;
     case 218:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "JP C,(" + $toHex$$($target$$) + ")";
       $code$$ = "if ((this.f & F_CARRY) !== 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $_inst_address$$ += 2;
       break;
     case 219:
-      $_inst_operand$$ = this.readRom8bit($address$$);
-      $inst$$ = "IN A,(" + $toHex$$($_inst_operand$$) + ")";
-      $code$$ = this.peepholePortIn($_inst_operand$$);
-      $address$$++;
+      $code$$ = this.readRom8bit($_inst_address$$);
+      $inst$$ = "IN A,(" + $toHex$$($code$$) + ")";
+      $code$$ = this.peepholePortIn($code$$);
+      $_inst_address$$++;
       break;
     case 220:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "CALL C (" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $code$$ = "if ((this.f & F_CARRY) !== 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($_inst_address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
+      $_inst_address$$ += 2;
       break;
     case 221:
-      $_inst_operand$$ = this.getIndexOpIX($address$$);
-      $inst$$ = $_inst_operand$$.inst;
-      $code$$ = $_inst_operand$$.code;
-      $opcodesArray$$ = $opcodesArray$$.concat($_inst_operand$$.opcodes);
-      $address$$ = $_inst_operand$$.nextAddress;
+      $_inst_address$$ = this.getIndexOpIX($_inst_address$$);
+      $inst$$ = $_inst_address$$.inst;
+      $code$$ = $_inst_address$$.code;
+      $opcodesArray$$ = $opcodesArray$$.concat($_inst_address$$.opcodes);
+      $_inst_address$$ = $_inst_address$$.nextAddress;
       break;
     case 222:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "SBC A," + $_inst_operand$$;
-      $code$$ = "this.sbc_a(" + $_inst_operand$$ + ");";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "SBC A," + $code$$;
+      $code$$ = "this.sbc_a(" + $code$$ + ");";
+      $_inst_address$$++;
       break;
     case 223:
       $target$$ = 24;
       $inst$$ = "RST " + $toHex$$($target$$);
-      $code$$ = "this.push1(" + $toHex$$($address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
+      $code$$ = "this.push1(" + $toHex$$($_inst_address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
       break;
     case 224:
       $inst$$ = "RET PO";
@@ -5346,35 +5345,35 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.setHL(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 226:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "JP PO,(" + $toHex$$($target$$) + ")";
       $code$$ = "if ((this.f & F_PARITY) === 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $_inst_address$$ += 2;
       break;
     case 227:
       $inst$$ = "EX (SP),HL";
       $code$$ = "temp = this.h;this.h = this.getUint8(this.sp + 0x01);this.setUint8(this.sp + 0x01, temp);temp = this.l;this.l = this.getUint8(this.sp);this.setUint8(this.sp, temp);";
       break;
     case 228:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "CALL PO (" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_PARITY) === 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $code$$ = "if ((this.f & F_PARITY) === 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($_inst_address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
+      $_inst_address$$ += 2;
       break;
     case 229:
       $inst$$ = "PUSH HL";
       $code$$ = "this.push2(this.h, this.l);";
       break;
     case 230:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "AND (" + $_inst_operand$$ + ")";
-      $code$$ = "this.f = this.SZP_TABLE[this.a &= " + $_inst_operand$$ + "] | F_HALFCARRY;";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "AND (" + $code$$ + ")";
+      $code$$ = "this.f = this.SZP_TABLE[this.a &= " + $code$$ + "] | F_HALFCARRY;";
+      $_inst_address$$++;
       break;
     case 231:
       $target$$ = 32;
       $inst$$ = "RST " + $toHex$$($target$$);
-      $code$$ = "this.push1(" + $toHex$$($address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
+      $code$$ = "this.push1(" + $toHex$$($_inst_address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
       break;
     case 232:
       $inst$$ = "RET PE";
@@ -5383,42 +5382,42 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 233:
       $inst$$ = "JP (HL)";
       $code$$ = "this.pc = this.getHL(); return;";
-      $address$$ = null;
+      $_inst_address$$ = null;
       break;
     case 234:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "JP PE,(" + $toHex$$($target$$) + ")";
       $code$$ = "if ((this.f & F_PARITY) !== 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $_inst_address$$ += 2;
       break;
     case 235:
       $inst$$ = "EX DE,HL";
       $code$$ = "temp = this.d;this.d = this.h;this.h = temp;temp = this.e;this.e = this.l;this.l = temp;";
       break;
     case 236:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "CALL PE (" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_PARITY) !== 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $code$$ = "if ((this.f & F_PARITY) !== 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($_inst_address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
+      $_inst_address$$ += 2;
       break;
     case 237:
-      $_inst_operand$$ = this.getED($address$$);
-      $target$$ = $_inst_operand$$.target;
-      $inst$$ = $_inst_operand$$.inst;
-      $code$$ = $_inst_operand$$.code;
-      $opcodesArray$$ = $opcodesArray$$.concat($_inst_operand$$.opcodes);
-      $address$$ = $_inst_operand$$.nextAddress;
+      $_inst_address$$ = this.getED($_inst_address$$);
+      $target$$ = $_inst_address$$.target;
+      $inst$$ = $_inst_address$$.inst;
+      $code$$ = $_inst_address$$.code;
+      $opcodesArray$$ = $opcodesArray$$.concat($_inst_address$$.opcodes);
+      $_inst_address$$ = $_inst_address$$.nextAddress;
       break;
     case 238:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "XOR " + $_inst_operand$$;
-      $code$$ = "this.f = this.SZP_TABLE[this.a ^= " + $_inst_operand$$ + "];";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "XOR " + $code$$;
+      $code$$ = "this.f = this.SZP_TABLE[this.a ^= " + $code$$ + "];";
+      $_inst_address$$++;
       break;
     case 239:
       $target$$ = 40;
       $inst$$ = "RST " + $toHex$$($target$$);
-      $code$$ = "this.push1(" + $toHex$$($address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
+      $code$$ = "this.push1(" + $toHex$$($_inst_address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
       break;
     case 240:
       $inst$$ = "RET P";
@@ -5429,35 +5428,35 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.setAF(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 242:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "JP P,(" + $toHex$$($target$$) + ")";
       $code$$ = "if ((this.f & F_SIGN) === 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $_inst_address$$ += 2;
       break;
     case 243:
       $inst$$ = "DI";
       $code$$ = "this.iff1 = false; this.iff2 = false; this.EI_inst = true;";
       break;
     case 244:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "CALL P (" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_SIGN) === 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $code$$ = "if ((this.f & F_SIGN) === 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($_inst_address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
+      $_inst_address$$ += 2;
       break;
     case 245:
       $inst$$ = "PUSH AF";
       $code$$ = "this.push2(this.a, this.f);";
       break;
     case 246:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "OR " + $_inst_operand$$;
-      $code$$ = "this.f = this.SZP_TABLE[this.a |= " + $_inst_operand$$ + "];";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "OR " + $code$$;
+      $code$$ = "this.f = this.SZP_TABLE[this.a |= " + $code$$ + "];";
+      $_inst_address$$++;
       break;
     case 247:
       $target$$ = 48;
       $inst$$ = "RST " + $toHex$$($target$$);
-      $code$$ = "this.push1(" + $toHex$$($address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
+      $code$$ = "this.push1(" + $toHex$$($_inst_address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
       break;
     case 248:
       $inst$$ = "RET M";
@@ -5468,38 +5467,38 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       $code$$ = "this.sp = this.getHL()";
       break;
     case 250:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "JP M,(" + $toHex$$($target$$) + ")";
       $code$$ = "if ((this.f & F_SIGN) !== 0x00) {this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $_inst_address$$ += 2;
       break;
     case 251:
       $inst$$ = "EI";
       $code$$ = "this.iff1 = true; this.iff2 = true; this.EI_inst = true;";
       break;
     case 252:
-      $target$$ = this.readRom16bit($address$$);
+      $target$$ = this.readRom16bit($_inst_address$$);
       $inst$$ = "CALL M (" + $toHex$$($target$$) + ")";
-      $code$$ = "if ((this.f & F_SIGN) !== 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
-      $address$$ += 2;
+      $code$$ = "if ((this.f & F_SIGN) !== 0x00) {this.tstates -= 0x07;this.push1(" + $toHex$$($_inst_address$$ + 2) + ");this.pc = " + $toHex$$($target$$) + ";return;}";
+      $_inst_address$$ += 2;
       break;
     case 253:
-      $_inst_operand$$ = this.getIndexOpIY($address$$);
-      $inst$$ = $_inst_operand$$.inst;
-      $code$$ = $_inst_operand$$.code;
-      $opcodesArray$$ = $opcodesArray$$.concat($_inst_operand$$.opcodes);
-      $address$$ = $_inst_operand$$.nextAddress;
+      $_inst_address$$ = this.getIndexOpIY($_inst_address$$);
+      $inst$$ = $_inst_address$$.inst;
+      $code$$ = $_inst_address$$.code;
+      $opcodesArray$$ = $opcodesArray$$.concat($_inst_address$$.opcodes);
+      $_inst_address$$ = $_inst_address$$.nextAddress;
       break;
     case 254:
-      $_inst_operand$$ = $toHex$$(this.readRom8bit($address$$));
-      $inst$$ = "CP " + $_inst_operand$$;
-      $code$$ = "this.cp_a(" + $_inst_operand$$ + ");";
-      $address$$++;
+      $code$$ = $toHex$$(this.readRom8bit($_inst_address$$));
+      $inst$$ = "CP " + $code$$;
+      $code$$ = "this.cp_a(" + $code$$ + ");";
+      $_inst_address$$++;
       break;
     case 255:
-      $target$$ = 56, $inst$$ = "RST " + $toHex$$($target$$), $code$$ = "this.push1(" + $toHex$$($address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
+      $target$$ = 56, $inst$$ = "RST " + $toHex$$($target$$), $code$$ = "this.push1(" + $toHex$$($_inst_address$$) + "); this.pc = " + $toHex$$($target$$) + "; return;";
   }
-  return Instruction({opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$, target:$target$$});
+  return Instruction({opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$_inst_address$$, target:$target$$});
 }, getCB:function $JSSMS$Debugger$$getCB$($address$$) {
   var $opcode$$ = this.readRom8bit($address$$), $opcodesArray$$ = [$opcode$$], $inst$$ = "Unimplemented 0xCB prefixed opcode", $currAddr$$ = $address$$, $code$$ = 'throw "Unimplemented 0xCB prefixed opcode";';
   $address$$++;
@@ -6457,26 +6456,26 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
   }
   return {opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$};
 }, getED:function $JSSMS$Debugger$$getED$($address$$) {
-  var $toHex$$ = JSSMS.Utils.toHex, $opcode$$ = this.readRom8bit($address$$), $opcodesArray$$ = [$opcode$$], $inst$$ = "Unimplemented 0xED prefixed opcode", $currAddr$$ = $address$$, $target$$ = null, $code$$ = 'throw "Unimplemented 0xED prefixed opcode";', $operand$$ = "", $location$$ = 0;
+  var $toHex$$ = JSSMS.Utils.toHex, $opcode$$ = this.readRom8bit($address$$), $opcodesArray$$ = [$opcode$$], $inst$$ = "Unimplemented 0xED prefixed opcode", $currAddr$$ = $address$$, $target$$ = null, $code$$5_operand$$ = 'throw "Unimplemented 0xED prefixed opcode";', $location$$;
   $address$$++;
   switch($opcode$$) {
     case 64:
       $inst$$ = "IN B,(C)";
-      $code$$ = "this.b = this.port.in_(this.c);this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.b];";
+      $code$$5_operand$$ = "this.b = this.port.in_(this.c);this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.b];";
       break;
     case 65:
       $inst$$ = "OUT (C),B";
-      $code$$ = "this.port.out(this.c, this.b);";
+      $code$$5_operand$$ = "this.port.out(this.c, this.b);";
       break;
     case 66:
       $inst$$ = "SBC HL,BC";
-      $code$$ = "this.sbc16(this.getBC());";
+      $code$$5_operand$$ = "this.sbc16(this.getBC());";
       break;
     case 67:
       $location$$ = this.readRom16bit($address$$);
-      $operand$$ = $toHex$$($location$$);
-      $inst$$ = "LD (" + $operand$$ + "),BC";
-      $code$$ = "this.setUint8(" + $operand$$ + ", this.c);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.b);";
+      $code$$5_operand$$ = $toHex$$($location$$);
+      $inst$$ = "LD (" + $code$$5_operand$$ + "),BC";
+      $code$$5_operand$$ = "this.setUint8(" + $code$$5_operand$$ + ", this.c);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.b);";
       $address$$ += 2;
       break;
     case 68:
@@ -6495,7 +6494,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     ;
     case 124:
       $inst$$ = "NEG";
-      $code$$ = "temp = this.a;this.a = 0x00;this.sub_a(temp);";
+      $code$$5_operand$$ = "temp = this.a;this.a = 0x00;this.sub_a(temp);";
       break;
     case 69:
     ;
@@ -6513,7 +6512,7 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     ;
     case 125:
       $inst$$ = "RETN / RETI";
-      $code$$ = "this.pc = this.getUint16(this.sp);this.sp += 0x02;this.iff1 = this.iff2;return;";
+      $code$$5_operand$$ = "this.pc = this.getUint16(this.sp);this.sp += 0x02;this.iff1 = this.iff2;return;";
       $address$$ = null;
       break;
     case 70:
@@ -6524,179 +6523,179 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     ;
     case 110:
       $inst$$ = "IM 0";
-      $code$$ = "this.im = 0x00;";
+      $code$$5_operand$$ = "this.im = 0x00;";
       break;
     case 71:
       $inst$$ = "LD I,A";
-      $code$$ = "this.i = this.a;";
+      $code$$5_operand$$ = "this.i = this.a;";
       break;
     case 72:
       $inst$$ = "IN C,(C)";
-      $code$$ = "this.c = this.port.in_(this.c);this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.c];";
+      $code$$5_operand$$ = "this.c = this.port.in_(this.c);this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.c];";
       break;
     case 73:
       $inst$$ = "OUT (C),C";
-      $code$$ = "this.port.out(this.c, this.c);";
+      $code$$5_operand$$ = "this.port.out(this.c, this.c);";
       break;
     case 74:
       $inst$$ = "ADC HL,BC";
-      $code$$ = "this.adc16(this.getBC());";
+      $code$$5_operand$$ = "this.adc16(this.getBC());";
       break;
     case 75:
-      $operand$$ = $toHex$$(this.readRom16bit($address$$));
-      $inst$$ = "LD BC,(" + $operand$$ + ")";
-      $code$$ = "this.setBC(this.getUint16(" + $operand$$ + "));";
+      $code$$5_operand$$ = $toHex$$(this.readRom16bit($address$$));
+      $inst$$ = "LD BC,(" + $code$$5_operand$$ + ")";
+      $code$$5_operand$$ = "this.setBC(this.getUint16(" + $code$$5_operand$$ + "));";
       $address$$ += 2;
       break;
     case 79:
       $inst$$ = "LD R,A";
-      $code$$ = "this.r = this.a;";
+      $code$$5_operand$$ = "this.r = this.a;";
       break;
     case 80:
       $inst$$ = "IN D,(C)";
-      $code$$ = "this.d = this.port.in_(this.c);this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.d];";
+      $code$$5_operand$$ = "this.d = this.port.in_(this.c);this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.d];";
       break;
     case 81:
       $inst$$ = "OUT (C),D";
-      $code$$ = "this.port.out(this.c, this.d);";
+      $code$$5_operand$$ = "this.port.out(this.c, this.d);";
       break;
     case 82:
       $inst$$ = "SBC HL,DE";
-      $code$$ = "this.sbc16(this.getDE());";
+      $code$$5_operand$$ = "this.sbc16(this.getDE());";
       break;
     case 83:
       $location$$ = this.readRom16bit($address$$);
-      $operand$$ = $toHex$$($location$$);
-      $inst$$ = "LD (" + $operand$$ + "),DE";
-      $code$$ = "this.setUint8(" + $operand$$ + ", this.e);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.d);";
+      $code$$5_operand$$ = $toHex$$($location$$);
+      $inst$$ = "LD (" + $code$$5_operand$$ + "),DE";
+      $code$$5_operand$$ = "this.setUint8(" + $code$$5_operand$$ + ", this.e);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.d);";
       $address$$ += 2;
       break;
     case 86:
     ;
     case 118:
       $inst$$ = "IM 1";
-      $code$$ = "this.im = 0x01;";
+      $code$$5_operand$$ = "this.im = 0x01;";
       break;
     case 87:
       $inst$$ = "LD A,I";
-      $code$$ = "this.a = this.i;this.f = (this.f & F_CARRY) | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);";
+      $code$$5_operand$$ = "this.a = this.i;this.f = (this.f & F_CARRY) | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);";
       break;
     case 88:
       $inst$$ = "IN E,(C)";
-      $code$$ = "this.e = this.port.in_(this.c);this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.e];";
+      $code$$5_operand$$ = "this.e = this.port.in_(this.c);this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.e];";
       break;
     case 89:
       $inst$$ = "OUT (C),E";
-      $code$$ = "this.port.out(this.c, this.e);";
+      $code$$5_operand$$ = "this.port.out(this.c, this.e);";
       break;
     case 90:
       $inst$$ = "ADC HL,DE";
-      $code$$ = "this.adc16(this.getDE());";
+      $code$$5_operand$$ = "this.adc16(this.getDE());";
       break;
     case 91:
-      $operand$$ = $toHex$$(this.readRom16bit($address$$));
-      $inst$$ = "LD DE,(" + $operand$$ + ")";
-      $code$$ = "this.setDE(this.getUint16(" + $operand$$ + "));";
+      $code$$5_operand$$ = $toHex$$(this.readRom16bit($address$$));
+      $inst$$ = "LD DE,(" + $code$$5_operand$$ + ")";
+      $code$$5_operand$$ = "this.setDE(this.getUint16(" + $code$$5_operand$$ + "));";
       $address$$ += 2;
       break;
     case 95:
       $inst$$ = "LD A,R";
-      $code$$ = REFRESH_EMULATION ? "this.a = this.r;" : "this.a = JSSMS.Utils.rndInt(0xFF);";
-      $code$$ += "this.f = this.f & F_CARRY | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0x00);";
+      $code$$5_operand$$ = REFRESH_EMULATION ? "this.a = this.r;" : "this.a = JSSMS.Utils.rndInt(0xFF);";
+      $code$$5_operand$$ += "this.f = this.f & F_CARRY | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0x00);";
       break;
     case 96:
       $inst$$ = "IN H,(C)";
-      $code$$ = "this.h = this.port.in_(this.c);this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.h];";
+      $code$$5_operand$$ = "this.h = this.port.in_(this.c);this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.h];";
       break;
     case 97:
       $inst$$ = "OUT (C),H";
-      $code$$ = "this.port.out(this.c, this.h);";
+      $code$$5_operand$$ = "this.port.out(this.c, this.h);";
       break;
     case 98:
       $inst$$ = "SBC HL,HL";
-      $code$$ = "this.sbc16(this.getHL());";
+      $code$$5_operand$$ = "this.sbc16(this.getHL());";
       break;
     case 99:
       $location$$ = this.readRom16bit($address$$);
-      $operand$$ = $toHex$$($location$$);
-      $inst$$ = "LD (" + $operand$$ + "),HL";
-      $code$$ = "this.setUint8(" + $operand$$ + ", this.l);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.h);";
+      $code$$5_operand$$ = $toHex$$($location$$);
+      $inst$$ = "LD (" + $code$$5_operand$$ + "),HL";
+      $code$$5_operand$$ = "this.setUint8(" + $code$$5_operand$$ + ", this.l);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.h);";
       $address$$ += 2;
       break;
     case 103:
       $inst$$ = "RRD";
-      $code$$ = "var location = this.getHL();temp = this.getUint8(location);this.setUint8(location, (temp >> 4) | ((this.a & 0x0F) << 4));this.a = (this.a & 0xF0) | (temp & 0x0F);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
+      $code$$5_operand$$ = "var location = this.getHL();temp = this.getUint8(location);this.setUint8(location, (temp >> 4) | ((this.a & 0x0F) << 4));this.a = (this.a & 0xF0) | (temp & 0x0F);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
       break;
     case 104:
       $inst$$ = "IN L,(C)";
-      $code$$ = "this.l = this.port.in_(this.c);this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.l];";
+      $code$$5_operand$$ = "this.l = this.port.in_(this.c);this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.l];";
       break;
     case 105:
       $inst$$ = "OUT (C),L";
-      $code$$ = "this.port.out(this.c, this.l);";
+      $code$$5_operand$$ = "this.port.out(this.c, this.l);";
       break;
     case 106:
       $inst$$ = "ADC HL,HL";
-      $code$$ = "this.adc16(this.getHL());";
+      $code$$5_operand$$ = "this.adc16(this.getHL());";
       break;
     case 107:
-      $operand$$ = $toHex$$(this.readRom16bit($address$$));
-      $inst$$ = "LD HL,(" + $operand$$ + ")";
-      $code$$ = "this.setHL(this.getUint16(" + $operand$$ + "));";
+      $code$$5_operand$$ = $toHex$$(this.readRom16bit($address$$));
+      $inst$$ = "LD HL,(" + $code$$5_operand$$ + ")";
+      $code$$5_operand$$ = "this.setHL(this.getUint16(" + $code$$5_operand$$ + "));";
       $address$$ += 2;
       break;
     case 111:
       $inst$$ = "RLD";
-      $code$$ = "var location = this.getHL();temp = this.getUint8(location);this.setUint8(location, (temp & 0x0F) << 4 | (this.a & 0x0F));this.a = (this.a & 0xF0) | (temp >> 4);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
+      $code$$5_operand$$ = "var location = this.getHL();temp = this.getUint8(location);this.setUint8(location, (temp & 0x0F) << 4 | (this.a & 0x0F));this.a = (this.a & 0xF0) | (temp >> 4);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
       break;
     case 113:
       $inst$$ = "OUT (C),0";
-      $code$$ = "this.port.out(this.c, 0);";
+      $code$$5_operand$$ = "this.port.out(this.c, 0);";
       break;
     case 114:
       $inst$$ = "SBC HL,SP";
-      $code$$ = "this.sbc16(this.sp);";
+      $code$$5_operand$$ = "this.sbc16(this.sp);";
       break;
     case 115:
       $location$$ = this.readRom16bit($address$$);
-      $operand$$ = $toHex$$($location$$);
-      $inst$$ = "LD (" + $operand$$ + "),SP";
-      $code$$ = "this.setUint8(" + $operand$$ + ", this.sp & 0xFF);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.sp >> 8);";
+      $code$$5_operand$$ = $toHex$$($location$$);
+      $inst$$ = "LD (" + $code$$5_operand$$ + "),SP";
+      $code$$5_operand$$ = "this.setUint8(" + $code$$5_operand$$ + ", this.sp & 0xFF);this.setUint8(" + $toHex$$($location$$ + 1) + ", this.sp >> 8);";
       $address$$ += 2;
       break;
     case 120:
       $inst$$ = "IN A,(C)";
-      $code$$ = "this.a = this.port.in_(this.c);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
+      $code$$5_operand$$ = "this.a = this.port.in_(this.c);this.f = this.f & F_CARRY | this.SZP_TABLE[this.a];";
       break;
     case 121:
       $inst$$ = "OUT (C),A";
-      $code$$ = "this.port.out(this.c, this.a);";
+      $code$$5_operand$$ = "this.port.out(this.c, this.a);";
       break;
     case 122:
       $inst$$ = "ADC HL,SP";
-      $code$$ = "this.adc16(this.sp);";
+      $code$$5_operand$$ = "this.adc16(this.sp);";
       break;
     case 123:
-      $operand$$ = $toHex$$(this.readRom16bit($address$$));
-      $inst$$ = "LD SP,(" + $operand$$ + ")";
-      $code$$ = "this.sp = this.getUint16(" + $operand$$ + ");";
+      $code$$5_operand$$ = $toHex$$(this.readRom16bit($address$$));
+      $inst$$ = "LD SP,(" + $code$$5_operand$$ + ")";
+      $code$$5_operand$$ = "this.sp = this.getUint16(" + $code$$5_operand$$ + ");";
       $address$$ += 2;
       break;
     case 160:
       $inst$$ = "LDI";
-      $code$$ = "temp = this.getUint8(this.getHL());this.setUint8(this.getDE(), temp);this.decBC();this.incDE();this.incHL();temp = (temp + this.a) & 0xFF;this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);";
+      $code$$5_operand$$ = "temp = this.getUint8(this.getHL());this.setUint8(this.getDE(), temp);this.decBC();this.incDE();this.incHL();temp = (temp + this.a) & 0xFF;this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);";
       break;
     case 161:
       $inst$$ = "CPI";
-      $code$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.getUint8(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);this.f = (this.f & 0xF8) | temp;";
+      $code$$5_operand$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.getUint8(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);this.f = (this.f & 0xF8) | temp;";
       break;
     case 162:
       $inst$$ = "INI";
-      $code$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$5_operand$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 163:
       $inst$$ = "OUTI";
-      $code$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.incHL();this.b = this.dec8(this.b);if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$5_operand$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.incHL();this.b = this.dec8(this.b);if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 168:
       $inst$$ = "LDD";
@@ -6706,34 +6705,34 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
       break;
     case 170:
       $inst$$ = "IND";
-      $code$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$5_operand$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 171:
       $inst$$ = "OUTD";
-      $code$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.decHL();this.b = this.dec8(this.b);if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$5_operand$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.decHL();this.b = this.dec8(this.b);if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 176:
       $inst$$ = "LDIR";
-      $code$$ = "this.setUint8(this.getDE(), this.getUint8(this.getHL()));this.incDE();this.incHL();this.decBC();";
-      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if (this.getBC() !== 0x00) {this.tstates -= 0x05;this.f |= F_PARITY;return;} else {") : $code$$ += "for (;this.getBC() !== 0x00; this.f |= F_PARITY, this.tstates -= 5) {this.setUint8(this.getDE(), this.getUint8(this.getHL()));this.incDE();this.incHL();this.decBC();}if (!(this.getBC() !== 0x00)) {";
-      $code$$ += "this.f &= ~ F_PARITY;}this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
+      $code$$5_operand$$ = "this.setUint8(this.getDE(), this.getUint8(this.getHL()));this.incDE();this.incHL();this.decBC();";
+      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$5_operand$$ += "if (this.getBC() !== 0x00) {this.tstates -= 0x05;this.f |= F_PARITY;return;} else {") : $code$$5_operand$$ += "for (;this.getBC() !== 0x00; this.f |= F_PARITY, this.tstates -= 5) {this.setUint8(this.getDE(), this.getUint8(this.getHL()));this.incDE();this.incHL();this.decBC();}if (!(this.getBC() !== 0x00)) {";
+      $code$$5_operand$$ += "this.f &= ~ F_PARITY;}this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY;";
       break;
     case 177:
       $inst$$ = "CPIR";
-      $code$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.getUint8(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);";
-      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if ((temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}") : $code$$ += "for (;(temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00; this.tstates -= 5) {temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.getUint8(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);}";
-      $code$$ += "this.f = (this.f & 0xF8) | temp;";
+      $code$$5_operand$$ = "temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.getUint8(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);";
+      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$5_operand$$ += "if ((temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00) {this.tstates -= 0x05;this.pc = " + $toHex$$($target$$) + ";return;}") : $code$$5_operand$$ += "for (;(temp & F_PARITY) !== 0x00 && (this.f & F_ZERO) === 0x00; this.tstates -= 5) {temp = (this.f & F_CARRY) | F_NEGATIVE;this.cp_a(this.getUint8(this.getHL()));this.incHL();this.decBC();temp |= (this.getBC() === 0x00 ? 0x00 : F_PARITY);}";
+      $code$$5_operand$$ += "this.f = (this.f & 0xF8) | temp;";
       break;
     case 178:
       $target$$ = $address$$ - 2;
       $inst$$ = "INIR";
-      $code$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$5_operand$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.incHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) === 0x80) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 179:
       $inst$$ = "OTIR";
-      $code$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();";
-      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$ += "if (this.b !== 0x00) {this.tstates -= 0x05;return;}") : $code$$ += "for (;this.b !== 0x00; this.tstates -= 5) {temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();}";
-      $code$$ += "if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$5_operand$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();";
+      ACCURATE_INTERRUPT_EMULATION ? ($target$$ = $address$$ - 2, $code$$5_operand$$ += "if (this.b !== 0x00) {this.tstates -= 0x05;return;}") : $code$$5_operand$$ += "for (;this.b !== 0x00; this.tstates -= 5) {temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.incHL();}";
+      $code$$5_operand$$ += "if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 184:
       $inst$$ = "LDDR";
@@ -6744,389 +6743,387 @@ JSSMS.Debugger.prototype = {instructions:[], resetDebug:function $JSSMS$Debugger
     case 186:
       $target$$ = $address$$ - 2;
       $inst$$ = "INDR";
-      $code$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $code$$5_operand$$ = "temp = this.port.in_(this.c);this.setUint8(this.getHL(), temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
       break;
     case 187:
-      $target$$ = $address$$ - 2, $inst$$ = "OTDR", $code$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
+      $target$$ = $address$$ - 2, $inst$$ = "OTDR", $code$$5_operand$$ = "temp = this.getUint8(this.getHL());this.port.out(this.c, temp);this.b = this.dec8(this.b);this.decHL();if (this.b !== 0x00) {this.tstates -= 0x05;return;}if (this.l + temp > 0xFF) {this.f |= F_CARRY; this.f |= F_HALFCARRY;} else {this.f &= ~ F_CARRY; this.f &= ~ F_HALFCARRY;}if ((temp & 0x80) !== 0x00) {this.f |= F_NEGATIVE;} else {this.f &= ~ F_NEGATIVE;}";
   }
-  return {opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$, target:$target$$};
-}, getIndex:function $JSSMS$Debugger$$getIndex$($index$$, $address$$) {
-  var $toHex$$ = JSSMS.Utils.toHex, $opcode$$ = this.readRom8bit($address$$), $opcodesArray$$ = [$opcode$$], $inst$$ = "Unimplemented 0xDD or 0xFD prefixed opcode", $currAddr$$ = $address$$, $code$$ = 'throw "Unimplemented 0xDD or 0xFD prefixed opcode";', $_inst$$1_operand$$ = "", $location$$25_offset$$ = 0;
+  return {opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$5_operand$$, address:$currAddr$$, nextAddress:$address$$, target:$target$$};
+}, getIndex:function $JSSMS$Debugger$$getIndex$($_inst$$1_index$$, $address$$) {
+  var $toHex$$ = JSSMS.Utils.toHex, $opcode$$ = this.readRom8bit($address$$), $opcodesArray$$ = [$opcode$$], $inst$$ = "Unimplemented 0xDD or 0xFD prefixed opcode", $currAddr$$ = $address$$, $code$$6_operand$$ = 'throw "Unimplemented 0xDD or 0xFD prefixed opcode";', $location$$25_offset$$;
   $address$$++;
-  $location$$25_offset$$ = 0;
-  $_inst$$1_operand$$ = {};
   switch($opcode$$) {
     case 9:
-      $inst$$ = "ADD " + $index$$ + ",BC";
-      $code$$ = "this.set" + $index$$ + "(this.add16(this.get" + $index$$ + "(), this.getBC()));";
+      $inst$$ = "ADD " + $_inst$$1_index$$ + ",BC";
+      $code$$6_operand$$ = "this.set" + $_inst$$1_index$$ + "(this.add16(this.get" + $_inst$$1_index$$ + "(), this.getBC()));";
       break;
     case 25:
-      $inst$$ = "ADD " + $index$$ + ",DE";
-      $code$$ = "this.set" + $index$$ + "(this.add16(this.get" + $index$$ + "(), this.getDE()));";
+      $inst$$ = "ADD " + $_inst$$1_index$$ + ",DE";
+      $code$$6_operand$$ = "this.set" + $_inst$$1_index$$ + "(this.add16(this.get" + $_inst$$1_index$$ + "(), this.getDE()));";
       break;
     case 33:
-      $_inst$$1_operand$$ = $toHex$$(this.readRom16bit($address$$));
-      $inst$$ = "LD " + $index$$ + "," + $_inst$$1_operand$$;
-      $code$$ = "this.set" + $index$$ + "(" + $_inst$$1_operand$$ + ");";
+      $code$$6_operand$$ = $toHex$$(this.readRom16bit($address$$));
+      $inst$$ = "LD " + $_inst$$1_index$$ + "," + $code$$6_operand$$;
+      $code$$6_operand$$ = "this.set" + $_inst$$1_index$$ + "(" + $code$$6_operand$$ + ");";
       $address$$ += 2;
       break;
     case 34:
       $location$$25_offset$$ = this.readRom16bit($address$$);
-      $_inst$$1_operand$$ = $toHex$$($location$$25_offset$$);
-      $inst$$ = "LD (" + $_inst$$1_operand$$ + ")," + $index$$;
-      $code$$ = "this.setUint8(" + $_inst$$1_operand$$ + ", this." + $index$$.toLowerCase() + "L);this.setUint8(" + $toHex$$($location$$25_offset$$ + 1) + ", this." + $index$$.toLowerCase() + "H);";
+      $code$$6_operand$$ = $toHex$$($location$$25_offset$$);
+      $inst$$ = "LD (" + $code$$6_operand$$ + ")," + $_inst$$1_index$$;
+      $code$$6_operand$$ = "this.setUint8(" + $code$$6_operand$$ + ", this." + $_inst$$1_index$$.toLowerCase() + "L);this.setUint8(" + $toHex$$($location$$25_offset$$ + 1) + ", this." + $_inst$$1_index$$.toLowerCase() + "H);";
       $address$$ += 2;
       break;
     case 35:
-      $inst$$ = "INC " + $index$$;
-      $code$$ = "this.inc" + $index$$ + "();";
+      $inst$$ = "INC " + $_inst$$1_index$$;
+      $code$$6_operand$$ = "this.inc" + $_inst$$1_index$$ + "();";
       break;
     case 36:
-      $inst$$ = "INC " + $index$$ + "H *";
+      $inst$$ = "INC " + $_inst$$1_index$$ + "H *";
       break;
     case 37:
-      $inst$$ = "DEC " + $index$$ + "H *";
+      $inst$$ = "DEC " + $_inst$$1_index$$ + "H *";
       break;
     case 38:
-      $inst$$ = "LD " + $index$$ + "H," + $toHex$$(this.readRom8bit($address$$)) + " *";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "H," + $toHex$$(this.readRom8bit($address$$)) + " *";
       $address$$++;
       break;
     case 41:
-      $inst$$ = "ADD " + $index$$ + "  " + $index$$;
+      $inst$$ = "ADD " + $_inst$$1_index$$ + "  " + $_inst$$1_index$$;
       break;
     case 42:
       $location$$25_offset$$ = this.readRom16bit($address$$);
-      $inst$$ = "LD " + $index$$ + " (" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.ixL = this.getUint8(" + $toHex$$($location$$25_offset$$) + ");this.ixH = this.getUint8(" + $toHex$$($location$$25_offset$$ + 1) + ");";
+      $inst$$ = "LD " + $_inst$$1_index$$ + " (" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.ixL = this.getUint8(" + $toHex$$($location$$25_offset$$) + ");this.ixH = this.getUint8(" + $toHex$$($location$$25_offset$$ + 1) + ");";
       $address$$ += 2;
       break;
     case 43:
-      $inst$$ = "DEC " + $index$$;
-      $code$$ = "this.dec" + $index$$ + "();";
+      $inst$$ = "DEC " + $_inst$$1_index$$;
+      $code$$6_operand$$ = "this.dec" + $_inst$$1_index$$ + "();";
       break;
     case 44:
-      $inst$$ = "INC " + $index$$ + "L *";
+      $inst$$ = "INC " + $_inst$$1_index$$ + "L *";
       break;
     case 45:
-      $inst$$ = "DEC " + $index$$ + "L *";
+      $inst$$ = "DEC " + $_inst$$1_index$$ + "L *";
       break;
     case 46:
-      $inst$$ = "LD " + $index$$ + "L," + $toHex$$(this.readRom8bit($address$$));
+      $inst$$ = "LD " + $_inst$$1_index$$ + "L," + $toHex$$(this.readRom8bit($address$$));
       $address$$++;
       break;
     case 52:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "INC (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.incMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $inst$$ = "INC (" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.incMem(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 53:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "DEC (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.decMem(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $inst$$ = "DEC (" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.decMem(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 54:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $_inst$$1_operand$$ = $toHex$$(this.readRom8bit($address$$ + 1));
-      $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")," + $_inst$$1_operand$$;
-      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", " + $_inst$$1_operand$$ + ");";
+      $code$$6_operand$$ = $toHex$$(this.readRom8bit($address$$ + 1));
+      $inst$$ = "LD (" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")," + $code$$6_operand$$;
+      $code$$6_operand$$ = "this.setUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", " + $code$$6_operand$$ + ");";
       $address$$ += 2;
       break;
     case 57:
-      $inst$$ = "ADD " + $index$$ + " SP";
-      $code$$ = "this.set" + $index$$ + "(this.add16(this.get" + $index$$ + "(), this.sp));";
+      $inst$$ = "ADD " + $_inst$$1_index$$ + " SP";
+      $code$$6_operand$$ = "this.set" + $_inst$$1_index$$ + "(this.add16(this.get" + $_inst$$1_index$$ + "(), this.sp));";
       break;
     case 68:
-      $inst$$ = "LD B," + $index$$ + "H *";
+      $inst$$ = "LD B," + $_inst$$1_index$$ + "H *";
       break;
     case 69:
-      $inst$$ = "LD B," + $index$$ + "L *";
+      $inst$$ = "LD B," + $_inst$$1_index$$ + "L *";
       break;
     case 70:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD B,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.b = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $inst$$ = "LD B,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.b = this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 76:
-      $inst$$ = "LD C," + $index$$ + "H *";
+      $inst$$ = "LD C," + $_inst$$1_index$$ + "H *";
       break;
     case 77:
-      $inst$$ = "LD C," + $index$$ + "L *";
+      $inst$$ = "LD C," + $_inst$$1_index$$ + "L *";
       break;
     case 78:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD C,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.c = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $inst$$ = "LD C,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.c = this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 84:
-      $inst$$ = "LD D," + $index$$ + "H *";
+      $inst$$ = "LD D," + $_inst$$1_index$$ + "H *";
       break;
     case 85:
-      $inst$$ = "LD D," + $index$$ + "L *";
+      $inst$$ = "LD D," + $_inst$$1_index$$ + "L *";
       break;
     case 86:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD D,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.d = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $inst$$ = "LD D,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.d = this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 92:
-      $inst$$ = "LD E," + $index$$ + "H *";
+      $inst$$ = "LD E," + $_inst$$1_index$$ + "H *";
       break;
     case 93:
-      $inst$$ = "LD E," + $index$$ + "L *";
+      $inst$$ = "LD E," + $_inst$$1_index$$ + "L *";
       break;
     case 94:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD E,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.e = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $inst$$ = "LD E,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.e = this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 96:
-      $inst$$ = "LD " + $index$$ + "H,B *";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "H,B *";
       break;
     case 97:
-      $inst$$ = "LD " + $index$$ + "H,C *";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "H,C *";
       break;
     case 98:
-      $inst$$ = "LD " + $index$$ + "H,D *";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "H,D *";
       break;
     case 99:
-      $inst$$ = "LD " + $index$$ + "H,E *";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "H,E *";
       break;
     case 100:
-      $inst$$ = "LD " + $index$$ + "H," + $index$$ + "H*";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "H," + $_inst$$1_index$$ + "H*";
       break;
     case 101:
-      $inst$$ = "LD " + $index$$ + "H," + $index$$ + "L *";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "H," + $_inst$$1_index$$ + "L *";
       break;
     case 102:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD H,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.h = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $inst$$ = "LD H,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.h = this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 103:
-      $inst$$ = "LD " + $index$$ + "H,A *";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "H,A *";
       break;
     case 104:
-      $inst$$ = "LD " + $index$$ + "L,B *";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "L,B *";
       break;
     case 105:
-      $inst$$ = "LD " + $index$$ + "L,C *";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "L,C *";
       break;
     case 106:
-      $inst$$ = "LD " + $index$$ + "L,D *";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "L,D *";
       break;
     case 107:
-      $inst$$ = "LD " + $index$$ + "L,E *";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "L,E *";
       break;
     case 108:
-      $inst$$ = "LD " + $index$$ + "L," + $index$$ + "H *";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "L," + $_inst$$1_index$$ + "H *";
       break;
     case 109:
-      $inst$$ = "LD " + $index$$ + "L," + $index$$ + "L *";
-      $code$$ = "";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "L," + $_inst$$1_index$$ + "L *";
+      $code$$6_operand$$ = "";
       break;
     case 110:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD L,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.l = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $inst$$ = "LD L,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.l = this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 111:
-      $inst$$ = "LD " + $index$$ + "L,A *";
-      $code$$ = "this." + $index$$.toLowerCase() + "L = this.a;";
+      $inst$$ = "LD " + $_inst$$1_index$$ + "L,A *";
+      $code$$6_operand$$ = "this." + $_inst$$1_index$$.toLowerCase() + "L = this.a;";
       break;
     case 112:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),B";
-      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.b);";
+      $inst$$ = "LD (" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + "),B";
+      $code$$6_operand$$ = "this.setUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.b);";
       $address$$++;
       break;
     case 113:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),C";
-      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.c);";
+      $inst$$ = "LD (" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + "),C";
+      $code$$6_operand$$ = "this.setUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.c);";
       $address$$++;
       break;
     case 114:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),D";
-      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.d);";
+      $inst$$ = "LD (" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + "),D";
+      $code$$6_operand$$ = "this.setUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.d);";
       $address$$++;
       break;
     case 115:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),E";
-      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.e);";
+      $inst$$ = "LD (" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + "),E";
+      $code$$6_operand$$ = "this.setUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.e);";
       $address$$++;
       break;
     case 116:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),H";
-      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.h);";
+      $inst$$ = "LD (" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + "),H";
+      $code$$6_operand$$ = "this.setUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.h);";
       $address$$++;
       break;
     case 117:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),L";
-      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.l);";
+      $inst$$ = "LD (" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + "),L";
+      $code$$6_operand$$ = "this.setUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.l);";
       $address$$++;
       break;
     case 119:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + "),A";
-      $code$$ = "this.setUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.a);";
+      $inst$$ = "LD (" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + "),A";
+      $code$$6_operand$$ = "this.setUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ", this.a);";
       $address$$++;
       break;
     case 124:
-      $inst$$ = "LD A," + $index$$ + "H *";
+      $inst$$ = "LD A," + $_inst$$1_index$$ + "H *";
       break;
     case 125:
-      $inst$$ = "LD A," + $index$$ + "L *";
+      $inst$$ = "LD A," + $_inst$$1_index$$ + "L *";
       break;
     case 126:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "LD A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.a = this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
+      $inst$$ = "LD A,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.a = this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ");";
       $address$$++;
       break;
     case 132:
-      $inst$$ = "ADD A," + $index$$ + "H *";
+      $inst$$ = "ADD A," + $_inst$$1_index$$ + "H *";
       break;
     case 133:
-      $inst$$ = "ADD A," + $index$$ + "L *";
+      $inst$$ = "ADD A," + $_inst$$1_index$$ + "L *";
       break;
     case 134:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "ADD A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.add_a(this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
+      $inst$$ = "ADD A,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.add_a(this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
       $address$$++;
       break;
     case 140:
-      $inst$$ = "ADC A," + $index$$ + "H *";
+      $inst$$ = "ADC A," + $_inst$$1_index$$ + "H *";
       break;
     case 141:
-      $inst$$ = "ADC A," + $index$$ + "L *";
+      $inst$$ = "ADC A," + $_inst$$1_index$$ + "L *";
       break;
     case 142:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "ADC A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.adc_a(this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
+      $inst$$ = "ADC A,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.adc_a(this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
       $address$$++;
       break;
     case 148:
-      $inst$$ = "SUB " + $index$$ + "H *";
+      $inst$$ = "SUB " + $_inst$$1_index$$ + "H *";
       break;
     case 149:
-      $inst$$ = "SUB " + $index$$ + "L *";
+      $inst$$ = "SUB " + $_inst$$1_index$$ + "L *";
       break;
     case 150:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "SUB A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.sub_a(this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
+      $inst$$ = "SUB A,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.sub_a(this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
       $address$$++;
       break;
     case 156:
-      $inst$$ = "SBC A," + $index$$ + "H *";
+      $inst$$ = "SBC A," + $_inst$$1_index$$ + "H *";
       break;
     case 157:
-      $inst$$ = "SBC A," + $index$$ + "L *";
+      $inst$$ = "SBC A," + $_inst$$1_index$$ + "L *";
       break;
     case 158:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "SBC A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.sbc_a(this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
+      $inst$$ = "SBC A,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.sbc_a(this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
       $address$$++;
       break;
     case 164:
-      $inst$$ = "AND " + $index$$ + "H *";
-      $code$$ = "this.f = this.SZP_TABLE[this.a &= this." + $index$$.toLowerCase() + "H];";
+      $inst$$ = "AND " + $_inst$$1_index$$ + "H *";
+      $code$$6_operand$$ = "this.f = this.SZP_TABLE[this.a &= this." + $_inst$$1_index$$.toLowerCase() + "H];";
       break;
     case 165:
-      $inst$$ = "AND " + $index$$ + "L *";
-      $code$$ = "this.f = this.SZP_TABLE[this.a &= this." + $index$$.toLowerCase() + "L];";
+      $inst$$ = "AND " + $_inst$$1_index$$ + "L *";
+      $code$$6_operand$$ = "this.f = this.SZP_TABLE[this.a &= this." + $_inst$$1_index$$.toLowerCase() + "L];";
       break;
     case 166:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "AND A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.f = this.SZP_TABLE[this.a &= this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ")] | F_HALFCARRY;";
+      $inst$$ = "AND A,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.f = this.SZP_TABLE[this.a &= this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ")] | F_HALFCARRY;";
       $address$$++;
       break;
     case 172:
-      $inst$$ = "XOR A " + $index$$ + "H*";
-      $code$$ = "this.f = this.SZP_TABLE[this.a |= this." + $index$$.toLowerCase() + "H];";
+      $inst$$ = "XOR A " + $_inst$$1_index$$ + "H*";
+      $code$$6_operand$$ = "this.f = this.SZP_TABLE[this.a |= this." + $_inst$$1_index$$.toLowerCase() + "H];";
       break;
     case 173:
-      $inst$$ = "XOR A " + $index$$ + "L*";
-      $code$$ = "this.f = this.SZP_TABLE[this.a |= this." + $index$$.toLowerCase() + "L];";
+      $inst$$ = "XOR A " + $_inst$$1_index$$ + "L*";
+      $code$$6_operand$$ = "this.f = this.SZP_TABLE[this.a |= this." + $_inst$$1_index$$.toLowerCase() + "L];";
       break;
     case 174:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "XOR A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ")];";
+      $inst$$ = "XOR A,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ")];";
       $address$$++;
       break;
     case 180:
-      $inst$$ = "OR A " + $index$$ + "H*";
-      $code$$ = "this.f = this.SZP_TABLE[this.a |= this." + $index$$.toLowerCase() + "H];";
+      $inst$$ = "OR A " + $_inst$$1_index$$ + "H*";
+      $code$$6_operand$$ = "this.f = this.SZP_TABLE[this.a |= this." + $_inst$$1_index$$.toLowerCase() + "H];";
       break;
     case 181:
-      $inst$$ = "OR A " + $index$$ + "L*";
-      $code$$ = "this.f = this.SZP_TABLE[this.a |= this." + $index$$.toLowerCase() + "L];";
+      $inst$$ = "OR A " + $_inst$$1_index$$ + "L*";
+      $code$$6_operand$$ = "this.f = this.SZP_TABLE[this.a |= this." + $_inst$$1_index$$.toLowerCase() + "L];";
       break;
     case 182:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "OR A,(" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.f = this.SZP_TABLE[this.a |= this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + ")];";
+      $inst$$ = "OR A,(" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.f = this.SZP_TABLE[this.a |= this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + ")];";
       $address$$++;
       break;
     case 188:
-      $inst$$ = "CP " + $index$$ + "H *";
-      $code$$ = "this.cp_a(this." + $index$$.toLowerCase() + "H);";
+      $inst$$ = "CP " + $_inst$$1_index$$ + "H *";
+      $code$$6_operand$$ = "this.cp_a(this." + $_inst$$1_index$$.toLowerCase() + "H);";
       break;
     case 189:
-      $inst$$ = "CP " + $index$$ + "L *";
-      $code$$ = "this.cp_a(this." + $index$$.toLowerCase() + "L);";
+      $inst$$ = "CP " + $_inst$$1_index$$ + "L *";
+      $code$$6_operand$$ = "this.cp_a(this." + $_inst$$1_index$$.toLowerCase() + "L);";
       break;
     case 190:
       $location$$25_offset$$ = this.readRom8bit($address$$);
-      $inst$$ = "CP (" + $index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
-      $code$$ = "this.cp_a(this.getUint8(this.get" + $index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
+      $inst$$ = "CP (" + $_inst$$1_index$$ + "+" + $toHex$$($location$$25_offset$$) + ")";
+      $code$$6_operand$$ = "this.cp_a(this.getUint8(this.get" + $_inst$$1_index$$ + "() + " + $toHex$$($location$$25_offset$$) + "));";
       $address$$++;
       break;
     case 203:
-      $_inst$$1_operand$$ = this.getIndexCB($index$$, $address$$);
-      $inst$$ = $_inst$$1_operand$$.inst;
-      $code$$ = $_inst$$1_operand$$.code;
-      $opcodesArray$$ = $opcodesArray$$.concat($_inst$$1_operand$$.opcodes);
-      $address$$ = $_inst$$1_operand$$.nextAddress;
+      $_inst$$1_index$$ = this.getIndexCB($_inst$$1_index$$, $address$$);
+      $inst$$ = $_inst$$1_index$$.inst;
+      $code$$6_operand$$ = $_inst$$1_index$$.code;
+      $opcodesArray$$ = $opcodesArray$$.concat($_inst$$1_index$$.opcodes);
+      $address$$ = $_inst$$1_index$$.nextAddress;
       break;
     case 225:
-      $inst$$ = "POP " + $index$$;
-      $code$$ = "this.set" + $index$$ + "(this.getUint16(this.sp)); this.sp += 0x02;";
+      $inst$$ = "POP " + $_inst$$1_index$$;
+      $code$$6_operand$$ = "this.set" + $_inst$$1_index$$ + "(this.getUint16(this.sp)); this.sp += 0x02;";
       break;
     case 227:
-      $inst$$ = "EX SP,(" + $index$$ + ")";
-      $code$$ = "temp = this.get" + $index$$ + "();this.set" + $index$$ + "(this.getUint16(this.sp));this.setUint8(this.sp, temp & 0xFF);this.setUint8(this.sp + 1, temp >> 8);";
+      $inst$$ = "EX SP,(" + $_inst$$1_index$$ + ")";
+      $code$$6_operand$$ = "temp = this.get" + $_inst$$1_index$$ + "();this.set" + $_inst$$1_index$$ + "(this.getUint16(this.sp));this.setUint8(this.sp, temp & 0xFF);this.setUint8(this.sp + 1, temp >> 8);";
       break;
     case 229:
-      $inst$$ = "PUSH " + $index$$;
-      $code$$ = "this.push2(this." + $index$$.toLowerCase() + "H, this." + $index$$.toLowerCase() + "L);";
+      $inst$$ = "PUSH " + $_inst$$1_index$$;
+      $code$$6_operand$$ = "this.push2(this." + $_inst$$1_index$$.toLowerCase() + "H, this." + $_inst$$1_index$$.toLowerCase() + "L);";
       break;
     case 233:
-      $inst$$ = "JP (" + $index$$ + ")";
-      $code$$ = "this.pc = this.get" + $index$$ + "(); return;";
+      $inst$$ = "JP (" + $_inst$$1_index$$ + ")";
+      $code$$6_operand$$ = "this.pc = this.get" + $_inst$$1_index$$ + "(); return;";
       $address$$ = null;
       break;
     case 249:
-      $inst$$ = "LD SP," + $index$$, $code$$ = "this.sp = this.get" + $index$$ + "();";
+      $inst$$ = "LD SP," + $_inst$$1_index$$, $code$$6_operand$$ = "this.sp = this.get" + $_inst$$1_index$$ + "();";
   }
-  return {opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$, address:$currAddr$$, nextAddress:$address$$};
+  return {opcode:$opcode$$, opcodes:$opcodesArray$$, inst:$inst$$, code:$code$$6_operand$$, address:$currAddr$$, nextAddress:$address$$};
 }, getIndexCB:function $JSSMS$Debugger$$getIndexCB$($index$$, $address$$) {
   var $location$$26_toHex$$ = JSSMS.Utils.toHex, $currAddr$$ = $address$$, $location$$26_toHex$$ = "location = this.get" + $index$$ + "() + " + $location$$26_toHex$$(this.readRom8bit($address$$++)) + " & 0xFFFF;", $opcode$$ = this.readRom8bit($address$$), $opcodesArray$$ = [$opcode$$], $inst$$ = "Unimplemented 0xDDCB or 0xFDCB prefixed opcode", $code$$ = 'throw "Unimplemented 0xDDCB or 0xFDCB prefixed opcode";';
   $address$$++;
@@ -7818,7 +7815,7 @@ function Instruction($options$$) {
   $defaultInstruction$$.label = $defaultInstruction$$.hexAddress + " " + $hexOpcodes$$ + $defaultInstruction$$.inst;
   return $defaultInstruction$$;
 }
-;var KEY_UP = 1, KEY_DOWN = 2, KEY_LEFT = 4, KEY_RIGHT = 8, KEY_FIRE1 = 16, KEY_FIRE2 = 32, KEY_START = 64;
+;var P1_KEY_UP = 1, P1_KEY_DOWN = 2, P1_KEY_LEFT = 4, P1_KEY_RIGHT = 8, P1_KEY_FIRE1 = 16, P1_KEY_FIRE2 = 32, P2_KEY_UP = 64, P2_KEY_DOWN = 128, P2_KEY_LEFT = 1, P2_KEY_RIGHT = 2, P2_KEY_FIRE1 = 4, P2_KEY_FIRE2 = 8, KEY_START = 64, GG_KEY_START = 128;
 JSSMS.Keyboard = function $JSSMS$Keyboard$($sms$$) {
   this.main = $sms$$;
   this.lightgunY = this.lightgunX = this.ggstart = this.controller2 = this.controller1 = 0;
@@ -7831,46 +7828,43 @@ JSSMS.Keyboard.prototype = {reset:function $JSSMS$Keyboard$$reset$() {
 }, keydown:function $JSSMS$Keyboard$$keydown$($evt$$) {
   switch($evt$$.keyCode) {
     case 38:
-      this.controller1 &= ~KEY_UP;
+      this.controller1 &= ~P1_KEY_UP;
       break;
     case 40:
-      this.controller1 &= ~KEY_DOWN;
+      this.controller1 &= ~P1_KEY_DOWN;
       break;
     case 37:
-      this.controller1 &= ~KEY_LEFT;
+      this.controller1 &= ~P1_KEY_LEFT;
       break;
     case 39:
-      this.controller1 &= ~KEY_RIGHT;
+      this.controller1 &= ~P1_KEY_RIGHT;
       break;
     case 88:
-      this.controller1 &= ~KEY_FIRE1;
+      this.controller1 &= ~P1_KEY_FIRE1;
       break;
     case 90:
-      this.controller1 &= ~KEY_FIRE2;
+      this.controller1 &= ~P1_KEY_FIRE2;
       break;
     case 13:
-      this.main.is_sms ? this.main.pause_button = !0 : this.ggstart &= -129;
+      this.main.is_sms ? this.main.pause_button = !0 : this.ggstart &= ~GG_KEY_START;
       break;
     case 104:
-      this.controller2 &= ~KEY_UP;
+      this.controller2 &= ~P2_KEY_UP;
       break;
     case 98:
-      this.controller2 &= ~KEY_DOWN;
+      this.controller2 &= ~P2_KEY_DOWN;
       break;
     case 100:
-      this.controller2 &= ~KEY_LEFT;
+      this.controller2 &= ~P2_KEY_LEFT;
       break;
     case 102:
-      this.controller2 &= ~KEY_RIGHT;
+      this.controller2 &= ~P2_KEY_RIGHT;
       break;
     case 103:
-      this.controller2 &= ~KEY_FIRE1;
+      this.controller2 &= ~P2_KEY_FIRE1;
       break;
     case 105:
-      this.controller2 &= ~KEY_FIRE2;
-      break;
-    case 97:
-      this.controller2 &= ~KEY_START;
+      this.controller2 &= ~P2_KEY_FIRE2;
       break;
     default:
       return;
@@ -7879,46 +7873,43 @@ JSSMS.Keyboard.prototype = {reset:function $JSSMS$Keyboard$$reset$() {
 }, keyup:function $JSSMS$Keyboard$$keyup$($evt$$) {
   switch($evt$$.keyCode) {
     case 38:
-      this.controller1 |= KEY_UP;
+      this.controller1 |= P1_KEY_UP;
       break;
     case 40:
-      this.controller1 |= KEY_DOWN;
+      this.controller1 |= P1_KEY_DOWN;
       break;
     case 37:
-      this.controller1 |= KEY_LEFT;
+      this.controller1 |= P1_KEY_LEFT;
       break;
     case 39:
-      this.controller1 |= KEY_RIGHT;
+      this.controller1 |= P1_KEY_RIGHT;
       break;
     case 88:
-      this.controller1 |= KEY_FIRE1;
+      this.controller1 |= P1_KEY_FIRE1;
       break;
     case 90:
-      this.controller1 |= KEY_FIRE2;
+      this.controller1 |= P1_KEY_FIRE2;
       break;
     case 13:
-      this.main.is_sms || (this.ggstart |= 128);
+      this.main.is_sms || (this.ggstart |= GG_KEY_START);
       break;
     case 104:
-      this.controller2 |= KEY_UP;
+      this.controller2 |= P2_KEY_UP;
       break;
     case 98:
-      this.controller2 |= KEY_DOWN;
+      this.controller2 |= P2_KEY_DOWN;
       break;
     case 100:
-      this.controller2 |= KEY_LEFT;
+      this.controller2 |= P2_KEY_LEFT;
       break;
     case 102:
-      this.controller2 |= KEY_RIGHT;
+      this.controller2 |= P2_KEY_RIGHT;
       break;
     case 103:
-      this.controller2 |= KEY_FIRE1;
+      this.controller2 |= P2_KEY_FIRE1;
       break;
     case 105:
-      this.controller2 |= KEY_FIRE2;
-      break;
-    case 97:
-      this.controller2 |= KEY_START;
+      this.controller2 |= P2_KEY_FIRE2;
       break;
     default:
       return;
@@ -7964,15 +7955,15 @@ JSSMS.SN76489.prototype = {init:function $JSSMS$SN76489$$init$($clockSpeed_i$$) 
   }
 }, update:function $JSSMS$SN76489$$update$($audioBuffer_buffer$$, $offset$$, $samplesToGenerate$$) {
   $audioBuffer_buffer$$ = $audioBuffer_buffer$$.getChannelData(0);
-  for (var $sample$$ = 0, $feedback_i$$19_output$$ = 0;$sample$$ < $samplesToGenerate$$;$sample$$++) {
-    for ($feedback_i$$19_output$$ = 0;3 > $feedback_i$$19_output$$;$feedback_i$$19_output$$++) {
-      this.outputChannel[$feedback_i$$19_output$$] = this.freqPos[$feedback_i$$19_output$$] !== NO_ANTIALIAS ? PSG_VOLUME[this.reg[($feedback_i$$19_output$$ << 1) + 1]] * this.freqPos[$feedback_i$$19_output$$] >> SCALE : PSG_VOLUME[this.reg[($feedback_i$$19_output$$ << 1) + 1]] * this.freqPolarity[$feedback_i$$19_output$$];
+  for (var $sample$$ = 0, $i$$19_output$$;$sample$$ < $samplesToGenerate$$;$sample$$++) {
+    for ($i$$19_output$$ = 0;3 > $i$$19_output$$;$i$$19_output$$++) {
+      this.outputChannel[$i$$19_output$$] = this.freqPos[$i$$19_output$$] !== NO_ANTIALIAS ? PSG_VOLUME[this.reg[($i$$19_output$$ << 1) + 1]] * this.freqPos[$i$$19_output$$] >> SCALE : PSG_VOLUME[this.reg[($i$$19_output$$ << 1) + 1]] * this.freqPolarity[$i$$19_output$$];
     }
     this.outputChannel[3] = PSG_VOLUME[this.reg[7]] * (this.noiseShiftReg & 1) << 1;
-    $feedback_i$$19_output$$ = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
-    $feedback_i$$19_output$$ /= 128;
-    1 < $feedback_i$$19_output$$ ? $feedback_i$$19_output$$ = 1 : -1 > $feedback_i$$19_output$$ && ($feedback_i$$19_output$$ = -1);
-    $audioBuffer_buffer$$[$offset$$ + $sample$$] = $feedback_i$$19_output$$;
+    $i$$19_output$$ = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
+    $i$$19_output$$ /= 128;
+    1 < $i$$19_output$$ ? $i$$19_output$$ = 1 : -1 > $i$$19_output$$ && ($i$$19_output$$ = -1);
+    $audioBuffer_buffer$$[$offset$$ + $sample$$] = $i$$19_output$$;
     this.clockFrac += this.clock;
     var $clockCycles$$ = this.clockFrac >> SCALE, $clockCyclesScaled$$ = $clockCycles$$ << SCALE;
     this.clockFrac -= $clockCyclesScaled$$;
@@ -7980,24 +7971,23 @@ JSSMS.SN76489.prototype = {init:function $JSSMS$SN76489$$init$($clockSpeed_i$$) 
     this.freqCounter[1] -= $clockCycles$$;
     this.freqCounter[2] -= $clockCycles$$;
     this.freqCounter[3] = 128 === this.noiseFreq ? this.freqCounter[2] : this.freqCounter[3] - $clockCycles$$;
-    for ($feedback_i$$19_output$$ = 0;3 > $feedback_i$$19_output$$;$feedback_i$$19_output$$++) {
-      var $counter$$ = this.freqCounter[$feedback_i$$19_output$$];
+    for ($i$$19_output$$ = 0;3 > $i$$19_output$$;$i$$19_output$$++) {
+      var $counter$$ = this.freqCounter[$i$$19_output$$];
       if (0 >= $counter$$) {
-        var $tone$$ = this.reg[$feedback_i$$19_output$$ << 1];
-        6 < $tone$$ ? (this.freqPos[$feedback_i$$19_output$$] = ($clockCyclesScaled$$ - this.clockFrac + (2 << SCALE) * $counter$$ << SCALE) * this.freqPolarity[$feedback_i$$19_output$$] / ($clockCyclesScaled$$ + this.clockFrac), this.freqPolarity[$feedback_i$$19_output$$] = -this.freqPolarity[$feedback_i$$19_output$$]) : (this.freqPolarity[$feedback_i$$19_output$$] = 1, this.freqPos[$feedback_i$$19_output$$] = NO_ANTIALIAS);
-        this.freqCounter[$feedback_i$$19_output$$] += $tone$$ * ($clockCycles$$ / $tone$$ + 1);
+        var $tone$$ = this.reg[$i$$19_output$$ << 1];
+        6 < $tone$$ ? (this.freqPos[$i$$19_output$$] = ($clockCyclesScaled$$ - this.clockFrac + (2 << SCALE) * $counter$$ << SCALE) * this.freqPolarity[$i$$19_output$$] / ($clockCyclesScaled$$ + this.clockFrac), this.freqPolarity[$i$$19_output$$] = -this.freqPolarity[$i$$19_output$$]) : (this.freqPolarity[$i$$19_output$$] = 1, this.freqPos[$i$$19_output$$] = NO_ANTIALIAS);
+        this.freqCounter[$i$$19_output$$] += $tone$$ * ($clockCycles$$ / $tone$$ + 1);
       } else {
-        this.freqPos[$feedback_i$$19_output$$] = NO_ANTIALIAS;
+        this.freqPos[$i$$19_output$$] = NO_ANTIALIAS;
       }
     }
-    0 >= this.freqCounter[3] && (this.freqPolarity[3] = -this.freqPolarity[3], 128 !== this.noiseFreq && (this.freqCounter[3] += this.noiseFreq * ($clockCycles$$ / this.noiseFreq + 1)), 1 === this.freqPolarity[3] && ($feedback_i$$19_output$$ = 0, $feedback_i$$19_output$$ = 0 !== (this.reg[6] & 4) ? 0 !== (this.noiseShiftReg & FEEDBACK_PATTERN) && 0 !== (this.noiseShiftReg & FEEDBACK_PATTERN ^ FEEDBACK_PATTERN) ? 1 : 0 : this.noiseShiftReg & 1, this.noiseShiftReg = this.noiseShiftReg >> 1 | $feedback_i$$19_output$$ << 
-    15));
+    0 >= this.freqCounter[3] && (this.freqPolarity[3] = -this.freqPolarity[3], 128 !== this.noiseFreq && (this.freqCounter[3] += this.noiseFreq * ($clockCycles$$ / this.noiseFreq + 1)), 1 === this.freqPolarity[3] && (this.noiseShiftReg = this.noiseShiftReg >> 1 | (0 !== (this.reg[6] & 4) ? 0 !== (this.noiseShiftReg & FEEDBACK_PATTERN) && 0 !== (this.noiseShiftReg & FEEDBACK_PATTERN ^ FEEDBACK_PATTERN) ? 1 : 0 : this.noiseShiftReg & 1) << 15));
   }
 }};
 var NTSC = 0, PAL = 1, SMS_X_PIXELS = 342, SMS_Y_PIXELS_NTSC = 262, SMS_Y_PIXELS_PAL = 313, SMS_WIDTH = 256, SMS_HEIGHT = 192, GG_WIDTH = 160, GG_HEIGHT = 144, GG_X_OFFSET = 48, GG_Y_OFFSET = 24, STATUS_VINT = 128, STATUS_OVERFLOW = 64, STATUS_COLLISION = 32, STATUS_HINT = 4, BGT_LENGTH = 1792, SPRITES_PER_LINE = 8, SPRITE_COUNT = 0, SPRITE_X = 1, SPRITE_Y = 2, SPRITE_N = 3, TOTAL_TILES = 512, TILE_SIZE = 8;
 JSSMS.Vdp = function $JSSMS$Vdp$($sms$$) {
   this.main = $sms$$;
-  var $i$$ = 0;
+  var $i$$;
   this.videoMode = NTSC;
   this.VRAM = new JSSMS.Utils.Uint8Array(16384);
   this.CRAM = new JSSMS.Utils.Uint8Array(96);
@@ -8110,7 +8100,7 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
   this.readBuffer = this.VRAM[this.location++ & 16383] & 255;
   return $value$$;
 }, dataWrite:function $JSSMS$Vdp$$dataWrite$($value$$) {
-  var $address$$17_temp$$ = 0;
+  var $address$$17_temp$$;
   this.firstByte = !0;
   switch(this.operation) {
     case 0:
@@ -8142,31 +8132,32 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
   1 && (this.vScrollLatch = this.vdpreg[9]));
 }, setVBlankFlag:function $JSSMS$Vdp$$setVBlankFlag$() {
   this.status |= STATUS_VINT;
-}, drawLine:function $JSSMS$Vdp$$drawLine$($lineno$$) {
-  var $x$$ = 0, $location$$ = 0, $colour$$ = 0;
-  if (!this.main.is_gg || !($lineno$$ < GG_Y_OFFSET || $lineno$$ >= GG_Y_OFFSET + GG_HEIGHT)) {
+}, drawLine:function $JSSMS$Vdp$$drawLine$($lineno$$1_location$$) {
+  var $x$$, $colour$$;
+  if (!this.main.is_gg || !($lineno$$1_location$$ < GG_Y_OFFSET || $lineno$$1_location$$ >= GG_Y_OFFSET + GG_HEIGHT)) {
     if (VDP_SPRITE_COLLISIONS) {
       for ($x$$ = 0;$x$$ < SMS_WIDTH;$x$$++) {
         this.spriteCol[$x$$] = !1;
       }
     }
     if (0 !== (this.vdpreg[1] & 64)) {
-      if (-1 !== this.maxDirty && this.decodeTiles(), this.drawBg($lineno$$), this.isSatDirty && this.decodeSat(), 0 !== this.lineSprites[$lineno$$][SPRITE_COUNT] && this.drawSprite($lineno$$), this.main.is_sms && this.vdpreg[0] & 32) {
-        for ($location$$ = 4 * ($lineno$$ << 8), $colour$$ = 3 * ((this.vdpreg[7] & 15) + 16), $x$$ = $location$$;$x$$ < $location$$ + 32;$x$$ += 4) {
+      if (-1 !== this.maxDirty && this.decodeTiles(), this.drawBg($lineno$$1_location$$), this.isSatDirty && this.decodeSat(), 0 !== this.lineSprites[$lineno$$1_location$$][SPRITE_COUNT] && this.drawSprite($lineno$$1_location$$), this.main.is_sms && this.vdpreg[0] & 32) {
+        for ($lineno$$1_location$$ = 4 * ($lineno$$1_location$$ << 8), $colour$$ = 3 * ((this.vdpreg[7] & 15) + 16), $x$$ = $lineno$$1_location$$;$x$$ < $lineno$$1_location$$ + 32;$x$$ += 4) {
           this.display[$x$$] = this.CRAM[$colour$$], this.display[$x$$ + 1] = this.CRAM[$colour$$ + 1], this.display[$x$$ + 2] = this.CRAM[$colour$$ + 2];
         }
       }
     } else {
-      this.drawBGColour($lineno$$);
+      this.drawBGColour($lineno$$1_location$$);
     }
   }
 }, drawBg:function $JSSMS$Vdp$$drawBg$($lineno$$) {
-  var $pixX_tile_props$$ = 0, $colour$$ = 0, $temp$$ = 0, $temp2$$ = 0, $hscroll$$ = this.vdpreg[8], $tile_y_vscroll$$ = ACCURATE ? this.vScrollLatch : this.vdpreg[9];
+  var $pixX_tile_props$$, $colour$$, $temp$$, $temp2$$, $hscroll$$ = this.vdpreg[8], $tile_y_vscroll$$ = ACCURATE ? this.vScrollLatch : this.vdpreg[9];
   16 > $lineno$$ && 0 !== (this.vdpreg[0] & 64) && ($hscroll$$ = 0);
   var $lock$$ = this.vdpreg[0] & 128, $tile_column$$ = 32 - ($hscroll$$ >> 3) + this.h_start, $tile_row$$ = $lineno$$ + $tile_y_vscroll$$ >> 3;
   27 < $tile_row$$ && ($tile_row$$ -= 28);
   for (var $tile_y_vscroll$$ = ($lineno$$ + ($tile_y_vscroll$$ & 7) & 7) << 3, $row_precal$$ = $lineno$$ << 8, $tx$$ = this.h_start;$tx$$ < this.h_end;$tx$$++) {
-    var $pixX_tile_props$$ = this.bgt + (($tile_column$$ & 31) << 1) + ($tile_row$$ << 6), $secondbyte$$ = this.VRAM[$pixX_tile_props$$ + 1], $pal$$ = ($secondbyte$$ & 8) << 1, $sx$$ = ($tx$$ << 3) + ($hscroll$$ & 7), $pixY$$ = 0 === ($secondbyte$$ & 4) ? $tile_y_vscroll$$ : 56 - $tile_y_vscroll$$, $tile$$ = this.tiles[(this.VRAM[$pixX_tile_props$$] & 255) + (($secondbyte$$ & 1) << 8)];
+    $pixX_tile_props$$ = this.bgt + (($tile_column$$ & 31) << 1) + ($tile_row$$ << 6);
+    var $secondbyte$$ = this.VRAM[$pixX_tile_props$$ + 1], $pal$$ = ($secondbyte$$ & 8) << 1, $sx$$ = ($tx$$ << 3) + ($hscroll$$ & 7), $pixY$$ = 0 === ($secondbyte$$ & 4) ? $tile_y_vscroll$$ : 56 - $tile_y_vscroll$$, $tile$$ = this.tiles[(this.VRAM[$pixX_tile_props$$] & 255) + (($secondbyte$$ & 1) << 8)];
     if ($secondbyte$$ & 2) {
       for ($pixX_tile_props$$ = 7;0 <= $pixX_tile_props$$ && $sx$$ < SMS_WIDTH;$pixX_tile_props$$--, $sx$$++) {
         $colour$$ = $tile$$[$pixX_tile_props$$ + $pixY$$], $temp$$ = 4 * ($sx$$ + $row_precal$$), $temp2$$ = 3 * ($colour$$ + $pal$$), this.bgPriority[$sx$$] = 0 !== ($secondbyte$$ & 16) && 0 !== $colour$$, $sx$$ >= 8 * this.h_start && $sx$$ < 8 * this.h_end && (this.display[$temp$$] = this.CRAM[$temp2$$], this.display[$temp$$ + 1] = this.CRAM[$temp2$$ + 1], this.display[$temp$$ + 2] = this.CRAM[$temp2$$ + 2]);
@@ -8180,8 +8171,9 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
     0 !== $lock$$ && 23 === $tx$$ && ($tile_row$$ = $lineno$$ >> 3, $tile_y_vscroll$$ = ($lineno$$ & 7) << 3);
   }
 }, drawSprite:function $JSSMS$Vdp$$drawSprite$($lineno$$) {
-  for (var $colour$$ = 0, $temp$$ = 0, $temp2$$ = 0, $i$$ = 0, $sprites$$ = this.lineSprites[$lineno$$], $count$$ = Math.min(SPRITES_PER_LINE, $sprites$$[SPRITE_COUNT]), $zoomed$$ = this.vdpreg[1] & 1, $row_precal$$ = $lineno$$ << 8, $off$$ = 3 * $count$$;$i$$ < $count$$;$i$$++) {
-    var $n$$6_tile$$ = $sprites$$[$off$$--] | (this.vdpreg[6] & 4) << 6, $pix_y$$ = $sprites$$[$off$$--], $x$$ = $sprites$$[$off$$--] - (this.vdpreg[0] & 8), $colour$$ = $lineno$$ - $pix_y$$ >> $zoomed$$;
+  for (var $colour$$, $temp$$, $temp2$$, $i$$ = 0, $sprites$$ = this.lineSprites[$lineno$$], $count$$ = Math.min(SPRITES_PER_LINE, $sprites$$[SPRITE_COUNT]), $zoomed$$ = this.vdpreg[1] & 1, $row_precal$$ = $lineno$$ << 8, $off$$ = 3 * $count$$;$i$$ < $count$$;$i$$++) {
+    var $n$$6_tile$$ = $sprites$$[$off$$--] | (this.vdpreg[6] & 4) << 6, $pix_y$$ = $sprites$$[$off$$--], $x$$ = $sprites$$[$off$$--] - (this.vdpreg[0] & 8);
+    $colour$$ = $lineno$$ - $pix_y$$ >> $zoomed$$;
     0 !== (this.vdpreg[1] & 2) && ($n$$6_tile$$ &= -2);
     $n$$6_tile$$ = this.tiles[$n$$6_tile$$ + (($colour$$ & 8) >> 3)];
     $pix_y$$ = 0;
@@ -8199,11 +8191,10 @@ JSSMS.Vdp.prototype = {reset:function $JSSMS$Vdp$$reset$() {
     }
   }
   $sprites$$[SPRITE_COUNT] >= SPRITES_PER_LINE && (this.status |= STATUS_OVERFLOW);
-}, drawBGColour:function $JSSMS$Vdp$$drawBGColour$($lineno$$4_location$$) {
-  var $x$$ = 0;
-  $lineno$$4_location$$ = 4 * ($lineno$$4_location$$ << 8);
-  for (var $colour$$ = 3 * ((this.vdpreg[7] & 15) + 16), $x$$ = $lineno$$4_location$$ + 32 * this.h_start;$x$$ < $lineno$$4_location$$ + 32 * this.h_end;$x$$ += 4) {
-    this.display[$x$$] = this.CRAM[$colour$$], this.display[$x$$ + 1] = this.CRAM[$colour$$ + 1], this.display[$x$$ + 2] = this.CRAM[$colour$$ + 2];
+}, drawBGColour:function $JSSMS$Vdp$$drawBGColour$($lineno$$4_x$$) {
+  var $location$$ = 4 * ($lineno$$4_x$$ << 8), $colour$$ = 3 * ((this.vdpreg[7] & 15) + 16);
+  for ($lineno$$4_x$$ = $location$$ + 32 * this.h_start;$lineno$$4_x$$ < $location$$ + 32 * this.h_end;$lineno$$4_x$$ += 4) {
+    this.display[$lineno$$4_x$$] = this.CRAM[$colour$$], this.display[$lineno$$4_x$$ + 1] = this.CRAM[$colour$$ + 1], this.display[$lineno$$4_x$$ + 2] = this.CRAM[$colour$$ + 2];
   }
 }, decodeTiles:function $JSSMS$Vdp$$decodeTiles$() {
   for (var $i$$ = this.minDirty;$i$$ <= this.maxDirty;$i$$++) {
@@ -8329,11 +8320,11 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
       } else {
         var $lastTime$$ = 0;
         this.requestAnimationFrame = function $this$requestAnimationFrame$($callback$$) {
-          var $currTime_timeToCall$$ = JSSMS.Utils.getTimestamp(), $currTime_timeToCall$$ = Math.max(0, 1E3 / 60 - ($currTime_timeToCall$$ - $lastTime$$));
+          var $currTime$$ = JSSMS.Utils.getTimestamp();
           window.setTimeout(function() {
             $lastTime$$ = JSSMS.Utils.getTimestamp();
             $callback$$();
-          }, $currTime_timeToCall$$);
+          }, Math.max(0, 1E3 / 60 - ($currTime$$ - $lastTime$$)));
         };
       }
       this.screen = $("<canvas width=" + SMS_WIDTH + " height=" + SMS_HEIGHT + " moz-opaque></canvas>");
@@ -8343,7 +8334,7 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
       this.canvasContext.imageSmoothingEnabled = !1;
       if (this.canvasContext.getImageData) {
         this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
-        this.gamepad = {up:KEY_UP, down:KEY_DOWN, left:KEY_LEFT, right:KEY_RIGHT, fire1:KEY_FIRE1, fire2:KEY_FIRE2};
+        this.gamepad = {up:P1_KEY_UP, down:P1_KEY_DOWN, left:P1_KEY_LEFT, right:P1_KEY_RIGHT, fire1:P1_KEY_FIRE1, fire2:P1_KEY_FIRE2};
         $requestAnimationFramePrefix_startButton$$ = $(".start", $gamepadContainer$$);
         this.romContainer = $('<div id="romSelector"></div>');
         this.romSelect = $("<select></select>").change(function() {
@@ -8371,16 +8362,18 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
           }), $self$$.buttons.zoom.attr("value", "Zoom in")) : ($self$$.screen.animate({width:2 * SMS_WIDTH + "px", height:2 * SMS_HEIGHT + "px"}), $self$$.buttons.zoom.attr("value", "Zoom out"));
           $self$$.zoomed = !$self$$.zoomed;
         }));
-        $gamepadContainer$$.on("touchstart touchmove", function($evt$$) {
+        $gamepadContainer$$.on("touchstart touchmove", function($evt$$26_touches$$) {
+          $evt$$26_touches$$.preventDefault();
           $self$$.main.keyboard.controller1 = 255;
-          for (var $changedTouches$$ = $evt$$.originalEvent.changedTouches, $i$$ = 0;$i$$ < $changedTouches$$.length;$i$$++) {
-            var $className$$ = document.elementFromPoint($changedTouches$$[$i$$].clientX, $changedTouches$$[$i$$].clientY).className;
-            $className$$ && $self$$.gamepad[$className$$] && ($self$$.main.keyboard.controller1 &= ~$self$$.gamepad[$className$$]);
+          $evt$$26_touches$$ = $evt$$26_touches$$.originalEvent.touches;
+          for (var $i$$ = 0;$i$$ < $evt$$26_touches$$.length;$i$$++) {
+            var $className$$4_target$$ = document.elementFromPoint($evt$$26_touches$$[$i$$].clientX, $evt$$26_touches$$[$i$$].clientY);
+            $className$$4_target$$ && ($className$$4_target$$ = $className$$4_target$$.className) && $self$$.gamepad[$className$$4_target$$] && ($self$$.main.keyboard.controller1 &= ~$self$$.gamepad[$className$$4_target$$]);
           }
-          $evt$$.preventDefault();
         });
         $gamepadContainer$$.on("touchend", function($evt$$) {
-          $self$$.main.keyboard.controller1 = 255;
+          $evt$$.preventDefault();
+          0 === $evt$$.originalEvent.touches.length && ($self$$.main.keyboard.controller1 = 255);
         });
         for ($i$$0$$ in this.gamepad) {
           $("." + $i$$0$$, $gamepadContainer$$).mousedown($mouseDown$$).mouseup($mouseUp$$);
@@ -8442,9 +8435,8 @@ window.$ && ($.fn.JSSMSUI = function $$$fn$JSSMSUI$($roms$$) {
       var $xhr$$ = $.ajaxSettings.xhr();
       void 0 !== $xhr$$.overrideMimeType && $xhr$$.overrideMimeType("text/plain; charset=x-user-defined");
       return $self$$.xhr = $xhr$$;
-    }, complete:function($xhr$$, $status$$) {
-      var $data$$;
-      "error" === $status$$ ? $self$$.updateStatus("The selected ROM file could not be loaded.") : ($data$$ = $xhr$$.responseText, $self$$.main.stop(), $self$$.main.readRomDirectly($data$$, $self$$.romSelect.val()), $self$$.main.reset(), $self$$.main.vdp.forceFullRedraw(), $self$$.enable());
+    }, complete:function($data$$40_xhr$$, $status$$) {
+      "error" === $status$$ ? $self$$.updateStatus("The selected ROM file could not be loaded.") : ($data$$40_xhr$$ = $data$$40_xhr$$.responseText, $self$$.main.stop(), $self$$.main.readRomDirectly($data$$40_xhr$$, $self$$.romSelect.val()), $self$$.main.reset(), $self$$.main.vdp.forceFullRedraw(), $self$$.enable());
     }});
   }, enable:function $$UI$$$$enable$() {
     this.buttons.start.removeAttr("disabled");
@@ -8583,7 +8575,7 @@ var Parser = function() {
   function $disassemble$$($bytecode$$, $stream$$) {
     $stream$$.page = $bytecode$$.page;
     $stream$$.seek($bytecode$$.address + 16384 * $stream$$.page);
-    var $opcode$$13_opcode$$inline_11_opcode$$ = $stream$$.getUint8(), $operand$$3_operand$$ = null, $target$$51_target$$ = null, $isFunctionEnder_isFunctionEnder$$ = !1, $canEnd_canEnd$$ = !1;
+    var $opcode$$13_opcode$$inline_11_opcode$$ = $stream$$.getUint8(), $operand$$3_operand$$ = null, $target$$61_target$$ = null, $isFunctionEnder_isFunctionEnder$$ = !1, $canEnd_canEnd$$ = !1;
     $bytecode$$.opcode.push($opcode$$13_opcode$$inline_11_opcode$$);
     switch($opcode$$13_opcode$$inline_11_opcode$$) {
       case 0:
@@ -8622,7 +8614,7 @@ var Parser = function() {
       case 15:
         break;
       case 16:
-        $target$$51_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$61_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 17:
@@ -8642,7 +8634,7 @@ var Parser = function() {
       case 23:
         break;
       case 24:
-        $target$$51_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$61_target$$ = $stream$$.position + $stream$$.getInt8();
         $stream$$.seek(null);
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
@@ -8662,7 +8654,7 @@ var Parser = function() {
       case 31:
         break;
       case 32:
-        $target$$51_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$61_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 33:
@@ -8683,7 +8675,7 @@ var Parser = function() {
       case 39:
         break;
       case 40:
-        $target$$51_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$61_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 41:
@@ -8703,7 +8695,7 @@ var Parser = function() {
       case 47:
         break;
       case 48:
-        $target$$51_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$61_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 49:
@@ -8724,7 +8716,7 @@ var Parser = function() {
       case 55:
         break;
       case 56:
-        $target$$51_target$$ = $stream$$.position + $stream$$.getInt8();
+        $target$$61_target$$ = $stream$$.position + $stream$$.getInt8();
         $canEnd_canEnd$$ = !0;
         break;
       case 57:
@@ -9006,16 +8998,16 @@ var Parser = function() {
       case 193:
         break;
       case 194:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 195:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $stream$$.seek(null);
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 196:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 197:
@@ -9024,7 +9016,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 199:
-        $target$$51_target$$ = 0;
+        $target$$61_target$$ = 0;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 200:
@@ -9035,24 +9027,24 @@ var Parser = function() {
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 202:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 203:
         return $opcode$$13_opcode$$inline_11_opcode$$ = $stream$$.getUint8(), $bytecode$$.opcode.push($opcode$$13_opcode$$inline_11_opcode$$), $bytecode$$.nextAddress = $stream$$.position, $bytecode$$;
       case 204:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 205:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 206:
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 207:
-        $target$$51_target$$ = 8;
+        $target$$61_target$$ = 8;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 208:
@@ -9061,14 +9053,14 @@ var Parser = function() {
       case 209:
         break;
       case 210:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 211:
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 212:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 213:
@@ -9077,7 +9069,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 215:
-        $target$$51_target$$ = 16;
+        $target$$61_target$$ = 16;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 216:
@@ -9086,14 +9078,14 @@ var Parser = function() {
       case 217:
         break;
       case 218:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 219:
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 220:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 221:
@@ -9102,7 +9094,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 223:
-        $target$$51_target$$ = 24;
+        $target$$61_target$$ = 24;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 224:
@@ -9111,13 +9103,13 @@ var Parser = function() {
       case 225:
         break;
       case 226:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 227:
         break;
       case 228:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 229:
@@ -9126,7 +9118,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 231:
-        $target$$51_target$$ = 32;
+        $target$$61_target$$ = 32;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 232:
@@ -9137,18 +9129,18 @@ var Parser = function() {
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 234:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 235:
         break;
       case 236:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 237:
         $opcode$$13_opcode$$inline_11_opcode$$ = $stream$$.getUint8();
-        $target$$51_target$$ = $operand$$3_operand$$ = null;
+        $target$$61_target$$ = $operand$$3_operand$$ = null;
         $canEnd_canEnd$$ = $isFunctionEnder_isFunctionEnder$$ = !1;
         $bytecode$$.opcode.push($opcode$$13_opcode$$inline_11_opcode$$);
         switch($opcode$$13_opcode$$inline_11_opcode$$) {
@@ -9297,19 +9289,19 @@ var Parser = function() {
           case 171:
             break;
           case 176:
-            $target$$51_target$$ = $stream$$.position - 2;
+            $target$$61_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 177:
-            $target$$51_target$$ = $stream$$.position - 2;
+            $target$$61_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 178:
-            $target$$51_target$$ = $stream$$.position - 2;
+            $target$$61_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 179:
-            $target$$51_target$$ = $stream$$.position - 2;
+            $target$$61_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 184:
@@ -9317,11 +9309,11 @@ var Parser = function() {
           case 185:
             break;
           case 186:
-            $target$$51_target$$ = $stream$$.position - 2;
+            $target$$61_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           case 187:
-            $target$$51_target$$ = $stream$$.position - 2;
+            $target$$61_target$$ = $stream$$.position - 2;
             $canEnd_canEnd$$ = !0;
             break;
           default:
@@ -9330,7 +9322,7 @@ var Parser = function() {
         16383 <= $bytecode$$.address && ($isFunctionEnder_isFunctionEnder$$ = !0, $bytecode$$.changePage = !0);
         $bytecode$$.nextAddress = $stream$$.position;
         $bytecode$$.operand = $operand$$3_operand$$;
-        $bytecode$$.target = $target$$51_target$$;
+        $bytecode$$.target = $target$$61_target$$;
         $bytecode$$.isFunctionEnder = $isFunctionEnder_isFunctionEnder$$;
         $bytecode$$.canEnd = $canEnd_canEnd$$;
         return $bytecode$$;
@@ -9338,7 +9330,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 239:
-        $target$$51_target$$ = 40;
+        $target$$61_target$$ = 40;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 240:
@@ -9347,13 +9339,13 @@ var Parser = function() {
       case 241:
         break;
       case 242:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 243:
         break;
       case 244:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 245:
@@ -9362,7 +9354,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 247:
-        $target$$51_target$$ = 48;
+        $target$$61_target$$ = 48;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       case 248:
@@ -9371,13 +9363,13 @@ var Parser = function() {
       case 249:
         break;
       case 250:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 251:
         break;
       case 252:
-        $target$$51_target$$ = $stream$$.getUint16();
+        $target$$61_target$$ = $stream$$.getUint16();
         $canEnd_canEnd$$ = !0;
         break;
       case 253:
@@ -9386,7 +9378,7 @@ var Parser = function() {
         $operand$$3_operand$$ = $stream$$.getUint8();
         break;
       case 255:
-        $target$$51_target$$ = 56;
+        $target$$61_target$$ = 56;
         $isFunctionEnder_isFunctionEnder$$ = !0;
         break;
       default:
@@ -9394,7 +9386,7 @@ var Parser = function() {
     }
     $bytecode$$.nextAddress = $stream$$.position;
     $bytecode$$.operand = $operand$$3_operand$$;
-    $bytecode$$.target = $target$$51_target$$;
+    $bytecode$$.target = $target$$61_target$$;
     $bytecode$$.isFunctionEnder = $isFunctionEnder_isFunctionEnder$$;
     $bytecode$$.canEnd = $canEnd_canEnd$$;
     return $bytecode$$;
@@ -9620,14 +9612,14 @@ var Parser = function() {
     this.pos = null;
     this.page = 0;
   }
-  var $toHex$$ = JSSMS.Utils.toHex, $parser$$ = function $$parser$$$($rom$$, $frameReg$$) {
+  var $toHex$$ = JSSMS.Utils.toHex, $parser$$ = function $$parser$$$($rom$$, $frameReg$$1_i$$) {
     this.stream = new $RomStream$$($rom$$);
-    this.frameReg = $frameReg$$;
+    this.frameReg = $frameReg$$1_i$$;
     this.addresses = Array($rom$$.length);
     this.entryPoints = [];
     this.bytecodes = Array($rom$$.length);
-    for (var $i$$ = 0;$i$$ < $rom$$.length;$i$$++) {
-      this.addresses[$i$$] = [], this.bytecodes[$i$$] = [];
+    for ($frameReg$$1_i$$ = 0;$frameReg$$1_i$$ < $rom$$.length;$frameReg$$1_i$$++) {
+      this.addresses[$frameReg$$1_i$$] = [], this.bytecodes[$frameReg$$1_i$$] = [];
     }
   };
   $parser$$.prototype = {addEntryPoint:function $$parser$$$$addEntryPoint$($obj$$) {
@@ -9653,7 +9645,7 @@ var Parser = function() {
       }
     }
     this.bytecodes[0][1023] ? this.bytecodes[0][1023].isFunctionEnder = !0 : this.bytecodes[0][1022] && (this.bytecodes[0][1022].isFunctionEnder = !0);
-    $i$$ = $length$$ = $i$$ = 0;
+    $i$$ = 0;
     for ($length$$ = this.entryPoints.length;$i$$ < $length$$;$i$$++) {
       $currentPage_entryPoint$$2_page$$ = this.entryPoints[$i$$].address, $currentAddress$$ = this.entryPoints[$i$$].romPage, this.bytecodes[$currentAddress$$][$currentPage_entryPoint$$2_page$$].isJumpTarget = !0, this.bytecodes[$currentAddress$$][$currentPage_entryPoint$$2_page$$].jumpTargetNb++;
     }
@@ -9665,20 +9657,20 @@ var Parser = function() {
       }
     }
     JSSMS.Utils.console.timeEnd("Parsing");
-  }, parseFromAddress:function $$parser$$$$parseFromAddress$($obj$$39_romPage$$) {
-    var $address$$ = $obj$$39_romPage$$.address % 16384;
-    $obj$$39_romPage$$ = $obj$$39_romPage$$.romPage;
-    var $pageStart$$ = 16384 * $obj$$39_romPage$$, $pageEnd$$ = 16384 * ($obj$$39_romPage$$ + 1), $branch$$ = [], $bytecode$$, $startingBytecode$$ = !0, $absoluteAddress$$ = 0;
-    1024 > $address$$ && 0 === $obj$$39_romPage$$ && ($pageStart$$ = 0, $pageEnd$$ = 1024);
+  }, parseFromAddress:function $$parser$$$$parseFromAddress$($obj$$33_romPage$$) {
+    var $address$$ = $obj$$33_romPage$$.address % 16384;
+    $obj$$33_romPage$$ = $obj$$33_romPage$$.romPage;
+    var $pageStart$$ = 16384 * $obj$$33_romPage$$, $pageEnd$$ = 16384 * ($obj$$33_romPage$$ + 1), $branch$$ = [], $bytecode$$, $startingBytecode$$ = !0, $absoluteAddress$$;
+    1024 > $address$$ && 0 === $obj$$33_romPage$$ && ($pageStart$$ = 0, $pageEnd$$ = 1024);
     do {
-      this.bytecodes[$obj$$39_romPage$$][$address$$] ? $bytecode$$ = this.bytecodes[$obj$$39_romPage$$][$address$$] : ($bytecode$$ = new Bytecode($address$$, $obj$$39_romPage$$), this.bytecodes[$obj$$39_romPage$$][$address$$] = $disassemble$$($bytecode$$, this.stream));
+      this.bytecodes[$obj$$33_romPage$$][$address$$] ? $bytecode$$ = this.bytecodes[$obj$$33_romPage$$][$address$$] : ($bytecode$$ = new Bytecode($address$$, $obj$$33_romPage$$), this.bytecodes[$obj$$33_romPage$$][$address$$] = $disassemble$$($bytecode$$, this.stream));
       if ($bytecode$$.canEnd && !$startingBytecode$$) {
         break;
       }
       $address$$ = $bytecode$$.nextAddress % 16384;
       $branch$$.push($bytecode$$);
       $startingBytecode$$ = !1;
-      $absoluteAddress$$ = $address$$ + 16384 * $obj$$39_romPage$$;
+      $absoluteAddress$$ = $address$$ + 16384 * $obj$$33_romPage$$;
     } while (null !== $address$$ && $absoluteAddress$$ >= $pageStart$$ && $absoluteAddress$$ < $pageEnd$$ && !$bytecode$$.isFunctionEnder);
     return $branch$$;
   }, writeGraphViz:function $$parser$$$$writeGraphViz$() {
@@ -9702,15 +9694,22 @@ var Parser = function() {
   }, seek:function $$RomStream$$$$seek$($pos$$) {
     this.pos = $pos$$;
   }, getUint8:function $$RomStream$$$$getUint8$() {
-    var $page$$2_value$$ = 0, $page$$2_value$$ = this.page, $address$$ = this.pos & 16383;
+    var $page$$2_value$$;
+    $page$$2_value$$ = this.page;
+    var $address$$ = this.pos & 16383;
     SUPPORT_DATAVIEW ? ($page$$2_value$$ = this.rom[$page$$2_value$$].getUint8($address$$), this.pos++, 16383 <= $address$$ && this.page++) : ($page$$2_value$$ = this.rom[$page$$2_value$$][$address$$] & 255, this.pos++);
     return $page$$2_value$$;
   }, getInt8:function $$RomStream$$$$getInt8$() {
-    var $page$$3_value$$ = 0, $page$$3_value$$ = this.page, $address$$ = this.pos & 16383;
+    var $page$$3_value$$;
+    $page$$3_value$$ = this.page;
+    var $address$$ = this.pos & 16383;
     SUPPORT_DATAVIEW ? ($page$$3_value$$ = this.rom[$page$$3_value$$].getInt8($address$$), this.pos++, 16383 <= $address$$ && this.page++) : ($page$$3_value$$ = this.rom[$page$$3_value$$][$address$$] & 255, 128 <= $page$$3_value$$ && ($page$$3_value$$ -= 256), this.pos++);
     return $page$$3_value$$ + 1;
   }, getUint16:function $$RomStream$$$$getUint16$() {
-    var $page$$4_value$$ = 0, $page$$4_value$$ = this.page, $address$$ = this.pos & 16383, $page$$4_value$$ = SUPPORT_DATAVIEW ? 16383 > $address$$ ? this.rom[$page$$4_value$$].getUint16($address$$, LITTLE_ENDIAN) : this.rom[$page$$4_value$$].getUint8($address$$) | this.rom[++$page$$4_value$$].getUint8($address$$) << 8 : this.rom[$page$$4_value$$][$address$$] & 255 | (this.rom[$page$$4_value$$][$address$$ + 1] & 255) << 8;
+    var $page$$4_value$$;
+    $page$$4_value$$ = this.page;
+    var $address$$ = this.pos & 16383;
+    $page$$4_value$$ = SUPPORT_DATAVIEW ? 16383 > $address$$ ? this.rom[$page$$4_value$$].getUint16($address$$, LITTLE_ENDIAN) : this.rom[$page$$4_value$$].getUint8($address$$) | this.rom[++$page$$4_value$$].getUint8($address$$) << 8 : this.rom[$page$$4_value$$][$address$$] & 255 | (this.rom[$page$$4_value$$][$address$$ + 1] & 255) << 8;
     this.pos += 2;
     return $page$$4_value$$;
   }};
@@ -10316,17 +10315,16 @@ var Analyzer = function() {
     this.ast = [];
     this.missingOpcodes = {};
   };
-  $Analyzer$$.prototype = {analyze:function $$Analyzer$$$$analyze$($bytecodes$$) {
-    var $i$$ = 0;
-    this.bytecodes = $bytecodes$$;
+  $Analyzer$$.prototype = {analyze:function $$Analyzer$$$$analyze$($bytecodes_i$$) {
+    this.bytecodes = $bytecodes_i$$;
     this.ast = Array(this.bytecodes.length);
     JSSMS.Utils.console.time("Analyzing");
-    for ($i$$ = 0;$i$$ < this.bytecodes.length;$i$$++) {
-      this.normalizeBytecode($i$$), this.restructure($i$$);
+    for ($bytecodes_i$$ = 0;$bytecodes_i$$ < this.bytecodes.length;$bytecodes_i$$++) {
+      this.normalizeBytecode($bytecodes_i$$), this.restructure($bytecodes_i$$);
     }
     JSSMS.Utils.console.timeEnd("Analyzing");
-    for ($i$$ in this.missingOpcodes) {
-      console.error("Missing opcode", $i$$, this.missingOpcodes[$i$$]);
+    for ($bytecodes_i$$ in this.missingOpcodes) {
+      console.error("Missing opcode", $bytecodes_i$$, this.missingOpcodes[$bytecodes_i$$]);
     }
   }, analyzeFromAddress:function $$Analyzer$$$$analyzeFromAddress$($bytecodes$$) {
     this.bytecodes = [$bytecodes$$];
@@ -10395,15 +10393,12 @@ var Optimizer = function() {
     this.ast[$page$$] = this.ast[$page$$].map(this.evaluateBinaryExpressions);
     this.ast[$page$$] = this.ast[$page$$].map(this.inlineRegisters);
     this.ast[$page$$] = this.ast[$page$$].map(this.evaluateMemberExpressions.bind(this));
+    this.ast[$page$$] = this.ast[$page$$].map(this.trimAfterReturn.bind(this));
   }, evaluateBinaryExpressions:function $$Optimizer$$$$evaluateBinaryExpressions$($fn$$) {
-    return $fn$$.map(function($bytecodes$$) {
-      var $ast$$0$$ = $bytecodes$$.ast;
-      if (!$ast$$0$$) {
-        return $bytecodes$$;
-      }
-      $bytecodes$$.ast = JSSMS.Utils.traverse($ast$$0$$, function($ast$$) {
+    return $fn$$.map(function($_ast$$) {
+      return $_ast$$ = JSSMS.Utils.traverse($_ast$$, function($ast$$) {
         if ("BinaryExpression" === $ast$$.type && "Literal" === $ast$$.left.type && "Literal" === $ast$$.right.type) {
-          var $value$$ = 0;
+          var $value$$;
           switch($ast$$.operator) {
             case ">>":
               $value$$ = $ast$$.left.value >> $ast$$.right.value;
@@ -10422,16 +10417,11 @@ var Optimizer = function() {
         }
         return $ast$$;
       });
-      return $bytecodes$$;
     });
   }, evaluateMemberExpressions:function $$Optimizer$$$$evaluateMemberExpressions$($fn$$) {
     var $self$$ = this;
-    return $fn$$.map(function($bytecodes$$) {
-      var $ast$$0$$ = $bytecodes$$.ast;
-      if (!$ast$$0$$) {
-        return $bytecodes$$;
-      }
-      $bytecodes$$.ast = JSSMS.Utils.traverse($ast$$0$$, function($ast$$) {
+    return $fn$$.map(function($_ast$$) {
+      return $_ast$$ = JSSMS.Utils.traverse($_ast$$, function($ast$$) {
         if ("MemberExpression" === $ast$$.type && "SZP_TABLE" === $ast$$.object.name && "Literal" === $ast$$.property.type) {
           var $value$$ = $self$$.main.cpu.SZP_TABLE[$ast$$.property.value];
           $ast$$.type = "Literal";
@@ -10443,16 +10433,11 @@ var Optimizer = function() {
         }
         return $ast$$;
       });
-      return $bytecodes$$;
     });
   }, inlineRegisters:function $$Optimizer$$$$inlineRegisters$($fn$$) {
     var $definedReg$$ = {b:!1, c:!1, d:!1, e:!1, h:!1, l:!1}, $definedRegValue$$ = {b:{}, c:{}, d:{}, e:{}, h:{}, l:{}};
-    return $fn$$.map(function($bytecodes$$) {
-      var $ast$$0$$ = $bytecodes$$.ast;
-      if (!$ast$$0$$) {
-        return $bytecodes$$;
-      }
-      $bytecodes$$.ast = JSSMS.Utils.traverse($ast$$0$$, function($ast$$) {
+    return $fn$$.map(function($_ast$$) {
+      return $_ast$$ = JSSMS.Utils.traverse($_ast$$, function($ast$$) {
         "AssignmentExpression" === $ast$$.type && "=" === $ast$$.operator && "Register" === $ast$$.left.type && "Literal" === $ast$$.right.type && "a" !== $ast$$.left.name && "f" !== $ast$$.left.name && ($definedReg$$[$ast$$.left.name] = !0, $definedRegValue$$[$ast$$.left.name] = $ast$$.right);
         if ("AssignmentExpression" === $ast$$.type && "Register" === $ast$$.left.type && "Literal" !== $ast$$.right.type && "a" !== $ast$$.left.name && "f" !== $ast$$.left.name) {
           return $definedReg$$[$ast$$.left.name] = !1, $definedRegValue$$[$ast$$.left.name] = {}, $ast$$;
@@ -10467,16 +10452,11 @@ var Optimizer = function() {
         "BinaryExpression" === $ast$$.type && ("Register" === $ast$$.right.type && $definedReg$$[$ast$$.right.name] && "a" !== $ast$$.right.name && "f" !== $ast$$.right.name && ($ast$$.right = $definedRegValue$$[$ast$$.right.name]), "Register" === $ast$$.left.type && $definedReg$$[$ast$$.left.name] && "a" !== $ast$$.left.name && "f" !== $ast$$.left.name && ($ast$$.left = $definedRegValue$$[$ast$$.left.name]));
         return $ast$$;
       });
-      return $bytecodes$$;
     });
   }, portPeephole:function $$Optimizer$$$$portPeephole$($fn$$) {
     var $self$$ = this;
-    return $fn$$.map(function($bytecodes$$) {
-      var $ast$$0$$ = $bytecodes$$.ast;
-      if (!$ast$$0$$) {
-        return $bytecodes$$;
-      }
-      $bytecodes$$.ast = JSSMS.Utils.traverse($ast$$0$$, function($ast$$) {
+    return $fn$$.map(function($_ast$$) {
+      return $_ast$$ = JSSMS.Utils.traverse($_ast$$, function($ast$$) {
         if ("CallExpression" === $ast$$.type) {
           if ("port.out" === $ast$$.callee.name) {
             var $port$$ = $ast$$.arguments[0].value, $value$$ = $ast$$.arguments[1];
@@ -10543,8 +10523,16 @@ var Optimizer = function() {
         }
         return $ast$$;
       });
-      return $bytecodes$$;
     });
+  }, trimAfterReturn:function $$Optimizer$$$$trimAfterReturn$($fn$$) {
+    var $returnStatementIndex$$ = null;
+    $fn$$.some(function($ast$$, $index$$) {
+      if ("ReturnStatement" === $ast$$.type) {
+        return $returnStatementIndex$$ = $index$$, !0;
+      }
+    });
+    $returnStatementIndex$$ && ($fn$$ = $fn$$.slice(0, $returnStatementIndex$$));
+    return $fn$$;
   }};
   return $Optimizer$$;
 }();
@@ -10563,19 +10551,13 @@ var CodeGenerator = function() {
         return OP_STATES[$opcodes$$[0]];
     }
   }
-  function $convertRegisters$$($ast$$) {
-    return JSSMS.Utils.traverse($ast$$, function($node$$) {
-      "Register" === $node$$.type && ($node$$.type = "Identifier");
-      return $node$$;
-    });
-  }
-  var $toHex$$ = JSSMS.Utils.toHex, $whitelist$$ = "page temp location val value JSSMS.Utils.rndInt".split(" "), $CodeGenerator$$ = function $$CodeGenerator$$$() {
+  var $toHex$$ = JSSMS.Utils.toHex, $CodeGenerator$$ = function $$CodeGenerator$$$() {
     this.ast = [];
   };
   $CodeGenerator$$.prototype = {generate:function $$CodeGenerator$$$$generate$($functions$$) {
     for (var $page$$ = 0;$page$$ < $functions$$.length;$page$$++) {
       $functions$$[$page$$] = $functions$$[$page$$].map(function($fn$$) {
-        var $body$$ = [{type:"ExpressionStatement", expression:{type:"Literal", value:"use strict", raw:'"use strict"'}}], $name$$ = $fn$$[0].address, $tstates$$ = 0;
+        var $body$$ = [{type:"ExpressionStatement", expression:{type:"Literal", value:"use strict", raw:'"use strict"'}, _address:$fn$$[0].address}], $tstates$$ = 0;
         $fn$$ = $fn$$.map(function($bytecode$$) {
           void 0 === $bytecode$$.ast && ($bytecode$$.ast = []);
           if (REFRESH_EMULATION) {
@@ -10599,12 +10581,7 @@ var CodeGenerator = function() {
         $fn$$.forEach(function($ast$$) {
           $body$$ = $body$$.concat($ast$$);
         });
-        $body$$ = $convertRegisters$$($body$$);
-        $body$$ = JSSMS.Utils.traverse($body$$, function($obj$$) {
-          $obj$$.type && "Identifier" === $obj$$.type && -1 === $whitelist$$.indexOf($obj$$.name) && ($obj$$.name = "this." + $obj$$.name);
-          return $obj$$;
-        });
-        return {type:"Program", body:[{type:"FunctionDeclaration", id:{type:"Identifier", name:"_" + $name$$}, params:[{type:"Identifier", name:"page"}, {type:"Identifier", name:"temp"}, {type:"Identifier", name:"location"}], defaults:[], body:{type:"BlockStatement", body:$body$$}, rest:null, generator:!1, expression:!1}]};
+        return $body$$;
       });
     }
     this.ast = $functions$$;
@@ -10629,9 +10606,13 @@ var Recompiler = function() {
     var $self$$ = this;
     this.options.entryPoints = [{address:0, romPage:0, memPage:0}];
     2 >= this.rom.length ? JSSMS.Utils.console.log("Parsing full ROM") : (this.options.pageLimit = 0, JSSMS.Utils.console.log("Parsing initial memory page of ROM"));
-    for (var $fns$$ = this.parse().analyze().optimize().generate(), $page$$ = 0;$page$$ < this.rom.length;$page$$++) {
-      $fns$$[$page$$].forEach(function($fn$$) {
-        $self$$.cpu.branches[$page$$][$fn$$.body[0].id.name] = (new Function("return " + $self$$.generateCodeFromAst($fn$$)))();
+    for (var $fns$$ = this.parse().analyze().generate().optimize(), $page$$ = 0;$page$$ < this.rom.length;$page$$++) {
+      $fns$$[$page$$].forEach(function($body$$) {
+        var $funcName$$ = "_" + $body$$[0]._address;
+        $body$$ = $self$$.convertRegisters($body$$);
+        $body$$ = $self$$.thisifyIdentifiers($body$$);
+        $body$$ = $self$$.wrapFunction($funcName$$, $body$$);
+        $self$$.cpu.branches[$page$$][$funcName$$] = (new Function("return " + $self$$.generateCodeFromAst($body$$)))();
       });
     }
   }, parse:function $$Recompiler$$$$parse$() {
@@ -10644,16 +10625,20 @@ var Recompiler = function() {
   }, analyze:function $$Recompiler$$$$analyze$() {
     this.analyzer.analyze(this.parser.bytecodes);
     return this;
-  }, optimize:function $$Recompiler$$$$optimize$() {
-    this.optimizer.optimize(this.analyzer.ast);
-    return this;
   }, generate:function $$Recompiler$$$$generate$() {
-    this.generator.generate(this.optimizer.ast);
-    return this.generator.ast;
+    this.generator.generate(this.analyzer.ast);
+    return this;
+  }, optimize:function $$Recompiler$$$$optimize$() {
+    this.optimizer.optimize(this.generator.ast);
+    return this.optimizer.ast;
   }, recompileFromAddress:function $$Recompiler$$$$recompileFromAddress$($address$$, $romPage$$, $memPage$$) {
     var $self$$ = this;
-    this.parseFromAddress($address$$, $romPage$$, $memPage$$).analyzeFromAddress().optimize().generate()[0].forEach(function($fn$$) {
-      $self$$.cpu.branches[$romPage$$]["_" + $address$$ % 16384] = (new Function("return " + $self$$.generateCodeFromAst($fn$$)))();
+    this.parseFromAddress($address$$, $romPage$$, $memPage$$).analyzeFromAddress().generate().optimize()[0].forEach(function($body$$) {
+      var $funcName$$ = "_" + $address$$ % 16384;
+      $body$$ = $self$$.convertRegisters($body$$);
+      $body$$ = $self$$.thisifyIdentifiers($body$$);
+      $body$$ = $self$$.wrapFunction($funcName$$, $body$$);
+      $self$$.cpu.branches[$romPage$$][$funcName$$] = (new Function("return " + $self$$.generateCodeFromAst($body$$)))();
     });
   }, parseFromAddress:function $$Recompiler$$$$parseFromAddress$($address$$27_obj$$, $romPage$$, $memPage$$) {
     $address$$27_obj$$ = {address:$address$$27_obj$$, romPage:$romPage$$, memPage:$memPage$$};
@@ -10667,6 +10652,19 @@ var Recompiler = function() {
     return window.escodegen.generate($fn$$, {comment:!0, renumber:!0, hexadecimal:!0, parse:DEBUG ? window.esprima.parse : function($c$$) {
       return {type:"Program", body:[{type:"ExpressionStatement", expression:{type:"Literal", value:$c$$, raw:$c$$}}]};
     }});
+  }, thisifyIdentifiers:function $$Recompiler$$$$thisifyIdentifiers$($body$$) {
+    var $whitelist$$ = "page temp location val value JSSMS.Utils.rndInt".split(" ");
+    return JSSMS.Utils.traverse($body$$, function($obj$$) {
+      $obj$$.type && "Identifier" === $obj$$.type && -1 === $whitelist$$.indexOf($obj$$.name) && ($obj$$.name = "this." + $obj$$.name);
+      return $obj$$;
+    });
+  }, convertRegisters:function $$Recompiler$$$$convertRegisters$($ast$$0$$) {
+    return JSSMS.Utils.traverse($ast$$0$$, function($ast$$) {
+      "Register" === $ast$$.type && ($ast$$.type = "Identifier");
+      return $ast$$;
+    });
+  }, wrapFunction:function $$Recompiler$$$$wrapFunction$($funcName$$, $body$$) {
+    return {type:"Program", body:[{type:"FunctionDeclaration", id:{type:"Identifier", name:$funcName$$}, params:[{type:"Identifier", name:"page"}, {type:"Identifier", name:"temp"}, {type:"Identifier", name:"location"}], defaults:[], body:{type:"BlockStatement", body:$body$$}, rest:null, generator:!1, expression:!1}]};
   }, dump:function $$Recompiler$$$$dump$() {
     var $output$$ = [], $i$$;
     for ($i$$ in this.cpu.branches) {

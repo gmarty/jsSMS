@@ -8839,13 +8839,20 @@ function Instruction(options) {
   defaultInstruction.label = defaultInstruction.hexAddress + " " + hexOpcodes + defaultInstruction.inst;
   return defaultInstruction;
 }
-;var KEY_UP = 1;
-var KEY_DOWN = 2;
-var KEY_LEFT = 4;
-var KEY_RIGHT = 8;
-var KEY_FIRE1 = 16;
-var KEY_FIRE2 = 32;
+;var P1_KEY_UP = 1;
+var P1_KEY_DOWN = 2;
+var P1_KEY_LEFT = 4;
+var P1_KEY_RIGHT = 8;
+var P1_KEY_FIRE1 = 16;
+var P1_KEY_FIRE2 = 32;
+var P2_KEY_UP = 64;
+var P2_KEY_DOWN = 128;
+var P2_KEY_LEFT = 1;
+var P2_KEY_RIGHT = 2;
+var P2_KEY_FIRE1 = 4;
+var P2_KEY_FIRE2 = 8;
 var KEY_START = 64;
+var GG_KEY_START = 128;
 JSSMS.Keyboard = function(sms) {
   this.main = sms;
   this.controller1 = 0;
@@ -8867,50 +8874,47 @@ JSSMS.Keyboard.prototype = {reset:function() {
 }, keydown:function(evt) {
   switch(evt.keyCode) {
     case 38:
-      this.controller1 &= ~KEY_UP;
+      this.controller1 &= ~P1_KEY_UP;
       break;
     case 40:
-      this.controller1 &= ~KEY_DOWN;
+      this.controller1 &= ~P1_KEY_DOWN;
       break;
     case 37:
-      this.controller1 &= ~KEY_LEFT;
+      this.controller1 &= ~P1_KEY_LEFT;
       break;
     case 39:
-      this.controller1 &= ~KEY_RIGHT;
+      this.controller1 &= ~P1_KEY_RIGHT;
       break;
     case 88:
-      this.controller1 &= ~KEY_FIRE1;
+      this.controller1 &= ~P1_KEY_FIRE1;
       break;
     case 90:
-      this.controller1 &= ~KEY_FIRE2;
+      this.controller1 &= ~P1_KEY_FIRE2;
       break;
     case 13:
       if (this.main.is_sms) {
         this.main.pause_button = true;
       } else {
-        this.ggstart &= ~128;
+        this.ggstart &= ~GG_KEY_START;
       }
       break;
     case 104:
-      this.controller2 &= ~KEY_UP;
+      this.controller2 &= ~P2_KEY_UP;
       break;
     case 98:
-      this.controller2 &= ~KEY_DOWN;
+      this.controller2 &= ~P2_KEY_DOWN;
       break;
     case 100:
-      this.controller2 &= ~KEY_LEFT;
+      this.controller2 &= ~P2_KEY_LEFT;
       break;
     case 102:
-      this.controller2 &= ~KEY_RIGHT;
+      this.controller2 &= ~P2_KEY_RIGHT;
       break;
     case 103:
-      this.controller2 &= ~KEY_FIRE1;
+      this.controller2 &= ~P2_KEY_FIRE1;
       break;
     case 105:
-      this.controller2 &= ~KEY_FIRE2;
-      break;
-    case 97:
-      this.controller2 &= ~KEY_START;
+      this.controller2 &= ~P2_KEY_FIRE2;
       break;
     default:
       return;
@@ -8919,48 +8923,45 @@ JSSMS.Keyboard.prototype = {reset:function() {
 }, keyup:function(evt) {
   switch(evt.keyCode) {
     case 38:
-      this.controller1 |= KEY_UP;
+      this.controller1 |= P1_KEY_UP;
       break;
     case 40:
-      this.controller1 |= KEY_DOWN;
+      this.controller1 |= P1_KEY_DOWN;
       break;
     case 37:
-      this.controller1 |= KEY_LEFT;
+      this.controller1 |= P1_KEY_LEFT;
       break;
     case 39:
-      this.controller1 |= KEY_RIGHT;
+      this.controller1 |= P1_KEY_RIGHT;
       break;
     case 88:
-      this.controller1 |= KEY_FIRE1;
+      this.controller1 |= P1_KEY_FIRE1;
       break;
     case 90:
-      this.controller1 |= KEY_FIRE2;
+      this.controller1 |= P1_KEY_FIRE2;
       break;
     case 13:
       if (!this.main.is_sms) {
-        this.ggstart |= 128;
+        this.ggstart |= GG_KEY_START;
       }
       break;
     case 104:
-      this.controller2 |= KEY_UP;
+      this.controller2 |= P2_KEY_UP;
       break;
     case 98:
-      this.controller2 |= KEY_DOWN;
+      this.controller2 |= P2_KEY_DOWN;
       break;
     case 100:
-      this.controller2 |= KEY_LEFT;
+      this.controller2 |= P2_KEY_LEFT;
       break;
     case 102:
-      this.controller2 |= KEY_RIGHT;
+      this.controller2 |= P2_KEY_RIGHT;
       break;
     case 103:
-      this.controller2 |= KEY_FIRE1;
+      this.controller2 |= P2_KEY_FIRE1;
       break;
     case 105:
-      this.controller2 |= KEY_FIRE2;
-      break;
-    case 97:
-      this.controller2 |= KEY_START;
+      this.controller2 |= P2_KEY_FIRE2;
       break;
     default:
       return;
@@ -9686,7 +9687,7 @@ if (window["$"]) {
         return;
       }
       this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
-      this.gamepad = {up:KEY_UP, down:KEY_DOWN, left:KEY_LEFT, right:KEY_RIGHT, fire1:KEY_FIRE1, fire2:KEY_FIRE2};
+      this.gamepad = {up:P1_KEY_UP, down:P1_KEY_DOWN, left:P1_KEY_LEFT, right:P1_KEY_RIGHT, fire1:P1_KEY_FIRE1, fire2:P1_KEY_FIRE2};
       var startButton = $(".start", gamepadContainer);
       this.romContainer = $('<div id="romSelector"></div>');
       this.romSelect = $("<select></select>").change(function() {
@@ -9759,10 +9760,14 @@ if (window["$"]) {
         });
       }
       gamepadContainer.on("touchstart touchmove", function(evt) {
+        evt.preventDefault();
         self.main.keyboard.controller1 = 255;
-        var changedTouches = evt.originalEvent.changedTouches;
-        for (var i = 0;i < changedTouches.length;i++) {
-          var target = document.elementFromPoint(changedTouches[i].clientX, changedTouches[i].clientY);
+        var touches = evt.originalEvent.touches;
+        for (var i = 0;i < touches.length;i++) {
+          var target = document.elementFromPoint(touches[i].clientX, touches[i].clientY);
+          if (!target) {
+            continue;
+          }
           var className = target.className;
           if (!className || !self.gamepad[className]) {
             continue;
@@ -9770,10 +9775,12 @@ if (window["$"]) {
           var key = self.gamepad[className];
           self.main.keyboard.controller1 &= ~key;
         }
-        evt.preventDefault();
       });
       gamepadContainer.on("touchend", function(evt) {
-        self.main.keyboard.controller1 = 255;
+        evt.preventDefault();
+        if (evt.originalEvent.touches.length === 0) {
+          self.main.keyboard.controller1 = 255;
+        }
       });
       function mouseDown(evt) {
         var className = this.className;
@@ -12312,13 +12319,10 @@ var Optimizer = function() {
     this.ast[page] = this.ast[page].map(this.evaluateBinaryExpressions);
     this.ast[page] = this.ast[page].map(this.inlineRegisters);
     this.ast[page] = this.ast[page].map(this.evaluateMemberExpressions.bind(this));
+    this.ast[page] = this.ast[page].map(this.trimAfterReturn.bind(this));
   }, evaluateBinaryExpressions:function(fn) {
-    return fn.map(function(bytecodes) {
-      var ast = bytecodes.ast;
-      if (!ast) {
-        return bytecodes;
-      }
-      bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+    return fn.map(function(_ast) {
+      _ast = JSSMS.Utils.traverse(_ast, function(ast) {
         if (ast["type"] === "BinaryExpression" && ast["left"]["type"] === "Literal" && ast["right"]["type"] === "Literal") {
           var value = 0;
           switch(ast["operator"]) {
@@ -12340,16 +12344,12 @@ var Optimizer = function() {
         }
         return ast;
       });
-      return bytecodes;
+      return _ast;
     });
   }, evaluateMemberExpressions:function(fn) {
     var self = this;
-    return fn.map(function(bytecodes) {
-      var ast = bytecodes.ast;
-      if (!ast) {
-        return bytecodes;
-      }
-      bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+    return fn.map(function(_ast) {
+      _ast = JSSMS.Utils.traverse(_ast, function(ast) {
         if (ast["type"] === "MemberExpression" && ast["object"]["name"] === "SZP_TABLE" && ast["property"]["type"] === "Literal") {
           var value = self.main.cpu.SZP_TABLE[ast["property"]["value"]];
           ast["type"] = "Literal";
@@ -12361,17 +12361,13 @@ var Optimizer = function() {
         }
         return ast;
       });
-      return bytecodes;
+      return _ast;
     });
   }, inlineRegisters:function(fn) {
     var definedReg = {b:false, c:false, d:false, e:false, h:false, l:false};
     var definedRegValue = {b:{}, c:{}, d:{}, e:{}, h:{}, l:{}};
-    return fn.map(function(bytecodes) {
-      var ast = bytecodes.ast;
-      if (!ast) {
-        return bytecodes;
-      }
-      bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+    return fn.map(function(_ast) {
+      _ast = JSSMS.Utils.traverse(_ast, function(ast) {
         if (ast["type"] === "AssignmentExpression" && ast["operator"] === "=" && ast["left"]["type"] === "Register" && ast["right"]["type"] === "Literal" && ast["left"]["name"] !== "a" && ast["left"]["name"] !== "f") {
           definedReg[ast["left"]["name"]] = true;
           definedRegValue[ast["left"]["name"]] = ast["right"];
@@ -12405,16 +12401,12 @@ var Optimizer = function() {
         }
         return ast;
       });
-      return bytecodes;
+      return _ast;
     });
   }, portPeephole:function(fn) {
     var self = this;
-    return fn.map(function(bytecodes) {
-      var ast = bytecodes.ast;
-      if (!ast) {
-        return bytecodes;
-      }
-      bytecodes.ast = JSSMS.Utils.traverse(ast, function(ast) {
+    return fn.map(function(_ast) {
+      _ast = JSSMS.Utils.traverse(_ast, function(ast) {
         if (ast["type"] === "CallExpression") {
           if (ast["callee"]["name"] === "port.out") {
             var port = ast["arguments"][0]["value"];
@@ -12532,14 +12524,25 @@ var Optimizer = function() {
         }
         return ast;
       });
-      return bytecodes;
+      return _ast;
     });
+  }, trimAfterReturn:function(fn) {
+    var returnStatementIndex = null;
+    fn.some(function(ast, index) {
+      if (ast["type"] === "ReturnStatement") {
+        returnStatementIndex = index;
+        return true;
+      }
+    });
+    if (returnStatementIndex) {
+      fn = fn.slice(0, returnStatementIndex);
+    }
+    return fn;
   }};
   return Optimizer;
 }();
 var CodeGenerator = function() {
   var toHex = JSSMS.Utils.toHex;
-  var whitelist = ["page", "temp", "location", "val", "value", "JSSMS.Utils.rndInt"];
   function getTotalTStates(opcodes) {
     switch(opcodes[0]) {
       case 203:
@@ -12557,23 +12560,14 @@ var CodeGenerator = function() {
         return OP_STATES[opcodes[0]];
     }
   }
-  function convertRegisters(ast) {
-    var convertRegistersFunc = function(node) {
-      if (node.type === "Register") {
-        node.type = "Identifier";
-      }
-      return node;
-    };
-    return JSSMS.Utils.traverse(ast, convertRegistersFunc);
-  }
   var CodeGenerator = function() {
     this.ast = [];
   };
   CodeGenerator.prototype = {generate:function(functions) {
     for (var page = 0;page < functions.length;page++) {
       functions[page] = functions[page].map(function(fn) {
-        var body = [{"type":"ExpressionStatement", "expression":{"type":"Literal", "value":"use strict", "raw":'"use strict"'}}];
         var name = fn[0].address;
+        var body = [{"type":"ExpressionStatement", "expression":{"type":"Literal", "value":"use strict", "raw":'"use strict"'}, "_address":name}];
         var tstates = 0;
         fn = fn.map(function(bytecode) {
           if (bytecode.ast === undefined) {
@@ -12614,14 +12608,7 @@ var CodeGenerator = function() {
         fn.forEach(function(ast) {
           body = body.concat(ast);
         });
-        body = convertRegisters(body);
-        body = JSSMS.Utils.traverse(body, function(obj) {
-          if (obj.type && obj.type === "Identifier" && whitelist.indexOf(obj.name) === -1) {
-            obj.name = "this." + obj.name;
-          }
-          return obj;
-        });
-        return {"type":"Program", "body":[{"type":"FunctionDeclaration", "id":{"type":"Identifier", "name":"_" + name}, "params":[{"type":"Identifier", "name":"page"}, {"type":"Identifier", "name":"temp"}, {"type":"Identifier", "name":"location"}], "defaults":[], "body":{"type":"BlockStatement", "body":body}, "rest":null, "generator":false, "expression":false}]};
+        return body;
       });
     }
     this.ast = functions;
@@ -12651,11 +12638,14 @@ var Recompiler = function() {
       this.options.pageLimit = 0;
       JSSMS.Utils.console.log("Parsing initial memory page of ROM");
     }
-    var fns = this.parse().analyze().optimize().generate();
+    var fns = this.parse().analyze().generate().optimize();
     for (var page = 0;page < this.rom.length;page++) {
-      fns[page].forEach(function(fn) {
-        var funcName = fn.body[0].id.name;
-        self.cpu.branches[page][funcName] = (new Function("return " + self.generateCodeFromAst(fn)))();
+      fns[page].forEach(function(body) {
+        var funcName = "_" + body[0]._address;
+        body = self.convertRegisters(body);
+        body = self.thisifyIdentifiers(body);
+        body = self.wrapFunction(funcName, body);
+        self.cpu.branches[page][funcName] = (new Function("return " + self.generateCodeFromAst(body)))();
       });
     }
   }, parse:function() {
@@ -12668,17 +12658,21 @@ var Recompiler = function() {
   }, analyze:function() {
     this.analyzer.analyze(this.parser.bytecodes);
     return this;
-  }, optimize:function() {
-    this.optimizer.optimize(this.analyzer.ast);
-    return this;
   }, generate:function() {
-    this.generator.generate(this.optimizer.ast);
-    return this.generator.ast;
+    this.generator.generate(this.analyzer.ast);
+    return this;
+  }, optimize:function() {
+    this.optimizer.optimize(this.generator.ast);
+    return this.optimizer.ast;
   }, recompileFromAddress:function(address, romPage, memPage) {
     var self = this;
-    var fns = this.parseFromAddress(address, romPage, memPage).analyzeFromAddress().optimize().generate();
-    fns[0].forEach(function(fn) {
-      self.cpu.branches[romPage]["_" + address % 16384] = (new Function("return " + self.generateCodeFromAst(fn)))();
+    var fns = this.parseFromAddress(address, romPage, memPage).analyzeFromAddress().generate().optimize();
+    fns[0].forEach(function(body) {
+      var funcName = "_" + address % 16384;
+      body = self.convertRegisters(body);
+      body = self.thisifyIdentifiers(body);
+      body = self.wrapFunction(funcName, body);
+      self.cpu.branches[romPage][funcName] = (new Function("return " + self.generateCodeFromAst(body)))();
     });
   }, parseFromAddress:function(address, romPage, memPage) {
     var obj = {address:address, romPage:romPage, memPage:memPage};
@@ -12692,6 +12686,23 @@ var Recompiler = function() {
     return window["escodegen"]["generate"](fn, {comment:true, renumber:true, hexadecimal:true, parse:DEBUG ? window["esprima"]["parse"] : function(c) {
       return {"type":"Program", "body":[{"type":"ExpressionStatement", "expression":{"type":"Literal", "value":c, "raw":c}}]};
     }});
+  }, thisifyIdentifiers:function(body) {
+    var whitelist = ["page", "temp", "location", "val", "value", "JSSMS.Utils.rndInt"];
+    return JSSMS.Utils.traverse(body, function(obj) {
+      if (obj.type && obj.type === "Identifier" && whitelist.indexOf(obj.name) === -1) {
+        obj.name = "this." + obj.name;
+      }
+      return obj;
+    });
+  }, convertRegisters:function(ast) {
+    return JSSMS.Utils.traverse(ast, function(ast) {
+      if (ast.type === "Register") {
+        ast.type = "Identifier";
+      }
+      return ast;
+    });
+  }, wrapFunction:function(funcName, body) {
+    return {"type":"Program", "body":[{"type":"FunctionDeclaration", "id":{"type":"Identifier", "name":funcName}, "params":[{"type":"Identifier", "name":"page"}, {"type":"Identifier", "name":"temp"}, {"type":"Identifier", "name":"location"}], "defaults":[], "body":{"type":"BlockStatement", "body":body}, "rest":null, "generator":false, "expression":false}]};
   }, dump:function() {
     var output = [];
     for (var i in this.cpu.branches) {

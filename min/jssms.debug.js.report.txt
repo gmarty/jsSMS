@@ -650,7 +650,11 @@ src/compiler/optimizer.js:62: WARNING - Property evaluateMemberExpressions never
       this.ast[page] = this.ast[page].map(this.evaluateMemberExpressions.bind(this));
                                                ^
 
-src/compiler/optimizer.js:508: WARNING - unreachable code
+src/compiler/optimizer.js:63: WARNING - Property trimAfterReturn never defined on Optimizer
+      this.ast[page] = this.ast[page].map(this.trimAfterReturn.bind(this));
+                                               ^
+
+src/compiler/optimizer.js:433: WARNING - unreachable code
                   return ast;
                   ^
 
@@ -658,17 +662,41 @@ src/compiler/recompiler.js:74: WARNING - Property parse never defined on Recompi
         .parse()
          ^
 
-src/compiler/recompiler.js:83: WARNING - Property generateCodeFromAst never defined on Recompiler
-          self.cpu.branches[page][funcName] = new Function('return ' + self.generateCodeFromAst(fn))();
+src/compiler/recompiler.js:84: WARNING - Property convertRegisters never defined on Recompiler
+          body = self.convertRegisters(body);
+                      ^
+
+src/compiler/recompiler.js:85: WARNING - Property thisifyIdentifiers never defined on Recompiler
+          body = self.thisifyIdentifiers(body);
+                      ^
+
+src/compiler/recompiler.js:87: WARNING - Property wrapFunction never defined on Recompiler
+          body = self.wrapFunction(funcName, body);
+                      ^
+
+src/compiler/recompiler.js:88: WARNING - Property generateCodeFromAst never defined on Recompiler
+          self.cpu.branches[page][funcName] = new Function('return ' + self.generateCodeFromAst(body))();
                                                                             ^
 
-src/compiler/recompiler.js:126: WARNING - Property parseFromAddress never defined on Recompiler
+src/compiler/recompiler.js:131: WARNING - Property parseFromAddress never defined on Recompiler
         .parseFromAddress(address, romPage, memPage)
          ^
 
-src/compiler/recompiler.js:133: WARNING - Property generateCodeFromAst never defined on Recompiler
-        self.cpu.branches[romPage]['_' + (address % 0x4000)] = new Function('return ' + self.generateCodeFromAst(fn))();
-                                                                                             ^
+src/compiler/recompiler.js:140: WARNING - Property convertRegisters never defined on Recompiler
+        body = self.convertRegisters(body);
+                    ^
+
+src/compiler/recompiler.js:141: WARNING - Property thisifyIdentifiers never defined on Recompiler
+        body = self.thisifyIdentifiers(body);
+                    ^
+
+src/compiler/recompiler.js:143: WARNING - Property wrapFunction never defined on Recompiler
+        body = self.wrapFunction(funcName, body);
+                    ^
+
+src/compiler/recompiler.js:144: WARNING - Property generateCodeFromAst never defined on Recompiler
+        self.cpu.branches[romPage][funcName] = new Function('return ' + self.generateCodeFromAst(body))();
+                                                                             ^
 
 src/debugger.js:396: WARNING - Property signExtend never defined on JSSMS.Debugger
         target = address + this.signExtend(this.readRom8bit(address) + 1);
@@ -735,7 +763,7 @@ src/psg.js:247: WARNING - Missing return statement. Function expected to return 
           ^
 
 src/utils.js:25: WARNING - assignment to property console of Window
-found   : {error: function (): undefined, log: function (): undefined}
+found   : {error: function (...*): ?, log: function (...*): ?}
 required: Console
     window.console = {
     ^
@@ -748,35 +776,35 @@ src/utils.js:40: WARNING - "function (this:Console, ...*): ?" must be called wit
         return fn(msg);
                ^
 
-src/utils.js:64: WARNING - Misplaced function annotation.
+src/utils.js:64: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
     if (SUPPORT_TYPED_ARRAYS) {
     ^
 
-src/utils.js:71: WARNING - Misplaced function annotation.
+src/utils.js:71: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return Array;
       ^
 
-src/utils.js:81: WARNING - Misplaced function annotation.
+src/utils.js:81: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
     if (SUPPORT_TYPED_ARRAYS) {
     ^
 
-src/utils.js:88: WARNING - Misplaced function annotation.
+src/utils.js:88: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return Array;
       ^
 
-src/utils.js:103: WARNING - Misplaced function annotation.
+src/utils.js:103: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return function(length) {
       ^
 
-src/utils.js:111: WARNING - Misplaced function annotation.
+src/utils.js:111: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return Array;
       ^
 
-src/utils.js:129: WARNING - Misplaced function annotation.
+src/utils.js:129: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return function(src, srcPos, dest, destPos, length) {
       ^
 
-src/utils.js:142: WARNING - Misplaced function annotation.
+src/utils.js:142: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return function(src, srcPos, dest, destPos, length) {
       ^
 
@@ -787,6 +815,42 @@ src/utils.js:341: WARNING - dangerous use of the global this object
 src/utils.js:351: WARNING - dangerous use of the global this object
     return this.crc32(str);
            ^
+
+src/vdp.js:639: WARNING - assignment
+found   : boolean
+required: number
+        this.spriteCol[x] = false;
+        ^
+
+src/vdp.js:744: WARNING - assignment
+found   : boolean
+required: number
+          this.bgPriority[sx] = ((secondbyte & 0x10) !== 0) && (colour !== 0);
+          ^
+
+src/vdp.js:759: WARNING - assignment
+found   : boolean
+required: number
+          this.bgPriority[sx] = ((secondbyte & 0x10) !== 0) && (colour !== 0);
+          ^
+
+src/vdp.js:855: WARNING - assignment
+found   : boolean
+required: number
+                this.spriteCol[x] = true;
+                ^
+
+src/vdp.js:878: WARNING - assignment
+found   : boolean
+required: number
+                this.spriteCol[x] = true;
+                ^
+
+src/vdp.js:896: WARNING - assignment
+found   : boolean
+required: number
+                this.spriteCol[x + 1] = true;
+                ^
 
 src/z80.js:501: WARNING - Property recompileFromAddress never defined on Recompiler
         this.recompiler.recompileFromAddress(this.pc, 0, 0);
@@ -806,44 +870,44 @@ src/z80.js:3417: WARNING - Property setRom never defined on Recompiler
         this.recompiler.setRom(this.rom);
                         ^
 
-src/z80.js:3445: WARNING - Misplaced function annotation.
+src/z80.js:3445: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return function setUint8(address, value) {
       ^
 
-src/z80.js:3466: WARNING - Misplaced function annotation.
+src/z80.js:3466: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return function setUint8(address, value) {
       ^
 
-src/z80.js:3495: WARNING - Misplaced function annotation.
+src/z80.js:3495: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return function setUint16(address, value) {
       ^
 
-src/z80.js:3516: WARNING - Misplaced function annotation.
+src/z80.js:3516: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return function setUint16(address, value) {
       ^
 
-src/z80.js:3547: WARNING - Misplaced function annotation.
+src/z80.js:3547: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return function getUint8(address) {
       ^
 
-src/z80.js:3590: WARNING - Misplaced function annotation.
+src/z80.js:3590: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return function getUint8(address) {
       ^
 
-src/z80.js:3641: WARNING - Misplaced function annotation.
+src/z80.js:3641: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return function getUint16(address) {
       ^
 
-src/z80.js:3684: WARNING - Misplaced function annotation.
+src/z80.js:3684: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return function getUint16(address) {
       ^
 
-src/z80.js:3735: WARNING - Misplaced function annotation.
+src/z80.js:3735: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return function getInt8(address) {
       ^
 
-src/z80.js:3779: WARNING - Misplaced function annotation.
+src/z80.js:3779: WARNING - Misplaced function annotation. This JSDoc is not attached to a function node. Are you missing parentheses?
       return function getInt8(address) {
       ^
 
-0 error(s), 208 warning(s), 84.6% typed
+0 error(s), 221 warning(s), 84.7% typed
