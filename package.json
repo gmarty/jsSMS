@@ -4,7 +4,7 @@
   "author": "G. C. Marty",
   "description": "JavaScript Sega Master System &amp; Game Gear dynamic recompiling emulator",
   "bin": {
-    "jssms": "./bin/jssms"
+    "jssms": "./bin/jssms.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
