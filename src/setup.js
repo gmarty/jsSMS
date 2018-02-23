@@ -21,20 +21,17 @@
 
 'use strict';
 
-
 // Constants
 /**
  * Whether to enable debug code globally. Set to false at build time.
  */
 var DEBUG = false;
 
-
 /**
  * Whether to activate debugger.
  * @define {boolean}
  */
 var ENABLE_DEBUGGER = false;
-
 
 /**
  * Whether to enable compiler.
@@ -43,7 +40,6 @@ var ENABLE_COMPILER = true;
 
 /** @const */ var WRITE_MODE = 0;
 /** @const */ var READ_MODE = 1;
-
 
 /**
  * Whether to enable server logging of various data used for debugging purposes.
@@ -55,18 +51,15 @@ var ENABLE_COMPILER = true;
  */
 var ENABLE_SERVER_LOGGER = false;
 
-
 /**
  * @const
  */
 var SYNC_MODE = READ_MODE;
 
-
 /**
  * @type {boolean}
  */
 var ACCURATE = false;
-
 
 /**
  * Whether the system uses little endian or big endian.
@@ -74,20 +67,17 @@ var ACCURATE = false;
  */
 var LITTLE_ENDIAN = true;
 
-
 /**
  * Force the use of typed arrays.
  * @define {boolean}
  */
 var FORCE_TYPED_ARRAYS = false;
 
-
 /**
  * Does browser support typed arrays?
  * @const
  */
-var SUPPORT_TYPED_ARRAYS = FORCE_TYPED_ARRAYS || ('Uint8Array' in window);
-
+var SUPPORT_TYPED_ARRAYS = FORCE_TYPED_ARRAYS || 'Uint8Array' in window;
 
 /**
  * Force ArrayBuffer and DataView use.
@@ -95,13 +85,12 @@ var SUPPORT_TYPED_ARRAYS = FORCE_TYPED_ARRAYS || ('Uint8Array' in window);
  */
 var FORCE_DATAVIEW = false;
 
-
 /**
  * Does browser support ArrayBuffer and DataView?
  * @const
  */
-var SUPPORT_DATAVIEW = FORCE_DATAVIEW || ('ArrayBuffer' in window && 'DataView' in window);
-
+var SUPPORT_DATAVIEW =
+  FORCE_DATAVIEW || ('ArrayBuffer' in window && 'DataView' in window);
 
 /**
  * Force use of destructuring assignments.
@@ -109,12 +98,11 @@ var SUPPORT_DATAVIEW = FORCE_DATAVIEW || ('ArrayBuffer' in window && 'DataView' 
  */
 var FORCE_DESTRUCTURING = false;
 
-
 /**
  * Does browser support destructuring assignments? Used in `EX ...` opcodes.
  * @const
  */
-var SUPPORT_DESTRUCTURING = false;/*FORCE_DESTRUCTURING || function() {
+var SUPPORT_DESTRUCTURING = false; /*FORCE_DESTRUCTURING || function() {
   try {
     eval('var [a]=[1]');
     return true;
@@ -123,7 +111,6 @@ var SUPPORT_DESTRUCTURING = false;/*FORCE_DESTRUCTURING || function() {
   }
 }()*/
 
-
 // Sound Output
 /**
  * Sample Rate
@@ -131,13 +118,11 @@ var SUPPORT_DESTRUCTURING = false;/*FORCE_DESTRUCTURING || function() {
  */
 var SAMPLE_RATE = 44100; //8000
 
-
 /**
  * Print timing information on screen.
  * @type {boolean}
  */
 var DEBUG_TIMING = DEBUG;
-
 
 // CPU Settings
 /**
@@ -145,7 +130,6 @@ var DEBUG_TIMING = DEBUG;
  * @type {boolean}
  */
 var REFRESH_EMULATION = false;
-
 
 /*
  * Games requiring accurate interrupt emulation:
@@ -157,7 +141,6 @@ var REFRESH_EMULATION = false;
  * @define {boolean}
  */
 var ACCURATE_INTERRUPT_EMULATION = false;
-
 
 /*
  * Lightgun Mode (For the following titles):
@@ -178,7 +161,6 @@ var ACCURATE_INTERRUPT_EMULATION = false;
  */
 var LIGHTGUN = /*ACCURATE*/ false;
 
-
 // VDP Settings
 /*
  * Games requiring sprite collision:
@@ -194,7 +176,6 @@ var LIGHTGUN = /*ACCURATE*/ false;
  * @type {boolean}
  */
 var VDP_SPRITE_COLLISIONS = ACCURATE;
-
 
 // Memory Settings
 /**

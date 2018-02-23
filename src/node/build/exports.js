@@ -7,7 +7,9 @@ JSSMS['Utils']['getFileExtension'] = JSSMS.Utils.getFileExtension;
 JSSMS['Utils']['crc32'] = JSSMS.Utils.crc32;
 
 JSSMS['NodeUI'] = JSSMS.NodeUI;
-JSSMS['NodeUI'].prototype['writeGraphViz'] = JSSMS.NodeUI.prototype.writeGraphViz;
-JSSMS['NodeUI'].prototype['writeJavaScript'] = JSSMS.NodeUI.prototype.writeJavaScript;
+JSSMS['NodeUI'].prototype['writeGraphViz'] =
+  JSSMS.NodeUI.prototype.writeGraphViz;
+JSSMS['NodeUI'].prototype['writeJavaScript'] =
+  JSSMS.NodeUI.prototype.writeJavaScript;
 
 window['JSSMS'] = JSSMS;

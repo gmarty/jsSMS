@@ -46,15 +46,14 @@ var argv = require('optimist')
   .alias('d', 'dump')
   .describe('d', 'Dump the ROM to a JavaScript file')
   .alias('o', 'output')
-  .describe('o', 'Output file, otherwise output is written to stdout')
-  .argv;
+  .describe('o', 'Output file, otherwise output is written to stdout').argv;
 
-fs.readFile(argv.file, {encoding: 'binary'}, function(err, data) {
+fs.readFile(argv.file, { encoding: 'binary' }, function(err, data) {
   if (err) return new Error(err);
 
   var sms = new JSSMS({
     ui: JSSMS.NodeUI,
-    ENABLE_COMPILER: false
+    ENABLE_COMPILER: false,
   });
 
   sms.readRomDirectly(data, argv.file);
@@ -66,7 +65,9 @@ fs.readFile(argv.file, {encoding: 'binary'}, function(err, data) {
   }
 
   if (argv.d) {
-    var tpl = fs.readFileSync(__dirname + '/tpl/z80.js.tpl', {encoding: 'ascii'}).toString();
+    var tpl = fs
+      .readFileSync(__dirname + '/tpl/z80.js.tpl', { encoding: 'ascii' })
+      .toString();
     tpl = tpl.replace(/\{\{run_method_code\}\}/, sms.ui.writeJavaScript());
     generateOutput(tpl);
     return;
@@ -77,7 +78,7 @@ fs.readFile(argv.file, {encoding: 'binary'}, function(err, data) {
 
 function generateOutput(content) {
   if (argv.o) {
-    fs.writeFile(argv.o, content, {encoding: 'ascii'}, function(err) {
+    fs.writeFile(argv.o, content, { encoding: 'ascii' }, function(err) {
       if (err) return new Error(err);
 
       process.stdout.write('File successfully generated.');

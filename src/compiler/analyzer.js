@@ -19,8 +19,6 @@
 
 'use strict';
 
-
-
 /**
  * @constructor
  */
@@ -54,7 +52,6 @@ var Analyzer = (function() {
       }
     },
 
-
     analyzeFromAddress: function(bytecodes) {
       this.bytecodes = [bytecodes];
       this.ast = [];
@@ -71,7 +68,6 @@ var Analyzer = (function() {
       }
     },
 
-
     /**
      * Remove unused addresses and populate bytecodes with AST.
      * @todo Can we merge operand & target? Ex: `bytecode.operand || bytecode.target`
@@ -80,61 +76,80 @@ var Analyzer = (function() {
       var self = this;
 
       this.bytecodes[page] = this.bytecodes[page]
-          // Populate AST for each bytecode.
+        // Populate AST for each bytecode.
         .map(function(bytecode) {
-            var opcode;
-            switch (bytecode.opcode.length) {
-              case 1:
-                opcode = opcodeTable[bytecode.opcode[0]];
-                break;
-              case 2:
-                opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]];
-                break;
-              case 3:
-                opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]][bytecode.opcode[2]];
-                break;
-              default:
-                JSSMS.Utils.console.error('Something went wrong in parsing. Opcode: [' + bytecode.hexOpcode + ']');
+          var opcode;
+          switch (bytecode.opcode.length) {
+            case 1:
+              opcode = opcodeTable[bytecode.opcode[0]];
+              break;
+            case 2:
+              opcode = opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]];
+              break;
+            case 3:
+              opcode =
+                opcodeTable[bytecode.opcode[0]][bytecode.opcode[1]][
+                  bytecode.opcode[2]
+                ];
+              break;
+            default:
+              JSSMS.Utils.console.error(
+                'Something went wrong in parsing. Opcode: [' +
+                  bytecode.hexOpcode +
+                  ']'
+              );
+          }
+
+          if (opcode && opcode.ast) {
+            var ast = opcode.ast(
+              bytecode.operand,
+              bytecode.target,
+              bytecode.nextAddress
+            );
+
+            // Force ast property to always be an array.
+            if (!Array.isArray(ast) && ast !== undefined) {
+              ast = [ast];
             }
 
-            if (opcode && opcode.ast) {
-              var ast = opcode.ast(bytecode.operand, bytecode.target, bytecode.nextAddress);
-
-              // Force ast property to always be an array.
-              if (!Array.isArray(ast) && ast !== undefined) {
-                ast = [ast];
-              }
-
-              if (bytecode.opcode.length > 1 && REFRESH_EMULATION) {
-                // Sync server.
-                ast = [].concat({
-                  'type': 'ExpressionStatement',
-                  'expression': {
-                    'type': 'CallExpression',
-                    'callee': n.Identifier('incR'),
-                    'arguments': []
-                  }
-                }, ast);
-              }
-
-              bytecode.ast = ast;
-
-              if (DEBUG) {
-                bytecode.name = opcode.name;
-                if (opcode.opcode) {
-                  bytecode.opcode = opcode.opcode(bytecode.operand, bytecode.target, bytecode.nextAddress);
-                }
-              }
-            } else {
-              var i = bytecode.hexOpcode;
-              self.missingOpcodes[i] = self.missingOpcodes[i] !== undefined ?
-                  self.missingOpcodes[i] + 1 : 1;
+            if (bytecode.opcode.length > 1 && REFRESH_EMULATION) {
+              // Sync server.
+              ast = [].concat(
+                {
+                  type: 'ExpressionStatement',
+                  expression: {
+                    type: 'CallExpression',
+                    callee: n.Identifier('incR'),
+                    arguments: [],
+                  },
+                },
+                ast
+              );
             }
 
-            return bytecode;
-          });
+            bytecode.ast = ast;
+
+            if (DEBUG) {
+              bytecode.name = opcode.name;
+              if (opcode.opcode) {
+                bytecode.opcode = opcode.opcode(
+                  bytecode.operand,
+                  bytecode.target,
+                  bytecode.nextAddress
+                );
+              }
+            }
+          } else {
+            var i = bytecode.hexOpcode;
+            self.missingOpcodes[i] =
+              self.missingOpcodes[i] !== undefined
+                ? self.missingOpcodes[i] + 1
+                : 1;
+          }
+
+          return bytecode;
+        });
     },
-
 
     /**
      * Do control flow graph restructuring. At the moment, the code is just split into functions
@@ -148,24 +163,23 @@ var Analyzer = (function() {
       var startNewFunction = true;
       var prevBytecode = {};
 
-      this.bytecodes[page]
-        .forEach(function(bytecode) {
-            if (bytecode.isJumpTarget || startNewFunction) {
-              pointer++;
-              self.ast[page][pointer] = [];
-              startNewFunction = false;
-              prevBytecode.isFunctionEnder = true; // Update previous bytecode object.
-            }
+      this.bytecodes[page].forEach(function(bytecode) {
+        if (bytecode.isJumpTarget || startNewFunction) {
+          pointer++;
+          self.ast[page][pointer] = [];
+          startNewFunction = false;
+          prevBytecode.isFunctionEnder = true; // Update previous bytecode object.
+        }
 
-            self.ast[page][pointer].push(bytecode);
+        self.ast[page][pointer].push(bytecode);
 
-            if (bytecode.isFunctionEnder) {
-              startNewFunction = true;
-            }
+        if (bytecode.isFunctionEnder) {
+          startNewFunction = true;
+        }
 
-            prevBytecode = bytecode;
-          });
-    }
+        prevBytecode = bytecode;
+      });
+    },
   };
 
   return Analyzer;

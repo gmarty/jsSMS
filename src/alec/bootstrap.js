@@ -19,7 +19,6 @@
 
 'use strict';
 
-
 /**
  * Deal with the installer:
  *  * Check if Open Web Apps are supported.
@@ -28,7 +27,9 @@
  *
  *  @todo Use externs for mozApps, mozNotification and Google Universal Analytics.
  */
-var installationInstructions = document.getElementById('installation-instructions');
+var installationInstructions = document.getElementById(
+  'installation-instructions'
+);
 
 var mozApps = navigator['mozApps'];
 if (mozApps) {
@@ -44,7 +45,9 @@ if (mozApps) {
       DEBUG && console.log('App is not installed.');
 
       var install = document.getElementById('install');
-      var manifestURL = location.href.substring(0, location.href.lastIndexOf('/')) + '/manifest.webapp';
+      var manifestURL =
+        location.href.substring(0, location.href.lastIndexOf('/')) +
+        '/manifest.webapp';
       install.className = 'show';
       installationInstructions.className = 'show';
       install.onclick = function() {
@@ -79,14 +82,12 @@ if (mozApps) {
   DEBUG && console.log('Open Web Apps are not supported.');
 }
 
-
 /**
  * Reload content using the button in the footer.
  */
 document.getElementById('reload').onclick = function() {
   location.reload(true);
 };
-
 
 /**
  * Check for new versions.
@@ -96,21 +97,24 @@ if (appCache) {
   appCache.onupdateready = function() {
     // Display a notification.
     var notification = navigator['mozNotification']['createNotification'](
-        'Alec emulator',
-        'New version available! Click to reload.'
-        );
+      'Alec emulator',
+      'New version available! Click to reload.'
+    );
     notification.onclick = function() {
       location.reload(true);
     };
     notification.show();
 
     // Ask for reload confirmation.
-    if (confirm('A new version is available. Do you want to update now?\nOtherwise it will be updated at the next reload.')) {
+    if (
+      confirm(
+        'A new version is available. Do you want to update now?\nOtherwise it will be updated at the next reload.'
+      )
+    ) {
       location.reload(true);
     }
   };
 }
-
 
 /**
  * Defer loading of the main script after load.
@@ -122,24 +126,27 @@ $(function() {
   scriptEl.onload = function() {
     // When the script is loaded, instantiate jsSMS.
     var sms = new JSSMS({
-      'ui': $('#emulator')['JSSMSUI']({
+      ui: $('#emulator')['JSSMSUI']({
         'Homebrew Master System': [
           ['Blockhead', 'rom/sms/homebrew/blockhead.sms'],
-          ['KunKun & KokoKun 2 - Return of the Kun', 'rom/sms/homebrew/KunKun & KokoKun 2 - Return of the Kun [v0.99].sms'],
-          ['Sokoban', 'rom/sms/homebrew/sokoban.sms']
+          [
+            'KunKun & KokoKun 2 - Return of the Kun',
+            'rom/sms/homebrew/KunKun & KokoKun 2 - Return of the Kun [v0.99].sms',
+          ],
+          ['Sokoban', 'rom/sms/homebrew/sokoban.sms'],
         ],
         'Homebrew Game Gear': [
           ['Fire Track', 'rom/gg/homebrew/ftrack.gg'],
           ['GG Nibbles v.4', 'rom/gg/homebrew/nibbles.gg'],
-          ['Zoop \'Em Up', 'rom/gg/homebrew/zoopemup.gg']
+          ["Zoop 'Em Up", 'rom/gg/homebrew/zoopemup.gg'],
         ],
         'Master System technical ROMs': [
-          ['ZEXALL v.0.15', 'rom/sms/technical/zexall.sms']
+          ['ZEXALL v.0.15', 'rom/sms/technical/zexall.sms'],
         ],
         'Game Gear technical ROMs': [
-          ['FadeTest', 'rom/gg/technical/FadeTest.gg']
-        ]
-      })
+          ['FadeTest', 'rom/gg/technical/FadeTest.gg'],
+        ],
+      }),
     });
   };
   firstScript.parentNode.insertBefore(scriptEl, firstScript);

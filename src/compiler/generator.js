@@ -22,8 +22,6 @@
 
 'use strict';
 
-
-
 /**
  * The generator cleans the data and returns a valid AST.
  *
@@ -38,15 +36,15 @@ var CodeGenerator = (function() {
    */
   function getTotalTStates(opcodes) {
     switch (opcodes[0]) {
-      case 0xCB:
+      case 0xcb:
         return OP_CB_STATES[opcodes[1]];
-      case 0xDD:
-      case 0xFD:
+      case 0xdd:
+      case 0xfd:
         if (opcodes.length === 2) {
           return OP_DD_STATES[opcodes[1]];
         }
         return OP_INDEX_CB_STATES[opcodes[2]];
-      case 0xED:
+      case 0xed:
         return OP_ED_STATES[opcodes[1]];
       default:
         return OP_STATES[opcodes[0]];
@@ -63,150 +61,157 @@ var CodeGenerator = (function() {
      */
     generate: function(functions) {
       for (var page = 0; page < functions.length; page++) {
-        functions[page] = functions[page]
-          .map(function(fn) {
-              var name = fn[0].address;
-              var body = [
-                {
-                  'type': 'ExpressionStatement',
-                  'expression': {
-                    'type': 'Literal',
-                    'value': 'use strict',
-                    'raw': '"use strict"'
+        functions[page] = functions[page].map(function(fn) {
+          var name = fn[0].address;
+          var body = [
+            {
+              type: 'ExpressionStatement',
+              expression: {
+                type: 'Literal',
+                value: 'use strict',
+                raw: '"use strict"',
+              },
+              _address: name,
+            },
+          ];
+          var tstates = 0;
+
+          fn = fn.map(function(bytecode) {
+            if (bytecode.ast === undefined) {
+              bytecode.ast = [];
+            }
+
+            if (REFRESH_EMULATION) {
+              // Sync server.
+              var refreshEmulationStmt = {
+                type: 'ExpressionStatement',
+                expression: {
+                  type: 'CallExpression',
+                  callee: n.Identifier('incR'),
+                  arguments: [],
+                },
+              };
+            }
+
+            if (ENABLE_SERVER_LOGGER) {
+              // Sync server.
+              var syncServerStmt = {
+                type: 'ExpressionStatement',
+                expression: {
+                  type: 'CallExpression',
+                  callee: n.Identifier('sync'),
+                  arguments: [],
+                },
+              };
+            }
+
+            // Decrement tstates.
+            tstates += getTotalTStates(bytecode.opcode);
+
+            //if (bytecode.isFunctionEnder || bytecode.canEnd || bytecode.target != null) {
+            var decreaseTStateStmt = [
+              {
+                type: 'ExpressionStatement',
+                expression: {
+                  type: 'AssignmentExpression',
+                  operator: '-=',
+                  left: {
+                    type: 'Identifier',
+                    name: 'tstates',
                   },
-                  '_address': name
-                }
-              ];
-              var tstates = 0;
+                  right: {
+                    type: 'Literal',
+                    value: tstates,
+                    raw: DEBUG ? toHex(tstates) : '' + tstates,
+                  },
+                },
+              },
+            ];
 
-              fn = fn
-              .map(function(bytecode) {
-                    if (bytecode.ast === undefined) {
-                      bytecode.ast = [];
-                    }
+            tstates = 0;
 
-                    if (REFRESH_EMULATION) {
-                      // Sync server.
-                      var refreshEmulationStmt = {
-                        'type': 'ExpressionStatement',
-                        'expression': {
-                          'type': 'CallExpression',
-                          'callee': n.Identifier('incR'),
-                          'arguments': []
-                        }
-                      };
-                    }
+            if (REFRESH_EMULATION) {
+              decreaseTStateStmt = [].concat(
+                refreshEmulationStmt,
+                decreaseTStateStmt
+              );
+            }
 
-                    if (ENABLE_SERVER_LOGGER) {
-                      // Sync server.
-                      var syncServerStmt = {
-                        'type': 'ExpressionStatement',
-                        'expression': {
-                          'type': 'CallExpression',
-                          'callee': n.Identifier('sync'),
-                          'arguments': []
-                        }
-                      };
-                    }
+            if (ENABLE_SERVER_LOGGER) {
+              decreaseTStateStmt = [].concat(
+                syncServerStmt,
+                decreaseTStateStmt
+              );
+            }
 
-                    // Decrement tstates.
-                    tstates += getTotalTStates(bytecode.opcode);
+            // Increment `page` statement.
+            if (bytecode.changePage) {
+              // page++;
+              var updatePageStmt = {
+                type: 'ExpressionStatement',
+                expression: {
+                  type: 'UpdateExpression',
+                  operator: '++',
+                  argument: {
+                    type: 'Identifier',
+                    name: 'page',
+                  },
+                  prefix: false,
+                },
+              };
 
-                    //if (bytecode.isFunctionEnder || bytecode.canEnd || bytecode.target != null) {
-                    var decreaseTStateStmt = [
-                      {
-                        'type': 'ExpressionStatement',
-                        'expression': {
-                          'type': 'AssignmentExpression',
-                          'operator': '-=',
-                          'left': {
-                            'type': 'Identifier',
-                            'name': 'tstates'
-                          },
-                          'right': {
-                            'type': 'Literal',
-                            'value': tstates,
-                            'raw': DEBUG ? toHex(tstates) : '' + tstates
-                          }
-                        }
-                      }
-                    ];
+              bytecode.ast = [].concat(updatePageStmt, bytecode.ast);
+            }
 
-                    tstates = 0;
+            bytecode.ast = [].concat(decreaseTStateStmt, bytecode.ast);
+            //}
 
-                    if (REFRESH_EMULATION) {
-                      decreaseTStateStmt = [].concat(refreshEmulationStmt, decreaseTStateStmt);
-                    }
+            // Update `this.pc` statement.
+            if (
+              (ENABLE_SERVER_LOGGER || bytecode.isFunctionEnder) &&
+              bytecode.nextAddress !== null
+            ) {
+              // this.pc = |nextAddress| + page * 0x4000;
+              var nextAddress = bytecode.nextAddress % 0x4000;
+              var updatePcStmt = {
+                type: 'ExpressionStatement',
+                expression: {
+                  type: 'AssignmentExpression',
+                  operator: '=',
+                  left: {
+                    type: 'Identifier',
+                    name: 'pc',
+                  },
+                  right: {
+                    type: 'BinaryExpression',
+                    operator: '+',
+                    left: {
+                      type: 'Literal',
+                      value: nextAddress,
+                      raw: DEBUG ? toHex(nextAddress) : '' + nextAddress,
+                    },
+                    right: {
+                      type: 'BinaryExpression',
+                      operator: '*',
+                      left: {
+                        type: 'Identifier',
+                        name: 'page',
+                      },
+                      right: {
+                        type: 'Literal',
+                        value: 0x4000,
+                        raw: '0x4000',
+                      },
+                    },
+                  },
+                },
+              };
 
-                    if (ENABLE_SERVER_LOGGER) {
-                      decreaseTStateStmt = [].concat(syncServerStmt, decreaseTStateStmt);
-                    }
+              bytecode.ast.push(updatePcStmt);
+            }
 
-                    // Increment `page` statement.
-                    if (bytecode.changePage) {
-                      // page++;
-                      var updatePageStmt = {
-                        'type': 'ExpressionStatement',
-                        'expression': {
-                          'type': 'UpdateExpression',
-                          'operator': '++',
-                          'argument': {
-                            'type': 'Identifier',
-                            'name': 'page'
-                          },
-                          'prefix': false
-                        }
-                      };
-
-                      bytecode.ast = [].concat(updatePageStmt, bytecode.ast);
-                    }
-
-                    bytecode.ast = [].concat(decreaseTStateStmt, bytecode.ast);
-                    //}
-
-                    // Update `this.pc` statement.
-                    if ((ENABLE_SERVER_LOGGER || bytecode.isFunctionEnder) && bytecode.nextAddress !== null) {
-                      // this.pc = |nextAddress| + page * 0x4000;
-                      var nextAddress = bytecode.nextAddress % 0x4000;
-                      var updatePcStmt = {
-                        'type': 'ExpressionStatement',
-                        'expression': {
-                          'type': 'AssignmentExpression',
-                          'operator': '=',
-                          'left': {
-                            'type': 'Identifier',
-                            'name': 'pc'
-                          },
-                          'right': {
-                            'type': 'BinaryExpression',
-                            'operator': '+',
-                            'left': {
-                              'type': 'Literal',
-                              'value': nextAddress,
-                              'raw': DEBUG ? toHex(nextAddress) : '' + nextAddress
-                            },
-                            'right': {
-                              'type': 'BinaryExpression',
-                              'operator': '*',
-                              'left': {
-                                'type': 'Identifier',
-                                'name': 'page'
-                              },
-                              'right': {
-                                'type': 'Literal',
-                                'value': 0x4000,
-                                'raw': '0x4000'
-                              }
-                            }
-                          }
-                        }
-                      };
-
-                      bytecode.ast.push(updatePcStmt);
-                    }
-
-                    // Test tstates.
-                    /*var tStateCheck = {
+            // Test tstates.
+            /*var tStateCheck = {
                       'type': 'IfStatement',
                       'test': {
                         'type': 'LogicalExpression',
@@ -247,39 +252,39 @@ var CodeGenerator = (function() {
 
                  bytecode.ast.push(tStateCheck);*/
 
-                    if (DEBUG) {
-                      // Inline comment about the current bytecode.
-                      if (bytecode.ast[0]) {
-                        bytecode.ast[0].leadingComments = [
-                          {
-                            type: 'Line',
-                            value: ' ' + bytecode.label
-                          }
-                        ];
-                      }
-                    }
+            if (DEBUG) {
+              // Inline comment about the current bytecode.
+              if (bytecode.ast[0]) {
+                bytecode.ast[0].leadingComments = [
+                  {
+                    type: 'Line',
+                    value: ' ' + bytecode.label,
+                  },
+                ];
+              }
+            }
 
-                    return bytecode.ast;
-                  });
+            return bytecode.ast;
+          });
 
-              /*if (DEBUG && fn[0][0])
+          /*if (DEBUG && fn[0][0])
                 // Inject data about current branch into a comment.
                 fn[0][0].leadingComments = [].concat({
                   type: 'Line',
                   value: ' Nb of bytecodes jumping here: ' + fn[0].jumpTargetNb
                 }, fn[0][0].leadingComments);*/
 
-              // Flatten the array.
-              fn.forEach(function(ast) {
-                body = body.concat(ast);
-              });
+          // Flatten the array.
+          fn.forEach(function(ast) {
+            body = body.concat(ast);
+          });
 
-              return body;
-            });
+          return body;
+        });
       }
 
       this.ast = functions;
-    }
+    },
   };
 
   return CodeGenerator;

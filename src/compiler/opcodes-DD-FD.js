@@ -29,265 +29,264 @@ function generateIndexTable(index) {
   return {
     0x09: {
       name: 'ADD ' + index + ',BC',
-      ast: o.ADD16(registerH, registerL, 'b', 'c')
+      ast: o.ADD16(registerH, registerL, 'b', 'c'),
     },
     0x19: {
       name: 'ADD ' + index + ',DE',
-      ast: o.ADD16(registerH, registerL, 'd', 'e')
+      ast: o.ADD16(registerH, registerL, 'd', 'e'),
     },
     0x21: {
       name: 'LD ' + index + ',nn',
-      ast: o.LD16(registerH, registerL)
+      ast: o.LD16(registerH, registerL),
     },
     0x22: {
       name: 'LD (nn),' + index,
-      ast: o.LD_NN(registerH, registerL)
+      ast: o.LD_NN(registerH, registerL),
     },
     0x23: {
       name: 'INC ' + index,
-      ast: o.INC16(registerH, registerL)
+      ast: o.INC16(registerH, registerL),
     },
-    0x2A: {
+    0x2a: {
       name: 'LD ' + index + ',(nn)',
-      ast: o.LD16(registerH, registerL, 'n', 'n')
+      ast: o.LD16(registerH, registerL, 'n', 'n'),
     },
-    0x2B: {
+    0x2b: {
       name: 'DEC ' + index,
-      ast: o.DEC16(registerH, registerL)
+      ast: o.DEC16(registerH, registerL),
     },
     0x34: {
       name: 'INC (' + index + '+d)',
-      ast: o.INC_X(registerH, registerL)
+      ast: o.INC_X(registerH, registerL),
     },
     0x35: {
       name: 'DEC (' + index + '+d)',
-      ast: o.DEC_X(registerH, registerL)
+      ast: o.DEC_X(registerH, registerL),
     },
     0x36: {
       name: 'LD (' + index + '+d),n',
-      ast: o.LD_X(registerH, registerL)
+      ast: o.LD_X(registerH, registerL),
     },
     0x39: {
       name: 'ADD ' + index + ',SP',
-      ast: o.ADD16(registerH, registerL, 'sp')
+      ast: o.ADD16(registerH, registerL, 'sp'),
     },
     0x46: {
       name: 'LD B,(' + index + '+d)',
-      ast: o.LD8_D('b', registerH, registerL)
+      ast: o.LD8_D('b', registerH, registerL),
     },
-    0x4E: {
+    0x4e: {
       name: 'LD C,(' + index + '+d)',
-      ast: o.LD8_D('c', registerH, registerL)
+      ast: o.LD8_D('c', registerH, registerL),
     },
     0x54: {
       name: ' LD D,' + index + 'H *',
-      ast: o.LD8('d', registerH)
+      ast: o.LD8('d', registerH),
     },
     0x56: {
       name: 'LD D,(' + index + '+d)',
-      ast: o.LD8_D('d', registerH, registerL)
+      ast: o.LD8_D('d', registerH, registerL),
     },
-    0x5D: {
+    0x5d: {
       name: 'LD E,' + index + 'L *',
-      ast: o.LD8('e', registerL)
+      ast: o.LD8('e', registerL),
     },
-    0x5E: {
+    0x5e: {
       name: 'LD E,(' + index + '+d)',
-      ast: o.LD8_D('e', registerH, registerL)
+      ast: o.LD8_D('e', registerH, registerL),
     },
     0x60: {
       name: 'LD ' + index + 'H,B',
-      ast: o.LD8(registerH, 'b')
+      ast: o.LD8(registerH, 'b'),
     },
     0x61: {
       name: 'LD ' + index + 'H,C',
-      ast: o.LD8(registerH, 'c')
+      ast: o.LD8(registerH, 'c'),
     },
     0x62: {
       name: 'LD ' + index + 'H,D',
-      ast: o.LD8(registerH, 'd')
+      ast: o.LD8(registerH, 'd'),
     },
     0x63: {
       name: 'LD ' + index + 'H,E',
-      ast: o.LD8(registerH, 'e')
+      ast: o.LD8(registerH, 'e'),
     },
     0x64: {
       name: 'LD ' + index + 'H,' + index + 'H',
-      ast: o.NOOP()
+      ast: o.NOOP(),
     },
     0x65: {
       name: 'LD ' + index + 'H,' + index + 'L *',
-      ast: o.LD8_D(registerH, registerL)
+      ast: o.LD8_D(registerH, registerL),
     },
     0x66: {
       name: 'LD H,(' + index + '+d)',
-      ast: o.LD8_D('h', registerH, registerL)
+      ast: o.LD8_D('h', registerH, registerL),
     },
     0x67: {
       name: 'LD ' + index + 'H,A',
-      ast: o.LD8(registerH, 'a')
+      ast: o.LD8(registerH, 'a'),
     },
     0x68: {
       name: 'LD ' + index + 'L,B',
-      ast: o.LD8(registerL, 'b')
+      ast: o.LD8(registerL, 'b'),
     },
     0x69: {
       name: 'LD ' + index + 'L,C',
-      ast: o.LD8(registerL, 'c')
+      ast: o.LD8(registerL, 'c'),
     },
-    0x6A: {
+    0x6a: {
       name: 'LD ' + index + 'L,D',
-      ast: o.LD8(registerL, 'd')
+      ast: o.LD8(registerL, 'd'),
     },
-    0x6B: {
+    0x6b: {
       name: 'LD ' + index + 'L,E',
-      ast: o.LD8(registerL, 'e')
+      ast: o.LD8(registerL, 'e'),
     },
-    0x6C: {
+    0x6c: {
       name: 'LD ' + index + 'L,' + index + 'H',
-      ast: o.LD8_D(registerL, registerH)
+      ast: o.LD8_D(registerL, registerH),
     },
-    0x6D: {
+    0x6d: {
       name: 'LD ' + index + 'L,' + index + 'L *',
-      ast: o.NOOP()
+      ast: o.NOOP(),
     },
-    0x6E: {
+    0x6e: {
       name: 'LD L,(' + index + '+d)',
-      ast: o.LD8_D('l', registerH, registerL)
+      ast: o.LD8_D('l', registerH, registerL),
     },
-    0x6F: {
+    0x6f: {
       name: 'LD ' + index + 'L,A *',
-      ast: o.LD8(registerL, 'a')
+      ast: o.LD8(registerL, 'a'),
     },
     0x70: {
       name: 'LD (' + index + '+d),B',
-      ast: o.LD_X('b', registerH, registerL)
+      ast: o.LD_X('b', registerH, registerL),
     },
     0x71: {
       name: 'LD (' + index + '+d),C',
-      ast: o.LD_X('c', registerH, registerL)
+      ast: o.LD_X('c', registerH, registerL),
     },
     0x72: {
       name: 'LD (' + index + '+d),D',
-      ast: o.LD_X('d', registerH, registerL)
+      ast: o.LD_X('d', registerH, registerL),
     },
     0x73: {
       name: 'LD (' + index + '+d),E',
-      ast: o.LD_X('e', registerH, registerL)
+      ast: o.LD_X('e', registerH, registerL),
     },
     0x74: {
       name: 'LD (' + index + '+d),H',
-      ast: o.LD_X('h', registerH, registerL)
+      ast: o.LD_X('h', registerH, registerL),
     },
     0x75: {
       name: 'LD (' + index + '+d),L',
-      ast: o.LD_X('l', registerH, registerL)
+      ast: o.LD_X('l', registerH, registerL),
     },
     0x76: {
       name: 'LD (' + index + '+d),B',
-      ast: o.LD_X('b', registerH, registerL)
+      ast: o.LD_X('b', registerH, registerL),
     },
     0x77: {
       name: 'LD (' + index + '+d),A',
-      ast: o.LD_X('a', registerH, registerL)
+      ast: o.LD_X('a', registerH, registerL),
     },
-    0x7E: {
+    0x7e: {
       name: 'LD A,(' + index + '+d)',
-      ast: o.LD8_D('a', registerH, registerL)
+      ast: o.LD8_D('a', registerH, registerL),
     },
-    0x7C: {
+    0x7c: {
       name: 'LD A,' + index + 'H',
-      ast: o.LD8('a', registerH)
+      ast: o.LD8('a', registerH),
     },
-    0x7D: {
+    0x7d: {
       name: 'LD A,' + index + 'L',
-      ast: o.LD8('a', registerL)
+      ast: o.LD8('a', registerL),
     },
     0x84: {
       name: 'ADD A,' + index + 'H',
-      ast: o.ADD(registerL)
+      ast: o.ADD(registerL),
     },
     0x85: {
       name: 'ADD A,' + index + 'L',
-      ast: o.ADD(registerL)
+      ast: o.ADD(registerL),
     },
     0x86: {
       name: 'ADD A,(' + index + '+d)',
-      ast: o.ADD_X(registerH, registerL)
+      ast: o.ADD_X(registerH, registerL),
     },
-    0x8C: {
+    0x8c: {
       name: 'ADC A,' + index + 'H',
-      ast: o.ADC(registerL)
+      ast: o.ADC(registerL),
     },
-    0x8D: {
+    0x8d: {
       name: 'ADC A,' + index + 'L',
-      ast: o.ADC(registerL)
+      ast: o.ADC(registerL),
     },
-    0x8E: {
+    0x8e: {
       name: 'ADC A,(' + index + '+d)',
-      ast: o.ADC_X(registerH, registerL)
+      ast: o.ADC_X(registerH, registerL),
     },
     0x94: {
       name: 'SUB A,' + index + 'H',
-      ast: o.SUB(registerL)
+      ast: o.SUB(registerL),
     },
     0x95: {
       name: 'SUB A,' + index + 'L',
-      ast: o.SUB(registerL)
+      ast: o.SUB(registerL),
     },
     0x96: {
       name: 'SUB A,(' + index + '+d)',
-      ast: o.SUB_X(registerH, registerL)
+      ast: o.SUB_X(registerH, registerL),
     },
-    0x9C: {
+    0x9c: {
       name: 'SBC A,' + index + 'H',
-      ast: o.SBC(registerL)
+      ast: o.SBC(registerL),
     },
-    0x9D: {
+    0x9d: {
       name: 'SBC A,' + index + 'L',
-      ast: o.SBC(registerL)
+      ast: o.SBC(registerL),
     },
-    0x9E: {
+    0x9e: {
       name: 'SBC A,(' + index + '+d)',
-      ast: o.SBC_X(registerH, registerL)
+      ast: o.SBC_X(registerH, registerL),
     },
-    0xA6: {
+    0xa6: {
       name: 'AND A,(' + index + '+d)',
-      ast: o.AND_X(registerH, registerL)
+      ast: o.AND_X(registerH, registerL),
     },
-    0xAE: {
+    0xae: {
       name: 'XOR A,(' + index + '+d)',
-      ast: o.XOR_X(registerH, registerL)
+      ast: o.XOR_X(registerH, registerL),
     },
-    0xB6: {
+    0xb6: {
       name: 'OR A,(' + index + '+d)',
-      ast: o.OR_X(registerH, registerL)
+      ast: o.OR_X(registerH, registerL),
     },
-    0xBE: {
+    0xbe: {
       name: 'CP (' + index + '+d)',
-      ast: o.CP_X(registerH, registerL)
+      ast: o.CP_X(registerH, registerL),
     },
-    0xCB:
-        index === 'IX' ? opcodeTableDDCB : opcodeTableFDCB,
-    0xE1: {
+    0xcb: index === 'IX' ? opcodeTableDDCB : opcodeTableFDCB,
+    0xe1: {
       name: 'POP ' + index,
-      ast: o.POP(registerH, registerL)
+      ast: o.POP(registerH, registerL),
     },
-    0xE3: {
+    0xe3: {
       name: 'EX SP,(' + index + ')',
-      ast: o.EX_SP_X(registerH, registerL)
+      ast: o.EX_SP_X(registerH, registerL),
     },
-    0xE5: {
+    0xe5: {
       name: 'PUSH ' + index,
-      ast: o.PUSH(registerH, registerL)
+      ast: o.PUSH(registerH, registerL),
     },
-    0xE9: {
+    0xe9: {
       name: 'JP (' + index + ')',
-      ast: o.JP_X(registerH, registerL)
+      ast: o.JP_X(registerH, registerL),
     },
-    0xF9: {
+    0xf9: {
       name: 'LD SP,' + index,
-      ast: o.LD_SP(registerH, registerL)
-    }
+      ast: o.LD_SP(registerH, registerL),
+    },
   };
 }

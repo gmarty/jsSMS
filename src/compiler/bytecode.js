@@ -19,8 +19,6 @@
 
 'use strict';
 
-
-
 /**
  * @param {number} address
  * @param {number} page
@@ -55,22 +53,28 @@ var Bytecode = (function() {
   Bytecode.prototype = {
     get hexOpcode() {
       if (this.opcode.length) {
-        return this.opcode
-          .map(toHex)
-          .join(' ');
+        return this.opcode.map(toHex).join(' ');
       }
 
       return '';
     },
 
-
     get label() {
       // @todo Generate a function for each opcode instead of this.
-      var name = this.name ? this.name.replace(/(nn|n|PC\+e|d)/, toHex(this.target || this.operand || 0)) : '';
-      return toHex(this.address + (this.page * PAGE_SIZE)) + ' ' +
-          this.hexOpcode + ' ' +
-          name;
-    }
+      var name = this.name
+        ? this.name.replace(
+            /(nn|n|PC\+e|d)/,
+            toHex(this.target || this.operand || 0)
+          )
+        : '';
+      return (
+        toHex(this.address + this.page * PAGE_SIZE) +
+        ' ' +
+        this.hexOpcode +
+        ' ' +
+        name
+      );
+    },
   };
 
   return Bytecode;

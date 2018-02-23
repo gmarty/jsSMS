@@ -23,10 +23,8 @@
 (function() {
   if (!('console' in window)) {
     window.console = {
-      log: function() {
-      },
-      error: function() {
-      }
+      log: function() {},
+      error: function() {},
     };
   } else if (!('bind' in window.console.log)) {
     // native functions in IE9 might not have bind.
@@ -55,8 +53,7 @@ JSSMS.Utils = {
     return Math.round(Math.random() * range);
   },
 
-
-  Uint8Array: function() {
+  Uint8Array: (function() {
     /**
      * @param {number|ArrayBufferView|Array.<number>|ArrayBuffer} length or array or buffer.
      * @return {Uint8Array}
@@ -70,10 +67,9 @@ JSSMS.Utils = {
        */
       return Array;
     }
-  }(),
+  })(),
 
-
-  Uint16Array: function() {
+  Uint16Array: (function() {
     /**
      * @param {number|ArrayBufferView|Array.<number>|ArrayBuffer} length or array or buffer.
      * @return {Uint16Array}
@@ -87,14 +83,13 @@ JSSMS.Utils = {
        */
       return Array;
     }
-  }(),
-
+  })(),
 
   /**
    * Simple polyfill for DataView and ArrayBuffer.
    * \@todo We must use Uint8Array for browsers supporting them but not DataView.
    */
-  Array: function() {
+  Array: (function() {
     if (SUPPORT_DATAVIEW) {
       /**
        * @param {number} length
@@ -110,14 +105,13 @@ JSSMS.Utils = {
        */
       return Array;
     }
-  }(),
-
+  })(),
 
   /**
    * Copies an array from the specified source array, beginning at the
    * specified position, to the specified position of the destination array.
    */
-  copyArrayElements: function() {
+  copyArrayElements: (function() {
     if (SUPPORT_DATAVIEW) {
       /**
        * @param {DataView} src The source DataView.
@@ -145,49 +139,43 @@ JSSMS.Utils = {
         }
       };
     }
-  }(),
-
+  })(),
 
   /**
    * A proxy for console that is activated in DEBUG mode only.
    */
   console: {
-    log: function() {
+    log: (function() {
       if (DEBUG) {
         return window.console.log.bind(window.console);
       }
-      return function(var_args) {
-      };
-    }(),
-    error: function() {
+      return function(var_args) {};
+    })(),
+    error: (function() {
       if (DEBUG) {
         return window.console.error.bind(window.console);
       }
-      return function(var_args) {
-      };
-    }(),
+      return function(var_args) {};
+    })(),
     /**
      * @todo Develop a polyfill for non supporting browsers like IE.
      */
-    time: function() {
+    time: (function() {
       if (DEBUG && window.console.time) {
         return window.console.time.bind(window.console);
       }
-      return function(label) {
-      };
-    }(),
+      return function(label) {};
+    })(),
     /**
      * @todo Develop a polyfill for non supporting browsers like IE.
      */
-    timeEnd: function() {
+    timeEnd: (function() {
       if (DEBUG && window.console.timeEnd) {
         return window.console.timeEnd.bind(window.console);
       }
-      return function(label) {
-      };
-    }()
+      return function(label) {};
+    })(),
   },
-
 
   /**
    * Apply a function recursively on an object and its children.
@@ -217,13 +205,12 @@ JSSMS.Utils = {
     return object;
   },
 
-
   /**
    * Return the current timestamp in a fast way.
    *
    * @return {number} The current timestamp.
    */
-  getTimestamp: function() {
+  getTimestamp: (function() {
     if (window.performance && window.performance.now) {
       return window.performance.now.bind(window.performance);
     } else {
@@ -231,8 +218,7 @@ JSSMS.Utils = {
         return new Date().getTime();
       };
     }
-  }(),
-
+  })(),
 
   /**
    * Get a hex from a decimal. Pad with 0 if necessary.
@@ -242,7 +228,9 @@ JSSMS.Utils = {
    */
   toHex: function(dec) {
     var minus = dec < 0;
-    var hex = Math.abs(dec).toString(16).toUpperCase();
+    var hex = Math.abs(dec)
+      .toString(16)
+      .toUpperCase();
     if (hex.length % 2) {
       hex = '0' + hex;
     }
@@ -253,7 +241,6 @@ JSSMS.Utils = {
 
     return '0x' + hex;
   },
-
 
   /**
    * Determine support and prefix of HTML5 features. Returns the prefix of the
@@ -281,7 +268,6 @@ JSSMS.Utils = {
     return prefix;
   },
 
-
   /**
    * Given a file name, returns the extension.
    *
@@ -293,9 +279,11 @@ JSSMS.Utils = {
       return '';
     }
 
-    return fileName.split('.').pop().toLowerCase();
+    return fileName
+      .split('.')
+      .pop()
+      .toLowerCase();
   },
-
 
   /**
    * Given a file name, returns the filename, without path or extension.
@@ -310,9 +298,11 @@ JSSMS.Utils = {
 
     var parts = fileName.split('.');
     parts.pop();
-    return parts.join('.').split('/').pop();
+    return parts
+      .join('.')
+      .split('/')
+      .pop();
   },
-
 
   /**
    * CRC32 algorithm.
@@ -330,7 +320,7 @@ JSSMS.Utils = {
       for (var n = 0; n < 256; n++) {
         c = n;
         for (var k = 0; k < 8; k++) {
-          c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+          c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
         }
         crcTable[n] = c;
       }
@@ -342,7 +332,7 @@ JSSMS.Utils = {
       var crc = 0 ^ -1;
 
       for (var i = 0; i < str.length; i++) {
-        crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xFF];
+        crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xff];
       }
 
       return (crc ^ -1) >>> 0;
@@ -351,13 +341,14 @@ JSSMS.Utils = {
     return this.crc32(str);
   },
 
-
   /**
    * Return true if current browser is IE. Not used at the moment.
    *
    * @return {boolean}
    */
   isIE: function() {
-    return (/msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent));
-  }
+    return (
+      /msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent)
+    );
+  },
 };

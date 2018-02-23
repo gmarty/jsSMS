@@ -19,7 +19,6 @@
 
 'use strict';
 
-
 /**
  * @todo Keep a track of memory locations parsed.
  */
@@ -56,7 +55,6 @@ var Parser = (function() {
       this.addAddress(obj.address);
     },
 
-
     /**
      * Parse the bytecodes in the ROM.
      *
@@ -77,13 +75,20 @@ var Parser = (function() {
         pageEnd = 0x4000 - 1;
       }
 
-      for (currentPage = 0; currentPage < this.addresses.length; currentPage++) {
+      for (
+        currentPage = 0;
+        currentPage < this.addresses.length;
+        currentPage++
+      ) {
         while (this.addresses[currentPage].length) {
           var currentObj = this.addresses[currentPage].shift();
           var currentAddress = currentObj.address % 0x4000;
 
           if (currentAddress < pageStart || currentAddress > pageEnd) {
-            JSSMS.Utils.console.error('Address out of bound', toHex(currentAddress));
+            JSSMS.Utils.console.error(
+              'Address out of bound',
+              toHex(currentAddress)
+            );
             continue;
           }
 
@@ -93,26 +98,36 @@ var Parser = (function() {
           }
 
           var bytecode = new Bytecode(currentAddress, currentPage);
-          this.bytecodes[currentPage][currentAddress] = disassemble(bytecode, this.stream);
+          this.bytecodes[currentPage][currentAddress] = disassemble(
+            bytecode,
+            this.stream
+          );
 
-          if (this.bytecodes[currentPage][currentAddress].nextAddress !== null &&
-              this.bytecodes[currentPage][currentAddress].nextAddress >= pageStart &&
-              this.bytecodes[currentPage][currentAddress].nextAddress <= pageEnd) {
-            this.addAddress(this.bytecodes[currentPage][currentAddress].nextAddress);
+          if (
+            this.bytecodes[currentPage][currentAddress].nextAddress !== null &&
+            this.bytecodes[currentPage][currentAddress].nextAddress >=
+              pageStart &&
+            this.bytecodes[currentPage][currentAddress].nextAddress <= pageEnd
+          ) {
+            this.addAddress(
+              this.bytecodes[currentPage][currentAddress].nextAddress
+            );
           }
-          if (this.bytecodes[currentPage][currentAddress].target !== null &&
-              this.bytecodes[currentPage][currentAddress].target >= pageStart &&
-              this.bytecodes[currentPage][currentAddress].target <= pageEnd) {
+          if (
+            this.bytecodes[currentPage][currentAddress].target !== null &&
+            this.bytecodes[currentPage][currentAddress].target >= pageStart &&
+            this.bytecodes[currentPage][currentAddress].target <= pageEnd
+          ) {
             this.addAddress(this.bytecodes[currentPage][currentAddress].target);
           }
         }
       }
 
       // We consider the first 0x0400 bytes as an independent memory page.
-      if (this.bytecodes[0][0x03FF]) {
-        this.bytecodes[0][0x03FF].isFunctionEnder = true;
-      } else if (this.bytecodes[0][0x03FE]) {
-        this.bytecodes[0][0x03FE].isFunctionEnder = true;
+      if (this.bytecodes[0][0x03ff]) {
+        this.bytecodes[0][0x03ff].isFunctionEnder = true;
+      } else if (this.bytecodes[0][0x03fe]) {
+        this.bytecodes[0][0x03fe].isFunctionEnder = true;
       }
 
       var i = 0;
@@ -128,24 +143,44 @@ var Parser = (function() {
       }
 
       // Mark all jump target bytecodes.
-      for (currentPage = 0; currentPage < this.bytecodes.length; currentPage++) {
-        for (i = 0, length = this.bytecodes[currentPage].length; i < length; i++) {
+      for (
+        currentPage = 0;
+        currentPage < this.bytecodes.length;
+        currentPage++
+      ) {
+        for (
+          i = 0, length = this.bytecodes[currentPage].length;
+          i < length;
+          i++
+        ) {
           if (!this.bytecodes[currentPage][i]) {
             continue;
           }
           // Comparing with null is important here as `0` is a valid address (0x00).
-          if (this.bytecodes[currentPage][i].nextAddress !== null &&
-              this.bytecodes[currentPage][this.bytecodes[currentPage][i].nextAddress]) {
-            this.bytecodes[currentPage][this.bytecodes[currentPage][i].nextAddress].jumpTargetNb++;
+          if (
+            this.bytecodes[currentPage][i].nextAddress !== null &&
+            this.bytecodes[currentPage][
+              this.bytecodes[currentPage][i].nextAddress
+            ]
+          ) {
+            this.bytecodes[currentPage][
+              this.bytecodes[currentPage][i].nextAddress
+            ].jumpTargetNb++;
           }
           if (this.bytecodes[currentPage][i].target !== null) {
             var targetPage = ~~(this.bytecodes[currentPage][i].target / 0x4000);
             var targetAddress = this.bytecodes[currentPage][i].target % 0x4000;
-            if (this.bytecodes[targetPage] && this.bytecodes[targetPage][targetAddress]) {
+            if (
+              this.bytecodes[targetPage] &&
+              this.bytecodes[targetPage][targetAddress]
+            ) {
               this.bytecodes[targetPage][targetAddress].isJumpTarget = true;
               this.bytecodes[targetPage][targetAddress].jumpTargetNb++;
             } else {
-              JSSMS.Utils.console.log('Invalid target address', toHex(this.bytecodes[currentPage][i].target));
+              JSSMS.Utils.console.log(
+                'Invalid target address',
+                toHex(this.bytecodes[currentPage][i].target)
+              );
             }
           }
         }
@@ -153,7 +188,6 @@ var Parser = (function() {
 
       JSSMS.Utils.console.timeEnd('Parsing');
     },
-
 
     /**
      * This method only parsed a single function. The result of the parsing is added to the parsed
@@ -197,12 +231,16 @@ var Parser = (function() {
         address = bytecode.nextAddress % 0x4000;
         branch.push(bytecode);
         startingBytecode = false;
-        absoluteAddress = address + (romPage * 0x4000);
-      } while (address !== null && absoluteAddress >= pageStart && absoluteAddress < pageEnd && !bytecode.isFunctionEnder);
+        absoluteAddress = address + romPage * 0x4000;
+      } while (
+        address !== null &&
+        absoluteAddress >= pageStart &&
+        absoluteAddress < pageEnd &&
+        !bytecode.isFunctionEnder
+      );
 
       return branch;
     },
-
 
     /**
      * Return a dot file representation of parsed bytecodes.
@@ -237,13 +275,15 @@ var Parser = (function() {
       content = content.join('\n');
 
       // Inject entry point styling.
-      content = content.replace(/ 0 \[label="/, ' 0 [style=filled,color="#CC0000",label="');
+      content = content.replace(
+        / 0 \[label="/,
+        ' 0 [style=filled,color="#CC0000",label="'
+      );
 
       JSSMS.Utils.console.timeEnd('DOT generation');
 
       return content;
     },
-
 
     /**
      * Add an address to the queue.
@@ -257,11 +297,10 @@ var Parser = (function() {
       this.addresses[romPage].push({
         address: address,
         romPage: romPage,
-        memPage: memPage
+        memPage: memPage,
       });
-    }
+    },
   };
-
 
   /**
    * Returns the bytecode associated to an opcode.
@@ -272,7 +311,7 @@ var Parser = (function() {
    */
   function disassemble(bytecode, stream) {
     stream.page = bytecode.page;
-    stream.seek(bytecode.address + (stream.page * 0x4000));
+    stream.seek(bytecode.address + stream.page * 0x4000);
     var opcode = stream.getUint8();
 
     var operand = null;
@@ -305,18 +344,18 @@ var Parser = (function() {
         break;
       case 0x09:
         break;
-      case 0x0A:
+      case 0x0a:
         break;
-      case 0x0B:
+      case 0x0b:
         break;
-      case 0x0C:
+      case 0x0c:
         break;
-      case 0x0D:
+      case 0x0d:
         break;
-      case 0x0E:
+      case 0x0e:
         operand = stream.getUint8();
         break;
-      case 0x0F:
+      case 0x0f:
         break;
       case 0x10:
         target = stream.position + stream.getInt8();
@@ -345,18 +384,18 @@ var Parser = (function() {
         break;
       case 0x19:
         break;
-      case 0x1A:
+      case 0x1a:
         break;
-      case 0x1B:
+      case 0x1b:
         break;
-      case 0x1C:
+      case 0x1c:
         break;
-      case 0x1D:
+      case 0x1d:
         break;
-      case 0x1E:
+      case 0x1e:
         operand = stream.getUint8();
         break;
-      case 0x1F:
+      case 0x1f:
         break;
       case 0x20:
         target = stream.position + stream.getInt8();
@@ -385,19 +424,19 @@ var Parser = (function() {
         break;
       case 0x29:
         break;
-      case 0x2A:
+      case 0x2a:
         operand = stream.getUint16();
         break;
-      case 0x2B:
+      case 0x2b:
         break;
-      case 0x2C:
+      case 0x2c:
         break;
-      case 0x2D:
+      case 0x2d:
         break;
-      case 0x2E:
+      case 0x2e:
         operand = stream.getUint8();
         break;
-      case 0x2F:
+      case 0x2f:
         break;
       case 0x30:
         target = stream.position + stream.getInt8();
@@ -426,19 +465,19 @@ var Parser = (function() {
         break;
       case 0x39:
         break;
-      case 0x3A:
+      case 0x3a:
         operand = stream.getUint16();
         break;
-      case 0x3B:
+      case 0x3b:
         break;
-      case 0x3C:
+      case 0x3c:
         break;
-      case 0x3D:
+      case 0x3d:
         break;
-      case 0x3E:
+      case 0x3e:
         operand = stream.getUint8();
         break;
-      case 0x3F:
+      case 0x3f:
         break;
       case 0x40:
         break;
@@ -460,17 +499,17 @@ var Parser = (function() {
         break;
       case 0x49:
         break;
-      case 0x4A:
+      case 0x4a:
         break;
-      case 0x4B:
+      case 0x4b:
         break;
-      case 0x4C:
+      case 0x4c:
         break;
-      case 0x4D:
+      case 0x4d:
         break;
-      case 0x4E:
+      case 0x4e:
         break;
-      case 0x4F:
+      case 0x4f:
         break;
       case 0x50:
         break;
@@ -492,17 +531,17 @@ var Parser = (function() {
         break;
       case 0x59:
         break;
-      case 0x5A:
+      case 0x5a:
         break;
-      case 0x5B:
+      case 0x5b:
         break;
-      case 0x5C:
+      case 0x5c:
         break;
-      case 0x5D:
+      case 0x5d:
         break;
-      case 0x5E:
+      case 0x5e:
         break;
-      case 0x5F:
+      case 0x5f:
         break;
       case 0x60:
         break;
@@ -524,17 +563,17 @@ var Parser = (function() {
         break;
       case 0x69:
         break;
-      case 0x6A:
+      case 0x6a:
         break;
-      case 0x6B:
+      case 0x6b:
         break;
-      case 0x6C:
+      case 0x6c:
         break;
-      case 0x6D:
+      case 0x6d:
         break;
-      case 0x6E:
+      case 0x6e:
         break;
-      case 0x6F:
+      case 0x6f:
         break;
       case 0x70:
         break;
@@ -558,17 +597,17 @@ var Parser = (function() {
         break;
       case 0x79:
         break;
-      case 0x7A:
+      case 0x7a:
         break;
-      case 0x7B:
+      case 0x7b:
         break;
-      case 0x7C:
+      case 0x7c:
         break;
-      case 0x7D:
+      case 0x7d:
         break;
-      case 0x7E:
+      case 0x7e:
         break;
-      case 0x7F:
+      case 0x7f:
         break;
       case 0x80:
         break;
@@ -590,17 +629,17 @@ var Parser = (function() {
         break;
       case 0x89:
         break;
-      case 0x8A:
+      case 0x8a:
         break;
-      case 0x8B:
+      case 0x8b:
         break;
-      case 0x8C:
+      case 0x8c:
         break;
-      case 0x8D:
+      case 0x8d:
         break;
-      case 0x8E:
+      case 0x8e:
         break;
-      case 0x8F:
+      case 0x8f:
         break;
       case 0x90:
         break;
@@ -622,283 +661,283 @@ var Parser = (function() {
         break;
       case 0x99:
         break;
-      case 0x9A:
+      case 0x9a:
         break;
-      case 0x9B:
+      case 0x9b:
         break;
-      case 0x9C:
+      case 0x9c:
         break;
-      case 0x9D:
+      case 0x9d:
         break;
-      case 0x9E:
+      case 0x9e:
         break;
-      case 0x9F:
+      case 0x9f:
         break;
-      case 0xA0:
+      case 0xa0:
         break;
-      case 0xA1:
+      case 0xa1:
         break;
-      case 0xA2:
+      case 0xa2:
         break;
-      case 0xA3:
+      case 0xa3:
         break;
-      case 0xA4:
+      case 0xa4:
         break;
-      case 0xA5:
+      case 0xa5:
         break;
-      case 0xA6:
+      case 0xa6:
         break;
-      case 0xA7:
+      case 0xa7:
         break;
-      case 0xA8:
+      case 0xa8:
         break;
-      case 0xA9:
+      case 0xa9:
         break;
-      case 0xAA:
+      case 0xaa:
         break;
-      case 0xAB:
+      case 0xab:
         break;
-      case 0xAC:
+      case 0xac:
         break;
-      case 0xAD:
+      case 0xad:
         break;
-      case 0xAE:
+      case 0xae:
         break;
-      case 0xAF:
+      case 0xaf:
         break;
-      case 0xB0:
+      case 0xb0:
         break;
-      case 0xB1:
+      case 0xb1:
         break;
-      case 0xB2:
+      case 0xb2:
         break;
-      case 0xB3:
+      case 0xb3:
         break;
-      case 0xB4:
+      case 0xb4:
         break;
-      case 0xB5:
+      case 0xb5:
         break;
-      case 0xB6:
+      case 0xb6:
         break;
-      case 0xB7:
+      case 0xb7:
         break;
-      case 0xB8:
+      case 0xb8:
         break;
-      case 0xB9:
+      case 0xb9:
         break;
-      case 0xBA:
+      case 0xba:
         break;
-      case 0xBB:
+      case 0xbb:
         break;
-      case 0xBC:
+      case 0xbc:
         break;
-      case 0xBD:
+      case 0xbd:
         break;
-      case 0xBE:
+      case 0xbe:
         break;
-      case 0xBF:
+      case 0xbf:
         break;
-      case 0xC0:
+      case 0xc0:
         canEnd = true;
         break;
-      case 0xC1:
+      case 0xc1:
         break;
-      case 0xC2:
+      case 0xc2:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xC3:
+      case 0xc3:
         target = stream.getUint16();
         stream.seek(null);
         isFunctionEnder = true;
         break;
-      case 0xC4:
+      case 0xc4:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xC5:
+      case 0xc5:
         break;
-      case 0xC6:
+      case 0xc6:
         operand = stream.getUint8();
         break;
-      case 0xC7:
+      case 0xc7:
         target = 0x00;
         isFunctionEnder = true;
         break;
-      case 0xC8:
+      case 0xc8:
         canEnd = true;
         break;
-      case 0xC9:
+      case 0xc9:
         stream.seek(null);
         isFunctionEnder = true;
         break;
-      case 0xCA:
+      case 0xca:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xCB:
+      case 0xcb:
         return getCB(bytecode, stream);
-      case 0xCC:
+      case 0xcc:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xCD:
+      case 0xcd:
         target = stream.getUint16();
         isFunctionEnder = true;
         break;
-      case 0xCE:
+      case 0xce:
         operand = stream.getUint8();
         break;
-      case 0xCF:
+      case 0xcf:
         target = 0x08;
         isFunctionEnder = true;
         break;
-      case 0xD0:
+      case 0xd0:
         canEnd = true;
         break;
-      case 0xD1:
+      case 0xd1:
         break;
-      case 0xD2:
+      case 0xd2:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xD3:
+      case 0xd3:
         operand = stream.getUint8();
         break;
-      case 0xD4:
+      case 0xd4:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xD5:
+      case 0xd5:
         break;
-      case 0xD6:
+      case 0xd6:
         operand = stream.getUint8();
         break;
-      case 0xD7:
+      case 0xd7:
         target = 0x10;
         isFunctionEnder = true;
         break;
-      case 0xD8:
+      case 0xd8:
         canEnd = true;
         break;
-      case 0xD9:
+      case 0xd9:
         break;
-      case 0xDA:
+      case 0xda:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xDB:
+      case 0xdb:
         operand = stream.getUint8();
         break;
-      case 0xDC:
+      case 0xdc:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xDD:
+      case 0xdd:
         return getIndex(bytecode, stream);
-      case 0xDE:
+      case 0xde:
         operand = stream.getUint8();
         break;
-      case 0xDF:
+      case 0xdf:
         target = 0x18;
         isFunctionEnder = true;
         break;
-      case 0xE0:
+      case 0xe0:
         canEnd = true;
         break;
-      case 0xE1:
+      case 0xe1:
         break;
-      case 0xE2:
+      case 0xe2:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xE3:
+      case 0xe3:
         break;
-      case 0xE4:
+      case 0xe4:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xE5:
+      case 0xe5:
         break;
-      case 0xE6:
+      case 0xe6:
         operand = stream.getUint8();
         break;
-      case 0xE7:
+      case 0xe7:
         target = 0x20;
         isFunctionEnder = true;
         break;
-      case 0xE8:
+      case 0xe8:
         canEnd = true;
         break;
-      case 0xE9:
+      case 0xe9:
         // This target can't be determined using static analysis.
         stream.seek(null);
         isFunctionEnder = true;
         break;
-      case 0xEA:
+      case 0xea:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xEB:
+      case 0xeb:
         break;
-      case 0xEC:
+      case 0xec:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xED:
+      case 0xed:
         return getED(bytecode, stream);
-      case 0xEE:
+      case 0xee:
         operand = stream.getUint8();
         break;
-      case 0xEF:
+      case 0xef:
         target = 0x28;
         isFunctionEnder = true;
         break;
-      case 0xF0:
+      case 0xf0:
         canEnd = true;
         break;
-      case 0xF1:
+      case 0xf1:
         break;
-      case 0xF2:
+      case 0xf2:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xF3:
+      case 0xf3:
         break;
-      case 0xF4:
+      case 0xf4:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xF5:
+      case 0xf5:
         break;
-      case 0xF6:
+      case 0xf6:
         operand = stream.getUint8();
         break;
-      case 0xF7:
+      case 0xf7:
         target = 0x30;
         isFunctionEnder = true;
         break;
-      case 0xF8:
+      case 0xf8:
         canEnd = true;
         break;
-      case 0xF9:
+      case 0xf9:
         break;
-      case 0xFA:
+      case 0xfa:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xFB:
+      case 0xfb:
         break;
-      case 0xFC:
+      case 0xfc:
         target = stream.getUint16();
         canEnd = true;
         break;
-      case 0xFD:
+      case 0xfd:
         return getIndex(bytecode, stream);
-      case 0xFE:
+      case 0xfe:
         operand = stream.getUint8();
         break;
-      case 0xFF:
+      case 0xff:
         target = 0x38;
         isFunctionEnder = true;
         break;
@@ -915,7 +954,6 @@ var Parser = (function() {
     return bytecode;
   }
 
-
   /**
    * Returns the bytecode associated to an opcode.
    *
@@ -931,7 +969,6 @@ var Parser = (function() {
 
     return bytecode;
   }
-
 
   /**
    * Returns the bytecode associated to an opcode.
@@ -961,29 +998,29 @@ var Parser = (function() {
         operand = stream.getUint16();
         break;
       case 0x44:
-      case 0x4C:
+      case 0x4c:
       case 0x54:
-      case 0x5C:
+      case 0x5c:
       case 0x64:
-      case 0x6C:
+      case 0x6c:
       case 0x74:
-      case 0x7C:
+      case 0x7c:
         break;
       case 0x45:
-      case 0x4D:
+      case 0x4d:
       case 0x55:
-      case 0x5D:
+      case 0x5d:
       case 0x65:
-      case 0x6D:
+      case 0x6d:
       case 0x75:
-      case 0x7D:
+      case 0x7d:
         stream.seek(null);
         isFunctionEnder = true;
         break;
       case 0x46:
-      case 0x4E:
+      case 0x4e:
       case 0x66:
-      case 0x6E:
+      case 0x6e:
         break;
       case 0x47:
         break;
@@ -991,12 +1028,12 @@ var Parser = (function() {
         break;
       case 0x49:
         break;
-      case 0x4A:
+      case 0x4a:
         break;
-      case 0x4B:
+      case 0x4b:
         operand = stream.getUint16();
         break;
-      case 0x4F:
+      case 0x4f:
         break;
       case 0x50:
         break;
@@ -1016,12 +1053,12 @@ var Parser = (function() {
         break;
       case 0x59:
         break;
-      case 0x5A:
+      case 0x5a:
         break;
-      case 0x5B:
+      case 0x5b:
         operand = stream.getUint16();
         break;
-      case 0x5F:
+      case 0x5f:
         break;
       case 0x60:
         break;
@@ -1038,12 +1075,12 @@ var Parser = (function() {
         break;
       case 0x69:
         break;
-      case 0x6A:
+      case 0x6a:
         break;
-      case 0x6B:
+      case 0x6b:
         operand = stream.getUint16();
         break;
-      case 0x6F:
+      case 0x6f:
         break;
       case 0x71:
         break;
@@ -1056,62 +1093,62 @@ var Parser = (function() {
         break;
       case 0x79:
         break;
-      case 0x7A:
+      case 0x7a:
         break;
-      case 0x7B:
+      case 0x7b:
         operand = stream.getUint16();
         break;
-      case 0xA0:
+      case 0xa0:
         break;
-      case 0xA1:
+      case 0xa1:
         break;
-      case 0xA2:
+      case 0xa2:
         break;
-      case 0xA3:
+      case 0xa3:
         break;
-      case 0xA8:
+      case 0xa8:
         break;
-      case 0xA9:
+      case 0xa9:
         break;
-      case 0xAA:
+      case 0xaa:
         break;
-      case 0xAB:
+      case 0xab:
         break;
-      case 0xB0:
+      case 0xb0:
         if (ACCURATE_INTERRUPT_EMULATION) {
           target = stream.position - 2;
           canEnd = true;
         }
         break;
-      case 0xB1:
+      case 0xb1:
         if (ACCURATE_INTERRUPT_EMULATION) {
           target = stream.position - 2;
           canEnd = true;
         }
         break;
-      case 0xB2:
+      case 0xb2:
         if (ACCURATE_INTERRUPT_EMULATION) {
           target = stream.position - 2;
           canEnd = true;
         }
         break;
-      case 0xB3:
+      case 0xb3:
         if (ACCURATE_INTERRUPT_EMULATION) {
           target = stream.position - 2;
           canEnd = true;
         }
         break;
-      case 0xB8:
+      case 0xb8:
         break;
-      case 0xB9:
+      case 0xb9:
         break;
-      case 0xBA:
+      case 0xba:
         if (ACCURATE_INTERRUPT_EMULATION) {
           target = stream.position - 2;
           canEnd = true;
         }
         break;
-      case 0xBB:
+      case 0xbb:
         if (ACCURATE_INTERRUPT_EMULATION) {
           target = stream.position - 2;
           canEnd = true;
@@ -1121,7 +1158,7 @@ var Parser = (function() {
         JSSMS.Utils.console.error('Unexpected opcode', '0xED ' + toHex(opcode));
     }
 
-    if (bytecode.address >= 0x3FFF) {
+    if (bytecode.address >= 0x3fff) {
       isFunctionEnder = true;
       bytecode.changePage = true;
     }
@@ -1134,7 +1171,6 @@ var Parser = (function() {
 
     return bytecode;
   }
-
 
   /**
    * Returns the bytecode associated to an opcode.
@@ -1173,16 +1209,16 @@ var Parser = (function() {
         break;
       case 0x29:
         break;
-      case 0x2A:
+      case 0x2a:
         operand = stream.getUint16();
         break;
-      case 0x2B:
+      case 0x2b:
         break;
-      case 0x2C:
+      case 0x2c:
         break;
-      case 0x2D:
+      case 0x2d:
         break;
-      case 0x2E:
+      case 0x2e:
         operand = stream.getUint8();
         break;
       case 0x34:
@@ -1204,11 +1240,11 @@ var Parser = (function() {
       case 0x46:
         operand = stream.getUint8();
         break;
-      case 0x4C:
+      case 0x4c:
         break;
-      case 0x4D:
+      case 0x4d:
         break;
-      case 0x4E:
+      case 0x4e:
         operand = stream.getUint8();
         break;
       case 0x54:
@@ -1218,11 +1254,11 @@ var Parser = (function() {
       case 0x56:
         operand = stream.getUint8();
         break;
-      case 0x5C:
+      case 0x5c:
         break;
-      case 0x5D:
+      case 0x5d:
         break;
-      case 0x5E:
+      case 0x5e:
         operand = stream.getUint8();
         break;
       case 0x60:
@@ -1246,18 +1282,18 @@ var Parser = (function() {
         break;
       case 0x69:
         break;
-      case 0x6A:
+      case 0x6a:
         break;
-      case 0x6B:
+      case 0x6b:
         break;
-      case 0x6C:
+      case 0x6c:
         break;
-      case 0x6D:
+      case 0x6d:
         break;
-      case 0x6E:
+      case 0x6e:
         operand = stream.getUint8();
         break;
-      case 0x6F:
+      case 0x6f:
         break;
       case 0x70:
         operand = stream.getUint8();
@@ -1280,11 +1316,11 @@ var Parser = (function() {
       case 0x77:
         operand = stream.getUint8();
         break;
-      case 0x7C:
+      case 0x7c:
         break;
-      case 0x7D:
+      case 0x7d:
         break;
-      case 0x7E:
+      case 0x7e:
         operand = stream.getUint8();
         break;
       case 0x84:
@@ -1294,11 +1330,11 @@ var Parser = (function() {
       case 0x86:
         operand = stream.getUint8();
         break;
-      case 0x8C:
+      case 0x8c:
         break;
-      case 0x8D:
+      case 0x8d:
         break;
-      case 0x8E:
+      case 0x8e:
         operand = stream.getUint8();
         break;
       case 0x94:
@@ -1308,58 +1344,61 @@ var Parser = (function() {
       case 0x96:
         operand = stream.getUint8();
         break;
-      case 0x9C:
+      case 0x9c:
         break;
-      case 0x9D:
+      case 0x9d:
         break;
-      case 0x9E:
+      case 0x9e:
         operand = stream.getUint8();
         break;
-      case 0xA4:
+      case 0xa4:
         break;
-      case 0xA5:
+      case 0xa5:
         break;
-      case 0xA6:
+      case 0xa6:
         operand = stream.getUint8();
         break;
-      case 0xAC:
+      case 0xac:
         break;
-      case 0xAD:
+      case 0xad:
         break;
-      case 0xAE:
+      case 0xae:
         operand = stream.getUint8();
         break;
-      case 0xB4:
+      case 0xb4:
         break;
-      case 0xB5:
+      case 0xb5:
         break;
-      case 0xB6:
+      case 0xb6:
         operand = stream.getUint8();
         break;
-      case 0xBC:
+      case 0xbc:
         break;
-      case 0xBD:
+      case 0xbd:
         break;
-      case 0xBE:
+      case 0xbe:
         operand = stream.getUint8();
         break;
-      case 0xCB:
+      case 0xcb:
         return getIndexCB(bytecode, stream);
-      case 0xE1:
+      case 0xe1:
         break;
-      case 0xE3:
+      case 0xe3:
         break;
-      case 0xE5:
+      case 0xe5:
         break;
-      case 0xE9:
+      case 0xe9:
         // This target can't be determined using static analysis.
         stream.seek(null);
         isFunctionEnder = true;
         break;
-      case 0xF9:
+      case 0xf9:
         break;
       default:
-        JSSMS.Utils.console.error('Unexpected opcode', '0xDD/0xFD ' + toHex(opcode));
+        JSSMS.Utils.console.error(
+          'Unexpected opcode',
+          '0xDD/0xFD ' + toHex(opcode)
+        );
     }
 
     bytecode.nextAddress = stream.position;
@@ -1368,7 +1407,6 @@ var Parser = (function() {
 
     return bytecode;
   }
-
 
   /**
    * Returns the bytecode associated to an opcode.
@@ -1388,7 +1426,6 @@ var Parser = (function() {
     return bytecode;
   }
 
-
   /**
    * @param {Array.<Array|DataView>} rom
    * @constructor
@@ -1407,7 +1444,6 @@ var Parser = (function() {
       return this.pos;
     },
 
-
     /**
      * @return {number}
      */
@@ -1415,14 +1451,12 @@ var Parser = (function() {
       return this.rom.length * PAGE_SIZE;
     },
 
-
     /**
      * @param {?number} pos
      */
     seek: function(pos) {
       this.pos = pos;
     },
-
 
     /**
      * Read an unsigned byte from ROM memory.
@@ -1432,22 +1466,21 @@ var Parser = (function() {
     getUint8: function() {
       var value = 0;
       var page = this.page;
-      var address = this.pos & 0x3FFF;
+      var address = this.pos & 0x3fff;
 
       if (SUPPORT_DATAVIEW) {
         value = this.rom[page].getUint8(address);
         this.pos++;
-        if (address >= 0x3FFF) {
+        if (address >= 0x3fff) {
           this.page++;
         }
         return value;
       } else {
-        value = this.rom[page][address] & 0xFF;
+        value = this.rom[page][address] & 0xff;
         this.pos++;
         return value;
       }
     },
-
 
     /**
      * Read a signed byte from ROM memory.
@@ -1457,17 +1490,17 @@ var Parser = (function() {
     getInt8: function() {
       var value = 0;
       var page = this.page;
-      var address = this.pos & 0x3FFF;
+      var address = this.pos & 0x3fff;
 
       if (SUPPORT_DATAVIEW) {
         value = this.rom[page].getInt8(address);
         this.pos++;
-        if (address >= 0x3FFF) {
+        if (address >= 0x3fff) {
           this.page++;
         }
         return value + 1;
       } else {
-        value = this.rom[page][address] & 0xFF;
+        value = this.rom[page][address] & 0xff;
         if (value >= 128) {
           value = value - 256;
         }
@@ -1475,7 +1508,6 @@ var Parser = (function() {
         return value + 1;
       }
     },
-
 
     /**
      * Read an unsigned word (two bytes) from ROM memory.
@@ -1485,26 +1517,28 @@ var Parser = (function() {
     getUint16: function() {
       var value = 0;
       var page = this.page;
-      var address = this.pos & 0x3FFF;
+      var address = this.pos & 0x3fff;
 
       if (SUPPORT_DATAVIEW) {
-        if (address < 0x3FFF) {
+        if (address < 0x3fff) {
           value = this.rom[page].getUint16(address, LITTLE_ENDIAN);
           this.pos += 2;
           return value;
         } else {
-          value = (this.rom[page].getUint8(address)) |
-              ((this.rom[++page].getUint8(address)) << 8);
+          value =
+            this.rom[page].getUint8(address) |
+            (this.rom[++page].getUint8(address) << 8);
           this.pos += 2;
           return value;
         }
       } else {
-        value = (this.rom[page][address] & 0xFF) |
-            ((this.rom[page][address + 1] & 0xFF) << 8);
+        value =
+          (this.rom[page][address] & 0xff) |
+          ((this.rom[page][address + 1] & 0xff) << 8);
         this.pos += 2;
         return value;
       }
-    }
+    },
   };
 
   return parser;

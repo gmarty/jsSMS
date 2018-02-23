@@ -6,25 +6,25 @@ There is a .jshintrc file at the project root. Your files must be checked agains
 errors or warnings are present.
 
 If your IDE doesn't support [JSHint](http://www.jshint.com/) natively, you can always install it:
+
 ```bash
 $ npm install jshint -g
 ```
 
 Then run:
+
 ```bash
 $ jshint myfile.js
 ```
 
 ## Coding styles
 
-Minimal requirements are:
+This project uses Prettier, so you don't have to worry about how to format the code.
 
-* Ident with 2 spaces
-* 100 characters max per line
+If needed, you can force a reformat of all the code base using:
 
-Make sure to pass your contribution through [Google Closure Linter](https://developers.google.com/closure/utilities/docs/linter_howto):
 ```bash
-fixjsstyle --strict myFile.js
+$ yarn format
 ```
 
 ## Testing

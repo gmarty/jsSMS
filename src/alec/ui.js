@@ -19,8 +19,6 @@
 
 'use strict';
 
-
-
 /**
  * Default implementation of UI. Could as well be defined as an interface, to
  * make sure we don't forget anything when implementing it.
@@ -30,14 +28,10 @@
  */
 JSSMS.DummyUI = function(sms) {
   this.main = sms;
-  this.enable = function() {
-  };
-  this.updateStatus = function() {
-  };
-  this.writeAudio = function() {
-  };
-  this.writeFrame = function() {
-  };
+  this.enable = function() {};
+  this.updateStatus = function() {};
+  this.writeAudio = function() {};
+  this.writeFrame = function() {};
 };
 
 if (window['$']) {
@@ -46,7 +40,7 @@ if (window['$']) {
    * @param {Object.<string, Object.<string, string>>} roms A list of ROM files.
    */
   $.fn['JSSMSUI'] = function(roms) {
-    var parent = /** HTMLElement **/ (this);
+    var parent = /** HTMLElement **/ this;
     var UI = function(sms) {
       this.main = sms;
 
@@ -54,7 +48,9 @@ if (window['$']) {
 
       // Create UI
       var screenContainer = $('<div id="screen"></div>');
-      var gamepadContainer = $('<div class="gamepad"><div class="direction"><div class="up"></div><div class="right"></div><div class="left"></div><div class="down"></div></div><div class="buttons"><div class="start"></div><div class="fire1"></div><div class="fire2"></div></div></div>');
+      var gamepadContainer = $(
+        '<div class="gamepad"><div class="direction"><div class="up"></div><div class="right"></div><div class="left"></div><div class="down"></div></div><div class="buttons"><div class="start"></div><div class="fire1"></div><div class="fire2"></div></div></div>'
+      );
 
       // General settings
       /**
@@ -63,16 +59,32 @@ if (window['$']) {
        */
       //var fullscreenSupport = JSSMS.Utils.getPrefix(['fullscreenEnabled', 'mozFullScreenEnabled']);
 
-      var requestAnimationFramePrefix = JSSMS.Utils.getPrefix(['requestAnimationFrame', 'msRequestAnimationFrame', 'mozRequestAnimationFrame', 'webkitRequestAnimationFrame'], window);
+      var requestAnimationFramePrefix = JSSMS.Utils.getPrefix(
+        [
+          'requestAnimationFrame',
+          'msRequestAnimationFrame',
+          'mozRequestAnimationFrame',
+          'webkitRequestAnimationFrame',
+        ],
+        window
+      );
 
       var i;
 
-      this.requestAnimationFrame = window[requestAnimationFramePrefix].bind(window);
+      this.requestAnimationFrame = window[requestAnimationFramePrefix].bind(
+        window
+      );
 
       // Screen
-      this.screen = $('<canvas width=' + SMS_WIDTH + ' height=' + SMS_HEIGHT + ' moz-opaque></canvas>');
+      this.screen = $(
+        '<canvas width=' +
+          SMS_WIDTH +
+          ' height=' +
+          SMS_HEIGHT +
+          ' moz-opaque></canvas>'
+      );
       this.canvasContext = this.screen[0].getContext('2d', {
-        'alpha': false // See http://wiki.whatwg.org/wiki/CanvasOpaque
+        alpha: false, // See http://wiki.whatwg.org/wiki/CanvasOpaque
       });
 
       // Nearest-neighbour rendering for scaling pixel-art.
@@ -80,7 +92,12 @@ if (window['$']) {
       this.canvasContext['mozImageSmoothingEnabled'] = false;
       this.canvasContext['imageSmoothingEnabled'] = false;
 
-      this.canvasImageData = this.canvasContext.getImageData(0, 0, SMS_WIDTH, SMS_HEIGHT);
+      this.canvasImageData = this.canvasContext.getImageData(
+        0,
+        0,
+        SMS_WIDTH,
+        SMS_HEIGHT
+      );
 
       // Gamepad
       this.gamepad = {
@@ -89,7 +106,7 @@ if (window['$']) {
         down: P1_KEY_DOWN,
         left: P1_KEY_LEFT,
         fire1: P1_KEY_FIRE1,
-        fire2: P1_KEY_FIRE2
+        fire2: P1_KEY_FIRE2,
       };
       var startButton = $('.start', gamepadContainer);
 
@@ -133,10 +150,9 @@ if (window['$']) {
       });
 
       // ROM selector
-      this.romSelect = $('#romSelector')
-        .change(function() {
-          self.loadROM();
-        });
+      this.romSelect = $('#romSelector').change(function() {
+        self.loadROM();
+      });
 
       // Buttons
       /*this.buttons.start = $('<button class="btn btn-primary" disabled="disabled">Start</button>')
@@ -176,27 +192,29 @@ if (window['$']) {
        }*/
 
       // @todo Add an exit fullScreen button.
-      $('#fullscreen')
-        .click(function() {
-          var screen = /** @type {HTMLDivElement} */ (screenContainer[0]);
+      $('#fullscreen').click(function() {
+        var screen = /** @type {HTMLDivElement} */ (screenContainer[0]);
 
-          if (screen.requestFullscreen) {
-            screen.requestFullscreen();
-          } else {
-            screen.mozRequestFullScreen();
-          }
-        });
+        if (screen.requestFullscreen) {
+          screen.requestFullscreen();
+        } else {
+          screen.mozRequestFullScreen();
+        }
+      });
 
       // Software buttons - touch
       gamepadContainer.on('touchstart touchmove', function(evt) {
         evt.preventDefault();
 
-        self.main.keyboard.controller1 = 0xFF;
+        self.main.keyboard.controller1 = 0xff;
 
         var touches = evt.originalEvent.touches;
 
         for (var i = 0; i < touches.length; i++) {
-          var target = document.elementFromPoint(touches[i].clientX, touches[i].clientY);
+          var target = document.elementFromPoint(
+            touches[i].clientX,
+            touches[i].clientY
+          );
 
           if (!target) {
             continue;
@@ -217,7 +235,7 @@ if (window['$']) {
         evt.preventDefault();
 
         if (evt.originalEvent.touches.length === 0) {
-          self.main.keyboard.controller1 = 0xFF;
+          self.main.keyboard.controller1 = 0xff;
         }
       });
 
@@ -245,7 +263,7 @@ if (window['$']) {
       startButton
         .on('mousedown touchstart', function(evt) {
           if (self.main.is_sms) {
-            self.main.pause_button = true;       // Pause
+            self.main.pause_button = true; // Pause
           } else {
             self.main.keyboard.ggstart &= ~0x80; // Start
           }
@@ -253,7 +271,7 @@ if (window['$']) {
         })
         .on('mouseup touchend', function(evt) {
           if (!self.main.is_sms) {
-            self.main.keyboard.ggstart |= 0x80;  // Start
+            self.main.keyboard.ggstart |= 0x80; // Start
           }
           evt.preventDefault();
         });
@@ -284,7 +302,6 @@ if (window['$']) {
         this.screen[0].height = SMS_HEIGHT;
       },
 
-
       /**
        * Given an map of ROMs, build a <select> tag to allow game selection.
        *
@@ -292,10 +309,10 @@ if (window['$']) {
        */
       setRoms: function(roms) {
         var groupName,
-            optgroup,
-            length,
-            i,
-            count = 0;
+          optgroup,
+          length,
+          i,
+          count = 0;
 
         this.romSelect.children().remove();
         $('<option></option>').appendTo(this.romSelect);
@@ -315,7 +332,6 @@ if (window['$']) {
           count++;
         }
       },
-
 
       loadROM: function() {
         var self = this;
@@ -348,10 +364,9 @@ if (window['$']) {
             //}
 
             self.loadROMFile(data, self.romSelect.val());
-          }
+          },
         });
       },
-
 
       loadROMFile: function(data, filename) {
         this.main.stop();
@@ -363,7 +378,6 @@ if (window['$']) {
         $('#play').removeClass('disabled');
         $('#fullscreen').removeClass('disabled');
       },
-
 
       /**
        * Enable and reset UI elements.
@@ -381,13 +395,10 @@ if (window['$']) {
          }*/
       },
 
-
       /**
        * Update the message. Used mainly for displaying frame rate.
        */
-      updateStatus: function() {
-      },
-
+      updateStatus: function() {},
 
       /**
        * @param {Array.<number>} buffer
@@ -399,17 +410,21 @@ if (window['$']) {
         source.start();
       },
 
-
       /**
        * Update the canvas screen. ATM, prevBuffer is not used. See JSNES for
        * an implementation of differential update.
        */
-      writeFrame: function() {
+      writeFrame: (function() {
         /**
          * Contains the visibility API prefix or false if not supported.
          * @type {string|boolean}
          */
-        var hiddenPrefix = JSSMS.Utils.getPrefix(['hidden', 'mozHidden', 'webkitHidden', 'msHidden']);
+        var hiddenPrefix = JSSMS.Utils.getPrefix([
+          'hidden',
+          'mozHidden',
+          'webkitHidden',
+          'msHidden',
+        ]);
 
         if (hiddenPrefix) {
           // If browser supports visibility API and this page is hidden, we exit.
@@ -425,8 +440,7 @@ if (window['$']) {
             this.canvasContext.putImageData(this.canvasImageData, 0, 0);
           };
         }
-      }(),
-
+      })(),
 
       /**
        * A function called at each cpu instruction and display information relative to debug.
@@ -442,16 +456,24 @@ if (window['$']) {
 
         for (; num < 16 && i <= length; i++) {
           if (instructions[i]) {
-            html += '<div' + (instructions[i].address === currentAddress ? ' class="current"' : '') + '>' + instructions[i].hexAddress +
+            html +=
+              '<div' +
+              (instructions[i].address === currentAddress
+                ? ' class="current"'
+                : '') +
+              '>' +
+              instructions[i].hexAddress +
               (instructions[i].isJumpTarget ? ':' : ' ') +
-              '<code>' + instructions[i].inst + '</code></div>';
+              '<code>' +
+              instructions[i].inst +
+              '</code></div>';
 
             num++;
           }
         }
 
         this.dissambler.html(html);
-      }
+      },
     };
 
     return UI;

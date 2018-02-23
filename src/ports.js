@@ -28,8 +28,6 @@
 /** @const */ var PORT_A = 0;
 /** @const */ var PORT_B = 5;
 
-
-
 /**
  * @constructor
  * @param {JSSMS} sms
@@ -70,7 +68,6 @@ JSSMS.Ports.prototype = {
     }
   },
 
-
   /**
    * Output to a Z80 port.
    *
@@ -83,7 +80,7 @@ JSSMS.Ports.prototype = {
       return;
     }
 
-    switch (port & 0xC1) {
+    switch (port & 0xc1) {
       // 0x3F IO Port
       // 0xD7 : Port B TH pin output level (1=high, 0=low)
       // 0xD6 : Port B TR pin output level (1=high, 0=low)
@@ -96,19 +93,22 @@ JSSMS.Ports.prototype = {
       case 0x01:
         // Accurate emulation with HCounter
         if (LIGHTGUN) {
-          this.oldTH = (this.getTH(PORT_A) !== 0 || this.getTH(PORT_B) !== 0);
+          this.oldTH = this.getTH(PORT_A) !== 0 || this.getTH(PORT_B) !== 0;
 
           this.writePort(PORT_A, value);
           this.writePort(PORT_B, value >> 2);
 
           // Toggling TH latches H Counter
-          if (!this.oldTH && (this.getTH(PORT_A) !== 0 || this.getTH(PORT_B) !== 0)) {
+          if (
+            !this.oldTH &&
+            (this.getTH(PORT_A) !== 0 || this.getTH(PORT_B) !== 0)
+          ) {
             this.hCounter = this.getHCount();
           }
         } else {
           // Rough emulation of Nationalisation bits
           this.ioPorts[0] = (value & 0x20) << 1;
-          this.ioPorts[1] = (value & 0x80);
+          this.ioPorts[1] = value & 0x80;
 
           if (this.europe === 0) {
             // Not European system
@@ -138,7 +138,6 @@ JSSMS.Ports.prototype = {
     }
   },
 
-
   /**
    * Read from a Z80 port.
    *
@@ -151,7 +150,7 @@ JSSMS.Ports.prototype = {
       switch (port) {
         // Game Gear (Start Button and Nationalisation)
         case 0x00:
-          return (this.keyboard.ggstart & 0xBF) | this.europe;
+          return (this.keyboard.ggstart & 0xbf) | this.europe;
 
         // GG Serial Communication Ports -
         // Return 0 for now as "OutRun" gets stuck in a loop by returning 0xFF
@@ -162,11 +161,11 @@ JSSMS.Ports.prototype = {
         case 0x05:
           return 0x00;
         case 0x06:
-          return 0xFF;
+          return 0xff;
       }
     }
 
-    switch (port & 0xC1) {
+    switch (port & 0xc1) {
       // 0x7E - Vertical Port
       case 0x40:
         return this.vdp.getVCount();
@@ -192,7 +191,7 @@ JSSMS.Ports.prototype = {
       // 0xD2 : Port A LEFT pin input
       // 0xD1 : Port A DOWN pin input
       // 0xD0 : Port A UP pin input
-      case 0xC0:
+      case 0xc0:
         return this.keyboard.controller1;
 
       // 0xC1 / 0xDD - I/O Port B and Misc
@@ -204,23 +203,29 @@ JSSMS.Ports.prototype = {
       // 0xD2 : Port B TL pin input
       // 0xD1 : Port B RIGHT pin input
       // 0xD0 : Port B LEFT pin input
-      case 0xC1:
+      case 0xc1:
         if (LIGHTGUN) {
           if (this.keyboard.lightgunClick) {
             this.lightPhaserSync();
           }
 
-          return (this.keyboard.controller2 & 0x3F) | (this.getTH(PORT_A) !== 0 ? 0x40 : 0) |
-              (this.getTH(PORT_B) !== 0 ? 0x80 : 0);
+          return (
+            (this.keyboard.controller2 & 0x3f) |
+            (this.getTH(PORT_A) !== 0 ? 0x40 : 0) |
+            (this.getTH(PORT_B) !== 0 ? 0x80 : 0)
+          );
         } else {
-          return (this.keyboard.controller2 & 0x3F) | this.ioPorts[0] | this.ioPorts[1];
+          return (
+            (this.keyboard.controller2 & 0x3f) |
+            this.ioPorts[0] |
+            this.ioPorts[1]
+          );
         }
     }
 
     // Default Value is 0xFF
-    return 0xFF;
+    return 0xff;
   },
-
 
   // Port A/B Emulation
   /**
@@ -231,20 +236,19 @@ JSSMS.Ports.prototype = {
     this.ioPorts[index + IO_TR_DIRECTION] = value & 0x01;
     this.ioPorts[index + IO_TH_DIRECTION] = value & 0x02;
     this.ioPorts[index + IO_TR_OUTPUT] = value & 0x10;
-    this.ioPorts[index + IO_TH_OUTPUT] = this.europe === 0 ? (~value) & 0x20 : value & 0x20;
+    this.ioPorts[index + IO_TH_OUTPUT] =
+      this.europe === 0 ? ~value & 0x20 : value & 0x20;
   },
-
 
   /**
    * @param {number} index
    * @return {number}
    */
   getTH: function(index) {
-    return (this.ioPorts[index + IO_TH_DIRECTION] === 0) ?
-        this.ioPorts[index + IO_TH_OUTPUT] :
-        this.ioPorts[index + IO_TH_INPUT];
+    return this.ioPorts[index + IO_TH_DIRECTION] === 0
+      ? this.ioPorts[index + IO_TH_OUTPUT]
+      : this.ioPorts[index + IO_TH_INPUT];
   },
-
 
   /**
    * @param {number} index
@@ -254,7 +258,6 @@ JSSMS.Ports.prototype = {
     this.ioPorts[index + IO_TH_DIRECTION] = 1;
     this.ioPorts[index + IO_TH_INPUT] = on ? 1 : 0;
   },
-
 
   // H Counter Emulation
   //
@@ -275,15 +278,16 @@ JSSMS.Ports.prototype = {
    * @return {number}
    */
   getHCount: function() {
-    var pixels = Math.round((this.main.cpu.getCycle() * SMS_X_PIXELS) / this.main.cyclesPerLine);
-    var v = ((pixels - 8) >> 1);
+    var pixels = Math.round(
+      this.main.cpu.getCycle() * SMS_X_PIXELS / this.main.cyclesPerLine
+    );
+    var v = (pixels - 8) >> 1;
     if (v > 0x93) {
-      v += 0xE9 - 0x94;
+      v += 0xe9 - 0x94;
     }
 
-    return v & 0xFF;
+    return v & 0xff;
   },
-
 
   // Lightgun <-> Port Synchronisation
   // This is a hacky way to do things, but works reasonably well.
@@ -293,13 +297,11 @@ JSSMS.Ports.prototype = {
    */
   X_RANGE: 48,
 
-
   /**
    * Y range of Lightgun.
    * @type {number}
    */
   Y_RANGE: 4,
-
 
   lightPhaserSync: function() {
     var oldTH = this.getTH(PORT_A);
@@ -310,8 +312,11 @@ JSSMS.Ports.prototype = {
 
     // Within 8 pixels of click on Y value
     // Within 96 pixels of click on X value
-    if ((dy > -this.Y_RANGE && dy < this.Y_RANGE) &&
-        (dx > -this.X_RANGE && dx < this.X_RANGE)) {
+    if (
+      dy > -this.Y_RANGE &&
+      dy < this.Y_RANGE &&
+      (dx > -this.X_RANGE && dx < this.X_RANGE)
+    ) {
       this.setTH(PORT_A, false);
 
       // TH has been toggled, update with lightgun position
@@ -328,7 +333,6 @@ JSSMS.Ports.prototype = {
     }
   },
 
-
   /**
    * Set console to European / Japanese model.
    *
@@ -338,11 +342,10 @@ JSSMS.Ports.prototype = {
     this.europe = value ? 0x40 : 0;
   },
 
-
   /**
    * @return {boolean}
    */
   isDomestic: function() {
     return this.europe !== 0;
-  }
+  },
 };

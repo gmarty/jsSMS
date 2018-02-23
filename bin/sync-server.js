@@ -52,7 +52,7 @@ function writeSyncLog(offset, length, request, response) {
 
     fs.writeSync(sync_fd, buffer, 0, dataLen, offset);
     //fs.truncateSync(sync_fd, offset + dataLen);
-    response.writeHead(200, {'Content-Type': 'text/plain'});
+    response.writeHead(200, { 'Content-Type': 'text/plain' });
     response.end('OK', 'utf-8');
   });
 }
@@ -64,7 +64,7 @@ function readSyncLog(offset, length, request, response) {
   var buffer = new Buffer(length);
 
   fs.readSync(sync_fd, buffer, 0, length, offset);
-  response.writeHead(200, {'Content-Type': 'application/octet-stream'});
+  response.writeHead(200, { 'Content-Type': 'application/octet-stream' });
   response.end(buffer, 'utf-8');
 }
 
@@ -111,7 +111,7 @@ function serveFile(request, response) {
           response.writeHead(500);
           response.end();
         } else {
-          response.writeHead(200, {'Content-Type': contentType});
+          response.writeHead(200, { 'Content-Type': contentType });
           response.end(content, 'utf-8');
         }
       });
@@ -122,26 +122,28 @@ function serveFile(request, response) {
   });
 }
 
-http.createServer(function(request, response) {
-  var parsed = url.parse(request.url, true);
+http
+  .createServer(function(request, response) {
+    var parsed = url.parse(request.url, true);
 
-  if (parsed.pathname === '/wsynclog') {
-    if (request.method === 'POST') {
-      writeSyncLog(parsed.query.o, parsed.query.l, request, response);
-    } else {
-      response.writeHead(500);
-      response.end();
+    if (parsed.pathname === '/wsynclog') {
+      if (request.method === 'POST') {
+        writeSyncLog(parsed.query.o, parsed.query.l, request, response);
+      } else {
+        response.writeHead(500);
+        response.end();
+      }
+      return;
     }
-    return;
-  }
 
-  if (parsed.pathname === '/rsynclog') {
-    readSyncLog(parsed.query.o, parsed.query.l, request, response);
-    return;
-  }
+    if (parsed.pathname === '/rsynclog') {
+      readSyncLog(parsed.query.o, parsed.query.l, request, response);
+      return;
+    }
 
-  serveFile(request, response);
-}).listen(8124);
+    serveFile(request, response);
+  })
+  .listen(8124);
 
 console.log('Server running at http://127.0.0.1:8124/');
 

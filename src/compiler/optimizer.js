@@ -22,8 +22,6 @@
 
 'use strict';
 
-
-
 /**
  * Apply several passes to the ast.
  * A pass looks for patterns and optimize the code accordingly.
@@ -49,7 +47,6 @@ var Optimizer = (function() {
       }
     },
 
-
     /**
      * Perform various optimizations limited to a function scope.
      *
@@ -59,10 +56,11 @@ var Optimizer = (function() {
       this.ast[page] = this.ast[page].map(this.portPeephole.bind(this));
       this.ast[page] = this.ast[page].map(this.evaluateBinaryExpressions);
       this.ast[page] = this.ast[page].map(this.inlineRegisters);
-      this.ast[page] = this.ast[page].map(this.evaluateMemberExpressions.bind(this));
+      this.ast[page] = this.ast[page].map(
+        this.evaluateMemberExpressions.bind(this)
+      );
       this.ast[page] = this.ast[page].map(this.trimAfterReturn.bind(this));
     },
-
 
     /**
      * Evaluate binary expressions when both operands are literal:
@@ -83,9 +81,11 @@ var Optimizer = (function() {
     evaluateBinaryExpressions: function(fn) {
       return fn.map(function(_ast) {
         _ast = JSSMS.Utils.traverse(_ast, function(ast) {
-          if (ast['type'] === 'BinaryExpression' &&
-              ast['left']['type'] === 'Literal' &&
-              ast['right']['type'] === 'Literal') {
+          if (
+            ast['type'] === 'BinaryExpression' &&
+            ast['left']['type'] === 'Literal' &&
+            ast['right']['type'] === 'Literal'
+          ) {
             var value = 0;
             switch (ast['operator']) {
               case '>>':
@@ -95,8 +95,10 @@ var Optimizer = (function() {
                 value = ast['left']['value'] & ast['right']['value'];
                 break;
               default:
-                JSSMS.Utils.console.log('Unimplemented evaluation optimization for operator',
-                    ast['operator']);
+                JSSMS.Utils.console.log(
+                  'Unimplemented evaluation optimization for operator',
+                  ast['operator']
+                );
                 return ast;
             }
 
@@ -114,7 +116,6 @@ var Optimizer = (function() {
         return _ast;
       });
     },
-
 
     /**
      * Evaluate members expressions when the property is a literal:
@@ -135,9 +136,11 @@ var Optimizer = (function() {
 
       return fn.map(function(_ast) {
         _ast = JSSMS.Utils.traverse(_ast, function(ast) {
-          if (ast['type'] === 'MemberExpression' &&
-              ast['object']['name'] === 'SZP_TABLE' &&
-              ast['property']['type'] === 'Literal') {
+          if (
+            ast['type'] === 'MemberExpression' &&
+            ast['object']['name'] === 'SZP_TABLE' &&
+            ast['property']['type'] === 'Literal'
+          ) {
             var value = self.main.cpu.SZP_TABLE[ast['property']['value']];
 
             // Change the properties of the AST node.
@@ -155,7 +158,6 @@ var Optimizer = (function() {
         return _ast;
       });
     },
-
 
     /**
      * This pass replaces references to defined registers with their respective values:
@@ -191,7 +193,7 @@ var Optimizer = (function() {
         d: false,
         e: false,
         h: false,
-        l: false
+        l: false,
       };
       var definedRegValue = {
         //a: {},
@@ -201,28 +203,32 @@ var Optimizer = (function() {
         d: {},
         e: {},
         h: {},
-        l: {}
+        l: {},
       };
 
       return fn.map(function(_ast) {
         _ast = JSSMS.Utils.traverse(_ast, function(ast) {
           // 1st, we tag defined registers.
-          if (ast['type'] === 'AssignmentExpression' &&
-              ast['operator'] === '=' &&
-              ast['left']['type'] === 'Register' &&
-              ast['right']['type'] === 'Literal' &&
-              ast['left']['name'] !== 'a' &&
-              ast['left']['name'] !== 'f') {
+          if (
+            ast['type'] === 'AssignmentExpression' &&
+            ast['operator'] === '=' &&
+            ast['left']['type'] === 'Register' &&
+            ast['right']['type'] === 'Literal' &&
+            ast['left']['name'] !== 'a' &&
+            ast['left']['name'] !== 'f'
+          ) {
             definedReg[ast['left']['name']] = true;
             definedRegValue[ast['left']['name']] = ast['right'];
           }
 
           // And we make sure to tag undefined registers.
-          if (ast['type'] === 'AssignmentExpression' &&
-              ast['left']['type'] === 'Register' &&
-              ast['right']['type'] !== 'Literal' &&
-              ast['left']['name'] !== 'a' &&
-              ast['left']['name'] !== 'f') {
+          if (
+            ast['type'] === 'AssignmentExpression' &&
+            ast['left']['type'] === 'Register' &&
+            ast['right']['type'] !== 'Literal' &&
+            ast['left']['name'] !== 'a' &&
+            ast['left']['name'] !== 'f'
+          ) {
             definedReg[ast['left']['name']] = false;
             definedRegValue[ast['left']['name']] = {};
             return ast;
@@ -230,45 +236,57 @@ var Optimizer = (function() {
 
           // Then inline arguments.
           if (ast['type'] === 'CallExpression') {
-            if (ast['arguments'][0] &&
-                ast['arguments'][0]['type'] === 'Register' &&
-                definedReg[ast['arguments'][0]['name']] &&
-                ast['arguments'][0]['name'] !== 'a' &&
-                ast['arguments'][0]['name'] !== 'f') {
-              ast['arguments'][0] = definedRegValue[ast['arguments'][0]['name']];
+            if (
+              ast['arguments'][0] &&
+              ast['arguments'][0]['type'] === 'Register' &&
+              definedReg[ast['arguments'][0]['name']] &&
+              ast['arguments'][0]['name'] !== 'a' &&
+              ast['arguments'][0]['name'] !== 'f'
+            ) {
+              ast['arguments'][0] =
+                definedRegValue[ast['arguments'][0]['name']];
             }
-            if (ast['arguments'][1] &&
-                ast['arguments'][1]['type'] === 'Register' &&
-                definedReg[ast['arguments'][1]['name']] &&
-                ast['arguments'][1]['name'] !== 'a' &&
-                ast['arguments'][1]['name'] !== 'f') {
-              ast['arguments'][1] = definedRegValue[ast['arguments'][1]['name']];
+            if (
+              ast['arguments'][1] &&
+              ast['arguments'][1]['type'] === 'Register' &&
+              definedReg[ast['arguments'][1]['name']] &&
+              ast['arguments'][1]['name'] !== 'a' &&
+              ast['arguments'][1]['name'] !== 'f'
+            ) {
+              ast['arguments'][1] =
+                definedRegValue[ast['arguments'][1]['name']];
             }
             return ast;
           }
 
           // Inline object/array properties.
-          if (ast['type'] === 'MemberExpression' &&
-              ast['property']['type'] === 'Register' &&
-              definedReg[ast['property']['name']] &&
-              ast['property']['name'] !== 'a' &&
-              ast['property']['name'] !== 'f') {
+          if (
+            ast['type'] === 'MemberExpression' &&
+            ast['property']['type'] === 'Register' &&
+            definedReg[ast['property']['name']] &&
+            ast['property']['name'] !== 'a' &&
+            ast['property']['name'] !== 'f'
+          ) {
             ast['property'] = definedRegValue[ast['property']['name']];
             return ast;
           }
 
           // Inline binary expressions.
           if (ast['type'] === 'BinaryExpression') {
-            if (ast['right']['type'] === 'Register' &&
-                definedReg[ast['right']['name']] &&
-                ast['right']['name'] !== 'a' &&
-                ast['right']['name'] !== 'f') {
+            if (
+              ast['right']['type'] === 'Register' &&
+              definedReg[ast['right']['name']] &&
+              ast['right']['name'] !== 'a' &&
+              ast['right']['name'] !== 'f'
+            ) {
               ast['right'] = definedRegValue[ast['right']['name']];
             }
-            if (ast['left']['type'] === 'Register' &&
-                definedReg[ast['left']['name']] &&
-                ast['left']['name'] !== 'a' &&
-                ast['left']['name'] !== 'f') {
+            if (
+              ast['left']['type'] === 'Register' &&
+              definedReg[ast['left']['name']] &&
+              ast['left']['name'] !== 'a' &&
+              ast['left']['name'] !== 'f'
+            ) {
               ast['left'] = definedRegValue[ast['left']['name']];
             }
             return ast;
@@ -280,7 +298,6 @@ var Optimizer = (function() {
         return _ast;
       });
     },
-
 
     /**
      * This pass inlines the port communication through bypassing port.out and port.in_ and calling
@@ -315,7 +332,7 @@ var Optimizer = (function() {
                 return undefined;
               }
 
-              switch (port & 0xC1) {
+              switch (port & 0xc1) {
                 case 0x01:
                   // @todo
                   break;
@@ -351,7 +368,11 @@ var Optimizer = (function() {
                     // (port.keyboard.ggstart & 0xBF) | port.europe
                     ast['type'] = 'BinaryExpression';
                     ast['operator'] = '|';
-                    ast['left'] = n.BinaryExpression('&', n.Identifier('port.keyboard.ggstart'), n.Literal(0xBF));
+                    ast['left'] = n.BinaryExpression(
+                      '&',
+                      n.Identifier('port.keyboard.ggstart'),
+                      n.Literal(0xbf)
+                    );
                     ast['right'] = n.Identifier('port.europe');
                     delete ast['callee'];
                     delete ast['arguments'];
@@ -371,15 +392,15 @@ var Optimizer = (function() {
 
                   case 0x06:
                     ast['type'] = 'Literal';
-                    ast['value'] = 0xFF;
-                    ast['raw'] = DEBUG ? JSSMS.Utils.toHex(0xFF) : '' + 0xFF;
+                    ast['value'] = 0xff;
+                    ast['raw'] = DEBUG ? JSSMS.Utils.toHex(0xff) : '' + 0xff;
                     delete ast['callee'];
                     delete ast['arguments'];
                     return ast;
                 }
               }
 
-              switch (port & 0xC1) {
+              switch (port & 0xc1) {
                 case 0x40:
                   ast['callee']['name'] = 'vdp.getVCount';
                   ast['arguments'] = [];
@@ -402,14 +423,14 @@ var Optimizer = (function() {
                   ast['arguments'] = [];
                   return ast;
 
-                case 0xC0:
+                case 0xc0:
                   ast['type'] = 'Identifier';
                   ast['name'] = 'main.keyboard.controller1';
                   delete ast['callee'];
                   delete ast['arguments'];
                   return ast;
 
-                case 0xC1:
+                case 0xc1:
                   // @todo
                   if (LIGHTGUN) {
                     // if (this.keyboard.lightgunClick) {
@@ -422,10 +443,22 @@ var Optimizer = (function() {
                     // (main.keyboard.controller2 & 0x3F) | port.ioPorts[0] | port.ioPorts[1]
                     ast['type'] = 'BinaryExpression';
                     ast['operator'] = '|';
-                    ast['left'] = n.BinaryExpression('|',
-                        n.BinaryExpression('&', n.Identifier('main.keyboard.controller2'), n.Literal(0x3F)),
-                        n.MemberExpression(n.Identifier('port.ioPorts'), n.Literal(0)));
-                    ast['right'] = n.MemberExpression(n.Identifier('port.ioPorts'), n.Literal(1));
+                    ast['left'] = n.BinaryExpression(
+                      '|',
+                      n.BinaryExpression(
+                        '&',
+                        n.Identifier('main.keyboard.controller2'),
+                        n.Literal(0x3f)
+                      ),
+                      n.MemberExpression(
+                        n.Identifier('port.ioPorts'),
+                        n.Literal(0)
+                      )
+                    );
+                    ast['right'] = n.MemberExpression(
+                      n.Identifier('port.ioPorts'),
+                      n.Literal(1)
+                    );
                     delete ast['callee'];
                     delete ast['arguments'];
                     return ast;
@@ -434,8 +467,8 @@ var Optimizer = (function() {
               }
 
               ast['type'] = 'Literal';
-              ast['value'] = 0xFF;
-              ast['raw'] = DEBUG ? JSSMS.Utils.toHex(0xFF) : '' + 0xFF;
+              ast['value'] = 0xff;
+              ast['raw'] = DEBUG ? JSSMS.Utils.toHex(0xff) : '' + 0xff;
               delete ast['callee'];
               delete ast['arguments'];
               return ast;
@@ -448,7 +481,6 @@ var Optimizer = (function() {
         return _ast;
       });
     },
-
 
     /**
      * A pass to remove all instructions from a function body located
@@ -483,7 +515,7 @@ var Optimizer = (function() {
       }
 
       return fn;
-    }
+    },
   };
 
   return Optimizer;

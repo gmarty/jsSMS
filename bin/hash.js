@@ -40,8 +40,7 @@ var argv = require('optimist')
   .alias('f', 'file')
   .describe('f', 'The path to a single ROM file')
   .alias('d', 'dir')
-  .describe('d', 'A folder containing ROM files')
-  .argv;
+  .describe('d', 'A folder containing ROM files').argv;
 
 if (argv.file) {
   var crc32 = getCRC32FromFile(argv.file);
@@ -64,7 +63,7 @@ if (argv.file) {
       })
       .forEach(function(file) {
         var fileName = file.split(path.sep);
-        fileName = fileName [fileName.length - 1];
+        fileName = fileName[fileName.length - 1];
         result.push(getCRC32FromFile(file) + '\t' + fileName);
       });
 
@@ -74,7 +73,6 @@ if (argv.file) {
   process.stdout.write('Please specify either -f or -d options.');
 }
 
-
 /**
  * Compute the CRC32 hash from a file.
  * Using the synchronous API for now.
@@ -83,7 +81,7 @@ if (argv.file) {
  * @returns {number}
  */
 function getCRC32FromFile(file) {
-  var data = fs.readFileSync(file, {encoding: 'binary'});
+  var data = fs.readFileSync(file, { encoding: 'binary' });
 
   return JSSMS.Utils.crc32(data);
 }

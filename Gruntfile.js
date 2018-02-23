@@ -8,9 +8,9 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     // Options
-    closurePath: function() {
+    closurePath: (function() {
       return process.env.CLOSURE_PATH;
-    }(),
+    })(),
     js: [
       'src/setup.js',
       'src/sms.js',
@@ -34,11 +34,10 @@ module.exports = function(grunt) {
       'src/compiler/optimizer.js',
       'src/compiler/generator.js',
       'src/compiler/recompiler.js',
-      '<%= grunt.task.current.nameArgs == "closure-compiler:node" ? "src/node/build/exports.js" : "src/build/exports.js" %>' // Required for targets using `output_wrapper`.
+      // Required for targets using `output_wrapper`.
+      '<%= grunt.task.current.nameArgs == "closure-compiler:node" ? "src/node/build/exports.js" : "src/build/exports.js" %>',
     ],
-    externs: [
-      '<%= closurePath %>/contrib/externs/jquery-1.9.js'
-    ],
+    externs: ['<%= closurePath %>/contrib/externs/jquery-1.9.js'],
 
     'closure-compiler': {
       // Generates a minified version of the script.
@@ -59,10 +58,10 @@ module.exports = function(grunt) {
             '"ENABLE_DEBUGGER=false"',
             //'"ENABLE_COMPILER=true"',
             '"ACCURATE_INTERRUPT_EMULATION=false"',
-            '"ENABLE_SERVER_LOGGER=false"'
+            '"ENABLE_SERVER_LOGGER=false"',
           ],
-          debug: false
-        }
+          debug: false,
+        },
       },
 
       // Generates a minified version of the script for debugging.
@@ -82,11 +81,11 @@ module.exports = function(grunt) {
             '"ENABLE_DEBUGGER=true"',
             //'"ENABLE_COMPILER=true"',
             '"ACCURATE_INTERRUPT_EMULATION=false"',
-            '"ENABLE_SERVER_LOGGER=false"'
+            '"ENABLE_SERVER_LOGGER=false"',
           ],
           debug: true,
-          formatting: 'PRETTY_PRINT'
-        }
+          formatting: 'PRETTY_PRINT',
+        },
       },
 
       // Generates a unminified concatenated version.
@@ -101,8 +100,8 @@ module.exports = function(grunt) {
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
           debug: true,
-          formatting: 'PRETTY_PRINT'
-        }
+          formatting: 'PRETTY_PRINT',
+        },
       },
 
       // Generates a minified version of the script for the Firefox OS app.
@@ -129,7 +128,7 @@ module.exports = function(grunt) {
           'src/compiler/optimizer.js',
           'src/compiler/generator.js',
           'src/compiler/recompiler.js',
-          'src/build/exports.js'
+          'src/build/exports.js',
         ],
         jsOutputFile: 'alec/min/alec.min.js',
         options: {
@@ -149,23 +148,20 @@ module.exports = function(grunt) {
             '"FORCE_DATAVIEW=true"',
             '"FORCE_DESTRUCTURING=true"',
             '"ACCURATE_INTERRUPT_EMULATION=false"',
-            '"ENABLE_SERVER_LOGGER=false"'
+            '"ENABLE_SERVER_LOGGER=false"',
           ],
-          debug: false
-        }
+          debug: false,
+        },
       },
 
       // Minify the bootstrap file for the Firefox OS app.
       'alec-bootstrap': {
-        js: [
-          'src/setup.js',
-          'src/alec/bootstrap.js'
-        ],
+        js: ['src/setup.js', 'src/alec/bootstrap.js'],
         jsOutputFile: 'alec/min/bootstrap.min.js',
         options: {
           externs: [
             '<%= closurePath %>/contrib/externs/jquery-1.9.js',
-            'src/build/externs/jssms.js'
+            'src/build/externs/jssms.js',
           ],
           compilation_level: 'ADVANCED_OPTIMIZATIONS',
           language_in: 'ECMASCRIPT5_STRICT',
@@ -173,12 +169,11 @@ module.exports = function(grunt) {
           use_types_for_optimization: null,
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
-          output_wrapper: '(function(window,document,navigator){%output%})(window,document,navigator);',
-          define: [
-            '"DEBUG=false"'
-          ],
-          debug: false
-        }
+          output_wrapper:
+            '(function(window,document,navigator){%output%})(window,document,navigator);',
+          define: ['"DEBUG=false"'],
+          debug: false,
+        },
       },
 
       // Generates a minified version of the script to use with node.js.
@@ -192,18 +187,19 @@ module.exports = function(grunt) {
           use_types_for_optimization: null,
           summary_detail_level: 3,
           warning_level: 'VERBOSE',
-          output_wrapper: '(function(window){%output%module.exports=JSSMS\n})(global);',
+          output_wrapper:
+            '(function(window){%output%module.exports=JSSMS\n})(global);',
           define: [
             //'"DEBUG=true"',
             '"ENABLE_DEBUGGER=true"',
             '"ENABLE_COMPILER=false"',
             '"ACCURATE_INTERRUPT_EMULATION=true"',
-            '"ENABLE_SERVER_LOGGER=false"'
+            '"ENABLE_SERVER_LOGGER=false"',
           ],
           debug: true,
-          formatting: 'PRETTY_PRINT'
-        }
-      }
+          formatting: 'PRETTY_PRINT',
+        },
+      },
     },
 
     htmlmin: {
@@ -216,55 +212,59 @@ module.exports = function(grunt) {
           removeRedundantAttributes: true,
           removeEmptyAttributes: true,
           removeOptionalTags: true,
-          html5: true
+          html5: true,
         },
         files: {
-          'alec/index.html': 'alec/src.html'
-        }
-      }
+          'alec/index.html': 'alec/src.html',
+        },
+      },
     },
 
     concat: {
       jssms: {
         options: {
-          banner: grunt.file.read('src/license.js')
+          banner: grunt.file.read('src/license.js'),
         },
         files: {
           'min/jssms.min.js': ['min/jssms.min.js'],
           'min/jssms.debug.js': ['min/jssms.debug.js'],
-          'min/jssms.concat.js': ['min/jssms.concat.js']
-        }
+          'min/jssms.concat.js': ['min/jssms.concat.js'],
+        },
       },
-      'alec': {
+      alec: {
         options: {
-          banner: grunt.file.read('src/license.js')
+          banner: grunt.file.read('src/license.js'),
         },
         files: {
-          'alec/min/alec.min.js': ['alec/min/alec.min.js']
-        }
+          'alec/min/alec.min.js': ['alec/min/alec.min.js'],
+        },
       },
       'alec-bootstrap': {
         // No banner on this one.
         options: {
           process: function(src) {
             // Inline JavaScript bootstrap code.
-            return src.replace(/<script src=\.\.\/src\/setup\.js>.+<\/script>/,
-              '<script>' + grunt.file.read('alec/min/bootstrap.min.js').trim() + '</script>');
-          }
+            return src.replace(
+              /<script src=\.\.\/src\/setup\.js>.+<\/script>/,
+              '<script>' +
+                grunt.file.read('alec/min/bootstrap.min.js').trim() +
+                '</script>'
+            );
+          },
         },
         files: {
-          'alec/index.html': ['alec/index.html']
-        }
+          'alec/index.html': ['alec/index.html'],
+        },
       },
       node: {
         options: {
-          banner: grunt.file.read('src/license.js')
+          banner: grunt.file.read('src/license.js'),
         },
         files: {
-          'min/jssms.node.js': ['min/jssms.node.js']
-        }
-      }
-    }
+          'min/jssms.node.js': ['min/jssms.node.js'],
+        },
+      },
+    },
   });
 
   // Default task.
@@ -272,17 +272,14 @@ module.exports = function(grunt) {
     'closure-compiler:min',
     'closure-compiler:debug',
     'closure-compiler:concat',
-    'concat:jssms'
+    'concat:jssms',
   ]);
   grunt.registerTask('alec', [
     'closure-compiler:alec',
     'closure-compiler:alec-bootstrap',
     'htmlmin:alec',
     'concat:alec',
-    'concat:alec-bootstrap'
+    'concat:alec-bootstrap',
   ]);
-  grunt.registerTask('node', [
-    'closure-compiler:node',
-    'concat:node'
-  ]);
+  grunt.registerTask('node', ['closure-compiler:node', 'concat:node']);
 };

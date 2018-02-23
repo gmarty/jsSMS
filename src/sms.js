@@ -22,13 +22,11 @@
 
 'use strict';
 
-
 /**
  * The frequency in ms at which the fps rate is displayed.
  * @const
  */
 var fpsInterval = 500;
-
 
 /**
  * NTSC Clock Speed (3579545Hz for NTSC systems).
@@ -36,14 +34,11 @@ var fpsInterval = 500;
  */
 var CLOCK_NTSC = 3579545;
 
-
 /**
  * PAL Clock Speed (3546893Hz for PAL/SECAM systems).
  * @const
  */
 var CLOCK_PAL = 3546893;
-
-
 
 /**
  * @constructor
@@ -55,7 +50,7 @@ function JSSMS(opts) {
    * @dict
    */
   this.opts = {
-    'ui': JSSMS.DummyUI
+    ui: JSSMS.DummyUI,
   };
   if (opts !== undefined) {
     var key;
@@ -101,13 +96,11 @@ JSSMS.prototype = {
    */
   isRunning: false,
 
-
   /**
    * CPU cycles per scanline.
    * @type {number}
    */
   cyclesPerLine: 0,
-
 
   /**
    * No of scanlines to render (including blanking).
@@ -115,13 +108,11 @@ JSSMS.prototype = {
    */
   no_of_scanlines: 0,
 
-
   /**
    * Render every FRAMESKIP frames.
    * @type {number}
    */
   frameSkip: 0,
-
 
   /**
    * Throttle mode.
@@ -129,13 +120,11 @@ JSSMS.prototype = {
    */
   throttle: true,
 
-
   /**
    * Target FPS (NTSC / PAL).
    * @type {number}
    */
   fps: 0,
-
 
   /**
    * Counter for frameskip.
@@ -143,13 +132,11 @@ JSSMS.prototype = {
    */
   frameskip_counter: 0,
 
-
   /**
    * SMS Pause button pressed?
    * @type {boolean}
    */
   pause_button: false,
-
 
   /**
    * SMS mode.
@@ -157,13 +144,11 @@ JSSMS.prototype = {
    */
   is_sms: true,
 
-
   /**
    * GG mode.
    * @type {boolean}
    */
   is_gg: false,
-
 
   // Audio Related
   /**
@@ -172,13 +157,11 @@ JSSMS.prototype = {
    */
   soundEnabled: true,
 
-
   /**
    * Audio context.
    * @type {AudioContext}
    */
   audioContext: null,
-
 
   /**
    * Audio buffer.
@@ -186,13 +169,11 @@ JSSMS.prototype = {
    */
   audioBuffer: null,
 
-
   /**
    * Offset into audio buffer.
    * @type {number}
    */
   audioBufferOffset: 0,
-
 
   /**
    * Number of samples to generate per frame.
@@ -200,12 +181,10 @@ JSSMS.prototype = {
    */
   samplesPerFrame: 0,
 
-
   /** How many samples to generate per line.
    * @type {Array.<number>}
    */
   samplesPerLine: [],
-
 
   // Emulation Related
   /**
@@ -214,19 +193,16 @@ JSSMS.prototype = {
    */
   emuWidth: 0,
 
-
   /**
    * Emulated screen height.
    * @type {number}
    */
   emuHeight: 0,
 
-
   /**
    * @type {number}
    */
   fpsFrameCount: 0,
-
 
   /**
    * @type {number}
@@ -234,13 +210,11 @@ JSSMS.prototype = {
    */
   z80Time: 0,
 
-
   /**
    * @type {number}
    * @private
    */
   drawTime: 0,
-
 
   /**
    * @type {number}
@@ -248,13 +222,11 @@ JSSMS.prototype = {
    */
   z80TimeCounter: 0,
 
-
   /**
    * @type {number}
    * @private
    */
   drawTimeCounter: 0,
-
 
   /**
    * @type {number}
@@ -262,13 +234,11 @@ JSSMS.prototype = {
    */
   frameCount: 0,
 
-
   /**
    * The data of the rom currently loaded.
    * @type {string}
    */
   romData: '',
-
 
   /**
    * The file name of the current loaded rom.
@@ -276,10 +246,8 @@ JSSMS.prototype = {
    */
   romFileName: '',
 
-
   // Debugger
   lineno: 0,
-
 
   /**
    * Reset all emulation.
@@ -305,7 +273,6 @@ JSSMS.prototype = {
     }
   },
 
-
   start: function() {
     var self = this;
 
@@ -325,14 +292,12 @@ JSSMS.prototype = {
     this.ui.updateStatus('Running');
   },
 
-
   stop: function() {
     if (DEBUG) {
       clearInterval(this.fpsInterval);
     }
     this.isRunning = false;
   },
-
 
   /**
    * Draw one frame on the screen.
@@ -346,14 +311,12 @@ JSSMS.prototype = {
     }
   },
 
-
   /**
    * At the moment, execute one frame, but should be changed to be executed at each instruction.
    */
   nextStep: function() {
     this.cpu.frame();
   },
-
 
   /**
    * Set SMS Mode.
@@ -369,7 +332,6 @@ JSSMS.prototype = {
     this.emuHeight = SMS_HEIGHT;
   },
 
-
   /**
    * Set GG Mode.
    */
@@ -384,7 +346,6 @@ JSSMS.prototype = {
     this.emuHeight = GG_HEIGHT;
   },
 
-
   /**
    * Set NTSC/PAL Timing.
    *
@@ -393,7 +354,8 @@ JSSMS.prototype = {
    */
   setVideoTiming: function(mode) {
     var clockSpeedHz = 0,
-        i, v;
+      i,
+      v;
 
     // Game Gear should only work in NTSC
     if (mode === NTSC || this.is_gg) {
@@ -408,7 +370,9 @@ JSSMS.prototype = {
     }
 
     // Add one manually here for rounding accuracy
-    this.cyclesPerLine = Math.round((clockSpeedHz / this.fps / this.no_of_scanlines) + 1);
+    this.cyclesPerLine = Math.round(
+      clockSpeedHz / this.fps / this.no_of_scanlines + 1
+    );
     this.vdp.videoMode = mode;
 
     // Setup appropriate sound buffer
@@ -418,17 +382,24 @@ JSSMS.prototype = {
       this.samplesPerFrame = Math.round(SAMPLE_RATE / this.fps);
 
       if (this.audioBuffer.length !== this.samplesPerFrame) {
-        this.audioBuffer = this.audioContext.createBuffer(1, this.samplesPerFrame, SAMPLE_RATE);
+        this.audioBuffer = this.audioContext.createBuffer(
+          1,
+          this.samplesPerFrame,
+          SAMPLE_RATE
+        );
       }
 
-      if (this.samplesPerLine.length === 0 || this.samplesPerLine.length !== this.no_of_scanlines) {
+      if (
+        this.samplesPerLine.length === 0 ||
+        this.samplesPerLine.length !== this.no_of_scanlines
+      ) {
         this.samplesPerLine = new Array(this.no_of_scanlines);
 
         var fractional = 0;
 
         // Calculate number of sound samples to generate per scanline
         for (i = 0; i < this.no_of_scanlines; i++) {
-          v = ((this.samplesPerFrame << 16) / this.no_of_scanlines) + fractional;
+          v = (this.samplesPerFrame << 16) / this.no_of_scanlines + fractional;
           fractional = v - ((v >> 16) << 16);
           this.samplesPerLine[i] = v >> 16;
         }
@@ -438,7 +409,6 @@ JSSMS.prototype = {
     //setFrameSkip(frameSkip);
   },
 
-
   // Sound Output
   /**
    * @param {Array.<number>} buffer
@@ -447,28 +417,26 @@ JSSMS.prototype = {
     this.ui.writeAudio(buffer);
   },
 
-
   // Screen Rendering
   doRepaint: function() {
     this.ui.writeFrame();
   },
 
-
   printFps: function() {
     var now = JSSMS.Utils.getTimestamp();
-    var s = 'Running: ' +
-        (this.fpsFrameCount / ((now - this.lastFpsTime) / 1000)).toFixed(2) + ' FPS';
+    var s =
+      'Running: ' +
+      (this.fpsFrameCount / ((now - this.lastFpsTime) / 1000)).toFixed(2) +
+      ' FPS';
     this.ui.updateStatus(s);
     this.fpsFrameCount = 0;
     this.lastFpsTime = now;
   },
 
-
   resetFps: function() {
     this.lastFpsTime = JSSMS.Utils.getTimestamp();
     this.fpsFrameCount = 0;
   },
-
 
   /**
    * @param {number} line
@@ -479,10 +447,13 @@ JSSMS.prototype = {
     }
 
     var samplesToGenerate = this.samplesPerLine[line];
-    this.psg.update(this.audioBuffer, this.audioBufferOffset, samplesToGenerate);
+    this.psg.update(
+      this.audioBuffer,
+      this.audioBufferOffset,
+      samplesToGenerate
+    );
     this.audioBufferOffset += samplesToGenerate;
   },
-
 
   // File Loading Routines
   /**
@@ -522,7 +493,6 @@ JSSMS.prototype = {
     return true;
   },
 
-
   /**
    * \@todo readRomDirectly() and loadROM() can be confusing. Renaming needed.
    *
@@ -542,18 +512,17 @@ JSSMS.prototype = {
       // \@todo Move this part to JSSMS.Utils.
       if (SUPPORT_DATAVIEW) {
         for (j = 0; j < PAGE_SIZE; j++) {
-          pages[i].setUint8(j, data.charCodeAt((i * PAGE_SIZE) + j));
+          pages[i].setUint8(j, data.charCodeAt(i * PAGE_SIZE + j));
         }
       } else {
         for (j = 0; j < PAGE_SIZE; j++) {
-          pages[i][j] = data.charCodeAt((i * PAGE_SIZE) + j) & 0xFF;
+          pages[i][j] = data.charCodeAt(i * PAGE_SIZE + j) & 0xff;
         }
       }
     }
 
     return pages;
   },
-
 
   /**
    * Reload a rom previously set in memory. Returns true if a rom was
@@ -567,5 +536,5 @@ JSSMS.prototype = {
     } else {
       return false;
     }
-  }
+  },
 };

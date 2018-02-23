@@ -25,250 +25,250 @@
 var opcodeTableED = {
   0x40: {
     name: 'IN B,(C)',
-    ast: o.IN('b', 'c')
+    ast: o.IN('b', 'c'),
   },
   0x42: {
     name: 'SBC HL,BC',
-    ast: o.SBC16('b', 'c')
+    ast: o.SBC16('b', 'c'),
   },
   0x41: {
     name: 'OUT (C),B',
-    ast: o.OUT('c', 'b')
+    ast: o.OUT('c', 'b'),
   },
   0x43: {
     name: 'LD (nn),BC',
-    ast: o.LD_NN('b', 'c')
+    ast: o.LD_NN('b', 'c'),
   },
   0x44: {
     name: 'NEG',
-    ast: o.NEG()
+    ast: o.NEG(),
   },
   0x45: {
     name: 'RETN / RETI',
-    ast: o.RETN_RETI()
+    ast: o.RETN_RETI(),
   },
   0x46: {
     name: 'IM 0',
-    ast: o.IM(0)
+    ast: o.IM(0),
   },
   0x48: {
     name: 'IN C,(C)',
-    ast: o.IN('c', 'c')
+    ast: o.IN('c', 'c'),
   },
   0x49: {
     name: 'OUT (C),C',
-    ast: o.OUT('c', 'c')
+    ast: o.OUT('c', 'c'),
   },
-  0x4A: {
+  0x4a: {
     name: 'ADC HL,BC',
-    ast: o.ADC16('b', 'c')
+    ast: o.ADC16('b', 'c'),
   },
-  0x4B: {
+  0x4b: {
     name: 'LD BC,(nn)',
-    ast: o.LD16('b', 'c', 'n', 'n')
+    ast: o.LD16('b', 'c', 'n', 'n'),
   },
-  0x4C: {
+  0x4c: {
     name: 'NEG',
-    ast: o.NEG()
+    ast: o.NEG(),
   },
-  0x4D: {
+  0x4d: {
     name: 'RETN / RETI',
-    ast: o.RETN_RETI()
+    ast: o.RETN_RETI(),
   },
-  0x4E: {
+  0x4e: {
     name: 'IM 0',
-    ast: o.IM(0)
+    ast: o.IM(0),
   },
-  0x4F: {
+  0x4f: {
     name: 'LD R,A',
-    ast: o.LD8('r', 'a')
+    ast: o.LD8('r', 'a'),
   },
   0x50: {
     name: 'IN D,(C)',
-    ast: o.IN('d', 'c')
+    ast: o.IN('d', 'c'),
   },
   0x51: {
     name: 'OUT (C),D',
-    ast: o.OUT('c', 'd')
+    ast: o.OUT('c', 'd'),
   },
   0x52: {
     name: 'SBC HL,DE',
-    ast: o.SBC16('d', 'e')
+    ast: o.SBC16('d', 'e'),
   },
   0x53: {
     name: 'LD (nn),DE',
-    ast: o.LD_NN('d', 'e')
+    ast: o.LD_NN('d', 'e'),
   },
   0x54: {
     name: 'NEG',
-    ast: o.NEG()
+    ast: o.NEG(),
   },
   0x55: {
     name: 'RETN / RETI',
-    ast: o.RETN_RETI()
+    ast: o.RETN_RETI(),
   },
   0x56: {
     name: 'IM 1',
-    ast: o.IM(1)
+    ast: o.IM(1),
   },
   0x57: {
     name: 'LD A,I',
-    ast: o.LD8('a', 'i')
+    ast: o.LD8('a', 'i'),
   },
   0x58: {
     name: 'IN E,(C)',
-    ast: o.IN('e', 'c')
+    ast: o.IN('e', 'c'),
   },
   0x59: {
     name: 'OUT (C),E',
-    ast: o.OUT('c', 'e')
+    ast: o.OUT('c', 'e'),
   },
-  0x5A: {
+  0x5a: {
     name: 'ADC HL,DE',
-    ast: o.ADC16('d', 'e')
+    ast: o.ADC16('d', 'e'),
   },
-  0x5B: {
+  0x5b: {
     name: 'LD DE,(nn)',
-    ast: o.LD16('d', 'e', 'n', 'n')
+    ast: o.LD16('d', 'e', 'n', 'n'),
   },
-  0x5C: {
+  0x5c: {
     name: 'NEG',
-    ast: o.NEG()
+    ast: o.NEG(),
   },
-  0x5F: {
+  0x5f: {
     name: 'LD A,R',
-    ast: o.LD8('a', 'r')
+    ast: o.LD8('a', 'r'),
   },
   0x60: {
     name: 'IN H,(C)',
-    ast: o.IN('h', 'c')
+    ast: o.IN('h', 'c'),
   },
   0x61: {
     name: 'OUT (C),H',
-    ast: o.OUT('c', 'h')
+    ast: o.OUT('c', 'h'),
   },
   0x62: {
     name: 'SBC HL,HL',
-    ast: o.SBC16('h', 'l')
+    ast: o.SBC16('h', 'l'),
   },
   0x63: {
     name: 'LD (nn),HL',
-    ast: o.LD_NN('h', 'l')
+    ast: o.LD_NN('h', 'l'),
   },
   0x64: {
     name: 'NEG',
-    ast: o.NEG()
+    ast: o.NEG(),
   },
   0x66: {
     name: 'IM 0',
-    ast: o.IM(0)
+    ast: o.IM(0),
   },
   0x67: {
     name: 'RRD',
-    ast: o.RRD()
+    ast: o.RRD(),
   },
   0x68: {
     name: 'IN L,(C)',
-    ast: o.IN('l', 'c')
+    ast: o.IN('l', 'c'),
   },
   0x69: {
     name: 'OUT (C),L',
-    ast: o.OUT('c', 'l')
+    ast: o.OUT('c', 'l'),
   },
-  0x6A: {
+  0x6a: {
     name: 'ADC HL,HL',
-    ast: o.ADC16('h', 'l')
+    ast: o.ADC16('h', 'l'),
   },
-  0x6B: {
+  0x6b: {
     name: 'LD HL,(nn)',
-    ast: o.LD16('h', 'l', 'n', 'n')
+    ast: o.LD16('h', 'l', 'n', 'n'),
   },
-  0x6C: {
+  0x6c: {
     name: 'NEG',
-    ast: o.NEG()
+    ast: o.NEG(),
   },
-  0x6E: {
+  0x6e: {
     name: 'IM 0',
-    ast: o.IM(0)
+    ast: o.IM(0),
   },
-  0x6F: {
+  0x6f: {
     name: 'RLD',
-    ast: o.RLD()
+    ast: o.RLD(),
   },
   0x73: {
     name: 'LD (nn),SP',
-    ast: o.LD_NN('sp')
+    ast: o.LD_NN('sp'),
   },
   0x74: {
     name: 'NEG',
-    ast: o.NEG()
+    ast: o.NEG(),
   },
   0x76: {
     name: 'IM 1',
-    ast: o.IM(1)
+    ast: o.IM(1),
   },
   0x78: {
     name: 'IN A,(C)',
-    ast: o.IN('a', 'c')
+    ast: o.IN('a', 'c'),
   },
   0x79: {
     name: 'OUT (C),A',
-    ast: o.OUT('c', 'a')
+    ast: o.OUT('c', 'a'),
   },
-  0x7A: {
+  0x7a: {
     name: 'ADC HL,SP',
-    ast: o.ADC16('sp')
+    ast: o.ADC16('sp'),
   },
-  0x7B: {
+  0x7b: {
     name: 'LD SP,(nn)',
-    ast: o.LD_SP('n', 'n')
+    ast: o.LD_SP('n', 'n'),
   },
-  0x7C: {
+  0x7c: {
     name: 'NEG',
-    ast: o.NEG()
+    ast: o.NEG(),
   },
-  0xA0: {
+  0xa0: {
     name: 'LDI',
-    ast: o.LDI()
+    ast: o.LDI(),
   },
-  0xA1: {
+  0xa1: {
     name: 'CPI',
-    ast: o.CPI()
+    ast: o.CPI(),
   },
-  0xA2: {
+  0xa2: {
     name: 'INI',
-    ast: o.INI()
+    ast: o.INI(),
   },
-  0xA3: {
+  0xa3: {
     name: 'OUTI',
-    ast: o.OUTI()
+    ast: o.OUTI(),
   },
-  0xA8: {
+  0xa8: {
     name: 'LDD',
-    ast: o.LDD()
+    ast: o.LDD(),
   },
-  0xAB: {
+  0xab: {
     name: 'OUTD',
-    ast: o.OUTD()
+    ast: o.OUTD(),
   },
-  0xB0: {
+  0xb0: {
     name: 'LDIR',
-    ast: o.LDIR()
+    ast: o.LDIR(),
   },
-  0xB1: {
+  0xb1: {
     name: 'CPIR',
-    ast: o.CPIR()
+    ast: o.CPIR(),
   },
-  0xB3: {
+  0xb3: {
     name: 'OTIR',
-    ast: o.OTIR()
+    ast: o.OTIR(),
   },
-  0xB8: {
+  0xb8: {
     name: 'LDDR',
-    ast: o.LDDR()
+    ast: o.LDDR(),
   },
-  0xBB: {
+  0xbb: {
     name: 'OTDR',
-    ast: o.OTDR()
-  }
+    ast: o.OTDR(),
+  },
 };

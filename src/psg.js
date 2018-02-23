@@ -19,13 +19,11 @@
 
 'use strict';
 
-
 /**
  * Fixed point scaling.
  * @const
  */
 var SCALE = 8;
-
 
 /**
  * Value to denote that antialiasing should not be used on sample.
@@ -33,20 +31,17 @@ var SCALE = 8;
  */
 var NO_ANTIALIAS = Number.MIN_VALUE;
 
-
 /**
  * Shift register reset value. Only the highest bit is set.
  * @const
  */
 var SHIFT_RESET = 0x8000;
 
-
 /**
  * SMS Only: Tapped bits are bits 0 and 3 (0x0009), fed back into bit 15.
  * @const
  */
 var FEEDBACK_PATTERN = 0x09;
-
 
 // Amplification
 /**
@@ -55,9 +50,23 @@ var FEEDBACK_PATTERN = 0x09;
  */
 var PSG_VOLUME = [
   //1516, 1205, 957, 760, 603, 479, 381, 303, 240, 191, 152, 120, 96, 76, 60, 0
-  25, 20, 16, 13, 10, 8, 6, 5, 4, 3, 3, 2, 2, 1, 1, 0
+  25,
+  20,
+  16,
+  13,
+  10,
+  8,
+  6,
+  5,
+  4,
+  3,
+  3,
+  2,
+  2,
+  1,
+  1,
+  0,
 ];
-
 
 /**
  * @constructor
@@ -152,7 +161,7 @@ JSSMS.SN76489.prototype = {
       this.reg[i << 1] = 1;
 
       // Set Volume Off
-      this.reg[(i << 1) + 1] = 0x0F;
+      this.reg[(i << 1) + 1] = 0x0f;
 
       // Set Frequency Counters
       this.freqCounter[i] = 0;
@@ -166,7 +175,6 @@ JSSMS.SN76489.prototype = {
       this.freqPos[i] = NO_ANTIALIAS;
     }
   },
-
 
   /**
    * Program the SN76489.
@@ -188,25 +196,25 @@ JSSMS.SN76489.prototype = {
       this.regLatch = (value >> 4) & 7;
 
       // Zero lower 4 bits of register and mask new value
-      this.reg[this.regLatch] = (this.reg[this.regLatch] & 0x3F0) | (value & 0x0F);
-    }
+      this.reg[this.regLatch] =
+        (this.reg[this.regLatch] & 0x3f0) | (value & 0x0f);
+    } else {
+      // If bit 7 is 0 then the byte is a DATA byte.
+      //  %0-DDDDDD
+      //    |``````-- Data
+      //    `-------- Unused
 
-    // If bit 7 is 0 then the byte is a DATA byte.
-    //  %0-DDDDDD
-    //    |``````-- Data
-    //    `-------- Unused
-
-    else {
       // TONE REGISTERS
       // If the currently latched register is a tone register then the low 6
       // bits of the byte are placed into the high 6 bits of the latched register.
       if (this.regLatch === 0 || this.regLatch === 2 || this.regLatch === 4) {
         // ddddDDDDDD (10 bits total) - keep lower 4 bits and replace upper 6 bits.
         // ddddDDDDDD gives the 10-bit half-wave counter reset value.
-        this.reg[this.regLatch] = (this.reg[this.regLatch] & 0x0F) | ((value & 0x3F) << 4);
+        this.reg[this.regLatch] =
+          (this.reg[this.regLatch] & 0x0f) | ((value & 0x3f) << 4);
       } else {
         // VOLUME & NOISE REGISTERS
-        this.reg[this.regLatch] = value & 0x0F;
+        this.reg[this.regLatch] = value & 0x0f;
       }
     }
 
@@ -237,7 +245,6 @@ JSSMS.SN76489.prototype = {
     }
   },
 
-
   /**
    * @param {AudioBuffer} audioBuffer
    * @param {number} offset
@@ -253,17 +260,24 @@ JSSMS.SN76489.prototype = {
       // Generate Sound from Tone Channels
       for (i = 0; i < 3; i++) {
         if (this.freqPos[i] !== NO_ANTIALIAS) {
-          this.outputChannel[i] = (PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPos[i]) >> SCALE;
+          this.outputChannel[i] =
+            (PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPos[i]) >> SCALE;
         } else {
-          this.outputChannel[i] = PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPolarity[i];
+          this.outputChannel[i] =
+            PSG_VOLUME[this.reg[(i << 1) + 1]] * this.freqPolarity[i];
         }
       }
 
       // Generate Sound from Noise Channel
-      this.outputChannel[3] = PSG_VOLUME[this.reg[7]] * (this.noiseShiftReg & 1) << 1; // Double output
+      this.outputChannel[3] =
+        (PSG_VOLUME[this.reg[7]] * (this.noiseShiftReg & 1)) << 1; // Double output
 
       // Output sound to buffer
-      var output = this.outputChannel[0] + this.outputChannel[1] + this.outputChannel[2] + this.outputChannel[3];
+      var output =
+        this.outputChannel[0] +
+        this.outputChannel[1] +
+        this.outputChannel[2] +
+        this.outputChannel[3];
 
       output /= 0x80;
 
@@ -320,8 +334,11 @@ JSSMS.SN76489.prototype = {
 
             // Note we divide a scaled number by a scaled number here
             // So to maintain accuracy we shift the top part of the fraction again
-            this.freqPos[i] = ((clockCyclesScaled - this.clockFrac + (2 << SCALE) * counter) << SCALE) *
-                this.freqPolarity[i] / (clockCyclesScaled + this.clockFrac);
+            this.freqPos[i] =
+              ((clockCyclesScaled - this.clockFrac + (2 << SCALE) * counter) <<
+                SCALE) *
+              this.freqPolarity[i] /
+              (clockCyclesScaled + this.clockFrac);
 
             // Flip Polarity
             this.freqPolarity[i] = -this.freqPolarity[i];
@@ -344,7 +361,8 @@ JSSMS.SN76489.prototype = {
 
         // Not matching Tone 2 Value, so reload counter
         if (this.noiseFreq !== 0x80) {
-          this.freqCounter[3] += this.noiseFreq * (clockCycles / this.noiseFreq + 1);
+          this.freqCounter[3] +=
+            this.noiseFreq * (clockCycles / this.noiseFreq + 1);
         }
 
         // Positive Amplitude i.e. We only want to do this once per cycle
@@ -355,11 +373,13 @@ JSSMS.SN76489.prototype = {
           if ((this.reg[6] & 0x04) !== 0) {
             // If two bits fed back, I can do Feedback=(nsr & fb) && (nsr & fb ^ fb)
             // since that's (one or more bits set) && (not all bits set)
-            feedback = (this.noiseShiftReg & FEEDBACK_PATTERN) !== 0 &&
-                ((this.noiseShiftReg & FEEDBACK_PATTERN) ^ FEEDBACK_PATTERN) !== 0 ? 1 : 0;
-          }
-          // Periodic Noise Selected
-          else {
+            feedback =
+              (this.noiseShiftReg & FEEDBACK_PATTERN) !== 0 &&
+              ((this.noiseShiftReg & FEEDBACK_PATTERN) ^ FEEDBACK_PATTERN) !== 0
+                ? 1
+                : 0;
+          } else {
+            // Periodic Noise Selected
             feedback = this.noiseShiftReg & 1;
           }
 
@@ -367,5 +387,5 @@ JSSMS.SN76489.prototype = {
         }
       }
     } // end for loop
-  }
+  },
 };

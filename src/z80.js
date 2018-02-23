@@ -62,127 +62,1320 @@
 /** @const */ var BIT_6 = 0x40;
 /** @const */ var BIT_7 = 0x80;
 
-
 /**
  * @const
  */
 var OP_STATES = new JSSMS.Utils.Uint8Array([
   /*         0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
-  /* 0x00 */ 4, 10, 7, 6, 4, 4, 7, 4, 4, 11, 7, 6, 4, 4, 7, 4,
-  /* 0x10 */ 8, 10, 7, 6, 4, 4, 7, 4, 12, 11, 7, 6, 4, 4, 7, 4,
-  /* 0x20 */ 7, 10, 16, 6, 4, 4, 7, 4, 7, 11, 16, 6, 4, 4, 7, 4,
-  /* 0x30 */ 7, 10, 13, 6, 11, 11, 10, 4, 7, 11, 13, 6, 4, 4, 7, 4,
-  /* 0x40 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-  /* 0x50 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-  /* 0x60 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-  /* 0x70 */ 7, 7, 7, 7, 7, 7, 4, 7, 4, 4, 4, 4, 4, 4, 7, 4,
-  /* 0x80 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-  /* 0x90 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-  /* 0xA0 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-  /* 0xB0 */ 4, 4, 4, 4, 4, 4, 7, 4, 4, 4, 4, 4, 4, 4, 7, 4,
-  /* 0xC0 */ 5, 10, 10, 10, 10, 11, 7, 11, 5, 10, 10, 0, 10, 17, 7, 11,
-  /* 0xD0 */ 5, 10, 10, 11, 10, 11, 7, 11, 5, 4, 10, 11, 10, 0, 7, 11,
-  /* 0xE0 */ 5, 10, 10, 19, 10, 11, 7, 11, 5, 4, 10, 4, 10, 0, 7, 11,
-  /* 0xF0 */ 5, 10, 10, 4, 10, 11, 7, 11, 5, 6, 10, 4, 10, 0, 7, 11
+  /* 0x00 */ 4,
+  10,
+  7,
+  6,
+  4,
+  4,
+  7,
+  4,
+  4,
+  11,
+  7,
+  6,
+  4,
+  4,
+  7,
+  4,
+  /* 0x10 */ 8,
+  10,
+  7,
+  6,
+  4,
+  4,
+  7,
+  4,
+  12,
+  11,
+  7,
+  6,
+  4,
+  4,
+  7,
+  4,
+  /* 0x20 */ 7,
+  10,
+  16,
+  6,
+  4,
+  4,
+  7,
+  4,
+  7,
+  11,
+  16,
+  6,
+  4,
+  4,
+  7,
+  4,
+  /* 0x30 */ 7,
+  10,
+  13,
+  6,
+  11,
+  11,
+  10,
+  4,
+  7,
+  11,
+  13,
+  6,
+  4,
+  4,
+  7,
+  4,
+  /* 0x40 */ 4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  /* 0x50 */ 4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  /* 0x60 */ 4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  /* 0x70 */ 7,
+  7,
+  7,
+  7,
+  7,
+  7,
+  4,
+  7,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  /* 0x80 */ 4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  /* 0x90 */ 4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  /* 0xA0 */ 4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  /* 0xB0 */ 4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  7,
+  4,
+  /* 0xC0 */ 5,
+  10,
+  10,
+  10,
+  10,
+  11,
+  7,
+  11,
+  5,
+  10,
+  10,
+  0,
+  10,
+  17,
+  7,
+  11,
+  /* 0xD0 */ 5,
+  10,
+  10,
+  11,
+  10,
+  11,
+  7,
+  11,
+  5,
+  4,
+  10,
+  11,
+  10,
+  0,
+  7,
+  11,
+  /* 0xE0 */ 5,
+  10,
+  10,
+  19,
+  10,
+  11,
+  7,
+  11,
+  5,
+  4,
+  10,
+  4,
+  10,
+  0,
+  7,
+  11,
+  /* 0xF0 */ 5,
+  10,
+  10,
+  4,
+  10,
+  11,
+  7,
+  11,
+  5,
+  6,
+  10,
+  4,
+  10,
+  0,
+  7,
+  11,
 ]);
-
 
 /**
  * @const
  */
 var OP_CB_STATES = new JSSMS.Utils.Uint8Array([
   /*         0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
-  /* 0x00 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
-  /* 0x10 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
-  /* 0x20 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
-  /* 0x30 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
-  /* 0x40 */ 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8,
-  /* 0x50 */ 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8,
-  /* 0x60 */ 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8,
-  /* 0x70 */ 8, 8, 8, 8, 8, 8, 12, 8, 8, 8, 8, 8, 8, 8, 12, 8,
-  /* 0x80 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
-  /* 0x90 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
-  /* 0xA0 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
-  /* 0xB0 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
-  /* 0xC0 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
-  /* 0xD0 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
-  /* 0xE0 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8,
-  /* 0xF0 */ 8, 8, 8, 8, 8, 8, 15, 8, 8, 8, 8, 8, 8, 8, 15, 8
+  /* 0x00 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  /* 0x10 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  /* 0x20 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  /* 0x30 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  /* 0x40 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  12,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  12,
+  8,
+  /* 0x50 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  12,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  12,
+  8,
+  /* 0x60 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  12,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  12,
+  8,
+  /* 0x70 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  12,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  12,
+  8,
+  /* 0x80 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  /* 0x90 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  /* 0xA0 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  /* 0xB0 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  /* 0xC0 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  /* 0xD0 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  /* 0xE0 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  /* 0xF0 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  15,
+  8,
 ]);
-
 
 /**
  * @const
  */
 var OP_DD_STATES = new JSSMS.Utils.Uint8Array([
   /*         0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
-  /* 0x00 */ 4, 4, 4, 4, 4, 4, 4, 4, 4, 15, 4, 4, 4, 4, 4, 4,
-  /* 0x10 */ 4, 4, 4, 4, 4, 4, 4, 4, 4, 15, 4, 4, 4, 4, 4, 4,
-  /* 0x20 */ 4, 14, 20, 10, 8, 8, 11, 4, 4, 15, 20, 10, 8, 8, 11, 4,
-  /* 0x30 */ 4, 4, 4, 4, 23, 23, 19, 4, 4, 15, 4, 4, 4, 4, 4, 4,
-  /* 0x40 */ 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4,
-  /* 0x50 */ 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4,
-  /* 0x60 */ 8, 8, 8, 8, 8, 8, 19, 8, 8, 8, 8, 8, 8, 8, 19, 8,
-  /* 0x70 */ 19, 19, 19, 19, 19, 19, 4, 19, 4, 4, 4, 4, 8, 8, 19, 4,
-  /* 0x80 */ 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4,
-  /* 0x90 */ 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4,
-  /* 0xA0 */ 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4,
-  /* 0xB0 */ 4, 4, 4, 4, 8, 8, 19, 4, 4, 4, 4, 4, 8, 8, 19, 4,
-  /* 0xC0 */ 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4,
-  /* 0xD0 */ 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-  /* 0xE0 */ 4, 14, 4, 23, 4, 15, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4,
-  /* 0xF0 */ 4, 4, 4, 4, 4, 4, 4, 4, 4, 10, 4, 4, 4, 4, 4, 4
+  /* 0x00 */ 4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  15,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  /* 0x10 */ 4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  15,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  /* 0x20 */ 4,
+  14,
+  20,
+  10,
+  8,
+  8,
+  11,
+  4,
+  4,
+  15,
+  20,
+  10,
+  8,
+  8,
+  11,
+  4,
+  /* 0x30 */ 4,
+  4,
+  4,
+  4,
+  23,
+  23,
+  19,
+  4,
+  4,
+  15,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  /* 0x40 */ 4,
+  4,
+  4,
+  4,
+  8,
+  8,
+  19,
+  4,
+  4,
+  4,
+  4,
+  4,
+  8,
+  8,
+  19,
+  4,
+  /* 0x50 */ 4,
+  4,
+  4,
+  4,
+  8,
+  8,
+  19,
+  4,
+  4,
+  4,
+  4,
+  4,
+  8,
+  8,
+  19,
+  4,
+  /* 0x60 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  19,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  19,
+  8,
+  /* 0x70 */ 19,
+  19,
+  19,
+  19,
+  19,
+  19,
+  4,
+  19,
+  4,
+  4,
+  4,
+  4,
+  8,
+  8,
+  19,
+  4,
+  /* 0x80 */ 4,
+  4,
+  4,
+  4,
+  8,
+  8,
+  19,
+  4,
+  4,
+  4,
+  4,
+  4,
+  8,
+  8,
+  19,
+  4,
+  /* 0x90 */ 4,
+  4,
+  4,
+  4,
+  8,
+  8,
+  19,
+  4,
+  4,
+  4,
+  4,
+  4,
+  8,
+  8,
+  19,
+  4,
+  /* 0xA0 */ 4,
+  4,
+  4,
+  4,
+  8,
+  8,
+  19,
+  4,
+  4,
+  4,
+  4,
+  4,
+  8,
+  8,
+  19,
+  4,
+  /* 0xB0 */ 4,
+  4,
+  4,
+  4,
+  8,
+  8,
+  19,
+  4,
+  4,
+  4,
+  4,
+  4,
+  8,
+  8,
+  19,
+  4,
+  /* 0xC0 */ 4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  0,
+  4,
+  4,
+  4,
+  4,
+  /* 0xD0 */ 4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  /* 0xE0 */ 4,
+  14,
+  4,
+  23,
+  4,
+  15,
+  4,
+  4,
+  4,
+  8,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  /* 0xF0 */ 4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  10,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
 ]);
-
 
 /**
  * @const
  */
 var OP_INDEX_CB_STATES = new JSSMS.Utils.Uint8Array([
   /*         0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F */
-  /* 0x00 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* 0x10 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* 0x20 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* 0x30 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* 0x40 */ 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-  /* 0x50 */ 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-  /* 0x60 */ 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-  /* 0x70 */ 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
-  /* 0x80 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* 0x90 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* 0xA0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* 0xB0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* 0xC0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* 0xD0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* 0xE0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23,
-  /* 0xF0 */ 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23, 23
+  /* 0x00 */ 23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  /* 0x10 */ 23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  /* 0x20 */ 23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  /* 0x30 */ 23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  /* 0x40 */ 20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  /* 0x50 */ 20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  /* 0x60 */ 20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  /* 0x70 */ 20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  20,
+  /* 0x80 */ 23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  /* 0x90 */ 23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  /* 0xA0 */ 23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  /* 0xB0 */ 23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  /* 0xC0 */ 23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  /* 0xD0 */ 23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  /* 0xE0 */ 23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  /* 0xF0 */ 23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
+  23,
 ]);
-
 
 /**
  * @const
  */
 var OP_ED_STATES = new JSSMS.Utils.Uint8Array([
   /*         0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
-  /* 0x00 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-  /* 0x10 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-  /* 0x20 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-  /* 0x30 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-  /* 0x40 */ 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 9,
-  /* 0x50 */ 12, 12, 15, 20, 8, 14, 8, 9, 12, 12, 15, 20, 8, 14, 8, 9,
-  /* 0x60 */ 12, 12, 15, 20, 8, 14, 8, 18, 12, 12, 15, 20, 8, 14, 8, 18,
-  /* 0x70 */ 8, 12, 15, 20, 8, 14, 8, 8, 12, 12, 15, 20, 8, 14, 8, 8,
-  /* 0x80 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-  /* 0x90 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-  /* 0xA0 */ 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8,
-  /* 0xB0 */ 16, 16, 16, 16, 8, 8, 8, 8, 16, 16, 16, 16, 8, 8, 8, 8,
-  /* 0xC0 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-  /* 0xD0 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-  /* 0xE0 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-  /* 0xF0 */ 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
+  /* 0x00 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  /* 0x10 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  /* 0x20 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  /* 0x30 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  /* 0x40 */ 12,
+  12,
+  15,
+  20,
+  8,
+  14,
+  8,
+  9,
+  12,
+  12,
+  15,
+  20,
+  8,
+  14,
+  8,
+  9,
+  /* 0x50 */ 12,
+  12,
+  15,
+  20,
+  8,
+  14,
+  8,
+  9,
+  12,
+  12,
+  15,
+  20,
+  8,
+  14,
+  8,
+  9,
+  /* 0x60 */ 12,
+  12,
+  15,
+  20,
+  8,
+  14,
+  8,
+  18,
+  12,
+  12,
+  15,
+  20,
+  8,
+  14,
+  8,
+  18,
+  /* 0x70 */ 8,
+  12,
+  15,
+  20,
+  8,
+  14,
+  8,
+  8,
+  12,
+  12,
+  15,
+  20,
+  8,
+  14,
+  8,
+  8,
+  /* 0x80 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  /* 0x90 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  /* 0xA0 */ 16,
+  16,
+  16,
+  16,
+  8,
+  8,
+  8,
+  8,
+  16,
+  16,
+  16,
+  16,
+  8,
+  8,
+  8,
+  8,
+  /* 0xB0 */ 16,
+  16,
+  16,
+  16,
+  8,
+  8,
+  8,
+  8,
+  16,
+  16,
+  16,
+  16,
+  8,
+  8,
+  8,
+  8,
+  /* 0xC0 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  /* 0xD0 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  /* 0xE0 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  /* 0xF0 */ 8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
+  8,
 ]);
-
-
 
 /**
  * @constructor
@@ -432,7 +1625,7 @@ JSSMS.Z80.prototype = {
     this.f2 = 0;
 
     this.pc = 0x0000;
-    this.sp = 0xDFF0;
+    this.sp = 0xdff0;
 
     this.totalCycles = 0;
     this.tstates = 0;
@@ -448,7 +1641,6 @@ JSSMS.Z80.prototype = {
       this.recompiler.reset();
     }
   },
-
 
   /**
    * Emulate one frame.
@@ -494,7 +1686,6 @@ JSSMS.Z80.prototype = {
     }
   },
 
-
   recompile: function() {
     if (this.pc < 0x0400) {
       if (!this.branches[0]['_' + this.pc]) {
@@ -503,14 +1694,21 @@ JSSMS.Z80.prototype = {
       this.branches[0]['_' + this.pc].call(this, 0);
 
       return;
-    } else if (this.pc < 0xC000) {
+    } else if (this.pc < 0xc000) {
       var frameId = this.pc % 0x4000;
       var frameReg = Math.floor(this.pc / 0x4000);
 
       if (!this.branches[this.frameReg[frameReg]]['_' + frameId]) {
-        this.recompiler.recompileFromAddress(this.pc, this.frameReg[frameReg], frameReg);
+        this.recompiler.recompileFromAddress(
+          this.pc,
+          this.frameReg[frameReg],
+          frameReg
+        );
       }
-      this.branches[this.frameReg[frameReg]]['_' + frameId].call(this, frameReg);
+      this.branches[this.frameReg[frameReg]]['_' + frameId].call(
+        this,
+        frameReg
+      );
 
       return;
     }
@@ -518,7 +1716,6 @@ JSSMS.Z80.prototype = {
     //throw 'PC: ' + JSSMS.Utils.toHex(this.pc);
     this.interpret();
   },
-
 
   /**
    * End of scanline.
@@ -561,7 +1758,6 @@ JSSMS.Z80.prototype = {
     return false;
   },
 
-
   /**
    * End of frame.
    */
@@ -579,13 +1775,7 @@ JSSMS.Z80.prototype = {
     this.main.doRepaint();
   },
 
-
-  branches: [
-    Object.create(null),
-    Object.create(null),
-    Object.create(null)
-  ],
-
+  branches: [Object.create(null), Object.create(null), Object.create(null)],
 
   /**
    * Run the Z80 interpreter.
@@ -594,259 +1784,748 @@ JSSMS.Z80.prototype = {
     var temp = 0;
 
     // Main Opcode Switch Rolled In For Speed
-    var opcode = this.getUint8(this.pc++);                   // Fetch & Interpret Opcode
+    var opcode = this.getUint8(this.pc++); // Fetch & Interpret Opcode
 
     if (ACCURATE_INTERRUPT_EMULATION) {
       this.EI_inst = false;
     }
 
-    this.tstates -= OP_STATES[opcode];   // Decrement TStates
+    this.tstates -= OP_STATES[opcode]; // Decrement TStates
 
     if (REFRESH_EMULATION) {
       this.incR();
     }
 
     switch (opcode) {
-      case 0x00: break;                                                   // NOP
-      case 0x01: this.setBC(this.getUint16(this.pc++)); this.pc++; break;             // LD BC,nn
-      case 0x02: this.setUint8(this.getBC(), this.a); break;                             // LD (BC),A
-      case 0x03: this.incBC(); break;                                          // INC BC
-      case 0x04: this.b = this.inc8(this.b); break;                                      // INC B
-      case 0x05: this.b = this.dec8(this.b); break;                                      // DEC B
-      case 0x06: this.b = this.getUint8(this.pc++); break;                                // LD B,n
-      case 0x07: this.rlca_a(); break;                                         // RLCA
-      case 0x08: this.exAF(); break;                                           // EX AF AF'
-      case 0x09: this.setHL(this.add16(this.getHL(), this.getBC())); break;                   // ADD HL,BC
-      case 0x0A: this.a = this.getUint8(this.getBC()); break;                             // LD A,(BC)
-      case 0x0B: this.decBC(); break;                                          // DEC BC
-      case 0x0C: this.c = this.inc8(this.c); break;                                      // INC C
-      case 0x0D: this.c = this.dec8(this.c); break;                                      // DEC C
-      case 0x0E: this.c = this.getUint8(this.pc++); break;                                // LD C,n
-      case 0x0F: this.rrca_a(); break;                                         // RRCA
-      case 0x10: this.b = (this.b - 1) & 0xFF; this.jr(this.b !== 0); break;                                      // DJNZ (PC+e)
-      case 0x11: this.setDE(this.getUint16(this.pc++)); this.pc++; break;             // LD DE,nn
-      case 0x12: this.setUint8(this.getDE(), this.a); break;                             // LD (DE),A
-      case 0x13: this.incDE(); break;                                          // INC DE
-      case 0x14: this.d = this.inc8(this.d); break;                                      // INC D
-      case 0x15: this.d = this.dec8(this.d); break;                                      // DEC D
-      case 0x16: this.d = this.getUint8(this.pc++); break;                              // LD D,n
-      case 0x17: this.rla_a(); break;                                          // RLA
-      case 0x18: this.pc += this.getInt8(this.pc); break;                                      // JR (PC+e)
-      case 0x19: this.setHL(this.add16(this.getHL(), this.getDE())); break;                   // ADD HL,DE
-      case 0x1A: this.a = this.getUint8(this.getDE()); break;                             // LD A,(DE)
-      case 0x1B: this.decDE(); break;                                          // DEC DE
-      case 0x1C: this.e = this.inc8(this.e); break;                                      // INC E
-      case 0x1D: this.e = this.dec8(this.e); break;                                      // DEC E
-      case 0x1E: this.e = this.getUint8(this.pc++); break;                                // LD E,n
-      case 0x1F: this.rra_a(); break;                                          // RRA
-      case 0x20: this.jr(!((this.f & F_ZERO) !== 0)); break;                         // JR NZ,(PC+e)
-      case 0x21: this.setHL(this.getUint16(this.pc++)); this.pc++; break;             // LD HL,nn
-      case 0x22: this.setUint16(this.getUint16(this.pc++), this.getHL()); this.pc++; break; // LD (nn),HL
-      case 0x23: this.incHL(); break;                                          // INC HL
-      case 0x24: this.h = this.inc8(this.h); break;                                      // INC H
-      case 0x25: this.h = this.dec8(this.h); break;                                      // DEC H
-      case 0x26: this.h = this.getUint8(this.pc++); break;                                // LD H,n
-      case 0x27: this.daa(); break;                                            // DAA
-      case 0x28: this.jr((this.f & F_ZERO) !== 0); break;                          // JR Z,(PC+e)
-      case 0x29: this.setHL(this.add16(this.getHL(), this.getHL())); break;                   // ADD HL,HL
-      case 0x2A: this.setHL(this.getUint16(this.getUint16(this.pc++))); this.pc++; break; // LD HL,(nn)
-      case 0x2B: this.decHL(); break;                                          // DEC HL
-      case 0x2C: this.l = this.inc8(this.l); break;                                      // INC L
-      case 0x2D: this.l = this.dec8(this.l); break;                                      // DEC L
-      case 0x2E: this.l = this.getUint8(this.pc++); break;                                // LD L,n
-      case 0x2F: this.cpl_a(); break;                                          // CPL
-      case 0x30: this.jr(!((this.f & F_CARRY) !== 0)); break;                        // JR NC,(PC+e)
-      case 0x31: this.sp = this.getUint16(this.pc++); this.pc++; break;                      // LD SP,nn
-      case 0x32: this.setUint8(this.getUint16(this.pc++), this.a); this.pc++; break;              // LD (nn),A
-      case 0x33: this.sp++; break;                                             // INC SP
-      case 0x34: this.incMem(this.getHL()); break;                                  // INC (HL)
-      case 0x35: this.decMem(this.getHL()); break;                                  // DEC (HL)
-      case 0x36: this.setUint8(this.getHL(), this.getUint8(this.pc++)); break;                 // LD (HL),n
-      case 0x37: this.f |= F_CARRY; this.f &= ~ F_NEGATIVE; this.f &= ~ F_HALFCARRY; break;       // SCF
-      case 0x38: this.jr((this.f & F_CARRY) !== 0); break;                           // JR C,(PC+e)
-      case 0x39: this.setHL(this.add16(this.getHL(), this.sp)); break;                        // ADD HL,SP
-      case 0x3A: this.a = this.getUint8(this.getUint16(this.pc++)); this.pc++; break;              // LD A,(nn)
-      case 0x3B: this.sp--; break;                                             // DEC SP
-      case 0x3C: this.a = this.inc8(this.a); break;                                      // INC A
-      case 0x3D: this.a = this.dec8(this.a); break;                                      // DEC A
-      case 0x3E: this.a = this.getUint8(this.pc++); break;                                // LD A,n
-      case 0x3F: this.ccf(); break;                                            // CCF
-      case 0x40: break;                                                   // LD B,B
-      case 0x41: this.b = this.c; break;                                            // LD B,C
-      case 0x42: this.b = this.d; break;                                            // LD B,D
-      case 0x43: this.b = this.e; break;                                            // LD B,E
-      case 0x44: this.b = this.h; break;                                            // LD B,H
-      case 0x45: this.b = this.l; break;                                            // LD B,L
-      case 0x46: this.b = this.getUint8(this.getHL()); break;                             // LD B,(HL)
-      case 0x47: this.b = this.a; break;                                            // LD B,A
-      case 0x48: this.c = this.b; break;                                            // LD C,B
-      case 0x49: break;                                                   // LD C,C
-      case 0x4A: this.c = this.d; break;                                            // LD C,D
-      case 0x4B: this.c = this.e; break;                                            // LD C,E
-      case 0x4C: this.c = this.h; break;                                            // LD C,H
-      case 0x4D: this.c = this.l; break;                                            // LD C,L
-      case 0x4E: this.c = this.getUint8(this.getHL()); break;                             // LD C,(HL)
-      case 0x4F: this.c = this.a; break;                                            // LD C,A
-      case 0x50: this.d = this.b; break;                                            // LD D,B
-      case 0x51: this.d = this.c; break;                                            // LD D,C
-      case 0x52: break;                                                   // LD D,D
-      case 0x53: this.d = this.e; break;                                            // LD D,E
-      case 0x54: this.d = this.h; break;                                            // LD D,H
-      case 0x55: this.d = this.l; break;                                            // LD D,L
-      case 0x56: this.d = this.getUint8(this.getHL()); break;                             // LD D,(HL)
-      case 0x57: this.d = this.a; break;                                            // LD D,A
-      case 0x58: this.e = this.b; break;                                            // LD E,B
-      case 0x59: this.e = this.c; break;                                            // LD E,C
-      case 0x5A: this.e = this.d; break;                                            // LD E,D
-      case 0x5B: break;                                                   // LD E,E
-      case 0x5C: this.e = this.h; break;                                            // LD E,H
-      case 0x5D: this.e = this.l; break;                                            // LD E,L
-      case 0x5E: this.e = this.getUint8(this.getHL()); break;                             // LD E,(HL)
-      case 0x5F: this.e = this.a; break;                                            // LD E,A
-      case 0x60: this.h = this.b; break;                                            // LD H,B
-      case 0x61: this.h = this.c; break;                                            // LD H,C
-      case 0x62: this.h = this.d; break;                                            // LD H,D
-      case 0x63: this.h = this.e; break;                                            // LD H,E
-      case 0x64: break;                                                   // LD H,H
-      case 0x65: this.h = this.l; break;                                            // LD H,L
-      case 0x66: this.h = this.getUint8(this.getHL()); break;                             // LD H,(HL)
-      case 0x67: this.h = this.a; break;                                            // LD H,A
-      case 0x68: this.l = this.b; break;                                            // LD L,B
-      case 0x69: this.l = this.c; break;                                            // LD L,C
-      case 0x6A: this.l = this.d; break;                                            // LD L,D
-      case 0x6B: this.l = this.e; break;                                            // LD L,E
-      case 0x6C: this.l = this.h; break;                                            // LD L,H
-      case 0x6D: break;                                                   // LD L,L
-      case 0x6E: this.l = this.getUint8(this.getHL()); break;                             // LD L,(HL)
-      case 0x6F: this.l = this.a; break;                                            // LD L,A
-      case 0x70: this.setUint8(this.getHL(), this.b); break;                             // LD (HL),B
-      case 0x71: this.setUint8(this.getHL(), this.c); break;                             // LD (HL),C
-      case 0x72: this.setUint8(this.getHL(), this.d); break;                             // LD (HL),D
-      case 0x73: this.setUint8(this.getHL(), this.e); break;                             // LD (HL),E
-      case 0x74: this.setUint8(this.getHL(), this.h); break;                             // LD (HL),H
-      case 0x75: this.setUint8(this.getHL(), this.l); break;                             // LD (HL),L
-      case 0x76: if (HALT_SPEEDUP) {this.tstates = 0;} this.halt = true; this.pc--; break;                               // HALT
-      case 0x77: this.setUint8(this.getHL(), this.a); break;                             // LD (HL),A
-      case 0x78: this.a = this.b; break;                                            // LD A,B
-      case 0x79: this.a = this.c; break;                                            // LD A,C
-      case 0x7A: this.a = this.d; break;                                            // LD A,D
-      case 0x7B: this.a = this.e; break;                                            // LD A,E
-      case 0x7C: this.a = this.h; break;                                            // LD A,H
-      case 0x7D: this.a = this.l; break;                                            // LD A,L
-      case 0x7E: this.a = this.getUint8(this.getHL()); break;                             // LD A,(HL)
-      case 0x7F: break;                                                   // LD A,A
-      case 0x80: this.add_a(this.b); break;                                         // ADD A,B
-      case 0x81: this.add_a(this.c); break;                                         // ADD A,C
-      case 0x82: this.add_a(this.d); break;                                         // ADD A,D
-      case 0x83: this.add_a(this.e); break;                                         // ADD A,E
-      case 0x84: this.add_a(this.h); break;                                         // ADD A,H
-      case 0x85: this.add_a(this.l); break;                                         // ADD A,L
-      case 0x86: this.add_a(this.getUint8(this.getHL())); break;                          // ADD A,(HL)
-      case 0x87: this.add_a(this.a); break;                                         // ADD A,A
-      case 0x88: this.adc_a(this.b); break;                                         // ADC A,B
-      case 0x89: this.adc_a(this.c); break;                                         // ADC A,C
-      case 0x8A: this.adc_a(this.d); break;                                         // ADC A,D
-      case 0x8B: this.adc_a(this.e); break;                                         // ADC A,E
-      case 0x8C: this.adc_a(this.h); break;                                         // ADC A,H
-      case 0x8D: this.adc_a(this.l); break;                                         // ADC A,L
-      case 0x8E: this.adc_a(this.getUint8(this.getHL())); break;                          // ADC A,(HL)
-      case 0x8F: this.adc_a(this.a); break;                                         // ADC A,A
-      case 0x90: this.sub_a(this.b); break;                                         // SUB A,B
-      case 0x91: this.sub_a(this.c); break;                                         // SUB A,C
-      case 0x92: this.sub_a(this.d); break;                                         // SUB A,D
-      case 0x93: this.sub_a(this.e); break;                                         // SUB A,E
-      case 0x94: this.sub_a(this.h); break;                                         // SUB A,H
-      case 0x95: this.sub_a(this.l); break;                                         // SUB A,L
-      case 0x96: this.sub_a(this.getUint8(this.getHL())); break;                          // SUB A,(HL)
-      case 0x97: this.sub_a(this.a); break;                                         // SUB A,A
-      case 0x98: this.sbc_a(this.b); break;                                         // SBC A,B
-      case 0x99: this.sbc_a(this.c); break;                                         // SBC A,C
-      case 0x9A: this.sbc_a(this.d); break;                                         // SBC A,D
-      case 0x9B: this.sbc_a(this.e); break;                                         // SBC A,E
-      case 0x9C: this.sbc_a(this.h); break;                                         // SBC A,H
-      case 0x9D: this.sbc_a(this.l); break;                                         // SBC A,L
-      case 0x9E: this.sbc_a(this.getUint8(this.getHL())); break;                          // SBC A,(HL)
-      case 0x9F: this.sbc_a(this.a); break;                                         // SBC A,A
-      case 0xA0: this.f = this.SZP_TABLE[this.a &= this.b] | F_HALFCARRY; break;              // AND A,B
-      case 0xA1: this.f = this.SZP_TABLE[this.a &= this.c] | F_HALFCARRY; break;              // AND A,C
-      case 0xA2: this.f = this.SZP_TABLE[this.a &= this.d] | F_HALFCARRY; break;              // AND A,D
-      case 0xA3: this.f = this.SZP_TABLE[this.a &= this.e] | F_HALFCARRY; break;              // AND A,E
-      case 0xA4: this.f = this.SZP_TABLE[this.a &= this.h] | F_HALFCARRY; break;              // AND A,H
-      case 0xA5: this.f = this.SZP_TABLE[this.a &= this.l] | F_HALFCARRY; break;              // AND A,L
-      case 0xA6: this.f = this.SZP_TABLE[this.a &= this.getUint8(this.getHL())] | F_HALFCARRY; break; // AND A,(HL)
-      case 0xA7: this.f = this.SZP_TABLE[this.a] | F_HALFCARRY; break;                   // AND A,A
-      case 0xA8: this.f = this.SZP_TABLE[this.a ^= this.b]; break;                            // XOR A,B
-      case 0xA9: this.f = this.SZP_TABLE[this.a ^= this.c]; break;                            // XOR A,C
-      case 0xAA: this.f = this.SZP_TABLE[this.a ^= this.d]; break;                            // XOR A,D
-      case 0xAB: this.f = this.SZP_TABLE[this.a ^= this.e]; break;                            // XOR A,E
-      case 0xAC: this.f = this.SZP_TABLE[this.a ^= this.h]; break;                            // XOR A,H
-      case 0xAD: this.f = this.SZP_TABLE[this.a ^= this.l]; break;                            // XOR A,L
-      case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.getHL())]; break;             // XOR A,(HL)
-      case 0xAF: this.f = this.SZP_TABLE[this.a = 0]; break;                             // XOR A,A
-      case 0xB0: this.f = this.SZP_TABLE[this.a |= this.b]; break;                            // OR A,B
-      case 0xB1: this.f = this.SZP_TABLE[this.a |= this.c]; break;                            // OR A,C
-      case 0xB2: this.f = this.SZP_TABLE[this.a |= this.d]; break;                            // OR A,D
-      case 0xB3: this.f = this.SZP_TABLE[this.a |= this.e]; break;                            // OR A,E
-      case 0xB4: this.f = this.SZP_TABLE[this.a |= this.h]; break;                            // OR A,H
-      case 0xB5: this.f = this.SZP_TABLE[this.a |= this.l]; break;                            // OR A,L
-      case 0xB6: this.f = this.SZP_TABLE[this.a |= this.getUint8(this.getHL())]; break;             // OR A,(HL)
-      case 0xB7: this.f = this.SZP_TABLE[this.a]; break;                                 // OR A,A
-      case 0xB8: this.cp_a(this.b); break;                                          // CP A,B
-      case 0xB9: this.cp_a(this.c); break;                                          // CP A,C
-      case 0xBA: this.cp_a(this.d); break;                                          // CP A,D
-      case 0xBB: this.cp_a(this.e); break;                                          // CP A,E
-      case 0xBC: this.cp_a(this.h); break;                                          // CP A,H
-      case 0xBD: this.cp_a(this.l); break;                                          // CP A,L
-      case 0xBE: this.cp_a(this.getUint8(this.getHL())); break;                           // CP A,(HL)
-      case 0xBF: this.cp_a(this.a); break;                                          // CP A,A
-      case 0xC0: this.ret((this.f & F_ZERO) === 0); break;                          // RET NZ
-      case 0xC1: this.setBC(this.getUint16(this.sp)); this.sp += 2; break;                    // POP BC
-      case 0xC2: this.jp((this.f & F_ZERO) === 0); break;                            // JP NZ,(nn)
-      case 0xC3: this.pc = this.getUint16(this.pc); break;                             // JP (nn)
-      case 0xC4: this.call((this.f & F_ZERO) === 0); break;                          // CALL NZ (nn)
-      case 0xC5: this.push(this.getBC()); break;                                       // PUSH BC
-      case 0xC6: this.add_a(this.getUint8(this.pc++)); break;                             // ADD A,n
-      case 0xC7: this.push(this.pc); this.pc = 0x00; break;                                // RST 00H
-      case 0xC8: this.ret((this.f & F_ZERO) !== 0); break;                           // RET Z
-      case 0xC9: this.pc = this.getUint16(this.sp); this.sp += 2; break;                      // RET
-      case 0xCA: this.jp((this.f & F_ZERO) !== 0); break;                            // JP Z,(nn)
-      case 0xCB: this.doCB(this.getUint8(this.pc++)); break;                              // CB Opcode
-      case 0xCC: this.call((this.f & F_ZERO) !== 0); break;                          // CALL Z (nn)
-      case 0xCD: this.push(this.pc + 2); this.pc = this.getUint16(this.pc); break;                 // CALL (nn)
-      case 0xCE: this.adc_a(this.getUint8(this.pc++)); break;                             // ADC A,n
-      case 0xCF: this.push(this.pc); this.pc = 0x08; break;                                // RST 08H
-      case 0xD0: this.ret((this.f & F_CARRY) === 0); break;                          // RET NC
-      case 0xD1: this.setDE(this.getUint16(this.sp)); this.sp += 2; break;                    // POP DE
-      case 0xD2: this.jp((this.f & F_CARRY) === 0); break;                           // JP NC,(nn)
-      case 0xD3: this.port.out(this.getUint8(this.pc++), this.a); break;                       // OUT (n),A
-      case 0xD4: this.call((this.f & F_CARRY) === 0); break;                         // CALL NC (nn)
-      case 0xD5: this.push(this.getDE()); break;                                       // PUSH DE
-      case 0xD6: this.sub_a(this.getUint8(this.pc++)); break;                             // SUB n
-      case 0xD7: this.push(this.pc); this.pc = 0x10; break;                                // RST 10H
-      case 0xD8: this.ret((this.f & F_CARRY) !== 0); break;                        // RET C
-      case 0xD9: this.exBC(); this.exDE(); this.exHL(); break;                           // EXX
-      case 0xDA: this.jp((this.f & F_CARRY) !== 0); break;                           // JP C,(nn)
-      case 0xDB: this.a = this.port.in_(this.getUint8(this.pc++)); break;                       // IN A,(n)
-      case 0xDC: this.call((this.f & F_CARRY) !== 0); break;                         // CALL C (nn)
-      case 0xDD: this.doIndexOpIX(this.getUint8(this.pc++)); break;                       // DD Opcode
-      case 0xDE: this.sbc_a(this.getUint8(this.pc++)); break;                             // SBC A,n
-      case 0xDF: this.push(this.pc); this.pc = 0x18; break;                                // RST 18H
-      case 0xE0: this.ret((this.f & F_PARITY) === 0); break;                        // RET PO
-      case 0xE1: this.setHL(this.getUint16(this.sp)); this.sp += 2; break;                    // POP HL
-      case 0xE2: this.jp((this.f & F_PARITY) === 0); break;                          // JP PO,(nn)
-      case 0xE3:                                                       // EX (SP),HL
+      case 0x00:
+        break; // NOP
+      case 0x01:
+        this.setBC(this.getUint16(this.pc++));
+        this.pc++;
+        break; // LD BC,nn
+      case 0x02:
+        this.setUint8(this.getBC(), this.a);
+        break; // LD (BC),A
+      case 0x03:
+        this.incBC();
+        break; // INC BC
+      case 0x04:
+        this.b = this.inc8(this.b);
+        break; // INC B
+      case 0x05:
+        this.b = this.dec8(this.b);
+        break; // DEC B
+      case 0x06:
+        this.b = this.getUint8(this.pc++);
+        break; // LD B,n
+      case 0x07:
+        this.rlca_a();
+        break; // RLCA
+      case 0x08:
+        this.exAF();
+        break; // EX AF AF'
+      case 0x09:
+        this.setHL(this.add16(this.getHL(), this.getBC()));
+        break; // ADD HL,BC
+      case 0x0a:
+        this.a = this.getUint8(this.getBC());
+        break; // LD A,(BC)
+      case 0x0b:
+        this.decBC();
+        break; // DEC BC
+      case 0x0c:
+        this.c = this.inc8(this.c);
+        break; // INC C
+      case 0x0d:
+        this.c = this.dec8(this.c);
+        break; // DEC C
+      case 0x0e:
+        this.c = this.getUint8(this.pc++);
+        break; // LD C,n
+      case 0x0f:
+        this.rrca_a();
+        break; // RRCA
+      case 0x10:
+        this.b = (this.b - 1) & 0xff;
+        this.jr(this.b !== 0);
+        break; // DJNZ (PC+e)
+      case 0x11:
+        this.setDE(this.getUint16(this.pc++));
+        this.pc++;
+        break; // LD DE,nn
+      case 0x12:
+        this.setUint8(this.getDE(), this.a);
+        break; // LD (DE),A
+      case 0x13:
+        this.incDE();
+        break; // INC DE
+      case 0x14:
+        this.d = this.inc8(this.d);
+        break; // INC D
+      case 0x15:
+        this.d = this.dec8(this.d);
+        break; // DEC D
+      case 0x16:
+        this.d = this.getUint8(this.pc++);
+        break; // LD D,n
+      case 0x17:
+        this.rla_a();
+        break; // RLA
+      case 0x18:
+        this.pc += this.getInt8(this.pc);
+        break; // JR (PC+e)
+      case 0x19:
+        this.setHL(this.add16(this.getHL(), this.getDE()));
+        break; // ADD HL,DE
+      case 0x1a:
+        this.a = this.getUint8(this.getDE());
+        break; // LD A,(DE)
+      case 0x1b:
+        this.decDE();
+        break; // DEC DE
+      case 0x1c:
+        this.e = this.inc8(this.e);
+        break; // INC E
+      case 0x1d:
+        this.e = this.dec8(this.e);
+        break; // DEC E
+      case 0x1e:
+        this.e = this.getUint8(this.pc++);
+        break; // LD E,n
+      case 0x1f:
+        this.rra_a();
+        break; // RRA
+      case 0x20:
+        this.jr(!((this.f & F_ZERO) !== 0));
+        break; // JR NZ,(PC+e)
+      case 0x21:
+        this.setHL(this.getUint16(this.pc++));
+        this.pc++;
+        break; // LD HL,nn
+      case 0x22:
+        this.setUint16(this.getUint16(this.pc++), this.getHL());
+        this.pc++;
+        break; // LD (nn),HL
+      case 0x23:
+        this.incHL();
+        break; // INC HL
+      case 0x24:
+        this.h = this.inc8(this.h);
+        break; // INC H
+      case 0x25:
+        this.h = this.dec8(this.h);
+        break; // DEC H
+      case 0x26:
+        this.h = this.getUint8(this.pc++);
+        break; // LD H,n
+      case 0x27:
+        this.daa();
+        break; // DAA
+      case 0x28:
+        this.jr((this.f & F_ZERO) !== 0);
+        break; // JR Z,(PC+e)
+      case 0x29:
+        this.setHL(this.add16(this.getHL(), this.getHL()));
+        break; // ADD HL,HL
+      case 0x2a:
+        this.setHL(this.getUint16(this.getUint16(this.pc++)));
+        this.pc++;
+        break; // LD HL,(nn)
+      case 0x2b:
+        this.decHL();
+        break; // DEC HL
+      case 0x2c:
+        this.l = this.inc8(this.l);
+        break; // INC L
+      case 0x2d:
+        this.l = this.dec8(this.l);
+        break; // DEC L
+      case 0x2e:
+        this.l = this.getUint8(this.pc++);
+        break; // LD L,n
+      case 0x2f:
+        this.cpl_a();
+        break; // CPL
+      case 0x30:
+        this.jr(!((this.f & F_CARRY) !== 0));
+        break; // JR NC,(PC+e)
+      case 0x31:
+        this.sp = this.getUint16(this.pc++);
+        this.pc++;
+        break; // LD SP,nn
+      case 0x32:
+        this.setUint8(this.getUint16(this.pc++), this.a);
+        this.pc++;
+        break; // LD (nn),A
+      case 0x33:
+        this.sp++;
+        break; // INC SP
+      case 0x34:
+        this.incMem(this.getHL());
+        break; // INC (HL)
+      case 0x35:
+        this.decMem(this.getHL());
+        break; // DEC (HL)
+      case 0x36:
+        this.setUint8(this.getHL(), this.getUint8(this.pc++));
+        break; // LD (HL),n
+      case 0x37:
+        this.f |= F_CARRY;
+        this.f &= ~F_NEGATIVE;
+        this.f &= ~F_HALFCARRY;
+        break; // SCF
+      case 0x38:
+        this.jr((this.f & F_CARRY) !== 0);
+        break; // JR C,(PC+e)
+      case 0x39:
+        this.setHL(this.add16(this.getHL(), this.sp));
+        break; // ADD HL,SP
+      case 0x3a:
+        this.a = this.getUint8(this.getUint16(this.pc++));
+        this.pc++;
+        break; // LD A,(nn)
+      case 0x3b:
+        this.sp--;
+        break; // DEC SP
+      case 0x3c:
+        this.a = this.inc8(this.a);
+        break; // INC A
+      case 0x3d:
+        this.a = this.dec8(this.a);
+        break; // DEC A
+      case 0x3e:
+        this.a = this.getUint8(this.pc++);
+        break; // LD A,n
+      case 0x3f:
+        this.ccf();
+        break; // CCF
+      case 0x40:
+        break; // LD B,B
+      case 0x41:
+        this.b = this.c;
+        break; // LD B,C
+      case 0x42:
+        this.b = this.d;
+        break; // LD B,D
+      case 0x43:
+        this.b = this.e;
+        break; // LD B,E
+      case 0x44:
+        this.b = this.h;
+        break; // LD B,H
+      case 0x45:
+        this.b = this.l;
+        break; // LD B,L
+      case 0x46:
+        this.b = this.getUint8(this.getHL());
+        break; // LD B,(HL)
+      case 0x47:
+        this.b = this.a;
+        break; // LD B,A
+      case 0x48:
+        this.c = this.b;
+        break; // LD C,B
+      case 0x49:
+        break; // LD C,C
+      case 0x4a:
+        this.c = this.d;
+        break; // LD C,D
+      case 0x4b:
+        this.c = this.e;
+        break; // LD C,E
+      case 0x4c:
+        this.c = this.h;
+        break; // LD C,H
+      case 0x4d:
+        this.c = this.l;
+        break; // LD C,L
+      case 0x4e:
+        this.c = this.getUint8(this.getHL());
+        break; // LD C,(HL)
+      case 0x4f:
+        this.c = this.a;
+        break; // LD C,A
+      case 0x50:
+        this.d = this.b;
+        break; // LD D,B
+      case 0x51:
+        this.d = this.c;
+        break; // LD D,C
+      case 0x52:
+        break; // LD D,D
+      case 0x53:
+        this.d = this.e;
+        break; // LD D,E
+      case 0x54:
+        this.d = this.h;
+        break; // LD D,H
+      case 0x55:
+        this.d = this.l;
+        break; // LD D,L
+      case 0x56:
+        this.d = this.getUint8(this.getHL());
+        break; // LD D,(HL)
+      case 0x57:
+        this.d = this.a;
+        break; // LD D,A
+      case 0x58:
+        this.e = this.b;
+        break; // LD E,B
+      case 0x59:
+        this.e = this.c;
+        break; // LD E,C
+      case 0x5a:
+        this.e = this.d;
+        break; // LD E,D
+      case 0x5b:
+        break; // LD E,E
+      case 0x5c:
+        this.e = this.h;
+        break; // LD E,H
+      case 0x5d:
+        this.e = this.l;
+        break; // LD E,L
+      case 0x5e:
+        this.e = this.getUint8(this.getHL());
+        break; // LD E,(HL)
+      case 0x5f:
+        this.e = this.a;
+        break; // LD E,A
+      case 0x60:
+        this.h = this.b;
+        break; // LD H,B
+      case 0x61:
+        this.h = this.c;
+        break; // LD H,C
+      case 0x62:
+        this.h = this.d;
+        break; // LD H,D
+      case 0x63:
+        this.h = this.e;
+        break; // LD H,E
+      case 0x64:
+        break; // LD H,H
+      case 0x65:
+        this.h = this.l;
+        break; // LD H,L
+      case 0x66:
+        this.h = this.getUint8(this.getHL());
+        break; // LD H,(HL)
+      case 0x67:
+        this.h = this.a;
+        break; // LD H,A
+      case 0x68:
+        this.l = this.b;
+        break; // LD L,B
+      case 0x69:
+        this.l = this.c;
+        break; // LD L,C
+      case 0x6a:
+        this.l = this.d;
+        break; // LD L,D
+      case 0x6b:
+        this.l = this.e;
+        break; // LD L,E
+      case 0x6c:
+        this.l = this.h;
+        break; // LD L,H
+      case 0x6d:
+        break; // LD L,L
+      case 0x6e:
+        this.l = this.getUint8(this.getHL());
+        break; // LD L,(HL)
+      case 0x6f:
+        this.l = this.a;
+        break; // LD L,A
+      case 0x70:
+        this.setUint8(this.getHL(), this.b);
+        break; // LD (HL),B
+      case 0x71:
+        this.setUint8(this.getHL(), this.c);
+        break; // LD (HL),C
+      case 0x72:
+        this.setUint8(this.getHL(), this.d);
+        break; // LD (HL),D
+      case 0x73:
+        this.setUint8(this.getHL(), this.e);
+        break; // LD (HL),E
+      case 0x74:
+        this.setUint8(this.getHL(), this.h);
+        break; // LD (HL),H
+      case 0x75:
+        this.setUint8(this.getHL(), this.l);
+        break; // LD (HL),L
+      case 0x76:
+        if (HALT_SPEEDUP) {
+          this.tstates = 0;
+        }
+        this.halt = true;
+        this.pc--;
+        break; // HALT
+      case 0x77:
+        this.setUint8(this.getHL(), this.a);
+        break; // LD (HL),A
+      case 0x78:
+        this.a = this.b;
+        break; // LD A,B
+      case 0x79:
+        this.a = this.c;
+        break; // LD A,C
+      case 0x7a:
+        this.a = this.d;
+        break; // LD A,D
+      case 0x7b:
+        this.a = this.e;
+        break; // LD A,E
+      case 0x7c:
+        this.a = this.h;
+        break; // LD A,H
+      case 0x7d:
+        this.a = this.l;
+        break; // LD A,L
+      case 0x7e:
+        this.a = this.getUint8(this.getHL());
+        break; // LD A,(HL)
+      case 0x7f:
+        break; // LD A,A
+      case 0x80:
+        this.add_a(this.b);
+        break; // ADD A,B
+      case 0x81:
+        this.add_a(this.c);
+        break; // ADD A,C
+      case 0x82:
+        this.add_a(this.d);
+        break; // ADD A,D
+      case 0x83:
+        this.add_a(this.e);
+        break; // ADD A,E
+      case 0x84:
+        this.add_a(this.h);
+        break; // ADD A,H
+      case 0x85:
+        this.add_a(this.l);
+        break; // ADD A,L
+      case 0x86:
+        this.add_a(this.getUint8(this.getHL()));
+        break; // ADD A,(HL)
+      case 0x87:
+        this.add_a(this.a);
+        break; // ADD A,A
+      case 0x88:
+        this.adc_a(this.b);
+        break; // ADC A,B
+      case 0x89:
+        this.adc_a(this.c);
+        break; // ADC A,C
+      case 0x8a:
+        this.adc_a(this.d);
+        break; // ADC A,D
+      case 0x8b:
+        this.adc_a(this.e);
+        break; // ADC A,E
+      case 0x8c:
+        this.adc_a(this.h);
+        break; // ADC A,H
+      case 0x8d:
+        this.adc_a(this.l);
+        break; // ADC A,L
+      case 0x8e:
+        this.adc_a(this.getUint8(this.getHL()));
+        break; // ADC A,(HL)
+      case 0x8f:
+        this.adc_a(this.a);
+        break; // ADC A,A
+      case 0x90:
+        this.sub_a(this.b);
+        break; // SUB A,B
+      case 0x91:
+        this.sub_a(this.c);
+        break; // SUB A,C
+      case 0x92:
+        this.sub_a(this.d);
+        break; // SUB A,D
+      case 0x93:
+        this.sub_a(this.e);
+        break; // SUB A,E
+      case 0x94:
+        this.sub_a(this.h);
+        break; // SUB A,H
+      case 0x95:
+        this.sub_a(this.l);
+        break; // SUB A,L
+      case 0x96:
+        this.sub_a(this.getUint8(this.getHL()));
+        break; // SUB A,(HL)
+      case 0x97:
+        this.sub_a(this.a);
+        break; // SUB A,A
+      case 0x98:
+        this.sbc_a(this.b);
+        break; // SBC A,B
+      case 0x99:
+        this.sbc_a(this.c);
+        break; // SBC A,C
+      case 0x9a:
+        this.sbc_a(this.d);
+        break; // SBC A,D
+      case 0x9b:
+        this.sbc_a(this.e);
+        break; // SBC A,E
+      case 0x9c:
+        this.sbc_a(this.h);
+        break; // SBC A,H
+      case 0x9d:
+        this.sbc_a(this.l);
+        break; // SBC A,L
+      case 0x9e:
+        this.sbc_a(this.getUint8(this.getHL()));
+        break; // SBC A,(HL)
+      case 0x9f:
+        this.sbc_a(this.a);
+        break; // SBC A,A
+      case 0xa0:
+        this.f = this.SZP_TABLE[(this.a &= this.b)] | F_HALFCARRY;
+        break; // AND A,B
+      case 0xa1:
+        this.f = this.SZP_TABLE[(this.a &= this.c)] | F_HALFCARRY;
+        break; // AND A,C
+      case 0xa2:
+        this.f = this.SZP_TABLE[(this.a &= this.d)] | F_HALFCARRY;
+        break; // AND A,D
+      case 0xa3:
+        this.f = this.SZP_TABLE[(this.a &= this.e)] | F_HALFCARRY;
+        break; // AND A,E
+      case 0xa4:
+        this.f = this.SZP_TABLE[(this.a &= this.h)] | F_HALFCARRY;
+        break; // AND A,H
+      case 0xa5:
+        this.f = this.SZP_TABLE[(this.a &= this.l)] | F_HALFCARRY;
+        break; // AND A,L
+      case 0xa6:
+        this.f =
+          this.SZP_TABLE[(this.a &= this.getUint8(this.getHL()))] | F_HALFCARRY;
+        break; // AND A,(HL)
+      case 0xa7:
+        this.f = this.SZP_TABLE[this.a] | F_HALFCARRY;
+        break; // AND A,A
+      case 0xa8:
+        this.f = this.SZP_TABLE[(this.a ^= this.b)];
+        break; // XOR A,B
+      case 0xa9:
+        this.f = this.SZP_TABLE[(this.a ^= this.c)];
+        break; // XOR A,C
+      case 0xaa:
+        this.f = this.SZP_TABLE[(this.a ^= this.d)];
+        break; // XOR A,D
+      case 0xab:
+        this.f = this.SZP_TABLE[(this.a ^= this.e)];
+        break; // XOR A,E
+      case 0xac:
+        this.f = this.SZP_TABLE[(this.a ^= this.h)];
+        break; // XOR A,H
+      case 0xad:
+        this.f = this.SZP_TABLE[(this.a ^= this.l)];
+        break; // XOR A,L
+      case 0xae:
+        this.f = this.SZP_TABLE[(this.a ^= this.getUint8(this.getHL()))];
+        break; // XOR A,(HL)
+      case 0xaf:
+        this.f = this.SZP_TABLE[(this.a = 0)];
+        break; // XOR A,A
+      case 0xb0:
+        this.f = this.SZP_TABLE[(this.a |= this.b)];
+        break; // OR A,B
+      case 0xb1:
+        this.f = this.SZP_TABLE[(this.a |= this.c)];
+        break; // OR A,C
+      case 0xb2:
+        this.f = this.SZP_TABLE[(this.a |= this.d)];
+        break; // OR A,D
+      case 0xb3:
+        this.f = this.SZP_TABLE[(this.a |= this.e)];
+        break; // OR A,E
+      case 0xb4:
+        this.f = this.SZP_TABLE[(this.a |= this.h)];
+        break; // OR A,H
+      case 0xb5:
+        this.f = this.SZP_TABLE[(this.a |= this.l)];
+        break; // OR A,L
+      case 0xb6:
+        this.f = this.SZP_TABLE[(this.a |= this.getUint8(this.getHL()))];
+        break; // OR A,(HL)
+      case 0xb7:
+        this.f = this.SZP_TABLE[this.a];
+        break; // OR A,A
+      case 0xb8:
+        this.cp_a(this.b);
+        break; // CP A,B
+      case 0xb9:
+        this.cp_a(this.c);
+        break; // CP A,C
+      case 0xba:
+        this.cp_a(this.d);
+        break; // CP A,D
+      case 0xbb:
+        this.cp_a(this.e);
+        break; // CP A,E
+      case 0xbc:
+        this.cp_a(this.h);
+        break; // CP A,H
+      case 0xbd:
+        this.cp_a(this.l);
+        break; // CP A,L
+      case 0xbe:
+        this.cp_a(this.getUint8(this.getHL()));
+        break; // CP A,(HL)
+      case 0xbf:
+        this.cp_a(this.a);
+        break; // CP A,A
+      case 0xc0:
+        this.ret((this.f & F_ZERO) === 0);
+        break; // RET NZ
+      case 0xc1:
+        this.setBC(this.getUint16(this.sp));
+        this.sp += 2;
+        break; // POP BC
+      case 0xc2:
+        this.jp((this.f & F_ZERO) === 0);
+        break; // JP NZ,(nn)
+      case 0xc3:
+        this.pc = this.getUint16(this.pc);
+        break; // JP (nn)
+      case 0xc4:
+        this.call((this.f & F_ZERO) === 0);
+        break; // CALL NZ (nn)
+      case 0xc5:
+        this.push(this.getBC());
+        break; // PUSH BC
+      case 0xc6:
+        this.add_a(this.getUint8(this.pc++));
+        break; // ADD A,n
+      case 0xc7:
+        this.push(this.pc);
+        this.pc = 0x00;
+        break; // RST 00H
+      case 0xc8:
+        this.ret((this.f & F_ZERO) !== 0);
+        break; // RET Z
+      case 0xc9:
+        this.pc = this.getUint16(this.sp);
+        this.sp += 2;
+        break; // RET
+      case 0xca:
+        this.jp((this.f & F_ZERO) !== 0);
+        break; // JP Z,(nn)
+      case 0xcb:
+        this.doCB(this.getUint8(this.pc++));
+        break; // CB Opcode
+      case 0xcc:
+        this.call((this.f & F_ZERO) !== 0);
+        break; // CALL Z (nn)
+      case 0xcd:
+        this.push(this.pc + 2);
+        this.pc = this.getUint16(this.pc);
+        break; // CALL (nn)
+      case 0xce:
+        this.adc_a(this.getUint8(this.pc++));
+        break; // ADC A,n
+      case 0xcf:
+        this.push(this.pc);
+        this.pc = 0x08;
+        break; // RST 08H
+      case 0xd0:
+        this.ret((this.f & F_CARRY) === 0);
+        break; // RET NC
+      case 0xd1:
+        this.setDE(this.getUint16(this.sp));
+        this.sp += 2;
+        break; // POP DE
+      case 0xd2:
+        this.jp((this.f & F_CARRY) === 0);
+        break; // JP NC,(nn)
+      case 0xd3:
+        this.port.out(this.getUint8(this.pc++), this.a);
+        break; // OUT (n),A
+      case 0xd4:
+        this.call((this.f & F_CARRY) === 0);
+        break; // CALL NC (nn)
+      case 0xd5:
+        this.push(this.getDE());
+        break; // PUSH DE
+      case 0xd6:
+        this.sub_a(this.getUint8(this.pc++));
+        break; // SUB n
+      case 0xd7:
+        this.push(this.pc);
+        this.pc = 0x10;
+        break; // RST 10H
+      case 0xd8:
+        this.ret((this.f & F_CARRY) !== 0);
+        break; // RET C
+      case 0xd9:
+        this.exBC();
+        this.exDE();
+        this.exHL();
+        break; // EXX
+      case 0xda:
+        this.jp((this.f & F_CARRY) !== 0);
+        break; // JP C,(nn)
+      case 0xdb:
+        this.a = this.port.in_(this.getUint8(this.pc++));
+        break; // IN A,(n)
+      case 0xdc:
+        this.call((this.f & F_CARRY) !== 0);
+        break; // CALL C (nn)
+      case 0xdd:
+        this.doIndexOpIX(this.getUint8(this.pc++));
+        break; // DD Opcode
+      case 0xde:
+        this.sbc_a(this.getUint8(this.pc++));
+        break; // SBC A,n
+      case 0xdf:
+        this.push(this.pc);
+        this.pc = 0x18;
+        break; // RST 18H
+      case 0xe0:
+        this.ret((this.f & F_PARITY) === 0);
+        break; // RET PO
+      case 0xe1:
+        this.setHL(this.getUint16(this.sp));
+        this.sp += 2;
+        break; // POP HL
+      case 0xe2:
+        this.jp((this.f & F_PARITY) === 0);
+        break; // JP PO,(nn)
+      case 0xe3: // EX (SP),HL
         temp = this.getHL();
         this.setHL(this.getUint16(this.sp));
         this.setUint16(this.sp, temp);
         break;
-      case 0xE4: this.call((this.f & F_PARITY) === 0); break;                        // CALL PO (nn)
-      case 0xE5: this.push(this.getHL()); break;                                       // PUSH HL
-      case 0xE6: this.f = this.SZP_TABLE[this.a &= this.getUint8(this.pc++)] | F_HALFCARRY; break;  // AND (n)
-      case 0xE7: this.push(this.pc); this.pc = 0x20; break;                                // RST 20H
-      case 0xE8: this.ret((this.f & F_PARITY) !== 0); break;                         // RET PE
-      case 0xE9: this.pc = this.getHL(); break;                                     // JP (HL)
-      case 0xEA: this.jp((this.f & F_PARITY) !== 0); break;                          // JP PE,(nn)
-      case 0xEB:                                                       // EX DE,HL
+      case 0xe4:
+        this.call((this.f & F_PARITY) === 0);
+        break; // CALL PO (nn)
+      case 0xe5:
+        this.push(this.getHL());
+        break; // PUSH HL
+      case 0xe6:
+        this.f =
+          this.SZP_TABLE[(this.a &= this.getUint8(this.pc++))] | F_HALFCARRY;
+        break; // AND (n)
+      case 0xe7:
+        this.push(this.pc);
+        this.pc = 0x20;
+        break; // RST 20H
+      case 0xe8:
+        this.ret((this.f & F_PARITY) !== 0);
+        break; // RET PE
+      case 0xe9:
+        this.pc = this.getHL();
+        break; // JP (HL)
+      case 0xea:
+        this.jp((this.f & F_PARITY) !== 0);
+        break; // JP PE,(nn)
+      case 0xeb: // EX DE,HL
         /*if (SUPPORT_DESTRUCTURING) {
           [this.d, this.e, this.h, this.l] = [this.h, this.l, this.d, this.e];
         } else {*/
@@ -858,29 +2537,73 @@ JSSMS.Z80.prototype = {
         this.l = temp;
         //}
         break;
-      case 0xEC: this.call((this.f & F_PARITY) !== 0); break;                        // CALL PE (nn)
-      case 0xED: this.doED(this.getUint8(this.pc)); break;                                // ED Opcode
-      case 0xEE: this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.pc++)]; break;                // XOR n
-      case 0xEF: this.push(this.pc); this.pc = 0x28; break;                                // RST 28H
-      case 0xF0: this.ret((this.f & F_SIGN) === 0); break;                           // RET P
-      case 0xF1: this.setAF(this.getUint16(this.sp)); this.sp += 2; break;             // POP AF
-      case 0xF2: this.jp((this.f & F_SIGN) === 0); break;                            // JP P,(nn)
-      case 0xF3: this.iff1 = this.iff2 = false; this.EI_inst = true; break;              // DI
-      case 0xF4: this.call((this.f & F_SIGN) === 0); break;                         // CALL P (nn)
-      case 0xF5: this.push(this.getAF()); break;                                       // PUSH AF
-      case 0xF6: this.f = this.SZP_TABLE[this.a |= this.getUint8(this.pc++)]; break;                // OR n
-      case 0xF7: this.push(this.pc); this.pc = 0x30; break;                                // RST 30H
-      case 0xF8: this.ret((this.f & F_SIGN) !== 0); break;                           // RET M
-      case 0xF9: this.sp = this.getHL(); break;                                     // LD SP,HL
-      case 0xFA: this.jp((this.f & F_SIGN) !== 0); break;                            // JP M,(nn)
-      case 0xFB: this.iff1 = this.iff2 = this.EI_inst = true; break;                     // EI
-      case 0xFC: this.call((this.f & F_SIGN) !== 0); break;                          // CALL M (nn)
-      case 0xFD: this.doIndexOpIY(this.getUint8(this.pc++)); break;                       // FD Opcode
-      case 0xFE: this.cp_a(this.getUint8(this.pc++)); break;                              // CP n
-      case 0xFF: this.push(this.pc); this.pc = 0x38; break;                                // RST 38H
+      case 0xec:
+        this.call((this.f & F_PARITY) !== 0);
+        break; // CALL PE (nn)
+      case 0xed:
+        this.doED(this.getUint8(this.pc));
+        break; // ED Opcode
+      case 0xee:
+        this.f = this.SZP_TABLE[(this.a ^= this.getUint8(this.pc++))];
+        break; // XOR n
+      case 0xef:
+        this.push(this.pc);
+        this.pc = 0x28;
+        break; // RST 28H
+      case 0xf0:
+        this.ret((this.f & F_SIGN) === 0);
+        break; // RET P
+      case 0xf1:
+        this.setAF(this.getUint16(this.sp));
+        this.sp += 2;
+        break; // POP AF
+      case 0xf2:
+        this.jp((this.f & F_SIGN) === 0);
+        break; // JP P,(nn)
+      case 0xf3:
+        this.iff1 = this.iff2 = false;
+        this.EI_inst = true;
+        break; // DI
+      case 0xf4:
+        this.call((this.f & F_SIGN) === 0);
+        break; // CALL P (nn)
+      case 0xf5:
+        this.push(this.getAF());
+        break; // PUSH AF
+      case 0xf6:
+        this.f = this.SZP_TABLE[(this.a |= this.getUint8(this.pc++))];
+        break; // OR n
+      case 0xf7:
+        this.push(this.pc);
+        this.pc = 0x30;
+        break; // RST 30H
+      case 0xf8:
+        this.ret((this.f & F_SIGN) !== 0);
+        break; // RET M
+      case 0xf9:
+        this.sp = this.getHL();
+        break; // LD SP,HL
+      case 0xfa:
+        this.jp((this.f & F_SIGN) !== 0);
+        break; // JP M,(nn)
+      case 0xfb:
+        this.iff1 = this.iff2 = this.EI_inst = true;
+        break; // EI
+      case 0xfc:
+        this.call((this.f & F_SIGN) !== 0);
+        break; // CALL M (nn)
+      case 0xfd:
+        this.doIndexOpIY(this.getUint8(this.pc++));
+        break; // FD Opcode
+      case 0xfe:
+        this.cp_a(this.getUint8(this.pc++));
+        break; // CP n
+      case 0xff:
+        this.push(this.pc);
+        this.pc = 0x38;
+        break; // RST 38H
     } // end switch
   },
-
 
   /**
    * Get current cycle number.
@@ -890,7 +2613,6 @@ JSSMS.Z80.prototype = {
   getCycle: function() {
     return this.totalCycles - this.tstates;
   },
-
 
   /**
    * Generate non maskable interrupt (NMI).
@@ -909,11 +2631,10 @@ JSSMS.Z80.prototype = {
       this.halt = false;
     }
 
-    this.push(this.pc);                // Preserve PC on stack
+    this.push(this.pc); // Preserve PC on stack
     this.pc = 0x66;
     this.tstates -= 11;
   },
-
 
   /**
    * Normal interrupt routine.
@@ -938,11 +2659,14 @@ JSSMS.Z80.prototype = {
     this.iff1 = this.iff2 = false;
     this.interruptLine = false;
 
-    this.push(this.pc);                // Preserve PC on stack
+    this.push(this.pc); // Preserve PC on stack
 
     if (this.im === 0) {
       // IM 0: Execute Instruction on Bus
-      this.pc = (this.interruptVector === 0 || this.interruptVector === 0xFF) ? 0x38 : this.interruptVector;
+      this.pc =
+        this.interruptVector === 0 || this.interruptVector === 0xff
+          ? 0x38
+          : this.interruptVector;
       this.tstates -= 13;
     } else if (this.im === 1) {
       // IM 1: Do RST 38h. Ignore Value on Bus.
@@ -954,7 +2678,6 @@ JSSMS.Z80.prototype = {
       this.tstates -= 19;
     }
   },
-
 
   /**
    * Jump.
@@ -968,7 +2691,6 @@ JSSMS.Z80.prototype = {
       this.pc += 2;
     }
   },
-
 
   /**
    * Jump relative.
@@ -984,7 +2706,6 @@ JSSMS.Z80.prototype = {
     }
   },
 
-
   /**
    * Call.
    *
@@ -992,14 +2713,13 @@ JSSMS.Z80.prototype = {
    */
   call: function(condition) {
     if (condition) {
-      this.push(this.pc + 2);                 // write value of PC to stack
+      this.push(this.pc + 2); // write value of PC to stack
       this.pc = this.getUint16(this.pc);
       this.tstates -= 7;
     } else {
       this.pc += 2;
     }
   },
-
 
   /**
    * Return.
@@ -1014,7 +2734,6 @@ JSSMS.Z80.prototype = {
     }
   },
 
-
   /**
    * Push value onto stack.
    *
@@ -1025,7 +2744,6 @@ JSSMS.Z80.prototype = {
     this.setUint16(this.sp, value);
   },
 
-
   /**
    * Push value onto stack.
    * Used only in recompiling mode.
@@ -1035,9 +2753,8 @@ JSSMS.Z80.prototype = {
    */
   pushUint8: function(hi, lo) {
     this.sp -= 2;
-    this.setUint16(this.sp, hi << 8 | lo);
+    this.setUint16(this.sp, (hi << 8) | lo);
   },
-
 
   /**
    * INC - Increment memory location.
@@ -1048,7 +2765,6 @@ JSSMS.Z80.prototype = {
     this.setUint8(offset, this.inc8(this.getUint8(offset)));
   },
 
-
   /**
    * DEC - Decrement memory location.
    *
@@ -1057,7 +2773,6 @@ JSSMS.Z80.prototype = {
   decMem: function(offset) {
     this.setUint8(offset, this.dec8(this.getUint8(offset)));
   },
-
 
   /**
    * CCF - Complement carry flag.
@@ -1073,7 +2788,6 @@ JSSMS.Z80.prototype = {
     this.f &= ~F_NEGATIVE;
   },
 
-
   /**
    * DAA - Decimal adjust accumulator.
    * Adds 6 to left and/or right nibble.
@@ -1084,11 +2798,15 @@ JSSMS.Z80.prototype = {
    */
   daa: function() {
     // Get result for calculated table (carry flag = bit 8, negative = bit 9, halfcarry = bit 10)
-    var temp = this.DAA_TABLE[this.a | ((this.f & F_CARRY) << 8) | ((this.f & F_NEGATIVE) << 8) | ((this.f & F_HALFCARRY) << 6)];
-    this.a = temp & 0xFF;
+    var temp = this.DAA_TABLE[
+      this.a |
+        ((this.f & F_CARRY) << 8) |
+        ((this.f & F_NEGATIVE) << 8) |
+        ((this.f & F_HALFCARRY) << 6)
+    ];
+    this.a = temp & 0xff;
     this.f = (this.f & F_NEGATIVE) | (temp >> 8);
   },
-
 
   /**
    * Execute CB prefixed opcode.
@@ -1103,270 +2821,783 @@ JSSMS.Z80.prototype = {
     }
 
     switch (opcode) {
-      case 0x00: this.b = this.rlc(this.b); break;                                 // RLC B
-      case 0x01: this.c = this.rlc(this.c); break;                                 // RLC C
-      case 0x02: this.d = this.rlc(this.d); break;                                 // RLC D
-      case 0x03: this.e = this.rlc(this.e); break;                                 // RLC E
-      case 0x04: this.h = this.rlc(this.h); break;                                 // RLC H
-      case 0x05: this.l = this.rlc(this.l); break;                                 // RLC L
-      case 0x06: this.setUint8(this.getHL(), this.rlc(this.getUint8(this.getHL()))); break;     // RLC (HL)
-      case 0x07: this.a = this.rlc(this.a); break;                                   // RLC A
-      case 0x08: this.b = this.rrc(this.b); break;                                 // RRC B
-      case 0x09: this.c = this.rrc(this.c); break;                                 // RRC C
-      case 0x0A: this.d = this.rrc(this.d); break;                                 // RRC D
-      case 0x0B: this.e = this.rrc(this.e); break;                                 // RRC E
-      case 0x0C: this.h = this.rrc(this.h); break;                                 // RRC H
-      case 0x0D: this.l = this.rrc(this.l); break;                                 // RRC L
-      case 0x0E: this.setUint8(this.getHL(), this.rrc(this.getUint8(this.getHL()))); break;     // RRC (HL)
-      case 0x0F: this.a = this.rrc(this.a); break;                                   // RRC A
-      case 0x10: this.b = this.rl(this.b); break;                                  // RL B
-      case 0x11: this.c = this.rl(this.c); break;                                  // RL C
-      case 0x12: this.d = this.rl(this.d); break;                                  // RL D
-      case 0x13: this.e = this.rl(this.e); break;                                  // RL E
-      case 0x14: this.h = this.rl(this.h); break;                                  // RL H
-      case 0x15: this.l = this.rl(this.l); break;                                  // RL L
-      case 0x16: this.setUint8(this.getHL(), this.rl(this.getUint8(this.getHL()))); break;      // RL (HL)
-      case 0x17: this.a = this.rl(this.a); break;                                    // RL A
-      case 0x18: this.b = this.rr(this.b); break;                                  // RR B
-      case 0x19: this.c = this.rr(this.c); break;                                  // RR C
-      case 0x1A: this.d = this.rr(this.d); break;                                  // RR D
-      case 0x1B: this.e = this.rr(this.e); break;                                  // RR E
-      case 0x1C: this.h = this.rr(this.h); break;                                  // RR H
-      case 0x1D: this.l = this.rr(this.l); break;                                  // RR L
-      case 0x1E: this.setUint8(this.getHL(), this.rr(this.getUint8(this.getHL()))); break;      // RR (HL)
-      case 0x1F: this.a = this.rr(this.a); break;                                    // RR A
-      case 0x20: this.b = this.sla(this.b); break;                                 // SLA B
-      case 0x21: this.c = this.sla(this.c); break;                                 // SLA C
-      case 0x22: this.d = this.sla(this.d); break;                                 // SLA D
-      case 0x23: this.e = this.sla(this.e); break;                                 // SLA E
-      case 0x24: this.h = this.sla(this.h); break;                                 // SLA H
-      case 0x25: this.l = this.sla(this.l); break;                                 // SLA L
-      case 0x26: this.setUint8(this.getHL(), this.sla(this.getUint8(this.getHL()))); break;     // SLA (HL)
-      case 0x27: this.a = this.sla(this.a); break;                                   // SLA A
-      case 0x28: this.b = this.sra(this.b); break;                                 // SRA B
-      case 0x29: this.c = this.sra(this.c); break;                                 // SRA C
-      case 0x2A: this.d = this.sra(this.d); break;                                 // SRA D
-      case 0x2B: this.e = this.sra(this.e); break;                                 // SRA E
-      case 0x2C: this.h = this.sra(this.h); break;                                 // SRA H
-      case 0x2D: this.l = this.sra(this.l); break;                                 // SRA L
-      case 0x2E: this.setUint8(this.getHL(), this.sra(this.getUint8(this.getHL()))); break;     // SRA (HL)
-      case 0x2F: this.a = this.sra(this.a); break;                                   // SRA A
-      case 0x30: this.b = this.sll(this.b); break;                                 // SLL B
-      case 0x31: this.c = this.sll(this.c); break;                                 // SLL C
-      case 0x32: this.d = this.sll(this.d); break;                                 // SLL D
-      case 0x33: this.e = this.sll(this.e); break;                                 // SLL E
-      case 0x34: this.h = this.sll(this.h); break;                                 // SLL H
-      case 0x35: this.l = this.sll(this.l); break;                                 // SLL L
-      case 0x36: this.setUint8(this.getHL(), this.sll(this.getUint8(this.getHL()))); break;     // SLL (HL)
-      case 0x37: this.a = this.sll(this.a); break;                                 // SLL A
-      case 0x38: this.b = this.srl(this.b); break;                                 // SRL B
-      case 0x39: this.c = this.srl(this.c); break;                                 // SRL C
-      case 0x3A: this.d = this.srl(this.d); break;                                 // SRL D
-      case 0x3B: this.e = this.srl(this.e); break;                                 // SRL E
-      case 0x3C: this.h = this.srl(this.h); break;                                 // SRL H
-      case 0x3D: this.l = this.srl(this.l); break;                                 // SRL L
-      case 0x3E: this.setUint8(this.getHL(), this.srl(this.getUint8(this.getHL()))); break;     // SRL (HL)
-      case 0x3F: this.a = this.srl(this.a); break;                                   // SRL A
-      case 0x40: this.bit(this.b & BIT_0); break;                               // BIT 0,B
-      case 0x41: this.bit(this.c & BIT_0); break;                               // BIT 0,C
-      case 0x42: this.bit(this.d & BIT_0); break;                               // BIT 0,D
-      case 0x43: this.bit(this.e & BIT_0); break;                               // BIT 0,E
-      case 0x44: this.bit(this.h & BIT_0); break;                               // BIT 0,H
-      case 0x45: this.bit(this.l & BIT_0); break;                               // BIT 0,L
-      case 0x46: this.bit(this.getUint8(this.getHL()) & BIT_0); break;                // BIT 0,(HL)
-      case 0x47: this.bit(this.a & BIT_0); break;                               // BIT 0,A
-      case 0x48: this.bit(this.b & BIT_1); break;                               // BIT 1,B
-      case 0x49: this.bit(this.c & BIT_1); break;                               // BIT 1,C
-      case 0x4A: this.bit(this.d & BIT_1); break;                               // BIT 1,D
-      case 0x4B: this.bit(this.e & BIT_1); break;                               // BIT 1,E
-      case 0x4C: this.bit(this.h & BIT_1); break;                               // BIT 1,H
-      case 0x4D: this.bit(this.l & BIT_1); break;                               // BIT 1,L
-      case 0x4E: this.bit(this.getUint8(this.getHL()) & BIT_1); break;                // BIT 1,(HL)
-      case 0x4F: this.bit(this.a & BIT_1); break;                               // BIT 1,A
-      case 0x50: this.bit(this.b & BIT_2); break;                               // BIT 2,B
-      case 0x51: this.bit(this.c & BIT_2); break;                               // BIT 2,C
-      case 0x52: this.bit(this.d & BIT_2); break;                               // BIT 2,D
-      case 0x53: this.bit(this.e & BIT_2); break;                               // BIT 2,E
-      case 0x54: this.bit(this.h & BIT_2); break;                               // BIT 2,H
-      case 0x55: this.bit(this.l & BIT_2); break;                               // BIT 2,L
-      case 0x56: this.bit(this.getUint8(this.getHL()) & BIT_2); break;                // BIT 2,(HL)
-      case 0x57: this.bit(this.a & BIT_2); break;                               // BIT 2,A
-      case 0x58: this.bit(this.b & BIT_3); break;                               // BIT 3,B
-      case 0x59: this.bit(this.c & BIT_3); break;                               // BIT 3,C
-      case 0x5A: this.bit(this.d & BIT_3); break;                               // BIT 3,D
-      case 0x5B: this.bit(this.e & BIT_3); break;                               // BIT 3,E
-      case 0x5C: this.bit(this.h & BIT_3); break;                               // BIT 3,H
-      case 0x5D: this.bit(this.l & BIT_3); break;                               // BIT 3,L
-      case 0x5E: this.bit(this.getUint8(this.getHL()) & BIT_3); break;                // BIT 3,(HL)
-      case 0x5F: this.bit(this.a & BIT_3); break;                               // BIT 3,A
-      case 0x60: this.bit(this.b & BIT_4); break;                               // BIT 4,B
-      case 0x61: this.bit(this.c & BIT_4); break;                               // BIT 4,C
-      case 0x62: this.bit(this.d & BIT_4); break;                               // BIT 4,D
-      case 0x63: this.bit(this.e & BIT_4); break;                               // BIT 4,E
-      case 0x64: this.bit(this.h & BIT_4); break;                               // BIT 4,H
-      case 0x65: this.bit(this.l & BIT_4); break;                               // BIT 4,L
-      case 0x66: this.bit(this.getUint8(this.getHL()) & BIT_4); break;                // BIT 4,(HL)
-      case 0x67: this.bit(this.a & BIT_4); break;                               // BIT 4,A
-      case 0x68: this.bit(this.b & BIT_5); break;                               // BIT 5,B
-      case 0x69: this.bit(this.c & BIT_5); break;                               // BIT 5,C
-      case 0x6A: this.bit(this.d & BIT_5); break;                               // BIT 5,D
-      case 0x6B: this.bit(this.e & BIT_5); break;                               // BIT 5,E
-      case 0x6C: this.bit(this.h & BIT_5); break;                               // BIT 5,H
-      case 0x6D: this.bit(this.l & BIT_5); break;                               // BIT 5,L
-      case 0x6E: this.bit(this.getUint8(this.getHL()) & BIT_5); break;                // BIT 5,(HL)
-      case 0x6F: this.bit(this.a & BIT_5); break;                               // BIT 5,A
-      case 0x70: this.bit(this.b & BIT_6); break;                               // BIT 6,B
-      case 0x71: this.bit(this.c & BIT_6); break;                               // BIT 6,C
-      case 0x72: this.bit(this.d & BIT_6); break;                               // BIT 6,D
-      case 0x73: this.bit(this.e & BIT_6); break;                               // BIT 6,E
-      case 0x74: this.bit(this.h & BIT_6); break;                               // BIT 6,H
-      case 0x75: this.bit(this.l & BIT_6); break;                               // BIT 6,L
-      case 0x76: this.bit(this.getUint8(this.getHL()) & BIT_6); break;                // BIT 6,(HL)
-      case 0x77: this.bit(this.a & BIT_6); break;                               // BIT 6,A
-      case 0x78: this.bit(this.b & BIT_7); break;                               // BIT 7,B
-      case 0x79: this.bit(this.c & BIT_7); break;                               // BIT 7,C
-      case 0x7A: this.bit(this.d & BIT_7); break;                               // BIT 7,D
-      case 0x7B: this.bit(this.e & BIT_7); break;                               // BIT 7,E
-      case 0x7C: this.bit(this.h & BIT_7); break;                               // BIT 7,H
-      case 0x7D: this.bit(this.l & BIT_7); break;                               // BIT 7,L
-      case 0x7E: this.bit(this.getUint8(this.getHL()) & BIT_7); break;                // BIT 7,(HL)
-      case 0x7F: this.bit(this.a & BIT_7); break;                               // BIT 7,A
-      case 0x80: this.b &= ~BIT_0; break;                                  // RES 0,B
-      case 0x81: this.c &= ~BIT_0; break;                                  // RES 0,C
-      case 0x82: this.d &= ~BIT_0; break;                                  // RES 0,D
-      case 0x83: this.e &= ~BIT_0; break;                                  // RES 0,E
-      case 0x84: this.h &= ~BIT_0; break;                                  // RES 0,H
-      case 0x85: this.l &= ~BIT_0; break;                                  // RES 0,L
-      case 0x86: this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_0); break; // RES 0,(HL)
-      case 0x87: this.a &= ~BIT_0; break;                                  // RES 0,A
-      case 0x88: this.b &= ~BIT_1; break;                                  // RES 1,B
-      case 0x89: this.c &= ~BIT_1; break;                                  // RES 1,C
-      case 0x8A: this.d &= ~BIT_1; break;                                  // RES 1,D
-      case 0x8B: this.e &= ~BIT_1; break;                                  // RES 1,E
-      case 0x8C: this.h &= ~BIT_1; break;                                  // RES 1,H
-      case 0x8D: this.l &= ~BIT_1; break;                                  // RES 1,L
-      case 0x8E: this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_1); break; // RES 1,(HL)
-      case 0x8F: this.a &= ~BIT_1; break;                                  // RES 1,A
-      case 0x90: this.b &= ~BIT_2; break;                                  // RES 2,B
-      case 0x91: this.c &= ~BIT_2; break;                                  // RES 2,C
-      case 0x92: this.d &= ~BIT_2; break;                                  // RES 2,D
-      case 0x93: this.e &= ~BIT_2; break;                                  // RES 2,E
-      case 0x94: this.h &= ~BIT_2; break;                                  // RES 2,H
-      case 0x95: this.l &= ~BIT_2; break;                                  // RES 2,L
-      case 0x96: this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_2); break; // RES 2,(HL)
-      case 0x97: this.a &= ~BIT_2; break;                                  // RES 2,A
-      case 0x98: this.b &= ~BIT_3; break;                                  // RES 3,B
-      case 0x99: this.c &= ~BIT_3; break;                                  // RES 3,C
-      case 0x9A: this.d &= ~BIT_3; break;                                  // RES 3,D
-      case 0x9B: this.e &= ~BIT_3; break;                                  // RES 3,E
-      case 0x9C: this.h &= ~BIT_3; break;                                  // RES 3,H
-      case 0x9D: this.l &= ~BIT_3; break;                                  // RES 3,L
-      case 0x9E: this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_3); break; // RES 3,(HL)
-      case 0x9F: this.a &= ~BIT_3; break;                                  // RES 3,A
-      case 0xA0: this.b &= ~BIT_4; break;                                  // RES 4,B
-      case 0xA1: this.c &= ~BIT_4; break;                                  // RES 4,C
-      case 0xA2: this.d &= ~BIT_4; break;                                  // RES 4,D
-      case 0xA3: this.e &= ~BIT_4; break;                                  // RES 4,E
-      case 0xA4: this.h &= ~BIT_4; break;                                  // RES 4,H
-      case 0xA5: this.l &= ~BIT_4; break;                                  // RES 4,L
-      case 0xA6: this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_4); break; // RES 4,(HL)
-      case 0xA7: this.a &= ~BIT_4; break;                                  // RES 4,A
-      case 0xA8: this.b &= ~BIT_5; break;                                  // RES 5,B
-      case 0xA9: this.c &= ~BIT_5; break;                                  // RES 5,C
-      case 0xAA: this.d &= ~BIT_5; break;                                  // RES 5,D
-      case 0xAB: this.e &= ~BIT_5; break;                                  // RES 5,E
-      case 0xAC: this.h &= ~BIT_5; break;                                  // RES 5,H
-      case 0xAD: this.l &= ~BIT_5; break;                                  // RES 5,L
-      case 0xAE: this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_5); break; // RES 5,(HL)
-      case 0xAF: this.a &= ~BIT_5; break;                                  // RES 5,A
-      case 0xB0: this.b &= ~BIT_6; break;                                  // RES 6,B
-      case 0xB1: this.c &= ~BIT_6; break;                                  // RES 6,C
-      case 0xB2: this.d &= ~BIT_6; break;                                  // RES 6,D
-      case 0xB3: this.e &= ~BIT_6; break;                                  // RES 6,E
-      case 0xB4: this.h &= ~BIT_6; break;                                  // RES 6,H
-      case 0xB5: this.l &= ~BIT_6; break;                                  // RES 6,L
-      case 0xB6: this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_6); break; // RES 6,(HL)
-      case 0xB7: this.a &= ~BIT_6; break;                                  // RES 6,A
-      case 0xB8: this.b &= ~BIT_7; break;                                  // RES 7,B
-      case 0xB9: this.c &= ~BIT_7; break;                                  // RES 7,C
-      case 0xBA: this.d &= ~BIT_7; break;                                  // RES 7,D
-      case 0xBB: this.e &= ~BIT_7; break;                                  // RES 7,E
-      case 0xBC: this.h &= ~BIT_7; break;                                  // RES 7,H
-      case 0xBD: this.l &= ~BIT_7; break;                                  // RES 7,L
-      case 0xBE: this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_7); break; // RES 7,(HL)
-      case 0xBF: this.a &= ~BIT_7; break;                                  // RES 7,A
-      case 0xC0: this.b |= BIT_0; break;                                   // SET 0,B
-      case 0xC1: this.c |= BIT_0; break;                                   // SET 0,C
-      case 0xC2: this.d |= BIT_0; break;                                   // SET 0,D
-      case 0xC3: this.e |= BIT_0; break;                                   // SET 0,E
-      case 0xC4: this.h |= BIT_0; break;                                   // SET 0,H
-      case 0xC5: this.l |= BIT_0; break;                                   // SET 0,L
-      case 0xC6: this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_0); break;  // SET 0,(HL)
-      case 0xC7: this.a |= BIT_0; break;                                   // SET 0,A
-      case 0xC8: this.b |= BIT_1; break;                                   // SET 1,B
-      case 0xC9: this.c |= BIT_1; break;                                   // SET 1,C
-      case 0xCA: this.d |= BIT_1; break;                                   // SET 1,D
-      case 0xCB: this.e |= BIT_1; break;                                   // SET 1,E
-      case 0xCC: this.h |= BIT_1; break;                                   // SET 1,H
-      case 0xCD: this.l |= BIT_1; break;                                   // SET 1,L
-      case 0xCE: this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_1); break;  // SET 1,(HL)
-      case 0xCF: this.a |= BIT_1; break;                                   // SET 1,A
-      case 0xD0: this.b |= BIT_2; break;                                   // SET 2,B
-      case 0xD1: this.c |= BIT_2; break;                                   // SET 2,C
-      case 0xD2: this.d |= BIT_2; break;                                   // SET 2,D
-      case 0xD3: this.e |= BIT_2; break;                                   // SET 2,E
-      case 0xD4: this.h |= BIT_2; break;                                   // SET 2,H
-      case 0xD5: this.l |= BIT_2; break;                                   // SET 2,L
-      case 0xD6: this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_2); break;  // SET 2,(HL)
-      case 0xD7: this.a |= BIT_2; break;                                   // SET 2,A
-      case 0xD8: this.b |= BIT_3; break;                                   // SET 3,B
-      case 0xD9: this.c |= BIT_3; break;                                   // SET 3,C
-      case 0xDA: this.d |= BIT_3; break;                                   // SET 3,D
-      case 0xDB: this.e |= BIT_3; break;                                   // SET 3,E
-      case 0xDC: this.h |= BIT_3; break;                                   // SET 3,H
-      case 0xDD: this.l |= BIT_3; break;                                   // SET 3,L
-      case 0xDE: this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_3); break;  // SET 3,(HL)
-      case 0xDF: this.a |= BIT_3; break;                                   // SET 3,A
-      case 0xE0: this.b |= BIT_4; break;                                   // SET 4,B
-      case 0xE1: this.c |= BIT_4; break;                                   // SET 4,C
-      case 0xE2: this.d |= BIT_4; break;                                   // SET 4,D
-      case 0xE3: this.e |= BIT_4; break;                                   // SET 4,E
-      case 0xE4: this.h |= BIT_4; break;                                   // SET 4,H
-      case 0xE5: this.l |= BIT_4; break;                                   // SET 4,L
-      case 0xE6: this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_4); break;  // SET 4,(HL)
-      case 0xE7: this.a |= BIT_4; break;                                   // SET 4,A
-      case 0xE8: this.b |= BIT_5; break;                                   // SET 5,B
-      case 0xE9: this.c |= BIT_5; break;                                   // SET 5,C
-      case 0xEA: this.d |= BIT_5; break;                                   // SET 5,D
-      case 0xEB: this.e |= BIT_5; break;                                   // SET 5,E
-      case 0xEC: this.h |= BIT_5; break;                                   // SET 5,H
-      case 0xED: this.l |= BIT_5; break;                                   // SET 5,L
-      case 0xEE: this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_5); break;  // SET 5,(HL)
-      case 0xEF: this.a |= BIT_5; break;                                   // SET 5,A
-      case 0xF0: this.b |= BIT_6; break;                                   // SET 6,B
-      case 0xF1: this.c |= BIT_6; break;                                   // SET 6,C
-      case 0xF2: this.d |= BIT_6; break;                                   // SET 6,D
-      case 0xF3: this.e |= BIT_6; break;                                   // SET 6,E
-      case 0xF4: this.h |= BIT_6; break;                                   // SET 6,H
-      case 0xF5: this.l |= BIT_6; break;                                   // SET 6,L
-      case 0xF6: this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_6); break;  // SET 6,(HL)
-      case 0xF7: this.a |= BIT_6; break;                                   // SET 6,A
-      case 0xF8: this.b |= BIT_7; break;                                   // SET 7,B
-      case 0xF9: this.c |= BIT_7; break;                                   // SET 7,C
-      case 0xFA: this.d |= BIT_7; break;                                   // SET 7,D
-      case 0xFB: this.e |= BIT_7; break;                                   // SET 7,E
-      case 0xFC: this.h |= BIT_7; break;                                   // SET 7,H
-      case 0xFD: this.l |= BIT_7; break;                                   // SET 7,L
-      case 0xFE: this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_7); break;  // SET 7,(HL)
-      case 0xFF: this.a |= BIT_7; break;                                   // SET 7,A
+      case 0x00:
+        this.b = this.rlc(this.b);
+        break; // RLC B
+      case 0x01:
+        this.c = this.rlc(this.c);
+        break; // RLC C
+      case 0x02:
+        this.d = this.rlc(this.d);
+        break; // RLC D
+      case 0x03:
+        this.e = this.rlc(this.e);
+        break; // RLC E
+      case 0x04:
+        this.h = this.rlc(this.h);
+        break; // RLC H
+      case 0x05:
+        this.l = this.rlc(this.l);
+        break; // RLC L
+      case 0x06:
+        this.setUint8(this.getHL(), this.rlc(this.getUint8(this.getHL())));
+        break; // RLC (HL)
+      case 0x07:
+        this.a = this.rlc(this.a);
+        break; // RLC A
+      case 0x08:
+        this.b = this.rrc(this.b);
+        break; // RRC B
+      case 0x09:
+        this.c = this.rrc(this.c);
+        break; // RRC C
+      case 0x0a:
+        this.d = this.rrc(this.d);
+        break; // RRC D
+      case 0x0b:
+        this.e = this.rrc(this.e);
+        break; // RRC E
+      case 0x0c:
+        this.h = this.rrc(this.h);
+        break; // RRC H
+      case 0x0d:
+        this.l = this.rrc(this.l);
+        break; // RRC L
+      case 0x0e:
+        this.setUint8(this.getHL(), this.rrc(this.getUint8(this.getHL())));
+        break; // RRC (HL)
+      case 0x0f:
+        this.a = this.rrc(this.a);
+        break; // RRC A
+      case 0x10:
+        this.b = this.rl(this.b);
+        break; // RL B
+      case 0x11:
+        this.c = this.rl(this.c);
+        break; // RL C
+      case 0x12:
+        this.d = this.rl(this.d);
+        break; // RL D
+      case 0x13:
+        this.e = this.rl(this.e);
+        break; // RL E
+      case 0x14:
+        this.h = this.rl(this.h);
+        break; // RL H
+      case 0x15:
+        this.l = this.rl(this.l);
+        break; // RL L
+      case 0x16:
+        this.setUint8(this.getHL(), this.rl(this.getUint8(this.getHL())));
+        break; // RL (HL)
+      case 0x17:
+        this.a = this.rl(this.a);
+        break; // RL A
+      case 0x18:
+        this.b = this.rr(this.b);
+        break; // RR B
+      case 0x19:
+        this.c = this.rr(this.c);
+        break; // RR C
+      case 0x1a:
+        this.d = this.rr(this.d);
+        break; // RR D
+      case 0x1b:
+        this.e = this.rr(this.e);
+        break; // RR E
+      case 0x1c:
+        this.h = this.rr(this.h);
+        break; // RR H
+      case 0x1d:
+        this.l = this.rr(this.l);
+        break; // RR L
+      case 0x1e:
+        this.setUint8(this.getHL(), this.rr(this.getUint8(this.getHL())));
+        break; // RR (HL)
+      case 0x1f:
+        this.a = this.rr(this.a);
+        break; // RR A
+      case 0x20:
+        this.b = this.sla(this.b);
+        break; // SLA B
+      case 0x21:
+        this.c = this.sla(this.c);
+        break; // SLA C
+      case 0x22:
+        this.d = this.sla(this.d);
+        break; // SLA D
+      case 0x23:
+        this.e = this.sla(this.e);
+        break; // SLA E
+      case 0x24:
+        this.h = this.sla(this.h);
+        break; // SLA H
+      case 0x25:
+        this.l = this.sla(this.l);
+        break; // SLA L
+      case 0x26:
+        this.setUint8(this.getHL(), this.sla(this.getUint8(this.getHL())));
+        break; // SLA (HL)
+      case 0x27:
+        this.a = this.sla(this.a);
+        break; // SLA A
+      case 0x28:
+        this.b = this.sra(this.b);
+        break; // SRA B
+      case 0x29:
+        this.c = this.sra(this.c);
+        break; // SRA C
+      case 0x2a:
+        this.d = this.sra(this.d);
+        break; // SRA D
+      case 0x2b:
+        this.e = this.sra(this.e);
+        break; // SRA E
+      case 0x2c:
+        this.h = this.sra(this.h);
+        break; // SRA H
+      case 0x2d:
+        this.l = this.sra(this.l);
+        break; // SRA L
+      case 0x2e:
+        this.setUint8(this.getHL(), this.sra(this.getUint8(this.getHL())));
+        break; // SRA (HL)
+      case 0x2f:
+        this.a = this.sra(this.a);
+        break; // SRA A
+      case 0x30:
+        this.b = this.sll(this.b);
+        break; // SLL B
+      case 0x31:
+        this.c = this.sll(this.c);
+        break; // SLL C
+      case 0x32:
+        this.d = this.sll(this.d);
+        break; // SLL D
+      case 0x33:
+        this.e = this.sll(this.e);
+        break; // SLL E
+      case 0x34:
+        this.h = this.sll(this.h);
+        break; // SLL H
+      case 0x35:
+        this.l = this.sll(this.l);
+        break; // SLL L
+      case 0x36:
+        this.setUint8(this.getHL(), this.sll(this.getUint8(this.getHL())));
+        break; // SLL (HL)
+      case 0x37:
+        this.a = this.sll(this.a);
+        break; // SLL A
+      case 0x38:
+        this.b = this.srl(this.b);
+        break; // SRL B
+      case 0x39:
+        this.c = this.srl(this.c);
+        break; // SRL C
+      case 0x3a:
+        this.d = this.srl(this.d);
+        break; // SRL D
+      case 0x3b:
+        this.e = this.srl(this.e);
+        break; // SRL E
+      case 0x3c:
+        this.h = this.srl(this.h);
+        break; // SRL H
+      case 0x3d:
+        this.l = this.srl(this.l);
+        break; // SRL L
+      case 0x3e:
+        this.setUint8(this.getHL(), this.srl(this.getUint8(this.getHL())));
+        break; // SRL (HL)
+      case 0x3f:
+        this.a = this.srl(this.a);
+        break; // SRL A
+      case 0x40:
+        this.bit(this.b & BIT_0);
+        break; // BIT 0,B
+      case 0x41:
+        this.bit(this.c & BIT_0);
+        break; // BIT 0,C
+      case 0x42:
+        this.bit(this.d & BIT_0);
+        break; // BIT 0,D
+      case 0x43:
+        this.bit(this.e & BIT_0);
+        break; // BIT 0,E
+      case 0x44:
+        this.bit(this.h & BIT_0);
+        break; // BIT 0,H
+      case 0x45:
+        this.bit(this.l & BIT_0);
+        break; // BIT 0,L
+      case 0x46:
+        this.bit(this.getUint8(this.getHL()) & BIT_0);
+        break; // BIT 0,(HL)
+      case 0x47:
+        this.bit(this.a & BIT_0);
+        break; // BIT 0,A
+      case 0x48:
+        this.bit(this.b & BIT_1);
+        break; // BIT 1,B
+      case 0x49:
+        this.bit(this.c & BIT_1);
+        break; // BIT 1,C
+      case 0x4a:
+        this.bit(this.d & BIT_1);
+        break; // BIT 1,D
+      case 0x4b:
+        this.bit(this.e & BIT_1);
+        break; // BIT 1,E
+      case 0x4c:
+        this.bit(this.h & BIT_1);
+        break; // BIT 1,H
+      case 0x4d:
+        this.bit(this.l & BIT_1);
+        break; // BIT 1,L
+      case 0x4e:
+        this.bit(this.getUint8(this.getHL()) & BIT_1);
+        break; // BIT 1,(HL)
+      case 0x4f:
+        this.bit(this.a & BIT_1);
+        break; // BIT 1,A
+      case 0x50:
+        this.bit(this.b & BIT_2);
+        break; // BIT 2,B
+      case 0x51:
+        this.bit(this.c & BIT_2);
+        break; // BIT 2,C
+      case 0x52:
+        this.bit(this.d & BIT_2);
+        break; // BIT 2,D
+      case 0x53:
+        this.bit(this.e & BIT_2);
+        break; // BIT 2,E
+      case 0x54:
+        this.bit(this.h & BIT_2);
+        break; // BIT 2,H
+      case 0x55:
+        this.bit(this.l & BIT_2);
+        break; // BIT 2,L
+      case 0x56:
+        this.bit(this.getUint8(this.getHL()) & BIT_2);
+        break; // BIT 2,(HL)
+      case 0x57:
+        this.bit(this.a & BIT_2);
+        break; // BIT 2,A
+      case 0x58:
+        this.bit(this.b & BIT_3);
+        break; // BIT 3,B
+      case 0x59:
+        this.bit(this.c & BIT_3);
+        break; // BIT 3,C
+      case 0x5a:
+        this.bit(this.d & BIT_3);
+        break; // BIT 3,D
+      case 0x5b:
+        this.bit(this.e & BIT_3);
+        break; // BIT 3,E
+      case 0x5c:
+        this.bit(this.h & BIT_3);
+        break; // BIT 3,H
+      case 0x5d:
+        this.bit(this.l & BIT_3);
+        break; // BIT 3,L
+      case 0x5e:
+        this.bit(this.getUint8(this.getHL()) & BIT_3);
+        break; // BIT 3,(HL)
+      case 0x5f:
+        this.bit(this.a & BIT_3);
+        break; // BIT 3,A
+      case 0x60:
+        this.bit(this.b & BIT_4);
+        break; // BIT 4,B
+      case 0x61:
+        this.bit(this.c & BIT_4);
+        break; // BIT 4,C
+      case 0x62:
+        this.bit(this.d & BIT_4);
+        break; // BIT 4,D
+      case 0x63:
+        this.bit(this.e & BIT_4);
+        break; // BIT 4,E
+      case 0x64:
+        this.bit(this.h & BIT_4);
+        break; // BIT 4,H
+      case 0x65:
+        this.bit(this.l & BIT_4);
+        break; // BIT 4,L
+      case 0x66:
+        this.bit(this.getUint8(this.getHL()) & BIT_4);
+        break; // BIT 4,(HL)
+      case 0x67:
+        this.bit(this.a & BIT_4);
+        break; // BIT 4,A
+      case 0x68:
+        this.bit(this.b & BIT_5);
+        break; // BIT 5,B
+      case 0x69:
+        this.bit(this.c & BIT_5);
+        break; // BIT 5,C
+      case 0x6a:
+        this.bit(this.d & BIT_5);
+        break; // BIT 5,D
+      case 0x6b:
+        this.bit(this.e & BIT_5);
+        break; // BIT 5,E
+      case 0x6c:
+        this.bit(this.h & BIT_5);
+        break; // BIT 5,H
+      case 0x6d:
+        this.bit(this.l & BIT_5);
+        break; // BIT 5,L
+      case 0x6e:
+        this.bit(this.getUint8(this.getHL()) & BIT_5);
+        break; // BIT 5,(HL)
+      case 0x6f:
+        this.bit(this.a & BIT_5);
+        break; // BIT 5,A
+      case 0x70:
+        this.bit(this.b & BIT_6);
+        break; // BIT 6,B
+      case 0x71:
+        this.bit(this.c & BIT_6);
+        break; // BIT 6,C
+      case 0x72:
+        this.bit(this.d & BIT_6);
+        break; // BIT 6,D
+      case 0x73:
+        this.bit(this.e & BIT_6);
+        break; // BIT 6,E
+      case 0x74:
+        this.bit(this.h & BIT_6);
+        break; // BIT 6,H
+      case 0x75:
+        this.bit(this.l & BIT_6);
+        break; // BIT 6,L
+      case 0x76:
+        this.bit(this.getUint8(this.getHL()) & BIT_6);
+        break; // BIT 6,(HL)
+      case 0x77:
+        this.bit(this.a & BIT_6);
+        break; // BIT 6,A
+      case 0x78:
+        this.bit(this.b & BIT_7);
+        break; // BIT 7,B
+      case 0x79:
+        this.bit(this.c & BIT_7);
+        break; // BIT 7,C
+      case 0x7a:
+        this.bit(this.d & BIT_7);
+        break; // BIT 7,D
+      case 0x7b:
+        this.bit(this.e & BIT_7);
+        break; // BIT 7,E
+      case 0x7c:
+        this.bit(this.h & BIT_7);
+        break; // BIT 7,H
+      case 0x7d:
+        this.bit(this.l & BIT_7);
+        break; // BIT 7,L
+      case 0x7e:
+        this.bit(this.getUint8(this.getHL()) & BIT_7);
+        break; // BIT 7,(HL)
+      case 0x7f:
+        this.bit(this.a & BIT_7);
+        break; // BIT 7,A
+      case 0x80:
+        this.b &= ~BIT_0;
+        break; // RES 0,B
+      case 0x81:
+        this.c &= ~BIT_0;
+        break; // RES 0,C
+      case 0x82:
+        this.d &= ~BIT_0;
+        break; // RES 0,D
+      case 0x83:
+        this.e &= ~BIT_0;
+        break; // RES 0,E
+      case 0x84:
+        this.h &= ~BIT_0;
+        break; // RES 0,H
+      case 0x85:
+        this.l &= ~BIT_0;
+        break; // RES 0,L
+      case 0x86:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_0);
+        break; // RES 0,(HL)
+      case 0x87:
+        this.a &= ~BIT_0;
+        break; // RES 0,A
+      case 0x88:
+        this.b &= ~BIT_1;
+        break; // RES 1,B
+      case 0x89:
+        this.c &= ~BIT_1;
+        break; // RES 1,C
+      case 0x8a:
+        this.d &= ~BIT_1;
+        break; // RES 1,D
+      case 0x8b:
+        this.e &= ~BIT_1;
+        break; // RES 1,E
+      case 0x8c:
+        this.h &= ~BIT_1;
+        break; // RES 1,H
+      case 0x8d:
+        this.l &= ~BIT_1;
+        break; // RES 1,L
+      case 0x8e:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_1);
+        break; // RES 1,(HL)
+      case 0x8f:
+        this.a &= ~BIT_1;
+        break; // RES 1,A
+      case 0x90:
+        this.b &= ~BIT_2;
+        break; // RES 2,B
+      case 0x91:
+        this.c &= ~BIT_2;
+        break; // RES 2,C
+      case 0x92:
+        this.d &= ~BIT_2;
+        break; // RES 2,D
+      case 0x93:
+        this.e &= ~BIT_2;
+        break; // RES 2,E
+      case 0x94:
+        this.h &= ~BIT_2;
+        break; // RES 2,H
+      case 0x95:
+        this.l &= ~BIT_2;
+        break; // RES 2,L
+      case 0x96:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_2);
+        break; // RES 2,(HL)
+      case 0x97:
+        this.a &= ~BIT_2;
+        break; // RES 2,A
+      case 0x98:
+        this.b &= ~BIT_3;
+        break; // RES 3,B
+      case 0x99:
+        this.c &= ~BIT_3;
+        break; // RES 3,C
+      case 0x9a:
+        this.d &= ~BIT_3;
+        break; // RES 3,D
+      case 0x9b:
+        this.e &= ~BIT_3;
+        break; // RES 3,E
+      case 0x9c:
+        this.h &= ~BIT_3;
+        break; // RES 3,H
+      case 0x9d:
+        this.l &= ~BIT_3;
+        break; // RES 3,L
+      case 0x9e:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_3);
+        break; // RES 3,(HL)
+      case 0x9f:
+        this.a &= ~BIT_3;
+        break; // RES 3,A
+      case 0xa0:
+        this.b &= ~BIT_4;
+        break; // RES 4,B
+      case 0xa1:
+        this.c &= ~BIT_4;
+        break; // RES 4,C
+      case 0xa2:
+        this.d &= ~BIT_4;
+        break; // RES 4,D
+      case 0xa3:
+        this.e &= ~BIT_4;
+        break; // RES 4,E
+      case 0xa4:
+        this.h &= ~BIT_4;
+        break; // RES 4,H
+      case 0xa5:
+        this.l &= ~BIT_4;
+        break; // RES 4,L
+      case 0xa6:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_4);
+        break; // RES 4,(HL)
+      case 0xa7:
+        this.a &= ~BIT_4;
+        break; // RES 4,A
+      case 0xa8:
+        this.b &= ~BIT_5;
+        break; // RES 5,B
+      case 0xa9:
+        this.c &= ~BIT_5;
+        break; // RES 5,C
+      case 0xaa:
+        this.d &= ~BIT_5;
+        break; // RES 5,D
+      case 0xab:
+        this.e &= ~BIT_5;
+        break; // RES 5,E
+      case 0xac:
+        this.h &= ~BIT_5;
+        break; // RES 5,H
+      case 0xad:
+        this.l &= ~BIT_5;
+        break; // RES 5,L
+      case 0xae:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_5);
+        break; // RES 5,(HL)
+      case 0xaf:
+        this.a &= ~BIT_5;
+        break; // RES 5,A
+      case 0xb0:
+        this.b &= ~BIT_6;
+        break; // RES 6,B
+      case 0xb1:
+        this.c &= ~BIT_6;
+        break; // RES 6,C
+      case 0xb2:
+        this.d &= ~BIT_6;
+        break; // RES 6,D
+      case 0xb3:
+        this.e &= ~BIT_6;
+        break; // RES 6,E
+      case 0xb4:
+        this.h &= ~BIT_6;
+        break; // RES 6,H
+      case 0xb5:
+        this.l &= ~BIT_6;
+        break; // RES 6,L
+      case 0xb6:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_6);
+        break; // RES 6,(HL)
+      case 0xb7:
+        this.a &= ~BIT_6;
+        break; // RES 6,A
+      case 0xb8:
+        this.b &= ~BIT_7;
+        break; // RES 7,B
+      case 0xb9:
+        this.c &= ~BIT_7;
+        break; // RES 7,C
+      case 0xba:
+        this.d &= ~BIT_7;
+        break; // RES 7,D
+      case 0xbb:
+        this.e &= ~BIT_7;
+        break; // RES 7,E
+      case 0xbc:
+        this.h &= ~BIT_7;
+        break; // RES 7,H
+      case 0xbd:
+        this.l &= ~BIT_7;
+        break; // RES 7,L
+      case 0xbe:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) & ~BIT_7);
+        break; // RES 7,(HL)
+      case 0xbf:
+        this.a &= ~BIT_7;
+        break; // RES 7,A
+      case 0xc0:
+        this.b |= BIT_0;
+        break; // SET 0,B
+      case 0xc1:
+        this.c |= BIT_0;
+        break; // SET 0,C
+      case 0xc2:
+        this.d |= BIT_0;
+        break; // SET 0,D
+      case 0xc3:
+        this.e |= BIT_0;
+        break; // SET 0,E
+      case 0xc4:
+        this.h |= BIT_0;
+        break; // SET 0,H
+      case 0xc5:
+        this.l |= BIT_0;
+        break; // SET 0,L
+      case 0xc6:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_0);
+        break; // SET 0,(HL)
+      case 0xc7:
+        this.a |= BIT_0;
+        break; // SET 0,A
+      case 0xc8:
+        this.b |= BIT_1;
+        break; // SET 1,B
+      case 0xc9:
+        this.c |= BIT_1;
+        break; // SET 1,C
+      case 0xca:
+        this.d |= BIT_1;
+        break; // SET 1,D
+      case 0xcb:
+        this.e |= BIT_1;
+        break; // SET 1,E
+      case 0xcc:
+        this.h |= BIT_1;
+        break; // SET 1,H
+      case 0xcd:
+        this.l |= BIT_1;
+        break; // SET 1,L
+      case 0xce:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_1);
+        break; // SET 1,(HL)
+      case 0xcf:
+        this.a |= BIT_1;
+        break; // SET 1,A
+      case 0xd0:
+        this.b |= BIT_2;
+        break; // SET 2,B
+      case 0xd1:
+        this.c |= BIT_2;
+        break; // SET 2,C
+      case 0xd2:
+        this.d |= BIT_2;
+        break; // SET 2,D
+      case 0xd3:
+        this.e |= BIT_2;
+        break; // SET 2,E
+      case 0xd4:
+        this.h |= BIT_2;
+        break; // SET 2,H
+      case 0xd5:
+        this.l |= BIT_2;
+        break; // SET 2,L
+      case 0xd6:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_2);
+        break; // SET 2,(HL)
+      case 0xd7:
+        this.a |= BIT_2;
+        break; // SET 2,A
+      case 0xd8:
+        this.b |= BIT_3;
+        break; // SET 3,B
+      case 0xd9:
+        this.c |= BIT_3;
+        break; // SET 3,C
+      case 0xda:
+        this.d |= BIT_3;
+        break; // SET 3,D
+      case 0xdb:
+        this.e |= BIT_3;
+        break; // SET 3,E
+      case 0xdc:
+        this.h |= BIT_3;
+        break; // SET 3,H
+      case 0xdd:
+        this.l |= BIT_3;
+        break; // SET 3,L
+      case 0xde:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_3);
+        break; // SET 3,(HL)
+      case 0xdf:
+        this.a |= BIT_3;
+        break; // SET 3,A
+      case 0xe0:
+        this.b |= BIT_4;
+        break; // SET 4,B
+      case 0xe1:
+        this.c |= BIT_4;
+        break; // SET 4,C
+      case 0xe2:
+        this.d |= BIT_4;
+        break; // SET 4,D
+      case 0xe3:
+        this.e |= BIT_4;
+        break; // SET 4,E
+      case 0xe4:
+        this.h |= BIT_4;
+        break; // SET 4,H
+      case 0xe5:
+        this.l |= BIT_4;
+        break; // SET 4,L
+      case 0xe6:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_4);
+        break; // SET 4,(HL)
+      case 0xe7:
+        this.a |= BIT_4;
+        break; // SET 4,A
+      case 0xe8:
+        this.b |= BIT_5;
+        break; // SET 5,B
+      case 0xe9:
+        this.c |= BIT_5;
+        break; // SET 5,C
+      case 0xea:
+        this.d |= BIT_5;
+        break; // SET 5,D
+      case 0xeb:
+        this.e |= BIT_5;
+        break; // SET 5,E
+      case 0xec:
+        this.h |= BIT_5;
+        break; // SET 5,H
+      case 0xed:
+        this.l |= BIT_5;
+        break; // SET 5,L
+      case 0xee:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_5);
+        break; // SET 5,(HL)
+      case 0xef:
+        this.a |= BIT_5;
+        break; // SET 5,A
+      case 0xf0:
+        this.b |= BIT_6;
+        break; // SET 6,B
+      case 0xf1:
+        this.c |= BIT_6;
+        break; // SET 6,C
+      case 0xf2:
+        this.d |= BIT_6;
+        break; // SET 6,D
+      case 0xf3:
+        this.e |= BIT_6;
+        break; // SET 6,E
+      case 0xf4:
+        this.h |= BIT_6;
+        break; // SET 6,H
+      case 0xf5:
+        this.l |= BIT_6;
+        break; // SET 6,L
+      case 0xf6:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_6);
+        break; // SET 6,(HL)
+      case 0xf7:
+        this.a |= BIT_6;
+        break; // SET 6,A
+      case 0xf8:
+        this.b |= BIT_7;
+        break; // SET 7,B
+      case 0xf9:
+        this.c |= BIT_7;
+        break; // SET 7,C
+      case 0xfa:
+        this.d |= BIT_7;
+        break; // SET 7,D
+      case 0xfb:
+        this.e |= BIT_7;
+        break; // SET 7,E
+      case 0xfc:
+        this.h |= BIT_7;
+        break; // SET 7,H
+      case 0xfd:
+        this.l |= BIT_7;
+        break; // SET 7,L
+      case 0xfe:
+        this.setUint8(this.getHL(), this.getUint8(this.getHL()) | BIT_7);
+        break; // SET 7,(HL)
+      case 0xff:
+        this.a |= BIT_7;
+        break; // SET 7,A
 
       // Unimplemented CB Opcode
       default:
-        JSSMS.Utils.console.log('Unimplemented CB Opcode: ' + JSSMS.Utils.toHex(opcode));
+        JSSMS.Utils.console.log(
+          'Unimplemented CB Opcode: ' + JSSMS.Utils.toHex(opcode)
+        );
         break;
     }
   },
-
 
   /**
    * CB RLC - Rotate left carry.
@@ -1376,11 +3607,10 @@ JSSMS.Z80.prototype = {
    */
   rlc: function(value) {
     var carry = (value & 0x80) >> 7;
-    value = ((value << 1) | (value >> 7)) & 0xFF;
+    value = ((value << 1) | (value >> 7)) & 0xff;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
-
 
   /**
    * CB RRC - Rotate right carry.
@@ -1389,12 +3619,11 @@ JSSMS.Z80.prototype = {
    * @return {number} Adjusted value.
    */
   rrc: function(value) {
-    var carry = (value & 0x01);
-    value = ((value >> 1) | (value << 7)) & 0xFF;
+    var carry = value & 0x01;
+    value = ((value >> 1) | (value << 7)) & 0xff;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
-
 
   /**
    * CB RL - Rotate left.
@@ -1404,11 +3633,10 @@ JSSMS.Z80.prototype = {
    */
   rl: function(value) {
     var carry = (value & 0x80) >> 7;
-    value = ((value << 1) | (this.f & F_CARRY)) & 0xFF;
+    value = ((value << 1) | (this.f & F_CARRY)) & 0xff;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
-
 
   /**
    * CB RR - Rotate right.
@@ -1417,12 +3645,11 @@ JSSMS.Z80.prototype = {
    * @return {number} Adjusted value.
    */
   rr: function(value) {
-    var carry = (value & 0x01);
-    value = ((value >> 1) | (this.f << 7)) & 0xFF;
+    var carry = value & 0x01;
+    value = ((value >> 1) | (this.f << 7)) & 0xff;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
-
 
   /**
    * CB SLA - Shift left arithmetic.
@@ -1432,11 +3659,10 @@ JSSMS.Z80.prototype = {
    */
   sla: function(value) {
     var carry = (value & 0x80) >> 7;
-    value = (value << 1) & 0xFF;
+    value = (value << 1) & 0xff;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
-
 
   /**
    * CB SLL - Logical left shift.
@@ -1446,11 +3672,10 @@ JSSMS.Z80.prototype = {
    */
   sll: function(value) {
     var carry = (value & 0x80) >> 7;
-    value = ((value << 1) | 1) & 0xFF;
+    value = ((value << 1) | 1) & 0xff;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
-
 
   /**
    * CB SRA - Shift right arithmetic.
@@ -1465,7 +3690,6 @@ JSSMS.Z80.prototype = {
     return value;
   },
 
-
   /**
    * CB SRL - Logical shift right.
    *
@@ -1474,11 +3698,10 @@ JSSMS.Z80.prototype = {
    */
   srl: function(value) {
     var carry = value & 0x01;
-    value = (value >> 1) & 0xFF;
+    value = (value >> 1) & 0xff;
     this.f = carry | this.SZP_TABLE[value];
     return value;
   },
-
 
   /**
    * CB BIT - Test bit.
@@ -1488,7 +3711,6 @@ JSSMS.Z80.prototype = {
   bit: function(mask) {
     this.f = (this.f & F_CARRY) | this.SZ_BIT_TABLE[mask];
   },
-
 
   /**
    * Execute DD/FD prefixed index opcode.
@@ -1505,105 +3727,310 @@ JSSMS.Z80.prototype = {
     }
 
     switch (opcode) {
-      case 0x09: this.setIXHIXL(this.add16(this.getIXHIXL(), this.getBC())); break;             // ADD IX,BC
-      case 0x19: this.setIXHIXL(this.add16(this.getIXHIXL(), this.getDE())); break;             // ADD IX,DE
-      case 0x21: this.setIXHIXL(this.getUint16(this.pc++)); this.pc++; break;              // LD IX,nn
-      case 0x22: this.setUint16(this.getUint16(this.pc++), this.getIXHIXL()); this.pc++; break; // LD (nn),IX
-      case 0x23: this.incIXHIXL(); break;                                    // INC IX
-      case 0x24: this.ixH = this.inc8(this.ixH); break;                            // INC IXH *
-      case 0x25: this.ixH = this.dec8(this.ixH); break;                            // DEC IXH *
-      case 0x26: this.ixH = this.getUint8(this.pc++); break;                        // LD IXH,n *
-      case 0x29: this.setIXHIXL(this.add16(this.getIXHIXL(), this.getIXHIXL())); break;             // ADD IX,IX
-      case 0x2A: this.setIXHIXL(this.getUint16(this.getUint16(this.pc++))); this.pc++; break; // LD IX,(nn)
-      case 0x2B: this.decIXHIXL(); break;                                    // DEC IX
-      case 0x2C: this.ixL = this.inc8(this.ixL); break;                            // INC IXL *
-      case 0x2D: this.ixL = this.dec8(this.ixL); break;                            // DEC IXL *
-      case 0x2E: this.ixL = this.getUint8(this.pc++); break;                        // LD IXL,n
-      case 0x34: this.incMem(this.getIXHIXL() + this.d_()); this.pc++; break;                  // INC (IX+d)
-      case 0x35: this.decMem(this.getIXHIXL() + this.d_()); this.pc++; break;                  // DEC (IX+d)
-      case 0x36: this.setUint8(this.getIXHIXL() + this.d_(), this.getUint8(++this.pc)); this.pc++; break; // LD (IX+d),n
-      case 0x39: this.setIXHIXL(this.add16(this.getIXHIXL(), this.sp)); break;                  // ADD IX,SP
-      case 0x44: this.b = this.ixH; break;                                    // LD B,IXH *
-      case 0x45: this.b = this.ixL; break;                                    // LD B,IXL *
-      case 0x46: this.b = this.getUint8(this.getIXHIXL() + this.d_()); this.pc++; break;             // LD B,(IX+d)
-      case 0x4C: this.c = this.ixH; break;                                    // LD C,IXH *
-      case 0x4D: this.c = this.ixL; break;                                    // LD C,IXL *
-      case 0x4E: this.c = this.getUint8(this.getIXHIXL() + this.d_()); this.pc++; break;             // LD C,(IX+d)
-      case 0x54: this.d = this.ixH; break;                                    // LD D,IXH *
-      case 0x55: this.d = this.ixL; break;                                    // LD D,IXL *
-      case 0x56: this.d = this.getUint8(this.getIXHIXL() + this.d_()); this.pc++; break;             // LD D,(IX+d)
-      case 0x5C: this.e = this.ixH; break;                                    // LD E,IXH *
-      case 0x5D: this.e = this.ixL; break;                                    // LD E,IXL *
-      case 0x5E: this.e = this.getUint8(this.getIXHIXL() + this.d_()); this.pc++; break;             // LD E,(IX+d)
-      case 0x60: this.ixH = this.b; break;                                    // LD IXH,B *
-      case 0x61: this.ixH = this.c; break;                                    // LD IXH,C *
-      case 0x62: this.ixH = this.d; break;                                    // LD IXH,D *
-      case 0x63: this.ixH = this.e; break;                                    // LD IXH,E *
-      case 0x64: break;                                             // LD IXH,IXH*
-      case 0x65: this.ixH = this.ixL; break;                                  // LD IXH,IXL *
-      case 0x66: this.h = this.getUint8(this.getIXHIXL() + this.d_()); this.pc++; break;             // LD H,(IX+d)
-      case 0x67: this.ixH = this.a; break;                                    // LD IXH,A *
-      case 0x68: this.ixL = this.b; break;                                    // LD IXL,B *
-      case 0x69: this.ixL = this.c; break;                                    // LD IXL,C *
-      case 0x6A: this.ixL = this.d; break;                                    // LD IXL,D *
-      case 0x6B: this.ixL = this.e; break;                                    // LD IXL,E *
-      case 0x6C: this.ixL = this.ixH; break;                                  // LD IXL,IXH *
-      case 0x6D: break;                                             // LD IXL,IXL *
-      case 0x6E: this.l = this.getUint8(this.getIXHIXL() + this.d_()); this.pc++; break;            // LD L,(IX+d)
-      case 0x6F: this.ixL = this.a; break;                                    // LD IXL,A *
-      case 0x70: this.setUint8(this.getIXHIXL() + this.d_(), this.b); this.pc++; break;             // LD (IX+d),B
-      case 0x71: this.setUint8(this.getIXHIXL() + this.d_(), this.c); this.pc++; break;             // LD (IX+d),C
-      case 0x72: this.setUint8(this.getIXHIXL() + this.d_(), this.d); this.pc++; break;             // LD (IX+d),D
-      case 0x73: this.setUint8(this.getIXHIXL() + this.d_(), this.e); this.pc++; break;             // LD (IX+d),E
-      case 0x74: this.setUint8(this.getIXHIXL() + this.d_(), this.h); this.pc++; break;             // LD (IX+d),H
-      case 0x75: this.setUint8(this.getIXHIXL() + this.d_(), this.l); this.pc++; break;             // LD (IX+d),L
-      case 0x77: this.setUint8(this.getIXHIXL() + this.d_(), this.a); this.pc++; break;             // LD (IX+d),A
-      case 0x7C: this.a = this.ixH; break;                                    // LD A,IXH *
-      case 0x7D: this.a = this.ixL; break;                                    // LD A,IXL *
-      case 0x7E: this.a = this.getUint8(this.getIXHIXL() + this.d_()); this.pc++; break;             // LD A,(IX+d)
-      case 0x84: this.add_a(this.ixH); break;                                 // ADD A,IXH *
-      case 0x85: this.add_a(this.ixL); break;                                 // ADD A,IXL *
-      case 0x86: this.add_a(this.getUint8(this.getIXHIXL() + this.d_())); this.pc++; break;          // ADD A,(IX+d)
-      case 0x8C: this.adc_a(this.ixH); break;                                 // ADC A,IXH *
-      case 0x8D: this.adc_a(this.ixL); break;                                 // ADC A,IXL *
-      case 0x8E: this.adc_a(this.getUint8(this.getIXHIXL() + this.d_())); this.pc++; break;          // ADC A,(IX+d)
-      case 0x94: this.sub_a(this.ixH); break;                                 // SUB IXH *
-      case 0x95: this.sub_a(this.ixL); break;                                 // SUB IXL *
-      case 0x96: this.sub_a(this.getUint8(this.getIXHIXL() + this.d_())); this.pc++; break;          // SUB A,(IX+d)
-      case 0x9C: this.sbc_a(this.ixH); break;                                 // SBC A,IXH *
-      case 0x9D: this.sbc_a(this.ixL); break;                                 // SBC A,IXL *
-      case 0x9E: this.sbc_a(this.getUint8(this.getIXHIXL() + this.d_())); this.pc++; break;          // SBC A,(IX+d)
-      case 0xA4: this.f = this.SZP_TABLE[this.a &= this.ixH] | F_HALFCARRY; break;      // AND IXH *
-      case 0xA5: this.f = this.SZP_TABLE[this.a &= this.ixL] | F_HALFCARRY; break;      // AND IXL *
-      case 0xA6: this.f = this.SZP_TABLE[this.a &= this.getUint8(this.getIXHIXL() + this.d_())] | F_HALFCARRY; this.pc++; break; // AND A,(IX+d)
-      case 0xAC: this.f = this.SZP_TABLE[this.a ^= this.ixH]; break;                    // XOR A IXH*
-      case 0xAD: this.f = this.SZP_TABLE[this.a ^= this.ixL]; break;                    // XOR A IXL*
-      case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.getIXHIXL() + this.d_())]; this.pc++; break; // XOR A,(IX+d)
-      case 0xB4: this.f = this.SZP_TABLE[this.a |= this.ixH]; break;                    // OR A IXH*
-      case 0xB5: this.f = this.SZP_TABLE[this.a |= this.ixL]; break;                    // OR A IXL*
-      case 0xB6: this.f = this.SZP_TABLE[this.a |= this.getUint8(this.getIXHIXL() + this.d_())]; this.pc++; break; // OR A,(IX+d)
-      case 0xBC: this.cp_a(this.ixH); break;                                    // CP IXH *
-      case 0xBD: this.cp_a(this.ixL); break;                                    // CP IXL *
-      case 0xBE: this.cp_a(this.getUint8(this.getIXHIXL() + this.d_())); this.pc++; break; // CP (IX+d)
-      case 0xCB: this.doIndexCB(this.getIXHIXL()); break;                           // CB Opcode
-      case 0xE1: this.setIXHIXL(this.getUint16(this.sp)); this.sp += 2; break;    // POP IX
-      case 0xE3:                                                                // EX SP,(IX)
+      case 0x09:
+        this.setIXHIXL(this.add16(this.getIXHIXL(), this.getBC()));
+        break; // ADD IX,BC
+      case 0x19:
+        this.setIXHIXL(this.add16(this.getIXHIXL(), this.getDE()));
+        break; // ADD IX,DE
+      case 0x21:
+        this.setIXHIXL(this.getUint16(this.pc++));
+        this.pc++;
+        break; // LD IX,nn
+      case 0x22:
+        this.setUint16(this.getUint16(this.pc++), this.getIXHIXL());
+        this.pc++;
+        break; // LD (nn),IX
+      case 0x23:
+        this.incIXHIXL();
+        break; // INC IX
+      case 0x24:
+        this.ixH = this.inc8(this.ixH);
+        break; // INC IXH *
+      case 0x25:
+        this.ixH = this.dec8(this.ixH);
+        break; // DEC IXH *
+      case 0x26:
+        this.ixH = this.getUint8(this.pc++);
+        break; // LD IXH,n *
+      case 0x29:
+        this.setIXHIXL(this.add16(this.getIXHIXL(), this.getIXHIXL()));
+        break; // ADD IX,IX
+      case 0x2a:
+        this.setIXHIXL(this.getUint16(this.getUint16(this.pc++)));
+        this.pc++;
+        break; // LD IX,(nn)
+      case 0x2b:
+        this.decIXHIXL();
+        break; // DEC IX
+      case 0x2c:
+        this.ixL = this.inc8(this.ixL);
+        break; // INC IXL *
+      case 0x2d:
+        this.ixL = this.dec8(this.ixL);
+        break; // DEC IXL *
+      case 0x2e:
+        this.ixL = this.getUint8(this.pc++);
+        break; // LD IXL,n
+      case 0x34:
+        this.incMem(this.getIXHIXL() + this.d_());
+        this.pc++;
+        break; // INC (IX+d)
+      case 0x35:
+        this.decMem(this.getIXHIXL() + this.d_());
+        this.pc++;
+        break; // DEC (IX+d)
+      case 0x36:
+        this.setUint8(this.getIXHIXL() + this.d_(), this.getUint8(++this.pc));
+        this.pc++;
+        break; // LD (IX+d),n
+      case 0x39:
+        this.setIXHIXL(this.add16(this.getIXHIXL(), this.sp));
+        break; // ADD IX,SP
+      case 0x44:
+        this.b = this.ixH;
+        break; // LD B,IXH *
+      case 0x45:
+        this.b = this.ixL;
+        break; // LD B,IXL *
+      case 0x46:
+        this.b = this.getUint8(this.getIXHIXL() + this.d_());
+        this.pc++;
+        break; // LD B,(IX+d)
+      case 0x4c:
+        this.c = this.ixH;
+        break; // LD C,IXH *
+      case 0x4d:
+        this.c = this.ixL;
+        break; // LD C,IXL *
+      case 0x4e:
+        this.c = this.getUint8(this.getIXHIXL() + this.d_());
+        this.pc++;
+        break; // LD C,(IX+d)
+      case 0x54:
+        this.d = this.ixH;
+        break; // LD D,IXH *
+      case 0x55:
+        this.d = this.ixL;
+        break; // LD D,IXL *
+      case 0x56:
+        this.d = this.getUint8(this.getIXHIXL() + this.d_());
+        this.pc++;
+        break; // LD D,(IX+d)
+      case 0x5c:
+        this.e = this.ixH;
+        break; // LD E,IXH *
+      case 0x5d:
+        this.e = this.ixL;
+        break; // LD E,IXL *
+      case 0x5e:
+        this.e = this.getUint8(this.getIXHIXL() + this.d_());
+        this.pc++;
+        break; // LD E,(IX+d)
+      case 0x60:
+        this.ixH = this.b;
+        break; // LD IXH,B *
+      case 0x61:
+        this.ixH = this.c;
+        break; // LD IXH,C *
+      case 0x62:
+        this.ixH = this.d;
+        break; // LD IXH,D *
+      case 0x63:
+        this.ixH = this.e;
+        break; // LD IXH,E *
+      case 0x64:
+        break; // LD IXH,IXH*
+      case 0x65:
+        this.ixH = this.ixL;
+        break; // LD IXH,IXL *
+      case 0x66:
+        this.h = this.getUint8(this.getIXHIXL() + this.d_());
+        this.pc++;
+        break; // LD H,(IX+d)
+      case 0x67:
+        this.ixH = this.a;
+        break; // LD IXH,A *
+      case 0x68:
+        this.ixL = this.b;
+        break; // LD IXL,B *
+      case 0x69:
+        this.ixL = this.c;
+        break; // LD IXL,C *
+      case 0x6a:
+        this.ixL = this.d;
+        break; // LD IXL,D *
+      case 0x6b:
+        this.ixL = this.e;
+        break; // LD IXL,E *
+      case 0x6c:
+        this.ixL = this.ixH;
+        break; // LD IXL,IXH *
+      case 0x6d:
+        break; // LD IXL,IXL *
+      case 0x6e:
+        this.l = this.getUint8(this.getIXHIXL() + this.d_());
+        this.pc++;
+        break; // LD L,(IX+d)
+      case 0x6f:
+        this.ixL = this.a;
+        break; // LD IXL,A *
+      case 0x70:
+        this.setUint8(this.getIXHIXL() + this.d_(), this.b);
+        this.pc++;
+        break; // LD (IX+d),B
+      case 0x71:
+        this.setUint8(this.getIXHIXL() + this.d_(), this.c);
+        this.pc++;
+        break; // LD (IX+d),C
+      case 0x72:
+        this.setUint8(this.getIXHIXL() + this.d_(), this.d);
+        this.pc++;
+        break; // LD (IX+d),D
+      case 0x73:
+        this.setUint8(this.getIXHIXL() + this.d_(), this.e);
+        this.pc++;
+        break; // LD (IX+d),E
+      case 0x74:
+        this.setUint8(this.getIXHIXL() + this.d_(), this.h);
+        this.pc++;
+        break; // LD (IX+d),H
+      case 0x75:
+        this.setUint8(this.getIXHIXL() + this.d_(), this.l);
+        this.pc++;
+        break; // LD (IX+d),L
+      case 0x77:
+        this.setUint8(this.getIXHIXL() + this.d_(), this.a);
+        this.pc++;
+        break; // LD (IX+d),A
+      case 0x7c:
+        this.a = this.ixH;
+        break; // LD A,IXH *
+      case 0x7d:
+        this.a = this.ixL;
+        break; // LD A,IXL *
+      case 0x7e:
+        this.a = this.getUint8(this.getIXHIXL() + this.d_());
+        this.pc++;
+        break; // LD A,(IX+d)
+      case 0x84:
+        this.add_a(this.ixH);
+        break; // ADD A,IXH *
+      case 0x85:
+        this.add_a(this.ixL);
+        break; // ADD A,IXL *
+      case 0x86:
+        this.add_a(this.getUint8(this.getIXHIXL() + this.d_()));
+        this.pc++;
+        break; // ADD A,(IX+d)
+      case 0x8c:
+        this.adc_a(this.ixH);
+        break; // ADC A,IXH *
+      case 0x8d:
+        this.adc_a(this.ixL);
+        break; // ADC A,IXL *
+      case 0x8e:
+        this.adc_a(this.getUint8(this.getIXHIXL() + this.d_()));
+        this.pc++;
+        break; // ADC A,(IX+d)
+      case 0x94:
+        this.sub_a(this.ixH);
+        break; // SUB IXH *
+      case 0x95:
+        this.sub_a(this.ixL);
+        break; // SUB IXL *
+      case 0x96:
+        this.sub_a(this.getUint8(this.getIXHIXL() + this.d_()));
+        this.pc++;
+        break; // SUB A,(IX+d)
+      case 0x9c:
+        this.sbc_a(this.ixH);
+        break; // SBC A,IXH *
+      case 0x9d:
+        this.sbc_a(this.ixL);
+        break; // SBC A,IXL *
+      case 0x9e:
+        this.sbc_a(this.getUint8(this.getIXHIXL() + this.d_()));
+        this.pc++;
+        break; // SBC A,(IX+d)
+      case 0xa4:
+        this.f = this.SZP_TABLE[(this.a &= this.ixH)] | F_HALFCARRY;
+        break; // AND IXH *
+      case 0xa5:
+        this.f = this.SZP_TABLE[(this.a &= this.ixL)] | F_HALFCARRY;
+        break; // AND IXL *
+      case 0xa6:
+        this.f =
+          this.SZP_TABLE[
+            (this.a &= this.getUint8(this.getIXHIXL() + this.d_()))
+          ] | F_HALFCARRY;
+        this.pc++;
+        break; // AND A,(IX+d)
+      case 0xac:
+        this.f = this.SZP_TABLE[(this.a ^= this.ixH)];
+        break; // XOR A IXH*
+      case 0xad:
+        this.f = this.SZP_TABLE[(this.a ^= this.ixL)];
+        break; // XOR A IXL*
+      case 0xae:
+        this.f = this.SZP_TABLE[
+          (this.a ^= this.getUint8(this.getIXHIXL() + this.d_()))
+        ];
+        this.pc++;
+        break; // XOR A,(IX+d)
+      case 0xb4:
+        this.f = this.SZP_TABLE[(this.a |= this.ixH)];
+        break; // OR A IXH*
+      case 0xb5:
+        this.f = this.SZP_TABLE[(this.a |= this.ixL)];
+        break; // OR A IXL*
+      case 0xb6:
+        this.f = this.SZP_TABLE[
+          (this.a |= this.getUint8(this.getIXHIXL() + this.d_()))
+        ];
+        this.pc++;
+        break; // OR A,(IX+d)
+      case 0xbc:
+        this.cp_a(this.ixH);
+        break; // CP IXH *
+      case 0xbd:
+        this.cp_a(this.ixL);
+        break; // CP IXL *
+      case 0xbe:
+        this.cp_a(this.getUint8(this.getIXHIXL() + this.d_()));
+        this.pc++;
+        break; // CP (IX+d)
+      case 0xcb:
+        this.doIndexCB(this.getIXHIXL());
+        break; // CB Opcode
+      case 0xe1:
+        this.setIXHIXL(this.getUint16(this.sp));
+        this.sp += 2;
+        break; // POP IX
+      case 0xe3: // EX SP,(IX)
         temp = this.getIXHIXL();
         this.setIXHIXL(this.getUint16(this.sp));
         this.setUint16(this.sp, temp);
         break;
-      case 0xE5: this.push(this.getIXHIXL()); break;                          // PUSH IX
-      case 0xE9: this.pc = this.getIXHIXL(); break;                                 // JP (IX)
-      case 0xF9: this.sp = this.getIXHIXL(); break;                                 // LD SP,IX
+      case 0xe5:
+        this.push(this.getIXHIXL());
+        break; // PUSH IX
+      case 0xe9:
+        this.pc = this.getIXHIXL();
+        break; // JP (IX)
+      case 0xf9:
+        this.sp = this.getIXHIXL();
+        break; // LD SP,IX
 
       // Unimplemented DD/FD Opcode
       default:
-        JSSMS.Utils.console.log('Unimplemented DD/FD Opcode: ' + JSSMS.Utils.toHex(opcode));
+        JSSMS.Utils.console.log(
+          'Unimplemented DD/FD Opcode: ' + JSSMS.Utils.toHex(opcode)
+        );
         this.pc--;
         break;
     } // end of switch
   },
-
 
   /**
    * @param {number} opcode Opcode hex value.
@@ -1618,105 +4045,310 @@ JSSMS.Z80.prototype = {
     }
 
     switch (opcode) {
-      case 0x09: this.setIYHIYL(this.add16(this.getIYHIYL(), this.getBC())); break;             // ADD IY,BC
-      case 0x19: this.setIYHIYL(this.add16(this.getIYHIYL(), this.getDE())); break;             // ADD IY,DE
-      case 0x21: this.setIYHIYL(this.getUint16(this.pc++)); this.pc++; break;              // LD IY,nn
-      case 0x22: this.setUint16(this.getUint16(this.pc++), this.getIYHIYL()); this.pc++; break; // LD (nn),IY
-      case 0x23: this.incIYHIYL(); break;                                    // INC IY
-      case 0x24: this.iyH = this.inc8(this.iyH); break;                            // INC IYH *
-      case 0x25: this.iyH = this.dec8(this.iyH); break;                            // DEC IYH *
-      case 0x26: this.iyH = this.getUint8(this.pc++); break;                        // LD IYH,n *
-      case 0x29: this.setIYHIYL(this.add16(this.getIYHIYL(), this.getIYHIYL())); break;             // ADD IY,IY
-      case 0x2A: this.setIYHIYL(this.getUint16(this.getUint16(this.pc++))); this.pc++; break; // LD IY,(nn)
-      case 0x2B: this.decIYHIYL(); break;                                    // DEC IY
-      case 0x2C: this.iyL = this.inc8(this.iyL); break;                            // INC IYL *
-      case 0x2D: this.iyL = this.dec8(this.iyL); break;                            // DEC IYL *
-      case 0x2E: this.iyL = this.getUint8(this.pc++); break;                        // LD IYL,n
-      case 0x34: this.incMem(this.getIYHIYL() + this.d_()); this.pc++; break;                  // INC (IY+d)
-      case 0x35: this.decMem(this.getIYHIYL() + this.d_()); this.pc++; break;                  // DEC (IY+d)
-      case 0x36: this.setUint8(this.getIYHIYL() + this.d_(), this.getUint8(++this.pc)); this.pc++; break; // LD (IY+d),n
-      case 0x39: this.setIYHIYL(this.add16(this.getIYHIYL(), this.sp)); break;                  // ADD IY,SP
-      case 0x44: this.b = this.iyH; break;                                    // LD B,IYH *
-      case 0x45: this.b = this.iyL; break;                                    // LD B,IYL *
-      case 0x46: this.b = this.getUint8(this.getIYHIYL() + this.d_()); this.pc++; break;             // LD B,(IY+d)
-      case 0x4C: this.c = this.iyH; break;                                    // LD C,IYH *
-      case 0x4D: this.c = this.iyL; break;                                    // LD C,IYL *
-      case 0x4E: this.c = this.getUint8(this.getIYHIYL() + this.d_()); this.pc++; break;             // LD C,(IY+d)
-      case 0x54: this.d = this.iyH; break;                                    // LD D,IYH *
-      case 0x55: this.d = this.iyL; break;                                    // LD D,IYL *
-      case 0x56: this.d = this.getUint8(this.getIYHIYL() + this.d_()); this.pc++; break;             // LD D,(IY+d)
-      case 0x5C: this.e = this.iyH; break;                                    // LD E,IYH *
-      case 0x5D: this.e = this.iyL; break;                                    // LD E,IYL *
-      case 0x5E: this.e = this.getUint8(this.getIYHIYL() + this.d_()); this.pc++; break;             // LD E,(IY+d)
-      case 0x60: this.iyH = this.b; break;                                    // LD IYH,B *
-      case 0x61: this.iyH = this.c; break;                                    // LD IYH,C *
-      case 0x62: this.iyH = this.d; break;                                    // LD IYH,D *
-      case 0x63: this.iyH = this.e; break;                                    // LD IYH,E *
-      case 0x64: break;                                             // LD IYH,IYH*
-      case 0x65: this.iyH = this.iyL; break;                                  // LD IYH,IYL *
-      case 0x66: this.h = this.getUint8(this.getIYHIYL() + this.d_()); this.pc++; break;             // LD H,(IY+d)
-      case 0x67: this.iyH = this.a; break;                                    // LD IYH,A *
-      case 0x68: this.iyL = this.b; break;                                    // LD IYL,B *
-      case 0x69: this.iyL = this.c; break;                                    // LD IYL,C *
-      case 0x6A: this.iyL = this.d; break;                                    // LD IYL,D *
-      case 0x6B: this.iyL = this.e; break;                                    // LD IYL,E *
-      case 0x6C: this.iyL = this.iyH; break;                                  // LD IYL,IYH *
-      case 0x6D: break;                                             // LD IYL,IYL *
-      case 0x6E: this.l = this.getUint8(this.getIYHIYL() + this.d_()); this.pc++; break;            // LD L,(IY+d)
-      case 0x6F: this.iyL = this.a; break;                                    // LD IYL,A *
-      case 0x70: this.setUint8(this.getIYHIYL() + this.d_(), this.b); this.pc++; break;             // LD (IY+d),B
-      case 0x71: this.setUint8(this.getIYHIYL() + this.d_(), this.c); this.pc++; break;             // LD (IY+d),C
-      case 0x72: this.setUint8(this.getIYHIYL() + this.d_(), this.d); this.pc++; break;             // LD (IY+d),D
-      case 0x73: this.setUint8(this.getIYHIYL() + this.d_(), this.e); this.pc++; break;             // LD (IY+d),E
-      case 0x74: this.setUint8(this.getIYHIYL() + this.d_(), this.h); this.pc++; break;             // LD (IY+d),H
-      case 0x75: this.setUint8(this.getIYHIYL() + this.d_(), this.l); this.pc++; break;             // LD (IY+d),L
-      case 0x77: this.setUint8(this.getIYHIYL() + this.d_(), this.a); this.pc++; break;             // LD (IY+d),A
-      case 0x7C: this.a = this.iyH; break;                                    // LD A,IYH *
-      case 0x7D: this.a = this.iyL; break;                                    // LD A,IYL *
-      case 0x7E: this.a = this.getUint8(this.getIYHIYL() + this.d_()); this.pc++; break;             // LD A,(IY+d)
-      case 0x84: this.add_a(this.iyH); break;                                 // ADD A,IYH *
-      case 0x85: this.add_a(this.iyL); break;                                 // ADD A,IYL *
-      case 0x86: this.add_a(this.getUint8(this.getIYHIYL() + this.d_())); this.pc++; break;          // ADD A,(IY+d)
-      case 0x8C: this.adc_a(this.iyH); break;                                 // ADC A,IYH *
-      case 0x8D: this.adc_a(this.iyL); break;                                 // ADC A,IYL *
-      case 0x8E: this.adc_a(this.getUint8(this.getIYHIYL() + this.d_())); this.pc++; break;          // ADC A,(IY+d)
-      case 0x94: this.sub_a(this.iyH); break;                                 // SUB IYH *
-      case 0x95: this.sub_a(this.iyL); break;                                 // SUB IYL *
-      case 0x96: this.sub_a(this.getUint8(this.getIYHIYL() + this.d_())); this.pc++; break;          // SUB A,(IY+d)
-      case 0x9C: this.sbc_a(this.iyH); break;                                 // SBC A,IYH *
-      case 0x9D: this.sbc_a(this.iyL); break;                                 // SBC A,IYL *
-      case 0x9E: this.sbc_a(this.getUint8(this.getIYHIYL() + this.d_())); this.pc++; break;          // SBC A,(IY+d)
-      case 0xA4: this.f = this.SZP_TABLE[this.a &= this.iyH] | F_HALFCARRY; break;      // AND IYH *
-      case 0xA5: this.f = this.SZP_TABLE[this.a &= this.iyL] | F_HALFCARRY; break;      // AND IYL *
-      case 0xA6: this.f = this.SZP_TABLE[this.a &= this.getUint8(this.getIYHIYL() + this.d_())] | F_HALFCARRY; this.pc++; break; // AND A,(IY+d)
-      case 0xAC: this.f = this.SZP_TABLE[this.a ^= this.iyH]; break;                    // XOR A IYH*
-      case 0xAD: this.f = this.SZP_TABLE[this.a ^= this.iyL]; break;                    // XOR A IYL*
-      case 0xAE: this.f = this.SZP_TABLE[this.a ^= this.getUint8(this.getIYHIYL() + this.d_())]; this.pc++; break; // XOR A,(IY+d)
-      case 0xB4: this.f = this.SZP_TABLE[this.a |= this.iyH]; break;                    // OR A IYH*
-      case 0xB5: this.f = this.SZP_TABLE[this.a |= this.iyL]; break;                    // OR A IYL*
-      case 0xB6: this.f = this.SZP_TABLE[this.a |= this.getUint8(this.getIYHIYL() + this.d_())]; this.pc++; break; // OR A,(IY+d)
-      case 0xBC: this.cp_a(this.iyH); break;                                    // CP IYH *
-      case 0xBD: this.cp_a(this.iyL); break;                                    // CP IYL *
-      case 0xBE: this.cp_a(this.getUint8(this.getIYHIYL() + this.d_())); this.pc++; break; // CP (IY+d)
-      case 0xCB: this.doIndexCB(this.getIYHIYL()); break;                           // CB Opcode
-      case 0xE1: this.setIYHIYL(this.getUint16(this.sp)); this.sp += 2; break;    // POP IY
-      case 0xE3:                                                                // EX SP,(IY)
+      case 0x09:
+        this.setIYHIYL(this.add16(this.getIYHIYL(), this.getBC()));
+        break; // ADD IY,BC
+      case 0x19:
+        this.setIYHIYL(this.add16(this.getIYHIYL(), this.getDE()));
+        break; // ADD IY,DE
+      case 0x21:
+        this.setIYHIYL(this.getUint16(this.pc++));
+        this.pc++;
+        break; // LD IY,nn
+      case 0x22:
+        this.setUint16(this.getUint16(this.pc++), this.getIYHIYL());
+        this.pc++;
+        break; // LD (nn),IY
+      case 0x23:
+        this.incIYHIYL();
+        break; // INC IY
+      case 0x24:
+        this.iyH = this.inc8(this.iyH);
+        break; // INC IYH *
+      case 0x25:
+        this.iyH = this.dec8(this.iyH);
+        break; // DEC IYH *
+      case 0x26:
+        this.iyH = this.getUint8(this.pc++);
+        break; // LD IYH,n *
+      case 0x29:
+        this.setIYHIYL(this.add16(this.getIYHIYL(), this.getIYHIYL()));
+        break; // ADD IY,IY
+      case 0x2a:
+        this.setIYHIYL(this.getUint16(this.getUint16(this.pc++)));
+        this.pc++;
+        break; // LD IY,(nn)
+      case 0x2b:
+        this.decIYHIYL();
+        break; // DEC IY
+      case 0x2c:
+        this.iyL = this.inc8(this.iyL);
+        break; // INC IYL *
+      case 0x2d:
+        this.iyL = this.dec8(this.iyL);
+        break; // DEC IYL *
+      case 0x2e:
+        this.iyL = this.getUint8(this.pc++);
+        break; // LD IYL,n
+      case 0x34:
+        this.incMem(this.getIYHIYL() + this.d_());
+        this.pc++;
+        break; // INC (IY+d)
+      case 0x35:
+        this.decMem(this.getIYHIYL() + this.d_());
+        this.pc++;
+        break; // DEC (IY+d)
+      case 0x36:
+        this.setUint8(this.getIYHIYL() + this.d_(), this.getUint8(++this.pc));
+        this.pc++;
+        break; // LD (IY+d),n
+      case 0x39:
+        this.setIYHIYL(this.add16(this.getIYHIYL(), this.sp));
+        break; // ADD IY,SP
+      case 0x44:
+        this.b = this.iyH;
+        break; // LD B,IYH *
+      case 0x45:
+        this.b = this.iyL;
+        break; // LD B,IYL *
+      case 0x46:
+        this.b = this.getUint8(this.getIYHIYL() + this.d_());
+        this.pc++;
+        break; // LD B,(IY+d)
+      case 0x4c:
+        this.c = this.iyH;
+        break; // LD C,IYH *
+      case 0x4d:
+        this.c = this.iyL;
+        break; // LD C,IYL *
+      case 0x4e:
+        this.c = this.getUint8(this.getIYHIYL() + this.d_());
+        this.pc++;
+        break; // LD C,(IY+d)
+      case 0x54:
+        this.d = this.iyH;
+        break; // LD D,IYH *
+      case 0x55:
+        this.d = this.iyL;
+        break; // LD D,IYL *
+      case 0x56:
+        this.d = this.getUint8(this.getIYHIYL() + this.d_());
+        this.pc++;
+        break; // LD D,(IY+d)
+      case 0x5c:
+        this.e = this.iyH;
+        break; // LD E,IYH *
+      case 0x5d:
+        this.e = this.iyL;
+        break; // LD E,IYL *
+      case 0x5e:
+        this.e = this.getUint8(this.getIYHIYL() + this.d_());
+        this.pc++;
+        break; // LD E,(IY+d)
+      case 0x60:
+        this.iyH = this.b;
+        break; // LD IYH,B *
+      case 0x61:
+        this.iyH = this.c;
+        break; // LD IYH,C *
+      case 0x62:
+        this.iyH = this.d;
+        break; // LD IYH,D *
+      case 0x63:
+        this.iyH = this.e;
+        break; // LD IYH,E *
+      case 0x64:
+        break; // LD IYH,IYH*
+      case 0x65:
+        this.iyH = this.iyL;
+        break; // LD IYH,IYL *
+      case 0x66:
+        this.h = this.getUint8(this.getIYHIYL() + this.d_());
+        this.pc++;
+        break; // LD H,(IY+d)
+      case 0x67:
+        this.iyH = this.a;
+        break; // LD IYH,A *
+      case 0x68:
+        this.iyL = this.b;
+        break; // LD IYL,B *
+      case 0x69:
+        this.iyL = this.c;
+        break; // LD IYL,C *
+      case 0x6a:
+        this.iyL = this.d;
+        break; // LD IYL,D *
+      case 0x6b:
+        this.iyL = this.e;
+        break; // LD IYL,E *
+      case 0x6c:
+        this.iyL = this.iyH;
+        break; // LD IYL,IYH *
+      case 0x6d:
+        break; // LD IYL,IYL *
+      case 0x6e:
+        this.l = this.getUint8(this.getIYHIYL() + this.d_());
+        this.pc++;
+        break; // LD L,(IY+d)
+      case 0x6f:
+        this.iyL = this.a;
+        break; // LD IYL,A *
+      case 0x70:
+        this.setUint8(this.getIYHIYL() + this.d_(), this.b);
+        this.pc++;
+        break; // LD (IY+d),B
+      case 0x71:
+        this.setUint8(this.getIYHIYL() + this.d_(), this.c);
+        this.pc++;
+        break; // LD (IY+d),C
+      case 0x72:
+        this.setUint8(this.getIYHIYL() + this.d_(), this.d);
+        this.pc++;
+        break; // LD (IY+d),D
+      case 0x73:
+        this.setUint8(this.getIYHIYL() + this.d_(), this.e);
+        this.pc++;
+        break; // LD (IY+d),E
+      case 0x74:
+        this.setUint8(this.getIYHIYL() + this.d_(), this.h);
+        this.pc++;
+        break; // LD (IY+d),H
+      case 0x75:
+        this.setUint8(this.getIYHIYL() + this.d_(), this.l);
+        this.pc++;
+        break; // LD (IY+d),L
+      case 0x77:
+        this.setUint8(this.getIYHIYL() + this.d_(), this.a);
+        this.pc++;
+        break; // LD (IY+d),A
+      case 0x7c:
+        this.a = this.iyH;
+        break; // LD A,IYH *
+      case 0x7d:
+        this.a = this.iyL;
+        break; // LD A,IYL *
+      case 0x7e:
+        this.a = this.getUint8(this.getIYHIYL() + this.d_());
+        this.pc++;
+        break; // LD A,(IY+d)
+      case 0x84:
+        this.add_a(this.iyH);
+        break; // ADD A,IYH *
+      case 0x85:
+        this.add_a(this.iyL);
+        break; // ADD A,IYL *
+      case 0x86:
+        this.add_a(this.getUint8(this.getIYHIYL() + this.d_()));
+        this.pc++;
+        break; // ADD A,(IY+d)
+      case 0x8c:
+        this.adc_a(this.iyH);
+        break; // ADC A,IYH *
+      case 0x8d:
+        this.adc_a(this.iyL);
+        break; // ADC A,IYL *
+      case 0x8e:
+        this.adc_a(this.getUint8(this.getIYHIYL() + this.d_()));
+        this.pc++;
+        break; // ADC A,(IY+d)
+      case 0x94:
+        this.sub_a(this.iyH);
+        break; // SUB IYH *
+      case 0x95:
+        this.sub_a(this.iyL);
+        break; // SUB IYL *
+      case 0x96:
+        this.sub_a(this.getUint8(this.getIYHIYL() + this.d_()));
+        this.pc++;
+        break; // SUB A,(IY+d)
+      case 0x9c:
+        this.sbc_a(this.iyH);
+        break; // SBC A,IYH *
+      case 0x9d:
+        this.sbc_a(this.iyL);
+        break; // SBC A,IYL *
+      case 0x9e:
+        this.sbc_a(this.getUint8(this.getIYHIYL() + this.d_()));
+        this.pc++;
+        break; // SBC A,(IY+d)
+      case 0xa4:
+        this.f = this.SZP_TABLE[(this.a &= this.iyH)] | F_HALFCARRY;
+        break; // AND IYH *
+      case 0xa5:
+        this.f = this.SZP_TABLE[(this.a &= this.iyL)] | F_HALFCARRY;
+        break; // AND IYL *
+      case 0xa6:
+        this.f =
+          this.SZP_TABLE[
+            (this.a &= this.getUint8(this.getIYHIYL() + this.d_()))
+          ] | F_HALFCARRY;
+        this.pc++;
+        break; // AND A,(IY+d)
+      case 0xac:
+        this.f = this.SZP_TABLE[(this.a ^= this.iyH)];
+        break; // XOR A IYH*
+      case 0xad:
+        this.f = this.SZP_TABLE[(this.a ^= this.iyL)];
+        break; // XOR A IYL*
+      case 0xae:
+        this.f = this.SZP_TABLE[
+          (this.a ^= this.getUint8(this.getIYHIYL() + this.d_()))
+        ];
+        this.pc++;
+        break; // XOR A,(IY+d)
+      case 0xb4:
+        this.f = this.SZP_TABLE[(this.a |= this.iyH)];
+        break; // OR A IYH*
+      case 0xb5:
+        this.f = this.SZP_TABLE[(this.a |= this.iyL)];
+        break; // OR A IYL*
+      case 0xb6:
+        this.f = this.SZP_TABLE[
+          (this.a |= this.getUint8(this.getIYHIYL() + this.d_()))
+        ];
+        this.pc++;
+        break; // OR A,(IY+d)
+      case 0xbc:
+        this.cp_a(this.iyH);
+        break; // CP IYH *
+      case 0xbd:
+        this.cp_a(this.iyL);
+        break; // CP IYL *
+      case 0xbe:
+        this.cp_a(this.getUint8(this.getIYHIYL() + this.d_()));
+        this.pc++;
+        break; // CP (IY+d)
+      case 0xcb:
+        this.doIndexCB(this.getIYHIYL());
+        break; // CB Opcode
+      case 0xe1:
+        this.setIYHIYL(this.getUint16(this.sp));
+        this.sp += 2;
+        break; // POP IY
+      case 0xe3: // EX SP,(IY)
         temp = this.getIYHIYL();
         this.setIYHIYL(this.getUint16(this.sp));
         this.setUint16(this.sp, temp);
         break;
-      case 0xE5: this.push(this.getIYHIYL()); break;                          // PUSH IY
-      case 0xE9: this.pc = this.getIYHIYL(); break;                                 // JP (IY)
-      case 0xF9: this.sp = this.getIYHIYL(); break;                                 // LD SP,IY
+      case 0xe5:
+        this.push(this.getIYHIYL());
+        break; // PUSH IY
+      case 0xe9:
+        this.pc = this.getIYHIYL();
+        break; // JP (IY)
+      case 0xf9:
+        this.sp = this.getIYHIYL();
+        break; // LD SP,IY
 
       // Unimplemented DD/FD Opcode
       default:
-        JSSMS.Utils.console.log('Unimplemented DD/FD Opcode: ' + JSSMS.Utils.toHex(opcode));
+        JSSMS.Utils.console.log(
+          'Unimplemented DD/FD Opcode: ' + JSSMS.Utils.toHex(opcode)
+        );
         this.pc--;
         break;
     } // end of switch
   },
-
 
   /**
    * Execute DDCB/FDCB prefixed opcode.
@@ -1725,76 +4357,260 @@ JSSMS.Z80.prototype = {
    * @param {number} index Index register to use.
    */
   doIndexCB: function(index) {
-    var location = (index + this.getUint8(this.pc)) & 0xFFFF;
+    var location = (index + this.getUint8(this.pc)) & 0xffff;
     var opcode = this.getUint8(++this.pc);
 
     this.tstates -= OP_INDEX_CB_STATES[opcode];
 
     switch (opcode) {
-      case 0x00: this.b = this.rlc(this.getUint8(location)); this.setUint8(location, this.b); break; // LD B,RLC (IX)
-      case 0x01: this.c = this.rlc(this.getUint8(location)); this.setUint8(location, this.c); break; // LD C,RLC (IX)
-      case 0x02: this.d = this.rlc(this.getUint8(location)); this.setUint8(location, this.d); break; // LD D,RLC (IX)
-      case 0x03: this.e = this.rlc(this.getUint8(location)); this.setUint8(location, this.e); break; // LD E,RLC (IX)
-      case 0x04: this.h = this.rlc(this.getUint8(location)); this.setUint8(location, this.h); break; // LD H,RLC (IX)
-      case 0x05: this.l = this.rlc(this.getUint8(location)); this.setUint8(location, this.l); break; // LD L,RLC (IX)
-      case 0x06: this.setUint8(location, this.rlc(this.getUint8(location))); break;       // RLC (IX)
-      case 0x07: this.a = this.rlc(this.getUint8(location)); this.setUint8(location, this.a); break; // LD A,RLC (IX)
-      case 0x08: this.b = this.rrc(this.getUint8(location)); this.setUint8(location, this.b); break; // LD B,RRC (IX)
-      case 0x09: this.c = this.rrc(this.getUint8(location)); this.setUint8(location, this.c); break; // LD C,RRC (IX)
-      case 0x0A: this.d = this.rrc(this.getUint8(location)); this.setUint8(location, this.d); break; // LD D,RRC (IX)
-      case 0x0B: this.e = this.rrc(this.getUint8(location)); this.setUint8(location, this.e); break; // LD E,RRC (IX)
-      case 0x0C: this.h = this.rrc(this.getUint8(location)); this.setUint8(location, this.h); break; // LD H,RRC (IX)
-      case 0x0D: this.l = this.rrc(this.getUint8(location)); this.setUint8(location, this.l); break; // LD L,RRC (IX)
-      case 0x0E: this.setUint8(location, this.rrc(this.getUint8(location))); break;      // RRC (IX)
-      case 0x0F: this.a = this.rrc(this.getUint8(location)); this.setUint8(location, this.a); break; // LD A,RRC (IX)
-      case 0x10: this.b = this.rl(this.getUint8(location)); this.setUint8(location, this.b); break;  // LD B,RL (IX)
-      case 0x11: this.c = this.rl(this.getUint8(location)); this.setUint8(location, this.c); break;  // LD C,RL (IX)
-      case 0x12: this.d = this.rl(this.getUint8(location)); this.setUint8(location, this.d); break;  // LD D,RL (IX)
-      case 0x13: this.e = this.rl(this.getUint8(location)); this.setUint8(location, this.e); break;  // LD E,RL (IX)
-      case 0x14: this.h = this.rl(this.getUint8(location)); this.setUint8(location, this.h); break;  // LD H,RL (IX)
-      case 0x15: this.l = this.rl(this.getUint8(location)); this.setUint8(location, this.l); break;  // LD L,RL (IX)
-      case 0x16: this.setUint8(location, this.rl(this.getUint8(location))); break;        // RL (IX)
-      case 0x17: this.a = this.rl(this.getUint8(location)); this.setUint8(location, this.a); break;  // LD A,RL (IX)
-      case 0x18: this.b = this.rr(this.getUint8(location)); this.setUint8(location, this.b); break;  // LD B,RR (IX)
-      case 0x19: this.c = this.rr(this.getUint8(location)); this.setUint8(location, this.c); break;  // LD C,RR (IX)
-      case 0x1A: this.d = this.rr(this.getUint8(location)); this.setUint8(location, this.d); break;  // LD D,RR (IX)
-      case 0x1B: this.e = this.rr(this.getUint8(location)); this.setUint8(location, this.e); break;  // LD E,RR (IX)
-      case 0x1C: this.h = this.rr(this.getUint8(location)); this.setUint8(location, this.h); break;  // LD H,RR (IX)
-      case 0x1D: this.l = this.rr(this.getUint8(location)); this.setUint8(location, this.l); break;  // LD L,RR (IX)
-      case 0x1E: this.setUint8(location, this.rr(this.getUint8(location))); break;        // RR (IX)
-      case 0x1F: this.a = this.rr(this.getUint8(location)); this.setUint8(location, this.a); break;  // LD A,RR (IX)
-      case 0x20: this.b = this.sla(this.getUint8(location)); this.setUint8(location, this.b); break; // LD B,SLA (IX)
-      case 0x21: this.c = this.sla(this.getUint8(location)); this.setUint8(location, this.c); break; // LD C,SLA (IX)
-      case 0x22: this.d = this.sla(this.getUint8(location)); this.setUint8(location, this.d); break; // LD D,SLA (IX)
-      case 0x23: this.e = this.sla(this.getUint8(location)); this.setUint8(location, this.e); break; // LD E,SLA (IX)
-      case 0x24: this.h = this.sla(this.getUint8(location)); this.setUint8(location, this.h); break; // LD H,SLA (IX)
-      case 0x25: this.l = this.sla(this.getUint8(location)); this.setUint8(location, this.l); break; // LD L,SLA (IX)
-      case 0x26: this.setUint8(location, this.sla(this.getUint8(location))); break;       // SLA (IX)
-      case 0x27: this.a = this.sla(this.getUint8(location)); this.setUint8(location, this.a); break; // LD A,SLA (IX)
-      case 0x28: this.b = this.sra(this.getUint8(location)); this.setUint8(location, this.b); break; // LD B,SRA (IX)
-      case 0x29: this.c = this.sra(this.getUint8(location)); this.setUint8(location, this.c); break; // LD C,SRA (IX)
-      case 0x2A: this.d = this.sra(this.getUint8(location)); this.setUint8(location, this.d); break; // LD D,SRA (IX)
-      case 0x2B: this.e = this.sra(this.getUint8(location)); this.setUint8(location, this.e); break; // LD E,SRA (IX)
-      case 0x2C: this.h = this.sra(this.getUint8(location)); this.setUint8(location, this.h); break; // LD H,SRA (IX)
-      case 0x2D: this.l = this.sra(this.getUint8(location)); this.setUint8(location, this.l); break; // LD L,SRA (IX)
-      case 0x2E: this.setUint8(location, this.sra(this.getUint8(location))); break;       // SRA (IX)
-      case 0x2F: this.a = this.sra(this.getUint8(location)); this.setUint8(location, this.a); break; // LD A,SRA (IX)
-      case 0x30: this.b = this.sll(this.getUint8(location)); this.setUint8(location, this.b); break; // LD B,SLL (IX)
-      case 0x31: this.c = this.sll(this.getUint8(location)); this.setUint8(location, this.c); break; // LD C,SLL (IX)
-      case 0x32: this.d = this.sll(this.getUint8(location)); this.setUint8(location, this.d); break; // LD D,SLL (IX)
-      case 0x33: this.e = this.sll(this.getUint8(location)); this.setUint8(location, this.e); break; // LD E,SLL (IX)
-      case 0x34: this.h = this.sll(this.getUint8(location)); this.setUint8(location, this.h); break; // LD H,SLL (IX)
-      case 0x35: this.l = this.sll(this.getUint8(location)); this.setUint8(location, this.l); break; // LD L,SLL (IX)
-      case 0x36: this.setUint8(location, this.sll(this.getUint8(location))); break;       // SLL (IX) *
-      case 0x37: this.a = this.sll(this.getUint8(location)); this.setUint8(location, this.a); break; // LD A,SLL (IX)
-      case 0x38: this.b = this.srl(this.getUint8(location)); this.setUint8(location, this.b); break; // LD B,SRL (IX)
-      case 0x39: this.c = this.srl(this.getUint8(location)); this.setUint8(location, this.c); break; // LD C,SRL (IX)
-      case 0x3A: this.d = this.srl(this.getUint8(location)); this.setUint8(location, this.d); break; // LD D,SRL (IX)
-      case 0x3B: this.e = this.srl(this.getUint8(location)); this.setUint8(location, this.e); break; // LD E,SRL (IX)
-      case 0x3C: this.h = this.srl(this.getUint8(location)); this.setUint8(location, this.h); break; // LD H,SRL (IX)
-      case 0x3D: this.l = this.srl(this.getUint8(location)); this.setUint8(location, this.l); break; // LD L,SRL (IX)
-      case 0x3E: this.setUint8(location, this.srl(this.getUint8(location))); break;       // SRL (IX)
-      case 0x3F: this.a = this.srl(this.getUint8(location)); this.setUint8(location, this.a); break; // LD A,SRL (IX)
+      case 0x00:
+        this.b = this.rlc(this.getUint8(location));
+        this.setUint8(location, this.b);
+        break; // LD B,RLC (IX)
+      case 0x01:
+        this.c = this.rlc(this.getUint8(location));
+        this.setUint8(location, this.c);
+        break; // LD C,RLC (IX)
+      case 0x02:
+        this.d = this.rlc(this.getUint8(location));
+        this.setUint8(location, this.d);
+        break; // LD D,RLC (IX)
+      case 0x03:
+        this.e = this.rlc(this.getUint8(location));
+        this.setUint8(location, this.e);
+        break; // LD E,RLC (IX)
+      case 0x04:
+        this.h = this.rlc(this.getUint8(location));
+        this.setUint8(location, this.h);
+        break; // LD H,RLC (IX)
+      case 0x05:
+        this.l = this.rlc(this.getUint8(location));
+        this.setUint8(location, this.l);
+        break; // LD L,RLC (IX)
+      case 0x06:
+        this.setUint8(location, this.rlc(this.getUint8(location)));
+        break; // RLC (IX)
+      case 0x07:
+        this.a = this.rlc(this.getUint8(location));
+        this.setUint8(location, this.a);
+        break; // LD A,RLC (IX)
+      case 0x08:
+        this.b = this.rrc(this.getUint8(location));
+        this.setUint8(location, this.b);
+        break; // LD B,RRC (IX)
+      case 0x09:
+        this.c = this.rrc(this.getUint8(location));
+        this.setUint8(location, this.c);
+        break; // LD C,RRC (IX)
+      case 0x0a:
+        this.d = this.rrc(this.getUint8(location));
+        this.setUint8(location, this.d);
+        break; // LD D,RRC (IX)
+      case 0x0b:
+        this.e = this.rrc(this.getUint8(location));
+        this.setUint8(location, this.e);
+        break; // LD E,RRC (IX)
+      case 0x0c:
+        this.h = this.rrc(this.getUint8(location));
+        this.setUint8(location, this.h);
+        break; // LD H,RRC (IX)
+      case 0x0d:
+        this.l = this.rrc(this.getUint8(location));
+        this.setUint8(location, this.l);
+        break; // LD L,RRC (IX)
+      case 0x0e:
+        this.setUint8(location, this.rrc(this.getUint8(location)));
+        break; // RRC (IX)
+      case 0x0f:
+        this.a = this.rrc(this.getUint8(location));
+        this.setUint8(location, this.a);
+        break; // LD A,RRC (IX)
+      case 0x10:
+        this.b = this.rl(this.getUint8(location));
+        this.setUint8(location, this.b);
+        break; // LD B,RL (IX)
+      case 0x11:
+        this.c = this.rl(this.getUint8(location));
+        this.setUint8(location, this.c);
+        break; // LD C,RL (IX)
+      case 0x12:
+        this.d = this.rl(this.getUint8(location));
+        this.setUint8(location, this.d);
+        break; // LD D,RL (IX)
+      case 0x13:
+        this.e = this.rl(this.getUint8(location));
+        this.setUint8(location, this.e);
+        break; // LD E,RL (IX)
+      case 0x14:
+        this.h = this.rl(this.getUint8(location));
+        this.setUint8(location, this.h);
+        break; // LD H,RL (IX)
+      case 0x15:
+        this.l = this.rl(this.getUint8(location));
+        this.setUint8(location, this.l);
+        break; // LD L,RL (IX)
+      case 0x16:
+        this.setUint8(location, this.rl(this.getUint8(location)));
+        break; // RL (IX)
+      case 0x17:
+        this.a = this.rl(this.getUint8(location));
+        this.setUint8(location, this.a);
+        break; // LD A,RL (IX)
+      case 0x18:
+        this.b = this.rr(this.getUint8(location));
+        this.setUint8(location, this.b);
+        break; // LD B,RR (IX)
+      case 0x19:
+        this.c = this.rr(this.getUint8(location));
+        this.setUint8(location, this.c);
+        break; // LD C,RR (IX)
+      case 0x1a:
+        this.d = this.rr(this.getUint8(location));
+        this.setUint8(location, this.d);
+        break; // LD D,RR (IX)
+      case 0x1b:
+        this.e = this.rr(this.getUint8(location));
+        this.setUint8(location, this.e);
+        break; // LD E,RR (IX)
+      case 0x1c:
+        this.h = this.rr(this.getUint8(location));
+        this.setUint8(location, this.h);
+        break; // LD H,RR (IX)
+      case 0x1d:
+        this.l = this.rr(this.getUint8(location));
+        this.setUint8(location, this.l);
+        break; // LD L,RR (IX)
+      case 0x1e:
+        this.setUint8(location, this.rr(this.getUint8(location)));
+        break; // RR (IX)
+      case 0x1f:
+        this.a = this.rr(this.getUint8(location));
+        this.setUint8(location, this.a);
+        break; // LD A,RR (IX)
+      case 0x20:
+        this.b = this.sla(this.getUint8(location));
+        this.setUint8(location, this.b);
+        break; // LD B,SLA (IX)
+      case 0x21:
+        this.c = this.sla(this.getUint8(location));
+        this.setUint8(location, this.c);
+        break; // LD C,SLA (IX)
+      case 0x22:
+        this.d = this.sla(this.getUint8(location));
+        this.setUint8(location, this.d);
+        break; // LD D,SLA (IX)
+      case 0x23:
+        this.e = this.sla(this.getUint8(location));
+        this.setUint8(location, this.e);
+        break; // LD E,SLA (IX)
+      case 0x24:
+        this.h = this.sla(this.getUint8(location));
+        this.setUint8(location, this.h);
+        break; // LD H,SLA (IX)
+      case 0x25:
+        this.l = this.sla(this.getUint8(location));
+        this.setUint8(location, this.l);
+        break; // LD L,SLA (IX)
+      case 0x26:
+        this.setUint8(location, this.sla(this.getUint8(location)));
+        break; // SLA (IX)
+      case 0x27:
+        this.a = this.sla(this.getUint8(location));
+        this.setUint8(location, this.a);
+        break; // LD A,SLA (IX)
+      case 0x28:
+        this.b = this.sra(this.getUint8(location));
+        this.setUint8(location, this.b);
+        break; // LD B,SRA (IX)
+      case 0x29:
+        this.c = this.sra(this.getUint8(location));
+        this.setUint8(location, this.c);
+        break; // LD C,SRA (IX)
+      case 0x2a:
+        this.d = this.sra(this.getUint8(location));
+        this.setUint8(location, this.d);
+        break; // LD D,SRA (IX)
+      case 0x2b:
+        this.e = this.sra(this.getUint8(location));
+        this.setUint8(location, this.e);
+        break; // LD E,SRA (IX)
+      case 0x2c:
+        this.h = this.sra(this.getUint8(location));
+        this.setUint8(location, this.h);
+        break; // LD H,SRA (IX)
+      case 0x2d:
+        this.l = this.sra(this.getUint8(location));
+        this.setUint8(location, this.l);
+        break; // LD L,SRA (IX)
+      case 0x2e:
+        this.setUint8(location, this.sra(this.getUint8(location)));
+        break; // SRA (IX)
+      case 0x2f:
+        this.a = this.sra(this.getUint8(location));
+        this.setUint8(location, this.a);
+        break; // LD A,SRA (IX)
+      case 0x30:
+        this.b = this.sll(this.getUint8(location));
+        this.setUint8(location, this.b);
+        break; // LD B,SLL (IX)
+      case 0x31:
+        this.c = this.sll(this.getUint8(location));
+        this.setUint8(location, this.c);
+        break; // LD C,SLL (IX)
+      case 0x32:
+        this.d = this.sll(this.getUint8(location));
+        this.setUint8(location, this.d);
+        break; // LD D,SLL (IX)
+      case 0x33:
+        this.e = this.sll(this.getUint8(location));
+        this.setUint8(location, this.e);
+        break; // LD E,SLL (IX)
+      case 0x34:
+        this.h = this.sll(this.getUint8(location));
+        this.setUint8(location, this.h);
+        break; // LD H,SLL (IX)
+      case 0x35:
+        this.l = this.sll(this.getUint8(location));
+        this.setUint8(location, this.l);
+        break; // LD L,SLL (IX)
+      case 0x36:
+        this.setUint8(location, this.sll(this.getUint8(location)));
+        break; // SLL (IX) *
+      case 0x37:
+        this.a = this.sll(this.getUint8(location));
+        this.setUint8(location, this.a);
+        break; // LD A,SLL (IX)
+      case 0x38:
+        this.b = this.srl(this.getUint8(location));
+        this.setUint8(location, this.b);
+        break; // LD B,SRL (IX)
+      case 0x39:
+        this.c = this.srl(this.getUint8(location));
+        this.setUint8(location, this.c);
+        break; // LD C,SRL (IX)
+      case 0x3a:
+        this.d = this.srl(this.getUint8(location));
+        this.setUint8(location, this.d);
+        break; // LD D,SRL (IX)
+      case 0x3b:
+        this.e = this.srl(this.getUint8(location));
+        this.setUint8(location, this.e);
+        break; // LD E,SRL (IX)
+      case 0x3c:
+        this.h = this.srl(this.getUint8(location));
+        this.setUint8(location, this.h);
+        break; // LD H,SRL (IX)
+      case 0x3d:
+        this.l = this.srl(this.getUint8(location));
+        this.setUint8(location, this.l);
+        break; // LD L,SRL (IX)
+      case 0x3e:
+        this.setUint8(location, this.srl(this.getUint8(location)));
+        break; // SRL (IX)
+      case 0x3f:
+        this.a = this.srl(this.getUint8(location));
+        this.setUint8(location, this.a);
+        break; // LD A,SRL (IX)
       case 0x40:
       case 0x41:
       case 0x42:
@@ -1802,15 +4618,19 @@ JSSMS.Z80.prototype = {
       case 0x44:
       case 0x45:
       case 0x46:
-      case 0x47: this.bit(this.getUint8(location) & BIT_0); break;                   // BIT 0,(IX)
+      case 0x47:
+        this.bit(this.getUint8(location) & BIT_0);
+        break; // BIT 0,(IX)
       case 0x48:
       case 0x49:
-      case 0x4A:
-      case 0x4B:
-      case 0x4C:
-      case 0x4D:
-      case 0x4E:
-      case 0x4F: this.bit(this.getUint8(location) & BIT_1); break;                   // BIT 1,(IX)
+      case 0x4a:
+      case 0x4b:
+      case 0x4c:
+      case 0x4d:
+      case 0x4e:
+      case 0x4f:
+        this.bit(this.getUint8(location) & BIT_1);
+        break; // BIT 1,(IX)
       case 0x50:
       case 0x51:
       case 0x52:
@@ -1818,15 +4638,19 @@ JSSMS.Z80.prototype = {
       case 0x54:
       case 0x55:
       case 0x56:
-      case 0x57: this.bit(this.getUint8(location) & BIT_2); break;                   // BIT 2,(IX)
+      case 0x57:
+        this.bit(this.getUint8(location) & BIT_2);
+        break; // BIT 2,(IX)
       case 0x58:
       case 0x59:
-      case 0x5A:
-      case 0x5B:
-      case 0x5C:
-      case 0x5D:
-      case 0x5E:
-      case 0x5F: this.bit(this.getUint8(location) & BIT_3); break;                   // BIT 3,(IX)
+      case 0x5a:
+      case 0x5b:
+      case 0x5c:
+      case 0x5d:
+      case 0x5e:
+      case 0x5f:
+        this.bit(this.getUint8(location) & BIT_3);
+        break; // BIT 3,(IX)
       case 0x60:
       case 0x61:
       case 0x62:
@@ -1834,15 +4658,19 @@ JSSMS.Z80.prototype = {
       case 0x64:
       case 0x65:
       case 0x66:
-      case 0x67: this.bit(this.getUint8(location) & BIT_4); break;                   // BIT 4,(IX)
+      case 0x67:
+        this.bit(this.getUint8(location) & BIT_4);
+        break; // BIT 4,(IX)
       case 0x68:
       case 0x69:
-      case 0x6A:
-      case 0x6B:
-      case 0x6C:
-      case 0x6D:
-      case 0x6E:
-      case 0x6F: this.bit(this.getUint8(location) & BIT_5); break;                   // BIT 5,(IX)
+      case 0x6a:
+      case 0x6b:
+      case 0x6c:
+      case 0x6d:
+      case 0x6e:
+      case 0x6f:
+        this.bit(this.getUint8(location) & BIT_5);
+        break; // BIT 5,(IX)
       case 0x70:
       case 0x71:
       case 0x72:
@@ -1850,15 +4678,19 @@ JSSMS.Z80.prototype = {
       case 0x74:
       case 0x75:
       case 0x76:
-      case 0x77: this.bit(this.getUint8(location) & BIT_6); break;                   // BIT 6,(IX)
+      case 0x77:
+        this.bit(this.getUint8(location) & BIT_6);
+        break; // BIT 6,(IX)
       case 0x78:
       case 0x79:
-      case 0x7A:
-      case 0x7B:
-      case 0x7C:
-      case 0x7D:
-      case 0x7E:
-      case 0x7F: this.bit(this.getUint8(location) & BIT_7); break;                   // BIT 7,(IX)
+      case 0x7a:
+      case 0x7b:
+      case 0x7c:
+      case 0x7d:
+      case 0x7e:
+      case 0x7f:
+        this.bit(this.getUint8(location) & BIT_7);
+        break; // BIT 7,(IX)
       case 0x80:
       case 0x81:
       case 0x82:
@@ -1866,15 +4698,19 @@ JSSMS.Z80.prototype = {
       case 0x84:
       case 0x85:
       case 0x86:
-      case 0x87: this.setUint8(location, this.getUint8(location) & ~BIT_0); break;   // RES 0,(IX)
+      case 0x87:
+        this.setUint8(location, this.getUint8(location) & ~BIT_0);
+        break; // RES 0,(IX)
       case 0x88:
       case 0x89:
-      case 0x8A:
-      case 0x8B:
-      case 0x8C:
-      case 0x8D:
-      case 0x8E:
-      case 0x8F: this.setUint8(location, this.getUint8(location) & ~BIT_1); break;   // RES 1,(IX)
+      case 0x8a:
+      case 0x8b:
+      case 0x8c:
+      case 0x8d:
+      case 0x8e:
+      case 0x8f:
+        this.setUint8(location, this.getUint8(location) & ~BIT_1);
+        break; // RES 1,(IX)
       case 0x90:
       case 0x91:
       case 0x92:
@@ -1882,121 +4718,149 @@ JSSMS.Z80.prototype = {
       case 0x94:
       case 0x95:
       case 0x96:
-      case 0x97: this.setUint8(location, this.getUint8(location) & ~BIT_2); break;   // RES 2,(IX)
+      case 0x97:
+        this.setUint8(location, this.getUint8(location) & ~BIT_2);
+        break; // RES 2,(IX)
       case 0x98:
       case 0x99:
-      case 0x9A:
-      case 0x9B:
-      case 0x9C:
-      case 0x9D:
-      case 0x9E:
-      case 0x9F: this.setUint8(location, this.getUint8(location) & ~BIT_3); break;   // RES 3,(IX)
-      case 0xA0:
-      case 0xA1:
-      case 0xA2:
-      case 0xA3:
-      case 0xA4:
-      case 0xA5:
-      case 0xA6:
-      case 0xA7: this.setUint8(location, this.getUint8(location) & ~BIT_4); break;   // RES 4,(IX)
-      case 0xA8:
-      case 0xA9:
-      case 0xAA:
-      case 0xAB:
-      case 0xAC:
-      case 0xAD:
-      case 0xAE:
-      case 0xAF: this.setUint8(location, this.getUint8(location) & ~BIT_5); break;   // RES 5,(IX)
-      case 0xB0:
-      case 0xB1:
-      case 0xB2:
-      case 0xB3:
-      case 0xB4:
-      case 0xB5:
-      case 0xB6:
-      case 0xB7: this.setUint8(location, this.getUint8(location) & ~BIT_6); break;   // RES 6,(IX)
-      case 0xB8:
-      case 0xB9:
-      case 0xBA:
-      case 0xBB:
-      case 0xBC:
-      case 0xBD:
-      case 0xBE:
-      case 0xBF: this.setUint8(location, this.getUint8(location) & ~BIT_7); break;   // RES 7,(IX)
-      case 0xC0:
-      case 0xC1:
-      case 0xC2:
-      case 0xC3:
-      case 0xC4:
-      case 0xC5:
-      case 0xC6:
-      case 0xC7: this.setUint8(location, this.getUint8(location) | BIT_0); break;    // SET 0,(IX)
-      case 0xC8:
-      case 0xC9:
-      case 0xCA:
-      case 0xCB:
-      case 0xCC:
-      case 0xCD:
-      case 0xCE:
-      case 0xCF: this.setUint8(location, this.getUint8(location) | BIT_1); break;    // SET 1,(IX)
-      case 0xD0:
-      case 0xD1:
-      case 0xD2:
-      case 0xD3:
-      case 0xD4:
-      case 0xD5:
-      case 0xD6:
-      case 0xD7: this.setUint8(location, this.getUint8(location) | BIT_2); break;    // SET 2,(IX)
-      case 0xD8:
-      case 0xD9:
-      case 0xDA:
-      case 0xDB:
-      case 0xDC:
-      case 0xDD:
-      case 0xDE:
-      case 0xDF: this.setUint8(location, this.getUint8(location) | BIT_3); break;    // SET 3,(IX)
-      case 0xE0:
-      case 0xE1:
-      case 0xE2:
-      case 0xE3:
-      case 0xE4:
-      case 0xE5:
-      case 0xE6:
-      case 0xE7: this.setUint8(location, this.getUint8(location) | BIT_4); break;    // SET 4,(IX)
-      case 0xE8:
-      case 0xE9:
-      case 0xEA:
-      case 0xEB:
-      case 0xEC:
-      case 0xED:
-      case 0xEE:
-      case 0xEF: this.setUint8(location, this.getUint8(location) | BIT_5); break;    // SET 5,(IX)
-      case 0xF0:
-      case 0xF1:
-      case 0xF2:
-      case 0xF3:
-      case 0xF4:
-      case 0xF5:
-      case 0xF6:
-      case 0xF7: this.setUint8(location, this.getUint8(location) | BIT_6); break;    // SET 6,(IX)
-      case 0xF8:
-      case 0xF9:
-      case 0xFA:
-      case 0xFB:
-      case 0xFC:
-      case 0xFD:
-      case 0xFE:
-      case 0xFF: this.setUint8(location, this.getUint8(location) | BIT_7); break;    // SET 7,(IX)
+      case 0x9a:
+      case 0x9b:
+      case 0x9c:
+      case 0x9d:
+      case 0x9e:
+      case 0x9f:
+        this.setUint8(location, this.getUint8(location) & ~BIT_3);
+        break; // RES 3,(IX)
+      case 0xa0:
+      case 0xa1:
+      case 0xa2:
+      case 0xa3:
+      case 0xa4:
+      case 0xa5:
+      case 0xa6:
+      case 0xa7:
+        this.setUint8(location, this.getUint8(location) & ~BIT_4);
+        break; // RES 4,(IX)
+      case 0xa8:
+      case 0xa9:
+      case 0xaa:
+      case 0xab:
+      case 0xac:
+      case 0xad:
+      case 0xae:
+      case 0xaf:
+        this.setUint8(location, this.getUint8(location) & ~BIT_5);
+        break; // RES 5,(IX)
+      case 0xb0:
+      case 0xb1:
+      case 0xb2:
+      case 0xb3:
+      case 0xb4:
+      case 0xb5:
+      case 0xb6:
+      case 0xb7:
+        this.setUint8(location, this.getUint8(location) & ~BIT_6);
+        break; // RES 6,(IX)
+      case 0xb8:
+      case 0xb9:
+      case 0xba:
+      case 0xbb:
+      case 0xbc:
+      case 0xbd:
+      case 0xbe:
+      case 0xbf:
+        this.setUint8(location, this.getUint8(location) & ~BIT_7);
+        break; // RES 7,(IX)
+      case 0xc0:
+      case 0xc1:
+      case 0xc2:
+      case 0xc3:
+      case 0xc4:
+      case 0xc5:
+      case 0xc6:
+      case 0xc7:
+        this.setUint8(location, this.getUint8(location) | BIT_0);
+        break; // SET 0,(IX)
+      case 0xc8:
+      case 0xc9:
+      case 0xca:
+      case 0xcb:
+      case 0xcc:
+      case 0xcd:
+      case 0xce:
+      case 0xcf:
+        this.setUint8(location, this.getUint8(location) | BIT_1);
+        break; // SET 1,(IX)
+      case 0xd0:
+      case 0xd1:
+      case 0xd2:
+      case 0xd3:
+      case 0xd4:
+      case 0xd5:
+      case 0xd6:
+      case 0xd7:
+        this.setUint8(location, this.getUint8(location) | BIT_2);
+        break; // SET 2,(IX)
+      case 0xd8:
+      case 0xd9:
+      case 0xda:
+      case 0xdb:
+      case 0xdc:
+      case 0xdd:
+      case 0xde:
+      case 0xdf:
+        this.setUint8(location, this.getUint8(location) | BIT_3);
+        break; // SET 3,(IX)
+      case 0xe0:
+      case 0xe1:
+      case 0xe2:
+      case 0xe3:
+      case 0xe4:
+      case 0xe5:
+      case 0xe6:
+      case 0xe7:
+        this.setUint8(location, this.getUint8(location) | BIT_4);
+        break; // SET 4,(IX)
+      case 0xe8:
+      case 0xe9:
+      case 0xea:
+      case 0xeb:
+      case 0xec:
+      case 0xed:
+      case 0xee:
+      case 0xef:
+        this.setUint8(location, this.getUint8(location) | BIT_5);
+        break; // SET 5,(IX)
+      case 0xf0:
+      case 0xf1:
+      case 0xf2:
+      case 0xf3:
+      case 0xf4:
+      case 0xf5:
+      case 0xf6:
+      case 0xf7:
+        this.setUint8(location, this.getUint8(location) | BIT_6);
+        break; // SET 6,(IX)
+      case 0xf8:
+      case 0xf9:
+      case 0xfa:
+      case 0xfb:
+      case 0xfc:
+      case 0xfd:
+      case 0xfe:
+      case 0xff:
+        this.setUint8(location, this.getUint8(location) | BIT_7);
+        break; // SET 7,(IX)
 
       // Unimplemented DDCB/FDCB Opcode
       default:
-        JSSMS.Utils.console.log('Unimplemented DDCB/FDCB Opcode: ' + JSSMS.Utils.toHex(opcode));
+        JSSMS.Utils.console.log(
+          'Unimplemented DDCB/FDCB Opcode: ' + JSSMS.Utils.toHex(opcode)
+        );
         break;
-
     } // end of switch
     this.pc++;
   },
-
 
   /**
    * Execute ED prefixed opcode.
@@ -2041,13 +4905,13 @@ JSSMS.Z80.prototype = {
 
       // -- ED44 NEG -------------------------------
       case 0x44:
-      case 0x4C:
+      case 0x4c:
       case 0x54:
-      case 0x5C:
+      case 0x5c:
       case 0x64:
-      case 0x6C:
+      case 0x6c:
       case 0x74:
-      case 0x7C:
+      case 0x7c:
         // A <- 0-A
         temp = this.a;
         this.a = 0;
@@ -2057,13 +4921,13 @@ JSSMS.Z80.prototype = {
 
       // -- ED45 RETN / RETI ------------------------------
       case 0x45:
-      case 0x4D:
+      case 0x4d:
       case 0x55:
-      case 0x5D:
+      case 0x5d:
       case 0x65:
-      case 0x6D:
+      case 0x6d:
       case 0x75:
-      case 0x7D:
+      case 0x7d:
         this.pc = this.getUint16(this.sp);
         this.sp += 2;
         this.iff1 = this.iff2;
@@ -2071,9 +4935,9 @@ JSSMS.Z80.prototype = {
 
       // -- ED46 IM 0-------------------------------
       case 0x46:
-      case 0x4E:
+      case 0x4e:
       case 0x66:
-      case 0x6E:
+      case 0x6e:
         this.im = 0;
         this.pc++;
         break;
@@ -2098,19 +4962,19 @@ JSSMS.Z80.prototype = {
         break;
 
       // -- ED4A ADC HL,BC ------------------------
-      case 0x4A:
+      case 0x4a:
         this.adc16(this.getBC());
         this.pc++;
         break;
 
       // -- ED4B LD BC,(nn) -----------------------
-      case 0x4B:
+      case 0x4b:
         this.setBC(this.getUint16(this.getUint16(++this.pc)));
         this.pc += 2;
         break;
 
       // -- ED4F LD R,A ---------------------------
-      case 0x4F:
+      case 0x4f:
         this.r = this.a;
         this.pc++;
         break;
@@ -2150,7 +5014,10 @@ JSSMS.Z80.prototype = {
       // -- ED57 LD A,I ---------------------------
       case 0x57:
         this.a = this.i;
-        this.f = (this.f & F_CARRY) | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);
+        this.f =
+          (this.f & F_CARRY) |
+          this.SZ_TABLE[this.a] |
+          (this.iff2 ? F_PARITY : 0);
         this.pc++;
         break;
 
@@ -2168,22 +5035,25 @@ JSSMS.Z80.prototype = {
         break;
 
       // -- ED5A ADC HL,DE ------------------------
-      case 0x5A:
+      case 0x5a:
         this.adc16(this.getDE());
         this.pc++;
         break;
 
       // -- ED5B LD DE,(nn) -----------------------
-      case 0x5B:
+      case 0x5b:
         this.setDE(this.getUint16(this.getUint16(++this.pc)));
         this.pc += 2;
         break;
 
       // -- ED5F LD A,R -----------------------------
-      case 0x5F:
+      case 0x5f:
         // Note, to fake refresh emulation we use the random number generator
         this.a = REFRESH_EMULATION ? this.r : JSSMS.Utils.rndInt(255);
-        this.f = (this.f & F_CARRY) | this.SZ_TABLE[this.a] | (this.iff2 ? F_PARITY : 0);
+        this.f =
+          (this.f & F_CARRY) |
+          this.SZ_TABLE[this.a] |
+          (this.iff2 ? F_PARITY : 0);
         this.pc++;
         break;
 
@@ -2219,9 +5089,9 @@ JSSMS.Z80.prototype = {
 
         // move high 4 of hl to low 4 of hl
         // move low 4 of a to high 4 of hl
-        this.setUint8(location, (temp >> 4) | ((this.a & 0x0F) << 4));
+        this.setUint8(location, (temp >> 4) | ((this.a & 0x0f) << 4));
         // move 4 lowest bits of hl to low 4 of a
-        this.a = (this.a & 0xF0) | (temp & 0x0F);
+        this.a = (this.a & 0xf0) | (temp & 0x0f);
 
         this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];
         this.pc++;
@@ -2241,28 +5111,28 @@ JSSMS.Z80.prototype = {
         break;
 
       // -- ED6A ADC HL,HL ------------------------
-      case 0x6A:
+      case 0x6a:
         this.adc16(this.getHL());
         this.pc++;
         break;
 
       // -- ED6B LD HL,(nn) -----------------------
-      case 0x6B:
+      case 0x6b:
         this.setHL(this.getUint16(this.getUint16(++this.pc)));
         this.pc += 2;
         break;
 
       // -- ED6F RLD -------------------------------
-      case 0x6F:
+      case 0x6f:
         location = this.getHL();
         temp = this.getUint8(location);
 
         // move low 4 of hl to high 4 of hl
         // move low 4 of a to low 4 of hl
-        this.setUint8(location, (temp & 0x0F) << 4 | (this.a & 0x0F));
+        this.setUint8(location, ((temp & 0x0f) << 4) | (this.a & 0x0f));
 
         // move high 4 of hl to low 4 of a
-        this.a = (this.a & 0xF0) | (temp >> 4);
+        this.a = (this.a & 0xf0) | (temp >> 4);
 
         this.f = (this.f & F_CARRY) | this.SZP_TABLE[this.a];
         this.pc++;
@@ -2300,45 +5170,49 @@ JSSMS.Z80.prototype = {
         break;
 
       // -- ED7A ADC HL,SP ------------------------
-      case 0x7A:
+      case 0x7a:
         this.adc16(this.sp);
         this.pc++;
         break;
 
       // -- ED7B LD SP,(nn) -----------------------
-      case 0x7B:
+      case 0x7b:
         this.sp = this.getUint16(this.getUint16(++this.pc));
         this.pc += 2;
         break;
 
       // -- EDA0 LDI ----------------------------------
-      case 0xA0:
+      case 0xa0:
         temp = this.getUint8(this.getHL());
         this.setUint8(this.getDE(), temp);
         this.decBC();
         this.incDE();
         this.incHL();
 
-        temp = (temp + this.a) & 0xFF;
-        this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);
+        temp = (temp + this.a) & 0xff;
+        this.f =
+          (this.f & 0xc1) |
+          (this.getBC() ? F_PARITY : 0) |
+          (temp & 0x08) |
+          (temp & 0x02 ? 0x20 : 0);
         this.pc++;
         break;
 
       // -- EDA1 CPI ------------------------------
-      case 0xA1:
+      case 0xa1:
         temp = (this.f & F_CARRY) | F_NEGATIVE;
         this.cp_a(this.getUint8(this.getHL())); // sets some flags
         this.decBC();
         this.incHL();
 
-        temp |= (this.getBC() === 0 ? 0 : F_PARITY);
+        temp |= this.getBC() === 0 ? 0 : F_PARITY;
 
-        this.f = (this.f & 0xF8) | temp;
+        this.f = (this.f & 0xf8) | temp;
         this.pc++;
         break;
 
       // -- EDA2 INI -------------------------------
-      case 0xA2:
+      case 0xa2:
         temp = this.port.in_(this.c);
         this.setUint8(this.getHL(), temp);
         this.b = this.dec8(this.b);
@@ -2355,7 +5229,7 @@ JSSMS.Z80.prototype = {
 
       // -- EDA3 OUTI ------------------------------
       // see p14 of undocumented z80 for additional flag info
-      case 0xA3:
+      case 0xa3:
         temp = this.getUint8(this.getHL());
         // (C) <- (HL)
         this.port.out(this.c, temp);
@@ -2364,7 +5238,7 @@ JSSMS.Z80.prototype = {
         // HL <- HL + 1
         this.incHL();
 
-        if ((this.l + temp) > 255) {
+        if (this.l + temp > 255) {
           this.f |= F_CARRY;
           this.f |= F_HALFCARRY;
         } else {
@@ -2380,33 +5254,37 @@ JSSMS.Z80.prototype = {
         break;
 
       // -- EDA8 LDD ----------------------------------
-      case 0xA8:
+      case 0xa8:
         temp = this.getUint8(this.getHL());
         this.setUint8(this.getDE(), temp);
         this.decBC();
         this.decDE();
         this.decHL();
 
-        temp = (temp + this.a) & 0xFF;
-        this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & F_BIT3) | ((temp & F_NEGATIVE) ? 0x20 : 0);
+        temp = (temp + this.a) & 0xff;
+        this.f =
+          (this.f & 0xc1) |
+          (this.getBC() ? F_PARITY : 0) |
+          (temp & F_BIT3) |
+          (temp & F_NEGATIVE ? 0x20 : 0);
         this.pc++;
         break;
 
       // -- EDA9 CPD ------------------------------
-      case 0xA9:
+      case 0xa9:
         temp = (this.f & F_CARRY) | F_NEGATIVE;
         this.cp_a(this.getUint8(this.getHL())); // sets some flags
         this.decBC();
         this.decHL();
 
-        temp |= (this.getBC() === 0 ? 0 : F_PARITY);
+        temp |= this.getBC() === 0 ? 0 : F_PARITY;
 
-        this.f = (this.f & 0xF8) | temp;
+        this.f = (this.f & 0xf8) | temp;
         this.pc++;
         break;
 
       // -- EDAA IND -------------------------------
-      case 0xAA:
+      case 0xaa:
         temp = this.port.in_(this.c);
         this.setUint8(this.getHL(), temp);
         this.b = this.dec8(this.b);
@@ -2423,7 +5301,7 @@ JSSMS.Z80.prototype = {
 
       // -- EDAB OUTD ------------------------------
       // see p14 of undocumented z80 for additional flag info
-      case 0xAB:
+      case 0xab:
         temp = this.getUint8(this.getHL());
         // (C) <- (HL)
         this.port.out(this.c, temp);
@@ -2432,7 +5310,7 @@ JSSMS.Z80.prototype = {
         // HL <- HL - 1
         this.decHL();
 
-        if ((this.l + temp) > 255) {
+        if (this.l + temp > 255) {
           this.f |= F_CARRY;
           this.f |= F_HALFCARRY;
         } else {
@@ -2448,15 +5326,19 @@ JSSMS.Z80.prototype = {
         break;
 
       // -- EDB0 LDIR ------------------------------
-      case 0xB0:
+      case 0xb0:
         temp = this.getUint8(this.getHL());
         this.setUint8(this.getDE(), temp);
         this.decBC();
         this.incDE();
         this.incHL();
 
-        temp = (temp + this.a) & 0xFF;
-        this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & 0x08) | ((temp & 0x02) ? 0x20 : 0);
+        temp = (temp + this.a) & 0xff;
+        this.f =
+          (this.f & 0xc1) |
+          (this.getBC() ? F_PARITY : 0) |
+          (temp & 0x08) |
+          (temp & 0x02 ? 0x20 : 0);
         if (this.getBC() !== 0) {
           this.tstates -= 5;
           this.pc--;
@@ -2466,13 +5348,13 @@ JSSMS.Z80.prototype = {
         break;
 
       // -- EDB1 CPIR ------------------------------
-      case 0xB1:
+      case 0xb1:
         temp = (this.f & F_CARRY) | F_NEGATIVE;
         this.cp_a(this.getUint8(this.getHL())); // sets zero flag
         this.decBC();
         this.incHL();
 
-        temp |= (this.getBC() === 0 ? 0 : F_PARITY);
+        temp |= this.getBC() === 0 ? 0 : F_PARITY;
 
         // Repeat instruction until a = (hl) or bc === 0
         if ((temp & F_PARITY) !== 0 && (this.f & F_ZERO) === 0) {
@@ -2482,11 +5364,11 @@ JSSMS.Z80.prototype = {
           this.pc++;
         }
 
-        this.f = (this.f & 0xF8) | temp; // Sign set by the cp instruction
+        this.f = (this.f & 0xf8) | temp; // Sign set by the cp instruction
         break;
 
       // -- EDB2 INIR ------------------------------
-      case 0xB2:
+      case 0xb2:
         temp = this.port.in_(this.c);
         this.setUint8(this.getHL(), temp);
         this.b = this.dec8(this.b);
@@ -2508,7 +5390,7 @@ JSSMS.Z80.prototype = {
         break;
 
       // -- EDB3 OTIR ------------------------------
-      case 0xB3:
+      case 0xb3:
         temp = this.getUint8(this.getHL());
         // (C) <- (HL)
         this.port.out(this.c, temp);
@@ -2523,7 +5405,7 @@ JSSMS.Z80.prototype = {
         } else {
           this.pc++;
         }
-        if ((this.l + temp) > 255) {
+        if (this.l + temp > 255) {
           this.f |= F_CARRY;
           this.f |= F_HALFCARRY;
         } else {
@@ -2539,15 +5421,19 @@ JSSMS.Z80.prototype = {
         break;
 
       // -- EDB8 LDDR ---------------------------------
-      case 0xB8:
+      case 0xb8:
         temp = this.getUint8(this.getHL());
         this.setUint8(this.getDE(), temp);
         this.decBC();
         this.decDE();
         this.decHL();
 
-        temp = (temp + this.a) & 0xFF;
-        this.f = (this.f & 0xC1) | (this.getBC() ? F_PARITY : 0) | (temp & F_BIT3) | ((temp & F_NEGATIVE) ? 0x20 : 0);
+        temp = (temp + this.a) & 0xff;
+        this.f =
+          (this.f & 0xc1) |
+          (this.getBC() ? F_PARITY : 0) |
+          (temp & F_BIT3) |
+          (temp & F_NEGATIVE ? 0x20 : 0);
         if (this.getBC() !== 0) {
           this.tstates -= 5;
           this.pc--;
@@ -2557,13 +5443,13 @@ JSSMS.Z80.prototype = {
         break;
 
       // -- EDB9 CPDR ------------------------------------
-      case 0xB9:
+      case 0xb9:
         temp = (this.f & F_CARRY) | F_NEGATIVE;
         this.cp_a(this.getUint8(this.getHL())); // sets zero flag
         this.decBC();
         this.decHL();
 
-        temp |= (this.getBC() === 0 ? 0 : F_PARITY);
+        temp |= this.getBC() === 0 ? 0 : F_PARITY;
 
         // Repeat instruction until a = (hl) or bc === 0
         if ((temp & F_PARITY) !== 0 && (this.f & F_ZERO) === 0) {
@@ -2573,11 +5459,11 @@ JSSMS.Z80.prototype = {
           this.pc++;
         }
 
-        this.f = (this.f & 0xF8) | temp;
+        this.f = (this.f & 0xf8) | temp;
         break;
 
       // -- EDBA INDR ------------------------------
-      case 0xBA:
+      case 0xba:
         temp = this.port.in_(this.c);
         this.setUint8(this.getHL(), temp);
         this.b = this.dec8(this.b);
@@ -2599,7 +5485,7 @@ JSSMS.Z80.prototype = {
         break;
 
       // -- EDBB OTDR ------------------------------
-      case 0xBB:
+      case 0xbb:
         temp = this.getUint8(this.getHL());
         // (C) <- (HL)
         this.port.out(this.c, temp);
@@ -2614,7 +5500,7 @@ JSSMS.Z80.prototype = {
         } else {
           this.pc++;
         }
-        if ((this.l + temp) > 255) {
+        if (this.l + temp > 255) {
           this.f |= F_CARRY;
           this.f |= F_HALFCARRY;
         } else {
@@ -2631,12 +5517,13 @@ JSSMS.Z80.prototype = {
 
       // Unimplemented ED Opcode
       default:
-        JSSMS.Utils.console.log('Unimplemented ED Opcode: ' + JSSMS.Utils.toHex(opcode));
+        JSSMS.Utils.console.log(
+          'Unimplemented ED Opcode: ' + JSSMS.Utils.toHex(opcode)
+        );
         this.pc++;
         break;
     } // end of switch
   },
-
 
   /**
    * Pre-calculate DAA table.
@@ -2665,7 +5552,9 @@ JSSMS.Z80.prototype = {
         for (h = 0; h <= 1; h++) {
           // Iterate negative / not-negative set
           for (n = 0; n <= 1; n++) {
-            this.DAA_TABLE[(c << 8) | (n << 9) | (h << 10) | i] = this.getDAAResult(i, c | (n << 1) | (h << 4));
+            this.DAA_TABLE[
+              (c << 8) | (n << 9) | (h << 10) | i
+            ] = this.getDAAResult(i, c | (n << 1) | (h << 4));
           }
         }
       }
@@ -2674,7 +5563,6 @@ JSSMS.Z80.prototype = {
     // Reset these to be sure
     this.a = this.f = 0;
   },
-
 
   /**
    * @param {number} value
@@ -2689,10 +5577,14 @@ JSSMS.Z80.prototype = {
     var correction = 0;
     var carry = flags & F_CARRY;
     var carry_copy = carry;
-    if ((flags & F_HALFCARRY) !== 0 || (a_copy & 0x0F) > 0x09) {
+    if ((flags & F_HALFCARRY) !== 0 || (a_copy & 0x0f) > 0x09) {
       correction |= 0x06;
     }
-    if ((carry === 1) || (a_copy > 0x9F) || ((a_copy > 0x8F) && ((a_copy & 0x0F) > 0x09))) {
+    if (
+      carry === 1 ||
+      a_copy > 0x9f ||
+      (a_copy > 0x8f && (a_copy & 0x0f) > 0x09)
+    ) {
       correction |= 0x60;
       carry_copy = 1;
     }
@@ -2707,17 +5599,16 @@ JSSMS.Z80.prototype = {
       this.add_a(correction);
     }
 
-    flags = (this.f & 0xFE) | carry_copy;
+    flags = (this.f & 0xfe) | carry_copy;
 
     if (this.getParity(this.a)) {
-      flags = (flags & 0xFB) | F_PARITY;
+      flags = (flags & 0xfb) | F_PARITY;
     } else {
-      flags = flags & 0xFB;
+      flags = flags & 0xfb;
     }
 
     return this.a | (flags << 8);
   },
-
 
   // ACCUMULATOR REGISTER
   /**
@@ -2726,11 +5617,10 @@ JSSMS.Z80.prototype = {
    * @param {number} value Value to add.
    */
   add_a: function(value) {
-    var temp = (this.a + value) & 0xFF;
+    var temp = (this.a + value) & 0xff;
     this.f = this.SZHVC_ADD_TABLE[(this.a << 8) | temp];
     this.a = temp;
   },
-
 
   /**
    * ADC 8 BIT - Add with carry.
@@ -2739,11 +5629,10 @@ JSSMS.Z80.prototype = {
    */
   adc_a: function(value) {
     var carry = this.f & F_CARRY;
-    var temp = (this.a + value + carry) & 0xFF;
+    var temp = (this.a + value + carry) & 0xff;
     this.f = this.SZHVC_ADD_TABLE[(carry << 16) | (this.a << 8) | temp];
     this.a = temp;
   },
-
 
   /**
    * SUB 8 BIT.
@@ -2751,11 +5640,10 @@ JSSMS.Z80.prototype = {
    * @param {number} value Value to subtract.
    */
   sub_a: function(value) {
-    var temp = (this.a - value) & 0xFF;
+    var temp = (this.a - value) & 0xff;
     this.f = this.SZHVC_SUB_TABLE[(this.a << 8) | temp];
     this.a = temp;
   },
-
 
   /**
    * SBC 8 BIT.
@@ -2764,11 +5652,10 @@ JSSMS.Z80.prototype = {
    */
   sbc_a: function(value) {
     var carry = this.f & F_CARRY;
-    var temp = (this.a - value - carry) & 0xFF;
+    var temp = (this.a - value - carry) & 0xff;
     this.f = this.SZHVC_SUB_TABLE[(carry << 16) | (this.a << 8) | temp];
     this.a = temp;
   },
-
 
   /**
    * CP Operation - Compare with accumulator.
@@ -2777,9 +5664,8 @@ JSSMS.Z80.prototype = {
    */
   cp_a: function(value) {
     // Subtract value from accumulator but discard result
-    this.f = this.SZHVC_SUB_TABLE[(this.a << 8) | ((this.a - value) & 0xFF)];
+    this.f = this.SZHVC_SUB_TABLE[(this.a << 8) | ((this.a - value) & 0xff)];
   },
-
 
   /**
    * CPL Operation - Complement accumulator.
@@ -2787,30 +5673,27 @@ JSSMS.Z80.prototype = {
    * Bit 3 and Bit incomplete
    */
   cpl_a: function() {
-    this.a ^= 0xFF;
+    this.a ^= 0xff;
     this.f |= F_NEGATIVE | F_HALFCARRY;
   },
-
 
   /**
    * RRA Operation - Rotate right accumulator.
    */
   rra_a: function() {
     var carry = this.a & 1; // bit 1 rotates to carry flag
-    this.a = ((this.a >> 1) | (this.f & F_CARRY) << 7) & 0xFF; // Shift Right One Bit Position
-    this.f = (this.f & 0xEC) | carry;
+    this.a = ((this.a >> 1) | ((this.f & F_CARRY) << 7)) & 0xff; // Shift Right One Bit Position
+    this.f = (this.f & 0xec) | carry;
   },
-
 
   /**
    * RLA Operation - Rotate left accumulator.
    */
   rla_a: function() {
     var carry = this.a >> 7; // bit 7 rotates to carry flag
-    this.a = ((this.a << 1) | (this.f & F_CARRY)) & 0xFF;
-    this.f = (this.f & 0xEC) | carry;
+    this.a = ((this.a << 1) | (this.f & F_CARRY)) & 0xff;
+    this.f = (this.f & 0xec) | carry;
   },
-
 
   /**
    * RLCA Operation - Rotate left with carry accumulator.
@@ -2820,12 +5703,11 @@ JSSMS.Z80.prototype = {
     var carry = this.a >> 7;
 
     // Shift register left
-    this.a = ((this.a << 1) & 0xFF) | carry;
+    this.a = ((this.a << 1) & 0xff) | carry;
 
     // Retain Sign, Zero, Bit 5, Bit 3 and Parity
-    this.f = (this.f & 0xEC) | carry;
+    this.f = (this.f & 0xec) | carry;
   },
-
 
   /**
    * RRCA Operation - Rotate right with carry accumulator.
@@ -2836,9 +5718,8 @@ JSSMS.Z80.prototype = {
     this.a = (this.a >> 1) | (carry << 7);
 
     // Retain Sign, Zero, Bit 5, Bit 3 and Parity
-    this.f = (this.f & 0xEC) | carry;
+    this.f = (this.f & 0xec) | carry;
   },
-
 
   // NORMAL REGISTER ACCESS
   /**
@@ -2848,14 +5729,12 @@ JSSMS.Z80.prototype = {
     return (this.b << 8) | this.c;
   },
 
-
   /**
    * @return {number}
    */
   getDE: function() {
     return (this.d << 8) | this.e;
   },
-
 
   /**
    * @return {number}
@@ -2864,14 +5743,12 @@ JSSMS.Z80.prototype = {
     return (this.h << 8) | this.l;
   },
 
-
   /**
    * @return {number}
    */
   getAF: function() {
     return (this.a << 8) | this.f;
   },
-
 
   /**
    * @return {number}
@@ -2880,7 +5757,6 @@ JSSMS.Z80.prototype = {
     return (this.ixH << 8) | this.ixL;
   },
 
-
   /**
    * @return {number}
    */
@@ -2888,162 +5764,143 @@ JSSMS.Z80.prototype = {
     return (this.iyH << 8) | this.iyL;
   },
 
-
   /**
    * @param {number} value
    */
   setBC: function(value) {
     this.b = value >> 8;
-    this.c = value & 0xFF;
+    this.c = value & 0xff;
   },
-
 
   /**
    * @param {number} value
    */
   setDE: function(value) {
     this.d = value >> 8;
-    this.e = value & 0xFF;
+    this.e = value & 0xff;
   },
-
 
   /**
    * @param {number} value
    */
   setHL: function(value) {
     this.h = value >> 8;
-    this.l = value & 0xFF;
+    this.l = value & 0xff;
   },
-
 
   /**
    * @param {number} value
    */
   setAF: function(value) {
     this.a = value >> 8;
-    this.f = value & 0xFF;
+    this.f = value & 0xff;
   },
-
 
   /**
    * @param {number} value
    */
   setIXHIXL: function(value) {
     this.ixH = value >> 8;
-    this.ixL = value & 0xFF;
+    this.ixL = value & 0xff;
   },
-
 
   /**
    * @param {number} value
    */
   setIYHIYL: function(value) {
     this.iyH = value >> 8;
-    this.iyL = value & 0xFF;
+    this.iyL = value & 0xff;
   },
-
 
   incBC: function() {
-    this.c = (this.c + 1) & 0xFF;
+    this.c = (this.c + 1) & 0xff;
     if (this.c === 0) {
-      this.b = (this.b + 1) & 0xFF;
+      this.b = (this.b + 1) & 0xff;
     }
   },
-
 
   incDE: function() {
-    this.e = (this.e + 1) & 0xFF;
+    this.e = (this.e + 1) & 0xff;
     if (this.e === 0) {
-      this.d = (this.d + 1) & 0xFF;
+      this.d = (this.d + 1) & 0xff;
     }
   },
-
 
   incHL: function() {
-    this.l = (this.l + 1) & 0xFF;
+    this.l = (this.l + 1) & 0xff;
     if (this.l === 0) {
-      this.h = (this.h + 1) & 0xFF;
+      this.h = (this.h + 1) & 0xff;
     }
   },
-
 
   incIXHIXL: function() {
-    this.ixL = (this.ixL + 1) & 0xFF;
+    this.ixL = (this.ixL + 1) & 0xff;
     if (this.ixL === 0) {
-      this.ixH = (this.ixH + 1) & 0xFF;
+      this.ixH = (this.ixH + 1) & 0xff;
     }
   },
-
 
   incIYHIYL: function() {
-    this.iyL = (this.iyL + 1) & 0xFF;
+    this.iyL = (this.iyL + 1) & 0xff;
     if (this.iyL === 0) {
-      this.iyH = (this.iyH + 1) & 0xFF;
+      this.iyH = (this.iyH + 1) & 0xff;
     }
   },
-
 
   decBC: function() {
-    this.c = (this.c - 1) & 0xFF;
+    this.c = (this.c - 1) & 0xff;
     if (this.c === 255) {
-      this.b = (this.b - 1) & 0xFF;
+      this.b = (this.b - 1) & 0xff;
     }
   },
-
 
   decDE: function() {
-    this.e = (this.e - 1) & 0xFF;
+    this.e = (this.e - 1) & 0xff;
     if (this.e === 255) {
-      this.d = (this.d - 1) & 0xFF;
+      this.d = (this.d - 1) & 0xff;
     }
   },
-
 
   decHL: function() {
-    this.l = (this.l - 1) & 0xFF;
+    this.l = (this.l - 1) & 0xff;
     if (this.l === 255) {
-      this.h = (this.h - 1) & 0xFF;
+      this.h = (this.h - 1) & 0xff;
     }
   },
-
 
   decIXHIXL: function() {
-    this.ixL = (this.ixL - 1) & 0xFF;
+    this.ixL = (this.ixL - 1) & 0xff;
     if (this.ixL === 255) {
-      this.ixH = (this.ixH - 1) & 0xFF;
+      this.ixH = (this.ixH - 1) & 0xff;
     }
   },
-
 
   decIYHIYL: function() {
-    this.iyL = (this.iyL - 1) & 0xFF;
+    this.iyL = (this.iyL - 1) & 0xff;
     if (this.iyL === 255) {
-      this.iyH = (this.iyH - 1) & 0xFF;
+      this.iyH = (this.iyH - 1) & 0xff;
     }
   },
-
 
   /**
    * @param {number} value
    * @return {number}
    */
   inc8: function(value) {
-    value = (value + 1) & 0xFF;
+    value = (value + 1) & 0xff;
     this.f = (this.f & F_CARRY) | this.SZHV_INC_TABLE[value];
     return value;
   },
-
 
   /**
    * @param {number} value
    * @return {number}
    */
   dec8: function(value) {
-    value = (value - 1) & 0xFF;
+    value = (value - 1) & 0xff;
     this.f = (this.f & F_CARRY) | this.SZHV_DEC_TABLE[value];
     return value;
   },
-
 
   // EXCHANGE REGISTER BANKS
   exAF: function() {
@@ -3059,7 +5916,6 @@ JSSMS.Z80.prototype = {
     //}
   },
 
-
   exBC: function() {
     /*if (SUPPORT_DESTRUCTURING) {
       [this.b, this.b2, this.c, this.c2] = [this.b2, this.b, this.c2, this.c];
@@ -3072,7 +5928,6 @@ JSSMS.Z80.prototype = {
     this.c2 = temp;
     //}
   },
-
 
   exDE: function() {
     /*if (SUPPORT_DESTRUCTURING) {
@@ -3087,7 +5942,6 @@ JSSMS.Z80.prototype = {
     //}
   },
 
-
   exHL: function() {
     /*if (SUPPORT_DESTRUCTURING) {
       [this.h, this.h2, this.l, this.l2] = [this.h2, this.h, this.l2, this.l];
@@ -3101,7 +5955,6 @@ JSSMS.Z80.prototype = {
     //}
   },
 
-
   /**
    * @param {number} reg
    * @param {number} value
@@ -3109,10 +5962,12 @@ JSSMS.Z80.prototype = {
    */
   add16: function(reg, value) {
     var result = reg + value;
-    this.f = (this.f & 0xC4) | (((reg ^ result ^ value) >> 8) & 0x10) | ((result >> 16) & 1);
-    return result & 0xFFFF;
+    this.f =
+      (this.f & 0xc4) |
+      (((reg ^ result ^ value) >> 8) & 0x10) |
+      ((result >> 16) & 1);
+    return result & 0xffff;
   },
-
 
   /**
    * Add with carry (16-bit).
@@ -3124,11 +5979,15 @@ JSSMS.Z80.prototype = {
     var hl = this.getHL();
 
     var result = hl + value + (this.f & F_CARRY);
-    this.f = (((hl ^ result ^ value) >> 8) & 0x10) | ((result >> 16) & 1) | ((result >> 8) & 0x80) | (((result & 0xFFFF) !== 0) ? 0 : 0x40) | (((value ^ hl ^ 0x8000) & (value ^ result) & 0x8000) >> 13);
-    this.h = (result >> 8) & 0xFF;
-    this.l = result & 0xFF;
+    this.f =
+      (((hl ^ result ^ value) >> 8) & 0x10) |
+      ((result >> 16) & 1) |
+      ((result >> 8) & 0x80) |
+      ((result & 0xffff) !== 0 ? 0 : 0x40) |
+      (((value ^ hl ^ 0x8000) & (value ^ result) & 0x8000) >> 13);
+    this.h = (result >> 8) & 0xff;
+    this.l = result & 0xff;
   },
-
 
   /**
    * Subtract with carry (16-bit).
@@ -3140,26 +5999,28 @@ JSSMS.Z80.prototype = {
     var hl = this.getHL();
 
     var result = hl - value - (this.f & F_CARRY);
-    this.f = (((hl ^ result ^ value) >> 8) & 0x10) | 0x02 | ((result >> 16) & 1) | ((result >> 8) & 0x80) | (((result & 0xFFFF) !== 0) ? 0 : 0x40) | (((value ^ hl) & (hl ^ result) & 0x8000) >> 13);
-    this.h = (result >> 8) & 0xFF;
-    this.l = result & 0xFF;
+    this.f =
+      (((hl ^ result ^ value) >> 8) & 0x10) |
+      0x02 |
+      ((result >> 16) & 1) |
+      ((result >> 8) & 0x80) |
+      ((result & 0xffff) !== 0 ? 0 : 0x40) |
+      (((value ^ hl) & (hl ^ result) & 0x8000) >> 13);
+    this.h = (result >> 8) & 0xff;
+    this.l = result & 0xff;
   },
-
 
   /**
    * Increment refresh register.
    */
   incR: function() {
-    this.r = (this.r & 0x80) | ((this.r + 1) & 0x7F);
+    this.r = (this.r & 0x80) | ((this.r + 1) & 0x7f);
   },
-
 
   /**
    * Do noting.
    */
-  nop: function() {
-  },
-
+  nop: function() {},
 
   // FLAG REGISTER
   /**
@@ -3176,10 +6037,10 @@ JSSMS.Z80.prototype = {
     // Generate tables
     for (i = 0; i < 256; i++) {
       // Sign bits (0x80)
-      sf = ((i & 0x80) !== 0 ? F_SIGN : 0);
+      sf = (i & 0x80) !== 0 ? F_SIGN : 0;
 
       // Zero bits (0x40)
-      zf = (i === 0 ? F_ZERO : 0);
+      zf = i === 0 ? F_ZERO : 0;
 
       // Bit 5 (0x20)
       yf = i & 0x20;
@@ -3204,16 +6065,16 @@ JSSMS.Z80.prototype = {
 
       // Generate table for inc8 instruction
       this.SZHV_INC_TABLE[i] = sf | zf | yf | xf;
-      this.SZHV_INC_TABLE[i] |= (i === 0x80) ? F_OVERFLOW : 0;
-      this.SZHV_INC_TABLE[i] |= ((i & 0x0F) === 0x00) ? F_HALFCARRY : 0;
+      this.SZHV_INC_TABLE[i] |= i === 0x80 ? F_OVERFLOW : 0;
+      this.SZHV_INC_TABLE[i] |= (i & 0x0f) === 0x00 ? F_HALFCARRY : 0;
 
       // Generate table for dec8 instruction
       this.SZHV_DEC_TABLE[i] = sf | zf | yf | xf | F_NEGATIVE;
-      this.SZHV_DEC_TABLE[i] |= (i === 0x7F) ? F_OVERFLOW : 0;
-      this.SZHV_DEC_TABLE[i] |= ((i & 0x0F) === 0x0F) ? F_HALFCARRY : 0;
+      this.SZHV_DEC_TABLE[i] |= i === 0x7f ? F_OVERFLOW : 0;
+      this.SZHV_DEC_TABLE[i] |= (i & 0x0f) === 0x0f ? F_HALFCARRY : 0;
 
       // Generate table for bit instruction (set sign flag on here)
-      this.SZ_BIT_TABLE[i] = ((i !== 0) ? i & 0x80 : F_ZERO | F_PARITY);
+      this.SZ_BIT_TABLE[i] = i !== 0 ? i & 0x80 : F_ZERO | F_PARITY;
       this.SZ_BIT_TABLE[i] |= yf | xf | F_HALFCARRY; // halfcarry is always on with bit instruction :)
     }
 
@@ -3238,9 +6099,9 @@ JSSMS.Z80.prototype = {
           this.SZHVC_ADD_TABLE[padd] = F_ZERO;
         }
 
-        this.SZHVC_ADD_TABLE[padd] |= (newval & (F_BIT5 | F_BIT3)); // undocumented flag bits 5+3
+        this.SZHVC_ADD_TABLE[padd] |= newval & (F_BIT5 | F_BIT3); // undocumented flag bits 5+3
 
-        if ((newval & 0x0F) < (oldval & 0x0F)) {
+        if ((newval & 0x0f) < (oldval & 0x0f)) {
           this.SZHVC_ADD_TABLE[padd] |= F_HALFCARRY;
         }
         if (newval < oldval) {
@@ -3263,9 +6124,9 @@ JSSMS.Z80.prototype = {
           this.SZHVC_ADD_TABLE[padc] = F_ZERO;
         }
 
-        this.SZHVC_ADD_TABLE[padc] |= (newval & (F_BIT5 | F_BIT3)); // undocumented flag bits 5+3
+        this.SZHVC_ADD_TABLE[padc] |= newval & (F_BIT5 | F_BIT3); // undocumented flag bits 5+3
 
-        if ((newval & 0x0F) <= (oldval & 0x0F)) {
+        if ((newval & 0x0f) <= (oldval & 0x0f)) {
           this.SZHVC_ADD_TABLE[padc] |= F_HALFCARRY;
         }
         if (newval <= oldval) {
@@ -3288,9 +6149,9 @@ JSSMS.Z80.prototype = {
           this.SZHVC_SUB_TABLE[psub] = F_NEGATIVE | F_ZERO;
         }
 
-        this.SZHVC_SUB_TABLE[psub] |= (newval & (F_BIT5 | F_BIT3)); // undocumented flag bits 5+3
+        this.SZHVC_SUB_TABLE[psub] |= newval & (F_BIT5 | F_BIT3); // undocumented flag bits 5+3
 
-        if ((newval & 0x0F) > (oldval & 0x0F)) {
+        if ((newval & 0x0f) > (oldval & 0x0f)) {
           this.SZHVC_SUB_TABLE[psub] |= F_HALFCARRY;
         }
         if (newval > oldval) {
@@ -3313,9 +6174,9 @@ JSSMS.Z80.prototype = {
           this.SZHVC_SUB_TABLE[psbc] = F_NEGATIVE | F_ZERO;
         }
 
-        this.SZHVC_SUB_TABLE[psbc] |= (newval & (F_BIT5 | F_BIT3)); // undocumented flag bits 5+3
+        this.SZHVC_SUB_TABLE[psbc] |= newval & (F_BIT5 | F_BIT3); // undocumented flag bits 5+3
 
-        if ((newval & 0x0F) >= (oldval & 0x0F)) {
+        if ((newval & 0x0f) >= (oldval & 0x0f)) {
           this.SZHVC_SUB_TABLE[psbc] |= F_HALFCARRY;
         }
         if (newval >= oldval) {
@@ -3328,7 +6189,6 @@ JSSMS.Z80.prototype = {
       }
     }
   },
-
 
   /**
    * Return the parity of a number.
@@ -3347,7 +6207,6 @@ JSSMS.Z80.prototype = {
     }
     return parity;
   },
-
 
   // MEMORY ACCESS
   /**
@@ -3382,7 +6241,6 @@ JSSMS.Z80.prototype = {
       this.frameReg[i] = i % 3;
     }
   },
-
 
   /**
    * Reset memory to default values.
@@ -3422,7 +6280,6 @@ JSSMS.Z80.prototype = {
     }
   },
 
-
   /**
    * Read a signed value from next memory location.
    *
@@ -3432,26 +6289,25 @@ JSSMS.Z80.prototype = {
     return this.getUint8(this.pc);
   },
 
-
   /**
    * Write an unsigned 8-bit integer to the specified address.
    */
-  setUint8: function() {
+  setUint8: (function() {
     if (SUPPORT_DATAVIEW) {
       /**
        * @param {number} address Memory address.
        * @param {number} value Value to write.
        */
       return function setUint8(address, value) {
-        if (address <= 0xFFFF) {
-          this.memWriteMap.setUint8(address & 0x1FFF, value);
-          if (address === 0xFFFC) {
+        if (address <= 0xffff) {
+          this.memWriteMap.setUint8(address & 0x1fff, value);
+          if (address === 0xfffc) {
             this.frameReg[3] = value;
-          } else if (address === 0xFFFD) {
+          } else if (address === 0xfffd) {
             this.frameReg[0] = value & this.romPageMask;
-          } else if (address === 0xFFFE) {
+          } else if (address === 0xfffe) {
             this.frameReg[1] = value & this.romPageMask;
-          } else if (address === 0xFFFF) {
+          } else if (address === 0xffff) {
             this.frameReg[2] = value & this.romPageMask;
           }
         } else {
@@ -3464,15 +6320,15 @@ JSSMS.Z80.prototype = {
        * @param {number} value Value to write.
        */
       return function setUint8(address, value) {
-        if (address <= 0xFFFF) {
-          this.memWriteMap[address & 0x1FFF] = value;
-          if (address === 0xFFFC) {
+        if (address <= 0xffff) {
+          this.memWriteMap[address & 0x1fff] = value;
+          if (address === 0xfffc) {
             this.frameReg[3] = value;
-          } else if (address === 0xFFFD) {
+          } else if (address === 0xfffd) {
             this.frameReg[0] = value & this.romPageMask;
-          } else if (address === 0xFFFE) {
+          } else if (address === 0xfffe) {
             this.frameReg[1] = value & this.romPageMask;
-          } else if (address === 0xFFFF) {
+          } else if (address === 0xffff) {
             this.frameReg[2] = value & this.romPageMask;
           }
         } else {
@@ -3480,29 +6336,28 @@ JSSMS.Z80.prototype = {
         }
       };
     }
-  }(),
-
+  })(),
 
   /**
    * Write an unsigned 16-bit integer to the specified address.
    */
-  setUint16: function() {
+  setUint16: (function() {
     if (SUPPORT_DATAVIEW) {
       /**
        * @param {number} address Memory address.
        * @param {number} value Value to write.
        */
       return function setUint16(address, value) {
-        if (address < 0xFFFC) {
-          this.memWriteMap.setUint16(address & 0x1FFF, value, LITTLE_ENDIAN);
-        } else if (address === 0xFFFC) {
-          this.frameReg[3] = value & 0xFF;
+        if (address < 0xfffc) {
+          this.memWriteMap.setUint16(address & 0x1fff, value, LITTLE_ENDIAN);
+        } else if (address === 0xfffc) {
+          this.frameReg[3] = value & 0xff;
           this.frameReg[0] = (value >> 8) & this.romPageMask;
-        } else if (address === 0xFFFD) {
-          this.frameReg[0] = (value & 0xFF) & this.romPageMask;
+        } else if (address === 0xfffd) {
+          this.frameReg[0] = value & 0xff & this.romPageMask;
           this.frameReg[1] = (value >> 8) & this.romPageMask;
-        } else if (address === 0xFFFE) {
-          this.frameReg[1] = (value & 0xFF) & this.romPageMask;
+        } else if (address === 0xfffe) {
+          this.frameReg[1] = value & 0xff & this.romPageMask;
           this.frameReg[2] = (value >> 8) & this.romPageMask;
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
@@ -3514,31 +6369,30 @@ JSSMS.Z80.prototype = {
        * @param {number} value Value to write.
        */
       return function setUint16(address, value) {
-        if (address < 0xFFFC) {
-          address &= 0x1FFF;
-          this.memWriteMap[address++] = value & 0xFF;
+        if (address < 0xfffc) {
+          address &= 0x1fff;
+          this.memWriteMap[address++] = value & 0xff;
           this.memWriteMap[address] = value >> 8;
-        } else if (address === 0xFFFC) {
-          this.frameReg[3] = value & 0xFF;
+        } else if (address === 0xfffc) {
+          this.frameReg[3] = value & 0xff;
           this.frameReg[0] = (value >> 8) & this.romPageMask;
-        } else if (address === 0xFFFD) {
-          this.frameReg[0] = (value & 0xFF) & this.romPageMask;
+        } else if (address === 0xfffd) {
+          this.frameReg[0] = value & 0xff & this.romPageMask;
           this.frameReg[1] = (value >> 8) & this.romPageMask;
-        } else if (address === 0xFFFE) {
-          this.frameReg[1] = (value & 0xFF) & this.romPageMask;
+        } else if (address === 0xfffe) {
+          this.frameReg[1] = value & 0xff & this.romPageMask;
           this.frameReg[2] = (value >> 8) & this.romPageMask;
         } else {
           JSSMS.Utils.console.error(JSSMS.Utils.toHex(address));
         }
       };
     }
-  }(),
-
+  })(),
 
   /**
    * Read an unsigned 8-bit integer from the specified address.
    */
-  getUint8: function() {
+  getUint8: (function() {
     if (SUPPORT_DATAVIEW) {
       /**
        * @param {number} address
@@ -3551,7 +6405,7 @@ JSSMS.Z80.prototype = {
           return this.rom[this.frameReg[0]].getUint8(address);
         } else if (address < 0x8000) {
           return this.rom[this.frameReg[1]].getUint8(address - 0x4000);
-        } else if (address < 0xC000) {
+        } else if (address < 0xc000) {
           if ((this.frameReg[3] & 12) === 8) {
             this.useSRAM = true;
             return this.sram.getUint8(address - 0x8000);
@@ -3561,20 +6415,20 @@ JSSMS.Z80.prototype = {
           } else {
             return this.rom[this.frameReg[2]].getUint8(address - 0x8000);
           }
-        } else if (address < 0xE000) {
-          return this.memWriteMap.getUint8(address - 0xC000);
-        } else if (address < 0xFFFC) {
-          return this.memWriteMap.getUint8(address - 0xE000);
-        } else if (address === 0xFFFC) {
+        } else if (address < 0xe000) {
+          return this.memWriteMap.getUint8(address - 0xc000);
+        } else if (address < 0xfffc) {
+          return this.memWriteMap.getUint8(address - 0xe000);
+        } else if (address === 0xfffc) {
           // 0xFFFC: RAM/ROM select register
           return this.frameReg[3];
-        } else if (address === 0xFFFD) {
+        } else if (address === 0xfffd) {
           // 0xFFFD: Page 0 ROM Bank
           return this.frameReg[0];
-        } else if (address === 0xFFFE) {
+        } else if (address === 0xfffe) {
           // 0xFFFE: Page 1 ROM Bank
           return this.frameReg[1];
-        } else if (address === 0xFFFF) {
+        } else if (address === 0xffff) {
           // 0xFFFF: Page 2 ROM Bank
           return this.frameReg[2];
         } else {
@@ -3594,7 +6448,7 @@ JSSMS.Z80.prototype = {
           return this.rom[this.frameReg[0]][address];
         } else if (address < 0x8000) {
           return this.rom[this.frameReg[1]][address - 0x4000];
-        } else if (address < 0xC000) {
+        } else if (address < 0xc000) {
           if ((this.frameReg[3] & 12) === 8) {
             this.useSRAM = true;
             return this.sram[address - 0x8000];
@@ -3604,20 +6458,20 @@ JSSMS.Z80.prototype = {
           } else {
             return this.rom[this.frameReg[2]][address - 0x8000];
           }
-        } else if (address < 0xE000) {
-          return this.memWriteMap[address - 0xC000];
-        } else if (address < 0xFFFC) {
-          return this.memWriteMap[address - 0xE000];
-        } else if (address === 0xFFFC) {
+        } else if (address < 0xe000) {
+          return this.memWriteMap[address - 0xc000];
+        } else if (address < 0xfffc) {
+          return this.memWriteMap[address - 0xe000];
+        } else if (address === 0xfffc) {
           // 0xFFFC: RAM/ROM select register
           return this.frameReg[3];
-        } else if (address === 0xFFFD) {
+        } else if (address === 0xfffd) {
           // 0xFFFD: Page 0 ROM Bank
           return this.frameReg[0];
-        } else if (address === 0xFFFE) {
+        } else if (address === 0xfffe) {
           // 0xFFFE: Page 1 ROM Bank
           return this.frameReg[1];
-        } else if (address === 0xFFFF) {
+        } else if (address === 0xffff) {
           // 0xFFFF: Page 2 ROM Bank
           return this.frameReg[2];
         } else {
@@ -3626,13 +6480,12 @@ JSSMS.Z80.prototype = {
         return 0x00;
       };
     }
-  }(),
-
+  })(),
 
   /**
    * Read an unsigned 16-bit integer from the specified address.
    */
-  getUint16: function() {
+  getUint16: (function() {
     if (SUPPORT_DATAVIEW) {
       /**
        * @param {number} address
@@ -3644,8 +6497,11 @@ JSSMS.Z80.prototype = {
         } else if (address < 0x4000) {
           return this.rom[this.frameReg[0]].getUint16(address, LITTLE_ENDIAN);
         } else if (address < 0x8000) {
-          return this.rom[this.frameReg[1]].getUint16(address - 0x4000, LITTLE_ENDIAN);
-        } else if (address < 0xC000) {
+          return this.rom[this.frameReg[1]].getUint16(
+            address - 0x4000,
+            LITTLE_ENDIAN
+          );
+        } else if (address < 0xc000) {
           if ((this.frameReg[3] & 12) === 8) {
             this.useSRAM = true;
             return this.sram[address - 0x8000];
@@ -3653,22 +6509,25 @@ JSSMS.Z80.prototype = {
             this.useSRAM = true;
             return this.sram[address - 0x4000];
           } else {
-            return this.rom[this.frameReg[2]].getUint16(address - 0x8000, LITTLE_ENDIAN);
+            return this.rom[this.frameReg[2]].getUint16(
+              address - 0x8000,
+              LITTLE_ENDIAN
+            );
           }
-        } else if (address < 0xE000) {
-          return this.memWriteMap.getUint16(address - 0xC000, LITTLE_ENDIAN);
-        } else if (address < 0xFFFC) {
-          return this.memWriteMap.getUint16(address - 0xE000, LITTLE_ENDIAN);
-        } else if (address === 0xFFFC) {
+        } else if (address < 0xe000) {
+          return this.memWriteMap.getUint16(address - 0xc000, LITTLE_ENDIAN);
+        } else if (address < 0xfffc) {
+          return this.memWriteMap.getUint16(address - 0xe000, LITTLE_ENDIAN);
+        } else if (address === 0xfffc) {
           // 0xFFFC: RAM/ROM select register
           return this.frameReg[3];
-        } else if (address === 0xFFFD) {
+        } else if (address === 0xfffd) {
           // 0xFFFD: Page 0 ROM Bank
           return this.frameReg[0];
-        } else if (address === 0xFFFE) {
+        } else if (address === 0xfffe) {
           // 0xFFFE: Page 1 ROM Bank
           return this.frameReg[1];
-        } else if (address === 0xFFFF) {
+        } else if (address === 0xffff) {
           // 0xFFFF: Page 2 ROM Bank
           return this.frameReg[2];
         } else {
@@ -3683,35 +6542,54 @@ JSSMS.Z80.prototype = {
        */
       return function getUint16(address) {
         if (address < 0x0400) {
-          return this.rom[0][address++] | this.rom[0][address] << 8;
+          return this.rom[0][address++] | (this.rom[0][address] << 8);
         } else if (address < 0x4000) {
-          return this.rom[this.frameReg[0]][address++] | this.rom[this.frameReg[0]][address] << 8;
+          return (
+            this.rom[this.frameReg[0]][address++] |
+            (this.rom[this.frameReg[0]][address] << 8)
+          );
         } else if (address < 0x8000) {
-          return this.rom[this.frameReg[1]][address++ - 0x4000] | this.rom[this.frameReg[1]][address - 0x4000] << 8;
-        } else if (address < 0xC000) {
+          return (
+            this.rom[this.frameReg[1]][address++ - 0x4000] |
+            (this.rom[this.frameReg[1]][address - 0x4000] << 8)
+          );
+        } else if (address < 0xc000) {
           if ((this.frameReg[3] & 12) === 8) {
             this.useSRAM = true;
-            return this.sram[address++ - 0x8000] | this.sram[address - 0x8000] << 8;
+            return (
+              this.sram[address++ - 0x8000] | (this.sram[address - 0x8000] << 8)
+            );
           } else if ((this.frameReg[3] & 12) === 12) {
             this.useSRAM = true;
-            return this.sram[address++ - 0x4000] | this.sram[address - 0x4000] << 8;
+            return (
+              this.sram[address++ - 0x4000] | (this.sram[address - 0x4000] << 8)
+            );
           } else {
-            return this.rom[this.frameReg[2]][address++ - 0x8000] | this.rom[this.frameReg[2]][address - 0x8000] << 8;
+            return (
+              this.rom[this.frameReg[2]][address++ - 0x8000] |
+              (this.rom[this.frameReg[2]][address - 0x8000] << 8)
+            );
           }
-        } else if (address < 0xE000) {
-          return this.memWriteMap[address++ - 0xC000] | this.memWriteMap[address - 0xC000] << 8;
-        } else if (address < 0xFFFC) {
-          return this.memWriteMap[address++ - 0xE000] | this.memWriteMap[address - 0xE000] << 8;
-        } else if (address === 0xFFFC) {
+        } else if (address < 0xe000) {
+          return (
+            this.memWriteMap[address++ - 0xc000] |
+            (this.memWriteMap[address - 0xc000] << 8)
+          );
+        } else if (address < 0xfffc) {
+          return (
+            this.memWriteMap[address++ - 0xe000] |
+            (this.memWriteMap[address - 0xe000] << 8)
+          );
+        } else if (address === 0xfffc) {
           // 0xFFFC: RAM/ROM select register
           return this.frameReg[3];
-        } else if (address === 0xFFFD) {
+        } else if (address === 0xfffd) {
           // 0xFFFD: Page 0 ROM Bank
           return this.frameReg[0];
-        } else if (address === 0xFFFE) {
+        } else if (address === 0xfffe) {
           // 0xFFFE: Page 1 ROM Bank
           return this.frameReg[1];
-        } else if (address === 0xFFFF) {
+        } else if (address === 0xffff) {
           // 0xFFFF: Page 2 ROM Bank
           return this.frameReg[2];
         } else {
@@ -3720,13 +6598,12 @@ JSSMS.Z80.prototype = {
         return 0x00;
       };
     }
-  }(),
-
+  })(),
 
   /**
    * Read a signed 8-bit integer from the specified address.
    */
-  getInt8: function() {
+  getInt8: (function() {
     if (SUPPORT_DATAVIEW) {
       /**
        * @param {number} address
@@ -3740,7 +6617,7 @@ JSSMS.Z80.prototype = {
           value = this.rom[this.frameReg[0]].getInt8(address);
         } else if (address < 0x8000) {
           value = this.rom[this.frameReg[1]].getInt8(address - 0x4000);
-        } else if (address < 0xC000) {
+        } else if (address < 0xc000) {
           if ((this.frameReg[3] & 12) === 8) {
             this.useSRAM = true;
             value = this.sram.getInt8(address - 0x8000);
@@ -3750,20 +6627,20 @@ JSSMS.Z80.prototype = {
           } else {
             value = this.rom[this.frameReg[2]].getInt8(address - 0x8000);
           }
-        } else if (address < 0xE000) {
-          value = this.memWriteMap.getInt8(address - 0xC000);
-        } else if (address < 0xFFFC) {
-          value = this.memWriteMap.getInt8(address - 0xE000);
-        } else if (address === 0xFFFC) {
+        } else if (address < 0xe000) {
+          value = this.memWriteMap.getInt8(address - 0xc000);
+        } else if (address < 0xfffc) {
+          value = this.memWriteMap.getInt8(address - 0xe000);
+        } else if (address === 0xfffc) {
           // 0xFFFC: RAM/ROM select register
           return this.frameReg[3];
-        } else if (address === 0xFFFD) {
+        } else if (address === 0xfffd) {
           // 0xFFFD: Page 0 ROM Bank
           return this.frameReg[0];
-        } else if (address === 0xFFFE) {
+        } else if (address === 0xfffe) {
           // 0xFFFE: Page 1 ROM Bank
           return this.frameReg[1];
-        } else if (address === 0xFFFF) {
+        } else if (address === 0xffff) {
           // 0xFFFF: Page 2 ROM Bank
           return this.frameReg[2];
         } else {
@@ -3784,7 +6661,7 @@ JSSMS.Z80.prototype = {
           value = this.rom[this.frameReg[0]][address];
         } else if (address < 0x8000) {
           value = this.rom[this.frameReg[1]][address - 0x4000];
-        } else if (address < 0xC000) {
+        } else if (address < 0xc000) {
           if ((this.frameReg[3] & 12) === 8) {
             this.useSRAM = true;
             value = this.sram[address - 0x8000];
@@ -3794,20 +6671,20 @@ JSSMS.Z80.prototype = {
           } else {
             value = this.rom[this.frameReg[2]][address - 0x8000];
           }
-        } else if (address < 0xE000) {
-          value = this.memWriteMap[address - 0xC000];
-        } else if (address < 0xFFFC) {
-          value = this.memWriteMap[address - 0xE000];
-        } else if (address === 0xFFFC) {
+        } else if (address < 0xe000) {
+          value = this.memWriteMap[address - 0xc000];
+        } else if (address < 0xfffc) {
+          value = this.memWriteMap[address - 0xe000];
+        } else if (address === 0xfffc) {
           // 0xFFFC: RAM/ROM select register
           return this.frameReg[3];
-        } else if (address === 0xFFFD) {
+        } else if (address === 0xfffd) {
           // 0xFFFD: Page 0 ROM Bank
           return this.frameReg[0];
-        } else if (address === 0xFFFE) {
+        } else if (address === 0xfffe) {
           // 0xFFFE: Page 1 ROM Bank
           return this.frameReg[1];
-        } else if (address === 0xFFFF) {
+        } else if (address === 0xffff) {
           // 0xFFFF: Page 2 ROM Bank
           return this.frameReg[2];
         } else {
@@ -3820,8 +6697,7 @@ JSSMS.Z80.prototype = {
         return value;
       };
     }
-  }(),
-
+  })(),
 
   /**
    * @return {boolean}
@@ -3830,16 +6706,20 @@ JSSMS.Z80.prototype = {
     return this.useSRAM;
   },
 
-
   setSRAM: function(bytes) {
     var length = bytes.length / PAGE_SIZE;
     var i;
 
     for (i = 0; i < length; i++) {
-      JSSMS.Utils.copyArrayElements(bytes, i * PAGE_SIZE, this.sram[i], 0, PAGE_SIZE);
+      JSSMS.Utils.copyArrayElements(
+        bytes,
+        i * PAGE_SIZE,
+        this.sram[i],
+        0,
+        PAGE_SIZE
+      );
     }
   },
-
 
   /**
    * Called when restoring from a saved state.
@@ -3849,7 +6729,6 @@ JSSMS.Z80.prototype = {
   setStateMem: function(state) {
     this.frameReg = state;
   },
-
 
   // Z80 State Saving
   /**
@@ -3864,7 +6743,12 @@ JSSMS.Z80.prototype = {
     var state = new Array(STATE_LENGTH);
 
     state[0] = this.pc | (this.sp << 16);
-    state[1] = (this.iff1 ? 0x01 : 0) | (this.iff2 ? 0x02 : 0) | (this.halt ? 0x04 : 0) | (this.EI_inst ? 0x08 : 0) | (this.interruptLine ? 0x10 : 0);
+    state[1] =
+      (this.iff1 ? 0x01 : 0) |
+      (this.iff2 ? 0x02 : 0) |
+      (this.halt ? 0x04 : 0) |
+      (this.EI_inst ? 0x08 : 0) |
+      (this.interruptLine ? 0x10 : 0);
     state[2] = this.a | (this.a2 << 8) | (this.f << 16) | (this.f2 << 24); // AF AF'
     state[3] = this.getBC() | (this.getDE() << 16); // BC DE
     state[4] = this.getHL() | (this.r << 16) | (this.i << 24); // HL, r, i
@@ -3884,14 +6768,13 @@ JSSMS.Z80.prototype = {
     return state;
   },
 
-
   /**
    * @param {Array.<number>} state
    */
   setState: function(state) {
     var temp = state[0];
-    this.pc = temp & 0xFFFF;
-    this.sp = (temp >> 16) & 0xFFFF;
+    this.pc = temp & 0xffff;
+    this.sp = (temp >> 16) & 0xffff;
 
     temp = state[1];
     this.iff1 = (temp & 0x01) !== 0;
@@ -3901,39 +6784,39 @@ JSSMS.Z80.prototype = {
     this.interruptLine = (temp & 0x10) !== 0;
 
     temp = state[2];
-    this.a = temp & 0xFF;
-    this.a2 = (temp >> 8) & 0xFF;
-    this.f = (temp >> 16) & 0xFF;
-    this.f2 = (temp >> 24) & 0xFF;
+    this.a = temp & 0xff;
+    this.a2 = (temp >> 8) & 0xff;
+    this.f = (temp >> 16) & 0xff;
+    this.f2 = (temp >> 24) & 0xff;
 
     temp = state[3];
-    this.setBC(temp & 0xFFFF);
-    this.setDE((temp >> 16) & 0xFFFF);
+    this.setBC(temp & 0xffff);
+    this.setDE((temp >> 16) & 0xffff);
 
     temp = state[4];
-    this.setHL(temp & 0xFFFF);
-    this.r = (temp >> 16) & 0xFF;
-    this.i = (temp >> 24) & 0xFF;
+    this.setHL(temp & 0xffff);
+    this.r = (temp >> 16) & 0xff;
+    this.i = (temp >> 24) & 0xff;
 
     temp = state[5];
-    this.setIXHIXL(temp & 0xFFFF);
-    this.setIYHIYL((temp >> 16) & 0xFFFF);
+    this.setIXHIXL(temp & 0xffff);
+    this.setIYHIYL((temp >> 16) & 0xffff);
 
     this.exBC();
     this.exDE();
     this.exHL(); // swap registers
 
     temp = state[6];
-    this.setBC(temp & 0xFFFF);
-    this.setDE((temp >> 16) & 0xFFFF);
+    this.setBC(temp & 0xffff);
+    this.setDE((temp >> 16) & 0xffff);
 
     temp = state[7];
-    this.setHL(temp & 0xFFFF);
-    this.im = (temp >> 16) & 0xFF;
-    this.interruptVector = (temp >> 24) & 0xFF;
+    this.setHL(temp & 0xffff);
+    this.im = (temp >> 16) & 0xff;
+    this.interruptVector = (temp >> 24) & 0xff;
 
     this.exBC();
     this.exDE();
     this.exHL(); // restore registers
-  }
+  },
 };

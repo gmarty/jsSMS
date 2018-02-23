@@ -24,13 +24,11 @@
 /** @const */ var NTSC = 0;
 /** @const */ var PAL = 1;
 
-
 /**
  * X Pixels, including blanking.
  * @const
  */
 var SMS_X_PIXELS = 342;
-
 
 /**
  * Y Pixels (NTSC), including blanking.
@@ -38,13 +36,11 @@ var SMS_X_PIXELS = 342;
  */
 var SMS_Y_PIXELS_NTSC = 262;
 
-
 /**
  * Y Pixels (PAL), including blanking.
  * @const
  */
 var SMS_Y_PIXELS_PAL = 313;
-
 
 /**
  * SMS visible screen width.
@@ -52,13 +48,11 @@ var SMS_Y_PIXELS_PAL = 313;
  */
 var SMS_WIDTH = 256;
 
-
 /**
  * SMS visible screen height.
  * @const
  */
 var SMS_HEIGHT = 192;
-
 
 /**
  * GG visible screen width.
@@ -66,20 +60,17 @@ var SMS_HEIGHT = 192;
  */
 var GG_WIDTH = 160;
 
-
 /**
  * GG visible screen height.
  * @const
  */
 var GG_HEIGHT = 144;
 
-
 /**
  * GG visible window starts here (x).
  * @const
  */
 var GG_X_OFFSET = 48;
-
 
 /**
  * GG window starts here (y).
@@ -99,19 +90,17 @@ var GG_Y_OFFSET = 24;
 /** @const */ var SPRITES_PER_LINE = 8;
 
 /** References into lineSprites table. */
-/** @const */ var SPRITE_COUNT = 0;   // Number of sprites on line
+/** @const */ var SPRITE_COUNT = 0; // Number of sprites on line
 
-/** @const */ var SPRITE_X = 1;       // Sprite X Position
-/** @const */ var SPRITE_Y = 2;       // Sprite Y Position
-/** @const */ var SPRITE_N = 3;       // Sprite Pattern
+/** @const */ var SPRITE_X = 1; // Sprite X Position
+/** @const */ var SPRITE_Y = 2; // Sprite Y Position
+/** @const */ var SPRITE_N = 3; // Sprite Pattern
 
 // Total number of tiles in VRAM
 /** @const */ var TOTAL_TILES = 512;
 
 // Tile size
 /** @const */ var TILE_SIZE = 8;
-
-
 
 /**
  * @constructor
@@ -145,7 +134,7 @@ JSSMS.Vdp = function(sms) {
    */
   this.CRAM = new JSSMS.Utils.Uint8Array(0x20 * 3);
   for (i = 0; i < 0x20 * 3; i++) {
-    this.CRAM[i] = 0xFF;
+    this.CRAM[i] = 0xff;
   }
 
   /**
@@ -277,7 +266,7 @@ JSSMS.Vdp = function(sms) {
    */
   this.lineSprites = new Array(SMS_HEIGHT);
   for (i = 0; i < SMS_HEIGHT; i++) {
-    this.lineSprites[i] = new JSSMS.Utils.Uint8Array(1 + (3 * SPRITES_PER_LINE));
+    this.lineSprites[i] = new JSSMS.Utils.Uint8Array(1 + 3 * SPRITES_PER_LINE);
   }
 
   // Decoded Tiles
@@ -317,8 +306,8 @@ JSSMS.Vdp.prototype = {
     for (i = 0; i < 16; i++) {
       this.vdpreg[i] = 0;
     }
-    this.vdpreg[2] = 0x0E;       // B1-B3 high on startup
-    this.vdpreg[5] = 0x7E;       // B1-B6 high on startup
+    this.vdpreg[2] = 0x0e; // B1-B3 high on startup
+    this.vdpreg[5] = 0x7e; // B1-B6 high on startup
 
     this.vScrollLatch = 0;
 
@@ -333,20 +322,19 @@ JSSMS.Vdp.prototype = {
       this.VRAM[i] = 0;
     }
 
-    for (i = 0; i < (SMS_WIDTH * SMS_HEIGHT * 4); i = i + 4) {
+    for (i = 0; i < SMS_WIDTH * SMS_HEIGHT * 4; i = i + 4) {
       this.display[i] = 0x00;
       this.display[i + 1] = 0x00;
       this.display[i + 2] = 0x00;
-      this.display[i + 3] = 0xFF; // Alpha channel
+      this.display[i + 3] = 0xff; // Alpha channel
     }
   },
-
 
   /**
    * Force full redraw of entire cache.
    */
   forceFullRedraw: function() {
-    this.bgt = (this.vdpreg[2] & 0x0F & ~0x01) << 10;
+    this.bgt = (this.vdpreg[2] & 0x0f & ~0x01) << 10;
     this.minDirty = 0;
     this.maxDirty = TOTAL_TILES - 1;
     for (var i = 0; i < TOTAL_TILES; i++) {
@@ -357,7 +345,6 @@ JSSMS.Vdp.prototype = {
     this.isSatDirty = true;
   },
 
-
   /**
    * Read Vertical Port
    *
@@ -365,19 +352,18 @@ JSSMS.Vdp.prototype = {
    */
   getVCount: function() {
     if (this.videoMode === NTSC) {
-      if (this.line > 0xDA) {
+      if (this.line > 0xda) {
         return this.line - 0x06; // Values from 00 to DA, then jump to D5-FF
       }
     } else {
       // PAL
-      if (this.line > 0xF2) {
+      if (this.line > 0xf2) {
         return this.line - 0x39;
       }
     }
 
     return this.line;
   },
-
 
   /**
    * Read VDP control port (0xBF).
@@ -400,7 +386,6 @@ JSSMS.Vdp.prototype = {
     return statuscopy;
   },
 
-
   /**
    * Write to VDP control port (0xBF).
    *
@@ -411,7 +396,7 @@ JSSMS.Vdp.prototype = {
     if (this.firstByte) {
       this.firstByte = false;
       this.commandByte = value;
-      this.location = (this.location & 0x3F00) | value;
+      this.location = (this.location & 0x3f00) | value;
     } else {
       this.firstByte = true;
       this.operation = (value >> 6) & 3;
@@ -419,10 +404,10 @@ JSSMS.Vdp.prototype = {
 
       // Read value from VRAM
       if (this.operation === 0) {
-        this.readBuffer = this.VRAM[(this.location++) & 0x3FFF] & 0xFF;
+        this.readBuffer = this.VRAM[this.location++ & 0x3fff] & 0xff;
       } else if (this.operation === 2) {
         // Set VDP Register
-        var reg = (value & 0x0F);
+        var reg = value & 0x0f;
 
         switch (reg) {
           // Interrupt Control 0 (Verified using Charles MacDonald test program)
@@ -432,14 +417,20 @@ JSSMS.Vdp.prototype = {
           // IRQ line if bit 4 of register $00 is set, and it will de-assert the IRQ line
           // if the same bit is cleared.
           case 0:
-            if (ACCURATE_INTERRUPT_EMULATION && (this.status & STATUS_HINT) !== 0) {
+            if (
+              ACCURATE_INTERRUPT_EMULATION &&
+              (this.status & STATUS_HINT) !== 0
+            ) {
               this.main.cpu.interruptLine = (this.commandByte & 0x10) !== 0;
             }
             break;
 
           // Interrupt Control 1
           case 1:
-            if (((this.status & STATUS_VINT) !== 0) && (this.commandByte & 0x20) !== 0) {
+            if (
+              (this.status & STATUS_VINT) !== 0 &&
+              (this.commandByte & 0x20) !== 0
+            ) {
               this.main.cpu.interruptLine = true;
             }
 
@@ -453,7 +444,7 @@ JSSMS.Vdp.prototype = {
           // BGT Written
           case 2:
             // Address of Background Table in VRAM
-            this.bgt = (this.commandByte & 0x0F & ~0x01) << 10;
+            this.bgt = (this.commandByte & 0x0f & ~0x01) << 10;
             break;
 
           // SAT Written
@@ -474,7 +465,6 @@ JSSMS.Vdp.prototype = {
     }
   },
 
-
   /**
    * Read VDP data port (0xBE).
    *
@@ -485,11 +475,10 @@ JSSMS.Vdp.prototype = {
     this.firstByte = true; // Reset flag
 
     var value = this.readBuffer; // Stores value to be returned
-    this.readBuffer = this.VRAM[(this.location++) & 0x3FFF] & 0xFF;
+    this.readBuffer = this.VRAM[this.location++ & 0x3fff] & 0xff;
 
     return value;
   },
-
 
   /**
    * Write to VDP data port (0xBE).
@@ -507,12 +496,14 @@ JSSMS.Vdp.prototype = {
       case 0x00:
       case 0x01:
       case 0x02:
-        var address = this.location & 0x3FFF;
+        var address = this.location & 0x3fff;
         // Check VRAM value has actually changed
-        if (value !== (this.VRAM[address] & 0xFF)) {
+        if (value !== (this.VRAM[address] & 0xff)) {
           //if (address >= bgt && address < bgt + BGT_LENGTH); // Don't write dirty to BGT
-          if ((address >= this.sat && address < this.sat + 64) ||
-              (address >= this.sat + 128 && address < this.sat + 256)) {
+          if (
+            (address >= this.sat && address < this.sat + 64) ||
+            (address >= this.sat + 128 && address < this.sat + 256)
+          ) {
             // Don't write dirty to SAT
             this.isSatDirty = true;
           } else {
@@ -536,12 +527,12 @@ JSSMS.Vdp.prototype = {
       // Slightly inaccurate, as CRAM doesn't contain real values, but it is never read by software.
       case 0x03:
         if (this.main.is_sms) {
-          temp = (this.location & 0x1F) * 3;
+          temp = (this.location & 0x1f) * 3;
           this.CRAM[temp] = this.main_JAVA_R[value];
           this.CRAM[temp + 1] = this.main_JAVA_G[value];
           this.CRAM[temp + 2] = this.main_JAVA_B[value];
         } else {
-          temp = ((this.location & 0x3F) >> 1) * 3;
+          temp = ((this.location & 0x3f) >> 1) * 3;
           if (!(this.location & 0x01)) {
             // first byte
             this.CRAM[temp] = this.GG_JAVA_R[value];
@@ -559,7 +550,6 @@ JSSMS.Vdp.prototype = {
 
     this.location++;
   },
-
 
   /**
    * Generate VDP Interrupts.
@@ -592,7 +582,7 @@ JSSMS.Vdp.prototype = {
       }
 
       // Line Interrupts Enabled and Pending. Assert IRQ Line.
-      if (((this.status & STATUS_HINT) !== 0) && ((this.vdpreg[0] & 0x10) !== 0)) {
+      if ((this.status & STATUS_HINT) !== 0 && (this.vdpreg[0] & 0x10) !== 0) {
         this.main.cpu.interruptLine = true;
       }
     } else {
@@ -601,7 +591,11 @@ JSSMS.Vdp.prototype = {
       this.counter = this.vdpreg[10];
 
       // Frame Interrupts Enabled and Pending. Assert IRQ Line.
-      if ((this.status & STATUS_VINT) !== 0 && (this.vdpreg[1] & 0x20) !== 0 && lineno < 224) {
+      if (
+        (this.status & STATUS_VINT) !== 0 &&
+        (this.vdpreg[1] & 0x20) !== 0 &&
+        lineno < 224
+      ) {
         this.main.cpu.interruptLine = true;
       }
 
@@ -612,11 +606,9 @@ JSSMS.Vdp.prototype = {
     }
   },
 
-
   setVBlankFlag: function() {
     this.status |= STATUS_VINT;
   },
-
 
   /**
    * Render Line of SMS/GG Display.
@@ -629,7 +621,10 @@ JSSMS.Vdp.prototype = {
     var colour = 0;
 
     // Check we are in the visible drawing region
-    if (this.main.is_gg && (lineno < GG_Y_OFFSET || lineno >= GG_Y_OFFSET + GG_HEIGHT)) {
+    if (
+      this.main.is_gg &&
+      (lineno < GG_Y_OFFSET || lineno >= GG_Y_OFFSET + GG_HEIGHT)
+    ) {
       return;
     }
 
@@ -659,11 +654,11 @@ JSSMS.Vdp.prototype = {
       }
 
       // Blank Leftmost Column (SMS Only)
-      if (this.main.is_sms && (this.vdpreg[0] & 0x20)) {
+      if (this.main.is_sms && this.vdpreg[0] & 0x20) {
         location = (lineno << 8) * 4;
-        colour = ((this.vdpreg[7] & 0x0F) + 16) * 3;
+        colour = ((this.vdpreg[7] & 0x0f) + 16) * 3;
 
-        for (x = location; x < location + (8 * 4); x = x + 4) {
+        for (x = location; x < location + 8 * 4; x = x + 4) {
           this.display[x] = this.CRAM[colour];
           this.display[x + 1] = this.CRAM[colour + 1];
           this.display[x + 2] = this.CRAM[colour + 2];
@@ -674,7 +669,6 @@ JSSMS.Vdp.prototype = {
       this.drawBGColour(lineno);
     }
   },
-
 
   /**
    * @param {number} lineno
@@ -693,7 +687,7 @@ JSSMS.Vdp.prototype = {
 
     // Top Two Rows Not Affected by Horizontal Scrolling (SMS Only)
     // We don't actually need the SMS check here as we don't draw this line for GG now
-    if (lineno < 16 && ((this.vdpreg[0] & 0x40) !== 0) /*&& this.main.is_sms*/) {
+    if (lineno < 16 && (this.vdpreg[0] & 0x40) !== 0 /*&& this.main.is_sms*/) {
       hscroll = 0;
     }
 
@@ -701,7 +695,7 @@ JSSMS.Vdp.prototype = {
     var lock = this.vdpreg[0] & 0x80;
 
     // Column to start drawing at (0 - 31) [Add extra columns for GG]
-    var tile_column = (32 - (hscroll >> 3)) + this.h_start;
+    var tile_column = 32 - (hscroll >> 3) + this.h_start;
 
     // Row to start drawing at (0 - 27)
     var tile_row = (lineno + vscroll) >> 3;
@@ -718,7 +712,7 @@ JSSMS.Vdp.prototype = {
 
     // Cycle through background table
     for (var tx = this.h_start; tx < this.h_end; tx++) {
-      var tile_props = this.bgt + ((tile_column & 0x1F) << 1) + (tile_row << 6);
+      var tile_props = this.bgt + ((tile_column & 0x1f) << 1) + (tile_row << 6);
       var secondbyte = this.VRAM[tile_props + 1];
 
       // Select Palette (Either 0 or 16)
@@ -728,10 +722,12 @@ JSSMS.Vdp.prototype = {
       var sx = (tx << 3) + (hscroll & 7);
 
       // Do V-Flip (take into account the fact that everything is times 8)
-      var pixY = ((secondbyte & 0x04) === 0) ? tile_y : ((7 << 3) - tile_y);
+      var pixY = (secondbyte & 0x04) === 0 ? tile_y : (7 << 3) - tile_y;
 
       // Pattern Number (0 - 512)
-      var tile = this.tiles[(this.VRAM[tile_props] & 0xFF) + ((secondbyte & 0x01) << 8)];
+      var tile = this.tiles[
+        (this.VRAM[tile_props] & 0xff) + ((secondbyte & 0x01) << 8)
+      ];
 
       // Plot 8 Pixel Row (No H-Flip)
       if (!(secondbyte & 0x02)) {
@@ -741,8 +737,8 @@ JSSMS.Vdp.prototype = {
           temp2 = (colour + pal) * 3;
 
           // Set Priority Array (Sprites over/under background tile)
-          this.bgPriority[sx] = ((secondbyte & 0x10) !== 0) && (colour !== 0);
-          if (sx >= (this.h_start) * 8 && sx < this.h_end * 8) {
+          this.bgPriority[sx] = (secondbyte & 0x10) !== 0 && colour !== 0;
+          if (sx >= this.h_start * 8 && sx < this.h_end * 8) {
             this.display[temp] = this.CRAM[temp2];
             this.display[temp + 1] = this.CRAM[temp2 + 1];
             this.display[temp + 2] = this.CRAM[temp2 + 2];
@@ -756,8 +752,8 @@ JSSMS.Vdp.prototype = {
           temp2 = (colour + pal) * 3;
 
           // Set Priority Array (Sprites over/under background tile)
-          this.bgPriority[sx] = ((secondbyte & 0x10) !== 0) && (colour !== 0);
-          if (sx >= (this.h_start) * 8 && sx < this.h_end * 8) {
+          this.bgPriority[sx] = (secondbyte & 0x10) !== 0 && colour !== 0;
+          if (sx >= this.h_start * 8 && sx < this.h_end * 8) {
             this.display[temp] = this.CRAM[temp2];
             this.display[temp + 1] = this.CRAM[temp2 + 1];
             this.display[temp + 2] = this.CRAM[temp2 + 2];
@@ -773,7 +769,6 @@ JSSMS.Vdp.prototype = {
       }
     }
   },
-
 
   /**
    * Render Line of Sprite Layer.
@@ -799,7 +794,7 @@ JSSMS.Vdp.prototype = {
     var row_precal = lineno << 8;
 
     // Get offset into array
-    var off = (count * 3);
+    var off = count * 3;
 
     // Have to iterate backwards here as we've already cached tiles
     for (; i < count; i++) {
@@ -883,7 +878,11 @@ JSSMS.Vdp.prototype = {
           }
 
           // Plot second pixel
-          if (x + 1 >= this.h_start * 8 && colour !== 0 && !this.bgPriority[x + 1]) {
+          if (
+            x + 1 >= this.h_start * 8 &&
+            colour !== 0 &&
+            !this.bgPriority[x + 1]
+          ) {
             temp = (x + row_precal + 1) * 4;
             temp2 = (colour + 16) * 3;
 
@@ -909,7 +908,6 @@ JSSMS.Vdp.prototype = {
     }
   },
 
-
   /**
    * Draw a line of the current background colour.
    *
@@ -918,15 +916,18 @@ JSSMS.Vdp.prototype = {
   drawBGColour: function(lineno) {
     var x = 0;
     var location = (lineno << 8) * 4;
-    var colour = ((this.vdpreg[7] & 0x0F) + 16) * 3;
+    var colour = ((this.vdpreg[7] & 0x0f) + 16) * 3;
 
-    for (x = location + (this.h_start * 8 * 4); x < location + (this.h_end * 8 * 4); x = x + 4) {
+    for (
+      x = location + this.h_start * 8 * 4;
+      x < location + this.h_end * 8 * 4;
+      x = x + 4
+    ) {
       this.display[x] = this.CRAM[colour];
       this.display[x + 1] = this.CRAM[colour + 1];
       this.display[x + 2] = this.CRAM[colour + 2];
     }
   },
-
 
   // Note we should try not to update the bgt/sat locations?
   decodeTiles: function() {
@@ -947,7 +948,7 @@ JSSMS.Vdp.prototype = {
       var pixel_index = 0;
 
       // 4 bytes per row, total of 32 bytes per tile
-      var address = (i << 5);
+      var address = i << 5;
 
       // Plot column of 8 pixels
       for (var y = 0; y < TILE_SIZE; y++) {
@@ -983,7 +984,6 @@ JSSMS.Vdp.prototype = {
     this.minDirty = TOTAL_TILES;
     this.maxDirty = -1;
   },
-
 
   //  DECODE SAT TABLE
   //
@@ -1033,7 +1033,7 @@ JSSMS.Vdp.prototype = {
     // Search Sprite Attribute Table (64 Bytes)
     for (var spriteno = 0; spriteno < 0x40; spriteno++) {
       // Sprite Y Position
-      var y = this.VRAM[this.sat + spriteno] & 0xFF;
+      var y = this.VRAM[this.sat + spriteno] & 0xff;
 
       // VDP stops drawing if y === 208
       if (y === 208) {
@@ -1050,7 +1050,7 @@ JSSMS.Vdp.prototype = {
 
       for (var lineno = y; lineno < SMS_HEIGHT; lineno++) {
         // Does Sprite fall on this line?
-        if ((lineno - y) < height) {
+        if (lineno - y < height) {
           var sprites = this.lineSprites[lineno];
 
           if (!sprites || sprites[SPRITE_COUNT] >= SPRITES_PER_LINE) {
@@ -1058,19 +1058,19 @@ JSSMS.Vdp.prototype = {
           }
 
           // Get offset into array
-          var off = (sprites[SPRITE_COUNT] * 3) + SPRITE_X;
+          var off = sprites[SPRITE_COUNT] * 3 + SPRITE_X;
 
           // Address of Sprite in Sprite Attribute Table
           var address = this.sat + (spriteno << 1) + 0x80;
 
           // Sprite X Position
-          sprites[off++] = this.VRAM[address++] & 0xFF;
+          sprites[off++] = this.VRAM[address++] & 0xff;
 
           // Sprite Y Position
           sprites[off++] = y;
 
           // Sprite Pattern Index
-          sprites[off++] = this.VRAM[address] & 0xFF;
+          sprites[off++] = this.VRAM[address] & 0xff;
 
           // Increment number of sprites on this scanline
           sprites[SPRITE_COUNT]++;
@@ -1078,7 +1078,6 @@ JSSMS.Vdp.prototype = {
       }
     }
   },
-
 
   // Decode all background tiles
   //
@@ -1102,7 +1101,6 @@ JSSMS.Vdp.prototype = {
     //this.isTileDirty = new JSSMS.Utils.Uint8Array(TOTAL_TILES);
   },
 
-
   // Generated pre-converted palettes.
   //
   // SMS and GG colours are converted to Java RGB for speed purposes.
@@ -1122,71 +1120,99 @@ JSSMS.Vdp.prototype = {
       g = (i >> 2) & 0x03;
       b = (i >> 4) & 0x03;
 
-      this.main_JAVA_R[i] = (r * 85) & 0xFF;
-      this.main_JAVA_G[i] = (g * 85) & 0xFF;
-      this.main_JAVA_B[i] = (b * 85) & 0xFF;
+      this.main_JAVA_R[i] = (r * 85) & 0xff;
+      this.main_JAVA_G[i] = (g * 85) & 0xff;
+      this.main_JAVA_B[i] = (b * 85) & 0xff;
     }
 
     // Convert GG palette.
     // Red & Green
     for (i = 0; i < 0x100; i++) {
-      g = i & 0x0F;
-      b = (i >> 4) & 0x0F;
+      g = i & 0x0f;
+      b = (i >> 4) & 0x0f;
 
       // Shift and fill with the original bitpattern
       // so %1111 becomes %11111111, %1010 becomes %10101010
-      this.GG_JAVA_R[i] = ((g << 4) | g) & 0xFF;
-      this.GG_JAVA_G[i] = ((b << 4) | b) & 0xFF;
+      this.GG_JAVA_R[i] = ((g << 4) | g) & 0xff;
+      this.GG_JAVA_G[i] = ((b << 4) | b) & 0xff;
     }
     // Blue
     for (i = 0; i < 0x10; i++) {
-      this.GG_JAVA_B[i] = ((i << 4) | i) & 0xFF;
+      this.GG_JAVA_B[i] = ((i << 4) | i) & 0xff;
     }
   },
-
 
   // VDP State Saving
   /**
    * @return {Array.<number>}
    */
   getState: function() {
-    var state = new Array(3 + 16 /*this.vdpreg.length*/ + 0x20 /*this.CRAM.length*/);
+    var state = new Array(
+      3 + 16 /*this.vdpreg.length*/ + 0x20 /*this.CRAM.length*/
+    );
 
-    state[0] = this.videoMode | (this.status << 8) | (this.firstByte ? (1 << 16) : 0) | (this.commandByte << 24);
+    state[0] =
+      this.videoMode |
+      (this.status << 8) |
+      (this.firstByte ? 1 << 16 : 0) |
+      (this.commandByte << 24);
     state[1] = this.location | (this.operation << 16) | (this.readBuffer << 24);
     state[2] = this.counter | (this.vScrollLatch << 8) | (this.line << 16);
 
-    JSSMS.Utils.copyArrayElements(this.vdpreg, 0, state, 3, 16 /*this.vdpreg.length*/);
-    JSSMS.Utils.copyArrayElements(this.CRAM, 0, state, 3 + 16 /*this.vdpreg.length*/, 0x20 * 3 /*this.CRAM.length*/);
+    JSSMS.Utils.copyArrayElements(
+      this.vdpreg,
+      0,
+      state,
+      3,
+      16 /*this.vdpreg.length*/
+    );
+    JSSMS.Utils.copyArrayElements(
+      this.CRAM,
+      0,
+      state,
+      3 + 16 /*this.vdpreg.length*/,
+      0x20 * 3 /*this.CRAM.length*/
+    );
 
     return state;
   },
-
 
   /**
    * @param {Array.<number>} state
    */
   setState: function(state) {
     var temp = state[0];
-    this.videoMode = temp & 0xFF;
-    this.status = (temp >> 8) & 0xFF;
-    this.firstByte = ((temp >> 16) & 0xFF) !== 0;
-    this.commandByte = (temp >> 24) & 0xFF;
+    this.videoMode = temp & 0xff;
+    this.status = (temp >> 8) & 0xff;
+    this.firstByte = ((temp >> 16) & 0xff) !== 0;
+    this.commandByte = (temp >> 24) & 0xff;
 
     temp = state[1];
-    this.location = temp & 0xFFFF;
-    this.operation = (temp >> 16) & 0xFF;
-    this.readBuffer = (temp >> 24) & 0xFF;
+    this.location = temp & 0xffff;
+    this.operation = (temp >> 16) & 0xff;
+    this.readBuffer = (temp >> 24) & 0xff;
 
     temp = state[2];
-    this.counter = temp & 0xFF;
-    this.vScrollLatch = (temp >> 8) & 0xFF;
-    this.line = (temp >> 16) & 0xFFFF;
+    this.counter = temp & 0xff;
+    this.vScrollLatch = (temp >> 8) & 0xff;
+    this.line = (temp >> 16) & 0xffff;
 
-    JSSMS.Utils.copyArrayElements(state, 3, this.vdpreg, 0, 16 /*this.vdpreg.length*/);
-    JSSMS.Utils.copyArrayElements(state, 3 + 16 /*this.vdpreg.length*/, this.CRAM, 0, 0x20 * 3 /*this.CRAM.length*/);
+    JSSMS.Utils.copyArrayElements(
+      state,
+      3,
+      this.vdpreg,
+      0,
+      16 /*this.vdpreg.length*/
+    );
+    JSSMS.Utils.copyArrayElements(
+      state,
+      3 + 16 /*this.vdpreg.length*/,
+      this.CRAM,
+      0,
+      0x20 * 3 /*this.CRAM.length*/
+    );
 
     // Force redraw of all cached tile data
     this.forceFullRedraw();
-  }
+  },
 };

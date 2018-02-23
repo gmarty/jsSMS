@@ -19,14 +19,11 @@
 
 'use strict';
 
-
 /**
  * This file is heavily inspired by n64.js.
  */
 
-
 /** @const */ var LOG_LENGTH = 100;
-
 
 /**
  * @todo Use jQuery here.
@@ -74,7 +71,12 @@ function BinaryRequest(method, url, args, data, cb) {
     if (this.response instanceof ArrayBuffer) {
       cb(this.response);
     } else {
-      console.error('Bad response type: ' + typeof(this.response) + ' for ' + JSON.stringify(this.response));
+      console.error(
+        'Bad response type: ' +
+          typeof this.response +
+          ' for ' +
+          JSON.stringify(this.response)
+      );
     }
   };
   xhr.send(data);
@@ -88,7 +90,6 @@ function BinaryRequest(method, url, args, data, cb) {
     return this;
   };
 }
-
 
 /**
  * @constructor
@@ -112,7 +113,6 @@ SyncWriter.prototype = {
     }
   },
 
-
   tick: function() {
     if (!this.curRequest && this.syncBufferIdx > 0) {
       var b = new Uint16Array(this.syncBufferIdx);
@@ -132,26 +132,29 @@ SyncWriter.prototype = {
       this.buffers.splice(0, 1);
       var bytes = buffer.length * 2;
 
-      this.curRequest = new BinaryRequest('POST', '/wsynclog', {
-        o: this.fileOffset,
-        l: bytes
-      }, buffer, function() {
-        self.fileOffset += bytes;
-      })
-        .always(function() {
-          self.curRequest = null;
-        });
+      this.curRequest = new BinaryRequest(
+        'POST',
+        '/wsynclog',
+        {
+          o: this.fileOffset,
+          l: bytes,
+        },
+        buffer,
+        function() {
+          self.fileOffset += bytes;
+        }
+      ).always(function() {
+        self.curRequest = null;
+      });
     }
 
     return this.buffers.length === 0;
   },
 
-
   getAvailableBytes: function() {
     // NB we can always handle full buffers, so return a large number here.
     return 1000000000;
   },
-
 
   /**
    * @param {number} val
@@ -166,7 +169,6 @@ SyncWriter.prototype = {
     this.syncBufferIdx++;
   },
 
-
   reflect16: function(val) {
     if (this.syncBufferIdx >= this.syncBuffer.length) {
       this.flushBuffer();
@@ -175,9 +177,8 @@ SyncWriter.prototype = {
     this.syncBuffer[this.syncBufferIdx] = val;
     this.syncBufferIdx++;
     return val;
-  }
+  },
 };
-
 
 /**
  * @constructor
@@ -204,30 +205,33 @@ SyncReader.prototype = {
     }
   },
 
-
   tick: function() {
     this.refill();
 
     if (!this.nextBuffer && !this.curRequest) {
       var self = this;
 
-      this.curRequest = new BinaryRequest('GET', '/rsynclog', {
-        o: this.fileOffset,
-        l: this.kBufferLength
-      }, undefined, function(result) {
-        self.nextBuffer = new Uint16Array(result);
-        self.fileOffset += result.byteLength;
-      })
-        .always(function() {
-          self.curRequest = null;
-        });
+      this.curRequest = new BinaryRequest(
+        'GET',
+        '/rsynclog',
+        {
+          o: this.fileOffset,
+          l: this.kBufferLength,
+        },
+        undefined,
+        function(result) {
+          self.nextBuffer = new Uint16Array(result);
+          self.fileOffset += result.byteLength;
+        }
+      ).always(function() {
+        self.curRequest = null;
+      });
 
       return false;
     }
 
     return true;
   },
-
 
   getAvailableBytes: function() {
     var ops = 0;
@@ -242,7 +246,6 @@ SyncReader.prototype = {
     return ops * 2;
   },
 
-
   pop: function() {
     if (!this.syncBuffer || this.syncBufferIdx >= this.syncBuffer.length) {
       this.refill();
@@ -256,7 +259,6 @@ SyncReader.prototype = {
 
     return -1;
   },
-
 
   /**
    * @param {number} val
@@ -289,12 +291,11 @@ SyncReader.prototype = {
     }
   },
 
-
   reflect16: function(val) {
     if (this.oos) {
       return val;
     }
     // Ignore val, just return the recorded value from the stream.
     return this.pop();
-  }
+  },
 };
