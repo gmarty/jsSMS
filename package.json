@@ -20,8 +20,7 @@
     "glob": "^4.0.2",
     "grunt": "^0.4.5",
     "grunt-closure-compiler": "^0.0.21",
-    "grunt-contrib-concat": "^0.4.0",
-    "grunt-contrib-htmlmin": "^0.3.0"
+    "grunt-contrib-concat": "^0.4.0"
   },
   "devDependencies": {
     "husky": "^0.14.3",
@@ -36,8 +35,7 @@
     "Game Gear",
     "Sega Game Gear",
     "emulator",
-    "dynamic recompilation",
-    "Alec"
+    "dynamic recompilation"
   ],
   "license": "GPL-3.0",
   "private": false
