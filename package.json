@@ -2,7 +2,7 @@
   "name": "jsSMS",
   "version": "0.0.1",
   "author": "G. C. Marty",
-  "description": "JavaScript Sega Master System &amp; Game Gear dynamic recompiling emulator",
+  "description": "JavaScript Sega Master System & Game Gear dynamic recompiling emulator",
   "bin": {
     "jssms": "./bin/jssms.js"
   },
@@ -10,10 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "main": "./min/jssms.node.js",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/gmarty/jsSMS.git"
-  },
+  "repository": "git://github.com/gmarty/jsSMS.git",
   "dependencies": {
     "closurecompiler-externs": "^1.0.0",
     "glob": "^4.0.2",
@@ -33,5 +30,6 @@
     "dynamic recompilation",
     "Alec"
   ],
-  "license": "GNU GPL"
+  "license": "GPL-3.0",
+  "private": false
 }
