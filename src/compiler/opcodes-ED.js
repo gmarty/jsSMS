@@ -18,7 +18,6 @@
  */
 
 /* global o */
-/* exported opcodeTableED */
 
 'use strict';
 

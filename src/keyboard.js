@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* jshint -W079 */
-
 'use strict';
 
 /** @const */ var P1_KEY_UP = 0x01;

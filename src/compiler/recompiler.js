@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* jshint -W079, -W098 */
+/* global Analyzer, Optimizer, CodeGenerator, Parser */
 
 'use strict';
 

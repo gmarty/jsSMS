@@ -284,7 +284,6 @@ SyncReader.prototype = {
       console.log('%c' + name, 'color: red;', toHex(val), toHex(writtenVal));
 
       if (name === 'pc') {
-        debugger;
         // Flag that we're out of sync so that we don't keep spamming errors.
         //this.oos = true;
       }

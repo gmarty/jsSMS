@@ -18,7 +18,6 @@
  */
 
 /* global n */
-/* exported CodeGenerator */
 
 'use strict';
 

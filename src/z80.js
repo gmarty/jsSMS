@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* jshint -W079 */
-
 'use strict';
 
 /** Speedup hack to set tstates to '0' on halt instruction. */

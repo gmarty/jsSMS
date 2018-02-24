@@ -18,7 +18,6 @@
  */
 
 /* global n */
-/* exported Optimizer */
 
 'use strict';
 
@@ -323,8 +322,9 @@ var Optimizer = (function() {
       return fn.map(function(_ast) {
         _ast = JSSMS.Utils.traverse(_ast, function(ast) {
           if (ast['type'] === 'CallExpression') {
+            var port;
             if (ast['callee']['name'] === 'port.out') {
-              var port = ast['arguments'][0]['value'];
+              port = ast['arguments'][0]['value'];
               var value = ast['arguments'][1];
 
               if (self.main.is_gg && port < 0x07) {
@@ -360,7 +360,7 @@ var Optimizer = (function() {
 
               return ast;
             } else if (ast['callee']['name'] === 'port.in_') {
-              var port = ast['arguments'][0]['value'];
+              port = ast['arguments'][0]['value'];
 
               if (self.main.is_gg && port < 0x07) {
                 switch (port) {
@@ -463,7 +463,6 @@ var Optimizer = (function() {
                     delete ast['arguments'];
                     return ast;
                   }
-                  return ast;
               }
 
               ast['type'] = 'Literal';

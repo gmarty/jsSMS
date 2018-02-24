@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global Bytecode */
+
 'use strict';
 
 /**
@@ -31,7 +33,7 @@ var Parser = (function() {
    * @param {Array.<number>} frameReg
    * @constructor
    */
-  var parser = function(rom, frameReg) {
+  var Parser = function(rom, frameReg) {
     this.stream = new RomStream(rom);
     this.frameReg = frameReg;
 
@@ -45,7 +47,7 @@ var Parser = (function() {
     }
   };
 
-  parser.prototype = {
+  Parser.prototype = {
     /**
      * Add an address to the queue.
      * @param {Object} obj
@@ -1541,5 +1543,5 @@ var Parser = (function() {
     },
   };
 
-  return parser;
+  return Parser;
 })();

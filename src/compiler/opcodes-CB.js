@@ -18,7 +18,6 @@
  */
 
 /* global o */
-/* exported opcodeTableCB, opcodeTableDDCB, opcodeTableFDCB */
 
 'use strict';
 

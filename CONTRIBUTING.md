@@ -2,20 +2,13 @@
 
 ## Coding standard
 
-There is a .jshintrc file at the project root. Your files must be checked against to make sure no
-errors or warnings are present.
-
-If your IDE doesn't support [JSHint](http://www.jshint.com/) natively, you can always install it:
+Make sure your contribution doesn't contain any ESLint errors. To check, run:
 
 ```bash
-$ npm install jshint -g
+$ yarn lint
 ```
 
-Then run:
-
-```bash
-$ jshint myfile.js
-```
+We recommend to enable [ESLint integration in your code editor](https://eslint.org/docs/user-guide/integrations#editors).
 
 ## Coding styles
 

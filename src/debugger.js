@@ -4554,7 +4554,6 @@ JSSMS.Debugger.prototype = {
           }
           return code;
         }
-        break;
 
       // 0xBE VDP Data port
       case 0x80:

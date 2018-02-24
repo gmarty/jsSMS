@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* jshint -W079, -W098 */
-
 'use strict';
 
 /** @const */ var NTSC = 0;

@@ -17,8 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global o, F_CARRY, F_PARITY, F_ZERO, F_SIGN */
-/* exported opcodeTable */
+/* global o, opcodeTableCB, opcodeTableED, generateIndexTable, F_CARRY, F_PARITY, F_ZERO, F_SIGN */
 
 'use strict';
 

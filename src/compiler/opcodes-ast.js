@@ -18,7 +18,6 @@
  */
 
 /* global F_CARRY, F_NEGATIVE, F_PARITY, F_BIT3, F_HALFCARRY, F_ZERO */
-/* exported n */
 
 'use strict';
 

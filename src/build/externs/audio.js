@@ -16,7 +16,7 @@
 
 /**
  * @fileoverview Definitions for the Web Audio API.
- *   This file is based on the　Working Draft 15 March 2012.
+ *   This file is based on the Working Draft 15 March 2012.
  * @see http://www.w3.org/TR/webaudio/
  *
  * @externs
