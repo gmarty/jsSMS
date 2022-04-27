@@ -19,7 +19,7 @@
   "dependencies": {
     "closurecompiler-externs": "^1.0.0",
     "glob": "^4.0.2",
-    "grunt": "^0.4.5",
+    "grunt": "^1.5.2",
     "grunt-closure-compiler": "^0.0.21",
     "grunt-contrib-concat": "^0.4.0"
   },
